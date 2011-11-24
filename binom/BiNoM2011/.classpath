@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/cd4.jar"/>
+	<classpathentry kind="lib" path="lib/csml.jar"/>
+	<classpathentry kind="lib" path="lib/MathMLIO.jar"/>
+	<classpathentry kind="lib" path="lib/sbml.jar"/>
+	<classpathentry kind="lib" path="lib/transpath.jar"/>
+	<classpathentry kind="lib" path="lib/xgmml.jar"/>
+	<classpathentry kind="lib" path="lib/VDAOEngine.jar"/>
+	<classpathentry kind="lib" path="lib/cytoscape270.jar"/>
+	<classpathentry kind="lib" path="lib/giny.jar"/>
+	<classpathentry kind="lib" path="lib/celldesigner.jar"/>
+	<classpathentry kind="lib" path="lib/CellDesigner401Jars.jar"/>
+	<classpathentry kind="lib" path="lib/binomlibext.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/commons-configuration-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/commons-lang-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/jwordpress-0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/xmlrpc-client-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/imgscalr-lib-3.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

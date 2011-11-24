@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph label="Notch.owl" name="Notch.owl" xmlns="http://www.cs.rpi.edu/XGMML">
+  <node id="NICD_4_fragment2" label="NOTCH4_nucleoplasm" name="NOTCH4_nucleoplasm">
+    <att name="BIOPAX_SPECIES" value="NICD_4_fragment2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_3_heterodimer__plasma_membrane_" label="NTM_NEC_3_heterodimer_plasma_membrane" name="NTM_NEC_3_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_3_heterodimer__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_4_fragment1" label="NOTCH4_cytosol" name="NOTCH4_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_4_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="gamma_secretase_complex__plasma_membrane_3" label="gamma_secretase_complex_plasma_membrane" name="gamma_secretase_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="gamma_secretase_complex__plasma_membrane_3" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC3_Notch_ligand_complex__extracellular_region_" label="NTM_NEC3_Notch_ligand_complex_extracellular_region" name="NTM_NEC3_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC3_Notch_ligand_complex__extracellular_region_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_Ligand__plasma_membrane_7" label="human_Delta_1_ligand_plasma_membrane" name="human_Delta_1_ligand_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_Ligand__plasma_membrane_7" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Transmembrane_remnant_3" label="NOTCH3_plasma_membrane" name="NOTCH3_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Transmembrane_remnant_3" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_2_heterodimer__Golgi_lumen_" label="NTM_NEC_2_heterodimer_Golgi_lumen" name="NTM_NEC_2_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_2_heterodimer__Golgi_lumen_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Transmembrane_remnant_1" label="NOTCH1_plasma_membrane" name="NOTCH1_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Transmembrane_remnant_1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC4_Notch_ligand_complex__extracellular_region_" label="NTM_NEC4_Notch_ligand_complex_extracellular_region" name="NTM_NEC4_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC4_Notch_ligand_complex__extracellular_region_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_receptor_precursor2" label="NOTCH2_Golgi_lumen" name="NOTCH2_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_2_receptor_precursor2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_1_fragment1" label="NOTCH1_cytosol" name="NOTCH1_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_1_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Transmembrane_remnant_4" label="NOTCH4_plasma_membrane" name="NOTCH4_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Transmembrane_remnant_4" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_receptor_precursor" label="NOTCH4_endoplasmic_reticulum_lumen" name="NOTCH4_endoplasmic_reticulum_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_4_receptor_precursor" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="furin" label="FUR_Golgi_lumen" name="FUR_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="furin" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_4_fragment" label="NOTCH4_cytosol" name="NOTCH4_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_4_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_receptor_precursor" label="NOTCH1_endoplasmic_reticulum_lumen" name="NOTCH1_endoplasmic_reticulum_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_1_receptor_precursor" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="Notch_4_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane" name="Notch_4_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_4_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC2_Notch_ligand_complex__extracellular_region_2" label="NTM_NEC2_Notch_ligand_complex_extracellular_region" name="NTM_NEC2_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC2_Notch_ligand_complex__extracellular_region_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_3" label="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane" name="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_3" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="furin2" label="FUR_Golgi_lumen" name="FUR_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="furin2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_4_heterodimer__plasma_membrane_" label="NTM_NEC_4_heterodimer_plasma_membrane" name="NTM_NEC_4_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_4_heterodimer__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_NEXT_fragment1" label="NOTCH3_plasma_membrane" name="NOTCH3_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_3_NEXT_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_NEXT_fragment" label="NOTCH3_plasma_membrane" name="NOTCH3_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_3_NEXT_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC4_Notch_ligand_complex__extracellular_region_2" label="NTM_NEC4_Notch_ligand_complex_extracellular_region" name="NTM_NEC4_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC4_Notch_ligand_complex__extracellular_region_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_4_heterodimer__plasma_membrane_2" label="NTM_NEC_4_heterodimer_plasma_membrane" name="NTM_NEC_4_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_4_heterodimer__plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_2" label="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane" name="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_receptor_precursor" label="NOTCH3_endoplasmic_reticulum_lumen" name="NOTCH3_endoplasmic_reticulum_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_3_receptor_precursor" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_NEXT_fragment1" label="NOTCH2_plasma_membrane" name="NOTCH2_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_2_NEXT_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_Ligand__plasma_membrane_" label="human_Delta_1_ligand_plasma_membrane" name="human_Delta_1_ligand_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_Ligand__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_NEXT_fragment1" label="NOTCH4_plasma_membrane" name="NOTCH4_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_4_NEXT_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC1_Notch_ligand_complex__extracellular_region_2" label="NTM_NEC1_Notch_ligand_complex_extracellular_region" name="NTM_NEC1_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC1_Notch_ligand_complex__extracellular_region_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_2_heterodimer__plasma_membrane_" label="NTM_NEC_2_heterodimer_plasma_membrane" name="NTM_NEC_2_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_2_heterodimer__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_receptor_precursor1" label="NOTCH2_Golgi_lumen" name="NOTCH2_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_2_receptor_precursor1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_receptor_precursor" label="NOTCH2_endoplasmic_reticulum_lumen" name="NOTCH2_endoplasmic_reticulum_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_2_receptor_precursor" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="furin3" label="FUR_Golgi_lumen" name="FUR_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="furin3" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_1_fragment" label="NOTCH1_cytosol" name="NOTCH1_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_1_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_1_fragment2" label="NOTCH1_nucleoplasm" name="NOTCH1_nucleoplasm">
+    <att name="BIOPAX_SPECIES" value="NICD_1_fragment2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_3_fragment" label="NOTCH3_cytosol" name="NOTCH3_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_3_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_1_heterodimer__plasma_membrane_2" label="NTM_NEC_1_heterodimer_plasma_membrane" name="NTM_NEC_1_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_1_heterodimer__plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Transmembrane_remnant_2" label="NOTCH2_plasma_membrane" name="NOTCH2_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Transmembrane_remnant_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_3_heterodimer__plasma_membrane_2" label="NTM_NEC_3_heterodimer_plasma_membrane" name="NTM_NEC_3_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_3_heterodimer__plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_receptor_precursor2" label="NOTCH4_Golgi_lumen" name="NOTCH4_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_4_receptor_precursor2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_4_heterodimer__Golgi_lumen_" label="NTM_NEC_4_heterodimer_Golgi_lumen" name="NTM_NEC_4_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_4_heterodimer__Golgi_lumen_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_4_heterodimer__Golgi_lumen_2" label="NTM_NEC_4_heterodimer_Golgi_lumen" name="NTM_NEC_4_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_4_heterodimer__Golgi_lumen_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_receptor_precursor2" label="NOTCH3_Golgi_lumen" name="NOTCH3_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_3_receptor_precursor2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC2_Notch_ligand_complex__extracellular_region_" label="NTM_NEC2_Notch_ligand_complex_extracellular_region" name="NTM_NEC2_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC2_Notch_ligand_complex__extracellular_region_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_3_heterodimer__Golgi_lumen_2" label="NTM_NEC_3_heterodimer_Golgi_lumen" name="NTM_NEC_3_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_3_heterodimer__Golgi_lumen_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_2_heterodimer__Golgi_lumen_2" label="NTM_NEC_2_heterodimer_Golgi_lumen" name="NTM_NEC_2_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_2_heterodimer__Golgi_lumen_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_Ligand__plasma_membrane_3" label="human_Delta_1_ligand_plasma_membrane" name="human_Delta_1_ligand_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_Ligand__plasma_membrane_3" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="gamma_secretase_complex__plasma_membrane_4" label="gamma_secretase_complex_plasma_membrane" name="gamma_secretase_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="gamma_secretase_complex__plasma_membrane_4" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_4" label="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane" name="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_4" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_3_fragment2" label="NOTCH3_nucleoplasm" name="NOTCH3_nucleoplasm">
+    <att name="BIOPAX_SPECIES" value="NICD_3_fragment2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_2_fragment1" label="NOTCH2_cytosol" name="NOTCH2_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_2_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_NEXT_fragment" label="NOTCH2_plasma_membrane" name="NOTCH2_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_2_NEXT_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_receptor_precursor1" label="NOTCH4_Golgi_lumen" name="NOTCH4_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_4_receptor_precursor1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_NEXT_fragment1" label="NOTCH1_plasma_membrane" name="NOTCH1_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_1_NEXT_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_receptor_precursor1" label="NOTCH3_Golgi_lumen" name="NOTCH3_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_3_receptor_precursor1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_4_NEXT_fragment" label="NOTCH4_plasma_membrane" name="NOTCH4_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_4_NEXT_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_receptor_precursor2" label="NOTCH1_Golgi_lumen" name="NOTCH1_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_1_receptor_precursor2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_1_heterodimer__Golgi_lumen_2" label="NTM_NEC_1_heterodimer_Golgi_lumen" name="NTM_NEC_1_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_1_heterodimer__Golgi_lumen_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="gamma_secretase_complex__plasma_membrane_" label="gamma_secretase_complex_plasma_membrane" name="gamma_secretase_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="gamma_secretase_complex__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_receptor_precursor1" label="NOTCH1_Golgi_lumen" name="NOTCH1_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="Notch_1_receptor_precursor1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="gamma_secretase_complex__plasma_membrane_2" label="gamma_secretase_complex_plasma_membrane" name="gamma_secretase_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="gamma_secretase_complex__plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_2_fragment2" label="NOTCH2_nucleoplasm" name="NOTCH2_nucleoplasm">
+    <att name="BIOPAX_SPECIES" value="NICD_2_fragment2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="furin1" label="FUR_Golgi_lumen" name="FUR_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="furin1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_1_heterodimer__Golgi_lumen_" label="NTM_NEC_1_heterodimer_Golgi_lumen" name="NTM_NEC_1_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_1_heterodimer__Golgi_lumen_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="Notch_1_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane" name="Notch_1_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_1_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_3_heterodimer__Golgi_lumen_" label="NTM_NEC_3_heterodimer_Golgi_lumen" name="NTM_NEC_3_heterodimer_Golgi_lumen">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_3_heterodimer__Golgi_lumen_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_1_NEXT_fragment" label="NOTCH1_plasma_membrane" name="NOTCH1_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_1_NEXT_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC1_Notch_ligand_complex__extracellular_region_" label="NTM_NEC1_Notch_ligand_complex_extracellular_region" name="NTM_NEC1_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC1_Notch_ligand_complex__extracellular_region_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_2_heterodimer__plasma_membrane_2" label="NTM_NEC_2_heterodimer_plasma_membrane" name="NTM_NEC_2_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_2_heterodimer__plasma_membrane_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_2_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="Notch_2_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane" name="Notch_2_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_2_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_3_fragment1" label="NOTCH3_cytosol" name="NOTCH3_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_3_fragment1" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NICD_2_fragment" label="NOTCH2_cytosol" name="NOTCH2_cytosol">
+    <att name="BIOPAX_SPECIES" value="NICD_2_fragment" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC_1_heterodimer__plasma_membrane_" label="NTM_NEC_1_heterodimer_plasma_membrane" name="NTM_NEC_1_heterodimer_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC_1_heterodimer__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_" label="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane" name="ADAM_10_metalloprotease_(Zn_cofactor)_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NTM_NEC3_Notch_ligand_complex__extracellular_region_2" label="NTM_NEC3_Notch_ligand_complex_extracellular_region" name="NTM_NEC3_Notch_ligand_complex_extracellular_region">
+    <att name="BIOPAX_SPECIES" value="NTM_NEC3_Notch_ligand_complex__extracellular_region_2" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_3_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="Notch_3_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane" name="Notch_3_ligand_bound_fragment_Notch_ligand_complex_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_3_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="complex" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="Notch_Ligand__plasma_membrane_5" label="human_Delta_1_ligand_plasma_membrane" name="human_Delta_1_ligand_plasma_membrane">
+    <att name="BIOPAX_SPECIES" value="Notch_Ligand__plasma_membrane_5" label="BIOPAX_SPECIES" type="string"/>
+    <att name="BIOPAX_NODE_TYPE" value="protein" label="BIOPAX_NODE_TYPE" type="string"/>
+  </node>
+  <node id="NEXT4_is_cleaved_to_produce_NICD4" label="NEXT4_is_cleaved_to_produce_NICD4" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NEXT4_is_cleaved_to_produce_NICD4" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_4_NEXT_fragment1(LEFT)NEXT4_is_cleaved_to_produce_NICD4" label="LEFT" source="Notch_4_NEXT_fragment1" target="NEXT4_is_cleaved_to_produce_NICD4"/>
+  <edge id="NEXT4_is_cleaved_to_produce_NICD4(RIGHT)NICD_4_fragment" label="RIGHT" source="NEXT4_is_cleaved_to_produce_NICD4" target="NICD_4_fragment"/>
+  <edge id="NEXT4_is_cleaved_to_produce_NICD4(RIGHT)Transmembrane_remnant_4" label="RIGHT" source="NEXT4_is_cleaved_to_produce_NICD4" target="Transmembrane_remnant_4"/>
+  <edge id="gamma_secretase_complex__plasma_membrane_4(fr.curie.BiNoM.pathways.biopax.catalysis)NEXT4_is_cleaved_to_produce_NICD4" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="gamma_secretase_complex__plasma_membrane_4" target="NEXT4_is_cleaved_to_produce_NICD4"/>
+  <node id="NICD1_trafficks_to_the_nucleus" label="NICD1_trafficks_to_the_nucleus" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NICD1_trafficks_to_the_nucleus" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NICD_1_fragment1(LEFT)NICD1_trafficks_to_the_nucleus" label="LEFT" source="NICD_1_fragment1" target="NICD1_trafficks_to_the_nucleus"/>
+  <edge id="NICD1_trafficks_to_the_nucleus(RIGHT)NICD_1_fragment2" label="RIGHT" source="NICD1_trafficks_to_the_nucleus" target="NICD_1_fragment2"/>
+  <node id="Notch_4_precursor_transport_to_golgi" label="Notch_4_precursor_transport_to_golgi" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_4_precursor_transport_to_golgi" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_4_receptor_precursor(LEFT)Notch_4_precursor_transport_to_golgi" label="LEFT" source="Notch_4_receptor_precursor" target="Notch_4_precursor_transport_to_golgi"/>
+  <edge id="Notch_4_precursor_transport_to_golgi(RIGHT)Notch_4_receptor_precursor1" label="RIGHT" source="Notch_4_precursor_transport_to_golgi" target="Notch_4_receptor_precursor1"/>
+  <node id="Notch_1_heterodimer_trafficks_to_the_plasma_membrane" label="Notch_1_heterodimer_trafficks_to_the_plasma_membrane" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_1_heterodimer_trafficks_to_the_plasma_membrane" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_1_heterodimer__Golgi_lumen_2(LEFT)Notch_1_heterodimer_trafficks_to_the_plasma_membrane" label="LEFT" source="NTM_NEC_1_heterodimer__Golgi_lumen_2" target="Notch_1_heterodimer_trafficks_to_the_plasma_membrane"/>
+  <edge id="Notch_1_heterodimer_trafficks_to_the_plasma_membrane(RIGHT)NTM_NEC_1_heterodimer__plasma_membrane_" label="RIGHT" source="Notch_1_heterodimer_trafficks_to_the_plasma_membrane" target="NTM_NEC_1_heterodimer__plasma_membrane_"/>
+  <node id="Notch_2_heterodimer_trafficks_to_the_plasma_membrane" label="Notch_2_heterodimer_trafficks_to_the_plasma_membrane" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_2_heterodimer_trafficks_to_the_plasma_membrane" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_2_heterodimer__Golgi_lumen_2(LEFT)Notch_2_heterodimer_trafficks_to_the_plasma_membrane" label="LEFT" source="NTM_NEC_2_heterodimer__Golgi_lumen_2" target="Notch_2_heterodimer_trafficks_to_the_plasma_membrane"/>
+  <edge id="Notch_2_heterodimer_trafficks_to_the_plasma_membrane(RIGHT)NTM_NEC_2_heterodimer__plasma_membrane_" label="RIGHT" source="Notch_2_heterodimer_trafficks_to_the_plasma_membrane" target="NTM_NEC_2_heterodimer__plasma_membrane_"/>
+  <node id="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" label="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC2_Notch_ligand_complex__extracellular_region_2(LEFT)Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" label="LEFT" source="NTM_NEC2_Notch_ligand_complex__extracellular_region_2" target="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2"/>
+  <edge id="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2(RIGHT)Notch_2_NEXT_fragment" label="RIGHT" source="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" target="Notch_2_NEXT_fragment"/>
+  <edge id="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2(RIGHT)Notch_2_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="RIGHT" source="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" target="Notch_2_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_"/>
+  <edge id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_2(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_2" target="Notch_2_ligand_complex_is_cleaved_to_produce_NEXT2"/>
+  <node id="NICD3_trafficks_to_the_nucleus" label="NICD3_trafficks_to_the_nucleus" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NICD3_trafficks_to_the_nucleus" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NICD_3_fragment1(LEFT)NICD3_trafficks_to_the_nucleus" label="LEFT" source="NICD_3_fragment1" target="NICD3_trafficks_to_the_nucleus"/>
+  <edge id="NICD3_trafficks_to_the_nucleus(RIGHT)NICD_3_fragment2" label="RIGHT" source="NICD3_trafficks_to_the_nucleus" target="NICD_3_fragment2"/>
+  <node id="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_2_heterodimer__plasma_membrane_2(LEFT)Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="NTM_NEC_2_heterodimer__plasma_membrane_2" target="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_Ligand__plasma_membrane_3(LEFT)Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="Notch_Ligand__plasma_membrane_3" target="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space(RIGHT)NTM_NEC2_Notch_ligand_complex__extracellular_region_" label="RIGHT" source="Notch_2_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" target="NTM_NEC2_Notch_ligand_complex__extracellular_region_"/>
+  <node id="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_Ligand__plasma_membrane_(LEFT)Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="Notch_Ligand__plasma_membrane_" target="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="NTM_NEC_1_heterodimer__plasma_membrane_2(LEFT)Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="NTM_NEC_1_heterodimer__plasma_membrane_2" target="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space(RIGHT)NTM_NEC1_Notch_ligand_complex__extracellular_region_" label="RIGHT" source="Notch_1_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" target="NTM_NEC1_Notch_ligand_complex__extracellular_region_"/>
+  <node id="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" label="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC3_Notch_ligand_complex__extracellular_region_2(LEFT)Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" label="LEFT" source="NTM_NEC3_Notch_ligand_complex__extracellular_region_2" target="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3"/>
+  <edge id="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3(RIGHT)Notch_3_NEXT_fragment" label="RIGHT" source="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" target="Notch_3_NEXT_fragment"/>
+  <edge id="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3(RIGHT)Notch_3_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="RIGHT" source="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" target="Notch_3_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_"/>
+  <edge id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_3(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_3" target="Notch_3_ligand_complex_is_cleaved_to_produce_NEXT3"/>
+  <node id="NEXT3_is_cleaved_to_produce_NICD3" label="NEXT3_is_cleaved_to_produce_NICD3" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NEXT3_is_cleaved_to_produce_NICD3" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_3_NEXT_fragment1(LEFT)NEXT3_is_cleaved_to_produce_NICD3" label="LEFT" source="Notch_3_NEXT_fragment1" target="NEXT3_is_cleaved_to_produce_NICD3"/>
+  <edge id="NEXT3_is_cleaved_to_produce_NICD3(RIGHT)NICD_3_fragment" label="RIGHT" source="NEXT3_is_cleaved_to_produce_NICD3" target="NICD_3_fragment"/>
+  <edge id="NEXT3_is_cleaved_to_produce_NICD3(RIGHT)Transmembrane_remnant_3" label="RIGHT" source="NEXT3_is_cleaved_to_produce_NICD3" target="Transmembrane_remnant_3"/>
+  <edge id="gamma_secretase_complex__plasma_membrane_3(fr.curie.BiNoM.pathways.biopax.catalysis)NEXT3_is_cleaved_to_produce_NICD3" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="gamma_secretase_complex__plasma_membrane_3" target="NEXT3_is_cleaved_to_produce_NICD3"/>
+  <node id="Notch_1_precursor_cleaved_to_form_a_heterodimer" label="Notch_1_precursor_cleaved_to_form_a_heterodimer" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_1_precursor_cleaved_to_form_a_heterodimer" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_1_receptor_precursor2(LEFT)Notch_1_precursor_cleaved_to_form_a_heterodimer" label="LEFT" source="Notch_1_receptor_precursor2" target="Notch_1_precursor_cleaved_to_form_a_heterodimer"/>
+  <edge id="Notch_1_precursor_cleaved_to_form_a_heterodimer(RIGHT)NTM_NEC_1_heterodimer__Golgi_lumen_" label="RIGHT" source="Notch_1_precursor_cleaved_to_form_a_heterodimer" target="NTM_NEC_1_heterodimer__Golgi_lumen_"/>
+  <edge id="furin(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_1_precursor_cleaved_to_form_a_heterodimer" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="furin" target="Notch_1_precursor_cleaved_to_form_a_heterodimer"/>
+  <node id="Notch_1_precursor_transport_to_golgi" label="Notch_1_precursor_transport_to_golgi" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_1_precursor_transport_to_golgi" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_1_receptor_precursor(LEFT)Notch_1_precursor_transport_to_golgi" label="LEFT" source="Notch_1_receptor_precursor" target="Notch_1_precursor_transport_to_golgi"/>
+  <edge id="Notch_1_precursor_transport_to_golgi(RIGHT)Notch_1_receptor_precursor1" label="RIGHT" source="Notch_1_precursor_transport_to_golgi" target="Notch_1_receptor_precursor1"/>
+  <node id="Notch_3_precursor_transport_to_golgi" label="Notch_3_precursor_transport_to_golgi" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_3_precursor_transport_to_golgi" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_3_receptor_precursor(LEFT)Notch_3_precursor_transport_to_golgi" label="LEFT" source="Notch_3_receptor_precursor" target="Notch_3_precursor_transport_to_golgi"/>
+  <edge id="Notch_3_precursor_transport_to_golgi(RIGHT)Notch_3_receptor_precursor1" label="RIGHT" source="Notch_3_precursor_transport_to_golgi" target="Notch_3_receptor_precursor1"/>
+  <node id="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_Ligand__plasma_membrane_5(LEFT)Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="Notch_Ligand__plasma_membrane_5" target="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="NTM_NEC_3_heterodimer__plasma_membrane_2(LEFT)Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="NTM_NEC_3_heterodimer__plasma_membrane_2" target="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space(RIGHT)NTM_NEC3_Notch_ligand_complex__extracellular_region_" label="RIGHT" source="Notch_3_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" target="NTM_NEC3_Notch_ligand_complex__extracellular_region_"/>
+  <node id="Notch_3_precursor_cleaved_to_form_a_heterodimer" label="Notch_3_precursor_cleaved_to_form_a_heterodimer" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_3_precursor_cleaved_to_form_a_heterodimer" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_3_receptor_precursor2(LEFT)Notch_3_precursor_cleaved_to_form_a_heterodimer" label="LEFT" source="Notch_3_receptor_precursor2" target="Notch_3_precursor_cleaved_to_form_a_heterodimer"/>
+  <edge id="Notch_3_precursor_cleaved_to_form_a_heterodimer(RIGHT)NTM_NEC_3_heterodimer__Golgi_lumen_" label="RIGHT" source="Notch_3_precursor_cleaved_to_form_a_heterodimer" target="NTM_NEC_3_heterodimer__Golgi_lumen_"/>
+  <edge id="furin2(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_3_precursor_cleaved_to_form_a_heterodimer" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="furin2" target="Notch_3_precursor_cleaved_to_form_a_heterodimer"/>
+  <node id="NEXT2_is_cleaved_to_produce_NICD2" label="NEXT2_is_cleaved_to_produce_NICD2" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NEXT2_is_cleaved_to_produce_NICD2" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_2_NEXT_fragment1(LEFT)NEXT2_is_cleaved_to_produce_NICD2" label="LEFT" source="Notch_2_NEXT_fragment1" target="NEXT2_is_cleaved_to_produce_NICD2"/>
+  <edge id="NEXT2_is_cleaved_to_produce_NICD2(RIGHT)NICD_2_fragment" label="RIGHT" source="NEXT2_is_cleaved_to_produce_NICD2" target="NICD_2_fragment"/>
+  <edge id="NEXT2_is_cleaved_to_produce_NICD2(RIGHT)Transmembrane_remnant_2" label="RIGHT" source="NEXT2_is_cleaved_to_produce_NICD2" target="Transmembrane_remnant_2"/>
+  <edge id="gamma_secretase_complex__plasma_membrane_2(fr.curie.BiNoM.pathways.biopax.catalysis)NEXT2_is_cleaved_to_produce_NICD2" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="gamma_secretase_complex__plasma_membrane_2" target="NEXT2_is_cleaved_to_produce_NICD2"/>
+  <node id="Notch_4_heterodimer_trafficks_to_the_plasma_membrane" label="Notch_4_heterodimer_trafficks_to_the_plasma_membrane" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_4_heterodimer_trafficks_to_the_plasma_membrane" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_4_heterodimer__Golgi_lumen_2(LEFT)Notch_4_heterodimer_trafficks_to_the_plasma_membrane" label="LEFT" source="NTM_NEC_4_heterodimer__Golgi_lumen_2" target="Notch_4_heterodimer_trafficks_to_the_plasma_membrane"/>
+  <edge id="Notch_4_heterodimer_trafficks_to_the_plasma_membrane(RIGHT)NTM_NEC_4_heterodimer__plasma_membrane_" label="RIGHT" source="Notch_4_heterodimer_trafficks_to_the_plasma_membrane" target="NTM_NEC_4_heterodimer__plasma_membrane_"/>
+  <node id="NICD4_trafficks_to_the_nucleus" label="NICD4_trafficks_to_the_nucleus" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NICD4_trafficks_to_the_nucleus" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NICD_4_fragment1(LEFT)NICD4_trafficks_to_the_nucleus" label="LEFT" source="NICD_4_fragment1" target="NICD4_trafficks_to_the_nucleus"/>
+  <edge id="NICD4_trafficks_to_the_nucleus(RIGHT)NICD_4_fragment2" label="RIGHT" source="NICD4_trafficks_to_the_nucleus" target="NICD_4_fragment2"/>
+  <node id="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_4_heterodimer__plasma_membrane_2(LEFT)Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="NTM_NEC_4_heterodimer__plasma_membrane_2" target="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_Ligand__plasma_membrane_7(LEFT)Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" label="LEFT" source="Notch_Ligand__plasma_membrane_7" target="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space"/>
+  <edge id="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space(RIGHT)NTM_NEC4_Notch_ligand_complex__extracellular_region_" label="RIGHT" source="Notch_4_heterodimer_binds_with_a_Notch_ligand_in_the_extracellular_space" target="NTM_NEC4_Notch_ligand_complex__extracellular_region_"/>
+  <node id="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" label="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC1_Notch_ligand_complex__extracellular_region_2(LEFT)Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" label="LEFT" source="NTM_NEC1_Notch_ligand_complex__extracellular_region_2" target="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1"/>
+  <edge id="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1(RIGHT)Notch_1_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="RIGHT" source="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" target="Notch_1_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_"/>
+  <edge id="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1(RIGHT)Notch_1_NEXT_fragment" label="RIGHT" source="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" target="Notch_1_NEXT_fragment"/>
+  <edge id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_" target="Notch_1_ligand_complex_is_cleaved_to_produce_NEXT1"/>
+  <node id="Notch_3_heterodimer_trafficks_to_the_plasma_membrane" label="Notch_3_heterodimer_trafficks_to_the_plasma_membrane" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_3_heterodimer_trafficks_to_the_plasma_membrane" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC_3_heterodimer__Golgi_lumen_2(LEFT)Notch_3_heterodimer_trafficks_to_the_plasma_membrane" label="LEFT" source="NTM_NEC_3_heterodimer__Golgi_lumen_2" target="Notch_3_heterodimer_trafficks_to_the_plasma_membrane"/>
+  <edge id="Notch_3_heterodimer_trafficks_to_the_plasma_membrane(RIGHT)NTM_NEC_3_heterodimer__plasma_membrane_" label="RIGHT" source="Notch_3_heterodimer_trafficks_to_the_plasma_membrane" target="NTM_NEC_3_heterodimer__plasma_membrane_"/>
+  <node id="Notch_2_precursor_cleaved_to_form_a_heterodimer" label="Notch_2_precursor_cleaved_to_form_a_heterodimer" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_2_precursor_cleaved_to_form_a_heterodimer" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_2_receptor_precursor2(LEFT)Notch_2_precursor_cleaved_to_form_a_heterodimer" label="LEFT" source="Notch_2_receptor_precursor2" target="Notch_2_precursor_cleaved_to_form_a_heterodimer"/>
+  <edge id="Notch_2_precursor_cleaved_to_form_a_heterodimer(RIGHT)NTM_NEC_2_heterodimer__Golgi_lumen_" label="RIGHT" source="Notch_2_precursor_cleaved_to_form_a_heterodimer" target="NTM_NEC_2_heterodimer__Golgi_lumen_"/>
+  <edge id="furin1(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_2_precursor_cleaved_to_form_a_heterodimer" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="furin1" target="Notch_2_precursor_cleaved_to_form_a_heterodimer"/>
+  <node id="Notch_4_precursor_cleaved_to_form_a_heterodimer" label="Notch_4_precursor_cleaved_to_form_a_heterodimer" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_4_precursor_cleaved_to_form_a_heterodimer" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_4_receptor_precursor2(LEFT)Notch_4_precursor_cleaved_to_form_a_heterodimer" label="LEFT" source="Notch_4_receptor_precursor2" target="Notch_4_precursor_cleaved_to_form_a_heterodimer"/>
+  <edge id="Notch_4_precursor_cleaved_to_form_a_heterodimer(RIGHT)NTM_NEC_4_heterodimer__Golgi_lumen_" label="RIGHT" source="Notch_4_precursor_cleaved_to_form_a_heterodimer" target="NTM_NEC_4_heterodimer__Golgi_lumen_"/>
+  <edge id="furin3(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_4_precursor_cleaved_to_form_a_heterodimer" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="furin3" target="Notch_4_precursor_cleaved_to_form_a_heterodimer"/>
+  <node id="NEXT1_is_cleaved_to_produce_NICD1" label="NEXT1_is_cleaved_to_produce_NICD1" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NEXT1_is_cleaved_to_produce_NICD1" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_1_NEXT_fragment1(LEFT)NEXT1_is_cleaved_to_produce_NICD1" label="LEFT" source="Notch_1_NEXT_fragment1" target="NEXT1_is_cleaved_to_produce_NICD1"/>
+  <edge id="NEXT1_is_cleaved_to_produce_NICD1(RIGHT)Transmembrane_remnant_1" label="RIGHT" source="NEXT1_is_cleaved_to_produce_NICD1" target="Transmembrane_remnant_1"/>
+  <edge id="NEXT1_is_cleaved_to_produce_NICD1(RIGHT)NICD_1_fragment" label="RIGHT" source="NEXT1_is_cleaved_to_produce_NICD1" target="NICD_1_fragment"/>
+  <edge id="gamma_secretase_complex__plasma_membrane_(fr.curie.BiNoM.pathways.biopax.catalysis)NEXT1_is_cleaved_to_produce_NICD1" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="gamma_secretase_complex__plasma_membrane_" target="NEXT1_is_cleaved_to_produce_NICD1"/>
+  <node id="Notch_2_precursor_transport_to_golgi" label="Notch_2_precursor_transport_to_golgi" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_2_precursor_transport_to_golgi" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="Notch_2_receptor_precursor(LEFT)Notch_2_precursor_transport_to_golgi" label="LEFT" source="Notch_2_receptor_precursor" target="Notch_2_precursor_transport_to_golgi"/>
+  <edge id="Notch_2_precursor_transport_to_golgi(RIGHT)Notch_2_receptor_precursor1" label="RIGHT" source="Notch_2_precursor_transport_to_golgi" target="Notch_2_receptor_precursor1"/>
+  <node id="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" label="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NTM_NEC4_Notch_ligand_complex__extracellular_region_2(LEFT)Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" label="LEFT" source="NTM_NEC4_Notch_ligand_complex__extracellular_region_2" target="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4"/>
+  <edge id="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4(RIGHT)Notch_4_NEXT_fragment" label="RIGHT" source="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" target="Notch_4_NEXT_fragment"/>
+  <edge id="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4(RIGHT)Notch_4_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_" label="RIGHT" source="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" target="Notch_4_ligand_bound_fragment_Notch_ligand_complex__plasma_membrane_"/>
+  <edge id="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_4(fr.curie.BiNoM.pathways.biopax.catalysis)Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4" label="fr.curie.BiNoM.pathways.biopax.catalysis" source="ADAM_10_metalloprotease__Zn_cofactor___plasma_membrane_4" target="Notch_4_ligand_complex_is_cleaved_to_produce_NEXT4"/>
+  <node id="NICD2_trafficks_to_the_nucleus" label="NICD2_trafficks_to_the_nucleus" name="reaction">
+    <att name="BIOPAX_NODE_TYPE" value="fr.curie.BiNoM.pathways.biopax.biochemicalReaction" label="BIOPAX_NODE_TYPE" type="string"/>
+    <att name="BIOPAX_REACTION" value="NICD2_trafficks_to_the_nucleus" label="BIOPAX_REACTION" type="string"/>
+  </node>
+  <edge id="NICD_2_fragment1(LEFT)NICD2_trafficks_to_the_nucleus" label="LEFT" source="NICD_2_fragment1" target="NICD2_trafficks_to_the_nucleus"/>
+  <edge id="NICD2_trafficks_to_the_nucleus(RIGHT)NICD_2_fragment2" label="RIGHT" source="NICD2_trafficks_to_the_nucleus" target="NICD_2_fragment2"/>
+</graph>

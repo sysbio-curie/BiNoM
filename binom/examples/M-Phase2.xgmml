@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph label="M-Phase2.xml" name="M-Phase2.xml" xmlns="http://www.cs.rpi.edu/XGMML">
+  <node id="s60_a25" label="Cdc13/Cdc2" name="Cdc13/Cdc2">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s60" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a25" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="794.2191895613155" y="269.6660052910056"/>
+  </node>
+  <node id="re2" label="re2" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re2" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="729.2364634671771" y="149.61650091947368"/>
+  </node>
+  <edge id="s60_a25(LEFT)re2" label="LEFT" source="s60_a25" target="re2"/>
+  <node id="s61_a26" label="Cdc13/Cdc2_Tyr15_pho" name="Cdc13/Cdc2_Tyr15_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s61" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a26" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="664.2537373730388" y="29.56699654794177"/>
+  </node>
+  <edge id="re2(RIGHT)s61_a26" label="RIGHT" source="re2" target="s61_a26"/>
+  <node id="s3_a3" label="Wee1" name="Wee1">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s3" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a3" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="560.0" y="190.0"/>
+  </node>
+  <edge id="s3_a3(CATALYSIS)re2" label="CATALYSIS" source="s3_a3" target="re2"/>
+  <node id="re3" label="re3" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re3" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="542.6268686865194" y="29.17900091947355"/>
+  </node>
+  <edge id="s61_a26(LEFT)re3" label="LEFT" source="s61_a26" target="re3"/>
+  <node id="s62_a27" label="Cdc13/Cdc2_Thr14_pho_Tyr15_pho" name="Cdc13/Cdc2_Thr14_pho_Tyr15_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s62" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a27" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="421.0" y="28.791005291005327"/>
+  </node>
+  <edge id="re3(RIGHT)s62_a27" label="RIGHT" source="re3" target="s62_a27"/>
+  <edge id="s3_a3(CATALYSIS)re3" label="CATALYSIS" source="s3_a3" target="re3"/>
+  <node id="re4" label="re4" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re4" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="328.75" y="109.42900091947348"/>
+  </node>
+  <edge id="s62_a27(LEFT)re4" label="LEFT" source="s62_a27" target="re4"/>
+  <node id="s63_a28" label="Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho" name="Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s63" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a28" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="236.5" y="190.06699654794164"/>
+  </node>
+  <edge id="re4(RIGHT)s63_a28" label="RIGHT" source="re4" target="s63_a28"/>
+  <node id="s5_a5" label="CAK" name="CAK">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s5" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a5" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="240.0" y="80.0"/>
+  </node>
+  <edge id="s5_a5(CATALYSIS)re4" label="CATALYSIS" source="s5_a5" target="re4"/>
+  <node id="re5" label="re5" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re5" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="235.73889575665197" y="329.56699654794215"/>
+  </node>
+  <edge id="s63_a28(LEFT)re5" label="LEFT" source="s63_a28" target="re5"/>
+  <node id="s57_a29" label="Cdc13/Cdc2_Thr167_pho" name="Cdc13/Cdc2_Thr167_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s57" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a29" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="234.97779151330394" y="469.0669965479427"/>
+  </node>
+  <edge id="re5(RIGHT)s57_a29" label="RIGHT" source="re5" target="s57_a29"/>
+  <node id="s26_a7" label="Cdc25_pho_active" name="Cdc25_pho_active">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s26" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a7" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="168.0" y="380.0"/>
+  </node>
+  <edge id="s26_a7(CATALYSIS)re5" label="CATALYSIS" source="s26_a7" target="re5"/>
+  <node id="s2_sa39" label="Cdc13'" name="Cdc13'">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s2" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="sa39" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="339.0" y="350.3544973544972"/>
+  </node>
+  <edge id="s2_sa39(CATALYSIS)re5" label="CATALYSIS" source="s2_sa39" target="re5"/>
+  <node id="s6_a6" label="Lamin_hm8" name="Lamin_hm8">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s6" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a6" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="31.0" y="776.0"/>
+  </node>
+  <node id="re6" label="re6" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re6" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="133.5" y="785.75"/>
+  </node>
+  <edge id="s6_a6(LEFT)re6" label="LEFT" source="s6_a6" target="re6"/>
+  <node id="s14_a23" label="Lamin_pho" name="Lamin_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s14" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a23" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="236.0" y="795.5"/>
+  </node>
+  <edge id="re6(RIGHT)s14_a23" label="RIGHT" source="re6" target="s14_a23"/>
+  <edge id="s57_a29(CATALYSIS)re6" label="CATALYSIS" source="s57_a29" target="re6"/>
+  <node id="re7" label="re7" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re7" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="505.5" y="797.75"/>
+  </node>
+  <edge id="s14_a23(LEFT)re7" label="LEFT" source="s14_a23" target="re7"/>
+  <node id="s15_a24" label="M-Phase" name="M-Phase">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PHENOTYPE" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s15" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a24" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="775.0" y="800.0"/>
+  </node>
+  <edge id="re7(RIGHT)s15_a24" label="RIGHT" source="re7" target="s15_a24"/>
+  <node id="s13_a32" label="Cdc2_Thr167_pho" name="Cdc2_Thr167_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s13" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a32" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="509.238895756652" y="552.7964939024389"/>
+  </node>
+  <node id="re10" label="re10" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re10" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="631.119447878326" y="553.1243593509438"/>
+  </node>
+  <edge id="s13_a32(LEFT)re10" label="LEFT" source="s13_a32" target="re10"/>
+  <node id="s1_a10" label="Cdc2" name="Cdc2">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s1" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a10" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="753.0" y="553.4522247994487"/>
+  </node>
+  <edge id="re10(RIGHT)s1_a10" label="RIGHT" source="re10" target="s1_a10"/>
+  <node id="re11" label="re11" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="DISSOCIATION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re11" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="418.0722290899853" y="554.4544968167938"/>
+  </node>
+  <edge id="s57_a29(LEFT)re11" label="LEFT" source="s57_a29" target="re11"/>
+  <edge id="re11(RIGHT)s13_a32" label="RIGHT" source="re11" target="s13_a32"/>
+  <node id="s31_a16" label="Cdc13_ubi" name="Cdc13_ubi">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s31" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a16" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="510.0" y="641.5"/>
+  </node>
+  <edge id="re11(RIGHT)s31_a16" label="RIGHT" source="re11" target="s31_a16"/>
+  <node id="s53_csa9" label="APC/Slp1_active" name="APC/Slp1_active">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s53" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="csa9" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="340.49999999999824" y="640.0"/>
+  </node>
+  <edge id="s53_csa9(CATALYSIS)re11" label="CATALYSIS" source="s53_csa9" target="re11"/>
+  <node id="re12" label="re12" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re12" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="543.8168829663759" y="700.908419377059"/>
+  </node>
+  <edge id="s31_a16(LEFT)re12" label="LEFT" source="s31_a16" target="re12"/>
+  <node id="re14" label="re14" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re14" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="560.5" y="235.0"/>
+  </node>
+  <edge id="s3_a3(LEFT)re14" label="LEFT" source="s3_a3" target="re14"/>
+  <node id="s24_a36" label="Wee1_pho" name="Wee1_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s24" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a36" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="561.0" y="280.0"/>
+  </node>
+  <edge id="re14(RIGHT)s24_a36" label="RIGHT" source="re14" target="s24_a36"/>
+  <edge id="s57_a29(CATALYSIS)re14" label="CATALYSIS" source="s57_a29" target="re14"/>
+  <node id="s7_a38" label="Cdc25" name="Cdc25">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s7" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a38" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="32.5" y="380.5"/>
+  </node>
+  <node id="re15" label="re15" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re15" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="100.25" y="380.25"/>
+  </node>
+  <edge id="s7_a38(LEFT)re15" label="LEFT" source="s7_a38" target="re15"/>
+  <edge id="re15(RIGHT)s26_a7" label="RIGHT" source="re15" target="s26_a7"/>
+  <edge id="s57_a29(CATALYSIS)re15" label="CATALYSIS" source="s57_a29" target="re15"/>
+  <node id="s27_a39" label="Plo1" name="Plo1">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s27" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a39" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="60.0" y="443.0"/>
+  </node>
+  <edge id="s27_a39(CATALYSIS)re15" label="CATALYSIS" source="s27_a39" target="re15"/>
+  <node id="re16" label="re16" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re16" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="100.25" y="380.25"/>
+  </node>
+  <edge id="s26_a7(LEFT)re16" label="LEFT" source="s26_a7" target="re16"/>
+  <edge id="re16(RIGHT)s7_a38" label="RIGHT" source="re16" target="s7_a38"/>
+  <node id="s8_a8" label="PP2A" name="PP2A">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s8" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a8" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="110.0" y="320.0"/>
+  </node>
+  <edge id="s8_a8(CATALYSIS)re16" label="CATALYSIS" source="s8_a8" target="re16"/>
+  <node id="re17" label="re17" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re17" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="804.7397298537718" y="459.87274336348474"/>
+  </node>
+  <edge id="s1_a10(LEFT)re17" label="LEFT" source="s1_a10" target="re17"/>
+  <node id="s2_a40" label="Cdc13" name="Cdc13">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s2" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a40" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="867.0" y="556.5"/>
+  </node>
+  <edge id="s2_a40(LEFT)re17" label="LEFT" source="s2_a40" target="re17"/>
+  <edge id="re17(RIGHT)s60_a25" label="RIGHT" source="re17" target="s60_a25"/>
+  <node id="s32_a50" label="Rum1" name="Rum1">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s32" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a50" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="456.0" y="430.5"/>
+  </node>
+  <node id="re20" label="re20" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re20" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="456.0" y="382.5"/>
+  </node>
+  <edge id="s32_a50(LEFT)re20" label="LEFT" source="s32_a50" target="re20"/>
+  <node id="s34_a49" label="Rum1_pho" name="Rum1_pho">
+    <att name="CELLDESIGNER_NODE_TYPE" value="PROTEIN" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s34" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a49" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="456.0" y="334.5"/>
+  </node>
+  <edge id="re20(RIGHT)s34_a49" label="RIGHT" source="re20" target="s34_a49"/>
+  <edge id="s57_a29(CATALYSIS)re20" label="CATALYSIS" source="s57_a29" target="re20"/>
+  <node id="re23" label="re23" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re23" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="500.61207355958743" y="291.39825855266304"/>
+  </node>
+  <edge id="s34_a49(LEFT)re23" label="LEFT" source="s34_a49" target="re23"/>
+  <node id="re24" label="re24" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re24" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="425.344007946089" y="427.71133103196183"/>
+  </node>
+  <edge id="s57_a29(LEFT)re24" label="LEFT" source="s57_a29" target="re24"/>
+  <edge id="s32_a50(LEFT)re24" label="LEFT" source="s32_a50" target="re24"/>
+  <node id="s59_a75" label="Cdc13/Cdc2_Thr167_pho/Rum1" name="Cdc13/Cdc2_Thr167_pho/Rum1">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s59" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a75" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="585.0542323249629" y="383.5669965479427"/>
+  </node>
+  <edge id="re24(RIGHT)s59_a75" label="RIGHT" source="re24" target="s59_a75"/>
+  <node id="s56_a43" label="Slp1/APC" name="Slp1/APC">
+    <att name="CELLDESIGNER_NODE_TYPE" value="COMPLEX" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s56" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="a43" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="183.99999999999818" y="639.0"/>
+  </node>
+  <node id="re25" label="re25" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re25" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="262.2499999999982" y="639.5"/>
+  </node>
+  <edge id="s56_a43(LEFT)re25" label="LEFT" source="s56_a43" target="re25"/>
+  <edge id="re25(RIGHT)s53_csa9" label="RIGHT" source="re25" target="s53_csa9"/>
+  <edge id="s57_a29(CATALYSIS)re25" label="CATALYSIS" source="s57_a29" target="re25"/>
+  <node id="s64_sa38" label="gCdc13" name="gCdc13">
+    <att name="CELLDESIGNER_NODE_TYPE" value="GENE" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_SPECIES" value="s64" label="CELLDESIGNER_SPECIES" type="string"/>
+    <att name="CELLDESIGNER_ALIAS" value="sa38" label="CELLDESIGNER_ALIAS" type="string"/>
+    <graphics x="873.0" y="634.5"/>
+  </node>
+  <node id="re26" label="re26" name="reaction">
+    <att name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION" label="CELLDESIGNER_NODE_TYPE" type="string"/>
+    <att name="CELLDESIGNER_REACTION" value="re26" label="CELLDESIGNER_REACTION" type="string"/>
+    <graphics x="870.0" y="595.5"/>
+  </node>
+  <edge id="s64_sa38(LEFT)re26" label="LEFT" source="s64_sa38" target="re26"/>
+  <edge id="re26(RIGHT)s2_a40" label="RIGHT" source="re26" target="s2_a40"/>
+</graph>

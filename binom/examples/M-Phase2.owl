@@ -1,0 +1,1627 @@
+<rdf:RDF
+    xmlns="http://bioinfo.curie.fr/celldesigner2biopax/M-Phase2#"
+    xmlns:bp="http://www.biopax.org/release/biopax-level2.owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:daml="http://www.daml.org/2001/03/daml+oil#"
+  xml:base="http://bioinfo.curie.fr/celldesigner2biopax/M-Phase2">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level2.owl"/>
+  </owl:Ontology>
+  <bp:externalReferenceUtilityClass rdf:ID="endoplasmic_reticulum">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endoplasmic_reticulum</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005783">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005783</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:utilityClass rdf:about="#re5_Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION>
+      <bp:externalReferenceUtilityClass rdf:ID="cellular_component_unknown">
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >cellular_component_unknown</bp:TERM>
+        <bp:XREF>
+          <bp:xref rdf:ID="GO_0008372">
+            <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >0008372</bp:ID>
+            <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GO</bp:DB>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+          </bp:xref>
+        </bp:XREF>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+      </bp:externalReferenceUtilityClass>
+    </bp:CELLULAR-LOCATION>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="s63">
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:physicalEntityParticipant rdf:ID="re5_Cdc25_pho_active">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:utilityClass rdf:ID="s26_s1_pho">
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >null_pho</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >null_pho</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+      </bp:utilityClass>
+    </bp:SEQUENCE-FEATURE-LIST>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="p7">
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc25</bp:SYNONYMS>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc25</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc25</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:externalReferenceUtilityClass rdf:ID="plasma_membrane">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >plasma_membrane</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005886">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005886</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_DISSOCIATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >DISSOCIATION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_HETERODIMER_ASSOCIATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >HETERODIMER_ASSOCIATION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:conversion rdf:ID="re16">
+    <bp:RIGHT>
+      <bp:physicalEntityParticipant rdf:ID="re16_Cdc25">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:RIGHT>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re16_Cdc25_pho_active">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s26_s1_pho"/>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:INTERACTION-TYPE>
+      <bp:externalReferenceUtilityClass rdf:ID="cd3_STATE_TRANSITION">
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >STATE_TRANSITION</bp:TERM>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+      </bp:externalReferenceUtilityClass>
+    </bp:INTERACTION-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:externalReferenceUtilityClass rdf:ID="endosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endosome</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005768">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005768</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_acetylated">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >acetylated</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="endoplasmic_reticulum_lumen">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endoplasmic_reticulum_lumen</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005788">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005788</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >INHIBITION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntityParticipant rdf:ID="re2_Wee1">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="p3">
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Wee1</bp:SYNONYMS>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Wee1</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Wee1</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:externalReferenceUtilityClass rdf:ID="ascus_lipid_droplet">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ascus_lipid_droplet</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005633">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005633</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntity rdf:ID="p6">
+    <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Lamin</bp:SYNONYMS>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Lamin</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Lamin</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+  </bp:physicalEntity>
+  <bp:physicalEntityParticipant rdf:ID="re15_Cdc25_pho_active">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s26_s1_pho"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:externalReferenceUtilityClass rdf:ID="cytosol">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytosol</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005829">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005829</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntity rdf:ID="s56">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Slp1/APC</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Slp1/APC</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+  </bp:physicalEntity>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRANSCRIPTIONAL_ACTIVATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSCRIPTIONAL_ACTIVATION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:xref rdf:ID="GO_0030526">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0030526</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:utilityClass rdf:about="#re3_Cdc13/Cdc2_Tyr15_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="s61">
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13/Cdc2_Tyr15_pho</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13/Cdc2_Tyr15_pho</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:xref rdf:ID="GO_0031012">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0031012</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:physicalEntity rdf:ID="s53">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >APC/Slp1_active</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >APC/Slp1_active</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+  </bp:physicalEntity>
+  <bp:externalReferenceUtilityClass rdf:ID="extracellular_region">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >extracellular_region</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005576">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005576</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntity rdf:ID="s59">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Cdc13/Cdc2_Thr167_pho/Rum1</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Cdc13/Cdc2_Thr167_pho/Rum1</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+  </bp:physicalEntity>
+  <bp:entity rdf:ID="re24">
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:HETERODIMER_ASSOCIATION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#conversion"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <bp:LEFT>
+      <bp:utilityClass rdf:about="#re24_Cdc13/Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="s57">
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13/Cdc2_Thr167_pho</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13/Cdc2_Thr167_pho</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:LEFT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complexAssembly"/>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re24_Rum1">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="p13">
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Rum1</bp:SYNONYMS>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Rum1</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Rum1</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_HETERODIMER_ASSOCIATION"/>
+    <bp:RIGHT>
+      <bp:utilityClass rdf:about="#re24_Cdc13/Cdc2_Thr167_pho/Rum1">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#s59"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:RIGHT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+  </bp:entity>
+  <bp:physicalEntityParticipant rdf:ID="re23_Rum1_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:utilityClass rdf:ID="s34_s1_pho">
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >null_pho</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >null_pho</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+      </bp:utilityClass>
+    </bp:SEQUENCE-FEATURE-LIST>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:externalReferenceUtilityClass rdf:ID="organelle">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >organelle</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0043226">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0043226</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntityParticipant rdf:ID="re6_Lamin_hm8">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="s6">
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Lamin_hm8</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Lamin_hm8</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:xref rdf:ID="GO_0005770">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005770</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:physicalEntityParticipant rdf:ID="re4_CAK">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="p5">
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CAK</bp:SYNONYMS>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CAK</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CAK</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:conversion rdf:ID="re7">
+    <bp:RIGHT>
+      <bp:utilityClass rdf:ID="re7_M-Phase">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="s15">
+            <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >This is a CellDesigner PHENOTYPE entity. It is not a real protein but rather an abstract representation of a process.</bp:COMMENT>
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >MPhase</bp:SYNONYMS>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >M-Phase</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >M-Phase</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:RIGHT>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re7_Lamin_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:SEQUENCE-FEATURE-LIST>
+          <bp:utilityClass rdf:ID="s14_s1_pho">
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >null_pho</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >null_pho</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+          </bp:utilityClass>
+        </bp:SEQUENCE-FEATURE-LIST>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p6"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:control rdf:ID="re15_c_s27">
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re15_Plo1">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="p10">
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Plo1</bp:SYNONYMS>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Plo1</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Plo1</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:CONTROLLED>
+      <bp:conversion rdf:ID="re15">
+        <bp:RIGHT rdf:resource="#re15_Cdc25_pho_active"/>
+        <bp:LEFT>
+          <bp:physicalEntityParticipant rdf:ID="re15_Cdc25">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+          </bp:physicalEntityParticipant>
+        </bp:LEFT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:CONTROLLED>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE>
+      <bp:externalReferenceUtilityClass rdf:ID="cd3_CATALYSIS">
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CATALYSIS</bp:TERM>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+      </bp:externalReferenceUtilityClass>
+    </bp:INTERACTION-TYPE>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+  </bp:control>
+  <bp:physicalEntityParticipant rdf:ID="re5_Cdc13">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:physicalEntity rdf:ID="p2">
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13</bp:SYNONYMS>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13</bp:SHORT-NAME>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13</bp:NAME>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+      </bp:physicalEntity>
+    </bp:PHYSICAL-ENTITY>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:physicalEntityParticipant rdf:ID="re6_Lamin_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s14_s1_pho"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p6"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:externalReferenceUtilityClass rdf:ID="recycling_endosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >recycling_endosome</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005764">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005764</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:catalysis rdf:ID="re25_c_s57">
+    <bp:CONTROLLER>
+      <bp:utilityClass rdf:about="#re25_Cdc13/Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:CONTROLLER>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <bp:CONTROLLED>
+      <bp:conversion rdf:ID="re25">
+        <bp:RIGHT>
+          <bp:utilityClass rdf:about="#re25_APC/Slp1_active">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s53"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:RIGHT>
+        <bp:LEFT>
+          <bp:utilityClass rdf:about="#re25_Slp1/APC">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s56"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:LEFT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:CONTROLLED>
+  </bp:catalysis>
+  <bp:conversion rdf:ID="re5">
+    <bp:RIGHT>
+      <bp:utilityClass rdf:about="#re5_Cdc13/Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:RIGHT>
+    <bp:LEFT rdf:resource="#re5_Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:utilityClass rdf:about="#re14_Cdc13/Cdc2_Thr167_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:physicalEntityParticipant rdf:ID="re20_Rum1_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s34_s1_pho"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:xref rdf:ID="GO_0005739">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005739</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:conversion rdf:ID="re6">
+    <bp:RIGHT rdf:resource="#re6_Lamin_pho"/>
+    <bp:LEFT rdf:resource="#re6_Lamin_hm8"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:externalReferenceUtilityClass rdf:ID="cytoplasm">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytoplasm</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005737">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005737</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:conversion rdf:ID="re3">
+    <bp:RIGHT>
+      <bp:utilityClass rdf:about="#re3_Cdc13/Cdc2_Thr14_pho_Tyr15_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="s62">
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13/Cdc2_Thr14_pho_Tyr15_pho</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13/Cdc2_Thr14_pho_Tyr15_pho</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:RIGHT>
+    <bp:LEFT rdf:resource="#re3_Cdc13/Cdc2_Tyr15_pho"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:conversion rdf:ID="re10">
+    <bp:RIGHT>
+      <bp:physicalEntityParticipant rdf:ID="re10_Cdc2">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="p1">
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc2</bp:SYNONYMS>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc2</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc2</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:RIGHT>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re10_Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:SEQUENCE-FEATURE-LIST>
+          <bp:utilityClass rdf:ID="s13_Thr167_pho">
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr167_pho</bp:SHORT-NAME>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr167_pho</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+          </bp:utilityClass>
+        </bp:SEQUENCE-FEATURE-LIST>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:utilityClass rdf:ID="s24_s1_pho">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >null_pho</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >null_pho</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+  </bp:utilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="mitochondrion">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mitochondrion</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005739"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntityParticipant rdf:ID="re14_Wee1">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:interaction rdf:ID="re4_c_s5">
+    <bp:CONTROLLED>
+      <bp:conversion rdf:ID="re4">
+        <bp:RIGHT>
+          <bp:utilityClass rdf:about="#re4_Cdc13/Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s63"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:RIGHT>
+        <bp:LEFT>
+          <bp:utilityClass rdf:about="#re4_Cdc13/Cdc2_Thr14_pho_Tyr15_pho">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s62"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:LEFT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:CONTROLLED>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:CONTROLLER rdf:resource="#re4_CAK"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:interaction>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_UNKNOWN_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_INHIBITION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:utilityClass rdf:about="#re2_Cdc13/Cdc2_Tyr15_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#s61"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:xref rdf:ID="GO_0005730">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005730</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:conversion rdf:ID="re26">
+    <bp:RIGHT>
+      <bp:physicalEntityParticipant rdf:ID="re26_Cdc13">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:RIGHT>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re26_gCdc13">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY>
+          <bp:physicalEntity rdf:ID="gn1">
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13</bp:SYNONYMS>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13</bp:NAME>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#dna"/>
+          </bp:physicalEntity>
+        </bp:PHYSICAL-ENTITY>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRANSLATIONAL_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSLATIONAL_INHIBITION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:utilityClass rdf:about="#re20_Cdc13/Cdc2_Thr167_pho">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:utilityClass rdf:ID="s31_s1_ubi">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >null_ubi</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >null_ubi</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceFeature"/>
+  </bp:utilityClass>
+  <bp:physicalEntity rdf:ID="s60">
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Cdc13/Cdc2</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Cdc13/Cdc2</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complex"/>
+  </bp:physicalEntity>
+  <bp:xref rdf:ID="GO_0005769">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005769</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:physicalEntityParticipant rdf:ID="re20_Rum1">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+  </bp:physicalEntityParticipant>
+  <bp:catalysis rdf:ID="re14_c_s57">
+    <bp:CONTROLLER rdf:resource="#re14_Cdc13/Cdc2_Thr167_pho"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:CONTROLLED>
+      <bp:conversion rdf:ID="re14">
+        <bp:RIGHT>
+          <bp:physicalEntityParticipant rdf:ID="re14_Wee1_pho">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s24_s1_pho"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+          </bp:physicalEntityParticipant>
+        </bp:RIGHT>
+        <bp:LEFT rdf:resource="#re14_Wee1"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:CONTROLLED>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:entity rdf:ID="re2_c_s3">
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <bp:CONTROLLER rdf:resource="#re2_Wee1"/>
+    <bp:CONTROLLED>
+      <bp:conversion rdf:ID="re2">
+        <bp:RIGHT rdf:resource="#re2_Cdc13/Cdc2_Tyr15_pho"/>
+        <bp:LEFT>
+          <bp:utilityClass rdf:about="#re2_Cdc13/Cdc2">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s60"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:LEFT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:CONTROLLED>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+  </bp:entity>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRANSLATIONAL_ACTIVATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSLATIONAL_ACTIVATION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:xref rdf:ID="GO_0005796">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005796</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:control rdf:ID="re6_c_s57">
+    <bp:CONTROLLED rdf:resource="#re6"/>
+    <bp:CONTROLLER>
+      <bp:utilityClass rdf:about="#re6_Cdc13/Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:CONTROLLER>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+  </bp:control>
+  <bp:physicalEntity rdf:ID="p12">
+    <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Slp1</bp:SYNONYMS>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Slp1</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Slp1</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+  </bp:physicalEntity>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_phosphorylated">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >phosphorylated</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_ubiquitinated">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ubiquitinated</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:interaction rdf:ID="re3_c_s3">
+    <bp:CONTROLLED rdf:resource="#re3"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re3_Wee1">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+  </bp:interaction>
+  <bp:xref rdf:ID="GO_0031982">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0031982</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:utilityClass rdf:about="#re17_Cdc13/Cdc2">
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY rdf:resource="#s60"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+  </bp:utilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="extracellular_matrix">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >extracellular_matrix</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0031012"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="Golgi_lumen">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Golgi_lumen</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005796"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalInteraction rdf:ID="re15_c_s57">
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:CONTROLLED rdf:resource="#re15"/>
+    <bp:CONTROLLER>
+      <bp:utilityClass rdf:about="#re15_Cdc13/Cdc2_Thr167_pho">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+      </bp:utilityClass>
+    </bp:CONTROLLER>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:physicalInteraction>
+  <bp:complexAssembly rdf:ID="re17">
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_HETERODIMER_ASSOCIATION"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <bp:RIGHT rdf:resource="#re17_Cdc13/Cdc2"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re17_Cdc2">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:LEFT>
+      <bp:physicalEntityParticipant rdf:ID="re17_Cdc13">
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+      </bp:physicalEntityParticipant>
+    </bp:LEFT>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:HETERODIMER_ASSOCIATION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#conversion"/>
+  </bp:complexAssembly>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRUNCATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRUNCATION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:conversion rdf:ID="re20">
+    <bp:RIGHT rdf:resource="#re20_Rum1_pho"/>
+    <bp:LEFT rdf:resource="#re20_Rum1"/>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+  </bp:conversion>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_methylated">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >methylated</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="vesicle">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >vesicle</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0031982"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:pathway rdf:ID="Fission_yeast_MPF_cycle">
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re25_c_s57"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re3_c_s3"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re25"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re3"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:entity rdf:ID="re16_c_s8">
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <bp:CONTROLLED rdf:resource="#re16"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+        <bp:CONTROLLER>
+          <bp:physicalEntityParticipant rdf:ID="re16_PP2A">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY>
+              <bp:physicalEntity rdf:ID="p8">
+                <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >PP2A</bp:SYNONYMS>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >PP2A</bp:SHORT-NAME>
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >PP2A</bp:NAME>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+              </bp:physicalEntity>
+            </bp:PHYSICAL-ENTITY>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+          </bp:physicalEntityParticipant>
+        </bp:CONTROLLER>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+      </bp:entity>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re16"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15_c_s57"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re2"/>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Fission_yeast_MPF_cycle</bp:NAME>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re4"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:physicalInteraction rdf:ID="re11_c_s53">
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <bp:CONTROLLER>
+          <bp:utilityClass rdf:about="#re11_APC/Slp1_active">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#s53"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+          </bp:utilityClass>
+        </bp:CONTROLLER>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <bp:CONTROLLED>
+          <bp:physicalInteraction rdf:ID="re11">
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#conversion"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#complexAssembly"/>
+            <bp:LEFT>
+              <bp:utilityClass rdf:about="#re11_Cdc13/Cdc2_Thr167_pho">
+                <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+                >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                <bp:PHYSICAL-ENTITY rdf:resource="#s57"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalEntityParticipant"/>
+              </bp:utilityClass>
+            </bp:LEFT>
+            <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CDTYPE:DISSOCIATION</bp:COMMENT>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+            <bp:RIGHT>
+              <bp:physicalEntityParticipant rdf:ID="re11_Cdc2_Thr167_pho">
+                <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+                >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s13_Thr167_pho"/>
+                <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+              </bp:physicalEntityParticipant>
+            </bp:RIGHT>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+            <bp:RIGHT>
+              <bp:physicalEntityParticipant rdf:ID="re11_Cdc13_ubi">
+                <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+                >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s31_s1_ubi"/>
+                <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+                <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+              </bp:physicalEntityParticipant>
+            </bp:RIGHT>
+            <bp:INTERACTION-TYPE rdf:resource="#cd3_DISSOCIATION"/>
+          </bp:physicalInteraction>
+        </bp:CONTROLLED>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+      </bp:physicalInteraction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re14"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:entity rdf:ID="re5_c_s26">
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <bp:CONTROLLER rdf:resource="#re5_Cdc25_pho_active"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <bp:CONTROLLED rdf:resource="#re5"/>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+      </bp:entity>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re10"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re17"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:conversion rdf:ID="re23">
+        <bp:LEFT rdf:resource="#re23_Rum1_pho"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re7"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re11"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re6"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This pathway is generated automatically from the CellDesigner 3.0 XML file  using CellDesigner2BioPAX converter developed by Andrei Zinovyev at the Bioinformatics Service of Institut Curie (andrei.zinovyev@curie.fr)</bp:COMMENT>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re6_c_s57"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re24"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:physicalInteraction rdf:ID="re5_c_s2">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+        <bp:CONTROLLER rdf:resource="#re5_Cdc13"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+        <bp:CONTROLLED rdf:resource="#re5"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+      </bp:physicalInteraction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re5"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re4_c_s5"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re20"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:conversion rdf:ID="re12">
+        <bp:LEFT>
+          <bp:physicalEntityParticipant rdf:ID="re12_Cdc13_ubi">
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s31_s1_ubi"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+            <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#sequenceParticipant"/>
+          </bp:physicalEntityParticipant>
+        </bp:LEFT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#interaction"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#biochemicalReaction"/>
+      </bp:conversion>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:interaction rdf:ID="re20_c_s57">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#control"/>
+        <bp:CONTROLLED rdf:resource="#re20"/>
+        <bp:CONTROLLER rdf:resource="#re20_Cdc13/Cdc2_Thr167_pho"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#catalysis"/>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#physicalInteraction"/>
+      </bp:interaction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re14_c_s57"/>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></bp:SHORT-NAME>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re2_c_s3"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15_c_s27"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re26"/>
+  </bp:pathway>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRANSCRIPTIONAL_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSCRIPTIONAL_INHIBITION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="nucleolus">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleolus</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005730"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_hydroxylated">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >hydroxylated</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="macrophage">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >macrophage</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0030526"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:xref rdf:ID="GO_0032009">
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0032009</bp:ID>
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+  </bp:xref>
+  <bp:externalReferenceUtilityClass rdf:ID="late_endosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >late_endosome</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005770"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="nucleus">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleus</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005634">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005634</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="nucleoplasm">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleoplasm</bp:TERM>
+    <bp:XREF>
+      <bp:xref rdf:ID="GO_0005654">
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005654</bp:ID>
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#externalReferenceUtilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+        <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#unificationXref"/>
+      </bp:xref>
+    </bp:XREF>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:physicalEntity rdf:ID="p11">
+    <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >APC</bp:SYNONYMS>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >APC</bp:SHORT-NAME>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >APC</bp:NAME>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#entity"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#protein"/>
+  </bp:physicalEntity>
+  <bp:externalReferenceUtilityClass rdf:ID="early_phagosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >early_phagosome</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0032009"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="early_endosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >early_endosome</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005769"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_KNOWN_TRANSITION_OMITTED">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >KNOWN_TRANSITION_OMITTED</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_TRANSPORT">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSPORT</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="lysosome">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >lysosome</bp:TERM>
+    <bp:XREF rdf:resource="#GO_0005764"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_UNKNOWN_CATALYSIS">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_CATALYSIS</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:about="#cd3_don&apos;t_care">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >don't_care</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_unknown">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >unknown</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+  <bp:externalReferenceUtilityClass rdf:ID="cd3_UNKNOWN_TRANSITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_TRANSITION</bp:TERM>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#utilityClass"/>
+    <rdf:type rdf:resource="http://www.biopax.org/release/biopax-level2.owl#openControlledVocabulary"/>
+  </bp:externalReferenceUtilityClass>
+</rdf:RDF>

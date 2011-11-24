@@ -1,0 +1,257 @@
+Return-Path: <msb@embo.org>
+Received: from mailhost.curie.fr (localhost.curie.fr [127.0.0.1])
+          by mailhost.curie.fr/1 with ESMTP id l88FF22M019256
+          for <zinovyev>; Sat, 8 Sep 2007 17:15:02 +0200 (CEST)
+Received: from smtp1.mts.nature.com (smtp1.mts.nature.com [170.224.106.168])
+          by mailhost.curie.fr/0 with ESMTP id l88FEvME019220
+          for <andrei.zinovyev@curie.fr>; Sat, 8 Sep 2007 17:14:57 +0200 (CEST)
+X-Client-Addr: 170.224.106.168 smtp1.mts.nature.com (OK)
+X-Client-Sender: msb@embo.org
+Received: from localhost.localdomain (unknown [192.168.11.179])
+	by smtp1.mts.nature.com (Postfix) with ESMTP id B78DD800D
+	for <andrei.zinovyev@curie.fr>; Sat,  8 Sep 2007 08:59:20 -0400 (EDT)
+Content-Transfer-Encoding: binary
+X-Mailer: MIME::Lite 3.01 (F2.6; B2.11; Q2.03)
+Date: Sat, 8 Sep 2007 14:18:50 UT
+Message-Id: <91118926113085@www9.nature.com>
+To: andrei.zinovyev@curie.fr
+Subject: MSB-07-468 Decision Letter
+From: msb@embo.org
+X-Greylist: Delayed for 01:01:10 by milter-greylist-2.1.12 (mailhost.curie.fr [193.49.205.23]); Sat, 08 Sep 2007 17:14:57 +0200 (CEST)
+X-Scanned-By: milter-spamc/1.11.382.382 (burton.curie.fr [193.49.205.23]); Sat, 08 Sep 2007 17:15:02 +0200
+X-Spam-Status: NO, score=-1.60 required=8.00
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="_----------=_11892611309760"; charset="UTF-8"
+X-UIDL: 4&5!!AJd"!lDa!!"fh"!
+Status: RO
+
+This is a multi-part message in MIME format.
+
+--_----------=_11892611309760
+Content-Disposition: inline
+Content-Length: 19008
+Content-Transfer-Encoding: binary
+Content-Type: text/plain
+
+ 
+ 
+8th Sep 2007 
+ 
+Manuscript Number: MSB-07-468 
+Title: A Comprehensive Modular Map of Molecular Interactions in RB/E2F Pathway 
+Author: Andrei Zinovyev 
+Laurence Calzone 
+Am&#x00E9;lie Gelay 
+Emmanuel Barillot 
+Fran&#x00E7;ois Radvanyi 
+ 
+ 
+Dear Dr. Zinovyev, 
+ 
+Thank you again for submitting your work to Molecular Systems Biology. We have now heard back from the four referees whom we asked to evaluate your manuscript. As you will see from the reports below, the referees find the topic of your study of potential interest. However, they raise substantial concerns on your work, which, I am afraid to say, preclude its publication in its present form. 
+ 
+Referee #2 and #4 are rather reserved on your study. Thus, referee #2 is worried that the scope of the manuscript, restricted to the Rb pathway, may not be sufficiently broad to interest a wide audience. Referee #4 is somewhat skeptical that the present map can be of decisive help to elucidate key biological questions, such as cell cycle dynamics. Referee #1 and #3 are however more positive. While referee #3 has only a few technical points, referee #1 in spite of his/her interest in your topic and approach, raise substantial concerns on both the manuscript and the associated website. The major concerns refer to serious limitations regarding the interactivity and visualization of the map, the description of the mining process and the integration with the literature (and possibly, to included referee #2 comment, with expression data). 
+ 
+Given this balance of opinions, we feel that we can nevertheless ask you to revise the manuscript, provided you would be able to extend and complete the present work according to the recommendations of the referees and bring it to the state-of-the-art in terms of representation, integration and interactivity. 
+ 
+In view of the nature of this work, which is closer to a knowledge-base than a bonafide research paper, we would consider this manuscript for our Reviews section rather than for the Original Reserch section, as we did for similar works previously. 
+ 
+If you feel you can satisfactorily deal with these points and those listed by the referees, you may wish to submit a revised version of your manuscript. Please attach a covering letter giving details of the way in which you have handled each of the points raised by the referees. A revised manuscript will be once again subject to review and you probably understand that we can give you no guarantee at this stage that the eventual outcome will be favourable. 
+ 
+Yours sincerely, 
+ 
+Thomas Lemberger, PhD 
+Section Editor 
+Molecular Systems Biology 
+ 
+ 
+--------------------------------------------------------------------------- 
+ 
+If you do choose to resubmit, please click on the link below to submit the revision online before 28th Oct 2007. 
+ 
+<http://mts-msb.nature.com/cgi-bin/main.plex?el=A1BL2Qm2A1BIK7I6A9LWMtf81uxaAVwCXEorgw7AZ> 
+ 
+ 
+ 
+IMPORTANT: When you send the revision, we will require the following items: 
+1. the manuscript text in LaTeX, RTF or MS Word format 
+2. a letter with a detailed description of the changes made in response to the referees 
+3. three to four 'bullet points' highlighting the main findings of your study 
+4. a 'standfirst text' summarizing in two sentences the study 
+ 
+ 
+ 
+Please use the link below to access the Licence to Publish. Please complete and sign this on behalf of all authors, with their consent, and fax to the editorial office on +44 (0)1256 321670 on the same day you submit your revision. 
+ 
+http://mts-msb.nature.com/letters/msb_copyright.pdf 
+ 
+We will need this form in order to proceed with processing this submission. 
+ 
+As a matter of course, please make sure that you have correctly followed the instructions for authors as given on the submission website. 
+---------------------------------------------------------------------------- 
+ 
+ 
+Reviewer #1 (Remarks to the Author): 
+ 
+Summary: 
+ 
+This paper reports an effort to describe the Rb network in a comprehensive manner, organizing data as machine-readable files and human-readable diagrams. The paper also reports, parenthetical, some suggested modifications to the systems biology graphical notations and a potentially useful cytoscape plug-in. This is a commendable effort, and a very good start for an important yet challenging project. The work addresses a significant problem with appropriate systems biology tools. Unfortunately, both the paper and the associated web site are essentially incomplete. In particular, various forms of the graphical representation and references are not easily mapped to each other and are not interactive, thus significantly reducing the potential use of the map as a resource. Other aspects of the representation and documentation are problematic as well. This work will benefit from addressing the issues below, rewriting the paper to highlight pertinent features and providing more
+comprehensive documentation. 
+ 
+Specific concerns: 
+ 
+1. Since the Rb network map is too large to be presented meaningfully in text form, it is critical that the web form will be easily navigable and interactive. Indeed, the module map (on the web site) connects nicely to cytoscape views of each module. However, the "comprehensive maps" (the gene map and process diagrams presented in Figure 2) are very hard to navigate and are not interactive: the user cannot access reaction description from interactions (also see the next comment re references); the lines are very hard to follow; and there is no easy, intuitive way to link gene names in the gene map to the molecules in the process diagram. Interactive features and better navigation features are essential if the maps are to become useful tools for organizing reaction information. 
+ 
+2. The map in its current form cites a literature list (available on the web site) but it does not provide actual references (i.e. it does not provide an obvious way for the reader to link reactions to particular reports in the literature). It is assumed that reference information is available for the authors, but as a reviewer I was not able to access information linking references to reactions. This information is either not available, or it is presented in a form that was not clearly apparent. Without links between references and reactions, the map cannot be considered a truly "curated" source. This problem significantly reduces the usefulness of the map as an educational or reference tool. 
+ 
+3. The main features of the paper are several maps describing the Rb network. Due to the magnitude of the network, the interactions cannot clearly be viewed on a printed page. Yet, even when the maps are printed in poster form, there are several problems: 
+ 
+i. The gene map (figure 2A): Assuming that horizonal arrows mean activation and inhibition reactions (this should be explained), and the vertical lines connect horizontal arrows, how does the reader know where vertical lines originate, and which reactions are connected by those lines? In the current form, the map is not useful. 
+ 
+ii. The process diagram (figure 2B): some text features are unclear and overlap (even when enlarged or viewed on the web page). For example, the phosphorylated residues of many molecules obscure the molecule name. 
+ 
+iii. Several molecules are designated "active" (using the process diagram convention - surrounded by a dashed border) but other active molecules are not. The rules for designating molecules as active should be explained. Also, the text states that the process diagram includes some modifications of the SBGN standard but those are not clearly illustrated in the map. 
+ 
+4. The decision-making process involved in deducing reactions from the literature should be explained. The current version of the paper contains obscure comments, such as (Page 19 second paragraph line 4, discussing ambiguity): " it was fixed in laboratory journal and discussed..." and (same paragraph line 6) "it was also fixed and some solution proposed. " What does "fixed" mean? Who was consulted? Which solutions were proposed? Are reservations pertinent to particular reactions available to readers? A better description of the process should be included in a revised version. Also, consistent with the custom for text-based reviews, the "experts" who were consulted should be identified. 
+ 
+5. The development and capabilities of the BiNoM plug-in are important features of the paper. Surprisingly, that tool is not mentioned in the abstract, and its use to deduce modules is relegated to the Methods section. The paper might be improved by describing the development and use of BiNoM in the assembly and analysis of the map or by associating the paper with a separate publication describing BiNoM in detail. As many other features presented in the paper, BiNoM is not complete yet. 
+ 
+6. The paper describes a comparison of the Rb network with information available at the reactome database, including construction of a core map that includes molecules featured in both resources. The authors conclude that the current map is more comprehensive than the reactome description because reaction density is higher. It is unclear whether a high reaction density is better, and it is unclear why the reaction density is higher - is it because the database is less comprehensive, or because reactome reports pathways and is not centered on specific molecules? Since conclusions are drawn based on the core map, that core map should be made available to the readers. 
+ 
+ 
+Minor comments: 
+ 
+The first paragraph of the Introduction describing the cell cycle is too basic. Consider either deleting or considerably shortening, combining with the second paragraph. The following description of the system is too simplistic - it is understood that the authors' goal was to show that a better representation of the system is needed, but the paper will benefit from a concrete description of the role of Rb and its interactions with CDKs and transcription factors, which can be adaptable from the many reviews on the subject. (On the other hand, the second part of the Introduction, describing the decisions underlying the representation, is clear and informative.) 
+ 
+The list of contributors (referred to the web site from the text) is missing from the web site. 
+ 
+The yellow frames shown in the process diagram presumably indicate cellular compartments. Those compartments should be defined. If the larger rectangle represent the cytoplasm and the smaller represents the nucleoplasm, what does the elipse on the upper right corner represent? 
+ 
+Page 8, middle paragraph, line 2: "as cyclC/CDK3 activates, it..." activates what? 
+ 
+The description of the map modules (page 8, middle paragraph starting with "more specifically") is not informative. It is too long for a general description, but it does not describe the system with sufficient detail. It also "skips" cell cycle phases (e.g. the description mentioned G1 and then G2 phase - what happens during S-phase?). Since the next section provides a detailed description of modules, the above-mentioned paragraph could be deleted with no significant loss of content. 
+ 
+The text states that only two modules will be described in the subsequent text and the rest will be discussed in the web site, yet several additional modules are described in the text. 
+ 
+The web site provides very nice links between the module diagram and cytoscape maps of each module. Those should be mentioned in the text. 
+ 
+What do the lines connecting figure 2A and 2B signify? 
+ 
+ 
+ 
+ 
+ 
+ 
+Reviewer #2 (Remarks to the Author): 
+ 
+The manuscript, 'A comprehensive modular map of molecular interactions in RB/E2F pathway' by Calzone et al. reported a literature curation of RB pathway and a preliminary analysis of the curated pathway. The manuscript seems a review paper, because the analysis is too preliminary, furthermore, the analysis did not provide any novel insights. Therefore, the manuscript provides only the curated data for the RB pathway which contains ~80 proteins. 
+ 
+Most of signaling pathways are important, however, certain pathways have much more impact than others, e.g., more than one third of breast cancers are related to EGFR receptors/pathway. However, the impact of the RB pathway is relatively low (the results presented are of immediate interest to the people who are focusing on RB, which is a small fraction only), therefore, the curation work for this pathway is not significant. 
+ 
+Several other concerns: 
+ 
+ 
+1. Some descriptions are not accurate and ambiguous, for example, in p3, 'When a problem occurs .....'. What kinds of problem occur? 
+ 
+2. In p20, the step (3) of the 'Methods for extraction modules in BiNoM', (a) the proposed merging procedure is not well described; (b) If implementing the procedure, there is a good chance to randomly (even picking up the largest/smallest cycle, however, the worst situation is that it can contain several same sized largest/smallest cycles) pick up two cycles to merger at the very beginning or in the process of merging. If doing so, I am wondering how robust of this procedure to produce results; (c) Why the authors use p=50% as a cutoff? (this is arbitrary). Because all the proteins and their relations in the pathways were obtained from literature, it is possible to check whether a merge is biological meaningful. A systemic evaluation of the biological meaning of different merging situations could tell the cutoff; (d) It is not clear how to deal with protein physical interactions in the procedure. 
+ 
+3. In p20, the step (4) of the Methods for extraction modules in BiNoM, it is not clear what 'the majority rule' means? 
+ 
+4. In the RB pathway, if there is any information about cell type or temporal expression data that needs to be taken into account, i.e., are all regulators are present at the same time and space? If not, information regarding non-ubiquitous proteins (such as cdk5-mediated phosphorylation of Rb in the CNS) should be noted if possible. 
+ 
+5. In so-called modules, certain members of the modules are clearly recruited from other pathways. It is better to note the recruited proteins (I found some annotations for this aspect in the text, but not comprehensive). It is also better to annotate key proteins that are recruited by cellular machineries (pathways). These annotations will help in understanding the cross-talks between RB pathway and other major pathways and cellular machines. 
+ 
+6. The introduction can be condensed. Consider adding a cell cycle diagram into Figure 1 and eliminating some of the introductory text (first paragraph mainly). 
+ 
+7. The network components identified on p7 are not shown nor is their purpose clearly indicated. 
+ 
+8. In Fig. 2, what does green, red and blue represent? In Fig. 4: what do the shapes and colors of the boxes mean? Is there a meaning to that or not. Also, what do the red 'arrows' mean? Negative/positive regulation? The order of Figs 4A and 4B are mixed up. These figures panels should be clearly indicated in the text. 
+ 
+9. Several references have no journal names. Some references have different format, e.g., PNAS in some references, Proc ...USA in some other references. 
+ 
+ 
+ 
+Reviewer #3 (Remarks to the Author): 
+ 
+This is a very valuable contribution on comprehensive molecular interaction map on mammalian cell cycle. 
+ 
+The approach to use standard de fact software tools and representation is important and this paper properly chosen a right set of resource. 
+ 
+There are several points that would strengthen the contribution. 
+ 
+(1) CellDesigner 3.2 is used, but 3.5 would be better as some of bugs are fixed and some notations are added. 
+CellDesigner 4.0 will be release in mid September that fully comply with SBGN Level 1.0, at least draft as of now. 
+ 
+SBML file converted using CD3.5 is send to the editor. 
+ 
+(2) The file seems to be SBML file, rather than BioPAX file. 
+This need to be clearly stated. 
+In the text of the paper, it said that sbml file was converted to biopax file, but the file provided is sbml file. 
+Even if the author provide biopax file, it is important sbml file is also provided because most software can use sbml files but not necessarily biopax file. 
+Thus, it is recommended that text of the paper clearly state that both SBML and BioPax files are provided, SBML file is provided and Biopax file is used merely to transfer network data to Cytscape. 
+ 
+(3) On page 18, some shortcomings of CellDesigner is briefly mentioned without detail. It is useful to explicitly explain what are problems as many other uses may have same issues. 
+Specifically, what does "representation is static" means? 
+how should network be represented to overcome problem of "static" representation. 
+Such discussions are useful for improvement of software as well. 
+ 
+(4) There are cases "inhibition" is directly connected to complex, rather than state transition arc. 
+ 
+s723 COMPLEX{ cycline E1*/CDK2} 
+s719 COMPLEX{ cylcine A2*/CDK2} 
+ 
+these should be fixed. 
+ 
+(5) CD3.2 is not fully complied with SBGN. 
+SBGN is now being drafted. While SBGN will largely based on CellDesigner notation, there are few improvements. 
+CellDesigner 4.0 shall reflect most of SBGN Level 1.0. 
+so, it is bit misleading to state Cd3.2 has full SBGN symbol set. 
+It is better to say something like "Graphical notation used in CellDesigner 3.2 (or 3.5) is the most widely accepted notation and is used as a basis of SBGN." 
+ 
+(6) Bow-tie structure has been discussed on network analysis. 
+but, biological implication of bow-tie in the context of this network is not discussed. It would be interesting to have some discussions on this aspect as well. 
+ 
+ 
+Reviewer #4 (Remarks to the Author): 
+ 
+The authors did a great job compiling and visualizing relevant known interactions for the RB network. It is important, though, that they address in their article how this knowledge will be useful for hypothesis generation and advancement of the field experimentally. One of the major issues around understanding the cell cycle is understanding how it works in different contexts. For example, trying to understand and predict the dynamics of normal cells vs. cancer cells (with different mutations and or genetic and epigenetic status) and under different stimulatory cues (serum starvation and or different growth factor stimulus). It is these dynamic complexities with in a complex signaling network (and lack of knowledge on this) that makes it so difficult to, for example, develop successful efficacious cancer drugs targeting the cell cycle and the RB network. 
+ 
+The authors need to link the knowledge that they have compiled to how it will help researchers in the field sort through these complexities. A knowledge base is not necessarily sufficient towards helping the community meet such goals. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+MSB - This email has been sent through the NPG Manuscript Tracking System NY-610A-NPG&MTS
+--_----------=_11892611309760--
+
+

@@ -1,0 +1,60 @@
+
+
+1. BioPAX Import
+
+files:
+cytoscape/biopax/BioPAXImportFromFile.java
+cytoscape/biopax/BioPAXImportDialog.java
+cytoscape/biopax/BioPAXImportTask.java
+
+cytoscape/biopax/BioPAXImportFromURL.java (not implemented)
+
+(note: rm cytoscape/biopax/BioPAXImport.java no more useful)
+
+process:
+BioPAXImportFromFile implements ActionListener
+menu activé => actionPerformed
+  a. FileUtil.getFile() (classe utilitaire de cytoscape)
+  b. BioPAXImportDialog.getInstance().raise(file, file.getName());
+-> la classe BioPAXImportFromFile n'est pas récupérable
+
+BioPAXImportDialog (à recuperer)
+2 choses non portables:
+ a. creation de la task
+   BioPAXImportTask task = new BioPAXImportTask
+  (file, url, name, algos, getOptions(), true);
+ b. invocation du taskmanager
+   fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+
+idee:
+le BioPAXImportDialog est cree avec une instance de AbstractBioPAXImportTaskFacory
+
+AbstractTask task = factory.createTask
+		    (file, url, name, algos, getOptions(), true);
+
+task.execute() // qui invoque fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this) dans le cas cytoscape, et autre chose dans le cas celldesigner
+
+BioPAXImportTask.java
+cette class n'est qu'un wrapper pour la librairie pathways, on peut dupliquer le code.
+cependant, on pourra factoriser certains bouts de codes dans BiNoM/biopax (mais pas dans l'immediat)
+
+
+Méthodologie
+------------
+
+X I. portage brut
+- on copie et porte les classes cytoscape/biopax/BioPAXImportFromFile.java et BioPAXImportTask.java sous celldesigner/biopax
+- on copie aussi temporairement et on porte BioPAXImportDialog.java
+- mise au point pour les networks RN (avec choix du fichier)
+
+X II. utilisation couche d'abstraction
+- réflexions supplementaires sur les couches d'abstraction liés aux Task
+- implémentation pour celldesigner et cytoscape
+- intégration dans cytoscape
+- intégration dans celldesigner
+- mise au point et affinage
+- BioPAXImportDialog.java pourra alors aller dans BiNoM/biopax/
+
+III. création nouveaux réseaux
+- on essaie de trouver la facon de créer un nouveau réseau depuis une méthode celldesigner => javap and cie.
+

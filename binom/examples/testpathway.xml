@@ -1,0 +1,36 @@
+<rdf:RDF
+    xmlns:rss="http://purl.org/rss/1.0/"
+    xmlns:bp="http://www.biopax.org/release/biopax-level2.owl#"
+    xmlns:jms="http://jena.hpl.hp.com/2003/08/jms#"
+    xmlns="http://curie.fr/celldesigner.owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#"
+    xmlns:daml="http://www.daml.org/2001/03/daml+oil#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xml:base="">
+  <owl:Ontology rdf:about="http://curie.fr/celldesigner.owl">
+    <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level2.owl"/>
+  </owl:Ontology>
+  <bp:pathway rdf:about="http://curie.fr/celldesigner.owl#pathway1"/>
+  <bp:unificationXref rdf:about="http://curie.fr/celldesigner.owl#Xref0"/>
+  <bp:protein rdf:about="http://curie.fr/celldesigner.owl#Protein1">
+    <bp:NAME>Metalloelastase</bp:NAME>
+  </bp:protein>
+  <bp:unificationXref rdf:about="http://curie.fr/celldesigner.owl#Xref1"/>
+  <bp:unificationXref rdf:about="http://curie.fr/celldesigner.owl#Xref2">
+    <bp:NAME>pathway1</bp:NAME>
+  </bp:unificationXref>
+  <bp:protein rdf:about="http://curie.fr/celldesigner.owl#Protein2">
+    <bp:ID>P308934</bp:ID>
+    <bp:DB>SWISS-PROT</bp:DB>
+    <bp:DB>RefSeq</bp:DB>
+    <bp:NAME>Collagenase</bp:NAME>
+    <bp:ID>P023244</bp:ID>
+    <bp:ID>NP_304845</bp:ID>
+  </bp:protein>
+  <bp:protein rdf:about="http://curie.fr/celldesigner.owl#Protein0">
+    <bp:NAME>Enamelysin</bp:NAME>
+  </bp:protein>
+</rdf:RDF>

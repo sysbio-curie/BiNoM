@@ -1,0 +1,18 @@
+\contentsline {chapter}{\numberline {1}Introduction}{5}
+\contentsline {section}{\numberline {1.1}Cytoscape, SBML, BioPAX, CellDesigner and others}{5}
+\contentsline {chapter}{\numberline {2}Simple scenarios}{7}
+\contentsline {section}{\numberline {2.1}Converting CellDesigner to BioPAX}{7}
+\contentsline {section}{\numberline {2.2}Analyzing BioPAX pathway and extracting its part}{7}
+\contentsline {chapter}{\numberline {3}Working with BiNoM}{9}
+\contentsline {section}{\numberline {3.1}BiNoM I/O dialog: importing and exporting documents}{9}
+\contentsline {section}{\numberline {3.2}BiNoM analysis dialog: structural analysis of reaction networks}{9}
+\contentsline {section}{\numberline {3.3}BiNoM BioPAX query dialog: working with huge BioPAX files}{9}
+\contentsline {section}{\numberline {3.4}BiNoM Utilities: what is not yet in Cytoscape}{9}
+\contentsline {chapter}{\numberline {4}Test cases}{11}
+\contentsline {section}{\numberline {4.1}Disentangling Retinoblastoma protein network}{11}
+\contentsline {section}{\numberline {4.2}Feedbacks in EGRF pathway diagram}{11}
+\contentsline {section}{\numberline {4.3}Bow-tie and the Toll-like receptor pathway}{11}
+\contentsline {chapter}{\numberline {5}BiNoM data model}{13}
+\contentsline {section}{\numberline {5.1}Attributed graph model}{13}
+\contentsline {section}{\numberline {5.2}{\it BiNoM CellDesigner} and {\it BiNoM BioPAX} visual mappers}{13}
+\contentsline {section}{\numberline {5.3}Three-level BioPAX representation}{13}

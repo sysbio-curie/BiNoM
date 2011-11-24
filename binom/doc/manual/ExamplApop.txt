@@ -1,0 +1,157 @@
+ReviewRef(GS reviews)	ExperimentRef	Link	ChemType	Delay	Confidence	Tissue	Comments
+PMID:9889183(GS:1)	.	RAF1->(MAPK8,MAPK9,MAPK10)	Post-transcriptional influence"	.	0.9	All	"Induced by PDGF pathway, simplified version of PDGF downstream, induce the whole Mapk cascade, ending on ERK, translocated to nucleus to activate c-jun, c-fos"
+#
+PMID:15313397(GS:2)	.	CASP3->(.RAS)	Cleavage	.	0.8	All	"Cleavage of RASA1, fragment activated has an active effect on RAS, low level of caspase 3 produce N fragment, higher level cleave again N-fragment"
+PMID:15313397(GS:2)	PMID:11847220	RASA1-|(.RAS)	"Post-transcriptional influence"	.	0.9	HeLa	"Generally accepted effect of RasGap (RASA1)"
+PMID:15313397(GS:2)	PMID:11847220	(.RAS)->(PIK3C.)	"Post-transcriptional influence"	.	0.7	HeLa	"Activation of PI3K is necessary and sufficient for fragment N of RASA1 to have anti-apoptotic effect"
+PMID:15313397(GS:2)	PMID:11847220	(PIK3C.)->AKT1	"Post-transcriptional influence"	.	0.7	HeLa	"Activation of AKT1 is necessary and sufficient for fragment N of RASA1 to anti-apoptotic effect"
+#
+PMID:17082813(GS:4)	.	CASP9->CASP3	Cleavage	.	0.9	All	"Activated CASP9 (septameric apoptosome) cleaved the pro-caspase 3"
+PMID:17082813(GS:4)	.	APAF1->CASP9	"Post-transcriptional influence"	.	0.7	"Animals KO"
+#
+PMID:17082813(GS:4)	.	CYCS->APAF1	"Post-transcriptional influence"	.	0.7	"Animals KO"	"(other name for CYCS: cytochrome c)"
+PMID:17082813(GS:4)	.	BAX->CYCS	"Post-transcriptional influence"	.	0.7	.	"Mitochondrial pathway (other name for CYCS: cytochrome c)"
+PMID:17082813(GS:4)	.	BCL2L1-|BAX	"Post-transcriptional influence"	.	0.6	.	"Constency links, hypothetical effect because BCL2L1 belongs to Bcl2"
+PMID:17082813(GS:4)	.	BID-|BCL2	"Post-transciptional influence"	.	0.7	.	"Mitochondrial pathway (BID seems to be the gene name of BH3 or BID posesses BH3 domain)"
+PMID:17082813(GS:4)	.	CASP8->CASP3	Cleavage	.	0.9	All	"Activated CASP8 (death-inducing signaling, DISC, cleave pro-caspase 3 (TNFR family membrane activation of apoptosis)"
+PMID:17082813(GS:4)	.	CASP3->[apoptosis]	Cleavage	.	0.9	All	"Main downstream apoptotic gene that cleave cellular substrates"
+PMID:17082813(GS:4)	.	FADD->CASP8	Recrutement	.	0.7	"Animals KO"	"FADD + CASP8 gives DISC"
+#PMID:17082813(GS:4)	.	CFLAR-|FADD	"Post-transcriptional influence"	.	0.7	.	"(CFLAR seems to be the gene name of FLIP)"
+PMID:17082813(GS:4)	.	FAS->FADD	"Post-transcriptional influence"	.	0.7	"Animals KO"	"(other name for FAS: TNFRSF6), TNF induced apoptosis through CASP8"
+PMID:17082813(GS:4)	.	FASLG->FAS	Membrane	.	1	All	"(other name for FASLG: TNFSF6), TNF induced apotptosis through CASP8"
+#
+PMID:17053807(GS:5)	.	CASP8->(NFKB.)	"Post-transcriptional influence"	.	0.4	"Different mouse cells"	"Indirect, different possible biochemical mecanisms"
+#
+PMID:12466191(GS:6)	.	IGFBP3-|BCL2	"Indirect transcription"	.	0.5	"Human breast cancer cells"	"Effect on the BAX to BCL2 ratio"
+PMID:12466191(GS:6)	.	(TNFA.)->IGFBP3	"Indirect transcription"	.	0.6	"Human breast cancer cells"
+PMID:12466191(GS:6)	.	(TGFB.)->IGFBP3	"Indirect transcription"	.	0.7	"Several tissues"	"TGFb signaling goes through IGFBP3"
+PMID:12466191(GS:6)	.	(.RAS)-|IGFBP3	Influence	.	0.6	"Breast epithelial cells"
+PMID:12466191(GS:6)	.	IGFBP3-|IGF1	"Physical interaction"	.	0.7	"Several tissues"	"More precisely, IGFBP3 block (IGF1->cell cycle)"
+#
+#PMID:10378691(GS:7)	.	RBL1-|MYC	"Physical interaction"	.	0.4	.	"(other name for RBL1: p107)"
+#PMID:10378691(GS:7)	.	MYCBP->MYC	Binding	.	0.6	.	"MYCB binds to MYC and stimulates E-box-dependant transactivation activity (other name for MYCB: AMY-1)"
+#
+PMID:15653317(GS:9)	.	TNFAIP3-|RPAIN	"Deubiquitination-reubiquitination"	20mn	0.7	.	"(other names: A20-|RIP), double mecanism: RIP-deubiquitination that have been induced by TRAF2,reubiquitination on an other site of RIP which induce proteasome, TNFAIP3 intefere with the TNF signaling"
+PMID:15653317(GS:9)	.	TRAF2->RPAIN	"Ubiquitination at Lys63"	10mn	0.8	.	"Part of TNF activation of NFkB"
+#
+PMID:10577967(GS:10)	.	RPAIN->(NFKB.)	"Post-transcriptional influence"	.	0.8	.	"Figure, indirect through (IKK)"
+PMID:10577967(GS:10)	.	RPAIN->CRADD	"Post-transcriptional influence"	.	0.8	.	"Figure,(Other name for CRADD: RAIDD)"
+PMID:10577967(GS:10)	.	CRADD->[apoptosis]	"Post-transcriptional influence"	.	0.7	.	"(other name for CRADD: RAIDD)"
+#
+.	PMID:10597252(GS:11)	TNFSF15->(NFKB.)	"Post-transcriptional influence"	12h	0.8	"U-937 cells"	"Through phosphorylation, ubiquitination and subsequent degradation of IkBalpha (other name for TNFSF15: VEGI)"
+.	PMID:10597252(GS:11)	TNFSF15->(MAPK8,MAPK9,MAPK10)	Influence	12h	0.8	"U-937 cells"	"Seems more persistant than TNF activation. (Other name for (MAPK8,MAPK9,MAPK10): JNK), (other name for TNFSF15: VEGI)"
+#
+.	PMID:10074428(GS:12)	TNFSF18->TRAF2	Influence	12h	0.6	"TRAF2 mutant embryonic kidney 293 cells"	"(other name for TNFSF18: hGITRL)"
+.	PMID:10074428(GS:12)	TNFSF18->MAP3K14	Influence	12h	0.6	"MAP3K14 mutant embryonic kidney 293 cells"	"(other name for MAP3K14: NIK), (other name for TNFSF18: hGITRL)"
+.	PMID:10074428(GS:12)	TRAF2->(NFKB.)	Influence	12h	0.7	"TRAF2 mutant embryonic kidney 293 cells"	"Activation of NFKB by TNFS18 was observed 24h later"
+.	PMID:10074428(GS:12)	MAP3K14->(NFKB.)	Influence	12h	0.7	"MAP3K14 mutant embryonic kidney 293 cells"	"Activation of NFKB by TNFS18 was observed 24h later, (other name for MAP3K14: NIK)"
+#
+PMID:12887914(GS:13)	.	(TNFRSF1A:RPAIN)->(NFKB.)	"Post-transcriptional influence"	.	0.7	.	"(other name for TNFRSF1A: TNF-R1), (other name for RPAIN: RIP)"
+PMID:12887914(GS:13)	.	(TNFRSF1A:TRAF2)->(NFKB.)	"Post-transcriptional influence"	.	0.7	.	"(other name for TNFRSF1A: TNF-R1)"
+PMID:12887914(GS:13)	.	(NFKB.)-|[apoptosis]	Transcription	.	0.9	All	"Figure, known effect of NFKB"
+PMID:12887914(GS:13)	.	(NFKB.)->CFLAR	Transcription	.	0.6	.	"(other name for CFLAR: c-FLIP)"
+PMID:12887914(GS:13)	.	CFLAR-|CASP8	"Post-transcriptional influence"	.	0.6	.	"(other name for CFLAR: c-FLIP)"
+PMID:12887914(GS:13)	.	(TNFRSF1A:RPAIN)->CASP8	"Post-transcriptional influence"	.	0.6	.	"Through modification of complex I in complex II inducing intracellular DISC, (other name for TNFRSF1A: TNF-R1), (other name for RPAIN: RIP)"
+PMID:12887914(GS:13)	.	(TNFRSF1A:TRAF2)->CASP8	"Post-transcriptional influence"	.	0.6	.	"Through modification of complex I in complex II inducing intracellular DISC, (other name for TNFRSF1A: TNF-R1)"
+PMID:12887914(GS:13)	.	(TNFRSF1A:RPAIN)->CASP10	"Post-transcriptional influence"	.	0.6	.	"Through modification of complex I in complex II inducing intracellular DISC, (other name for TNFRSF1A: TNF-R1), (other name for RPAIN: RIP)"
+PMID:12887914(GS:13)	.	(TNFRSF1A:TRAF2)->CASP10	"Post-transcriptional influence"	.	0.6	.	"Through modification of complex I in complex II inducing intracellular DISC, (other name for TNFRSF1A: TNF-R1)"
+#
+PMID:16502253(GS:14)	.	TNFRSF1A->CTSB	Release	.	0.6	.	"TNFR permealize the lysosome membrane, release CTSB, true for other cathepsin, (other name for TNFRSF1A: TNF-R1)"
+PMID:16502253(GS:14)	.	CTSB->BID	Cleavage	.	0.8	"In vitro"	"Bid induce apotosis through mitochondria and CASP9"
+PMID:16502253(GS:14)	.	(NFKB.)-|CTSB	"Post-transcriptional influence"	.	0.7	.	"Through SPIN2A, figure"
+PMID:16502253(GS:14)	.	CASP8->CTSB	Release	.	0.6	Hepatocyte	"Through lysosome release"
+PMID:16502253(GS:14)	.	CTSB->[apoptosis]	"Chromatin condensation"	.	0.7	"Cell-free systems"
+PMID:16502253(GS:14)	.	CTSB->BAX	Influence	.	0.4	"Mutant mice"	"Hypothetical connection could explain BID free apoptosis induced by CTSB"
+PMID:16502253(GS:14)	.	BAX->CYCS	"Post-transcriptional influence"	.	0.8	.	"Through mitochondria, figure"
+#
+PMID:17085381(GS:16)	.	RAF1->(MAP2K1,MAP2K2)	Phosphorylation	.	0.9	All	"(other name for MAP2K1,2: MEK1,2)"
+PMID:17085381(GS:16)	.	(MAP2K1,MAP2K2)->(MAPK1,MAPK3)	Phosphorylation	.	0.9	"Generally accepted"	"(other name for MAPK1,3: ERK1,2)"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)->BAX	"Indirect transcription"	.	0.6	Mutant	"Pro-apoptotic effects of MAP kinases in case of DNA damage"
+PMID:17085381(GS:16)	.	BAX->CYCS	"Post-transcriptional influence	.	0.7	.	"Downstream part of BAX pathway"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)->BAD^p	Phosphorylation	.	0.8	"Mammalian T cells"	"Phosphorylation of RSK (p90, hugo:(RPS6KA.)), phosphrylates BAD at serine 112"
+PMID:17085381(GS:16)	.	BAD->CYCS	"Post-transcriptional influence"	.	0.8	"Generally accepted"	"Downstream effects of BAD, block the heterodimerisation of BAX and (BCL.), ref swissprot annotation, more precise in GS:19"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)-|BCL2L11	"Phosphorylation, transcription"	.	0.7	"Mammalian T cells"	"(other name for BCL2L11: BIM)"
+PMID:17085381(GS:16)	.	BCL2L11-|BCL2	Binding	.	0.8	"Generally accepted"	"Form heterodimer with anti-apoptotic proteins like BCL2, added after Transpath curation"
+PMID:17085381(GS:16)	.	BCL2L11-|BCL2L1	Binding	.	0.8	"Generally accepted"	"Form heterodimer with anti-apoptotic proteins like BCL2, added after Transpath curation"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)->MCL1	"Phosphorylation, indirect transcription"	.	0.6	.	"Phosphorylation of MCL1 stabilized it, makes it more efficient"
+#PMID:17085381(GS:16)	.	MCL1-|CYCS	"Post-transcriptional influence"	.	0.6	.	"Constency links, hypthetical effect because MCL1 belongs to Bcl2 family"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)->BCL2L1	"Indirect transcription"	.	0.6	.	"(other name for BCL2L1: Bcl-Xl)"
+#PMID:17085381(GS:16)	.	BCL2L1-|CYCS	"Post-transcriptional influence"	.	0.6	.	"Constency links, hypothetical effect because BCL2L1 belongs to Bcl2 family, (other name for BCL2L1: Bcl-Xl)"
+.	.	MCL1-|BAX	"Post-transcriptional influence"	.	0.6	.	"Constency links, hypothetical effect because MCL1 belongs to Bcl2 family, (other name for BCL2L1: Bcl-Xl), added after transpath curation, confidence: 0.6"
+PMID:17085381(GS:16)	.	(MAPK1,MAPK3)->IER3^p	Phosphorylation	.	0.8	.	"(other name for IER3:IEX-1)"
+PMID:17085381(GS:16)	.	IER3^p-|CYCS	"Post-transcriptional influence"	.	0.8	.	"(other name for IER3:IEX-1)"
+PMID:17085381(GS:16)	.	(NFKB.)->IER3	Transcription	.	0.7	.	"(other name for IER3:IEX-1)"
+PMID:17085381(GS:16)	.	IER3->(MAPK1,MAPK3)	"Post-transcriptional influence"	.	0.6	.
+#
+PMID:16341064(GS:18)	.	(PIK3C.)->AKT1	"Post-transcriptional influence"	.	0.9	"Generally accepted"	"By phosophrylation of PIP that interact specifically with AKT1, (PIK3C.) are the enzymatic subunit of PI3K"
+#
+PMID:15838523(GS:19)	.	AKT1->BAD^p	Phosphorylation	.	0.7	.	"Phosphorylation at Ser-136 of BAD"
+PMID:15838523(GS:19)	.	BAD-|BCL2L1	Binding	.	0.7	.	"(other name for BCL2L1: BCL-XL), binded BCL2L1 is blocked"
+PMID:15838523(GS:19)	.	BAD^p->BCL2L1	Unbinding	.	0.7	.	"(other name for BCL2L1: BCL-XL)"
+PMID:15838523(GS:19)	.	BCL2L1-|CYCS	"Post-transcriptional influence"	.	0.7	.	"(other name for BCL2L1: BCL-XL)"
+PMID:15838523(GS:19)	.	AKT1-|CASP9	Phosphorylation	.	0.7	.	"Phosphorylation of pro-caspase9 at Ser-196 prevent the caspase cascade"
+PMID:15838523(GS:19)	.	AKT1-|(FOXO1,FOXO3)	Phosphorylation	.	0.7	.	"(other names: FKHR, FKHRL1), phosphorylation prevent the transcriptional action of (FOXO1,FOXO3)"
+PMID:15838523(GS:19)	.	(FOXO1,FOXO3)->FASLG	Transcription	.	0.7	.	"(other names: FKHR, FKHRL1)"
+PMID:15838523(GS:19)	.	(FOXO1,FOXO3)->[apoptosis]	Transcription	.	0.4	.	"(other names: FKHR, FKHRL1), other apoptotic target genes"
+#
+PMID:15339239(GS:23)	.	IGF1->BCL2L1	"Indirect transcription"	.	0.6	"Tumor cells"	"(other name for BCL2L1: Bcl-Xl)"
+PMID:15339239(GS:23)	.	IGF1->AKT1	"Indirect transcription"	.	0.2	"Tumor cells"	"Probably through (PIK3C.)"
+PMID:15339239(GS:23)	.	IGF1-|CASP9	Binding	.	0.6	"Tumor cells"	"Binding blocks downstream activation of caspase 3"
+PMID:15339239(GS:23)	.	IGF1->(MAPK.)	Influence	.	0.5	.	"Oestrogen signaling crosstalk"
+PMID:15339239(GS:23)	.	IGF1->(PIK3C.)	Influence	.	0.5	.	"Oestrogen signaling crosstalk"
+#
+.	PMID:8288587	(PRKC.)->RAF1	Phosphorylation	.	0.6	.
+.	PMID:10781600	(PRKC.)->RAF1	Phosphorylation	.	0.6	.
+#
+.	PMID:10698680	BAD-|BCL2	"Post-transcriptional influence"	.	0.6	.
+.	PMID:10320048	BAD-|BCL2	"Post-transcriptional influence"	.	0.6	.
+#
+.	PMID:10698680	BAD^p->BCL2	"Post-transcriptional influence"	.	0.6	.
+.	PMID:10320048	BAD^p->BCL2	"Post-transcriptional influence"	.	0.6	.
+#
+.	.	MAPK8->BAD^p	Phosphorylation	.	0.9	.
+#
+.	PMID:10195903	RAF1->BAD^p	Phosphorylation	.	0.6	.
+.	PMID:10802706	RAF1->BAD^p	Phosphorylation	.	0.6	.
+#
+.	PMID:10687952	BCL2-|BAX	Binding	.	0.6	.
+.	PMID:10500797	BCL2-|BAX	Binding	.	0.6	.
+#
+.	PMID:10085289	BCL2-|BID	Binding	.	0.5	.
+#
+.	PMID:14732682	BCL2L11-|BCL2	Binding	.	0.5	.
+#
+.	PMID:11741882	BCL2L1-|BID	Binding	.	0.7	.
+.	PMID:10085289	BCL2L1-|BID	Binding	.	0.7	.
+.	PMID:9727492	BCL2L1-|BID	Binding	.	0.7	.
+#
+.	PMID:10629050	BID->BAX	"Binding, oligomerization"	.	0.6	.
+.	PMID:12808108	BID->BAX	"Binding oligomerization"	.	0.6	.
+#
+.	PMID:11997495	BCL2L11->BAX	Binding	.	0.5	.
+#
+.	PMID:15071501	(MAPK8,MAPK9,MAPK10)->SFN^p	Phosphorylation	.	0.5	.
+.	PMID:15071501	SFN^p->BAX	Binding	.	0.5	.
+.	PMID:15071501	SFN-|BAX	Binding	.	0.5	.
+#
+.	PMID:9794838	CFLAR->TRAF2	Binding	.	0.5	.	"Exact effect unknown"
+#
+.	.	IGFBP3-|IGF2	Binding	.	0.9	.
+#
+.	PMID:12223490	MAPK10-|MCL1	Phosphorylation	.	0.5	.
+#
+.	PMID:15014070	MCL1-|BCL2L11	Binding	.	0.6	.
+#
+.	.	FOXO3->BCL2L11	Transcription	.	0.9	.
+#
+.	PMID:11463845	AKT1-|CDKN1A	Phosphorylation	.	0.5	.
+#
+.	.	MAPK1->TNFRSF1A	Phosphorylation	.	0.9	.
+PMID:11988758(GS:29)	.	(MAPK8,MAPK9,MAPK10)->JUN	Phosphorylation	0.9	.	"Activate AP1 transcriptional complex"
+PMID:11988758(GS:29)	.	JUN->CCND1	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN-|TP53	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN->FASLG	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN-|FAS	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN->BCL2L11	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+#
+PMID:12510147(GS:31)	.	(NFKB.)->IER3	Transcription	.	0.8	.	

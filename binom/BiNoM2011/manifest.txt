@@ -1,0 +1,1 @@
+Cytoscape-Plugin: fr.curie.BiNoM.cytoscape.plugin.BiNoMPlugin

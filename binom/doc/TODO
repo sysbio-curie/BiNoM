@@ -1,0 +1,270 @@
+
+1. Import
+
+X Import BioPAX v1
+
+X Import CellDesigner v1
+
+X Integration nouvelles sources Andrei 
+
+X Mise dans CVS
+
+X Dialog Form:
+[ ] reaction network
+  options
+[ ] pathway structure
+  [ ] 
+  [ ] 
+  [ ] 
+  [ ] 
+[ ] protein-protein interaction
+
+X Interpretation dialogue:
+- creation multiple networks
+- prise en compte des options
+
+Layout:
+- résoudre pb layout: soit élégamment... soit en intégrant le code 
+  des layout directement dans le plugin
+- Pathway: Hierarchic Layout
+- Reaction: Organic Layout
+
+Visual mapping ? Fonction generant un bitmap ?
+
+X BioPAX: Import URL
+
+CellDesigner: Import URL
+
+X 2. Export :
+
+[cytoscape filtering]
+
+- export -> BioPAX (on doit garder une BW reference sur le fichier d'origine)
+
+- export -> CellDesigner (idem)
+
+3. Property edition
+
+- Property Editor form
+
+Flow Control:
+- selection d'un node + menu Edit Properties
+- chercher valeur attribut: BIOPAX_NODE_ID -> attr_value
+- biopax_DASH_level2_DOT_owlFactory.getXxx(attr_value) -> objet
+  fr/curie/BiNoM/pathways/biopax/biopax_DASH_level2_DOT_owlFactory.java
+- par instrospection chercher les methodes et les types des attributs :
+  strings:
+  getXxx() -> String | bioSource | etc.
+  setXxx() -> String | bioSource
+
+  lists:
+  getXxx() -> Iterator of String, bioSource etc.
+  addXxx(String)
+  addXxx(...) si object != String
+  removeXxx(...)
+
+- 4 types principaux :
+  + String
+  + Double
+  + Object (plus precisement: bioSource, dataSource, xref, Protein etc.)
+  + list of string, double, object
+
+GUI:
+- affichage commun:
+   Type object
+   ID (immutable)
+   BioPAX Name (BioPAXNamingService) -> se met a jour quand on fait apply =>
+      recalcul du nom
+  fr.curie.BiNoM.pathways.utils.BioPAXNamingService
+  
+- selon type de properties:
+
+  string => JTextField
+
+  object => ID/BioPAX name
+
+            - bouton update reference: ouvre un autre property editor
+              correspondant a cet objet
+
+            - bouton change reference: ouvre une fenetre scrollbar avec les
+              references de tous les objets de meme type (getAllXxx()) de la base
+              + la reference null
+
+  list of strings => scroll list de string multiselectable
+            - bouton remove (des strings selectionnées)
+            - JTextField + bouton add
+
+  list of objects => scroll list de object multiselectable
+
+            - bouton remove (des strings selectionnées)
+
+            - bouton update reference (si un seul objet selectionné): ouvre un
+              autre property editor correspondant a cet objet
+
+            - bouton change reference (si un seul object selectionné): ouvre une
+              fenetre scrollbar avec les references de tous les objets de meme
+               type (getAllXxx()) de la base + la reference null
+
+X - ajouter boutons back & forward dans le browser
+
+X - pb des commentaires trop long: split en lignes
+
+- couleurs != des onglets selon le type d'objet ??
+
+- browser de classes :
+  + 1 page principale recapitulant toutes les classes + la couleur d'onglet
+    associee a chaque classe
+  + en cliquant sur le nom d'une classe, on peut naviguer entre les classes
+    qui s'affichent dans des onglets (as property browser)
+  - ou bien, simplement la liste (+ le choix des couleurs) que l'on pourrait
+    afficher dans la property browser
+
+  -> plutot:
+   ensemble des classes sous forme d'un JTree: noeud racine Thing
+   pour chaque noeud: entre parentheses le nombre d'instances strictes
+   pouvoir ouvrir la liste des objets (avec liens sur le Browser)
+   pouvoir choisir une couleur
+   option: random color generator
+   rectificatif:
+   il faut pouvoir afficher les instances strites et non strictes, cela sera
+   utile pour le browser editor
+
+X - rendre le bouton "display all|valid attributes" actif
+
+- penser a un mode d'edition dans la property browser
+  -> reflechir a l'interface
+
+X - ajouter le type Integer et IntegerList
+
+X - factoriser le code relafif aux AttrDesc dans PropertyBrowserPanel
+
+X - PropertyNavigator
+  n'affiche que les proprietes non null ou listes non vides
+  permet la navigation entre objets :
+  + onglet (click milieu)
+  + nouvelle fenetre (idem) : onglet ou nouvelle fenetre determinee selon config
+  + in place (click gauche)
+  -> prevoir des boutons back, forward et edit
+  afficher les noeuds lies et la qualification (type) des edges qui les connectent- 
+
+- PropertyDisplayer : idem PropertyNavigator mais :
+   + situé dans les fenetres a gauche (Network)
+   + affichant les infos du noeud selectionné
+
+ -- checkpoint --
+
+- ajouter dans BioPAXPropertyManager.getSelectedBioPAXObjects(), le parcours
+  des edges selectionnées: les ajouter dans la liste ssi il existe les
+  attributs BIOPAX_NODE_ID et BIOPAX_NODE_TYPE 
+
+X - ajouter un systeme de navigation dans la fenetre popup d'update ou add
+  d'un biopax object => un PropertyBrowser (autre instance sans mode edit et
+  éventuellement d'une autre couleur de fond).
+
+X - le naming service:
+  bns = new BioPAXNamingService(biopax)
+  bns.getnameByUri(uri)
+  + utilisation du mode NamingService ou CURI : globale
+    - un menu item en plus
+    - (idée) se baser sur le systeme de property de Cytosapce (preference)
+      => on bénéficie de la sauvergarde: attention, il faut quand même un menu
+      item de plus qui controle cette propriété et l'affichage
+      
+  + getCURI(obj) devra désormais appeler bns.getnameByUri(uri) : attention
+    on devra avoit biopax dans un coin pour le naming service
+
+X - implémenter les set de values et d'objets
+
+X/2 - menu new biopax object:
+  + choix du type: Protein, Gene, Complex etc. a recuperer dans la factory
+  + en fonction du type, affiche le property editor
+    Type object
+    ID (genere automatiquement un ID unique)
+
+    BioPAX Name (BioPAXNamingService) -> se met a jour quand on fait apply =>
+       recalcul du nom
+
+- Ameliorer l'introspection:
+  + detecter les methodes GET, SET, ADD _asXX et les doublons de RMV
+    - changer String attr = name.substring(SET.length());
+      en  String attr = name.getAttrName(SET) :
+        -> detecte eventuellement le _asis
+        -> retourne null si pas sous la forme setXXX ou setXXX_as.....
+    - changer skipAttrName: de facon 
+  + conserver les methodes de ce type dans un Vector de methodes
+    - changer les setAddMethod(), setSetMethod() etc. en addAddMethod(),
+      addSetMethod() etc.
+      avec 2 arguments: la methode et le clsobj.
+
+- Création ou update des réseaux :
+
+  X + créer un ou plusieurs nouveaux reseaux a partir du biopax modifié:
+     X - Save associated biopax as...
+       + BioPAX.saveToFile(filename, biopax.model)
+     - plus tard: fenetre de dialog <=> import biopax (Reaction, Pathway, Protein)
+
+  X/2 + update des réseaux: on part de la fenetre BioPAX Class Tree et on déclenche
+    l'update (ou bien plutot de "Update networks
+     - affichage d'un dialogue:
+      + liste des reseaux associés pre-selectionnés (on peut deselectionner)
+      + ok/cancel
+     - Graph graph = BioPAXToCytoscapeConverter.convert(algo, biopax);
+         qui fabrique le Graph (l'index) (algo == "FULL_INDEX")
+     - foreach network to update {
+        + calculer intersection des Nodes (uniquement !) avec le graph
+	  ATTENTION: pb des nouveaux objets créés !!!
+        + pour les nodes detruits dans BioPAX (TBD), supprimer ces nodes (+
+          les edges) : automatiques avec le calcul de l'intersection
+        + refabriquer le NetworkView en respectant le layout affiché avant
+          l'update
+       }
+
+X - BIOPAX_URI:
+  + gestion des listes d'attributs !
+  getStringAttribute()
+  getListAttributes()
+
+X - NetworkIntersection:
+  methode de comparaison:
+  node1 == node2
+  si un des BIOPAX_URI de node1 == BIOPAX_URI de node2 
+
+- objets crees:
+  X + nouvel objet: dialogue proposant une URI par default que l'utilisateur
+    peut changer
+  + maintenir une liste des objets 
+  + lors de l'update:
+    - ajouter tous ces objets avec leurs liens eventuels a chaque reseau
+    - vider la liste
+    - attention a la position des nouveaux noeuds:
+      + si non connecté, en haut à gauche
+      + si connecté avec N > 1, barycentre
+      + si 1 lien, pas trop loin de l'autre noeud (45o north-west)
+
+- remove d'instances
+  X + en mode Edit seulement, ajouter un label remove a cote du nom de l'entite
+  + implementation
+
+- a noter que le property browser/editor est global a tous les biopax: est-ce
+  une bonne idee ?
+
+- construction d'un jar global BiNoM.jar + BiNoM/lib/*.jar (uniquement ce qui
+  est nécessaire)
+
+X - ajouter dans dialogue BioPAX import:
+  un checkbox apply layout
+
+- centrer les dialogues
+
+X - pb GridBagLayout sur Java < 6 : limité à 512 rows: le detecter
+
+4. Merging
+
+5. Structure Analysis
+
+6. Querying system
+
+Others.
+- Probleme du .jar
+- Ajouter remove networks au menu:
+  + pb: comment avoir la liste des networks selectionnés ?

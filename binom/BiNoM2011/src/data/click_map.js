@@ -16,28 +16,6 @@
   *
   *    $Id$
   */
-function initialize() {
-	var tileOptions = {
-			  getTileUrl: function(coord, zoom) {
-				  return "tiles/" + zoom + "_" + coord.x + "_" + coord.y + ".png";
-			  },
-			  tileSize: new google.maps.Size(256, 256),
-			  isPng: true
-			};
-
-	var myMapType = new google.maps.ImageMapType(tileOptions);
-	
-	
-    var latlng = new google.maps.LatLng(-34.397, 150.644);
-    var myOptions = {
-      zoom: 8,
-      center: latlng,
-      mapTypeId: "ClickMap"
-    };
-    var map = new google.maps.Map(document.getElementById("map"),
-        myOptions);
-    map.mapTypes.set("ClickMap", myMapType);
-  }
 
 function make_marker(map, lat, lng)
 {

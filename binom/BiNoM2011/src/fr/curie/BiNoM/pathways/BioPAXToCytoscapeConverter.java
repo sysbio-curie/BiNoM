@@ -436,9 +436,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			pathways.put(p.uri(),p);
 		}
 		
-		System.out.println("Nb pathways"+ pathways.size());
-		
-		
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllPathwayStep(biopax.model);
 		for (int i=0;i<pl.size();i++) {
 			PathwayStep p = (PathwayStep)pl.get(i);
@@ -449,11 +446,8 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalPathwayStep(biopax.model);
 		for (int i=0;i<pl.size();i++) {
 			PathwayStep p = (PathwayStep)pl.get(i);
-			System.out.println(p.uri());
 			pathwaySteps.put(p.uri(),p);
 		}
-		
-		System.out.println("pathwaySteps"+pathwaySteps.size());
 		
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllInteraction(biopax.model);
 		for (int i=0;i<pl.size();i++) { interactions.put(((Entity)pl.get(i)).uri(),pl.get(i));   }
@@ -476,8 +470,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		for (int i=0;i<pl.size();i++) { interactions.put(((Entity)pl.get(i)).uri(),pl.get(i));   }
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllTransport(biopax.model);
 		for (int i=0;i<pl.size();i++) { interactions.put(((Entity)pl.get(i)).uri(),pl.get(i));   }
-		
-		System.out.println("Nb interactions:"+interactions.size());
 		
 		GraphDocument gr = GraphDocument.Factory.newInstance();
 		GraphicGraph grf = gr.addNewGraph();
@@ -513,19 +505,23 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 					}
 				}
 			}
-
 		} 
 
 		if (option.includeNextLinks) {
 			List stl = biopax_DASH_level3_DOT_owlFactory.getAllPathwayStep(biopax.model);
+			List tmp = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalPathwayStep(biopax.model);
+			for (int i=0;i<tmp.size();i++)
+				stl.add(tmp.get(i));
+			
 			for (int i=0;i<stl.size();i++) {
 				PathwayStep ps = (PathwayStep)stl.get(i);
 				n = (GraphicNode)nodes.get(ps.uri());
-				Vector uris = Utils.getPropertyURIs(ps,"NEXT-STEP");
+				//Vector uris = Utils.getPropertyURIs(ps,"NEXT-STEP");
+				Vector uris = Utils.getPropertyURIs(ps,"nextStep");
 				for (int j=0;j<uris.size();j++) {
 					String s = (String)uris.elementAt(j);
 					PathwayStep ps1 = (PathwayStep)pathwaySteps.get(s);
-					GraphicNode n1 = (GraphicNode)nodes.get(ps1.uri());;
+					GraphicNode n1 = (GraphicNode)nodes.get(ps1.uri());
 					if((n!=null)&&(n1!=null)){		    
 						if(edges.get(n.getId()+" ("+"NEXT"+") "+n1.getId())==null){
 							GraphicEdge e = grf.addNewEdge();
@@ -573,8 +569,8 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		pathwaysAdded.add(p.uri());
 
 		//Vector uris = Utils.getPropertyURIs(p,"PATHWAY-COMPONENTS");
-		Vector uris = Utils.getPropertyURIs(p, "pathwayComponent");
-		System.out.println("Nb pathwayComponent: "+uris.size());
+		Vector<String> uris = Utils.getPropertyURIs(p, "pathwayOrder");
+		
 		for (int i=0;i<uris.size();i++) {
 			String s = (String)uris.elementAt(i);
 			if (pathways.containsKey(s)) {
@@ -593,7 +589,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 				}
 			}
 			if (pathwaySteps.containsKey(s)) {
-				System.out.println("pathwaySteps");
 				GraphicNode n1 = addPathwayStepNode(grf,(PathwayStep)pathwaySteps.get(s),pathways,interactions,pathwaySteps,nodes,edges, option);
 				if(edges.get(n.getId()+" ("+"CONTAINS"+") "+n1.getId())==null){
 					GraphicEdge e = grf.addNewEdge();
@@ -633,12 +628,12 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			n.setId(bpnm.getNameByUri(ps.uri()));
 			n.setName(bpnm.getNameByUri(ps.uri()));
 			nodes.put(ps.uri(),n);
-			Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","pathwayStep",ObjectType.STRING);
+			Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","PathwayStep",ObjectType.STRING);
 			Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",ps.uri(),ObjectType.STRING);
 		}
 		//Vector uris = Utils.getPropertyURIs(ps,"STEP-INTERACTIONS");
 		Vector uris = Utils.getPropertyURIs(ps,"stepProcess");
-		System.out.println("Nb stepProcess: "+uris.size());
+		
 		for (int i=0;i<uris.size();i++) {
 			String s = (String)uris.elementAt(i);
 			if (option.includePathways)

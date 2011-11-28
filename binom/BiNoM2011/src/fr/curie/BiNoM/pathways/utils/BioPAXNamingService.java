@@ -255,6 +255,9 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllPathwayStep(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalPathwayStep(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllEntityFeature(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 

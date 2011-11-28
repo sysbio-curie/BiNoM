@@ -2,6 +2,7 @@ package fr.curie.BiNoM.pathways.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -54,48 +55,58 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
 
 			
-			/*
-			 * Pathway components
-			 */
-			BioPAX bp = new BioPAX();
-			bp.loadBioPAX(new FileInputStream(fn));
+			
+		      /*
+		       * Pathway components
+		       */
+//		      BioPAX bp = new BioPAX();
+//		      bp.loadBioPAX(new FileInputStream(fn));
+//		
+//		      List l = biopax_DASH_level3_DOT_owlFactory.getAllPathway(bp.model);
+//		      for (int i=0;i<l.size();i++) {
+//		        Pathway p = (Pathway) l.get(i);
+//		        //System.out.println("Pathway: "+p.uri());
+//		        
+//		        Iterator it = p.getPathwayOrder();
+//		        int ct = 0;
+//		        while(it.hasNext()) {
+//		          PathwayStep ps = (PathwayStep)it.next();
+////		          System.out.println("PathwayStep: "+ps.uri());
+//		          Vector<String> vec = Utils.getPropertyURIs(ps, "nextStep");
+//		          for (String sg : vec)
+//		            System.out.println(ps.uri()+" nextStep: "+sg);
+//		        }
+//		        
+//		      }
 
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllPathway(bp.model);
-			for (int i=0;i<l.size();i++) {
-				Pathway p = (Pathway) l.get(i);
-				System.out.println("Pathway: "+p.uri());
-				Iterator it = p.getPathwayOrder();
-				while(it.hasNext()) {
-					PathwayStep ps = (PathwayStep)it.next();
-					Vector<String> vec = Utils.getPropertyURIs(ps, "stepProcess");
-					for (String sg : vec)
-						System.out.println("stepProcess"+sg);
-				}
-				
-				Vector<String> uris = Utils.getPropertyURIs(p, "pathwayComponent");
-				for (String s : uris)
-					System.out.println("pathwayComponent: "+s);
-			}
+
+		      /*
+		       * test pathway structure import
+		       */
+
+		      BioPAXToCytoscapeConverter.Option option = new BioPAXToCytoscapeConverter.Option();
+		      option.makeRootPathwayNode = false;
+		      option.includeNextLinks = true;
+		      option.includePathways = true;
+		      option.includeInteractions = true;
+
+		      BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
+		      BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, fn, option);
+		      
+		      //System.out.println(gr.graphDocument.toString());
+		      
+		      try{
+		    	  FileWriter fw = new FileWriter("/bioinfo/users/ebonnet/out.xgmml");
+		    	  String s = gr.graphDocument.toString();
+		    	  s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
+		    	  fw.write(s);
+		    	  fw.close();
+		      }catch(Exception e){
+		    	  e.printStackTrace();
+		      }
+
+
 			
-			
-			
-			
-			/*
-			 * test pathway structure import
-			 */
-			
-//			BioPAXToCytoscapeConverter.Option option = new BioPAXToCytoscapeConverter.Option();
-//			option.makeRootPathwayNode = false;
-//			option.includeNextLinks = false;
-//			option.includePathways = true;
-//			option.includeInteractions = true;
-//			
-//			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
-//			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
-//			
-//			//System.out.println(gr.graphDocument.toString());
-//			Graph graph = XGMML.convertXGMMLToGraph(gr.graphDocument);
-//			XGMML.saveToXGMML(graph, "/bioinfo/users/ebonnet/out.xgmml");
 			
 			/*
 			 * Test sbml conversion

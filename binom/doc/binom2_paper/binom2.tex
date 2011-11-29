@@ -455,15 +455,28 @@ selected nodes and edges and also to show the clipboard content.
 
 cairns:
 
-- import of the network
+\subsection{Import of the network}
 
-- subnetwork extraction
+\subsection{Subnetwork extraction}
 
-- intersection with Reactome
+\subsection{Intersection with Reactome}
 
-- modularization
+\subsection{modularization} 
 
-- application of PIQuant on 2 GS networks (comprehensive + modular network), data from Stransky.
+\begin{itemize}\item Import network\\\bf{Plugins = BiNoM IO = Import CellDesigner document from file}  \\
+Choose G1S.xml\item	Get material decomposition: 36 modules are created.\bf{Plugins => BiNoM analysis => Get material components}\item	Clustering\bf{Plugins => BiNoM analysis => Cluster networks}Select all networks except G1S and choose 25\% overlap.7 networks are created.\item	Rename the newly-created clusters
+\begin{itemize}
+\item	E2F1\_RB\item	CycD1\item CycE\_A\item Wee1\item p21\item CycH\item CycB1
+\end{itemize}\item	Inside the clusters, check the content of the modules (manual curation of the modularization)
+\begin{itemize}
+\item	For cluster E2F1\_RB, separate RB from E2F1 and from E2F6 and create three different modules.\bf{Select => Nodes => By Name}\\Write *E2F6*. The nodes with E2F6 are highlighted.Select the reactions between the nodes\bf{Select => Nodes => First neighbours of selected nodes}\\\bf{File => New => Network => From selected nodes all edges}\\Rename E2F1\_RB child Delete the nodes from E2F1\_RB network\item	Do the same for pRB\item	Rename the remaining network of E2F1\_RB, E2F1\item	For cluster, CycB1, select CDC25 and create a new module with components including CDC25.\item	The resulting list of modules is:CDC25, CycB1, Wee1, CycH, p21, CycD1, CycE\_A, E2F1, RB and E2F6
+\end{itemize}
+\item	Select modules to prepare the modular view. In the pop-up window, choose the 10 modules\bf{Plugins => BiNoM modules => Create nest network}\item	Connect modules\bf{Plugins => BiNoM modules => Update connections between nests}
+\item Verify the resulting modular view
+\begin{itemize}\item	Merge networks (modules)\bf{Plugins => Advanced network merge}Choose union and the 10 modules.Resulting network: 209 nodes and 476 edgesInitial network: 209 nodes and 266 edgesLC: there seems that there was a duplication of edges in the merging process\item	Update connections from other network\item	Network difference\end{itemize}
+\end{itemize}
+
+\subsection{Application of PIQuant on 2 GS networks (comprehensive + modular network), data from Stransky.}
 
 
 \section*{Conclusions}

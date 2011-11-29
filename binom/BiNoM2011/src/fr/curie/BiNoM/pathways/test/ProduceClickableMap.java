@@ -95,7 +95,21 @@ public class ProduceClickableMap {
 		non_entities = new String[]{DEGRADED_CLASS_NAME, COMPLEX_CLASS_NAME, PHENOTYPE_CLASS_NAME, DRUG_CLASS_NAME, ION_CLASS_NAME, UNKNOWN_CLASS_NAME, SIMPLE_MOLECULE_CLASS_NAME};
 		Arrays.sort(non_entities);
 	}
-	private static final String[] javascript_files = new String[]{"head_section", "click_map", "customMap", "markers", "marker_links", "marker_checkboxes"};
+	
+	private static final String[] javascript_files;
+	private static final String[] javascript_for_index = new String[]{
+		// "markers",
+		// "marker_links",
+		// "marker_checkboxes",
+		"click_map"
+//		"customMap"
+	};
+	static
+	{
+		javascript_files = Arrays.copyOf(javascript_for_index, javascript_for_index.length + 1);
+		javascript_files[javascript_files.length - 1] = "head_section";
+	}	
+	
 	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>(); 
 	public SbmlDocument cd = null;
 	private final HashMap<String, XmlObject> species = new HashMap<String, XmlObject>(); // not used
@@ -128,6 +142,7 @@ public class ProduceClickableMap {
 	private static final String celldesigner_suffix = ".xml";
 	private static final String image_suffix = ".png";
 	private static final String common_directory_name = "_common";
+	private static final String common_directory_url = "../" + common_directory_name + "/";
 	
 	private final String blog_name;
 	
@@ -158,7 +173,7 @@ public class ProduceClickableMap {
 	static private void calculate_all_modification_names(SbmlDocument cd, final Map<String, EntityBase> _entityIDToEntityMap,
 		final Map<String, Modification> _speciesIDToModificationMap)
 	{
-		/* this is really horrible but I need to have the name of the species and this can only only 
+		/* this is really horrible but I need to have the name of the species and this can only 
 		 * be done once the maps are set up. Which maps? Who knows?
 		 */
 		int i =0;
@@ -170,7 +185,7 @@ public class ProduceClickableMap {
 			}
 			catch (ClassCastException w)
 			{
-				// WTF?
+				// some names cannot de calculated
 				Utils.eclipseErrorln("exceptions " + m.getId());
 				i++;
 			}
@@ -297,8 +312,8 @@ public class ProduceClickableMap {
 		if (!root.exists())
 			root.mkdir();
 		final File destination_common = new File(root, common_directory_name);
-		if (!destination_common.exists())
-			destination_common.mkdir();
+		if (!destination_common.exists() && !destination_common.mkdir())
+			throw new Exception("failed to make " + destination_common);
 		copy_files(data_directory, destination_common);
 
 		process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, key);
@@ -332,16 +347,26 @@ public class ProduceClickableMap {
 		return process_a_map(blog_name, name.substring(base.length(), name.length() - celldesigner_suffix.length()), title, destination, base, source_directory, make_tiles, null, key);
 
 	}
-	
 
-	private static int[] make_tiles(File source_directory, String root, File outdir)
+	private static int[] make_tiles(File source_directory, String root, File outdir) throws Exception
 	{
-		int min_scale = -1;
 		int count = 0;
-		int last_found = -1;
-		final BufferedImage tiled = new BufferedImage(tile_size, tile_size, BufferedImage.TYPE_INT_RGB);
+		int last_found = 0;
+		
+		final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
+		final BufferedImage image0 = ImageIO.read(image_file0);
+		
+		final int width = image0.getWidth();
+		final int height = image0.getHeight();
+		
+		File zoom0 = new File(outdir, "0");
+		zoom0.mkdir();
+		copy_file(image_file0, new File(zoom0, "0_0.png"));
+		
+		final BufferedImage tiled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		final Graphics2D g = tiled.createGraphics();
-		for (int file_number = 0;; file_number++)
+		
+		for (int file_number = 1;; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
 			final BufferedImage image;
@@ -351,31 +376,48 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ min_scale, last_found };
+				return new int[]{ last_found, width, height };
 			}
-			final int scale_factor = get_maxscale(Math.max(image.getWidth(), image.getHeight()));
-			if (last_found < 0)
-				min_scale = last_found = scale_factor;
-			final int max_size = tile_size << scale_factor;
-			final BufferedImage padded_image = new BufferedImage(max_size, max_size, BufferedImage.TYPE_INT_RGB);
+			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, width, height, image_file0);
+			
+			final BufferedImage padded_image = new BufferedImage(width << scale_factor, height << scale_factor, BufferedImage.TYPE_INT_RGB);
 			padded_image.createGraphics().drawRenderedImage(image, null);
 			
 			for (int i = last_found + 1; i < scale_factor; i++)
 			{
-				final int size = tile_size << i;
-				count += write_tiles(Scalr.resize(padded_image, Scalr.Method.QUALITY, size, size, Scalr.OP_ANTIALIAS), outdir, i, tiled, g);
+				count += write_tiles(Scalr.resize(padded_image, Scalr.Method.QUALITY, width << scale_factor, height << scale_factor, Scalr.OP_ANTIALIAS), outdir, i, tiled, g, width, height);
 				Utils.eclipsePrintln("resized image " + file_number + " " + (scale_factor - i) + " step");
 			}
-			count += write_tiles(padded_image, outdir, scale_factor, tiled, g);
+			count += write_tiles(padded_image, outdir, scale_factor, tiled, g, width, height);
 			last_found = scale_factor;
 		}
 	}
 	
-	private static int[] get_zooms(File source_directory, String root)
+	private static int get_scale(int width, int height, final File image, int width0, int height0, final File image0)
+        {
+		/*
+	        if (width % width0 != 0)
+	        	throw new Exception(image + "'s width " + width + " is not a multiple of " + image0 + "'s width " + width0);
+	        if (height % height0 != 0)
+	        	throw new Exception(image + "'s height " + height + " is not a multiple of " + image0 + "'s height " + height0);
+	        final int scale = width / width0;
+	        if (scale != height / height0)
+	        	throw new Exception(image + "'s height is not the same multiple of " + image0 + "'s height as is the width");
+	        */
+		return Math.min(get_maxscale(width, width0), get_maxscale(height, height0));
+        }
+
+	private static int[] get_zooms(File source_directory, String root) throws Exception
 	{
-		int min_scale = -1;
-		int last_found = -1;
-		for (int file_number = 0;; file_number++)
+		int last_found = 0;
+		
+		final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
+		final BufferedImage image0 = ImageIO.read(image_file0);
+		
+		final int width = image0.getWidth();
+		final int height = image0.getHeight();
+		
+		for (int file_number = last_found + 1;; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
 			final BufferedImage image;
@@ -385,15 +427,38 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ min_scale, last_found };
+				return new int[]{ last_found, width, height };
 			}
-			final int scale_factor = get_maxscale(Math.max(image.getWidth(), image.getHeight()));
-			if (last_found < 0)
-				min_scale = last_found = scale_factor;
-			last_found = scale_factor;
+			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width, height, image_file0);
 		}
 	}
+
+	private static int get_maxscale(final int width, int base_width)
+        {
+		final double a = width / (double)base_width;
+		final double b = Math.log(a) / Math.log(2);
+		final double c = Math.ceil(b);
+		return (int)c;
+        }
 	
+	private static final String right_panel_list = "right_panel.xml";
+	
+	private static boolean empty_tiles(final File tiles_directory)
+	{
+		final File[] directories = tiles_directory.listFiles();
+		if (directories == null)
+			return false;
+		
+		for (final File directory : directories)
+		{
+			final File[] files = directory.listFiles();
+			if (files != null)
+				for (File file : files)
+					file.delete();
+			directory.delete();
+		}
+		return true;
+	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
 		boolean make_tiles, Wordpress wp, String key) throws Exception, FileNotFoundException
@@ -404,15 +469,16 @@ public class ProduceClickableMap {
 		if (!this_map_directory.exists())
 			this_map_directory.mkdir();
 
-		clMap.createClickableMap(wp, new File(this_map_directory, "markers.xml"));
+		clMap.createClickableMap(wp, new File(this_map_directory, "markers.xml"), new File(this_map_directory, right_panel_list));
 
 		final File tiles_directory = new File(this_map_directory, "tiles");
 		final boolean tiles_exist = tiles_directory.exists();
 		int[] scales;
 		if (make_tiles || !tiles_exist)
 		{
-			if (!tiles_exist)
-				tiles_directory.mkdir();
+			if (tiles_exist)
+				empty_tiles(tiles_directory);
+			tiles_directory.mkdir();
 			scales = make_tiles(source_directory, base + map, tiles_directory);
 		}
 		else
@@ -420,7 +486,7 @@ public class ProduceClickableMap {
 		if (scales[0] < 0)
 			Utils.eclipseErrorln("no images found");
 		Utils.eclipsePrintln("scales " + scales[0] + " " + scales[1]);
-		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales[0], scales[1]);
+		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales[0], scales[1], scales[2]);
 		return clMap;
 	}
 
@@ -433,8 +499,18 @@ public class ProduceClickableMap {
 
 	private static void copy_file_between_directories(final File source, File destination, final String file) throws IOException
 	{
-		copyFile(new File(source, file), new File(destination, file));
+		final File destFile = new File(destination, file);
+                final File sourceFile = new File(source, file);
+		copy_file(sourceFile, destFile);
 	}
+
+	private static void copy_file(final File sourceFile, final File destFile) throws IOException
+        {
+	        if (destFile.getCanonicalFile().equals(destFile.getAbsoluteFile()))
+	                copyFile(sourceFile, destFile);
+                else
+			Utils.eclipsePrintln("skipping " + destFile + " because is symlink");
+        }
 
 	static private void fatal_error(String message)
 	{
@@ -499,19 +575,20 @@ public class ProduceClickableMap {
 		}
 	}
 	
-	private static final int tile_size = 256;
-	
-	private static int write_tiles(final BufferedImage scaledImage, final File outdir, final int scale_factor, final BufferedImage tiled, final Graphics2D g)
+	private static int write_tiles(final BufferedImage scaledImage, final File outdir, final int scale_factor, final BufferedImage tiled, final Graphics2D g, int width, int height)
 	{
-		final int n = scaledImage.getHeight() / tile_size;
+		final int nx = scaledImage.getWidth() / width;
+		final int ny = scaledImage.getHeight() / height;
 		final AffineTransform af = new AffineTransform();
 		int count = 0;
-		for (int i = 0; i < n; i++)
+		final File zoom_dir = new File(outdir, scale_factor + "");
+		zoom_dir.mkdir();
+		for (int i = 0; i < nx; i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0; j < ny; j++)
 			{
 				g.drawRenderedImage(scaledImage, af);
-				final File png = new File(outdir, scale_factor + "_" + j + "_" + i + image_suffix);
+				final File png = new File(zoom_dir, j + "_" + i + image_suffix);
 				try
 				{
 					ImageIO.write(tiled, "png", png);
@@ -521,27 +598,12 @@ public class ProduceClickableMap {
 				{
 					Utils.eclipseErrorln("failed to write to " + png + ": " + e.getMessage());
 				}
-				af.translate(-tile_size, 0);
+				af.translate(-width, 0);
 			}
-			af.translate(-af.getTranslateX(), -tile_size);
+			af.translate(-af.getTranslateX(), -height);
 		}
 		return count;
 	}
-
-	private static int get_maxscale(final int width)
-        {
-		final double a = width / (double)tile_size;
-		final double b = Math.log(a) / Math.log(2);
-		final double c = Math.ceil(b);
-		return (int)c;
-		/*
-		double h = Math.pow(2, c) * tile_size;
-		verbose("h = " + h);
-		int adjustedw = (int)h;
-		verbose("width = " + width + " " + b + " " + h + " adjusted = " + adjustedw);
-		return adjustedw;
-		*/
-        }
 
 	public void loadCellDesigner(String fn) throws Exception{
 		cd = CellDesigner.loadCellDesigner(fn);
@@ -1143,6 +1205,128 @@ public class ProduceClickableMap {
 		return makeEntityId(pos, Utils.getValue(identity.getCelldesignerName()));
 	}
 	
+	static private void content_line(final PrintWriter output, int indent, String content)
+	{
+		while (indent-- > 0)
+			output.print('\t');
+//		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
+		output.println("<content><name>" + content + "</name></content>");
+	}
+
+	
+	static class ItemCloser
+	{
+		final int indent;
+		PrintWriter output;
+		ItemCloser(int i, PrintWriter o)
+		{
+			indent = i;
+			output = o;
+		}
+		void close()
+		{
+			for (int i = 0; i < indent; i++)
+				output.print('\t');
+			output.println("</item>");
+			output = null;
+		}
+	}
+
+	static private ItemCloser item_line(final PrintWriter output, final int indent, String id, String cls, String name, String type)
+	{
+		item_list_start(output, indent, id, cls);
+		if (type != null)
+			output.print(" rel=\"" + type + "\"");
+		return item_line_end(output, indent, name);
+	}
+
+	private static ItemCloser item_line_end(final PrintWriter output, final int indent, String name)
+	{
+		output.println(">");
+		content_line(output, indent + 1, name);
+		return new ItemCloser(indent, output);
+	}
+
+	private static void item_list_start(final PrintWriter output, final int indent, String id, String cls)
+	{
+		for (int i = 0; i < indent; i++)
+			output.print('\t');
+		output.print("<item id=\"" + id + "\"");
+		if (cls != null)
+			output.print(" class=\"" + cls + "\"");
+	}
+	
+	private static void modifcation_line(final PrintWriter output, Modification m,
+		Map<String, Vector<String>> speciesAliases,
+		Map<String, Vector<Place>> placeMap
+	)
+	{
+		final int indent = 4;
+		item_list_start(output, indent, m.getId(), "modification");
+		output.print(" position=\"");
+		boolean first = true;
+		for (final String shape_id : m.getShapeIds(speciesAliases))
+		{
+			final Vector<Place> places = placeMap.get(shape_id);
+			assert places.size() == 1 : shape_id + " " + places.size();
+			final Place place = places.get(0);
+			if (first)
+				first = false;
+			else
+				output.print(" ");
+			output.print(place.x);
+			output.print(";");
+			output.print(place.y);
+		}		
+		output.print("\"");
+		item_line_end(output, indent, m.getName()).close();
+	}
+	
+	static private void generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
+		Map<String, Vector<String>> speciesAliases,
+		Map<String, Vector<Place>> placeMap
+	)
+		throws FileNotFoundException, UnsupportedEncodingException
+	{
+		final String encoding = "UTF-8";
+		final PrintWriter output = new PrintWriter(output_file, encoding);
+		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
+		output.println("<root>");
+		final ItemCloser entities = item_line(output, 1, "entities", null, "Entities", null);
+		for (final String[] s : class_name_to_human_name)
+		{
+//			if (!s[0].equals(DEGRADED_CLASS_NAME))
+			{
+//				final ItemCloser cls = item_line(output, 2, s[0], null, s[1]);
+				String img = " <img border='0' src=\"" + common_directory_url + "entity_icons/" + s[0] + ".png\"/>";
+				final ItemCloser cls = item_line(output, 2, s[0], null, s[1] + img, s[0]);
+				for (final EntityBase ent : entityIDToEntityMap.values())
+				{
+					if (s[0].equals(ent.getCls()) && !ent.isBad())
+					{
+						final ItemCloser entity = item_line(output, 3, ent.getId(), null, ent.getName(), null);
+						
+						for (Modification m : ent.getModifications())
+	                                                modifcation_line(output, m, speciesAliases, placeMap);
+						
+						entity.close();
+					}
+				}
+				cls.close();
+			}
+			
+		}
+		entities.close();
+		
+		ItemCloser modules = item_line(output, 1, "modules", null, "Modules", null);
+		item_line(output, 2, "oval", "modules", "Oval", null).close();
+		item_line(output, 2, "square", "modules", "Square", null).close();
+		modules.close();
+		
+		output.println("</root>");
+		
+		output.close();
+	}
 	private void generatePages(final Wordpress wp, final File markers) throws Exception
 	{
 		final FormatProteinNotes format = new FormatProteinNotes();
@@ -5008,9 +5192,10 @@ public class ProduceClickableMap {
 		}*/
 	}
 	
-	private void createClickableMap(final Wordpress wp, final File markers) throws Exception
+	private void createClickableMap(final Wordpress wp, final File markers, File rpanel_index) throws Exception
 	{
 		generatePages(wp, markers);
+		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap);
 	}
 	
 	private void find_the_position_of_the_OVAL_in_OVAL_xml_for_centering()
@@ -5441,7 +5626,8 @@ public class ProduceClickableMap {
 		}
 	}
 	
-	static private final String[][] class_name_to_human_name = {
+	static private final String[][] class_name_to_human_name =
+	{
 		{ PROTEIN_CLASS_NAME, "Proteins", "Protein" },
 		{ GENE_CLASS_NAME, "Genes", "Gene" },
 		{ RNA_CLASS_NAME, "RNAs", "RNA" },
@@ -5463,38 +5649,56 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int minzoom, int maxzoom)
+	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int maxzoom,
+		final int width,
+		final int height)
 	{
-		assert minzoom <= maxzoom : minzoom + " " + maxzoom;
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
 		out.println("<!-- $Id$ -->");
 		out.println("<head>");
 		out.println("<meta http-equiv='content-type' content='text/html;charset=UTF-8'/>");
 		out.println("<title>" + title + "</title>");
+		/*
 		out.println("<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=" + key + "' type='text/javascript'></script>");
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
+		*/
 		
-		out.println("<script>");
+		out.println("<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?sensor=false'></script>");
+		
+		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
+		out.println("<script src='/maps/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
+	
+		out.println("<script type='text/javascript'>");
 		out.print("var clickmap_maxzoom = ");
 		out.print(maxzoom);
 		out.println(";");
 		out.println("</script>");
 
-		for (String s : javascript_files)
-			out.println("<script src='../" + common_directory_name + "/" + s + ".js' type='text/javascript'></script>");
-		out.println("<link rel='stylesheet' type='text/css' href='../" + common_directory_name + "/style.css'/>");
+		for (final String s : javascript_for_index)
+			out.println("<script src=\"" + common_directory_url + s + ".js\" type='text/javascript'></script>");
+
+		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "style.css\"/>");
 		out.println("</head>");
 		
-		out.println("<body onunload='GUnload()'>");
+		out.println("<body>");
 		out.println("<noscript><b>JavaScript must be enabled in order for you to use ClickMap.</b>");
 		out.println("However, it seems JavaScript is either disabled or not supported by your browser.");
 		out.println("To view the maps, enable JavaScript by changing your browser options and then try again.");
 		out.println("</noscript>");
 		out.println("<div id='header'><span id='pathway'>" + title + "</span> <span id='author'>by Institut Curie</span></div>");
-		out.println("<div id='map'></div>");
+		final String map_div_name = "map";
+		out.println("<div id='" + map_div_name + "'></div>");
 		out.println("<div id='side_bar'>");
 		
+		final String marker_div_name = "marker_checkboxes";
+		out.println("<div id='" + marker_div_name + "'></div>");
+		if (false)
+		out.println("<script type='text/javascript'>start_right_hand_panel('#" + marker_div_name + "', \"" + right_panel_list + "\");</script>");
+
+		
+		if (false)
+		{
 		for (final String[] l : class_name_to_human_name)
 		{
 			out.println("	<div id='" + l[0] + "'>");
@@ -5502,6 +5706,7 @@ public class ProduceClickableMap {
 			out.println("		<ul id='" + l[0] + "_list'>");
 			out.println("		</ul>");
 			out.println("	</div>");
+		}
 		}
 		out.println("</div>");
 		if (false)
@@ -5516,7 +5721,18 @@ public class ProduceClickableMap {
 		}
 		out.println("<script type='text/javascript'>");
 		if (true)
-			out.println("clickmap_start('" + map_name + "', " + minzoom + ")");
+		if (true)
+		{
+			out.print("clickmap_start(");
+			out.print("'" + map_name + "'");
+			out.print(", " + 0);
+			out.print(", " + maxzoom);
+			out.print(", " + width);
+			out.print(", " + height);
+			out.print(", '#" + marker_div_name + "'");
+			out.print(", \"" + right_panel_list + "\"");
+			out.println(")");
+		}
 		else
 		{
 			out.println("var settingsCustomMap = {");

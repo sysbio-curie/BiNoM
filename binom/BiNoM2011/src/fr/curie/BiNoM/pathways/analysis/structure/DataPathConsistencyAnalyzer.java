@@ -995,8 +995,6 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public void findOptimalCutSet() {
 		
-		long tic, toc;
-		
 		this.optCutSetReport.append("--- Optimal cut set search report ---\n\n");
 		
 		String line = "";
@@ -1031,8 +1029,6 @@ public class DataPathConsistencyAnalyzer {
 //				System.out.println(e.EdgeLabel+":"+att.name+"="+att.value);
 //			}
 //		}
-		
-		tic = getTic();
 		
 		// convert every "neutral" edge to activation
 		int nbConversions = this.checkEdgeInfluence();
@@ -1304,9 +1300,6 @@ public class DataPathConsistencyAnalyzer {
 		}
 		Collections.sort(omegaScores);
 		
-		
-		toc = getToc(tic);
-		System.out.println("timing first part: "+toc);
 		/*
 		 * optimal cut set search
 		 */
@@ -1332,6 +1325,8 @@ public class DataPathConsistencyAnalyzer {
 
 		// The maximum number of set size to search for
 		int k = this.maxSetSize;
+		if (k > allNodes.size())
+			k = allNodes.size();
 		
 		// covered nodes
 		HashSet<String> covered = new HashSet<String>();
@@ -1399,10 +1394,7 @@ public class DataPathConsistencyAnalyzer {
 					 * than the threshold.
 					 * 
 					 */
-					tic = getTic();
 					long nbComb =  calcCombinations(elts.size(), setSize);
-					toc = getToc(tic);
-					System.out.println("Timing calcCombinations: "+toc);
 					long cutoff = this.maxSetNb;
 					ArrayList<String> selection = new ArrayList<String>();
 					boolean selTest = false;
@@ -1434,7 +1426,6 @@ public class DataPathConsistencyAnalyzer {
 					int[] indices;
 					ArrayList<HashSet<String>> candidates = new ArrayList<HashSet<String>>();
 
-					tic = getTic();
 					while(cg.hasMore()) {
 						candidates.add(new HashSet<String>());
 						indices = cg.getNext();
@@ -1446,8 +1437,6 @@ public class DataPathConsistencyAnalyzer {
 						}
 					}
 
-					toc = getToc(tic);
-					System.out.println("Timing generate candidate sets: "+toc);
 //					System.out.println("combinations");
 //					for (HashSet h : candidates)
 //						System.out.println(h.toString());
@@ -1464,7 +1453,6 @@ public class DataPathConsistencyAnalyzer {
 					 */
 					int[] countHit = new int[allSets.size()];
 					int countSets = 0;
-					tic = getTic();
 					long ticHS, tocHS=0; // hitting sets
 					long ticPS, tocPS=0; // previous sets
 					for (HashSet<String> ca : candidates) {
@@ -1479,7 +1467,6 @@ public class DataPathConsistencyAnalyzer {
 									countHit[l]++;
 							}
 						}
-						
 
 						int sum=0;
 						for (int l=0;l<allSets.size();l++)
@@ -1501,10 +1488,6 @@ public class DataPathConsistencyAnalyzer {
 							}
 						}
 					}
-					toc=getToc(tic);
-					System.out.println("Timing check candidates: "+toc);
-					System.out.println("Timing true HS: "+tocHS);
-					System.out.println("Timing previous HS: "+tocPS);
 					System.out.println("OptCutSet size: "+optCutSets.size());
 					this.optCutSetReport.append("Found "+countSets+" hitting sets.\n");
 					System.out.println("Found "+countSets+" hitting sets.");
@@ -1647,14 +1630,14 @@ public class DataPathConsistencyAnalyzer {
 			}
 
 			if (found == false && inter != null) { 
-				if (inter.indexOf("activation")>=0) {
+				if (inter.indexOf("activation") >= 0 || inter.indexOf("activate") >= 0) {
 					e.setAttributeValueUnique("interaction", "activation", Attribute.ATTRIBUTE_TYPE_STRING);
 					found = true;
 				}
 			}
 
 			if (found == false && inter != null) {
-				if (inter.indexOf("inhibition")>=0) {
+				if (inter.indexOf("inhibition") >=0 || inter.indexOf("inhibit") >= 0) {
 					e.setAttributeValueUnique("interaction", "inhibition", Attribute.ATTRIBUTE_TYPE_STRING);
 					found = true;
 				}

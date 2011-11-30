@@ -364,6 +364,8 @@ public class ProduceClickableMap {
 		final int difference_zoom0_image0;
 		final int xshift_zoom0;
 		final int yshift_zoom0;
+		final int width_zoom0;
+		final int height_zoom0;
 		
 		{
 			final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
@@ -373,8 +375,10 @@ public class ProduceClickableMap {
 		
 			difference_zoom0_image0 = Math.max(get_maxscale(height0, max_height), get_maxscale(width0, max_width));
 			
-			xshift_zoom0 = (max_width - (width0 >> difference_zoom0_image0)) / 2 + xmargin;
-			yshift_zoom0 = (max_height - (height0 >> difference_zoom0_image0)) / 2;
+			width_zoom0 = width0 >> difference_zoom0_image0;
+			xshift_zoom0 = (max_width - width_zoom0) / 2 + xmargin;
+			height_zoom0 = height0 >> difference_zoom0_image0;
+			yshift_zoom0 = (max_height - height_zoom0) / 2;
 			
 			calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, difference_zoom0_image0);
 			count += write_tiles(image0, outdir, difference_zoom0_image0, tiled, g, tile_width, tile_height, shifts);
@@ -392,7 +396,7 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0 };
+				return new int[]{ difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0 };
 			}
 			
 			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, max_width, max_height);
@@ -517,7 +521,7 @@ public class ProduceClickableMap {
 		if (scales[0] < 0)
 			Utils.eclipseErrorln("no images found");
 		Utils.eclipsePrintln("scales " + scales[0] + " " + scales[1]);
-		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales[0], scales[1], scales[2], scales[3], scales[4], scales[5]);
+		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales);
 		return clMap;
 	}
 
@@ -5686,11 +5690,13 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int minzoom, int maxzoom,
+	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int[] map_info
+			/*
+		int minzoom, int maxzoom,
 		final int width,
 		final int height,
 		final int xshift,
-		final int yshift
+		final int yshift*/
 	)
 	{
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
@@ -5709,11 +5715,11 @@ public class ProduceClickableMap {
 		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/maps/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
 	
-		out.println("<script type='text/javascript'>");
-		out.print("var clickmap_maxzoom = ");
-		out.print(maxzoom);
-		out.println(";");
-		out.println("</script>");
+//		out.println("<script type='text/javascript'>");
+//		out.print("var clickmap_maxzoom = ");
+//		out.print(maxzoom);
+//		out.println(";");
+//		out.println("</script>");
 
 		for (final String s : javascript_for_index)
 			out.println("<script src=\"" + common_directory_url + s + ".js\" type='text/javascript'></script>");
@@ -5765,14 +5771,13 @@ public class ProduceClickableMap {
 		{
 			out.print("clickmap_start(");
 			out.print("'" + map_name + "'");
-			out.print(", " + minzoom);
-			out.print(", " + maxzoom);
-			out.print(", " + width);
-			out.print(", " + height);
-			out.print(", " + xshift);
-			out.print(", " + yshift);
 			out.print(", '#" + marker_div_name + "'");
 			out.print(", \"" + right_panel_list + "\"");
+			for (final int i : map_info)
+			{
+				out.print(", ");
+				out.print(i);
+			}
 			out.println(")");
 		}
 		else

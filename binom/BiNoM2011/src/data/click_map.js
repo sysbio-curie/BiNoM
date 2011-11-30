@@ -17,37 +17,42 @@
   *    $Id$
   */
 
-function make_marker(map, lat, lng)
+function make_marker(map, pos)
 {
 	var marker = new google.maps.Marker({
-	    position: new google.maps.LatLng(lat, lng),
+	    position: pos,
 	    map: map,
-	    title: lat + ", " + lng,
+	    title: " ",// + pos.lat + " " + pos.lng,
 	    zIndex: 0
 	});
+	return pos;
 }
 
-var fromPointToLatLng;
-
-function osm(min_zoom, max_zoom, width, height) {
-	
+function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height)
+{
+	var lat_ = 90;
+	var lng_ = 180;
+	lat_ = 50;
+	lng_ = 50;
 	function ClickMapProjection()
 	{
 		// http://code.google.com/apis/maps/documentation/javascript/examples/map-projection-simple.html
 	};
-	
-	fromPointToLatLng = function(point, noWrap) {
+	ClickMapProjection.prototype.fromPointToLatLng = function(point, noWrap) {
 		var y = point.y;
 		var x = point.x;
-		return new google.maps.LatLng(y / height * (2 * lat) - lat, x / width * (2 * lng) - lng, noWrap);
+		var lng = -x / tile_width * (2 * lng_) + lng_;
+		var lat = y / tile_height * (2 * lat_) - lat_;
+		var r = new google.maps.LatLng(lat, lng, noWrap);
+		return r;
 	};
 	ClickMapProjection.prototype.fromLatLngToPoint = function(latLng)
 	{
-		return new google.maps.Point((latLng.lng() + lng) / (2 * lng) * width, (latLng.lat() + lat) / (2 * lat) * height);
+		var x = -(latLng.lng() - lng_) / (2 * lng_) * tile_width;
+		var y = (latLng.lat() + lat_) / (2 * lat_) * tile_height;
+		var r = new google.maps.Point(x, y);
+		return r;
 	}
-	ClickMapProjection.prototype.fromPointToLatLng = function(point, noWrap) {
-		return fromPointToLatLng(point, noWrap);
-	};
 	
 	var id = "ClickMap";
 
@@ -77,14 +82,21 @@ function osm(min_zoom, max_zoom, width, height) {
 				return null;
 			return "tiles/" + zoom + "/" + coord.x + "_" + coord.y + ".png";
 		},
-		tileSize : new google.maps.Size(width, height),
+		tileSize : new google.maps.Size(tile_width, tile_height),
 		maxZoom : max_zoom,
 		minZoom : min_zoom
 	});
 	
 	map_type.projection = new ClickMapProjection();
-
 	map.mapTypes.set(id, map_type);
+	
+	var bounds = new google.maps.LatLngBounds();
+	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift + width, yshift + height)));
+	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift, yshift)));
+//	bounds.extend(p1);
+//	bounds.extend(make_marker(map, xshift + width, yshift + height));
+	map.fitBounds(bounds);
+	return { map : map, projection : map_type.projection};
 	
 	var lat = 90;
 	var lng = 180;
@@ -103,7 +115,7 @@ function osm(min_zoom, max_zoom, width, height) {
 	return map;
 }
 
-function start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift)
+function start_right_hand_panel(selector, source, map, projection, max_zoom, xshift, yshift)
 {
 	var filter = ".modification";
 	var z = 1 << max_zoom;
@@ -143,7 +155,7 @@ function start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift)
 							var marker = new google.maps.Marker
 							(
 									{
-										position: fromPointToLatLng(p),
+										position: projection.fromPointToLatLng(p),
 										map: map,
 										title: "id " + element.id + " " + item + " " + (xy[0] / z) + " " + (xy[1] / z)
 									}
@@ -166,9 +178,9 @@ function start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift)
 
 };
 
-function clickmap_start(map_name, min_zoom, max_zoom, width, height, xshift, yshift, selector, source) {
-	var map = osm(min_zoom, max_zoom, width, height);
-	start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift);
+function clickmap_start(map_name, selector, source, min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height) {
+	var map = start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height);
+	start_right_hand_panel(selector, source, map.map, map.projection, max_zoom, xshift, yshift);
 	return;
 	initialize(min_zoom);
 	return;

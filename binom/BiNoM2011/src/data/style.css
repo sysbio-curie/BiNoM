@@ -6,19 +6,22 @@ html, body {
 		padding: 0;
 		border: none;
 }
- 
+
+/*
 body {
-/*		background-color: #ffdab0; */
+		background-color: #ffdab0;
 		font-family: Calibri,Verdana,sans-serif;
 }
+/*
 
+/*
 .active ul{
 	display: block;
 }
 
 .inactive ul{
 	display: none;
-}
+}*/
 
 #container {
 		position: relative; /* needed for footer positioning */
@@ -46,6 +49,7 @@ body {
 	
 }
 
+/*
 #pathway {
 	font-size: 2em;
 	
@@ -53,7 +57,7 @@ body {
 
 #author {
 	font-size: 1.5em;
-}
+}*/
 
 #map {
 		position: absolute;
@@ -81,7 +85,6 @@ body {
 		
 		top: 0%;
 		overflow: auto;
-		text-decoration: underline;
 		color: #4444ff;
 		position: absolute;
 		right: 0;
@@ -113,33 +116,3 @@ body {
  
 .style1 {background-color:#ffffff;font-family:Calibri,Verdana,sans-serif;font-weight:normal;border:2px #006699 solid;}
 .style2 {background-color:#ffffff;font-family:Calibri,Verdana,sans-serif;font-weight:normal;border:2px #ff0000 solid;}
- 
- 
-/*CSS for Simple Tree Menu*/
- 
-.treeview ul{ 
-	margin: 0;
-	padding: 0;
-}
- 
-.treeview li{ /*Style for LI elements in general (excludes an LI that contains sub lists)*/
-	background: #ccffcc url(bullet.gif) no-repeat left center;
-	list-style-type: none;
-	padding-left: 22px;
-	margin-bottom: 3px;
-}
- 
-.treeview li.submenu{ /* Style for LI that contains sub lists (other ULs). */
-	background: #ccffcc url(plus.gif) no-repeat left 1px;
-	cursor: hand !important;
-	cursor: pointer !important;
-}
- 
- 
-.treeview li.submenu ul{ /*Style for ULs that are children of LIs (submenu) */
-	display: none; /*Hide them by default. Don't delete. */
-}
- 
-.treeview .submenu ul li{ /*Style for LIs of ULs that are children of LIs (submenu) */
-	cursor: default;
-}

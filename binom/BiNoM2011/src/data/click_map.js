@@ -90,8 +90,8 @@ function osm(min_zoom, max_zoom, width, height) {
 	var lng = 180;
 	    
 	var bounds = new google.maps.LatLngBounds();
-	bounds.extend(new google.maps.LatLng(-lat, 0));
-	bounds.extend(new google.maps.LatLng(lat, 2 * lng));
+	bounds.extend(new google.maps.LatLng(-lat, -lng));
+	bounds.extend(new google.maps.LatLng(lat, lng));
 	map.fitBounds(bounds);
 	return map;
 	make_marker(map, lat - 0.1, lng);
@@ -103,7 +103,8 @@ function osm(min_zoom, max_zoom, width, height) {
 	return map;
 }
 
-function start_right_hand_panel(selector, source, map, max_zoom) {
+function start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift)
+{
 	var filter = ".modification";
 	var z = 1 << max_zoom;
 	$(selector).jstree({
@@ -123,18 +124,12 @@ function start_right_hand_panel(selector, source, map, max_zoom) {
 	}).bind("uncheck_node.jstree", function(event, data) {
 		var f = function(index, element)
 		{
-			console.log("--", " ", element.id);
 			element.markers.forEach(function(i) { i.setVisible(false); });
 		};
-//		if (data.args[0].parentNode.parentNode.id == "")
 		$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
 		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-//		console.log("- " + data.args[0].parentNode.parentNode.id);
 	}).bind("check_node.jstree", function(event, data) {
-//		console.log(event.type + ' checked l=' +  data.args.length + ' ' + data.args[0].parentNode.id + ' href=' + data.rslt.obj.attr('href') + " " + data.inst.get_text(data.rslt.obj));
-
 		var f = function(index, element) {
-			console.log("++" + index + " " + $(element).attr("id"));
 			if (element.markers != null)
 				element.markers.forEach(function(i) { i.setVisible(true); });
 			else
@@ -144,8 +139,7 @@ function start_right_hand_panel(selector, source, map, max_zoom) {
 						function(item)
 						{
 							var xy = item.split(";");
-//							console.log("create new marker for", element, xy[0] / z, xy[1] / z, z);
-							var p = new google.maps.Point(xy[0] / z, xy[1] / z);
+							var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
 							var marker = new google.maps.Marker
 							(
 									{
@@ -155,7 +149,7 @@ function start_right_hand_panel(selector, source, map, max_zoom) {
 									}
 							);
 							var infowindow = new google.maps.InfoWindow({
-								content: "hello" // + " this is " + $(element).attr("id") + " at " + xy
+								content: $(element).attr("id") + " at " + xy
 							});
 							google.maps.event.addListener(marker, 'click', function() {
 								infowindow.open(map, marker);
@@ -168,14 +162,13 @@ function start_right_hand_panel(selector, source, map, max_zoom) {
 		$(this).jstree("get_checked",data.args[0],true).filter(filter).each(f);
 
 		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-//		console.log("+  '" + data.args[0].parentNode.parentNode.id + "' '" + data.args[0].parentNode.parentNode.className + "'");
 	});
 
 };
 
-function clickmap_start(map_name, min_zoom, max_zoom, width, height, selector, source) {
+function clickmap_start(map_name, min_zoom, max_zoom, width, height, xshift, yshift, selector, source) {
 	var map = osm(min_zoom, max_zoom, width, height);
-	start_right_hand_panel(selector, source, map, max_zoom);
+	start_right_hand_panel(selector, source, map, max_zoom, xshift, yshift);
 	return;
 	initialize(min_zoom);
 	return;

@@ -347,24 +347,40 @@ public class ProduceClickableMap {
 		return process_a_map(blog_name, name.substring(base.length(), name.length() - celldesigner_suffix.length()), title, destination, base, source_directory, make_tiles, null, key);
 
 	}
-
+	
 	private static int[] make_tiles(File source_directory, String root, File outdir) throws Exception
 	{
+		int[] shifts = new int[2];
+		final int xmargin = 10;
+		final int tile_width = 256;
+		final int tile_height = 256;
+		final int max_width = tile_width - 2 * xmargin;
+		final int max_height = tile_height;
 		int count = 0;
-		int last_found = 0;
 		
-		final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
-		final BufferedImage image0 = ImageIO.read(image_file0);
-		
-		final int width = image0.getWidth();
-		final int height = image0.getHeight();
-		
-		File zoom0 = new File(outdir, "0");
-		zoom0.mkdir();
-		copy_file(image_file0, new File(zoom0, "0_0.png"));
-		
-		final BufferedImage tiled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		final BufferedImage tiled = new BufferedImage(tile_width, tile_height, BufferedImage.TYPE_INT_RGB);
 		final Graphics2D g = tiled.createGraphics();
+		
+		final int difference_zoom0_image0;
+		final int xshift_zoom0;
+		final int yshift_zoom0;
+		
+		{
+			final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
+			final BufferedImage image0 = ImageIO.read(image_file0);
+			final int width0 = image0.getWidth();
+			final int height0 = image0.getHeight();
+		
+			difference_zoom0_image0 = Math.max(get_maxscale(height0, max_height), get_maxscale(width0, max_width));
+			
+			xshift_zoom0 = (max_width - (width0 >> difference_zoom0_image0)) / 2 + xmargin;
+			yshift_zoom0 = (max_height - (height0 >> difference_zoom0_image0)) / 2;
+			
+			calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, difference_zoom0_image0);
+			count += write_tiles(image0, outdir, difference_zoom0_image0, tiled, g, tile_width, tile_height, shifts);
+		}
+		
+		int last_found = difference_zoom0_image0;
 		
 		for (int file_number = 1;; file_number++)
 		{
@@ -376,24 +392,39 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ last_found, width, height };
+				return new int[]{ difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0 };
 			}
-			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, width, height, image_file0);
 			
-			final BufferedImage padded_image = new BufferedImage(width << scale_factor, height << scale_factor, BufferedImage.TYPE_INT_RGB);
-			padded_image.createGraphics().drawRenderedImage(image, null);
+			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, max_width, max_height);
+			assert scale_factor > last_found : scale_factor + " " + last_found;
 			
-			for (int i = last_found + 1; i < scale_factor; i++)
+			for (int i = last_found + 1; i <= scale_factor; i++)
 			{
-				count += write_tiles(Scalr.resize(padded_image, Scalr.Method.QUALITY, width << scale_factor, height << scale_factor, Scalr.OP_ANTIALIAS), outdir, i, tiled, g, width, height);
-				Utils.eclipsePrintln("resized image " + file_number + " " + (scale_factor - i) + " step");
+				final BufferedImage resize;
+				if (i == scale_factor)
+					resize = image;
+				else
+				{
+					resize = Scalr.resize(image, Scalr.Method.QUALITY, tile_width << scale_factor, tile_height << scale_factor, Scalr.OP_ANTIALIAS);
+					Utils.eclipsePrintln("resized image " + file_number);
+				}
+				final BufferedImage padded_image = new BufferedImage(tile_width << i, tile_height << i, BufferedImage.TYPE_INT_RGB);
+				padded_image.createGraphics().drawRenderedImage(image, null);
+				
+				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, scale_factor);
+				count += write_tiles(resize, outdir, i, tiled, g, tile_width, tile_height, shifts);
 			}
-			count += write_tiles(padded_image, outdir, scale_factor, tiled, g, width, height);
 			last_found = scale_factor;
 		}
 	}
+
+	private static void calculate_shifts(int[] shifts, final int xshift, final int yshift, final int scale_factor)
+	{
+		shifts[0] = xshift << scale_factor;
+		shifts[1] = yshift << scale_factor;
+	}
 	
-	private static int get_scale(int width, int height, final File image, int width0, int height0, final File image0)
+	private static int get_scale(int width, int height, final File image, int width0, int height0)
         {
 		/*
 	        if (width % width0 != 0)
@@ -404,7 +435,7 @@ public class ProduceClickableMap {
 	        if (scale != height / height0)
 	        	throw new Exception(image + "'s height is not the same multiple of " + image0 + "'s height as is the width");
 	        */
-		return Math.min(get_maxscale(width, width0), get_maxscale(height, height0));
+		return Math.max(get_maxscale(width, width0), get_maxscale(height, height0));
         }
 
 	private static int[] get_zooms(File source_directory, String root) throws Exception
@@ -429,7 +460,7 @@ public class ProduceClickableMap {
 			{
 				return new int[]{ last_found, width, height };
 			}
-			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width, height, image_file0);
+			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width, height);
 		}
 	}
 
@@ -486,7 +517,7 @@ public class ProduceClickableMap {
 		if (scales[0] < 0)
 			Utils.eclipseErrorln("no images found");
 		Utils.eclipsePrintln("scales " + scales[0] + " " + scales[1]);
-		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales[0], scales[1], scales[2]);
+		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales[0], scales[1], scales[2], scales[3], scales[4], scales[5]);
 		return clMap;
 	}
 
@@ -575,18 +606,24 @@ public class ProduceClickableMap {
 		}
 	}
 	
-	private static int write_tiles(final BufferedImage scaledImage, final File outdir, final int scale_factor, final BufferedImage tiled, final Graphics2D g, int width, int height)
+	private static int write_tiles(final BufferedImage scaledImage, final File outdir,
+			final int scale_factor, final BufferedImage tiled, final Graphics2D g, int width, int height, int[] shifts)
 	{
-		final int nx = scaledImage.getWidth() / width;
-		final int ny = scaledImage.getHeight() / height;
+		int xshift = shifts[0];
+		int yshift = shifts[1];
+		final int nx = (scaledImage.getWidth() + width - 1 + xshift) / width;
+		final int ny = (scaledImage.getHeight() + height - 1 + yshift) / height;
 		final AffineTransform af = new AffineTransform();
+//		af.setToTranslation(xshift, yshift);
 		int count = 0;
 		final File zoom_dir = new File(outdir, scale_factor + "");
 		zoom_dir.mkdir();
-		for (int i = 0; i < nx; i++)
+		for (int i = 0; i < ny; i++)
 		{
-			for (int j = 0; j < ny; j++)
+			af.setToTranslation(xshift, yshift - height * i);
+			for (int j = 0; j < nx; j++)
 			{
+				g.clearRect(0, 0, width, height);
 				g.drawRenderedImage(scaledImage, af);
 				final File png = new File(zoom_dir, j + "_" + i + image_suffix);
 				try
@@ -600,7 +637,7 @@ public class ProduceClickableMap {
 				}
 				af.translate(-width, 0);
 			}
-			af.translate(-af.getTranslateX(), -height);
+//			af.translate(-af.getTranslateX(), -height);
 		}
 		return count;
 	}
@@ -5649,9 +5686,12 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int maxzoom,
+	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int minzoom, int maxzoom,
 		final int width,
-		final int height)
+		final int height,
+		final int xshift,
+		final int yshift
+	)
 	{
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
@@ -5725,10 +5765,12 @@ public class ProduceClickableMap {
 		{
 			out.print("clickmap_start(");
 			out.print("'" + map_name + "'");
-			out.print(", " + 0);
+			out.print(", " + minzoom);
 			out.print(", " + maxzoom);
 			out.print(", " + width);
 			out.print(", " + height);
+			out.print(", " + xshift);
+			out.print(", " + yshift);
 			out.print(", '#" + marker_div_name + "'");
 			out.print(", \"" + right_panel_list + "\"");
 			out.println(")");

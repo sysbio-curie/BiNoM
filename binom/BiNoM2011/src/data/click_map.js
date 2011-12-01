@@ -28,6 +28,11 @@ function make_marker(map, pos)
 	return pos;
 }
 
+function show_markers(markers)
+{
+	console.log(markers);
+}
+
 function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height)
 {
 	var lat_ = 90;
@@ -132,7 +137,8 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 			},
 			"xsl" : "nest"
 		},
-		plugins : [ "themes", "xml_data", "ui", "checkbox" ],
+		"languages" : [ "en", "ln" ],
+		plugins : [ "themes", "xml_data", "ui", "checkbox", "languages" ],
 		html_titles : true
 	}).bind("uncheck_node.jstree", function(event, data) {
 		var f = function(index, element)
@@ -155,8 +161,8 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 							var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
 							//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
 							var id = $(element).attr("id");
-							var name = id;
-							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
+							var name = data.inst.get_text(element, 'en');
+//							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
 //							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
 //							$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
 							var marker = new google.maps.Marker
@@ -167,11 +173,20 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 										title: name + " (" + id + ")"
 									}
 							);
-							var infowindow = new google.maps.InfoWindow({
-								content: $(element).attr("id") + " at " + xy
-							});
 							google.maps.event.addListener(marker, 'click', function() {
-								infowindow.open(map, marker);
+								if (element.bubble == null)
+								{
+									var ln = data.inst.get_text(element, 'ln');
+									console.log("open3", ln);
+									element.bubble = new google.maps.InfoWindow
+									(
+										{
+											content: ln,
+											maxWidth: 350
+										}
+									);
+								}
+								element.bubble.open(map, marker);
 							});
 							element.markers.push(marker);
 						}

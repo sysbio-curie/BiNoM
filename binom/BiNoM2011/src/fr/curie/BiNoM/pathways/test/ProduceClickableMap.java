@@ -1246,15 +1246,46 @@ public class ProduceClickableMap {
 		return makeEntityId(pos, Utils.getValue(identity.getCelldesignerName()));
 	}
 	
-	static private void content_line(final PrintWriter output, int indent, String content)
+	static private PrintWriter indent(final PrintWriter output, int indent)
 	{
 		while (indent-- > 0)
 			output.print('\t');
-//		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
-		output.println("<content><name>" + content + "</name></content>");
+		return output;
+	}
+	
+	static final private String cdata_end = "]]>";
+	static final private String cdata_end_rep;
+	static {
+		cdata_end_rep = cdata_end.substring(0, cdata_end.length() - 1) + "&zwnj;" + cdata_end.substring(cdata_end.length() - 1, cdata_end.length());
+	}
+	
+	static private void content_line(final PrintWriter output, final int indent, String content, String content2)
+	{
+		indent(output, indent).println("<content>");
+		indent(output, indent + 1).print("<name lang='en' language='en'>");
+		cdata(output, content);
+		output.println("</name>");
+		indent(output, indent + 1).print("<name lang='ln' language='ln'>");
+		cdata(output, content2);
+		output.println("</name>");
+		indent(output, indent).println("</content>");
 	}
 
+	private static void cdata(final PrintWriter output, String content2)
+        {
+		output.print("<![CDATA[");
+	        output.print(content2.replace(cdata_end, cdata_end_rep));
+		output.print(cdata_end);
+        }
 	
+	static private void content_line(final PrintWriter output, int indent, String content)
+	{
+//		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
+		indent(output, indent).print("<content><name>");
+		output.print(content);
+		output.println("</name></content>");
+	}
+
 	static class ItemCloser
 	{
 		final int indent;
@@ -1299,7 +1330,8 @@ public class ProduceClickableMap {
 	
 	private static void modifcation_line(final PrintWriter output, Modification m,
 		Map<String, Vector<String>> speciesAliases,
-		Map<String, Vector<Place>> placeMap
+		Map<String, Vector<Place>> placeMap,
+		String bubble
 	)
 	{
 		final int indent = 4;
@@ -1318,16 +1350,20 @@ public class ProduceClickableMap {
 			output.print(place.x);
 			output.print(";");
 			output.print(place.y);
-		}		
-		output.print("\"");
-		item_line_end(output, indent, m.getName()).close();
+		}
+		output.println("\">");
+		content_line(output, indent, m.getName(), bubble);
+		new ItemCloser(indent, output).close();
 	}
 	
 	static private void generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
-		Map<String, Vector<String>> speciesAliases,
-		Map<String, Vector<Place>> placeMap
-	)
-		throws FileNotFoundException, UnsupportedEncodingException
+		final Map<String, Vector<String>> speciesAliases,
+		final Map<String, Vector<Place>> placeMap,
+		final FormatProteinNotes format,
+		final AllPosts all_posts,
+		final SbmlDocument cd,
+		final String blog_name
+	) throws FileNotFoundException, UnsupportedEncodingException
 	{
 		final String encoding = "UTF-8";
 		final PrintWriter output = new PrintWriter(output_file, encoding);
@@ -1348,7 +1384,10 @@ public class ProduceClickableMap {
 						final ItemCloser entity = item_line(output, 3, ent.getId(), null, ent.getName(), null);
 						
 						for (Modification m : ent.getModifications())
-	                                                modifcation_line(output, m, speciesAliases, placeMap);
+						{
+	                                        	String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, speciesAliases);
+	                                                modifcation_line(output, m, speciesAliases, placeMap, b);
+						}
 						
 						entity.close();
 					}
@@ -1368,7 +1407,7 @@ public class ProduceClickableMap {
 		
 		output.close();
 	}
-	private void generatePages(final Wordpress wp, final File markers) throws Exception
+	private void generatePages(final Wordpress wp, final File markers, File rpanel_index) throws Exception
 	{
 		final FormatProteinNotes format = new FormatProteinNotes();
 		final MarkerManager xml = new MarkerManager(markers);
@@ -1421,6 +1460,7 @@ public class ProduceClickableMap {
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
 		}
+		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name);
 				
 /*		for (final CelldesignerRNA rna : annotation.getCelldesignerListOfRNAs().getCelldesignerRNAArray())
 		{
@@ -1873,7 +1913,7 @@ public class ProduceClickableMap {
 		fw.append("<b>").append(human_class).append(' ').append(h.add(complex.getName())).append("</b>");
 		visible_debug(fw, complex.getId());
 		fw.append(" ");
-		show_shapes_on_map(h, fw, complex.getModifications(), master_map_name);
+		show_shapes_on_map(h, fw, complex.getModifications(), master_map_name, speciesAliases, blog_name);
 		
 		fw.append("<hr><b>Complex composition:</b>\n");
 		fw.append("<ol>\n");
@@ -1882,7 +1922,7 @@ public class ProduceClickableMap {
 				fw.append("<li>");
 				post_to_post_link_checked(component, makeFoldable(h.add(component.getName())), fw, pass2);
 				fw.append(' ');
-				show_shapes_on_map(h, fw, component.getModifications(), master_map_name);
+				show_shapes_on_map(h, fw, component.getModifications(), master_map_name, speciesAliases, blog_name);
 			}
 		fw.append("</ol>\n");
 	        
@@ -2011,7 +2051,7 @@ public class ProduceClickableMap {
  //               	show_shapes_on_master_map(h, fw, m.getEntityBase());
                 	final List<Modification> modif = new ArrayList<Modification>(1);
                 	modif.add(m);
-        		show_shapes_on_map(h, fw, modif, master_map_name);
+        		show_shapes_on_map(h, fw, modif, master_map_name, speciesAliases, blog_name);
 		}
 	}
 
@@ -2657,7 +2697,7 @@ public class ProduceClickableMap {
 				{
 					m.appendReplacement(res, "");
 					res.append(tag + m.group(offset + 1)).append(" ");
-					show_shapes_on_map(h, res, all, m.group(offset + 1));
+					show_shapes_on_map(h, res, all, m.group(offset + 1), speciesAliases, blog_name);
 				}
 				else
 				{	
@@ -2779,16 +2819,16 @@ public class ProduceClickableMap {
 		final int y = (int)Math.round((Float)position.o2);
 		final StringBuffer notes = new StringBuffer();
 		notes.append("<b>Reaction ").append(r.getId()).append("</b>");
-		bubble_to_post_link_with_anchor(post_id, notes);
+		bubble_to_post_link_with_anchor(post_id, notes, blog_name);
 		notes.append("\n<br>");
 		format.pmid(r.getNotes(), notes, null_hasher, cd);
 		xml.create(REACTION_CLASS_NAME, notes.toString(), r.getId(), r.getId(), x, y);
 	}
 
-	private void bubble_to_post_link_with_anchor(int post_id, final StringBuffer notes)
+	private static void bubble_to_post_link_with_anchor(int post_id, final StringBuffer notes, String blog_name)
 	{
 		notes.append(" (");
-		bubble_to_post_link(post_id, notes);
+		bubble_to_post_link(post_id, notes, blog_name);
 		notes.append("blog").append("</a>)");
 	}
 	
@@ -2807,7 +2847,7 @@ public class ProduceClickableMap {
 		return notes.append("<a href=\"index.php?p=").append(post_id).append("\">");
 	}
 
-	private StringBuffer bubble_to_post_link(int post_id, final StringBuffer notes)
+	private static StringBuffer bubble_to_post_link(int post_id, final StringBuffer notes, String blog_name)
 	{
 		return notes.append("<a href=\"/annotations/" + blog_name + "?p=").append(post_id).append("\" target=\"blog_").append(blog_name).append("\">");
 	}
@@ -2824,9 +2864,10 @@ public class ProduceClickableMap {
 		create_entity_marker(format, markers, post_id, ent);
         }
 	*/
-	private static final String js_show_markers = onclick_before + "cellpublisher.marker_links._show_markers(";
+	private static final String js_show_markers = onclick_before + "show_markers(";
 	
-	private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw)
+	static private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw,
+		Map<String, Vector<String>> speciesAliases)
 	{
 		final Complex complex = modification.getComplex();
 		if (complex == null)
@@ -2846,7 +2887,7 @@ public class ProduceClickableMap {
 				for (final Entity m : complex.getComponents())
 					if (m.getName().equals(t[0]))
 					{
-						show_markers_from_map(m, fw);
+						show_markers_from_map(m, fw, speciesAliases);
 //						fw.append('[').append(t[0]).append(']');
 						if (t.length == 2)
 							fw.append(sep).append(t[1]);
@@ -2863,6 +2904,41 @@ public class ProduceClickableMap {
 		return fw;
 	}
 	
+	private static String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name,
+		Map<String, Vector<String>> speciesAliases)
+        {
+	        final ArrayList<Modification> one_mod = new ArrayList<Modification>(1);
+	        one_mod.add(null);
+	        
+		final StringBuffer body_buf = new StringBuffer();
+		body_buf.append("<b><big>");
+		final String human_cls = class_name_to_human_name_map.get(ent.getCls());
+		body_buf.append(human_cls == null ? ent.getCls() : human_cls);
+		visible_debug(body_buf, ent.getId());
+		body_buf.append("<br>\n");
+		
+		show_markers_from_map(ent, body_buf, speciesAliases);
+		bubble_to_post_link_with_anchor(post_id, body_buf, blog_name);
+		body_buf.append("</big></b>");
+		body_buf.append("\n<p>");
+		
+		one_mod.set(0, modification);
+		format.simple(body_buf, ent.getComment(), cd);
+		
+		body_buf.append("<hr>\n<b>Modification:</b>");
+		visible_debug(body_buf, modification.getId());
+		body_buf.append("<br>\n");
+		final int pos = modification.getName().lastIndexOf('@');
+		if (pos <= 0)
+			split_complex_for_marker(modification, modification.getName(), body_buf, speciesAliases);
+		else
+			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf, speciesAliases).append("<br>\nin ").append(modification.getName().substring(pos + 1));
+		body_buf.append("<br>\n");
+	
+		format.simple(body_buf, modification.getNotes(), cd);
+		return body_buf.toString();
+        }
+	
 	private void create_entity_marker(FormatProteinNotes format, MarkerManager xml, int post_id, EntityBase ent) throws IOException
         {
 	        final ArrayList<Modification> one_mod = new ArrayList<Modification>(1);
@@ -2876,8 +2952,8 @@ public class ProduceClickableMap {
 			visible_debug(body_buf, ent.getId());
 			body_buf.append("<br>\n");
 			
-			show_markers_from_map(ent, body_buf);
-			bubble_to_post_link_with_anchor(post_id, body_buf);
+			show_markers_from_map(ent, body_buf, speciesAliases);
+			bubble_to_post_link_with_anchor(post_id, body_buf, blog_name);
 			body_buf.append("</big></b>");
 			body_buf.append("\n<p>");
 			
@@ -2889,9 +2965,9 @@ public class ProduceClickableMap {
 			body_buf.append("<br>\n");
 			final int pos = modification.getName().lastIndexOf('@');
 			if (pos <= 0)
-				split_complex_for_marker(modification, modification.getName(), body_buf);
+				split_complex_for_marker(modification, modification.getName(), body_buf, module_protein_names);
 			else
-				split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>\nin ").append(modification.getName().substring(pos + 1));
+				split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf, module_protein_names).append("<br>\nin ").append(modification.getName().substring(pos + 1));
 			body_buf.append("<br>\n");
 		
 			format.simple(body_buf, modification.getNotes(), cd);
@@ -2900,10 +2976,10 @@ public class ProduceClickableMap {
 		}
         }
 
-	private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf)
+	static private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf, Map<String, Vector<String>> speciesAliases)
         {
 	        final StringBuffer title = new StringBuffer();
-	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers))
+	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers, speciesAliases))
 	        	body_buf.append(ent.getName());
 	        else
 	        	body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
@@ -3274,7 +3350,7 @@ public class ProduceClickableMap {
 	
 	private StringBuffer show_shapes_on_master_map(final Hasher h, StringBuffer fw, final EntityBase ent)
 	{
-		show_shapes_on_map(h, fw, ent.getModifications(), master_map_name);
+		show_shapes_on_map(h, fw, ent.getModifications(), master_map_name, speciesAliases, blog_name);
 		return fw;
 	}
 
@@ -3287,11 +3363,12 @@ public class ProduceClickableMap {
 		return fw;
 	}
 	
-	private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name)
+	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name,
+		final Map<String, Vector<String>> speciesAliases, final String blog_name)
 	{
 		final StringBuffer title = new StringBuffer();
 		final boolean first = show_modifications(h, fw, sps, title,
-			"(" + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
+			"(" + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ", speciesAliases);
 		
 		if (!first)
 			fw.append(")").append(onclick_after).append(" title='").append(title).append("'>").append("map").append("</a>").append(')');
@@ -3300,9 +3377,11 @@ public class ProduceClickableMap {
 		return fw;
 	}
 
-	private boolean show_modifications(final Hasher h, final StringBuffer fw, final List<Modification> sps,
+	static private boolean show_modifications(final Hasher h, final StringBuffer fw, final List<Modification> sps,
 		final StringBuffer title,
-		final String start)
+		final String start,
+		final Map<String, Vector<String>> speciesAliases
+	)
         {
 		boolean first = true;
 		int scount = 0;
@@ -5235,8 +5314,7 @@ public class ProduceClickableMap {
 	
 	private void createClickableMap(final Wordpress wp, final File markers, File rpanel_index) throws Exception
 	{
-		generatePages(wp, markers);
-		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap);
+		generatePages(wp, markers, rpanel_index);
 	}
 	
 	private void find_the_position_of_the_OVAL_in_OVAL_xml_for_centering()

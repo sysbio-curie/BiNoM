@@ -5690,14 +5690,7 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int[] map_info
-			/*
-		int minzoom, int maxzoom,
-		final int width,
-		final int height,
-		final int xshift,
-		final int yshift*/
-	)
+	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int[] map_info)
 	{
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
@@ -5728,13 +5721,17 @@ public class ProduceClickableMap {
 		out.println("</head>");
 		
 		out.println("<body>");
-		out.println("<noscript><b>JavaScript must be enabled in order for you to use ClickMap.</b>");
-		out.println("However, it seems JavaScript is either disabled or not supported by your browser.");
-		out.println("To view the maps, enable JavaScript by changing your browser options and then try again.");
+		out.println("<noscript>");
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<b>JavaScript must be enabled in order for you to use ClickMap.</b>\n")
+			.append("However, it seems JavaScript is either disabled or not supported by your browser.\n")
+			.append("To view the maps, enable JavaScript by changing your browser options and then try again.");
+		final String message = sb.toString();
+		out.println(message);
 		out.println("</noscript>");
 		out.println("<div id='header'><span id='pathway'>" + title + "</span> <span id='author'>by Institut Curie</span></div>");
 		final String map_div_name = "map";
-		out.println("<div id='" + map_div_name + "'></div>");
+		out.println("<div id='" + map_div_name + "'>" + message + "</div>");
 		out.println("<div id='side_bar'>");
 		
 		final String marker_div_name = "marker_checkboxes";

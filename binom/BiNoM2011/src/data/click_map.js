@@ -132,7 +132,8 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 			},
 			"xsl" : "nest"
 		},
-		plugins : [ "themes", "xml_data", "ui", "checkbox" ]
+		plugins : [ "themes", "xml_data", "ui", "checkbox" ],
+		html_titles : true
 	}).bind("uncheck_node.jstree", function(event, data) {
 		var f = function(index, element)
 		{
@@ -152,12 +153,18 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 						{
 							var xy = item.split(";");
 							var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
+							//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
+							var id = $(element).attr("id");
+							var name = id;
+							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
+//							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
+//							$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
 							var marker = new google.maps.Marker
 							(
 									{
 										position: projection.fromPointToLatLng(p),
 										map: map,
-										title: "id " + element.id + " " + item + " " + (xy[0] / z) + " " + (xy[1] / z)
+										title: name + " (" + id + ")"
 									}
 							);
 							var infowindow = new google.maps.InfoWindow({

@@ -3384,33 +3384,22 @@ public class ProduceClickableMap {
 	)
         {
 		boolean first = true;
-		int scount = 0;
 	        for (final Modification sp : sps)
 		{
-			title.append(title.length() == 0 ? "" : ") ").append(sp.getId()).append("(");
-			final Vector<String> shapes = speciesAliases.get(sp.getId());
-			int title_flag = 0;
-			if (shapes != null)
+			if (first)
 			{
-				for (final String shape_id : shapes)
-				{
-					if (first)
-					{
-						fw.append(start).append("[");
-						first = false;
-					}
-					else
-						fw.append(", ");
-
-					fw.append("\"").append(h.add(shape_id)).append("\"");
-					title.append(title_flag++ == 0 ? "" : " ").append(shape_id);
-				}
-				scount += shapes.size();
+				fw.append(start).append("[");
+				first = false;
 			}
+			else
+				fw.append(", ");
+			fw.append("\"").append(h.add(sp.getId())).append("\"");
+	        	
+			title.append(title.length() == 0 ? "" : " ").append(sp.getId());
 		}
 		if (title.length() != 0)
-			title.append(") ");
-		title.append(sps.size()).append(" modifs & ").append(scount).append(" shapes");
+			title.append(" ");
+		title.append(sps.size()).append(" modifs");
 		if (!first)
 			fw.append("]");
 	        return first;

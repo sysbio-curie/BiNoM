@@ -28,9 +28,26 @@ function make_marker(map, pos)
 	return pos;
 }
 
+var jtree;
+
 function show_markers(markers)
 {
 	console.log(markers);
+	markers.forEach
+	(
+		function(i)
+		{
+			console.log(i);
+			var element = $("#" + i);
+			console.log(element.attr("id"));
+			var markers = element.attr("markers");
+			if (markers != null)
+			{
+				console.log(markers.length);
+				markers.forEach(function(j) { j.setVisible(true); });
+			}
+		}
+	);
 }
 
 function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height)
@@ -124,7 +141,7 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 {
 	var filter = ".modification";
 	var z = 1 << max_zoom;
-	$(selector).jstree({
+	jtree = $(selector).jstree({
 		"themes" : {
 			"theme" : "default",
 			"dots" : false,
@@ -148,48 +165,50 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 		$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
 		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 	}).bind("check_node.jstree", function(event, data) {
+		console.log(data.inst, jtree);
 		var f = function(index, element) {
 			if (element.markers != null)
 				element.markers.forEach(function(i) { i.setVisible(true); });
 			else
 			{
 				element.markers = Array();
-				$(element).attr("position").split(" ").forEach(
-						function(item)
-						{
-							var xy = item.split(";");
-							var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
-							//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
-							var id = $(element).attr("id");
-							var name = data.inst.get_text(element, 'en');
-//							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
-//							$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
-//							$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
-							var marker = new google.maps.Marker
-							(
-									{
-										position: projection.fromPointToLatLng(p),
-										map: map,
-										title: name + " (" + id + ")"
-									}
-							);
-							google.maps.event.addListener(marker, 'click', function() {
-								if (element.bubble == null)
+				$(element).attr("position").split(" ").forEach
+				(
+					function(item)
+					{
+						var xy = item.split(";");
+						var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
+						//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
+						var id = $(element).attr("id");
+						var name = data.inst.get_text(element, 'en');
+//						$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
+//						$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
+//						$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
+						var marker = new google.maps.Marker
+						(
 								{
-									var ln = data.inst.get_text(element, 'ln');
-									console.log("open3", ln);
-									element.bubble = new google.maps.InfoWindow
-									(
-										{
-											content: ln,
-											maxWidth: 350
-										}
-									);
+									position: projection.fromPointToLatLng(p),
+									map: map,
+									title: name + " (" + id + ")"
 								}
-								element.bubble.open(map, marker);
-							});
-							element.markers.push(marker);
-						}
+						);
+						google.maps.event.addListener(marker, 'click', function() {
+							if (element.bubble == null)
+							{
+								var ln = data.inst.get_text(element, 'ln');
+								ln = jtree.jstree("get_text", element, "ln");
+								element.bubble = new google.maps.InfoWindow
+								(
+									{
+										content: ln,
+										maxWidth: 350
+									}
+								);
+							}
+							element.bubble.open(map, marker);
+						});
+						element.markers.push(marker);
+					}
 				);
 			}
 		};

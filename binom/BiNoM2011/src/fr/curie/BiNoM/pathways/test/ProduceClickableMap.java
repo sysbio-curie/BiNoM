@@ -335,7 +335,7 @@ public class ProduceClickableMap {
 				return image_file.exists();
 			}
 		};
-
+/*
 		if (false)
 			for (final File f : source_directory.listFiles(is_good_xml_file))
 				process_a_map(blog_name, f, title, root, base, source_directory, make_tiles, key);
@@ -345,10 +345,26 @@ public class ProduceClickableMap {
 	{
 		String name = f.getName();
 		return process_a_map(blog_name, name.substring(base.length(), name.length() - celldesigner_suffix.length()), title, destination, base, source_directory, make_tiles, null, key);
-
+*/
 	}
 	
-	private static int[] make_tiles(File source_directory, String root, File outdir) throws Exception
+	static class ImagesInfo
+	{
+		final int minzoom, maxzoom, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0;
+		ImagesInfo(final int minzoom, final int maxzoom, final int tile_width, final int tile_height, final int xshift_zoom0, final int yshift_zoom0, final int width_zoom0, final int height_zoom0)
+		{
+			this.minzoom = minzoom;
+			this.maxzoom = maxzoom;
+			this.tile_width = tile_width;
+			this.tile_height = tile_height;
+			this.xshift_zoom0 = xshift_zoom0;
+			this.yshift_zoom0 = yshift_zoom0;
+			this.width_zoom0 = width_zoom0;
+			this.height_zoom0 = height_zoom0;
+		}
+	};
+	
+	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws Exception
 	{
 		int[] shifts = new int[2];
 		final int xmargin = 10;
@@ -396,7 +412,7 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0 };
+				return new ImagesInfo(difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
 			}
 			
 			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, max_width, max_height);
@@ -442,7 +458,7 @@ public class ProduceClickableMap {
 		return Math.max(get_maxscale(width, width0), get_maxscale(height, height0));
         }
 
-	private static int[] get_zooms(File source_directory, String root) throws Exception
+	private static ImagesInfo get_zooms(File source_directory, String root) throws Exception
 	{
 		int last_found = 0;
 		
@@ -462,7 +478,7 @@ public class ProduceClickableMap {
 			}
 			catch (IOException e)
 			{
-				return new int[]{ last_found, width, height };
+				return null; //new int[]{ last_found, width, height };
 			}
 			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width, height);
 		}
@@ -504,11 +520,9 @@ public class ProduceClickableMap {
 		if (!this_map_directory.exists())
 			this_map_directory.mkdir();
 
-		clMap.createClickableMap(wp, new File(this_map_directory, "markers.xml"), new File(this_map_directory, right_panel_list));
-
 		final File tiles_directory = new File(this_map_directory, "tiles");
 		final boolean tiles_exist = tiles_directory.exists();
-		int[] scales;
+		ImagesInfo scales;
 		if (make_tiles || !tiles_exist)
 		{
 			if (tiles_exist)
@@ -518,9 +532,11 @@ public class ProduceClickableMap {
 		}
 		else
 			scales = get_zooms(source_directory, base + map);
-		if (scales[0] < 0)
+		if (scales == null)
 			Utils.eclipseErrorln("no images found");
-		Utils.eclipsePrintln("scales " + scales[0] + " " + scales[1]);
+
+		clMap.generatePages(wp, new File(this_map_directory, "markers.xml"), new File(this_map_directory, right_panel_list), scales);
+		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
 		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales);
 		return clMap;
 	}
@@ -1328,16 +1344,17 @@ public class ProduceClickableMap {
 			output.print(" class=\"" + cls + "\"");
 	}
 	
-	private static void modifcation_line(final PrintWriter output, Modification m,
+	private static void modification_line(final PrintWriter output, int indent, Modification m,
 		Map<String, Vector<String>> speciesAliases,
 		Map<String, Vector<Place>> placeMap,
-		String bubble
+		String bubble,
+		ImagesInfo scales
 	)
 	{
-		final int indent = 4;
-		item_list_start(output, indent, m.getId(), "modification");
+		item_list_start(output, indent, m.getId(), "modification posttranslational");
 		output.print(" position=\"");
 		boolean first = true;
+		final int z = 1 << scales.maxzoom;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
 		{
 			final Vector<Place> places = placeMap.get(shape_id);
@@ -1347,9 +1364,9 @@ public class ProduceClickableMap {
 				first = false;
 			else
 				output.print(" ");
-			output.print(place.x);
+			output.print(place.x / (double)z + scales.xshift_zoom0);
 			output.print(";");
-			output.print(place.y);
+			output.print(place.y / (double)z + scales.yshift_zoom0);
 		}
 		output.println("\">");
 		content_line(output, indent, m.getName(), bubble);
@@ -1362,7 +1379,8 @@ public class ProduceClickableMap {
 		final FormatProteinNotes format,
 		final AllPosts all_posts,
 		final SbmlDocument cd,
-		final String blog_name
+		final String blog_name,
+		ImagesInfo scales
 	) throws FileNotFoundException, UnsupportedEncodingException
 	{
 		final String encoding = "UTF-8";
@@ -1372,30 +1390,35 @@ public class ProduceClickableMap {
 		final ItemCloser entities = item_line(output, 1, "entities", null, "Entities", null);
 		for (final String[] s : class_name_to_human_name)
 		{
-//			if (!s[0].equals(DEGRADED_CLASS_NAME))
+			String img = " <img border='0' src=\"" + common_directory_url + "entity_icons/" + s[0] + ".png\"/>";
+			final ItemCloser cls = item_line(output, 2, s[0], null, s[1] + img, s[0]);
+			for (final EntityBase ent : entityIDToEntityMap.values())
 			{
-//				final ItemCloser cls = item_line(output, 2, s[0], null, s[1]);
-				String img = " <img border='0' src=\"" + common_directory_url + "entity_icons/" + s[0] + ".png\"/>";
-				final ItemCloser cls = item_line(output, 2, s[0], null, s[1] + img, s[0]);
-				for (final EntityBase ent : entityIDToEntityMap.values())
+				if (s[0].equals(ent.getCls()) && !ent.isBad())
 				{
-					if (s[0].equals(ent.getCls()) && !ent.isBad())
+					final ItemCloser entity = item_line(output, 3, ent.getId(), null, ent.getName(), null);
+					
+					final int indent = 4;
+					for (Modification m : ent.getPostTranslational())
 					{
-						final ItemCloser entity = item_line(output, 3, ent.getId(), null, ent.getName(), null);
-						
-						for (Modification m : ent.getModifications())
-						{
-	                                        	String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, speciesAliases);
-	                                                modifcation_line(output, m, speciesAliases, placeMap, b);
-						}
-						
-						entity.close();
+						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, speciesAliases);
+						modification_line(output, indent, m, speciesAliases, placeMap, b, scales);
 					}
+					
+					for (Modification m : ent.getAssociated())
+					{
+						item_list_start(output, indent, m.getId(), "modification associated");
+						output.println(">");
+						content_line(output, indent + 1, m.getName());
+						new ItemCloser(indent, output).close();
+					}
+					
+					entity.close();
 				}
-				cls.close();
 			}
-			
+			cls.close();
 		}
+		
 		entities.close();
 		
 		ItemCloser modules = item_line(output, 1, "modules", null, "Modules", null);
@@ -1407,7 +1430,7 @@ public class ProduceClickableMap {
 		
 		output.close();
 	}
-	private void generatePages(final Wordpress wp, final File markers, File rpanel_index) throws Exception
+	private void generatePages(final Wordpress wp, final File markers, File rpanel_index, ImagesInfo scales) throws Exception
 	{
 		final FormatProteinNotes format = new FormatProteinNotes();
 		final MarkerManager xml = new MarkerManager(markers);
@@ -1460,7 +1483,7 @@ public class ProduceClickableMap {
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
 		}
-		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name);
+		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
 				
 /*		for (final CelldesignerRNA rna : annotation.getCelldesignerListOfRNAs().getCelldesignerRNAArray())
 		{
@@ -3715,6 +3738,11 @@ public class ProduceClickableMap {
 		{
 			return post == null ? -3 : post.getPostId();
 		}
+		public List<Modification> getAssociated()
+                {
+	                // TODO Auto-generated method stub
+	                return Collections.<Modification>emptyList();
+                }
 		public boolean isBad()
 		{
 			return false;
@@ -3780,6 +3808,7 @@ public class ProduceClickableMap {
 		public String getComment() { return comment; }
 		public String getName() { return label; }
 		public String getCls() { return cls; }
+		@Override
 		public ArrayList<Modification> getAssociated()
 		{
 			return associated;
@@ -5301,11 +5330,6 @@ public class ProduceClickableMap {
 		}*/
 	}
 	
-	private void createClickableMap(final Wordpress wp, final File markers, File rpanel_index) throws Exception
-	{
-		generatePages(wp, markers, rpanel_index);
-	}
-	
 	private void find_the_position_of_the_OVAL_in_OVAL_xml_for_centering()
 	{
 		if (false)
@@ -5757,7 +5781,7 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, int[] map_info)
+	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, ImagesInfo scales)
 	{
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
@@ -5770,9 +5794,10 @@ public class ProduceClickableMap {
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
 		*/
 		
-		out.println("<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?sensor=false'></script>");
-		
-		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
+		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "style.css\"/>");
+		out.println("<script src='http://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
+//		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
+		out.println("<script src='/maps/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/maps/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
 	
 //		out.println("<script type='text/javascript'>");
@@ -5784,7 +5809,6 @@ public class ProduceClickableMap {
 		for (final String s : javascript_for_index)
 			out.println("<script src=\"" + common_directory_url + s + ".js\" type='text/javascript'></script>");
 
-		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "style.css\"/>");
 		out.println("</head>");
 		
 		out.println("<body>");
@@ -5837,11 +5861,22 @@ public class ProduceClickableMap {
 			out.print("'" + map_name + "'");
 			out.print(", '#" + marker_div_name + "'");
 			out.print(", \"" + right_panel_list + "\"");
-			for (final int i : map_info)
-			{
 				out.print(", ");
-				out.print(i);
-			}
+				out.print(scales.minzoom);
+				out.print(", ");
+				out.print(scales.maxzoom);
+				out.print(", ");
+				out.print(scales.tile_width);
+				out.print(", ");
+				out.print(scales.tile_height);
+				out.print(", ");
+				out.print(scales.width_zoom0);
+				out.print(", ");
+				out.print(scales.height_zoom0);
+				out.print(", ");
+				out.print(scales.xshift_zoom0);
+				out.print(", ");
+				out.print(scales.yshift_zoom0);
 			out.println(")");
 		}
 		else

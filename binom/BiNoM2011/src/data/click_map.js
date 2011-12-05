@@ -27,8 +27,11 @@ function make_marker(map, pos)
 	});
 	return pos;
 }
+var filter = ".modification";
 
 var jtree;
+var map;
+var projection
 
 function show_markers(markers)
 {
@@ -37,20 +40,38 @@ function show_markers(markers)
 	(
 		function(i)
 		{
-			console.log(i);
-			var element = $("#" + i);
-			console.log(element.attr("id"));
-			var markers = element.attr("markers");
-			if (markers != null)
-			{
-				console.log(markers.length);
-				markers.forEach(function(j) { j.setVisible(true); });
-			}
+			var element = $("li#" + i).filter(".posttranslational")[0];
+			console.log(element, $(element).attr("id"), "show_markers");
+			get_markers_for_modification(element, projection, map);
+//			console.log(element.attr("id"), markers.length);
+			element.markers.forEach
+			(
+				function(i)
+				{
+					i.setVisible(false);
+				}
+			);
+			element.markers.forEach
+			(
+				function(i)
+				{
+					i.setVisible(true);
+					i.setAnimation(google.maps.Animation.DROP);
+				}
+			);
+			jQuery.jstree._reference(jtree).check_node(element);
+			element.slaves.each
+			(
+				function(i)
+				{
+					jQuery.jstree._reference(jtree).check_node(this);
+				}
+			);
 		}
 	);
 }
 
-function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height)
+function start_map(min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
 	var lat_ = 90;
 	var lng_ = 180;
@@ -80,7 +101,8 @@ function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, 
 
 	var element = document.getElementById("map");
 
-	var map = new google.maps.Map(element, {
+	map = new google.maps.Map(element, {
+        copyright_owner: 'Institut Curie',
 		center : new google.maps.LatLng(10, 10),
 		disableDefaultUI: true,
 		zoomControl: true,
@@ -89,7 +111,7 @@ function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, 
 		{
 			opened: true
 		},
-		zoom : 0,
+		zoom : min_zoom,
 		mapTypeId : id
 	});
 	
@@ -109,38 +131,93 @@ function start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, 
 		minZoom : min_zoom
 	});
 	
-	map_type.projection = new ClickMapProjection();
+	projection = new ClickMapProjection();
+	map_type.projection = projection;
 	map.mapTypes.set(id, map_type);
 	
 	var bounds = new google.maps.LatLngBounds();
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift + width, yshift + height)));
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift, yshift)));
-//	bounds.extend(p1);
-//	bounds.extend(make_marker(map, xshift + width, yshift + height));
 	map.fitBounds(bounds);
 	return { map : map, projection : map_type.projection};
-	
-	var lat = 90;
-	var lng = 180;
-	    
-	var bounds = new google.maps.LatLngBounds();
-	bounds.extend(new google.maps.LatLng(-lat, -lng));
-	bounds.extend(new google.maps.LatLng(lat, lng));
-	map.fitBounds(bounds);
-	return map;
-	make_marker(map, lat - 0.1, lng);
-	make_marker(map, -lat, lng);
-	make_marker(map, 0, lng);
-	make_marker(map, 0, 0);
-	make_marker(map, lat - 0.1, 0);
-	make_marker(map, -lat, 0);
-	return map;
 }
 
-function start_right_hand_panel(selector, source, map, projection, max_zoom, xshift, yshift)
+function get_markers_for_modification(element, projection, map)
 {
-	var filter = ".modification";
-	var z = 1 << max_zoom;
+	if (element.markers == null)
+	{
+		var id = $(element).attr("id");
+		var position = $(element).attr("position");
+		if (position == null)
+		{
+			var element2 = $("li#" + id).filter(".posttranslational")[0];
+			get_markers_for_modification(element2, projection, map);
+			console.log("position is null", $(element).attr("id"), element.slaves.length);
+		}
+		else
+		{
+			element.markers = Array();
+			position.split(" ").forEach
+			(
+				function(item)
+				{
+					var xy = item.split(";");
+					var p = new google.maps.Point(xy[0], xy[1]);
+					//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
+					var name = jtree.jstree("get_text", element, "en");
+	//				$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
+	//				$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
+	//				$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
+					var marker = new google.maps.Marker
+					(
+							{
+								position: projection.fromPointToLatLng(p),
+								map: map,
+								title: name + " (" + id + ")",
+								visible: false
+							}
+					);
+					google.maps.event.addListener
+					(
+						marker, 'click', function()
+						{
+							if (element.bubble == null)
+							{
+		//						var ln = data.inst.get_text(element, 'ln');
+								var ln = jtree.jstree("get_text", element, "ln");
+								element.bubble = new google.maps.InfoWindow
+								(
+									{
+										content: ln,
+										maxWidth: 350
+									}
+								);
+							}
+							element.bubble.open(map, marker);
+						}
+					);
+					element.markers.push(marker);
+				}
+			);
+			element.slaves = $("li#" + id).filter(".associated");
+			element.slaves.each
+			(
+				function()
+				{
+					var s = element.slaves.not(this).add(element);
+					this.slaves = s;
+					this.markers = element.markers;
+				}
+			);
+			
+			console.log($(element).attr("id"), "created", element.markers.length);
+		}
+	}
+	return element.markers;
+}
+
+function start_right_hand_panel(selector, source, map, projection)
+{
 	jtree = $(selector).jstree({
 		"themes" : {
 			"theme" : "default",
@@ -155,73 +232,61 @@ function start_right_hand_panel(selector, source, map, projection, max_zoom, xsh
 			"xsl" : "nest"
 		},
 		"languages" : [ "en", "ln" ],
+		"checkbox" :
+		{
+			"checked_parent_open" : false
+		},
 		plugins : [ "themes", "xml_data", "ui", "checkbox", "languages" ],
 		html_titles : true
 	}).bind("uncheck_node.jstree", function(event, data) {
 		var f = function(index, element)
 		{
 			element.markers.forEach(function(i) { i.setVisible(false); });
+			element.slaves.each
+			(
+				function()
+				{
+					jQuery.jstree._reference(jtree).uncheck_node(this);
+				}
+			);
 		};
 		$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
 		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 	}).bind("check_node.jstree", function(event, data) {
-		console.log(data.inst, jtree);
-		var f = function(index, element) {
-			if (element.markers != null)
-				element.markers.forEach(function(i) { i.setVisible(true); });
-			else
-			{
-				element.markers = Array();
-				$(element).attr("position").split(" ").forEach
-				(
-					function(item)
+		console.log("check_node.jstree", data.args[0]);
+		var f = function(index, element)
+		{
+			get_markers_for_modification(element, projection, map);
+			
+			element.markers.forEach
+			(
+					function(i)
 					{
-						var xy = item.split(";");
-						var p = new google.maps.Point(xy[0] / z + xshift, xy[1] / z + yshift);
-						//$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
-						var id = $(element).attr("id");
-						var name = data.inst.get_text(element, 'en');
-//						$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).each(function(i, v){ name = v.textContent;});
-//						$(element).find("a").contents().filter(function(){ return this.nodeType != 1; }).wrap("<b/>");
-//						$(element).find("a").filter("TextNode").each(function(i, v){console.log(v);});
-						var marker = new google.maps.Marker
-						(
-								{
-									position: projection.fromPointToLatLng(p),
-									map: map,
-									title: name + " (" + id + ")"
-								}
-						);
-						google.maps.event.addListener(marker, 'click', function() {
-							if (element.bubble == null)
-							{
-								var ln = data.inst.get_text(element, 'ln');
-								ln = jtree.jstree("get_text", element, "ln");
-								element.bubble = new google.maps.InfoWindow
-								(
-									{
-										content: ln,
-										maxWidth: 350
-									}
-								);
-							}
-							element.bubble.open(map, marker);
-						});
-						element.markers.push(marker);
+						if (!i.getVisible())
+						{
+							i.setVisible(true);
+							i.setAnimation(google.maps.Animation.DROP);
+						}
 					}
 				);
-			}
+			element.slaves.each
+			(
+				function(i)
+				{
+					jQuery.jstree._reference(jtree).check_node(this);
+				}
+			);
 		};
-		$(this).jstree("get_checked",data.args[0],true).filter(filter).each(f);
+		jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 
 		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 	});
 
 };
 
-function clickmap_start(map_name, selector, source, min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height) {
-	var map = start_map(min_zoom, max_zoom, tile_width, tile_height, xshift, yshift, width, height);
-	start_right_hand_panel(selector, source, map.map, map.projection, max_zoom, xshift, yshift);
+function clickmap_start(map_name, selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift) {
+	var map = start_map(min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
+	start_right_hand_panel(selector, source, map.map, map.projection);
 	return;
 	initialize(min_zoom);
 	return;

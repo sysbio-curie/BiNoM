@@ -47,7 +47,7 @@ public class NestMerging{
 		nx=nx/size;
 		ny=ny/size;
 		mergeName=nestSet.get(0).getIdentifier();
-		for(int i=0;i<nestSet.size();i++) mergeName=mergeName+"&"+nestSet.get(i).getIdentifier();
+		for(int i=1;i<nestSet.size();i++) mergeName=mergeName+"&"+nestSet.get(i).getIdentifier();
 		CyNode mergeNest=Cytoscape.getCyNode(mergeName,true);
 		currentNW.addNode(mergeNest);
 		currentV.getNodeView(mergeNest).setXPosition(nx);

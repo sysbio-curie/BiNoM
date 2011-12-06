@@ -96,19 +96,8 @@ public class ProduceClickableMap {
 		Arrays.sort(non_entities);
 	}
 	
-	private static final String[] javascript_files;
-	private static final String[] javascript_for_index = new String[]{
-		// "markers",
-		// "marker_links",
-		// "marker_checkboxes",
-		"click_map"
-//		"customMap"
-	};
-	static
-	{
-		javascript_files = Arrays.copyOf(javascript_for_index, javascript_for_index.length + 1);
-		javascript_files[javascript_files.length - 1] = "head_section";
-	}	
+	private final static String included_blog_base = "clickmap_blog";
+	private final static String included_map_base = "clickmap_map";
 	
 	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>(); 
 	public SbmlDocument cd = null;
@@ -543,9 +532,9 @@ public class ProduceClickableMap {
 
 	private static void copy_files(final File source, File destination) throws IOException
 	{
-		for (final String file : javascript_files)
-			copy_file_between_directories(source, destination, file + ".js");
-		copy_file_between_directories(source, destination, "style.css");
+		for (final String suffix : new String[]{"js", "css"})
+			for (final String base : new String[]{ included_blog_base, included_map_base })
+				copy_file_between_directories(source, destination, base + "." + suffix);
 	}
 
 	private static void copy_file_between_directories(final File source, File destination, final String file) throws IOException
@@ -560,7 +549,7 @@ public class ProduceClickableMap {
 	        if (destFile.getCanonicalFile().equals(destFile.getAbsoluteFile()))
 	                copyFile(sourceFile, destFile);
                 else
-			Utils.eclipsePrintln("skipping " + destFile + " because is symlink");
+			Utils.eclipsePrintln("skipping symlink " + destFile);
         }
 
 	static private void fatal_error(String message)
@@ -592,37 +581,50 @@ public class ProduceClickableMap {
 		}
 	}
 	
-	private static void copyFile(File sourceFile, File destFile) throws IOException {
+	private static void copyFile(File sourceFile, File destFile) throws IOException
+	{
 		// http://stackoverflow.com/questions/106770/standard-concise-way-to-copy-a-file-in-java
 		// https://gist.github.com/889747
-//		if (!destFile.exists())
-//			destFile.createNewFile();
+		// if (!destFile.exists())
+		// destFile.createNewFile();
 		FileInputStream fIn = null;
 		FileOutputStream fOut = null;
 		FileChannel source = null;
 		FileChannel destination = null;
-		try {
+		try
+		{
 			fIn = new FileInputStream(sourceFile);
 			source = fIn.getChannel();
 			fOut = new FileOutputStream(destFile);
 			destination = fOut.getChannel();
 			long transfered = 0;
 			long bytes = source.size();
-			while (transfered < bytes) {
+			while (transfered < bytes)
+			{
 				transfered += destination.transferFrom(source, 0, source.size());
 				destination.position(transfered);
 			}
-		} finally {
-			if (source != null) {
+		}
+		finally
+		{
+			if (source != null)
+			{
 				source.close();
-			} else if (fIn != null) {
-				fIn.close();
 			}
-			if (destination != null) {
+			else
+				if (fIn != null)
+				{
+					fIn.close();
+				}
+			if (destination != null)
+			{
 				destination.close();
-			} else if (fOut != null) {
-				fOut.close();
 			}
+			else
+				if (fOut != null)
+				{
+					fOut.close();
+				}
 		}
 	}
 	
@@ -5794,24 +5796,43 @@ public class ProduceClickableMap {
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
 		*/
 		
-		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "style.css\"/>");
+		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + included_map_base + ".css\"/>");
 		out.println("<script src='http://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/maps/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/maps/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
 	
-//		out.println("<script type='text/javascript'>");
-//		out.print("var clickmap_maxzoom = ");
-//		out.print(maxzoom);
-//		out.println(";");
-//		out.println("</script>");
-
-		for (final String s : javascript_for_index)
-			out.println("<script src=\"" + common_directory_url + s + ".js\" type='text/javascript'></script>");
+		out.println("<script src=\"" + common_directory_url + included_map_base + ".js\" type='text/javascript'></script>");
 
 		out.println("</head>");
 		
-		out.println("<body>");
+		final String map_div_name = "map"; // see css
+		final String marker_div_name = "marker_checkboxes"; // see css
+		
+		out.print("<body onload=\"");
+		out.print("clickmap_start(");
+		out.print("'" + map_name + "'");
+		out.print(", '#" + marker_div_name + "'");
+		out.print(", '" + map_div_name + "'");
+		out.print(", '" + right_panel_list + "'");
+		out.print(", ");
+		out.print(scales.minzoom);
+		out.print(", ");
+		out.print(scales.maxzoom);
+		out.print(", ");
+		out.print(scales.tile_width);
+		out.print(", ");
+		out.print(scales.tile_height);
+		out.print(", ");
+		out.print(scales.width_zoom0);
+		out.print(", ");
+		out.print(scales.height_zoom0);
+		out.print(", ");
+		out.print(scales.xshift_zoom0);
+		out.print(", ");
+		out.print(scales.yshift_zoom0);
+		out.println(")\">");
+		
 		out.println("<noscript>");
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<b>JavaScript must be enabled in order for you to use ClickMap.</b>\n")
@@ -5821,89 +5842,12 @@ public class ProduceClickableMap {
 		out.println(message);
 		out.println("</noscript>");
 		out.println("<div id='header'><span id='pathway'>" + title + "</span> <span id='author'>by Institut Curie</span></div>");
-		final String map_div_name = "map";
 		out.println("<div id='" + map_div_name + "'>" + message + "</div>");
 		out.println("<div id='side_bar'>");
 		
-		final String marker_div_name = "marker_checkboxes";
 		out.println("<div id='" + marker_div_name + "'></div>");
-		if (false)
-		out.println("<script type='text/javascript'>start_right_hand_panel('#" + marker_div_name + "', \"" + right_panel_list + "\");</script>");
-
 		
-		if (false)
-		{
-		for (final String[] l : class_name_to_human_name)
-		{
-			out.println("	<div id='" + l[0] + "'>");
-			out.println("		<h3><input type='checkbox' name='" + l[0] + "' value='' checked='checked'/>" + l[1] + "</h3>");
-			out.println("		<ul id='" + l[0] + "_list'>");
-			out.println("		</ul>");
-			out.println("	</div>");
-		}
-		}
 		out.println("</div>");
-		if (false)
-		{
-		out.println("<div id='form'>");
-		out.println("<form action='#'>");
-		for (final String[] l : class_name_to_human_name)
-			out.println("	<input type='checkbox' name='" + l[0] + "' value='' checked='checked'/>" + l[1]);
-		
-		out.println("</form>");
-		out.println("</div>");
-		}
-		out.println("<script type='text/javascript'>");
-		if (true)
-		if (true)
-		{
-			out.print("clickmap_start(");
-			out.print("'" + map_name + "'");
-			out.print(", '#" + marker_div_name + "'");
-			out.print(", \"" + right_panel_list + "\"");
-				out.print(", ");
-				out.print(scales.minzoom);
-				out.print(", ");
-				out.print(scales.maxzoom);
-				out.print(", ");
-				out.print(scales.tile_width);
-				out.print(", ");
-				out.print(scales.tile_height);
-				out.print(", ");
-				out.print(scales.width_zoom0);
-				out.print(", ");
-				out.print(scales.height_zoom0);
-				out.print(", ");
-				out.print(scales.xshift_zoom0);
-				out.print(", ");
-				out.print(scales.yshift_zoom0);
-			out.println(")");
-		}
-		else
-		{
-			out.println("var settingsCustomMap = {");
-			out.println("	copyright_owner: 'Institut Curie',");
-			out.println("	maxZoom: 5,");
-			out.println("	div: 'map'");
-			out.println("};");
-			
-			out.println("var customMap = cellpublisher.customMap.createCustomMap(settingsCustomMap);");
-			out.println("cellpublisher.map = customMap;");
-			
-			out.println("var settingsMarkers = {");
-			out.println("	xml: 'markers.xml',");
-			out.println("	map: customMap,");
-			out.println("	maxZoom: 5");
-			out.println("}");
-			
-			out.println("var markers = cellpublisher.markers.createMarkers(settingsMarkers);");
-			//alert(markers.length);
-			
-			out.println("cellpublisher.marker_links.create_side_bar(markers);");
-			out.println("cellpublisher.marker_checkboxes.activate_checkboxes();");
-		}
-		
-		out.println("</script>");
 		out.println("</body>");
 		out.println("</html>");
 		out.flush();

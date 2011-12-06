@@ -36,7 +36,7 @@ function show_map_and_markers(blog_name, map_name, ids)
 {
 	var f = function()
 	{
-		maps[map_name].cellpublisher.marker_links._show_markers(ids);
+		maps[map_name].show_markers(ids);
 	}
 	if (is_map_open(map_name))
 	{

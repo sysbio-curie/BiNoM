@@ -524,7 +524,7 @@ public class ProduceClickableMap {
 		if (scales == null)
 			Utils.eclipseErrorln("no images found");
 
-		clMap.generatePages(wp, new File(this_map_directory, "markers.xml"), new File(this_map_directory, right_panel_list), scales);
+		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales);
 		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
 		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales);
 		return clMap;
@@ -556,29 +556,6 @@ public class ProduceClickableMap {
 	{
 		Utils.eclipseParentErrorln(message);
 		System.exit(1);
-	}
-	
-	private static void copyFile1(File sourceFile, File destFile) throws IOException
-	{
-//		if(!destFile.exists())
-//			destFile.createNewFile();
-
-		FileChannel source = null;
-		FileChannel destination = null;
-
-		try
-		{
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		}
-		finally
-		{
-			if (source != null)
-				source.close();
-			if (destination != null)
-				destination.close();
-		}
 	}
 	
 	private static void copyFile(File sourceFile, File destFile) throws IOException
@@ -1039,25 +1016,6 @@ public class ProduceClickableMap {
 		return id_buf.toString();
 	}
 	
-	static private String makeComplexIdFromEntities(final ArrayList<Entity> components, final Map<String, Modification> map)
-	{
-		assert !components.isEmpty();
-		String[] ids = new String[components.size()];
-		int i = 0;
-		for (final Entity component : components)
-			ids[i++] = component.getId();
-		Arrays.sort(ids);
-		
-		final StringBuffer id_buf = new StringBuffer();
-		for (final String id : ids)
-		{
-			if (id_buf.length() != 0)
-				id_buf.append('_');
-			id_buf.append(id);
-		}
-		return id_buf.toString();
-	}
-	
 	static private void completeComplexes(final SbmlDocument cd, Map<String, EntityBase> map, Map<String, String> includedSpeciesToEntityMap, Map<String, ArrayList<CelldesignerSpecies>> complexToIncludedSpeciesMap2)
 	{
 		final Model model = cd.getSbml().getModel();
@@ -1375,6 +1333,21 @@ public class ProduceClickableMap {
 		new ItemCloser(indent, output).close();
 	}
 	
+	/*
+	static private void reactions_for_right_hand_panel(AllPosts all_posts, FormatProteinNotes format)
+	{
+		
+		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+		{
+			final String title = r.getId();
+			final String body = createReactionBody(r, format, false);
+			final AllPosts.Post post = updateBlogPostId(wp, all_posts, r.getId(), title, REACTION_CLASS_NAME, body);
+	//		createReactionMarker(xml, r, post.getPostId(), format);
+			updateBlogPostIfRequired(wp, post, title, body);
+		}
+	}
+	*/
+	
 	static private void generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
@@ -1432,10 +1405,9 @@ public class ProduceClickableMap {
 		
 		output.close();
 	}
-	private void generatePages(final Wordpress wp, final File markers, File rpanel_index, ImagesInfo scales) throws Exception
+	private void generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales) throws Exception
 	{
 		final FormatProteinNotes format = new FormatProteinNotes();
-		final MarkerManager xml = new MarkerManager(markers);
 		final AllPosts all_posts = new AllPosts(wp);		
 		final Model model = cd.getSbml().getModel();
 		
@@ -1459,7 +1431,7 @@ public class ProduceClickableMap {
 			final String title = r.getId();
 			final String body = createReactionBody(r, format, false);
 			final AllPosts.Post post = updateBlogPostId(wp, all_posts, r.getId(), title, REACTION_CLASS_NAME, body);
-			createReactionMarker(xml, r, post.getPostId(), format);
+//			createReactionMarker(xml, r, post.getPostId(), format);
 			updateBlogPostIfRequired(wp, post, title, body);
 		}
 				
@@ -1472,7 +1444,6 @@ public class ProduceClickableMap {
 		        	if (body != null)
 		        	{
 		        		final AllPosts.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
-		        		create_entity_marker(format, xml, post.getPostId(), complex);
 		        		updateBlogPostIfRequired(wp, post, complex.getName(), body);
 		        	}
 			}
@@ -1481,7 +1452,6 @@ public class ProduceClickableMap {
 //				do_entity(wp, format, xml, all_posts, ent);
 				final String body = create_entity_body(format, ent, true, all_posts);
 		        	final AllPosts.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
-		        	create_entity_marker(format, xml, post.getPostId(), ent);
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
 		}
@@ -1542,9 +1512,7 @@ public class ProduceClickableMap {
 		}
 	*/
 		
-		
 		remove_old_posts(wp, all_posts.getUnused());
-		xml.close();
 		
 		/*
 		if (false)
@@ -1725,207 +1693,6 @@ public class ProduceClickableMap {
 		}*/
 	}
 	
-	static final private char[] modification_indicators = { '@', '|' };
-	
-	static private String strip_modifications(final String name)
-	{
-		int stop = -1;
-		for (char c : modification_indicators)
-		{
-			final int p = name.indexOf(c);
-			if (p >= 0)
-				stop = (stop < 0) ? p : Math.min(p, stop);
-		}
-		return stop < 0 ? name : name.substring(0, stop);
-			
-	}
-
-	/*
-	private Map<String, ArrayList<Entity>> get_complex_compositions()
-	{
-		final Map<String, ArrayList<Entity>> complex_composition = new HashMap<String, ArrayList<Entity>>();
-		for (CelldesignerSpecies included : cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
-		{
-			final String child_id = get_entity_id(included.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity());
-			if (child_id != null)
-			{
-				final EntityBase e = entityIDToEntityMap.get(child_id);
-				assert e != null : "no entity for " + child_id;
-				final String complex = Utils.getValue(included.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
-				assert complex != null : included.getId();
-				ArrayList<EntityBase> composition = complex_composition.get(complex);
-				if (composition == null)
-					complex_composition.put(complex, composition = new ArrayList<Entity>());
-				composition.add(e);
-			}
-		}
-		
-		for (Entry<String, ArrayList<Entity>> entry : complex_composition.entrySet())
-			Collections.sort(entry.getValue());
-		
-		return Collections.unmodifiableMap(complex_composition);
-	}
-	*/
-
-	private String get_child_id(final CelldesignerSpecies sp)
-        {
-		final CelldesignerSpeciesIdentity identity = sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
-	        final String child_id;
-	        final String type = Utils.getValue(identity.getCelldesignerClass());
-	        if (type.equals(PROTEIN_CLASS_NAME))
-	        {
-	        	final CelldesignerProteinReference ref = identity.getCelldesignerProteinReference();
-	        	return Utils.getValue(ref);
-	        }
-	        else if (type.equals(GENE_CLASS_NAME))
-	        {
-	        	final CelldesignerGeneReference ref = identity.getCelldesignerGeneReference();
-	        	return Utils.getValue(ref);
-	        }
-	        else if (type.equals(RNA_CLASS_NAME))
-	        {
-	        	final CelldesignerRnaReference ref = identity.getCelldesignerRnaReference();
-	        	return Utils.getValue(ref);
-	        }
-	        else if (type.equals(UNKNOWN_CLASS_NAME))
-	        {
-	        	final CelldesignerHypothetical ref = identity.getCelldesignerHypothetical();
-	        	return Utils.getValue(ref);
-	        }
-	        else if (type.equals(ANTISENSE_RNA_CLASS_NAME))
-	        {
-	        	final CelldesignerAntisensernaReference ref = identity.getCelldesignerAntisensernaReference();
-	        	child_id = Utils.getValue(ref);
-	        }
-	        else if (type.equals(ION_CLASS_NAME))
-	        {
-	        	child_id = sp.getId();
-	        }
-	        else if (type.equals(SIMPLE_MOLECULE_CLASS_NAME))
-	        {
-	        	child_id = sp.getId();
-	        }
-	        else if (type.equals(DEGRADED_CLASS_NAME))
-	        {
-	        	child_id = null;
-	        }
-	        else
-	        {
-	        	assert false : "unknown type " + type;
-	        	child_id = null;
-	        }
-	        return child_id;
-        }
-	
-	/*
-	private Map<String, ArrayList<Entity>> make_complex_to_modifications()
-	{
-		final Map<String, ArrayList<Entity>> r = new HashMap<String, ArrayList<Entity>>();
-		
-		for (final CelldesignerComplexSpeciesAlias complex_alias : cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray())
-		{
-		        final ArrayList<Entity> composants = complex_composition.get(complex_alias.getSpecies());
-		        if (composants == null)
-		        {
-		        	Utils.eclipseErrorln("complex " + complex_alias.getId() + " does not have any composants");
-		        	continue;
-		        }
-		        final StringBuffer name_buf = new StringBuffer();
-		        	
-		        for (final Entity composant : composants)
-		        {
-		        	if (name_buf.length() != 0)
-		        		name_buf.append(':');
-		        	name_buf.append(composant.label);
-		        }
-			final String id = makeComplexId(composants);
-		        if (composants.size() <= 1)
-		        {
-		        	Utils.eclipseErrorln("complex " + complex_alias.getId() + "/" + id + " has " + composants.size() + " composant");
-		        	continue;
-		        }
-		        Species found = null;
-		        for (final Species t : cd.getSbml().getModel().getListOfSpecies().getSpeciesArray())
-		        {
-		        	if (t.getId().equals(complex_alias.getSpecies()))
-		        	{
-		        		assert found == null;
-		        		found = t;
-		        	}
-		        }
-		        assert found != null : complex_alias.getId() + " " + complex_alias.getSpecies();
-			final String notes = Utils.getValue(found.getNotes());
-			
-			final String myclass = "complex";
-			
-			final String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd, complex_alias.getSpecies(), true,true);
-				
-			final Entity entity = new Entity(id, name, myclass, found.getNotes());
-			entity.addSpecies(found);
-			
-			ArrayList<Entity> modifications = r.get(id);
-			if (modifications == null)
-				r.put(id, modifications = new ArrayList<Entity>());
-//			for (Entity m : modifications)
-//				assert !m.label.equals(name) : complex_alias.getId() + " has this modification twice " + m.id + " " + m.label + " " + m.cls;
-			modifications.add(entity);
-		}
-		return Collections.unmodifiableMap(r);
-	}
-	*/
-/*	
-	private void do_complex_(final Complex complex, final Wordpress wp, final FormatProteinNotes format, final AllPosts all_posts, final FileWriter xml) throws IOException
-        {
-		if (complex.getEntities().size() < 2)
-			return;
-		String myid = complex.id;
-		final Hasher h = new Hasher();
-		final StringBuffer fw = new StringBuffer();
-		final String myclass = "complex";
-		final Entity entity = complex.getEntities().get(0);
-		show_shapes_on_map(h, fw, entity, "<b>" + h.add(titlecase(myclass)) + " " + h.add(entity.label) + " (" + h.add(entity.id) + ")</b>", master_map_name);
-		
-	        final ArrayList<Entity> composants = complex.getEntities(); //complex_composition.get(entity.species.get(0).getId());
-	        if (composants == null)
-	        {
-	        	Utils.eclipseErrorln(myid + ": " + myid + " does not have any composants");
-	        	return;
-	        }
-	        
-	        fw.append("<hr><b>Complex composition:</b>\n");
-	        fw.append("<ol>\n");
-	        
-	        for (final Entity e : composants)
-			show_shapes_on_map(h, fw.append("<li>"), e, h.add(e.label), master_map_name);
-	        fw.append("</ol>\n");
-	        
-	        fw.append("<hr>");
-	        format.complex(complex.comment, fw, h, entity, cd);
-	        
-	        fw.append("<hr>Post-translational modifications\n");
-	        fw.append("<ol>");
-	        for (final Entity e : complex.getEntities())
-			show_shapes_on_map(h, fw.append("<li>"), e, h.add(e.label), master_map_name);
-	        fw.append("</ol>\n");
-	        
-        	format_modifications(entity, h, fw, true, false);
-        	participates_in_reactions_split(entity, h, fw);
-		final String body = h.insert(fw, myid).toString();
-        	final AllPosts.Post post = updateBlogPostId(wp, all_posts, myid, entity.label, myclass, body);
-//        	create_entity_marker(format, xml, post.getPostId(), found.getNotes(), entity);
-        	updateBlogPostIfRequired(wp, post, entity.label, body);
-        }
-*/
-	/*
-	private void do_complex(final Complex complex, final Wordpress wp, final FormatProteinNotes format, final AllPosts all_posts, final MarkerManager xml) throws IOException
-        {
-		final String body = create_complex_body(complex, format);
-        	final AllPosts.Post post = updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
-        	create_entity_marker(format, xml, post.getPostId(), complex);
-        	updateBlogPostIfRequired(wp, post, complex.getName(), body);
-	}
-	*/
-
 	private String create_complex_body(final Complex complex, final FormatProteinNotes format, final boolean pass2, AllPosts posts)
         {
 		if (complex.getComponents().size() < 2)
@@ -2434,18 +2201,6 @@ public class ProduceClickableMap {
 			md = md2;
 		}
 
-		public Hasher(XmlAnySimpleType name)
-		{
-			this();
-			add(Utils.getValue(name));
-		}
-
-		public Hasher(String name)
-		{
-			this();
-			add(name);
-		}
-
 		String add(String v)
 		{
 			try
@@ -2459,10 +2214,6 @@ public class ProduceClickableMap {
 			return v;
 		}
 
-		public String add(XmlAnySimpleType name)
-		{
-			return add(name.toString());
-		}
 		String getHash()
 		{
 			return new java.math.BigInteger(1, md.digest()).toString(Character.MAX_RADIX);
@@ -2471,11 +2222,6 @@ public class ProduceClickableMap {
 		{
 			return sb.insert(0, get_hash(id));
 		}
-		StringBuilder insert(StringBuilder sb, String id)
-		{
-			return sb.insert(0, get_hash(id));
-		}
-
 		private String get_hash(String id)
                 {
 	                return head_leadin + id + head_seperator + getHash() + " -->";
@@ -2957,40 +2703,6 @@ public class ProduceClickableMap {
 		format.simple(body_buf, modification.getNotes(), cd);
 		return body_buf.toString();
         }
-	
-	private void create_entity_marker(FormatProteinNotes format, MarkerManager xml, int post_id, EntityBase ent) throws IOException
-        {
-		for (final Modification modification : ent.getPostTranslational())
-		{
-			final StringBuffer body_buf = new StringBuffer();
-			body_buf.append("<b><big>");
-			final String human_cls = class_name_to_human_name_map.get(ent.getCls());
-			body_buf.append(human_cls == null ? ent.getCls() : human_cls);
-			visible_debug(body_buf, ent.getId());
-			body_buf.append("<br>\n");
-			
-			show_markers_from_map(ent, body_buf);
-			bubble_to_post_link_with_anchor(post_id, body_buf, blog_name);
-			body_buf.append("</big></b>");
-			body_buf.append("\n<p>");
-			
-			format.simple(body_buf, ent.getComment(), cd);
-			
-			body_buf.append("<hr>\n<b>Modification:</b>");
-			visible_debug(body_buf, modification.getId());
-			body_buf.append("<br>\n");
-			final int pos = modification.getName().lastIndexOf('@');
-			if (pos <= 0)
-				split_complex_for_marker(modification, modification.getName(), body_buf, module_protein_names);
-			else
-				split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf, module_protein_names).append("<br>\nin ").append(modification.getName().substring(pos + 1));
-			body_buf.append("<br>\n");
-		
-			format.simple(body_buf, modification.getNotes(), cd);
-			
-			modification.write_marker(xml, ent.getCls(), body_buf.toString(), placeMap, speciesAliases);
-		}
-        }
 
 	static private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf)
         {
@@ -3202,27 +2914,6 @@ public class ProduceClickableMap {
 			notes = create_notes(Utils.getValue(modification.getCelldesignerNotes()));
 			this.complex = e;
 		}
-		public void write_marker(MarkerManager xml, String entity_class, String body, Map<String,Vector<Place>> placeMap, Map<String, Vector<String>> speciesAliases)
-			throws IOException
-	        {
-			final Vector<String> shapes = getShapeIds(speciesAliases);
-			if (shapes != null)
-			{
-				final String title = getName();
-				if (shapes.size() > 1)
-					shapes.size();
-				for (String shape_id : shapes)
-				{
-					final Vector<Place> places = placeMap.get(shape_id);
-					assert places.size() == 1 : shape_id + " " + places.size();
-					final Place place = places.get(0);
-					final int x = Math.round(place.x);
-					final int y = Math.round(place.y);
-					
-					xml.create(entity_class, body, title, shape_id, x, y);
-				}
-			}
-	        }
 		String getCls() { return cls; }
 		private String getId() { return modification_id; }
 		public boolean isComplex()
@@ -3429,289 +3120,6 @@ public class ProduceClickableMap {
 	        return first;
         }
 
-	static private boolean skip_entity(Entity ent)
-        {
-	        return ent == null; // || ent.standardName == null | ent.label == null;
-        }
-	
-	private static String stripAt(final String name)
-	{
-		final int pos = name.indexOf('@');
-		return pos < 0 ? name : name.substring(0, pos);
-	}
-/*
-	private String createSpeciesBody(String modulefolder, AllPosts all_posts, final String id, final String name, SpeciesDocument.Species sp) throws IOException
-        {
-		StringBuffer fw = new StringBuffer();
-	        fw.append("<h3>Chemical species ("+id+")</h3>\n");
-	        fw.append("<b><font color=blue>"+ name +"</font></b>\n");
-	        //fw.write("<small><a href='"+id+".html' onClick='top.map.document.map.src=\"./"+mapfolder+"/"+id+".png\";top.map.window.scrollTo("+(int)(place.positionx)+"-getSize().width/2,"+(int)(place.positiony)+"-getSize().height/2)'>(partial map)</a></small> - ");
-	        //fw.write("<small><a href='"+id+".html' onClick='top.map.document.map.src=\""+prname+".png\";top.map.window.scrollTo("+(int)(place.positionx)+"-getSize().width/2,"+(int)(place.positiony)+"-getSize().height/2)'>(full map)</a></small>");
-	        //fw.write("<small><a href='"+id+".html' onClick='top.map.location.href=\"../"+prname+".html\";top.map.window.scrollTo("+(int)(place.positionx)+"-getSize().width/2,"+(int)(place.positiony)+"-getSize().height/2)'>(full map)</a></small>");
-	        //fw.write("<br><small><a href='' onClick='top.map.window.scrollTo("+(int)(place.positionx)+","+(int)(place.positiony)+")'>(center on it)</a></small>");
-	        //fw.write("<br><small><a href='' onClick=\"alert(''+getSize('map').width);\">(center on it)</a></small>");
-	        //fw.write("<br><small><a href='' onClick=\"alert('?');\">(center on it)</a></small>");
-	        
-	        fw.append("<hr><font color=red>Participates in reactions:</font><br>\n");
-	        fw.append("<p><font size=-1 FACE='Courier New'>\n");
-	        final Vector in_reactions = (Vector)speciesInReactions.get(sp.getId());
-        	for(int i = 0; in_reactions!=null && i<in_reactions.size();i++)
-        	{
-        		ReactionDocument.Reaction r = (ReactionDocument.Reaction)in_reactions.get(i);
-        		String reactionString = getReactionString(r, cd, true,true);
-        		fw.append("<a href='"+r.getId()+".html'>("+(i+1)+")</a> "+reactionString+"<br>\n");
-        	}
-	        fw.append("</font>\n");
-
-	        final Vector entities = (Vector)speciesEntities.get(sp.getId());
-	        fw.append("<hr><font color=red>Related entities:</font><br>\n");
-	        if (entities != null)
-	        {
-		        fw.append("<ol>\n");
-		        for(int i = 0; i < entities.size(); i++)
-		        {
-		        	final Entity ent = (Entity)entities.get(i);
-		        	if (ent != null && !ent.cls.equals("DEGRADED") && !ent.cls.equals("UNKNOWN"))
-		        	{
-		        		fw.append("<li>");
-		        		final AllPosts.Post post = all_posts.lookup(ent.id);
-		        		if (post == null)
-		        			fw.append(Utils.eclipseErrorln("could not find post for " + ent.id + " (" + ent.label + ")"));
-		        		else
-		        			post.add_href(fw, ent.label);
-		        	}
-		        }
-		        fw.append("</ol>\n");
-	        }
-	        
-	        if(sp.getNotes()!=null)
-	        	//if(sp.getNotes().getHtml()!=null)
-	        	{
-	        		String comment = Utils.getValue(sp.getNotes());
-	        		comment = Utils.replaceString(comment, "Notes by CellDesigner", "");
-	        		comment = checkCommentForXREFS(comment);
-	        		fw.append("<hr><font color=red>Comments:</font><br>\n");
-	        		fw.append("<p>"+comment+"\n");
-	        	}
-	        
-
-	        fw.append("<hr><font color=red>In modules:</font><br>\n");
-	        
-	        final Vector mnames = getModuleName(module_species, id);
-	        fw.append("<ol>\n");
-	        for(int i=0;i<mnames.size();i++){
-	        	String mname = (String)mnames.get(i);
-	        	String mnamec = correctName(mname);
-	        	fw.append("<li>Module: <a href='../"+modulefolder+"/"+subfolder+"/"+mnamec+".html'>"+module_names.get(mname)+"</a>\n");
-	        }
-	        fw.append("</ol>\n");
-        
-	        return fw.toString();
-        }
-*/	
-	/*
-	protected void updateStandardNames(){
-		HashMap<String, String> names = new HashMap<String, String>();
-		Iterator<String> it = entityIDToEntityMap.keySet().iterator();
-		while(it.hasNext()){
-			String key = it.next();
-			Entity ent = entityIDToEntityMap.get(key);
-			if(ent.standardName!=null)
-			if(!ent.standardName.equals(""))
-			if(!ent.label.equals(ent.standardName)){
-				names.put(ent.label, ent.standardName);
-			}
-			ent.standardName = ent.label;
-		}
-		it = entityIDToEntityMap.keySet().iterator();
-		while(it.hasNext()){
-			String key = it.next();
-			Entity ent = entityIDToEntityMap.get(key);
-			if(names.get(ent.label)!=null)
-				ent.standardName = (String)names.get(ent.label);
-		}
-	}
-	*/
-	
-	/* generate the list of entities (an index of html files)
-	 */
-	private void fullListOfEntities(String fn) throws Exception{
-		Vector v = new Vector();
-		HashMap entitiesMap = new HashMap();
-		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
-			CelldesignerProteinDocument.CelldesignerProtein prot = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
-			v.add(Utils.getValue(prot.getName()));
-			entitiesMap.put(Utils.getValue(prot.getName()),prot);
-		}
-		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
-			CelldesignerGeneDocument.CelldesignerGene gene = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
-			v.add(gene.getName()+" (gene)");
-			entitiesMap.put(gene.getName()+" (gene)",gene);
-		}
-	    Collections.sort(v);
-	    FileWriter fw = new FileWriter(fn);
-	    fw.write("<h3>List of entities</h3>\n");	    
-	    fw.write("<ol>\n");
-	    for(int i=0;i<v.size();i++){
-	    	String s = (String)v.get(i);
-	    	//System.out.println(s);
-	    	if(s.indexOf("gene")>=0){
-	    		CelldesignerGeneDocument.CelldesignerGene gene = (CelldesignerGeneDocument.CelldesignerGene)entitiesMap.get(s);
-	    		fw.write("<li><font color=green><a href="+gene.getId()+".html>"+s+"</a></font>\n");
-	    	}else{
-	    		CelldesignerProteinDocument.CelldesignerProtein prot = (CelldesignerProteinDocument.CelldesignerProtein)entitiesMap.get(s);
-	    		fw.write("<li><font color=blue><a href="+prot.getId()+".html>"+s+"</a></font>\n");
-	    	}
-	    }
-	    fw.write("</ol>\n");
-	    fw.close();
-	}
-	
-	/* generates the list of modules (an HTML index of all the modules)
-	 */
-	private void fullListOfModules(String fn) throws Exception{
-		Iterator keys = module_species.keySet().iterator();
-		Vector v = new Vector();
-		while(keys.hasNext()){
-			v.add(keys.next());
-		}
-		Collections.sort(v);
-		FileWriter fw = new FileWriter(fn);
-		fw.write("<h3>List of modules</h3>\n");
-		fw.write("<ol>\n");
-		keys = v.iterator();
-		while(keys.hasNext()){
-			String mname = (String)keys.next();
-			String mnamec = correctName(mname); 
-			fw.write("<li><a href='"+mnamec+"_module.html'>Module "+mname+"</a>\n");
-		}
-		fw.write("</ol>\n");
-		fw.close();
-	}
-	
-	/* 
-	 */
-	private void makeModuleMapFiles(String path, String mapStringFull, String mapStringSmall, String mapStringTiny, String mapStringScript) throws Exception{
-		Iterator keys = module_species.keySet().iterator();
-		Vector v = new Vector();
-		while(keys.hasNext()){
-			v.add(keys.next());
-		}
-		Collections.sort(v);
-		keys = v.iterator();
-		while(keys.hasNext()){
-			String mname = (String)keys.next();
-			String mnamec = correctName(mname);
-			
-			FileWriter fw = new FileWriter(path+mnamec+".html");
-			fw.write("<html><body>\n");
-			fw.write("<img usemap=\"#immapdata\" name=\"map\" src=\""+mnamec+".png\">\n");
-			fw.write(mapStringFull);
-			fw.write(mapStringScript+"\n");
-			fw.close();
-
-			fw = new FileWriter(path+mnamec+"_small.html");
-			fw.write("<html><body>\n");
-			fw.write("<img usemap=\"#immapdata\" name=\"map\" src=\""+mnamec+"_small.png\">\n");
-			fw.write(mapStringFull);
-			fw.write(mapStringScript+"\n");
-			fw.close();
-			
-			fw = new FileWriter(path+mnamec+"_tiny.html");
-			fw.write("<html><body>\n");
-			fw.write("<img usemap=\"#immapdata\" name=\"map\" src=\""+mnamec+"_tiny.png\">\n");
-			fw.write(mapStringTiny);
-			/*fw.write("\n</body><script>\n");
-			
-			fw.write("function showLabel(id){\n");
-			fw.write("d = top.menu.document.getElementById(\"showhide\");\n");
-			fw.write("d.innerHTML = '<small>'+id+'</small>';\n");
-			fw.write("}\n");
-			fw.write("</script></html>\n");*/
-			fw.write(mapStringScript+"\n");
-			fw.close();
-			
-		}
-	}
-	
-	/* generates an image map HTML file (for anything)
-	 * */
-	private String generateMapFile(String path, String imgname, String pagefolder) throws Exception{
-		String mapString = "";
-		FileWriter fw = new FileWriter(path+imgname+".html");
-		fw.write("<img usemap=\"#immapdata\" name=\"map\" src=\""+imgname+".png\">\n");
-		mapString = "<map name=\"immapdata\" href=\"\">\n";
-		fw.write("<map name=\"immapdata\" href=\"\">\n");
-		
-		Iterator<String> it = placeMap.keySet().iterator();
-		while(it.hasNext()){
-			String id = it.next();
-			Vector<Place> plv = placeMap.get(id);
-			for(int i=0;i<plv.size();i++){
-				Place pl = plv.get(i);
-				String Shape = "CIRCLE";
-				if(pl.type==pl.RECTANGLE) Shape = "RECT";
-				if(pl.type==pl.CIRCLE) Shape = "CIRCLE";
-				if(pl.type==pl.POLY) Shape = "POLY";				
-				String Label = pl.label;
-				
-				String coords = "";
-				if(pl.type==pl.RECTANGLE){
-					coords = (int)(pl.x*scale)+","+(int)(pl.y*scale)+","+(int)(pl.x*scale+pl.width*scale)+","+(int)(pl.y*scale+pl.height*scale);
-				}
-				if(pl.type==pl.CIRCLE){
-					coords = (int)(pl.x*scale)+","+(int)(pl.y*scale)+","+(int)(pl.radius*scale);
-				}
-				if(pl.type==pl.POLY)
-					coords = pl.coords;
-				
-				Label = Utils.replaceString(Label, ">", "&gt;");
-				Label = Utils.replaceString(Label, "<", "&lt;");
-				
-				// This is temprorarily done to remove compartment name
-				StringTokenizer st = new StringTokenizer(Label,"@");
-				Label = st.nextToken();
-				
-				//fw.write("<area shape\""+Shape+"\" alt=\""+Label+"\" coords=\""+coords+"\" onMouseOver=\"\" onMouseOut=\"\" href=\"\">\n");
-				mapString+="<area shape=\""+Shape+"\" alt=\""+Label+"\" coords=\""+coords+"\" onMouseClick=\"\" onMouseOver=\"showLabel('"+Label+"')\" href=\""+pagefolder+"/"+pl.sbmlid+".html\" target='info' />\n";
-				fw.write("<area shape=\""+Shape+"\" alt=\""+Label+"\" coords=\""+coords+"\" onMouseClick=\"\" onMouseOver=\"showLabel('"+Label+"')\" href=\""+pagefolder+"/"+pl.sbmlid+".html\" target='info' />\n");
-			}
-		}
-		
-		mapString+="</map>\n";
-		fw.write("</map>\n");
-		
-		fw.write("\n"+script+"\n");
-		
-		// Script code
-		
-		/*fw.write("\n\n<script>\nfunction showId(id){\n");
-		fw.write("//top.info.document.open('"+pagefolder+"/'+id+'.html');\n");
-		/*fw.write("top.info.document.close();\n");
-		fw.write("top.info.document.write('<HTML><BODY>');\n");
-	    fw.write("top.info.document.write('<h3>Species <b>'+id+'</b></h3>');\n");
-	    
-	    fw.write("top.info.document.write('<p><font color=red>Participates in reactions:');\n");
-	    fw.write("top.info.document.write('<ol>');\n");
-	    fw.write("top.info.document.write('</ol></font><hr>');\n");
-
-	    fw.write("top.info.document.write('<p><font color=green>Entities:');\n");
-	    fw.write("top.info.document.write('<ol>');\n");
-	    fw.write("top.info.document.write('</ol></font><hr>');\n");
-	    
-	    fw.write("top.info.document.write('<p><font color=blue>Participate in other pathways:');\n");
-	    fw.write("top.info.document.write('<ol>');\n");
-	    fw.write("top.info.document.write('</ol></font>');\n");
-
-	    fw.write("top.info.document.write('</BODY></HTML>');\n");*/
-	    //fw.write("}</script>\n");*/
-				
-		
-		fw.close();
-		return mapString;
-	}
-	
-	
 	private class Place{
 		String id;
 		String label;
@@ -3959,160 +3367,6 @@ public class ProduceClickableMap {
 		assert n + 1 == entities.size() : ent.getId();
 		return ent;
 	}
-/*	
-	private Entity makeEntity(final Species sp, Map<String, Entity> entities2)
-	{
-		final Entity old;
-		final String species_id = sp.getId();
-		
-		final CelldesignerSpeciesIdentity identity = sp.getAnnotation().getCelldesignerSpeciesIdentity();
-		final String entity_class = Utils.getValue(identity.getCelldesignerClass());
-		final String entity_id;
-		if (entity_class.equals(PROTEIN_CLASS_NAME))
-		{
-			entity_id = Utils.getValue(identity.getCelldesignerProteinReference());
-			if ((old = entities2.get(entity_id)) != null)
-				return old;
-			assert false : entity_id;
-			final CelldesignerProteinDocument.CelldesignerProtein prot = idProteinMap.get(entity_id);
-			return add(entities2, new Entity(entity_id, Utils.getValue(prot.getName()), entity_class, prot.getCelldesignerNotes()));
-		}
-		else if (entity_class.equals(GENE_CLASS_NAME))
-		{
-			entity_id = Utils.getValue(identity.getCelldesignerGeneReference());
-			if ((old = entities2.get(entity_id)) != null)
-				return old;
-			assert false : entity_id;
-			final CelldesignerGeneDocument.CelldesignerGene gene = idGeneMap.get(entity_id);
-			return add(entities2, new Entity(entity_id, gene.getName(), entity_class, gene.getCelldesignerNotes()));
-		}
-		else if (entity_class.equals(RNA_CLASS_NAME))
-		{
-			entity_id = Utils.getValue(identity.getCelldesignerRnaReference());
-			if ((old = entities2.get(entity_id)) != null)
-				return old;
-			assert false : entity_id;
-			final CelldesignerRNA rna = idRNAMap.get(entity_id);
-			assert rna != null : species_id + " " + entity_id;
-			return add(entities2, new Entity(entity_id, rna.getName(), entity_class, rna.getCelldesignerNotes()));
-		}
-		else if (entity_class.equals(ANTISENSE_RNA_CLASS_NAME))
-		{
-			entity_id = Utils.getValue(identity.getCelldesignerAntisensernaReference());
-			if ((old = entities2.get(entity_id)) != null)
-				return old;
-			final CelldesignerAntisenseRNA antisense = idAntisenseRNAMap.get(entity_id);
-			assert false : entity_id;
-			assert antisense != null : species_id + " " + entity_id;
-			return add(entities2, new Entity(entity_id, antisense.getName(), entity_class, antisense.getCelldesignerNotes()));
-		}
-		else if (entity_class.equals(DEGRADED_CLASS_NAME) || entity_class.equals(COMPLEX_CLASS_NAME))
-			return null;
-		else if (entity_class.equals(PHENOTYPE_CLASS_NAME) || entity_class.equals(ION_CLASS_NAME) || entity_class.equals(SIMPLE_MOLECULE_CLASS_NAME) || entity_class.equals(DRUG_CLASS_NAME) || entity_class.equals(UNKNOWN_CLASS_NAME))
-			return add(entities2, new Entity(species_id, Utils.getValue(sp.getName()), entity_class, sp.getNotes()));
-		else
-		{
-			assert false : species_id + " " + entity_class;
-			return null;
-		}
-	}
-	*/
-/*
-	private Entity getEntity_(String id){
-		
-		Entity ent = new Entity();
-		for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
-			SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
-			if(sp.getId().equals(id)){
-				ent.cls = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
-				if(ent.cls.equals(PROTEIN_CLASS_NAME)){
-					ent.id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
-					ent.label = getEntityLabel(ent.id);
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = getEntityComment(ent);;
-					//System.out.println("Protein id "+ent.id);
-				}else if(ent.cls.equals(GENE_CLASS_NAME)){
-					ent.id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
-					ent.label = getEntityLabel(ent.id);
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = getEntityComment(ent);;
-				}else if(ent.cls.equals(RNA_CLASS_NAME)){
-					ent.id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
-					ent.label = getEntityLabel(ent.id);
-//					assert !ent.label.isEmpty() : ent.id;
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = getEntityComment(ent);;
-				}else if(ent.cls.equals(ANTISENSE_RNA_CLASS_NAME)){
-					ent.id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
-					ent.label = getEntityLabel(ent.id);
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = getEntityComment(ent);;
-				}else if(ent.cls.equals(DRUG_CLASS_NAME)){
-					ent.id = id;
-					ent.label = Utils.getValue(sp.getName());
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = Utils.getValue(sp.getNotes());
-				}else if(ent.cls.equals(SIMPLE_MOLECULE_CLASS_NAME)){
-					ent = null;
-				}else if(ent.cls.equals(ION_CLASS_NAME)){
-					ent = null;
-				}else if(ent.cls.equals(UNKNOWN_CLASS_NAME)){
-//					ent.id = sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerHypothetical().xmlText();
-//						ent.label = getEntityLabel(ent.id);
-//						if(entities.get(ent.id)!=null)
-//							ent = (Entity)entities.get(ent.id);
-//						ent.comment = getEntityComment(ent.id);
-					ent = null;
-				}else if(ent.cls.equals(DEGRADED_CLASS_NAME)){
-					ent.id = sp.getId();
-				}else
-					//if(ent.cls.equals("COMPLEX")){
-					//		ent.id = sp.getId();
-					//}else
-					if(ent.cls.equals(PHENOTYPE_CLASS_NAME)){
-						ent.id = sp.getId();
-						ent.label = Utils.getValue(sp.getName());
-					}else
-						System.out.println("Class not found in getEntity: "+ent.cls+" for "+sp.getId());
-				//if(ent.id.equals("p13"))
-				//	System.out.println(Utils.getValue(sp.getName()));
-				if(ent!=null && !ent.species.contains(sp)) // HACK, Andrei should rewrite this
-					ent.species.add(sp);
-			}
-		}
-		if(ent!=null){
-			//System.out.println("Put "+ent.id);
-			entityIDToEntityMap.put(ent.id, ent);
-		}
-		return ent;
-	}
-*/	
-	static private Map<String, String> makeAliasToSpeciesMap(final SbmlDocument cd)
-	{
-		final Map<String, String> map = new HashMap<String, String>();
-		for (final CelldesignerSpeciesAlias spa : cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray())
-			map.put(spa.getId(), spa.getSpecies());
-		return Collections.unmodifiableMap(map);
-	}
-	
-	static private Map<String, SpeciesDocument.Species> makeIdSpeciesMap(final SbmlDocument cd)
-	{
-		final Map<String, SpeciesDocument.Species> map = new HashMap<String, SpeciesDocument.Species>();
-		for (final SpeciesDocument.Species sp : cd.getSbml().getModel().getListOfSpecies().getSpeciesArray())
-			map.put(sp.getId(), sp);
-/*		
-		for (final CelldesignerSpecies sp : cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
-			if (sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass().equals("GENE"))
-				sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()
-	*/	
-		return Collections.unmodifiableMap(map);
-	}
-	
 	static private Map<String, ArrayList<CelldesignerSpecies>> makeComplexToIncludedSpeciesMap(final SbmlDocument cd)
 	{
 		final Map<String, ArrayList<CelldesignerSpecies>> map = new HashMap<String, ArrayList<CelldesignerSpecies>>();
@@ -4128,101 +3382,6 @@ public class ProduceClickableMap {
 		}
 		return Collections.unmodifiableMap(map);
 	}
-	
-	private Vector<Entity> getEntitiesInComplex(String id){
-		final Vector<Entity> v = new Vector<Entity>();
-			return v;
-		
-/*		
-		
-		
-		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
-			CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
-			String cid = Utils.getValue(sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
-			//System.out.println(id+"\t"+cid);
-			if(cid.equals(id)){
-				Entity ent = new Entity();
-				ent.cls = Utils.getValue(sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
-				if(ent.cls.equals(PROTEIN_CLASS_NAME)){
-					ent.id = Utils.getValue(sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
-					ent.label = getEntityLabel(ent.id);
-					if(entityIDToEntityMap.get(ent.id)!=null)
-						ent = (Entity)entityIDToEntityMap.get(ent.id);
-					ent.comment = getEntityComment(ent);;
-					//System.out.println("Protein id "+ent.id);
-				}else
-				if(ent.cls.equals(GENE_CLASS_NAME)){
-					ent.id = sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().xmlText();
-					ent.label = getEntityLabel(ent.id);
-					ent.comment = getEntityComment(ent);;
-				}else
-				if(ent.cls.equals(SIMPLE_MOLECULE_CLASS_NAME)){
-						//ent.id = sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().xmlText();
-						//ent.label = getEntityLabel(ent.id);
-						//ent.comment = getEntityComment(ent);;
-						ent = null;
-				}else
-				if(ent.cls.equals(ION_CLASS_NAME)){
-						//ent.id = sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().xmlText();
-						//ent.label = getEntityLabel(ent.id);
-						//ent.comment = getEntityComment(ent);;
-						ent = null;
-				}else					
-				if(ent.cls.equals(UNKNOWN_CLASS_NAME)){
-						// ent.id = sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerHypothetical().xmlText();
-						// ent.label = getEntityLabel(ent.id);
-						// ent.comment = getEntityComment(ent.id);;
-					    ent = null;
-				}else
-	    			if(ent.cls.equals(DEGRADED_CLASS_NAME)){
-							ent.id = sp.getId();
-					}else
-		    			if(ent.cls.equals(COMPLEX_CLASS_NAME)){
-							
-					}else
-	    			if(ent.cls.equals(PHENOTYPE_CLASS_NAME)){
-							ent.id = sp.getId();
-							ent.label = Utils.getValue(sp.getName());
-					}else
-						System.out.println("Class not found in getEntity (getEntitiesInComplex): "+ent.cls+" for "+sp.getId());
-				if(ent!=null){
-					entityIDToEntityMap.put(ent.id, ent);
-//					ent.species.add((SpeciesDocument.Species)CellDesigner.entities.get(id));
-					v.add(ent);
-				}
-			}
-		}
-		return v;
-		*/
-	}
-
-/*		
-	private String getEntityComment(Entity ent){
-		String res = "";
-		for(int j=0;j<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();j++){
-			CelldesignerProteinDocument.CelldesignerProtein prot = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(j);
-			if(prot.getId().equals(ent.id)){
-				if(prot.getCelldesignerNotes()!=null)
-				   res = Utils.getValue(prot.getCelldesignerNotes());
-				   res = Utils.replaceString(res, "Notes by CellDesigner", "");
-				   ent.standardName = getStandardName(res);
-				   if(ent.standardName.equals(""))
-					   ent.standardName = ent.label;
-				   res = checkCommentForXREFS(res);
-			}
-		}
-		for(int j=0;j<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();j++){
-			CelldesignerGeneDocument.CelldesignerGene gene = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(j);
-			if(gene.getId().equals(ent.id)){
-				//if(gene.getCelldesignerNotes()!=null)
-				//   res = Utils.getValue(gene.get);
-				//   res = Utils.replaceString(res, "Notes by CellDesigner", "");
-				//   res = checkCommentForXREFS(res);
-			}
-		}	
-		return res;
-	}
-*/	
 	
 	private String getReactionString(ReactionDocument.Reaction r, SbmlDocument sbmlDoc, boolean realNames, boolean insertLinks){
 		  String reactionString = "";
@@ -4299,47 +3458,6 @@ public class ProduceClickableMap {
 		  }}*/
 		  return reactionString;
 		}
-	
-	private static String checkCommentForXREFS(String comment){
-		final StringBuilder res = new StringBuilder();
-		Vector refs = new Vector();
-		try{
-
-			String dbid = "";
-			StringTokenizer st = new StringTokenizer(comment," >:;\r\n");
-			String s = "";
-			while(st.hasMoreTokens()){
-				String ss = st.nextToken();
-				//System.out.println(ss);
-				if(ss.toLowerCase().equals("pmid")){
-					if(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						res.append("<a target='_blank' href='http://www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&Cmd=ShowDetailView&TermToSearch=").append(dbid).append("'>PMID:").append(dbid).append("</a> ");
-					}
-				}else if(ss.toLowerCase().equals("hugo")){
-					if(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						res.append("<a target='_blank' href='http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=search&db=gene&dopt=full_report&term=").append(dbid).append("'>HUGO:").append(dbid).append("</a> ");
-					}
-				}else if(ss.toLowerCase().equals("uniprot")){
-					while(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						if(dbid.length()!=6){
-							res.append(dbid).append(" ");
-							break;
-						}else
-							res.append("<a target='_blank' href='http://www.expasy.org/uniprot/").append(dbid).append("'>UNIPROT:").append(dbid).append("</a> ");
-					}
-				}
-				else
-					res.append(ss).append(" ");
-			}
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return res.toString();
-	}
 	
 	private static String getStandardName(String comment){
 		String res = "";
@@ -4531,10 +3649,6 @@ public class ProduceClickableMap {
 		
 		Vector<Place> startPoints = new Vector<Place>();
 		Vector<Place> endPoints = new Vector<Place>();
-		Vector<Place> modPoints = new Vector<Place>();
-		
-		//System.out.println(r.getId());
-		
 		for(int i=0;i<r.getAnnotation().getCelldesignerBaseReactants().sizeOfCelldesignerBaseReactantArray();i++){
 			CelldesignerBaseReactantDocument.CelldesignerBaseReactant react = r.getAnnotation().getCelldesignerBaseReactants().getCelldesignerBaseReactantArray(i);
 			String anchor = null;

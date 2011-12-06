@@ -1376,7 +1376,7 @@ public class ProduceClickableMap {
 					final int indent = 4;
 					for (Modification m : ent.getPostTranslational())
 					{
-						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, speciesAliases);
+						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
 						modification_line(output, indent, m, speciesAliases, placeMap, b, scales);
 					}
 					
@@ -1426,6 +1426,9 @@ public class ProduceClickableMap {
 		        	ent.setPost(updateBlogPostId(wp, all_posts, ent.getId(), ent.getName(), ent.getCls(), body));
 			}
 		}
+
+		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
+
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
 			final String title = r.getId();
@@ -1455,7 +1458,6 @@ public class ProduceClickableMap {
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
 		}
-		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
 				
 /*		for (final CelldesignerRNA rna : annotation.getCelldesignerListOfRNAs().getCelldesignerRNAArray())
 		{
@@ -2631,8 +2633,7 @@ public class ProduceClickableMap {
 	*/
 	private static final String js_show_markers = onclick_before + "show_markers(";
 	
-	static private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw,
-		Map<String, Vector<String>> speciesAliases)
+	static private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw)
 	{
 		final Complex complex = modification.getComplex();
 		if (complex == null)
@@ -2669,8 +2670,7 @@ public class ProduceClickableMap {
 		return fw;
 	}
 	
-	private static String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name,
-		Map<String, Vector<String>> speciesAliases)
+	private static String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name)
         {
 	        final ArrayList<Modification> one_mod = new ArrayList<Modification>(1);
 	        one_mod.add(null);
@@ -2695,9 +2695,9 @@ public class ProduceClickableMap {
 		body_buf.append("<br>\n");
 		final int pos = modification.getName().lastIndexOf('@');
 		if (pos <= 0)
-			split_complex_for_marker(modification, modification.getName(), body_buf, speciesAliases);
+			split_complex_for_marker(modification, modification.getName(), body_buf);
 		else
-			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf, speciesAliases).append("<br>\nin ").append(modification.getName().substring(pos + 1));
+			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>\nin ").append(modification.getName().substring(pos + 1));
 		body_buf.append("<br>\n");
 	
 		format.simple(body_buf, modification.getNotes(), cd);

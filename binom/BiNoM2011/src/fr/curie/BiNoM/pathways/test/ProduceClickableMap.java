@@ -108,9 +108,9 @@ public class ProduceClickableMap {
 	private final Map<String, EntityBase> entityIDToEntityMap;
 	private final Map<String, Modification> speciesIDToModificationMap;
 	
-	final public HashMap<String, Vector<String>> module_species = new HashMap<String, Vector<String>>();
-	final public HashMap<String, Vector<String>> module_proteins = new HashMap<String, Vector<String>>();
-	final public HashMap<String, Vector<String>> module_protein_names = new HashMap<String, Vector<String>>();
+	final private HashMap<String, Vector<String>> module_species = new HashMap<String, Vector<String>>();
+	final private HashMap<String, Vector<String>> module_proteins = new HashMap<String, Vector<String>>();
+	final private HashMap<String, Vector<String>> module_protein_names = new HashMap<String, Vector<String>>();
 	
 	final public HashMap<String, String> module_names = new HashMap<String, String>();
 	
@@ -1937,8 +1937,7 @@ public class ProduceClickableMap {
 		final String human_class = class_name_to_human_name_map.get(COMPLEX_CLASS_NAME);
 		fw.append("<b>").append(human_class).append(' ').append(h.add(complex.getName())).append("</b>");
 		visible_debug(fw, complex.getId());
-		fw.append(" ");
-		show_shapes_on_map(h, fw, complex.getModifications(), master_map_name, speciesAliases, blog_name);
+		show_shapes_on_map(h, fw, complex.getModifications(), master_map_name, blog_name);
 		
 		fw.append("<hr><b>Complex composition:</b>\n");
 		fw.append("<ol>\n");
@@ -1946,8 +1945,7 @@ public class ProduceClickableMap {
 			{
 				fw.append("<li>");
 				post_to_post_link_checked(component, makeFoldable(h.add(component.getName())), fw, pass2);
-				fw.append(' ');
-				show_shapes_on_map(h, fw, component.getModifications(), master_map_name, speciesAliases, blog_name);
+				show_shapes_on_map(h, fw, component.getModifications(), master_map_name, blog_name);
 			}
 		fw.append("</ol>\n");
 	        
@@ -2072,11 +2070,7 @@ public class ProduceClickableMap {
 		else
 		{
 			post_to_post_link_checked(m.getEntityBase(), makeFoldable(h.add(m.getName())), fw, pass2);
-			fw.append(" ");
- //               	show_shapes_on_master_map(h, fw, m.getEntityBase());
-                	final List<Modification> modif = new ArrayList<Modification>(1);
-                	modif.add(m);
-        		show_shapes_on_map(h, fw, modif, master_map_name, speciesAliases, blog_name);
+         		show_shapes_on_map(h, fw, m, master_map_name, blog_name);
 		}
 	}
 
@@ -2721,8 +2715,8 @@ public class ProduceClickableMap {
 				else if (tag.endsWith(":"))
 				{
 					m.appendReplacement(res, "");
-					res.append(tag + m.group(offset + 1)).append(" ");
-					show_shapes_on_map(h, res, all, m.group(offset + 1), speciesAliases, blog_name);
+					res.append(tag + m.group(offset + 1));
+					show_shapes_on_map(h, res, all, m.group(offset + 1), blog_name);
 				}
 				else
 				{	
@@ -2912,7 +2906,7 @@ public class ProduceClickableMap {
 				for (final Entity m : complex.getComponents())
 					if (m.getName().equals(t[0]))
 					{
-						show_markers_from_map(m, fw, speciesAliases);
+						show_markers_from_map(m, fw);
 //						fw.append('[').append(t[0]).append(']');
 						if (t.length == 2)
 							fw.append(sep).append(t[1]);
@@ -2942,7 +2936,7 @@ public class ProduceClickableMap {
 		visible_debug(body_buf, ent.getId());
 		body_buf.append("<br>\n");
 		
-		show_markers_from_map(ent, body_buf, speciesAliases);
+		show_markers_from_map(ent, body_buf);
 		bubble_to_post_link_with_anchor(post_id, body_buf, blog_name);
 		body_buf.append("</big></b>");
 		body_buf.append("\n<p>");
@@ -2966,8 +2960,6 @@ public class ProduceClickableMap {
 	
 	private void create_entity_marker(FormatProteinNotes format, MarkerManager xml, int post_id, EntityBase ent) throws IOException
         {
-	        final ArrayList<Modification> one_mod = new ArrayList<Modification>(1);
-	        one_mod.add(null);
 		for (final Modification modification : ent.getPostTranslational())
 		{
 			final StringBuffer body_buf = new StringBuffer();
@@ -2977,12 +2969,11 @@ public class ProduceClickableMap {
 			visible_debug(body_buf, ent.getId());
 			body_buf.append("<br>\n");
 			
-			show_markers_from_map(ent, body_buf, speciesAliases);
+			show_markers_from_map(ent, body_buf);
 			bubble_to_post_link_with_anchor(post_id, body_buf, blog_name);
 			body_buf.append("</big></b>");
 			body_buf.append("\n<p>");
 			
-			one_mod.set(0, modification);
 			format.simple(body_buf, ent.getComment(), cd);
 			
 			body_buf.append("<hr>\n<b>Modification:</b>");
@@ -3001,10 +2992,10 @@ public class ProduceClickableMap {
 		}
         }
 
-	static private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf, Map<String, Vector<String>> speciesAliases)
+	static private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf)
         {
 	        final StringBuffer title = new StringBuffer();
-	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers, speciesAliases))
+	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers))
 	        	body_buf.append(ent.getName());
 	        else
 	        	body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
@@ -3263,14 +3254,17 @@ public class ProduceClickableMap {
 		{
 			return speciesAliases.get(getId());
 		}
-		public StringBuffer add_link_to_markers(StringBuffer fw, Hasher h, boolean link, boolean pass2, String blog_name, Map<String, Vector<String>> speciesAliases)
+		public StringBuffer add_link_to_markers(StringBuffer fw, Hasher h, boolean link, boolean pass2, String blog_name)
 		{
 			final String folded = makeFoldable(h.add(getName()));
 			if (link)
 				post_to_post_link_checked(getEntityBase(), folded, fw, pass2);
 			else
 				fw.append(folded);
+			
+			return show_shapes_on_map(h, fw, this, master_map_name, blog_name);
 
+/*
 			final Vector<String> shapes = getShapeIds(speciesAliases);
 			if (shapes != null && !shapes.isEmpty())
 			{
@@ -3290,6 +3284,7 @@ public class ProduceClickableMap {
 				fw.append("map").append("</a>").append(")");
 			}
 			return fw;
+			*/
 		}
 	};
 	
@@ -3359,7 +3354,7 @@ public class ProduceClickableMap {
 				fw.append(list_on);
 			}
 			fw.append("<li>");
-			m.add_link_to_markers(fw, h, complex, pass2, blog_name, speciesAliases);
+			m.add_link_to_markers(fw, h, complex, pass2, blog_name);
 			fw.append("\n");
 		}
 		if (compartment != null)
@@ -3375,7 +3370,7 @@ public class ProduceClickableMap {
 	
 	private StringBuffer show_shapes_on_master_map(final Hasher h, StringBuffer fw, final EntityBase ent)
 	{
-		show_shapes_on_map(h, fw, ent.getModifications(), master_map_name, speciesAliases, blog_name);
+		show_shapes_on_map(h, fw, ent.getModifications(), master_map_name, blog_name);
 		return fw;
 	}
 
@@ -3387,13 +3382,18 @@ public class ProduceClickableMap {
 			fw.append(" <font size=\"3\" face=\"sans-serif\" color=\"green\">").append(v).append("</font>");
 		return fw;
 	}
-	
-	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name,
-		final Map<String, Vector<String>> speciesAliases, final String blog_name)
+	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, Modification modif, final String map_name, final String blog_name)
+	{
+		final List<Modification> l = new ArrayList<Modification>(1);
+		l.add(modif);
+		return show_shapes_on_map(h, fw, l, map_name, blog_name);
+	}
+
+	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name)
 	{
 		final StringBuffer title = new StringBuffer();
 		final boolean first = show_modifications(h, fw, sps, title,
-			"(" + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ", speciesAliases);
+			" (" + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
 		
 		if (!first)
 			fw.append(")").append(onclick_after).append(" title='").append(title).append("'>").append("map").append("</a>").append(')');
@@ -3404,8 +3404,7 @@ public class ProduceClickableMap {
 
 	static private boolean show_modifications(final Hasher h, final StringBuffer fw, final List<Modification> sps,
 		final StringBuffer title,
-		final String start,
-		final Map<String, Vector<String>> speciesAliases
+		final String start
 	)
         {
 		boolean first = true;

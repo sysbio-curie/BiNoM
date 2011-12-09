@@ -77,6 +77,8 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 
 public class ProduceClickableMap {
 	
+	private static final String entity_icons_directory = "entity_icons";
+	private static final String icons_directory = "icons";
 	private static final String REACTION_CLASS_NAME = "REACTION";
 	private static final String PHENOTYPE_CLASS_NAME = "PHENOTYPE";
 	private static final String DRUG_CLASS_NAME = "DRUG";
@@ -110,7 +112,6 @@ public class ProduceClickableMap {
 	
 	final private HashMap<String, Vector<String>> module_species = new HashMap<String, Vector<String>>();
 	final private HashMap<String, Vector<String>> module_proteins = new HashMap<String, Vector<String>>();
-	final private HashMap<String, Vector<String>> module_protein_names = new HashMap<String, Vector<String>>();
 	
 	final public HashMap<String, String> module_names = new HashMap<String, String>();
 	
@@ -124,8 +125,6 @@ public class ProduceClickableMap {
 	public static String scriptFile = "";
 	
 	private String name = "";
-	
-	private String script = "";
 	
 	private static final String wordpress_username = "binom";
 	private static final String celldesigner_suffix = ".xml";
@@ -530,11 +529,20 @@ public class ProduceClickableMap {
 		return clMap;
 	}
 
-	private static void copy_files(final File source, File destination) throws IOException
+	private static void copy_files(final File source, final File destination) throws IOException
 	{
 		for (final String suffix : new String[]{"js", "css"})
 			for (final String base : new String[]{ included_blog_base, included_map_base })
 				copy_file_between_directories(source, destination, base + "." + suffix);
+		for (final String dir_name : new String[]{icons_directory, entity_icons_directory})
+		{
+			final File src = new File(source, dir_name);
+			final File dest = new File(destination, dir_name);
+			dest.mkdir();
+			for (String f : src.list())
+				copy_file_between_directories(src, dest, f);
+		}
+				
 	}
 
 	private static void copy_file_between_directories(final File source, File destination, final String file) throws IOException
@@ -1235,16 +1243,16 @@ public class ProduceClickableMap {
 		cdata_end_rep = cdata_end.substring(0, cdata_end.length() - 1) + "&zwnj;" + cdata_end.substring(cdata_end.length() - 1, cdata_end.length());
 	}
 	
-	static private void content_line(final PrintWriter output, final int indent, String content, String content2)
+	static private void content_line(ItemCloser indent, String content, String content2)
 	{
-		indent(output, indent).println("<content>");
-		indent(output, indent + 1).print("<name lang='en' language='en'>");
-		cdata(output, content);
-		output.println("</name>");
-		indent(output, indent + 1).print("<name lang='ln' language='ln'>");
-		cdata(output, content2);
-		output.println("</name>");
-		indent(output, indent).println("</content>");
+		indent.indent().println("<content>");
+		indent.indent(1).print("<name lang='en' language='en'>");
+		cdata(indent.getOutput(), content);
+		indent.getOutput().println("</name>");
+		indent.indent(1).print("<name lang='ln' language='ln'>");
+		cdata(indent.getOutput(), content2);
+		indent.getOutput().println("</name>");
+		indent.indent().println("</content>");
 	}
 
 	private static void cdata(final PrintWriter output, String content2)
@@ -1254,65 +1262,100 @@ public class ProduceClickableMap {
 		output.print(cdata_end);
         }
 	
-	static private void content_line(final PrintWriter output, int indent, String content)
+	static private void content_line(ItemCloser indent, String content)
 	{
 //		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
-		indent(output, indent).print("<content><name>");
-		output.print(content);
-		output.println("</name></content>");
+		indent.indent().print("<content><name>");
+		indent.getOutput().print(content);
+		indent.getOutput().println("</name></content>");
 	}
 
 	static class ItemCloser
 	{
+		final ItemCloser parent;
 		final int indent;
-		PrintWriter output;
-		ItemCloser(int i, PrintWriter o)
+		PrintWriter output_;
+		ItemCloser(final ItemCloser i)
 		{
-			indent = i;
-			output = o;
+			parent = i;
+			indent = i.indent + 1;
+			output_= i.output_;
+			assert output_ != null;
+			assert parent != null;
+		}
+		ItemCloser(final PrintWriter o)
+		{
+			parent = null;
+			indent = 1;
+			output_ = o;
+			assert o != null;
 		}
 		void close()
 		{
 			for (int i = 0; i < indent; i++)
-				output.print('\t');
-			output.println("</item>");
-			output = null;
+				output_.print('\t');
+			output_.println("</item>");
+			output_ = null;
+		}
+		PrintWriter getOutput()
+		{
+			assert output_ != null;
+			return output_;
+		}
+		int nextIndent() { return indent + 1; }
+		PrintWriter indent()
+		{
+			return indent(0);
+		}
+		PrintWriter indent(int i)
+		{
+			i += indent;
+			while (i-- > 0)
+				output_.print('\t');
+			return output_;
+		}
+		public ItemCloser getParent()
+		{
+			return parent;
+		}
+		public ItemCloser add()
+		{
+			return new ItemCloser(this);
 		}
 	}
 
-	static private ItemCloser item_line(final PrintWriter output, final int indent, String id, String cls, String name, String type)
+	static private ItemCloser item_line(final ItemCloser indent, String id, String cls, String name, String type)
 	{
-		item_list_start(output, indent, id, cls);
+		item_list_start(indent, id, cls);
 		if (type != null)
-			output.print(" rel=\"" + type + "\"");
-		return item_line_end(output, indent, name);
+			indent.getOutput().print(" rel=\"" + type + "\"");
+		return item_line_end(indent, name);
 	}
 
-	private static ItemCloser item_line_end(final PrintWriter output, final int indent, String name)
+	private static ItemCloser item_line_end(final ItemCloser indent, String name)
 	{
-		output.println(">");
-		content_line(output, indent + 1, name);
-		return new ItemCloser(indent, output);
+		indent.getOutput().println(">");
+		content_line(indent.add(), name);
+		return indent;
 	}
 
-	private static void item_list_start(final PrintWriter output, final int indent, String id, String cls)
+	private static ItemCloser item_list_start(final ItemCloser indent, String id, String cls)
 	{
-		for (int i = 0; i < indent; i++)
-			output.print('\t');
-		output.print("<item id=\"" + id + "\"");
+		indent.indent().print("<item id=\"" + id + "\"");
 		if (cls != null)
-			output.print(" class=\"" + cls + "\"");
+			indent.getOutput().print(" class=\"" + cls + "\"");
+		return indent;
 	}
 	
-	private static void modification_line(final PrintWriter output, int indent, Modification m,
+	private static void modification_line(final ItemCloser indent, Modification m,
 		Map<String, Vector<String>> speciesAliases,
 		Map<String, Vector<Place>> placeMap,
 		String bubble,
 		ImagesInfo scales
 	)
 	{
-		item_list_start(output, indent, m.getId(), "modification posttranslational");
-		output.print(" position=\"");
+		item_list_start(indent, m.getId(), "modification posttranslational");
+		indent.getOutput().print(" position=\"");
 		boolean first = true;
 		final int z = 1 << scales.maxzoom;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
@@ -1323,14 +1366,14 @@ public class ProduceClickableMap {
 			if (first)
 				first = false;
 			else
-				output.print(" ");
-			output.print(place.x / (double)z + scales.xshift_zoom0);
-			output.print(";");
-			output.print(place.y / (double)z + scales.yshift_zoom0);
+				indent.getOutput().print(" ");
+			indent.getOutput().print(place.x / (double)z + scales.xshift_zoom0);
+			indent.getOutput().print(";");
+			indent.getOutput().print(place.y / (double)z + scales.yshift_zoom0);
 		}
-		output.println("\">");
-		content_line(output, indent, m.getName(), bubble);
-		new ItemCloser(indent, output).close();
+		indent.getOutput().println("\">");
+		content_line(indent.add(), m.getName(), bubble);
+		indent.close();
 	}
 	
 	/*
@@ -1348,7 +1391,7 @@ public class ProduceClickableMap {
 	}
 	*/
 	
-	static private void generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
+	static private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
@@ -1362,30 +1405,30 @@ public class ProduceClickableMap {
 		final PrintWriter output = new PrintWriter(output_file, encoding);
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
 		output.println("<root>");
-		final ItemCloser entities = item_line(output, 1, "entities", null, "Entities", null);
+		final ItemCloser entities = item_line(new ItemCloser(output), "entities", null, "Entities", null);
 		for (final String[] s : class_name_to_human_name)
 		{
-			String img = " <img border='0' src=\"" + common_directory_url + "entity_icons/" + s[0] + ".png\"/>";
-			final ItemCloser cls = item_line(output, 2, s[0], null, s[1] + img, s[0]);
+			final ItemCloser cls = create_entity_header(entities.add(), s);
+			if (s[0].equals(REACTION_CLASS_NAME))
+				return cls;
 			for (final EntityBase ent : entityIDToEntityMap.values())
 			{
 				if (s[0].equals(ent.getCls()) && !ent.isBad())
 				{
-					final ItemCloser entity = item_line(output, 3, ent.getId(), null, ent.getName(), null);
+					final ItemCloser entity = item_line(cls.add(), ent.getId(), null, ent.getName(), null);
 					
-					final int indent = 4;
 					for (Modification m : ent.getPostTranslational())
 					{
 						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
-						modification_line(output, indent, m, speciesAliases, placeMap, b, scales);
+						modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
 					}
 					
 					for (Modification m : ent.getAssociated())
 					{
-						item_list_start(output, indent, m.getId(), "modification associated");
+						ItemCloser modif = item_list_start(entity.add(), m.getId(), "modification associated");
 						output.println(">");
-						content_line(output, indent + 1, m.getName());
-						new ItemCloser(indent, output).close();
+						content_line(modif.add(), m.getName());
+						modif.close();
 					}
 					
 					entity.close();
@@ -1393,18 +1436,50 @@ public class ProduceClickableMap {
 			}
 			cls.close();
 		}
+		assert false;
+		return entities;
 		
-		entities.close();
+	}
+
+	private static ItemCloser create_entity_header(final ItemCloser entities, final String[] s)
+        {
+	        final String img = " <img border='0' src=\"" + common_directory_url + entity_icons_directory + "/" + s[0] + ".png\"/>";
+	        return item_line(entities , s[0], null, s[1] + img, s[0]);
+        }
+	
+	static private void finish_right_panel_xml(final ItemCloser right)
+	{
+		final PrintWriter output = right.getOutput();
 		
-		ItemCloser modules = item_line(output, 1, "modules", null, "Modules", null);
-		item_line(output, 2, "oval", "modules", "Oval", null).close();
-		item_line(output, 2, "square", "modules", "Square", null).close();
+		right.close();
+		right.getParent().close();
+	
+		final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
+		item_line(modules.add(), "oval", "modules", "Oval", null).close();
+		item_line(modules.add(), "square", "modules", "Square", null).close();
 		modules.close();
 		
 		output.println("</root>");
-		
 		output.close();
 	}
+	
+	private void reaction_line(final ItemCloser indent, ReactionDocument.Reaction r, String bubble, ImagesInfo scales
+	)
+	{
+		final Pair position = findCentralPlaceForReaction(r);
+		final float x = (Float)position.o1;
+		final float y = (Float)position.o2;
+		item_list_start(indent, r.getId(), "modification posttranslational");
+		indent.getOutput().print(" position=\"");
+		final int z = 1 << scales.maxzoom;
+		indent.getOutput().print(x / (double)z + scales.xshift_zoom0);
+		indent.getOutput().print(";");
+		indent.getOutput().print(y / (double)z + scales.yshift_zoom0);
+		indent.getOutput().println("\">");
+		content_line(indent.add(), r.getId(), bubble);
+		indent.close();
+	}
+
 	private void generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales) throws Exception
 	{
 		final FormatProteinNotes format = new FormatProteinNotes();
@@ -1416,34 +1491,44 @@ public class ProduceClickableMap {
 			if (ent instanceof Complex)
 			{
 				final Complex complex = (Complex)ent;
-				final String body = create_complex_body(complex, format, false, all_posts);
+				final String body = create_complex_body(complex, format, ReactionDisplayType.FirstPass, all_posts);
 				if (body != null)
 					complex.setPost(updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body));
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
-				final String body = create_entity_body(format, ent, false, all_posts);
+				final String body = create_entity_body(format, ent, ReactionDisplayType.FirstPass, all_posts);
 		        	ent.setPost(updateBlogPostId(wp, all_posts, ent.getId(), ent.getName(), ent.getCls(), body));
 			}
 		}
 
-		generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
+		ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
 
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
 			final String title = r.getId();
-			final String body = createReactionBody(r, format, false);
+			final String body = createReactionBody(r, format);
 			final AllPosts.Post post = updateBlogPostId(wp, all_posts, r.getId(), title, REACTION_CLASS_NAME, body);
+			
+//			final ItemCloser entity = item_line(right.add(), r.getId(), null, r.getId(), null);
+			final String bubble = createReactionBubble(r, post.getPostId(), format);
+			reaction_line(right.add(), r, bubble, scales);
+			
+			
+	//		entity.close();
+			
 //			createReactionMarker(xml, r, post.getPostId(), format);
 			updateBlogPostIfRequired(wp, post, title, body);
 		}
+		
+		finish_right_panel_xml(right);
 				
 		for (final EntityBase ent : entityIDToEntityMap.values())
 		{
 			if (ent instanceof Complex)
 			{
 				final Complex complex = (Complex)ent;
-				final String body = create_complex_body(complex, format, true, all_posts);
+				final String body = create_complex_body(complex, format, ReactionDisplayType.SecondPass, all_posts);
 		        	if (body != null)
 		        	{
 		        		final AllPosts.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
@@ -1453,7 +1538,7 @@ public class ProduceClickableMap {
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
 //				do_entity(wp, format, xml, all_posts, ent);
-				final String body = create_entity_body(format, ent, true, all_posts);
+				final String body = create_entity_body(format, ent, ReactionDisplayType.SecondPass, all_posts);
 		        	final AllPosts.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
@@ -1695,7 +1780,7 @@ public class ProduceClickableMap {
 		}*/
 	}
 	
-	private String create_complex_body(final Complex complex, final FormatProteinNotes format, final boolean pass2, AllPosts posts)
+	private String create_complex_body(final Complex complex, final FormatProteinNotes format, final ReactionDisplayType pass2, AllPosts posts)
         {
 		if (complex.getComponents().size() < 2)
 			return null;
@@ -1783,22 +1868,22 @@ public class ProduceClickableMap {
 		return fw;
 	}*/
 
-	private StringBuffer formatProducts(StringBuffer fw, ReactionDocument.Reaction r, final Hasher h, boolean pass2)
+	private StringBuffer formatProducts(StringBuffer fw, ReactionDocument.Reaction r, final Hasher h, ReactionDisplayType pass2)
         {
 		return format_reactants_and_products(fw, h, r.getListOfProducts().getSpeciesReferenceArray(), pass2);
         }
 
-	private StringBuffer formatReactants(StringBuffer fw, ReactionDocument.Reaction r, final Hasher h, boolean pass2)
+	private StringBuffer formatReactants(StringBuffer fw, ReactionDocument.Reaction r, final Hasher h, ReactionDisplayType pass2)
         {
 		return format_reactants_and_products(fw, h, r.getListOfReactants().getSpeciesReferenceArray(), pass2);
         }
 	
-	static private StringBuffer post_to_post_link_checked(final EntityBase e, String anchor, StringBuffer fw, boolean pass2)
+	static private StringBuffer post_to_post_link_checked(final EntityBase e, String anchor, StringBuffer fw, ReactionDisplayType pass2)
 	{
 		final int postid = e.getPostId();
 		if (postid >= 0)
 			post_to_post_link(postid, fw);
-		else if (pass2)
+		else if (pass2 != ReactionDisplayType.FirstPass)
 			Utils.eclipseErrorln(e.getId() + " does not have a post");
 		fw.append(anchor);
 		if (postid >= 0)
@@ -1808,7 +1893,7 @@ public class ProduceClickableMap {
 		return fw;
 	}
 
-	private StringBuffer format_reactants_and_products(StringBuffer fw, final Hasher h, final SpeciesReference[] speciesReferenceArray, boolean pass2)
+	private StringBuffer format_reactants_and_products(StringBuffer fw, final Hasher h, final SpeciesReference[] speciesReferenceArray, ReactionDisplayType pass2)
         {
 		boolean first = true;
 	        for (final SpeciesReference ref : speciesReferenceArray)
@@ -1829,18 +1914,56 @@ public class ProduceClickableMap {
 	        	fw.append("none");
 	        return fw;
         }
+	
+	enum ReactionDisplayType
+	{
+		FirstPass,
+		SecondPass,
+		ReactionPass
+	}
+	
+	static private StringBuffer html_quote(StringBuffer sb, String s)
+	{
+		if (s.indexOf('"') == -1)
+			return sb.append('"').append(s).append('"');
+		if (s.indexOf('\'') == -1)
+			return sb.append('\'').append(s).append('\'');
+		return sb.append('"').append(s.replace('"', '\'')).append('"');
+	}
 
-	private void show_links_to_post_and_map(final String species_id, final Modification m, StringBuffer fw, final Hasher h, boolean pass2)
+	private void show_links_to_post_and_map(final String species_id, final Modification m, StringBuffer fw, final Hasher h, ReactionDisplayType pass2)
 	{
 		if (m.isDegraded())
                 	fw.append("degraded");
 		else if (m.isBad())
                 	fw.append(m.getId());
-		else
-		{
-			post_to_post_link_checked(m.getEntityBase(), makeFoldable(h.add(m.getName())), fw, pass2);
-         		show_shapes_on_map(h, fw, m, master_map_name, blog_name);
-		}
+                else
+                {
+	                final String folded = makeFoldable(h.add(m.getName()));
+	                if (pass2 == ReactionDisplayType.ReactionPass)
+	                {
+	                	assert h == null_hasher;
+	                	final StringBuffer title = new StringBuffer();
+	                	final boolean first = show_modifications(h, fw, Arrays.asList(m), title, onclick_before + "show_markers(");
+	                	if (first)
+	                		fw.append(folded);
+	                	else
+	                	{
+	                		fw.append(")")
+		                		.append(onclick_after)
+		                		.append(" title=\"")
+	                			.append(title)
+		                		.append("\">")
+		                		.append(folded)
+		                		.append("</a>");
+	                	}
+	                }
+	                else
+	                {
+	                	post_to_post_link_checked(m.getEntityBase(), folded, fw, pass2);
+	                	show_shapes_on_map(h, fw, m, master_map_name, blog_name);
+	                }
+                }
 	}
 
 	private static String titlecase(String str)
@@ -1853,7 +1976,7 @@ public class ProduceClickableMap {
 			.toString();
 	}
 	
-	private void formatRegulators(StringBuffer fw, ReactionDocument.Reaction r, Hasher h, boolean pass2)
+	private void formatRegulators(StringBuffer fw, ReactionDocument.Reaction r, Hasher h, ReactionDisplayType pass2)
         {
 		final Annotation annotation = r.getAnnotation();
 		if (annotation != null)
@@ -1890,7 +2013,7 @@ public class ProduceClickableMap {
 		}
         }
 
-	private StringBuffer show_regulators_in_post(StringBuffer fw, Hasher h, final String species_list, boolean pass2)
+	private StringBuffer show_regulators_in_post(StringBuffer fw, Hasher h, final String species_list, ReactionDisplayType pass2)
 	{
 		boolean first = true;
 		for (final String sp : species_list.split(","))
@@ -1907,30 +2030,54 @@ public class ProduceClickableMap {
 	
 	private static String onclick_before = "<a href=\"javascript_required.html\" onclick='try { ";
 	private static String onclick_after = " } catch (e) {}; return false;'";
+	
+	private String createReactionBubble(ReactionDocument.Reaction r, int post_id, FormatProteinNotes format) throws IOException
+	{
+		final StringBuffer fw = new StringBuffer();
+		final Hasher h = null_hasher;
+		reaction_header(r, h, fw);
+		bubble_to_post_link_with_anchor(post_id, fw, blog_name);
+		fw.append("\n<br>");
+		
+		reaction_body(r, format, h, fw, ReactionDisplayType.ReactionPass);
+		
+		return fw.toString();
+	}
 
-	private String createReactionBody(ReactionDocument.Reaction r, FormatProteinNotes format, boolean pass2) throws IOException
+	private String createReactionBody(ReactionDocument.Reaction r, FormatProteinNotes format) throws IOException
         {
 	        final String id = r.getId();
 		final Hasher h = new Hasher();
 		final StringBuffer fw = new StringBuffer();
-		final String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
 		
-		fw.append("Reaction ").append(h.add(rtype.toLowerCase())).append(' ').append(id);
+		reaction_header(r, h, fw);
+		
 		show_reaction_on_map(r, fw);
 		fw.append("\n<br>");
 		
-		show_reaction(r, h, fw, true, null);
-		fw.append("\n<br><b>Reaction regulators:</b>\n");
-		formatRegulators(fw, r, h, pass2);
-		fw.append("\n");
+		reaction_body(r, format, h, fw, ReactionDisplayType.SecondPass);
 		
-		format.pmid(r.getNotes(), fw, h, cd).append("\n");
 	        return h.insert(fw, id).toString();
+        }
+
+	private void reaction_body(ReactionDocument.Reaction r, FormatProteinNotes format, final Hasher h, final StringBuffer fw, final ReactionDisplayType pass)
+        {
+	        show_reaction(r, h, fw, pass, null);
+		fw.append("\n<br><b>Reaction regulators:</b>\n");
+		formatRegulators(fw, r, h, pass);
+		fw.append("\n");
+		format.pmid(r.getNotes(), fw, h, cd).append("\n");
+        }
+
+	private StringBuffer reaction_header(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw)
+        {
+	        final String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
+		return fw.append("Reaction ").append(h.add(rtype.toLowerCase())).append(' ').append(r.getId());
         }
 
 	private StringBuffer show_reaction_on_map(ReactionDocument.Reaction r, final StringBuffer fw)
 	{
-		return fw.append(" (")
+		fw.append(" ")
 			.append(onclick_before)
 			.append("show_map_and_markers(\"")
 			.append(blog_name)
@@ -1940,10 +2087,26 @@ public class ProduceClickableMap {
 			.append(r.getId())
 			.append("\"])")
 			.append(onclick_after)
-			.append(" title=\"").append(r.getId()).append("\">map</a>)");
+			.append(" title=\"")
+			.append(r.getId())
+			.append("\">");
+		show_map_icon(fw, blog_name);
+		return fw.append("</a>");
 	}
 
-	private StringBuffer show_reaction(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw, boolean pass2, AllPosts.Post post)
+	static private void show_map_icon(final StringBuffer fw, final String blog_name)
+        {
+	        fw
+			.append("<img border='0' src='/maps/")
+			.append(blog_name)
+			.append('/')
+			.append(common_directory_name)
+			.append('/')
+			.append(icons_directory)
+			.append("/map.png' alt='map'>");
+        }
+
+	private StringBuffer show_reaction(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts.Post post)
 	{
 		formatReactants(fw, r, h, pass2);
 		fw.append(" ");
@@ -2579,24 +2742,11 @@ public class ProduceClickableMap {
 		@Override String add(String s) { return s; }
 	};
 	
-	private void createReactionMarker(MarkerManager xml, ReactionDocument.Reaction r, int post_id, FormatProteinNotes format) throws IOException
-	{
-		final Pair position = findCentralPlaceForReaction(r);
-		final int x = (int)Math.round((Float)position.o1);
-		final int y = (int)Math.round((Float)position.o2);
-		final StringBuffer notes = new StringBuffer();
-		notes.append("<b>Reaction ").append(r.getId()).append("</b>");
-		bubble_to_post_link_with_anchor(post_id, notes, blog_name);
-		notes.append("\n<br>");
-		format.pmid(r.getNotes(), notes, null_hasher, cd);
-		xml.create(REACTION_CLASS_NAME, notes.toString(), r.getId(), r.getId(), x, y);
-	}
-
 	private static void bubble_to_post_link_with_anchor(int post_id, final StringBuffer notes, String blog_name)
 	{
-		notes.append(" (");
+		notes.append(" ");
 		bubble_to_post_link(post_id, notes, blog_name);
-		notes.append("blog").append("</a>)");
+		notes.append("<img border='0' src='" + common_directory_url + icons_directory + "/blog.png' alt='blog'>").append("</a>");
 	}
 	
 	static String href(int post_id, String text)
@@ -2713,7 +2863,7 @@ public class ProduceClickableMap {
 	        	body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
         }
 
-	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, boolean pass2, AllPosts posts)
+	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, ReactionDisplayType pass2, AllPosts posts)
 		throws IOException
 	{
 		final Hasher h = new Hasher();
@@ -2758,7 +2908,7 @@ public class ProduceClickableMap {
 		return false;
 	}
 
-	private void participates_in_reactions_split(final ArrayList<Modification> arrayList, final Hasher h, final StringBuffer fw, boolean pass2, AllPosts all_posts)
+	private void participates_in_reactions_split(final ArrayList<Modification> arrayList, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts all_posts)
 	{
 		final ArrayList<ReactionDocument.Reaction> catalysers = new ArrayList<ReactionDocument.Reaction>();
 		final ArrayList<ReactionDocument.Reaction> others = new ArrayList<ReactionDocument.Reaction>();
@@ -2781,7 +2931,7 @@ public class ProduceClickableMap {
 		show_reactions(catalysers, "Catalyser", fw, h, pass2, all_posts);
 	}
 
-	private void participates_in_reactions(final EntityBase ent, final Hasher h, final StringBuffer fw, boolean pass2, AllPosts all_posts)
+	private void participates_in_reactions(final EntityBase ent, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts all_posts)
 	{
 		final ArrayList<ReactionDocument.Reaction> reactions = new ArrayList<ReactionDocument.Reaction>();
 		
@@ -2796,7 +2946,7 @@ public class ProduceClickableMap {
 		show_reactions(reactions, null, fw, h, pass2, all_posts);
 	}
 
-	private void show_reactions(ArrayList<ReactionDocument.Reaction> reactions, String as, final StringBuffer fw, final Hasher h, boolean pass2, AllPosts all_posts)
+	private void show_reactions(ArrayList<ReactionDocument.Reaction> reactions, String as, final StringBuffer fw, final Hasher h, ReactionDisplayType pass2, AllPosts all_posts)
 	{
 		Collections.sort(reactions, reaction_comparator);
 		if (as != null)
@@ -2945,7 +3095,7 @@ public class ProduceClickableMap {
 		{
 			return speciesAliases.get(getId());
 		}
-		public StringBuffer add_link_to_markers(StringBuffer fw, Hasher h, boolean link, boolean pass2, String blog_name)
+		public StringBuffer add_link_to_markers(StringBuffer fw, Hasher h, boolean link, ReactionDisplayType pass2, String blog_name)
 		{
 			final String folded = makeFoldable(h.add(getName()));
 			if (link)
@@ -3013,7 +3163,7 @@ public class ProduceClickableMap {
 	static private final String heading_font_on = "<b><font size='+2'>";
 	static private final String heading_font_off = "</font></b>";
 
-	private void format_modifications(final Hasher h, final StringBuffer fw, final boolean show_complexes, ArrayList<Modification> modifications, boolean pass2)
+	private void format_modifications(final Hasher h, final StringBuffer fw, final boolean show_complexes, ArrayList<Modification> modifications, ReactionDisplayType pass2)
 	{
 		fw.append("<hr>");
 		fw.append(heading_font_on).append("Modifications:").append(heading_font_off).append("\n");
@@ -3084,11 +3234,20 @@ public class ProduceClickableMap {
 	{
 		final StringBuffer title = new StringBuffer();
 		final boolean first = show_modifications(h, fw, sps, title,
-			" (" + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
+			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
 		
 		if (!first)
-			fw.append(")").append(onclick_after).append(" title='").append(title).append("'>").append("map").append("</a>").append(')');
+		{
+			fw.append(")")
+				.append(onclick_after)
+				.append(" title='")
+				.append(title)
+				.append("'>");
+			show_map_icon(fw, blog_name);
+			fw.append("</a>");
+		}
 		//visible_debug(fw, ids);
+//		notes.append("<img border='0' src='" + common_directory_url + icons_directory + "/blog.png' alt='blog'>").append("</a>");
 
 		return fw;
 	}
@@ -4885,8 +5044,7 @@ public class ProduceClickableMap {
 		{ PHENOTYPE_CLASS_NAME, "Phenotypes", "Phenotype" },
 		{ UNKNOWN_CLASS_NAME, "Unknown" },
 		{ COMPLEX_CLASS_NAME, "Complexes", "Complex" },
-		{ REACTION_CLASS_NAME, "Reactions", "Reaction" },
-		{ "OTHER", "Other" }
+		{ REACTION_CLASS_NAME, "Reactions", "Reaction" }
 	};
 	static private final Map<String, String> class_name_to_human_name_map;
 	static {

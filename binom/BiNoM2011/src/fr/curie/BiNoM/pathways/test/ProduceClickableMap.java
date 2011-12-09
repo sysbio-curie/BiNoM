@@ -1412,34 +1412,63 @@ public class ProduceClickableMap {
 			if (s[0].equals(REACTION_CLASS_NAME))
 				return cls;
 			for (final EntityBase ent : entityIDToEntityMap.values())
-			{
 				if (s[0].equals(ent.getCls()) && !ent.isBad())
-				{
-					final ItemCloser entity = item_line(cls.add(), ent.getId(), null, ent.getName(), null);
-					
-					for (Modification m : ent.getPostTranslational())
-					{
-						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
-						modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
-					}
-					
-					for (Modification m : ent.getAssociated())
-					{
-						ItemCloser modif = item_list_start(entity.add(), m.getId(), "modification associated");
-						output.println(">");
-						content_line(modif.add(), m.getName());
-						modif.close();
-					}
-					
-					entity.close();
-				}
-			}
+					add_modifications_to_right(speciesAliases, placeMap, format, cd, blog_name, scales, output, cls, ent);
 			cls.close();
 		}
 		assert false;
 		return entities;
 		
 	}
+
+	private static void add_modifications_to_right(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap,
+                        final FormatProteinNotes format, final SbmlDocument cd, final String blog_name, ImagesInfo scales, final PrintWriter output,
+                        final ItemCloser cls, final EntityBase ent)
+        {
+	        final ItemCloser entity = item_line(cls.add(), ent.getId(), null, ent.getName(), null);
+	        
+	        class Modif
+	        {
+	        	final Modification m;
+	        	final boolean associated;
+	        	Modif(Modification m, boolean associated)
+	        	{
+	        		this.m = m;
+	        		this.associated = associated;
+	        	}
+	        }
+	        final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
+	        for (final Modification m : ent.getPostTranslational())
+	        	modifs.add(new Modif(m, false));
+	        for (final Modification m : ent.getAssociated())
+	        	modifs.add(new Modif(m, true));
+	        Collections.sort(modifs, new Comparator<Modif>(){
+	        	@Override
+	                public int compare(final Modif o1, final Modif o2)
+	                {
+	        		final int r = modification_orderer.compare(o1.m, o2.m);
+	                        return r != 0 ? r : (o1.associated == o2.associated ? 0 : o1.associated ? -1 : 1);
+	                }});
+	        
+	        for (final Modif q : modifs)
+	        {
+	        	final Modification m = q.m;
+	        	if (q.associated)
+	        	{
+	        		ItemCloser modif = item_list_start(entity.add(), m.getId(), "modification associated");
+	        		output.println(">");
+	        		content_line(modif.add(), m.getName());
+	        		modif.close();
+	        	}
+	        	else	
+	        	{
+	        		String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
+	        		modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
+	        	}
+	        }
+	        
+	        entity.close();
+        }
 
 	private static ItemCloser create_entity_header(final ItemCloser entities, final String[] s)
         {
@@ -3162,6 +3191,43 @@ public class ProduceClickableMap {
 	};
 	static private final String heading_font_on = "<b><font size='+2'>";
 	static private final String heading_font_off = "</font></b>";
+	
+	static private final Comparator<Modification> modification_orderer = new Comparator<Modification>()
+	{
+		int count(String s, char c)
+		{
+			int n = 0;
+			int p = -1;
+			while ((p = s.indexOf(c, p + 1)) != -1)
+				n++;
+			return n;
+		}
+		int count(Modification s1, Modification s2, char c)
+		{
+			return count(s1.getName(), c) - count(s2.getName(), c);
+		}
+		@Override
+                public int compare(Modification o1, Modification o2)
+                {
+			int r;
+			if ((r = count(o1, o2, ':')) != 0)
+				return r;
+                        if ((r = o1.getCompartment().compareTo(o2.getCompartment())) != 0)
+                        	return r;
+			if ((r = count(o1, o2, '|')) != 0)
+				return r;
+			if ((r = o1.getName().length() - o2.getName().length()) != 0)
+				return r;
+			return o1.getName().compareTo(o2.getName());
+                }
+	};
+	
+	private static List<Modification> sort_modifications(List<Modification> modifications)
+	{
+		final List<Modification> copy = new ArrayList<Modification>(modifications);
+		Collections.sort(copy, modification_orderer);
+		return copy;
+	}
 
 	private void format_modifications(final Hasher h, final StringBuffer fw, final boolean show_complexes, ArrayList<Modification> modifications, ReactionDisplayType pass2)
 	{
@@ -3172,7 +3238,7 @@ public class ProduceClickableMap {
 		boolean complex = false;
 		String compartment = null;
 		final String list_off = "</ol>";
-		for (final Modification m : modifications)
+		for (final Modification m : sort_modifications(modifications))
 		{
 			final String list_on = "<ol>";
 			if (!complex && m.isComplex())
@@ -3346,7 +3412,7 @@ public class ProduceClickableMap {
 		}
 		final void addPostTranslational(Modification sp)
 		{
-			assert !COMPLEX_CLASS_NAME.equals(sp.getCls());
+			assert !COMPLEX_CLASS_NAME.equals((String)sp.getCls());
 			for (final Modification y : post_translational)
 				assert y.entity != sp.entity;
 			post_translational.add(sp);

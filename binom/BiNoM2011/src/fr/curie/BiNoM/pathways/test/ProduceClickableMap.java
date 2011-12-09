@@ -38,10 +38,8 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerBaseProductDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerBaseReactantDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerBoundsDocument.CelldesignerBounds;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument.CelldesignerGene;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneReferenceDocument.CelldesignerGeneReference;
-import org.sbml.x2001.ns.celldesigner.CelldesignerHypotheticalDocument.CelldesignerHypothetical;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerCompartmentAliasDocument.CelldesignerLayerCompartmentAlias;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerDocument.CelldesignerLayer;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerFreeLineDocument.CelldesignerLayerFreeLine;
@@ -53,7 +51,6 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerProteinReferenceDocument.Celld
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument.CelldesignerRNA;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRnaReferenceDocument.CelldesignerRnaReference;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity;
 import org.sbml.x2001.ns.celldesigner.ListOfModifiersDocument;
@@ -1406,14 +1403,21 @@ public class ProduceClickableMap {
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
 		output.println("<root>");
 		final ItemCloser entities = item_line(new ItemCloser(output), "entities", null, "Entities", null);
+		final List<EntityBase> sorted = new ArrayList<EntityBase>();
 		for (final String[] s : class_name_to_human_name)
 		{
 			final ItemCloser cls = create_entity_header(entities.add(), s);
 			if (s[0].equals(REACTION_CLASS_NAME))
 				return cls;
+			sorted.clear();
 			for (final EntityBase ent : entityIDToEntityMap.values())
 				if (s[0].equals(ent.getCls()) && !ent.isBad())
-					add_modifications_to_right(speciesAliases, placeMap, format, cd, blog_name, scales, output, cls, ent);
+					sorted.add(ent);
+			
+			Collections.sort(sorted);
+			
+			for (final EntityBase ent : sorted)
+				add_modifications_to_right(speciesAliases, placeMap, format, cd, blog_name, scales, output, cls, ent);
 			cls.close();
 		}
 		assert false;
@@ -3365,8 +3369,13 @@ public class ProduceClickableMap {
 		public int POLY = 2;
 	}
 	
-	static abstract class EntityBase
+	static abstract class EntityBase implements Comparable<EntityBase>
 	{
+		@Override
+		public int compareTo(EntityBase arg0)
+		{
+			return getName().compareTo(arg0.getName());
+		}
 		protected AllPosts.Post post;
 		public int getPostId()
 		{
@@ -3431,7 +3440,7 @@ public class ProduceClickableMap {
                }
 	}
 	
-	static class Entity extends EntityBase implements Comparable<Entity> {
+	static class Entity extends EntityBase {
 		String id;
 		String label;
 		String standardName_;
@@ -3485,11 +3494,6 @@ public class ProduceClickableMap {
 		public Entity(String id, String label, String cls)
 		{
 			this(id, label, cls, (String)null);
-		}
-		@Override
-		public int compareTo(Entity arg0)
-		{
-			return label.compareTo(arg0.label);
 		}
 		public void addAssociated(Modification sp)
 		{

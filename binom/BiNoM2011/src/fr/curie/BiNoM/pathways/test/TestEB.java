@@ -15,10 +15,13 @@ import cytoscape.Cytoscape;
 import cytoscape.util.CyFileFilter;
 import cytoscape.util.FileUtil;
 
+import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.biopax.BioPAXImportDialog;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportTaskFactory;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.BioPAXToSBMLConverter;
+import fr.curie.BiNoM.pathways.BioPAXToSBMLConverter.BioPAXSpecies;
+import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.utils.*;
@@ -36,8 +39,8 @@ public class TestEB {
 		
 		try {
 
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-short-metabolic-pathway.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/tmp.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-short-metabolic-pathway.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/tmp.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
@@ -53,8 +56,87 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/H_sapiens_L3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-phosphorylation-reaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
-
 			
+			//String fn = "/bioinfo/users/ebonnet/test.owl";
+			
+//			BioPAXToSBMLConverter b2s = new BioPAXToSBMLConverter();
+//			b2s.biopax.loadBioPAX(new FileInputStream(fn));
+//			b2s.populateSbml();
+//			
+//			Iterator it = b2s.independentSpeciesIds.keySet().iterator();
+//			while(it.hasNext()) {
+//				String cut_uri = (String) it.next();
+//				System.out.println("independent species id: "+cut_uri);
+//			}
+//			
+//			it = b2s.includedSpecies.keySet().iterator();
+//			while(it.hasNext()) {
+//				String cut_uri = (String) it.next();
+//				System.out.println("included species id: "+cut_uri);
+//			}
+			
+			
+//			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter(); 
+//			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
+//			Graph graphDoc = XGMML.convertXGMMLToGraph(gr.graphDocument);
+//	    	Graph grres = BiographUtils.ShowMonoMolecularReactionsAsEdges(graphDoc);
+//	    	GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
+	    	
+//	    	XGMML.saveToXGMML(grDoc, "/bioinfo/users/ebonnet/test.xgmml");
+			
+			BioPAX bp = new BioPAX();
+			bp.loadBioPAX(new FileInputStream(fn));
+//			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
+//			
+//			String pname = ns.getNameByUri("http://www.biopax.org/release/biopax-level3.owl#(E2F4,E2F5)");
+//			System.out.println("pname = " +pname);
+//			System.out.println(GraphUtils.correctId(pname));
+			
+			List l = biopax_DASH_level3_DOT_owlFactory.getAllProtein(bp.model);
+			
+			for (int i=0;i<l.size();i++) {
+				Protein p = (Protein) l.get(i);
+				System.out.print(p.uri()+ "\t");
+				Iterator it = p.getName();
+				System.out.println((String)it.next());
+			}
+
+//			l = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalReaction(bp.model);
+//			
+//			for (int i=0;i<l.size();i++) {
+//				BiochemicalReaction p = (BiochemicalReaction) l.get(i);
+//				System.out.println(">>> br: "+p.uri());
+//				Iterator it = p.getLeft();
+//				System.out.print("left: ");
+//				while(it.hasNext()) {
+//					PhysicalEntity pe = (PhysicalEntity) it.next();
+//					System.out.print(Utils.cutUri(pe.uri())+" ");
+//				}
+//				System.out.println();
+//				it = p.getRight();
+//				System.out.print("right: ");
+//				while(it.hasNext()) {
+//					PhysicalEntity pe = (PhysicalEntity) it.next();
+//					System.out.print(Utils.cutUri(pe.uri())+" ");
+//				}
+//				System.out.println();
+//			}
+//			
+//			l = biopax_DASH_level3_DOT_owlFactory.getAllComplexAssembly(bp.model);
+//			for (int i=0;i<l.size();i++) {
+//				ComplexAssembly ca = (ComplexAssembly) l.get(i);
+//				System.out.println(">>> ca: "+ca.uri());
+//				Iterator it = ca.getLeft();
+//				while(it.hasNext()) {
+//					PhysicalEntity pe = (PhysicalEntity) it.next();
+//					System.out.println("left: "+pe.uri());
+//				}
+//				it = ca.getRight();
+//				while(it.hasNext()) {
+//					PhysicalEntity pe = (PhysicalEntity) it.next();
+//					System.out.println("right: "+pe.uri());
+//				}
+//			}
 			
 		      /*
 		       * Pathway components
@@ -84,26 +166,26 @@ public class TestEB {
 		       * test pathway structure import
 		       */
 
-		      BioPAXToCytoscapeConverter.Option option = new BioPAXToCytoscapeConverter.Option();
-		      option.makeRootPathwayNode = false;
-		      option.includeNextLinks = true;
-		      option.includePathways = true;
-		      option.includeInteractions = true;
-
-		      BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
-		      BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, fn, option);
-		      
-		      //System.out.println(gr.graphDocument.toString());
-		      
-		      try{
-		    	  FileWriter fw = new FileWriter("/bioinfo/users/ebonnet/out.xgmml");
-		    	  String s = gr.graphDocument.toString();
-		    	  s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
-		    	  fw.write(s);
-		    	  fw.close();
-		      }catch(Exception e){
-		    	  e.printStackTrace();
-		      }
+//		      BioPAXToCytoscapeConverter.Option option = new BioPAXToCytoscapeConverter.Option();
+//		      option.makeRootPathwayNode = false;
+//		      option.includeNextLinks = true;
+//		      option.includePathways = true;
+//		      option.includeInteractions = true;
+//
+//		      BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
+//		      BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, fn, option);
+//		      
+//		      //System.out.println(gr.graphDocument.toString());
+//		      
+//		      try{
+//		    	  FileWriter fw = new FileWriter("/bioinfo/users/ebonnet/out.xgmml");
+//		    	  String s = gr.graphDocument.toString();
+//		    	  s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
+//		    	  fw.write(s);
+//		    	  fw.close();
+//		      }catch(Exception e){
+//		    	  e.printStackTrace();
+//		      }
 
 
 			

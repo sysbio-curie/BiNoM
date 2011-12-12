@@ -12,6 +12,7 @@ public class SimpleTextInfluenceToBioPAX {
 	public  BioPAX biopax = null;
 	public  HashMap nameEntity = new HashMap();
 	public  HashMap nameParticipant = new HashMap();
+	public HashMap nameElements = new HashMap();
 	public  HashMap nameFeatures = new HashMap();
 	public  HashMap nameReactions = new HashMap();
 	public  HashMap families = new HashMap();
@@ -35,6 +36,11 @@ public class SimpleTextInfluenceToBioPAX {
 	
 	private static SimpleTextInfluenceToBioPAX instance = null;
 	
+	/**
+	 * BioPAX ModificationFeature object, e.g. a phosphorylation.  
+	 */
+	private ModificationFeature modificationFeature;
+	
 	public static SimpleTextInfluenceToBioPAX getInstance(){
 		if(instance==null)
 			instance = new SimpleTextInfluenceToBioPAX();
@@ -45,11 +51,11 @@ public class SimpleTextInfluenceToBioPAX {
 		instance = null;
 	}
 	
-
-	public  BioPAX convertFromFile(String fileName) throws Exception{
-		return convert(Utils.loadString(fileName));
-	}
-	
+//
+//	public  BioPAX convertFromFile(String fileName) throws Exception{
+//		return convert(Utils.loadString(fileName));
+//	}
+//	
 	public  void prepareFamilies(String text) throws Exception{
 		SimpleTable vt = new SimpleTable();
 		vt.LoadFromSimpleDatFileString(text, true, "\t");
@@ -657,15 +663,27 @@ public class SimpleTextInfluenceToBioPAX {
 		tissueTypes.clear();
 		publications.clear();
 		vt.LoadFromSimpleDatFileString(text, true, "\t");
-		
+
 		biopax = new BioPAX();
 		
+		// create BioPAX modification feature for Phosphorylation
+		SequenceModificationVocabulary voc = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+"voc1", biopax.biopaxmodel);
+		voc.addTerm("Pho");
+		ModificationFeature mod = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+"mod1", biopax.biopaxmodel);
+		mod.setModificationType(voc);
+		this.modificationFeature = mod;
+		
+		
 		for(int i=0;i<tokens.size();i++){
+			// get vector of entities for a given token
+			// e.g. token=E2F5 ent=(E2F4,E2F5)
 			Vector ents = (Vector)entitiesForToken((String)tokens.get(i));
-			for(int j=0;j<ents.size();j++){
+			
+			for(int j=0;j<ents.size();j++) {
 				addEntityBioPAX((String)ents.get(j));
 			}
 		}
+		
 		
 	    for(int k=0;k<vt.fieldNames.length;k++)
 	    	if(vt.fieldNames[k].endsWith(")"))
@@ -724,6 +742,7 @@ public class SimpleTextInfluenceToBioPAX {
 		    Comments = "Constitutive reaction";
 		    Tissue = "";			
 			String link = (String)constitutiveReactions.get(i);
+			//System.out.println("Constitutive reaction "+link);
 			addReactionBioPAX("const_re"+(i+1),link);
 		}
 		
@@ -731,48 +750,78 @@ public class SimpleTextInfluenceToBioPAX {
 	
 	public  void addEntityBioPAX(String name) throws Exception{
 		boolean cont = true;
+
+		// phenotypes
 		if(name.startsWith("[")){
 			addPhenotypeBioPAX(name);
 			cont = false;
-		}else
-		if(name.startsWith("(")){
-			if(name.indexOf(":")>=0){
-				addComplexBioPAX(name.substring(1,name.length()-1));
-				cont=false;
+		}
+		// complexes
+		else {
+			if(name.startsWith("(")){
+				if(name.indexOf(":")>=0){
+					addComplexBioPAX(name.substring(1,name.length()-1));
+					cont=false;
+				}
 			}
 		}
-		if(cont)
-		if(name.indexOf("^")>=0){
-			String pname = name.substring(0,name.indexOf("^"));
-			String feature = name.substring(name.indexOf("^")+1,name.length());
-			Vector v = entitiesForToken(pname);
-			pname = (String)v.get(0);
-			//System.out.println(pname);
-			addEntityBioPAX(pname);			
-			if(nameParticipant.get(name+"_")==null){
-				PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
-				//sequenceFeature feat = biopax_DASH_level2_DOT_owlFactory.createsequenceFeature(biopax.namespaceString+feature, biopax.biopaxmodel);
-				EntityFeature feat = biopax_DASH_level3_DOT_owlFactory.createEntityFeature(biopax.namespaceString+feature, biopax.biopaxmodel);
-				//part.addSEQUENCE_DASH_FEATURE_DASH_LIST(feat);
-				part.addFeature(feat);
-				//Protein p = (Protein)nameEntity.get(pname);
-				//part.setPHYSICAL_DASH_ENTITY(p);
-				nameParticipant.put(name+"_", part);
+		
+		//continue, we don't have a complex or a phenotype
+		if(cont) {
+			// phosphorylation
+			if(name.indexOf("^")>=0){
+				
+				/*
+				String pname = name.substring(0,name.indexOf("^"));
+				String feature = name.substring(name.indexOf("^")+1,name.length());
+				Vector v = entitiesForToken(pname);
+				pname = (String)v.get(0);
+				addEntityBioPAX(pname);			
+				if(nameParticipant.get(name+"_")==null) {
+					PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
+					//sequenceFeature feat = biopax_DASH_level2_DOT_owlFactory.createsequenceFeature(biopax.namespaceString+feature, biopax.biopaxmodel);
+					EntityFeature feat = biopax_DASH_level3_DOT_owlFactory.createEntityFeature(biopax.namespaceString+feature, biopax.biopaxmodel);
+					//part.addSEQUENCE_DASH_FEATURE_DASH_LIST(feat);
+					part.addFeature(feat);
+					//Protein p = (Protein)nameEntity.get(pname);
+					//part.setPHYSICAL_DASH_ENTITY(p);
+					nameParticipant.put(name+"_", part);
+				}
+				*/
+				String pname = name.substring(0,name.indexOf("^"));
+				Vector v = entitiesForToken(pname);
+				pname = (String)v.get(0);
+				addEntityBioPAX(pname);
+			
+				if (nameEntity.get(name)==null) {
+					Protein prot = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+pname+"_p",biopax.biopaxmodel);
+					prot.addName(pname);
+					// add phosphorylation
+					prot.addFeature(this.modificationFeature);
+					nameEntity.put(name, prot);
+				}
 			}
-		}else{
-			//String uri = biopax.biopaxFileString+name;				
-			if(nameEntity.get(name)==null){
-				Protein p = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+name, biopax.biopaxmodel);
-				nameEntity.put(name, p);
-				p.addName(name);
-			}
-			if(nameParticipant.get(name)==null){
-//				sequenceParticipant part = biopax_DASH_level2_DOT_owlFactory.createsequenceParticipant(biopax.namespaceString+name+"_",biopax.biopaxmodel);
-//				protein p = (protein)nameEntity.get(name);
-//				part.setPHYSICAL_DASH_ENTITY(p);
-//				nameParticipant.put(name+"_", part);
-				PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
-				nameParticipant.put(name+"_", part);
+			// no phosphorylation
+			else {
+				//String uri = biopax.biopaxFileString+name;				
+				if(nameEntity.get(name)==null){
+					Protein p = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+name, biopax.biopaxmodel);
+					//System.out.println("adding: "+name);
+					p.addName(name);
+					nameEntity.put(name, p);
+				}
+				
+				/* old stuff
+				if(nameParticipant.get(name)==null){
+					//				sequenceParticipant part = biopax_DASH_level2_DOT_owlFactory.createsequenceParticipant(biopax.namespaceString+name+"_",biopax.biopaxmodel);
+					//				protein p = (protein)nameEntity.get(name);
+					//				part.setPHYSICAL_DASH_ENTITY(p);
+					//				nameParticipant.put(name+"_", part);
+					
+					PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
+					nameParticipant.put(name+"_", part);
+				}
+				*/
 			}
 		}
 	}
@@ -784,18 +833,25 @@ public class SimpleTextInfluenceToBioPAX {
 		if(cmp==null){
 			cmp = biopax_DASH_level3_DOT_owlFactory.createComplex(biopax.namespaceString+name, biopax.biopaxmodel);
 			cmp.addName(name);
+			cmp.addComment("SHOW_TYPE: Complex");
+			nameEntity.put(name,cmp);
 		}
 		
-		if(nameParticipant.get(name+"_")==null){
+		// old stuff
+		/*if(nameParticipant.get(name+"_")==null){
 			PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
 			//part.setPHYSICAL_DASH_ENTITY(cmp);
 			nameParticipant.put(name+"_", part);
-		}
+		}*/
+		
+		
 		int k = 1;
 		while(st.hasMoreTokens()){
 			String part = st.nextToken();
 			addEntityBioPAX(part);
-			k++;
+			
+			//old stuff
+			/*k++;
 			String compname = part+"_from_"+name+k;
 			if(nameParticipant.get(compname)==null){
 				PhysicalEntity pt = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+compname,biopax.biopaxmodel);
@@ -815,6 +871,14 @@ public class SimpleTextInfluenceToBioPAX {
 				nameParticipant.put(compname, pt);
 			}
 			cmp.addComponent((PhysicalEntity)nameParticipant.get(compname));
+			*/
+
+			if (nameEntity.get(part)==null) {
+				addEntityBioPAX(part);
+				cmp.addComponent((Protein)nameEntity.get(part));
+			}
+			else
+				cmp.addComponent((Protein)nameEntity.get(part));
 		}
 	}
 	
@@ -823,103 +887,161 @@ public class SimpleTextInfluenceToBioPAX {
 		if(name.startsWith("[")){
 			sname = name.substring(1,name.length()-1);
 			if(nameEntity.get(sname)==null){
-				Protein p = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+sname, biopax.biopaxmodel);
+				
+				/*Protein p = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+sname, biopax.biopaxmodel);
 				nameEntity.put(sname, p);
 				p.addName(sname);
 				//p.setSHORT_DASH_NAME(sname);
-				p.addComment("This is a psedo-protein representing a pathway (or phenotype) after conversion from AIN file");
+				p.addComment("This is a pseudo-protein representing a pathway (or phenotype) after conversion from AIN file");
 				p.addComment("SHOW_TYPE: pathway");
+				*/
+				
+				// encode phenotype as an empty Pathway object
+				Protein pa = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+sname, biopax.biopaxmodel);
+				pa.addName(sname);
+				pa.addComment("Phenotype from AIN file encoded as a pseudo-protein");
+				pa.addComment("SHOW_TYPE: Pathway");
+				nameEntity.put(sname, pa);
 			}
+			
+			
+			// old stuff
+			/*
 			if(nameParticipant.get(sname)==null){
 				PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+sname+"_",biopax.biopaxmodel);
 				//Protein p = (Protein)nameEntity.get(sname);
 				//part.setPHYSICAL_DASH_ENTITY(p);
 				nameParticipant.put(sname+"_", part);
-			}
+			}*/
 		}
 	}	
 	
-	public  void addReactionBioPAX(String id, String link) throws Exception{
+	public  void addReactionBioPAX(String id, String link) throws Exception {
 		if(link.indexOf("+")>=0){
 			
+			//System.out.println("Adding complex assembly: "+link);
 			String left = "";
 			String right = "";
 			left = link.substring(0, link.indexOf("->"));
 			right = link.substring(link.indexOf("->")+2,link.length());
 			
+			// right => Complex
 			String name = right;
 			Complex cmp = (Complex)nameEntity.get(name);
+			//System.out.println("complex: "+name);
+			
 			ComplexAssembly assembly = biopax_DASH_level3_DOT_owlFactory.createComplexAssembly(biopax.namespaceString+"assembly_"+name, biopax.biopaxmodel);
-			if(nameParticipant.get(name+"_")==null){
+			/*if(nameParticipant.get(name+"_")==null){
 				PhysicalEntity part = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(biopax.namespaceString+name+"_",biopax.biopaxmodel);
 				//part.setPHYSICAL_DASH_ENTITY(cmp);
 				nameParticipant.put(name+"_", part);
 			}
 			assembly.addRight((PhysicalEntity)nameParticipant.get(name+"_"));
-
+			*/
+			
+			assembly.addRight((PhysicalEntity)cmp);
+			
 			int k=1;
 			StringTokenizer st = new StringTokenizer(left,"+");			
 			while(st.hasMoreTokens()){
 				String part = st.nextToken();
-				assembly.addLeft((PhysicalEntity)nameParticipant.get(part+"_"));
+				//assembly.addLeft((PhysicalEntity)nameParticipant.get(part+"_"));
+				//System.out.println("adding left part: "+part);
+				//System.out.println(((Protein)nameEntity.get(part)).uri());
+				assembly.addLeft((PhysicalEntity)nameEntity.get(part));
 			}
-			
-			
-		}else{
+		}
+		else {
 			BiochemicalReaction r = null;
 			String inftype = "unknown";
 			String left = "";
 			String right = "";
 			if(nameReactions.get(link)==null){
-			if(link.indexOf("->")>=0){
-				inftype = "activation";
-				left = link.substring(0, link.indexOf("->"));
-				right = link.substring(link.indexOf("->")+2,link.length());
-			}
-			if(link.indexOf("-|")>=0){
-				inftype = "inhibition";
-				left = link.substring(0, link.indexOf("-|"));
-				right = link.substring(link.indexOf("-|")+2,link.length());
-			}
-			left = left.trim();
-			right = right.trim();
-			
-			if(right.startsWith("[")||left.startsWith("["))
-				addPathwayInfluenceBioPAX(id,link);
-			else{
-				
-			r = biopax_DASH_level3_DOT_owlFactory.createBiochemicalReaction(biopax.namespaceString+id, biopax.biopaxmodel);
-			r.addName(link);
-			nameReactions.put(link,r);
-			
-			if(left.startsWith("("))if(left.indexOf(":")>=0)
-				left = left.substring(1,left.length()-1);
-			if(right.startsWith("("))if(right.indexOf(":")>=0)
-				right = right.substring(1,right.length()-1);
-			if(nameParticipant.get(left+"_")!=null)
-				r.addLeft((PhysicalEntity)nameParticipant.get(left+"_"));
-			if(nameParticipant.get(right+"_")!=null)
-				r.addRight((PhysicalEntity)nameParticipant.get(right+"_"));
-		
-			// now properties
-			addPublication(r,pub1);
-			addPublication(r,pub2);
-		
-			r.addComment("EFFECT: "+inftype);
-		
-			if(ChemType!=null)if(!ChemType.equals(""))
-				r.addComment("CHEMTYPE: "+ChemType);
-			if(Delay!=null)if(!Delay.equals(""))
-				r.addComment("DELAY: "+Delay);
-			if(Confidence!=null)if(!Confidence.equals(""))
-				r.addComment("CONFIDENCE: "+Confidence);
-		
-			if(Tissue!=null)if(!Tissue.equals(""))
-				r.addComment("TISSUE: "+Tissue);
-			if(Comments!=null)if(!Comments.equals(""))
-				r.addComment("COMMENT: "+Comments);
+				if(link.indexOf("->")>=0){
+					inftype = "activation";
+					left = link.substring(0, link.indexOf("->"));
+					right = link.substring(link.indexOf("->")+2,link.length());
+				}
+				if(link.indexOf("-|")>=0){
+					inftype = "inhibition";
+					left = link.substring(0, link.indexOf("-|"));
+					right = link.substring(link.indexOf("-|")+2,link.length());
+				}
+				left = left.trim();
+				right = right.trim();
 
-	    }}}
+				// reaction with a phenotype involved
+				if(right.startsWith("[")||left.startsWith("[")) {
+					addPathwayInfluenceBioPAX(id,link);
+				}
+				else {
+
+					r = biopax_DASH_level3_DOT_owlFactory.createBiochemicalReaction(biopax.namespaceString+id, biopax.biopaxmodel);
+					r.addName(link);
+					nameReactions.put(link,r);
+					//System.out.println("Adding reaction: "+link);
+
+					// remove extra brackets around complexes
+					if(left.startsWith("("))
+						if(left.indexOf(":")>=0)
+							left = left.substring(1,left.length()-1);
+					if(right.startsWith("("))
+						if(right.indexOf(":")>=0)
+							right = right.substring(1,right.length()-1);
+					
+					/*
+					if(nameParticipant.get(left+"_")!=null)
+						r.addLeft((PhysicalEntity)nameParticipant.get(left+"_"));
+					if(nameParticipant.get(right+"_")!=null)
+						r.addRight((PhysicalEntity)nameParticipant.get(right+"_"));
+					*/
+					
+					if (nameEntity.get(left)!=null) {
+						if (left.indexOf(":")>=0) {
+							//System.out.println("left: "+((Complex)nameEntity.get(left)).uri());
+							r.addLeft((Complex)nameEntity.get(left));
+						}
+						else {
+							//System.out.println("left: "+((Protein)nameEntity.get(left)).uri());
+							r.addLeft((Protein)nameEntity.get(left));
+						}
+					}
+					else
+						System.out.println("Error: could not get entity for "+left);
+					
+					if (nameEntity.get(right)!=null) {
+						if (right.indexOf(":")>=0) {
+							//System.out.println("right: "+((Complex)nameEntity.get(right)).uri());
+							r.addRight((Complex)nameEntity.get(right));
+						}
+						else { 
+							//System.out.println("right: "+((Protein)nameEntity.get(right)).uri());
+							r.addRight((Protein)nameEntity.get(right));
+						}
+					}
+					else
+						System.out.println("Error: could not get entity for "+right);
+					
+					// now properties
+					addPublication(r,pub1);
+					addPublication(r,pub2);
+
+					r.addComment("EFFECT: "+inftype);
+
+					if(ChemType!=null)if(!ChemType.equals(""))
+						r.addComment("CHEMTYPE: "+ChemType);
+					if(Delay!=null)if(!Delay.equals(""))
+						r.addComment("DELAY: "+Delay);
+					if(Confidence!=null)if(!Confidence.equals(""))
+						r.addComment("CONFIDENCE: "+Confidence);
+
+					if(Tissue!=null)if(!Tissue.equals(""))
+						r.addComment("TISSUE: "+Tissue);
+					if(Comments!=null)if(!Comments.equals(""))
+						r.addComment("COMMENT: "+Comments);
+				}
+			}
+		}
 	}
 	
 	public  void addPublicationBioPAX(BiochemicalReaction r, String pub) throws Exception{
@@ -954,99 +1076,100 @@ public class SimpleTextInfluenceToBioPAX {
 	// ------------------------------------
 	// ------------------------------------
 	// ------------------------------------	
-	
-	public  BioPAX convert(String text) throws Exception{
-		
-		text = preprocessText(text);
-	
-		SimpleTable vt = new SimpleTable();
-		vt.LoadFromSimpleDatFileString(text, true, "\t");
-		
-		biopax = new BioPAX();
-		
-		for(int i=0;i<vt.rowCount;i++){
-			String tt = vt.stringTable[i][vt.fieldNumByName("Tissue")];
-			tt = tt.trim();
-			if(tissueTypes.indexOf(tt)<0)
-				tissueTypes.add(tt);
-			
-		String link = vt.stringTable[i][vt.fieldNumByName("Link")];
-		String inftype = "unknown";
-		String left = "";
-		String right = "";
-		if(link.indexOf("->")>=0){
-			inftype = "activation";
-			left = link.substring(0, link.indexOf("->"));
-			right = link.substring(link.indexOf("->")+2,link.length());
-		}
-		if(link.indexOf("-|")>=0){
-			inftype = "inhibition";
-			left = link.substring(0, link.indexOf("-|"));
-			right = link.substring(link.indexOf("-|")+2,link.length());
-		}
-		left = left.trim();
-		right = right.trim();
-		if(tokens.indexOf(left)<0) tokens.add(left);
-		if(tokens.indexOf(right)<0) tokens.add(right);
-		   addMolecule(left);
-		   addMolecule(right);
-		}
-		Collections.sort(tokens);
-		for(int i=0;i<tokens.size();i++)
-			System.out.println((String)tokens.get(i));
-		
-		// Now add families and phenotypes
-		for(int i=0;i<vt.rowCount;i++){
-		String link = vt.stringTable[i][vt.fieldNumByName("Link")];
-		String left = "";
-		String right = "";
-		if(link.indexOf("->")>=0){
-			left = link.substring(0, link.indexOf("->"));
-			right = link.substring(link.indexOf("->")+2,link.length());
-		}
-		if(link.indexOf("-|")>=0){
-			left = link.substring(0, link.indexOf("-|"));
-			right = link.substring(link.indexOf("-|")+2,link.length());
-		}
-		left = left.trim();
-		right = right.trim();
-		   addFamily(left);
-		   addFamily(right);
-		   addPhenotype(left);
-		   addPhenotype(right);
-		}
-		
-		Iterator it = families.keySet().iterator();
-		while(it.hasNext()){
-			String key = (String)it.next();
-			System.out.print(key+":\t");
-			Vector members = (Vector)families.get(key);
-			for(int i=0;i<members.size();i++)
-				System.out.print((String)members.get(i)+"\t");
-			System.out.println();
-		}
-		
-		// Now add reactions
-		for(int i=0;i<vt.rowCount;i++){
-			String tt = vt.stringTable[i][vt.fieldNumByName("Tissue")];
-			tt = tt.trim();
-			if(tissueTypes.indexOf(tt)<0)
-				tissueTypes.add(tt);
-		    String link = vt.stringTable[i][vt.fieldNumByName("Link")];
-		    pub1 = vt.stringTable[i][vt.fieldNumByName("ReviewRef")];
-		    pub2 = vt.stringTable[i][vt.fieldNumByName("ExperimentRef")];
-		    ChemType = vt.stringTable[i][vt.fieldNumByName("ChemType")];
-		    Delay = vt.stringTable[i][vt.fieldNumByName("Delay")];
-		    Confidence = vt.stringTable[i][vt.fieldNumByName("Confidence")];
-		    Comments = vt.stringTable[i][vt.fieldNumByName("Comments")];
-		    Tissue = vt.stringTable[i][vt.fieldNumByName("Tissue")];
-		    addReaction("reaction"+(i+1),link);
-		}
-		
-		return biopax;
 
-	}
-	
+//	
+//	public  BioPAX convert(String text) throws Exception{
+//		
+//		text = preprocessText(text);
+//	
+//		SimpleTable vt = new SimpleTable();
+//		vt.LoadFromSimpleDatFileString(text, true, "\t");
+//		
+//		biopax = new BioPAX();
+//		
+//		for(int i=0;i<vt.rowCount;i++){
+//			String tt = vt.stringTable[i][vt.fieldNumByName("Tissue")];
+//			tt = tt.trim();
+//			if(tissueTypes.indexOf(tt)<0)
+//				tissueTypes.add(tt);
+//			
+//		String link = vt.stringTable[i][vt.fieldNumByName("Link")];
+//		String inftype = "unknown";
+//		String left = "";
+//		String right = "";
+//		if(link.indexOf("->")>=0){
+//			inftype = "activation";
+//			left = link.substring(0, link.indexOf("->"));
+//			right = link.substring(link.indexOf("->")+2,link.length());
+//		}
+//		if(link.indexOf("-|")>=0){
+//			inftype = "inhibition";
+//			left = link.substring(0, link.indexOf("-|"));
+//			right = link.substring(link.indexOf("-|")+2,link.length());
+//		}
+//		left = left.trim();
+//		right = right.trim();
+//		if(tokens.indexOf(left)<0) tokens.add(left);
+//		if(tokens.indexOf(right)<0) tokens.add(right);
+//		   addMolecule(left);
+//		   addMolecule(right);
+//		}
+//		Collections.sort(tokens);
+//		for(int i=0;i<tokens.size();i++)
+//			System.out.println((String)tokens.get(i));
+//		
+//		// Now add families and phenotypes
+//		for(int i=0;i<vt.rowCount;i++){
+//		String link = vt.stringTable[i][vt.fieldNumByName("Link")];
+//		String left = "";
+//		String right = "";
+//		if(link.indexOf("->")>=0){
+//			left = link.substring(0, link.indexOf("->"));
+//			right = link.substring(link.indexOf("->")+2,link.length());
+//		}
+//		if(link.indexOf("-|")>=0){
+//			left = link.substring(0, link.indexOf("-|"));
+//			right = link.substring(link.indexOf("-|")+2,link.length());
+//		}
+//		left = left.trim();
+//		right = right.trim();
+//		   addFamily(left);
+//		   addFamily(right);
+//		   addPhenotype(left);
+//		   addPhenotype(right);
+//		}
+//		
+//		Iterator it = families.keySet().iterator();
+//		while(it.hasNext()){
+//			String key = (String)it.next();
+//			System.out.print(key+":\t");
+//			Vector members = (Vector)families.get(key);
+//			for(int i=0;i<members.size();i++)
+//				System.out.print((String)members.get(i)+"\t");
+//			System.out.println();
+//		}
+//		
+//		// Now add reactions
+//		for(int i=0;i<vt.rowCount;i++){
+//			String tt = vt.stringTable[i][vt.fieldNumByName("Tissue")];
+//			tt = tt.trim();
+//			if(tissueTypes.indexOf(tt)<0)
+//				tissueTypes.add(tt);
+//		    String link = vt.stringTable[i][vt.fieldNumByName("Link")];
+//		    pub1 = vt.stringTable[i][vt.fieldNumByName("ReviewRef")];
+//		    pub2 = vt.stringTable[i][vt.fieldNumByName("ExperimentRef")];
+//		    ChemType = vt.stringTable[i][vt.fieldNumByName("ChemType")];
+//		    Delay = vt.stringTable[i][vt.fieldNumByName("Delay")];
+//		    Confidence = vt.stringTable[i][vt.fieldNumByName("Confidence")];
+//		    Comments = vt.stringTable[i][vt.fieldNumByName("Comments")];
+//		    Tissue = vt.stringTable[i][vt.fieldNumByName("Tissue")];
+//		    addReaction("reaction"+(i+1),link);
+//		}
+//		
+//		return biopax;
+//
+//	}
+//	
 
 	public  void addMolecule(String name) throws Exception{
 		if(name.startsWith("[")){
@@ -1184,7 +1307,7 @@ public class SimpleTextInfluenceToBioPAX {
 			cntrl.setControlType("INHIBITION");
 		if(left.startsWith("("))
 			left = left.substring(1,left.length()-1);
-		//TODO no setController method
+		//remark => no setController method
 		//cntrl.setCONTROLLER((sequenceParticipant)nameParticipant.get(left+"_"));
 		cntrl.setControlled(pn);
 		nameReactions.put(link,cntrl);

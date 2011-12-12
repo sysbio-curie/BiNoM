@@ -369,7 +369,9 @@ public class BioPAXToSBMLConverter {
     		while(comps.hasNext()){
     			//physicalEntityParticipant part = (physicalEntityParticipant)comps.next();
     			PhysicalEntity pe = (PhysicalEntity) comps.next();
-    			addIncludedParticipant(pe);
+    			// modif ebonnet 12.2011: there is no PhysicalEntityParticipant in complexes, it's directly PhysicalEntity objects like proteins
+    			//addIncludedParticipant(pe);
+    			addParticipant(pe);
     		}
     	}
     	
@@ -419,7 +421,8 @@ public class BioPAXToSBMLConverter {
 
     	// Now we will deal with the situation when some included species are erroneously used as reactants, products and controllers
     	// This is, unfortunately, the case for NatureNCI BioPAX dump (24 April 2008)
-    	findIncludedSpeciesInvolvedInReactionsPatch();
+    	// modif ebonnet 12.2011 this is most probably obsolete
+    	//findIncludedSpeciesInvolvedInReactionsPatch();
 
     	Set keys = independentSpeciesIds.keySet();
     	Iterator kit = keys.iterator();
@@ -553,13 +556,17 @@ public class BioPAXToSBMLConverter {
      * (add it to already specified species or create new species)
      */
     private void addParticipant(PhysicalEntity pe) throws Exception{
-    	if(independentSpecies.get(Utils.cutUri(pe.uri()))==null)
+    	//System.out.println("add participant "+pe.uri());
+    	if(independentSpecies.get(Utils.cutUri(pe.uri()))==null) {
+    		/*
+    		 * modif ebonnet 12.2011 for correct AIN file import
+    		 */
     		if(includedSpecies.get(Utils.cutUri(pe.uri()))==null){
     			//String pname = (String)bpnm.genericUtilityName.get(pe.uri());
     			String pname = bpnm.getNameByUri(pe.uri());
     			String id = GraphUtils.correctId(pname);
     			String tpe = getTypeForParticipant(pe);
-    			//System.out.println(pe.uri());
+    			//System.out.println("adding indep species: "+pe.uri());
     			BioPAXSpecies pt = (BioPAXSpecies)independentSpeciesIds.get(id);
     			if(pt==null){
     				pt = new BioPAXSpecies();
@@ -571,6 +578,7 @@ public class BioPAXToSBMLConverter {
     			pt.sinonymSpecies.add(pe);
     			independentSpecies.put(Utils.cutUri(pe.uri()),pt);
     		}
+    	}
     }
 
     /**
@@ -878,10 +886,12 @@ public class BioPAXToSBMLConverter {
     		if(smallMoleculeList.get(Utils.cutUri(pe.uri()))!=null) tpe = "SmallMolecule";
 
     		/*
-    		 * ebo: show_type do not exist in comments for biopax level3, it seems.
+    		 * SHOW_TYPE is used to force a BioPAX type to another when the object will be converted to
+    		 * cytoscape. for example turn a Protein into Pathway for the BIOPAX_NODE_TYPE attribute.
+    		 * Like that, the object can be displayed with the appropriate visual style.
     		 */
     		
-    		/*Iterator it = pe.getComment();
+    		Iterator it = pe.getComment();
     		while(it.hasNext()){
     			String comm = (String)it.next();
     			if(comm.startsWith("SHOW_TYPE"))
@@ -890,7 +900,7 @@ public class BioPAXToSBMLConverter {
     					st.nextToken();
     					tpe = st.nextToken().trim();
     				}
-    		}*/
+    		}
 
     	}
 	return tpe;

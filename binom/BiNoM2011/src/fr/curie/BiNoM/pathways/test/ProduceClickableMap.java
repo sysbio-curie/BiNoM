@@ -131,7 +131,7 @@ public class ProduceClickableMap {
 	
 	private final String blog_name;
 	
-	public ProduceClickableMap(final String blog_name, File input) throws Exception
+	public ProduceClickableMap(final String blog_name, File input, boolean show_def_compartement_names) throws Exception
 	{
 		this.blog_name = blog_name;
 		assert input.canRead() : "cannot read " + input;
@@ -152,11 +152,11 @@ public class ProduceClickableMap {
 
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 		
-		calculate_all_modification_names(cd, _entityIDToEntityMap, _speciesIDToModificationMap);
+		calculate_all_modification_names(cd, _entityIDToEntityMap, _speciesIDToModificationMap, show_def_compartement_names);
 	}
 
 	static private void calculate_all_modification_names(SbmlDocument cd, final Map<String, EntityBase> _entityIDToEntityMap,
-		final Map<String, Modification> _speciesIDToModificationMap)
+		final Map<String, Modification> _speciesIDToModificationMap, boolean show_def_compartement_names)
 	{
 		/* this is really horrible but I need to have the name of the species and this can only 
 		 * be done once the maps are set up. Which maps? Who knows?
@@ -166,7 +166,7 @@ public class ProduceClickableMap {
 		{
 			try
 			{
-				m.calculateName(cd);
+				m.calculateName(cd, show_def_compartement_names);
 			}
 			catch (ClassCastException w)
 			{
@@ -179,7 +179,7 @@ public class ProduceClickableMap {
 			for (Modification m : e.getModifications())
 				try
 				{
-					m.calculateName(cd);
+					m.calculateName(cd, show_def_compartement_names);
 				}
 				catch (ClassCastException w)
 				{
@@ -239,6 +239,9 @@ public class ProduceClickableMap {
 		boolean make_tiles = false;
 		boolean production = false;
 		String blog_name = null;
+		
+		Boolean show_default_compartement_name = null;
+		
 		while (true)
 		{
 			Boolean b;
@@ -266,13 +269,20 @@ public class ProduceClickableMap {
 				make_tiles = !b.booleanValue();
 			else if ((b = options.booleanOption("production", "make the map on the production server")) != null)
 				production = b.booleanValue();
+			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
+				show_default_compartement_name = b.booleanValue();
+			else if ((b = options.booleanOption("nodefcptname", "show default compartement name")) != null)
+				show_default_compartement_name = !b.booleanValue();
 			else
 				break;
 		}
 		options.done();
-
+		
 		final Properties configuration = new Properties();
 		configuration.load(new FileInputStream(config));
+		
+		if (show_default_compartement_name == null)
+			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));
 
 		if (base == null && (base = configuration.getProperty("base")) == null)
 			fatal_error("no base on the command line or in the configuration file");
@@ -301,7 +311,7 @@ public class ProduceClickableMap {
 			throw new Exception("failed to make " + destination_common);
 		copy_files(data_directory, destination_common);
 
-		process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, key);
+		process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, key, show_default_compartement_name);
 
 		final String fbase = base;
 		final FilenameFilter is_good_xml_file = new FilenameFilter()
@@ -497,9 +507,9 @@ public class ProduceClickableMap {
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
-		boolean make_tiles, Wordpress wp, String key) throws Exception, FileNotFoundException
+		boolean make_tiles, Wordpress wp, String key, boolean show_default_compartement_name) throws Exception, FileNotFoundException
 	{
-		final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"));
+		final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"), show_default_compartement_name);
 
 		final File this_map_directory = new File(destination, map);
 		if (!this_map_directory.exists())
@@ -3023,11 +3033,13 @@ public class ProduceClickableMap {
 			}
 			return name_;
 		}
-		void calculateName(SbmlDocument cd)
+		void calculateName(SbmlDocument cd, boolean show_def_compartement_names)
 		{
 			if (name_ == null && !isDegraded() && !isBad())
 			{
 				name_ = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd, modification_id, true, true);
+//				String n = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd, modification_id, false, true);
+//				assert n.equals(name_);
 				assert name_ != null && !name_.isEmpty() : modification_id;
 			}
 		}
@@ -3198,7 +3210,7 @@ public class ProduceClickableMap {
 	
 	static private final Comparator<Modification> modification_orderer = new Comparator<Modification>()
 	{
-		int count(String s, char c)
+		int count(final String s, final char c)
 		{
 			int n = 0;
 			int p = -1;
@@ -3206,18 +3218,24 @@ public class ProduceClickableMap {
 				n++;
 			return n;
 		}
-		int count(Modification s1, Modification s2, char c)
+		int count(final Modification s1, final Modification s2, final char c)
 		{
 			return count(s1.getName(), c) - count(s2.getName(), c);
 		}
 		@Override
-                public int compare(Modification o1, Modification o2)
+                public int compare(final Modification o1, final Modification o2)
                 {
+			final int c1 = count(o1.getName(), ':');
+			final int c2 = count(o2.getName(), ':');
+			
 			int r;
-			if ((r = count(o1, o2, ':')) != 0)
+			if ((r = (c1 > 0 ? 1 : 0) - (c2 > 0 ? 1 : 0)) != 0)
 				return r;
+			
                         if ((r = o1.getCompartment().compareTo(o2.getCompartment())) != 0)
                         	return r;
+			if ((r = c1 - c2) != 0)
+				return r;
 			if ((r = count(o1, o2, '|')) != 0)
 				return r;
 			if ((r = o1.getName().length() - o2.getName().length()) != 0)

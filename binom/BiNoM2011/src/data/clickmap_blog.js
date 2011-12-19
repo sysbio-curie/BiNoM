@@ -21,12 +21,6 @@
  */
 var maps = Object();
 
-function open_map2(blog_name, name)
-{
-	maps[name] = window.open("/maps/" + blog_name + "/" + name, "map_" + name);
-	return maps[name];
-}
-
 function is_map_open(map_name)
 {
 	return maps[map_name] && !maps[map_name].closed;
@@ -34,17 +28,20 @@ function is_map_open(map_name)
 
 function show_map_and_markers(blog_name, map_name, ids)
 {
-	var f = function()
-	{
-		maps[map_name].show_markers(ids);
-	}
 	if (is_map_open(map_name))
 	{
-		f();
+		if (maps[map_name].to_open.length < 1)
+		{
+			maps[map_name].show_markers(ids);
+		}
+		else
+		{
+			maps[map_name].to_open.concat(ids);
+		}
 	}
 	else
 	{
-		maps[map_name] = open_map2(blog_name, map_name);
-		maps[map_name].addEventListener('load', f, true);
+		maps[map_name] = window.open("/maps/" + blog_name + "/" + map_name, "map_" + map_name);
+		maps[map_name].to_open = ids;
 	}
 }

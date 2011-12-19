@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -131,7 +132,7 @@ public class ProduceClickableMap {
 	
 	private final String blog_name;
 	
-	public ProduceClickableMap(final String blog_name, File input, boolean show_def_compartement_names) throws Exception
+	public ProduceClickableMap(final String blog_name, File input, boolean show_def_compartement_names)
 	{
 		this.blog_name = blog_name;
 		assert input.canRead() : "cannot read " + input;
@@ -190,7 +191,7 @@ public class ProduceClickableMap {
 		Utils.eclipseErrorln(i + " exceptions");
 	}
 
-	public static void main(String args[]) throws Exception
+	public static void main(String args[])
 	{
 		/*
 			if (false)	ProduceClickableMap clMap = new ProduceClickableMap();
@@ -230,7 +231,6 @@ public class ProduceClickableMap {
 		OptionParser options = new fr.curie.BiNoM.pathways.utils.OptionParser(args, null);
 		String title = null;
 		String base = null;
-		String key = null;
 		File config = null;
 		File source_directory = null;
 		File destination = null;
@@ -253,8 +253,6 @@ public class ProduceClickableMap {
 				base = s;
 			else if ((s = options.stringOption("name", "project name")) != null)
 				blog_name = s;
-			else if ((s = options.stringOption("key", "google key")) != null)
-				key = s;
 			else if ((f = options.fileOption("destination", "destination directory")) != null)
 				destination = f;
 			else if ((f = options.fileRequiredOption("config", "configuration file")) != null)
@@ -278,8 +276,7 @@ public class ProduceClickableMap {
 		}
 		options.done();
 		
-		final Properties configuration = new Properties();
-		configuration.load(new FileInputStream(config));
+		final Properties configuration = load_config(config);
 		
 		if (show_default_compartement_name == null)
 			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));
@@ -288,8 +285,6 @@ public class ProduceClickableMap {
 			fatal_error("no base on the command line or in the configuration file");
 		if (title == null)
 			title = configuration.getProperty("title", base);
-		if (key == null && (key = configuration.getProperty("key")) == null)
-			fatal_error("no google API key on the command line or in the configuration file");
 		if (blog_name == null)
 			blog_name = configuration.getProperty("name", base);
 		if (source_directory == null)
@@ -300,20 +295,66 @@ public class ProduceClickableMap {
 			else
 				destination = new File("/bioinfo/http/dev/hosted/clickmap-dev.curie.fr/html/maps");
 
-		Wordpress wp = new Wordpress(wordpress_username, "dsf6%sk9Idqqf", "http://clickmap" + (production ? "" : "-dev") + ".curie.fr/annotations/" + blog_name + "/xmlrpc.php");
+		final Wordpress wp = open_wordpress(production, blog_name);
 
 		final File data_directory = new File("bin/data");
-		final File root = new File(destination, blog_name);
-		if (!root.exists())
-			root.mkdir();
+		final File root = mk_maps_directory(blog_name, destination);
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir())
-			throw new Exception("failed to make " + destination_common);
-		copy_files(data_directory, destination_common);
+		{
+			System.err.println("failed to make " + destination_common);
+			System.exit(1);
+		}
 
-		process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, key, show_default_compartement_name);
+		try
+		{
+			copy_files(data_directory, destination_common);
+		}
+		catch (IOException e)
+		{
+			System.err.println("IO error installing static files: " + e.getMessage());
+			System.exit(1);
+			return;
+		}
+		
+		final Set<String> modules = get_module_list(source_directory, base);
 
-		final String fbase = base;
+		final ProduceClickableMap master;
+		try
+		{
+			master = process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, show_default_compartement_name, modules);
+		}
+		catch (IOException e)
+		{
+			System.err.println("IO error creating map " + master_map_name + ": " + e.getMessage());
+			System.exit(3);
+			return;
+		}
+
+		for (final String map_name : modules)
+		{
+			try
+			{
+				process_a_map(master, map_name, title, root, base, source_directory, make_tiles, show_default_compartement_name);
+			}
+			catch (IOException e)
+			{
+				System.err.println("IO error creating map " + map_name + ": " + e.getMessage());
+				System.exit(4);
+				return;
+			}
+		}
+	}
+/*
+	private static ProduceClickableMap process_a_map(ProduceClickableMap master, File f, String title, File root, String base, File source_directory, boolean make_tiles, String key, boolean show_default_compartement_name) throws FileNotFoundException, Exception
+	{
+		return process_a_map(master, map_name, title, root, base, source_directory, make_tiles, key, show_default_compartement_name);
+	}
+	*/
+
+	private static Set<String> get_module_list(final File source_directory, final String base)
+	{
+		final Set<String> list = new HashSet<String>();
 		final FilenameFilter is_good_xml_file = new FilenameFilter()
 		{
 			@Override
@@ -321,27 +362,67 @@ public class ProduceClickableMap {
 			{
 				if (!name.endsWith(celldesigner_suffix))
 					return false;
-				if (!name.startsWith(fbase))
+				if (!name.startsWith(base))
 					return false;
 				final String map_name = name.substring(0, name.length() - celldesigner_suffix.length());
-				if (map_name.substring(fbase.length(), map_name.length()).equals(master_map_name))
+				if (map_name.substring(base.length(), map_name.length()).equals(master_map_name))
 					return false;
-				final File image_file = new File(dir, map_name + image_suffix);
+				final File image_file = new File(dir, map_name + "-0" + image_suffix);
 				return image_file.exists();
 			}
 		};
-/*
-		if (false)
-			for (final File f : source_directory.listFiles(is_good_xml_file))
-				process_a_map(blog_name, f, title, root, base, source_directory, make_tiles, key);
+		for (final File f : source_directory.listFiles(is_good_xml_file))
+		{
+			String base_name = f.getName();
+			String map_name = base_name.substring(base.length(), base_name.length() - celldesigner_suffix.length());
+			list.add(map_name);
+		}
+		return Collections.unmodifiableSet(list);
 	}
 
-	private static ProduceClickableMap process_a_map(final String blog_name, File f, String title, File destination, String base, File source_directory, boolean make_tiles, String key) throws FileNotFoundException, Exception
+	private static Wordpress open_wordpress(boolean production, String blog_name)
 	{
-		String name = f.getName();
-		return process_a_map(blog_name, name.substring(base.length(), name.length() - celldesigner_suffix.length()), title, destination, base, source_directory, make_tiles, null, key);
-*/
+		final Wordpress wp;
+		final String url = "http://clickmap" + (production ? "" : "-dev") + ".curie.fr/annotations/" + blog_name + "/xmlrpc.php";
+		try
+		{
+			wp = new Wordpress(wordpress_username, "dsf6%sk9Idqqf", url);
+		}
+		catch (MalformedURLException e1)
+		{
+			System.err.println("failed to connect to Wordpress at " + url + ": " + e1.getMessage());
+			System.exit(1);
+			return null;
+		}
+		return wp;
 	}
+
+	private static Properties load_config(File config)
+        {
+	        final Properties configuration = new Properties();
+		final FileInputStream config_stream;
+                try
+                {
+	                config_stream = new FileInputStream(config);
+                }
+                catch (FileNotFoundException e1)
+                {
+			System.err.println(e1.getMessage());
+	                System.exit(1);
+	                return configuration;
+                }
+		try
+                {
+	                configuration.load(config_stream);
+                }
+                catch (IOException e1)
+                {
+			System.err.println("failed to load configuration file " + config + ": " + e1.getMessage());
+	                System.exit(1);
+	                return configuration;
+                }
+	        return configuration;
+        }
 	
 	static class ImagesInfo
 	{
@@ -359,7 +440,7 @@ public class ProduceClickableMap {
 		}
 	};
 	
-	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws Exception
+	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
 	{
 		int[] shifts = new int[2];
 		final int xmargin = 10;
@@ -380,7 +461,15 @@ public class ProduceClickableMap {
 		
 		{
 			final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
-			final BufferedImage image0 = ImageIO.read(image_file0);
+			BufferedImage image0;
+                        try
+                        {
+	                        image0 = ImageIO.read(image_file0);
+                        }
+                        catch (IOException e)
+                        {
+	                        throw new IOException("failed to read image from " + image_file0, e);
+                        }
 			final int width0 = image0.getWidth();
 			final int height0 = image0.getHeight();
 		
@@ -453,7 +542,7 @@ public class ProduceClickableMap {
 		return Math.max(get_maxscale(width, width0), get_maxscale(height, height0));
         }
 
-	private static ImagesInfo get_zooms(File source_directory, String root) throws Exception
+	private static ImagesInfo get_zooms(File source_directory, String root) throws IOException
 	{
 		int last_found = 0;
 		
@@ -506,15 +595,45 @@ public class ProduceClickableMap {
 		return true;
 	}
 
-	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
-		boolean make_tiles, Wordpress wp, String key, boolean show_default_compartement_name) throws Exception, FileNotFoundException
+	private static void process_a_map(final ProduceClickableMap master, final String map, String title, File destination, String base, File source_directory,
+		boolean make_tiles, boolean show_default_compartement_name) throws IOException
 	{
-		final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"), show_default_compartement_name);
+		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory, show_default_compartement_name);
 
-		final File this_map_directory = new File(destination, map);
-		if (!this_map_directory.exists())
-			this_map_directory.mkdir();
+		final File this_map_directory = mk_maps_directory(map, destination);
 
+		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+
+		clMap.generatePages(master.all_posts, new File(this_map_directory, right_panel_list), scales, master.master_format);
+		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
+		make_index_html(this_map_directory, title + " " + map, map, scales);
+	}
+
+	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
+		boolean make_tiles, Wordpress wp, boolean show_default_compartement_name, Set<String> modules) throws IOException
+	{
+		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory, show_default_compartement_name);
+
+		final File this_map_directory = mk_maps_directory(map, destination);
+
+		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+
+		clMap.master_format = new FormatProteinNotes(modules, blog_name);
+		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales, clMap.master_format);
+		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
+		make_index_html(this_map_directory, title + " " + map, map, scales);
+		return clMap;
+	}
+
+	private static ProduceClickableMap make_clickmap(final String blog_name, final String map, String base, File source_directory,
+                        boolean show_default_compartement_name)
+        {
+	        final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"), show_default_compartement_name);
+	        return clMap;
+        }
+
+	private static ImagesInfo make_tiles(final String map, String base, File source_directory, boolean make_tiles, final File this_map_directory) throws IOException
+	{
 		final File tiles_directory = new File(this_map_directory, "tiles");
 		final boolean tiles_exist = tiles_directory.exists();
 		ImagesInfo scales;
@@ -529,11 +648,15 @@ public class ProduceClickableMap {
 			scales = get_zooms(source_directory, base + map);
 		if (scales == null)
 			Utils.eclipseErrorln("no images found");
+		return scales;
+	}
 
-		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales);
-		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
-		make_index_html(new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html"))), title + " " + map, key, map, scales);
-		return clMap;
+	private static File mk_maps_directory(final String map, File destination)
+	{
+		final File this_map_directory = new File(destination, map);
+		if (!this_map_directory.exists())
+			this_map_directory.mkdir();
+		return this_map_directory;
 	}
 
 	private static void copy_files(final File source, final File destination) throws IOException
@@ -656,7 +779,8 @@ public class ProduceClickableMap {
 		return count;
 	}
 
-	public void loadCellDesigner(String fn) throws Exception{
+	public void loadCellDesigner(String fn)
+	{
 		cd = CellDesigner.loadCellDesigner(fn);
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 	}
@@ -1406,7 +1530,7 @@ public class ProduceClickableMap {
 		final SbmlDocument cd,
 		final String blog_name,
 		ImagesInfo scales
-	) throws FileNotFoundException, UnsupportedEncodingException
+	) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		final String encoding = "UTF-8";
 		final PrintWriter output = new PrintWriter(output_file, encoding);
@@ -1522,11 +1646,35 @@ public class ProduceClickableMap {
 		content_line(indent.add(), r.getId(), bubble);
 		indent.close();
 	}
-
-	private void generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales) throws Exception
+	
+	private AllPosts all_posts;
+	private FormatProteinNotes master_format;
+	
+	private void generatePages(final AllPosts posts, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
-		final FormatProteinNotes format = new FormatProteinNotes();
-		final AllPosts all_posts = new AllPosts(wp);		
+		final Model model = cd.getSbml().getModel();
+		
+		for (final EntityBase ent : entityIDToEntityMap.values())
+			ent.setPost(posts);
+		
+		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
+
+		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+		{
+			final AllPosts.Post post = posts.lookup(r.getId());
+			
+			final String bubble = createReactionBubble(r, post.getPostId(), format);
+			reaction_line(right.add(), r, bubble, scales);
+		}
+		
+		finish_right_panel_xml(right);
+	}
+	
+
+	private void generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format)
+		throws UnsupportedEncodingException, FileNotFoundException
+	{
+		all_posts = new AllPosts(wp);		
 		final Model model = cd.getSbml().getModel();
 		
 		for (final EntityBase ent : entityIDToEntityMap.values())
@@ -1545,7 +1693,7 @@ public class ProduceClickableMap {
 			}
 		}
 
-		ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
+		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, all_posts, cd, blog_name, scales);
 
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
@@ -1553,14 +1701,9 @@ public class ProduceClickableMap {
 			final String body = createReactionBody(r, format);
 			final AllPosts.Post post = updateBlogPostId(wp, all_posts, r.getId(), title, REACTION_CLASS_NAME, body);
 			
-//			final ItemCloser entity = item_line(right.add(), r.getId(), null, r.getId(), null);
 			final String bubble = createReactionBubble(r, post.getPostId(), format);
 			reaction_line(right.add(), r, bubble, scales);
 			
-			
-	//		entity.close();
-			
-//			createReactionMarker(xml, r, post.getPostId(), format);
 			updateBlogPostIfRequired(wp, post, title, body);
 		}
 		
@@ -1586,6 +1729,8 @@ public class ProduceClickableMap {
 		        	updateBlogPostIfRequired(wp, post, ent.getName(), body);
 			}
 		}
+		
+		remove_old_posts(wp, all_posts.getUnused());
 				
 /*		for (final CelldesignerRNA rna : annotation.getCelldesignerListOfRNAs().getCelldesignerRNAArray())
 		{
@@ -1641,8 +1786,6 @@ public class ProduceClickableMap {
 //			write_marker(xml, entity_class, id, name, body);
 		}
 	*/
-		
-		remove_old_posts(wp, all_posts.getUnused());
 		
 		/*
 		if (false)
@@ -2074,7 +2217,7 @@ public class ProduceClickableMap {
 	private static String onclick_before = "<a href=\"javascript_required.html\" onclick='try { ";
 	private static String onclick_after = " } catch (e) {}; return false;'";
 	
-	private String createReactionBubble(ReactionDocument.Reaction r, int post_id, FormatProteinNotes format) throws IOException
+	private String createReactionBubble(ReactionDocument.Reaction r, int post_id, FormatProteinNotes format)
 	{
 		final StringBuffer fw = new StringBuffer();
 		final Hasher h = null_hasher;
@@ -2087,7 +2230,7 @@ public class ProduceClickableMap {
 		return fw.toString();
 	}
 
-	private String createReactionBody(ReactionDocument.Reaction r, FormatProteinNotes format) throws IOException
+	private String createReactionBody(ReactionDocument.Reaction r, FormatProteinNotes format)
         {
 	        final String id = r.getId();
 		final Hasher h = new Hasher();
@@ -2529,7 +2672,7 @@ public class ProduceClickableMap {
 	
 	static private class FormatProteinNotesBase
 	{
-		final private static String[] layer_tags = new String[]{ "CC_phase", "LAYER", "CHECKPOINT", "PATHWAY" };
+		final private static String[] layer_tags = new String[]{ "CC_phase", "LAYER", "CHECKPOINT", "PATHWAY", "MODULE" };
 		static
 		{
 			Arrays.sort(layer_tags);
@@ -2576,9 +2719,16 @@ public class ProduceClickableMap {
 		protected static final String[] colours = { "cyan", "LightGreen", "LightGoldenRodYellow", "Khaki", "SpringGreen", "Yellow" };
 	}
 	
-	private class FormatProteinNotes extends FormatProteinNotesBase
+	static private class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		final private HashMap<String, String> colour_map = new HashMap<String, String>();
+		final private Set<String> modules;
+		final private String blog_name;
+		public FormatProteinNotes(final Set<String> modules, final String blog_name)
+		{
+			this.modules = modules;
+			this.blog_name = blog_name;
+		}
 		private String get_colour(String name)
 		{
 			String colour = colour_map.get(name);
@@ -2642,51 +2792,56 @@ public class ProduceClickableMap {
 				{
 					m.appendReplacement(res, (after_block) ? "\n" : "<bR>\n");
 				}
-				else if ("_end".equals(m.group(offset + 1)))
-				{
-					if (block != null && block.equals(tag))
-					{
-						block = null;
-						m.appendReplacement(res, "</p>");
-						after_block = true;
-					}
-					else
-						m.appendReplacement(res, "$0");
-				}
-				else if ("_begin".equals(m.group(offset + 1)))
-				{
-					if (block == null)
-					{
-						block = tag;
-						m.appendReplacement(res, "");
-						res.append("<p style=\"background: ").append(get_colour(block)).append("\">");
-						res.append("<b>").append(block).append("</b>");
-						after_block = false;
-					}
-					else
-						m.appendReplacement(res, "$0");
-				}
-				else if (tag.endsWith(":"))
-				{
-					m.appendReplacement(res, "");
-					res.append(tag + m.group(offset + 1));
-					show_shapes_on_map(h, res, all, m.group(offset + 1), blog_name);
-				}
-				else
-				{	
-					boolean done = false;
-					for (final String[] entry : urls)
-						if (entry[0].equals(tag))
-						{
-							m.appendReplacement(res, "");
-							add_link(res, tag, m.group(offset + 2), entry[1]);
-							done = true;
-							break;
-						}
+                                else
+                                {
+	                                final String arg = m.group(offset + 1);
+	                                if ("_end".equals(arg))
+	                                {
+	                                	if (block != null && block.equals(tag))
+	                                	{
+	                                		block = null;
+	                                		m.appendReplacement(res, "</p>");
+	                                		after_block = true;
+	                                	}
+	                                	else
+	                                		m.appendReplacement(res, "$0");
+	                                }
+	                                else if ("_begin".equals(arg))
+	                                {
+	                                	if (block == null)
+	                                	{
+	                                		block = tag;
+	                                		m.appendReplacement(res, "");
+	                                		res.append("<p style=\"background: ").append(get_colour(block)).append("\">");
+	                                		res.append("<b>").append(block).append("</b>");
+	                                		after_block = false;
+	                                	}
+	                                	else
+	                                		m.appendReplacement(res, "$0");
+	                                }
+	                                else if (tag.endsWith(":"))
+	                                {
+	                                	m.appendReplacement(res, "");
+	                                	res.append(tag + arg);
+	                                	if (modules.contains(arg))
+	                                		show_shapes_on_map(h, res, all, arg, blog_name);
+	                                }
+	                                else
+	                                {	
+	                                	boolean done = false;
+	                                	for (final String[] entry : urls)
+	                                		if (entry[0].equals(tag))
+	                                		{
+	                                			m.appendReplacement(res, "");
+	                                			add_link(res, tag, m.group(offset + 2), entry[1]);
+	                                			done = true;
+	                                			break;
+	                                		}
 
-					if (!done)
-						m.appendReplacement(res, "<em>$0</em>");
-				}
+	                                	if (!done)
+	                                		m.appendReplacement(res, "<em>$0</em>");
+	                                }
+                                }
 			}
 			return res;
 		}
@@ -2907,7 +3062,6 @@ public class ProduceClickableMap {
         }
 
 	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, ReactionDisplayType pass2, AllPosts posts)
-		throws IOException
 	{
 		final Hasher h = new Hasher();
 		final StringBuffer fw = new StringBuffer();
@@ -3394,6 +3548,10 @@ public class ProduceClickableMap {
 		{
 			return getName().compareTo(arg0.getName());
 		}
+		public void setPost(AllPosts posts)
+		{
+			setPost(posts.lookup(getId()));
+		}
 		protected AllPosts.Post post;
 		public int getPostId()
 		{
@@ -3775,7 +3933,7 @@ public class ProduceClickableMap {
 		
 		Vector v = new Vector();
 		
-		if(rtype.equals("STATE_TRANSITION")||rtype.equals("TRANSPORT")||rtype.equals("TRANSCRIPTIONAL_INHIBITION")||rtype.equals("TRANSCRIPTIONAL_ACTIVATION")||rtype.equals("UNKNOWN_TRANSITION")||rtype.equals("KNOWN_TRANSITION_OMITTED")||rtype.equals("TRANSLATIONAL_INHIBITION")||rtype.equals("UNKNOWN_CATALYSIS")||rtype.equals("TRANSLATION")||rtype.equals("TRANSCRIPTION")){
+		if (one_reactant_one_product.contains(rtype)){
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
@@ -3878,7 +4036,7 @@ public class ProduceClickableMap {
 			}
 			//addPolyLine(central.x,central.y,endPoints.get(1).x,endPoints.get(1).y,ep,r,v);			
 		}}else
-			System.out.println("In generatePlacesForReaction "+rtype+" not found for "+r.getId());
+			Utils.eclipseErrorln("In generatePlacesForReaction "+rtype+" not found for "+r.getId());
 		
 		if(v.size()>0)
 			placeMap.put(r.getId(), v);
@@ -3887,11 +4045,33 @@ public class ProduceClickableMap {
 		return position;
 	}
 	
+	private static final Set<String> one_reactant_one_product = Collections.unmodifiableSet
+	(
+		new HashSet<String>()
+		{
+			private static final long serialVersionUID = 6409895886399401092L;
+			{
+				add("STATE_TRANSITION");
+				add("TRANSPORT");
+				add("TRANSCRIPTIONAL_INHIBITION");
+				add("TRANSCRIPTIONAL_ACTIVATION");
+				add("UNKNOWN_TRANSITION");
+				add("KNOWN_TRANSITION_OMITTED");
+				add("TRANSLATIONAL_INHIBITION");
+				add("UNKNOWN_CATALYSIS");
+				add("TRANSLATION");
+				add("NEGATIVE_INFLUENCE");
+				add("POSITIVE_INFLUENCE");
+				add("UNKNOWN_POSITIVE_INFLUENCE");
+			}
+		}
+	);
+
 	/* generates a polygon (for an image map) along reactions 
 	 */
 	private void generatePlacesForReaction(ReactionDocument.Reaction r){
 		
-		String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
+		final String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
 		//System.out.println(r.getId()+"\t"+rtype);
 		
 		Vector<Place> startPoints = new Vector<Place>();
@@ -3941,7 +4121,7 @@ public class ProduceClickableMap {
 		
 		Vector v = new Vector();
 		
-		if(rtype.equals("STATE_TRANSITION")||rtype.equals("TRANSPORT")||rtype.equals("TRANSCRIPTIONAL_INHIBITION")||rtype.equals("TRANSCRIPTIONAL_ACTIVATION")||rtype.equals("UNKNOWN_TRANSITION")||rtype.equals("KNOWN_TRANSITION_OMITTED")||rtype.equals("TRANSLATIONAL_INHIBITION")||rtype.equals("UNKNOWN_CATALYSIS")||rtype.equals("TRANSLATION")||rtype.equals("TRANSCRIPTION")){
+		if (one_reactant_one_product.contains(rtype)) {
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
@@ -4053,7 +4233,7 @@ public class ProduceClickableMap {
 			}
 			addPolyLine(central.x,central.y,endPoints.get(1).x,endPoints.get(1).y,ep,r,v);			
 		}}else
-			System.out.println("In generatePlacesForReaction "+rtype+" not found for "+r.getId());
+			Utils.eclipseErrorln("In generatePlacesForReaction "+rtype+" not found for "+r.getId());
 		
 		if(v.size()>0)
 			placeMap.put(r.getId(), v);
@@ -5142,8 +5322,10 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final PrintStream out, final String title, final String key, final String map_name, ImagesInfo scales)
+	private static void make_index_html(final File this_map_directory, final String title, final String map_name, ImagesInfo scales) throws FileNotFoundException
 	{
+		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
+		
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
 		out.println("<!-- $Id$ -->");

@@ -199,104 +199,99 @@ function get_markers_for_modification(element, projection, map)
 	return element.markers;
 }
 
-function start_right_hand_panel(selector, source, map, projection)
+function start_right_hand_panel(selector, source, map, projection, whenloaded)
 {
-	jtree = $(selector).jstree({
-		"themes" : {
-			"theme" : "default",
-			"dots" : false,
-			"icons" : false
-		},
-		core : { "animation" : 200 },
-		"xml_data" : {
-			"ajax" : {
-				"url" : source
+	jtree = $(selector)
+		.bind("loaded.jstree", whenloaded)
+		.jstree({
+			"themes" : {
+				"theme" : "default",
+				"dots" : false,
+				"icons" : false
 			},
-			"xsl" : "nest"
-		},
-		"languages" : [ "en", "ln" ],
-		"checkbox" :
-		{
-			"checked_parent_open" : false
-		},
-		plugins : [ "themes", "xml_data", "ui", "checkbox", "languages" ],
-		html_titles : true
-	}).bind("uncheck_node.jstree", function(event, data) {
-		var f = function(index, element)
-		{
-			element.markers.forEach(function(i) { i.setVisible(false); });
-			element.peers.each
-			(
-				function()
-				{
-					jQuery.jstree._reference(jtree).uncheck_node(this);
-				}
-			);
-		};
-		$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
-		$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-	}).bind
-	(
-		"check_node.jstree",
-		function(event, data)
-		{
+			core : { "animation" : 200 },
+			"xml_data" : {
+				"ajax" : {
+					"url" : source
+				},
+				"xsl" : "nest"
+			},
+			"languages" : [ "en", "ln" ],
+			"checkbox" :
+			{
+				"checked_parent_open" : false
+			},
+			plugins : [ "themes", "xml_data", "ui", "checkbox", "languages" ],
+			html_titles : true
+		}).bind("uncheck_node.jstree", function(event, data) {
 			var f = function(index, element)
 			{
-				get_markers_for_modification(element, projection, map);
-				
-//				console.log("check_node.jstree", "master", element);
-				element.markers.forEach
-				(
-					function(i)
-					{
-						if (!i.getVisible())
-						{
-							i.setVisible(true);
-							i.setAnimation(google.maps.Animation.DROP);
-						}
-					}
-				);
+				element.markers.forEach(function(i) { i.setVisible(false); });
 				element.peers.each
 				(
-					function(i)
+					function()
 					{
-						jQuery.jstree._reference(jtree).check_node(this);
+						jQuery.jstree._reference(jtree).uncheck_node(this);
 					}
 				);
 			};
-			
-			jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
+			$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
 			$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-		}
-	);
+		}).bind
+		(
+			"check_node.jstree",
+			function(event, data)
+			{
+				var f = function(index, element)
+				{
+					get_markers_for_modification(element, projection, map);
+					
+	//				console.log("check_node.jstree", "master", element);
+					element.markers.forEach
+					(
+						function(i)
+						{
+							if (!i.getVisible())
+							{
+								i.setVisible(true);
+								i.setAnimation(google.maps.Animation.DROP);
+							}
+						}
+					);
+					element.peers.each
+					(
+						function(i)
+						{
+							jQuery.jstree._reference(jtree).check_node(this);
+						}
+					);
+				};
+				
+				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
+				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+			}
+		);
 
 };
 
 function clickmap_start(map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift) {
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
-	start_right_hand_panel(panel_selector, source, map.map, map.projection);
-	return;
-	initialize(min_zoom);
-	return;
-	var settingsCustomMap = {
-	        copyright_owner: 'Institut Curie',
-	        minZoom : min_zoom,
-	        maxZoom: clickmap_maxzoom,
-	        div: 'map'
+	var whenready = function()
+	{
+		if (to_open && to_open.length > 0)
+		{
+			show_markers(to_open);
+			to_open = [];
+		}
 	};
-	var customMap = cellpublisher.customMap.createCustomMap(settingsCustomMap);
-	cellpublisher.map = customMap;
-	return;
-	var settingsMarkers = {
-	        xml: 'markers.xml',
-	        map: customMap,
-	        maxZoom: clickmap_maxzoom
-	}
-	var markers = cellpublisher.markers.createMarkers(settingsMarkers);
-	cellpublisher.marker_links.create_side_bar(markers);
-	cellpublisher.marker_checkboxes.activate_checkboxes();
-	
-	setInterval(function() {
-		if (window.opener) { window.opener.maps[map_name] = window };
-	}, 100);
+	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
+	var tell_opener = function()
+	{
+		if (window.opener && window.opener.maps)
+		{
+			window.opener.maps[map_name] = window;
+		};
+	};
+	tell_opener();
+	setInterval(tell_opener, 100);
 }

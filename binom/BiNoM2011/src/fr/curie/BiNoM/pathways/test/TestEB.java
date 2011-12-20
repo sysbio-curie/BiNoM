@@ -40,11 +40,11 @@ public class TestEB {
 		try {
 
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-short-metabolic-pathway.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/tmp.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/tmp.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_arf6.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_bcatenin.owl";
@@ -92,13 +92,17 @@ public class TestEB {
 //			System.out.println("pname = " +pname);
 //			System.out.println(GraphUtils.correctId(pname));
 			
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllProtein(bp.model);
+			List l = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(bp.model);
 			
 			for (int i=0;i<l.size();i++) {
-				Protein p = (Protein) l.get(i);
-				System.out.print(p.uri()+ "\t");
+				ProteinReference p = (ProteinReference) l.get(i);
+				//System.out.println(p.uri());
 				Iterator it = p.getName();
-				System.out.println((String)it.next());
+				String name = "";
+				if (it.hasNext()) {
+					name = name + ":"+(String)it.next();
+				}
+				System.out.println(p.uri()+"\t"+name);
 			}
 
 //			l = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalReaction(bp.model);

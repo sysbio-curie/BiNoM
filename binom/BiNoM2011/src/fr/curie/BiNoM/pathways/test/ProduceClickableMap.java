@@ -3074,7 +3074,7 @@ public class ProduceClickableMap {
 		format.full(fw, h, ent, cd, ent.getPostTranslational());
 		format_modifications(h, fw, true, ent.getModifications(), pass2);
 
-		participates_in_reactions(ent, h, fw, pass2, posts);
+		participates_in_reactions_split(ent.getModifications(), h, fw, pass2, posts);
 
 		return h.insert(fw, ent.getId()).toString();
 	}
@@ -3105,7 +3105,7 @@ public class ProduceClickableMap {
 		return false;
 	}
 
-	private void participates_in_reactions_split(final ArrayList<Modification> arrayList, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts all_posts)
+	private void participates_in_reactions_split(final List<Modification> arrayList, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts all_posts)
 	{
 		final ArrayList<ReactionDocument.Reaction> catalysers = new ArrayList<ReactionDocument.Reaction>();
 		final ArrayList<ReactionDocument.Reaction> others = new ArrayList<ReactionDocument.Reaction>();
@@ -3115,7 +3115,7 @@ public class ProduceClickableMap {
 			final String id = sp.getId();
 			final Vector<ReactionDocument.Reaction> v = speciesInReactions.get(id);
 			if (v != null)
-				for (ReactionDocument.Reaction r : v)
+				for (final ReactionDocument.Reaction r : v)
 				{
 					if (is_catalyser(sp.getModificationId(), r))
 						catalysers.add(r);

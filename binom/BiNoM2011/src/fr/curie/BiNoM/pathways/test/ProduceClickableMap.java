@@ -3128,21 +3128,6 @@ public class ProduceClickableMap {
 		show_reactions(catalysers, "Catalyser", fw, h, pass2, all_posts);
 	}
 
-	private void participates_in_reactions(final EntityBase ent, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts all_posts)
-	{
-		final ArrayList<ReactionDocument.Reaction> reactions = new ArrayList<ReactionDocument.Reaction>();
-		
-		for (final Modification sp : ent.getModifications())
-		{
-			final String id = sp.getId();
-			final Vector<ReactionDocument.Reaction> v = speciesInReactions.get(id);
-			if (v != null)
-				reactions.addAll(v);
-		}
-		fw.append(heading_font_on).append("Participates in reactions:").append(heading_font_off).append("<br>");
-		show_reactions(reactions, null, fw, h, pass2, all_posts);
-	}
-
 	private void show_reactions(ArrayList<ReactionDocument.Reaction> reactions, String as, final StringBuffer fw, final Hasher h, ReactionDisplayType pass2, AllPosts all_posts)
 	{
 		Collections.sort(reactions, reaction_comparator);

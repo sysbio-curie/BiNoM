@@ -1,0 +1,125 @@
+We illustrate, here, the different functions of BiNoM related to the structural analysis, using the modified version of the Novak et al. model, M-Phase.xml as an example (figure~\ref{Cytoscape_view_of_the_M-Phase_network}).
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Cytoscape_view_of_the_M-Phase_network.png}
+\caption{Cytoscape view of the M-Phase network}
+\label{Cytoscape_view_of_the_M-Phase_network}
+\end{figure}
+\\From the menu Plugins$\Rightarrow$ BiNoM analysis, we review all the functions one by one:
+\subsection{Get connected components}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Get connected components\\
+This command dissociates the unconnected subparts of the network. In our case, since the network is already completely connected, the one obtained when choosing this function is the same as the initial one (called M-Phase.xml\_cc1).
+\subsection{Get strongly connected components}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Get strongly connected components\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Strongly_Connected_Component_of_M-Phase_network.png}
+\caption{Strongly Connected Component of M-Phase network}
+\label{Strongly_Connected_Component_of M-Phase_network}
+\end{figure}
+\\Based on Tarjan’s algorithm\cite{tarjan1972depth}, the strongly connected components are isolated. In simple words, the obtained network, M-Phase.xml\_scc1(figure~\ref{Strongly_Connected_Component_of M-Phase_network}), insures that there exists a path from one node to another and deletes the components which do not respond to this requirement.
+\subsection{Prune Graph}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Prune graph\\
+Pruning the graph is equivalent to separating the network into three parts(figure~\ref{Prune_the_graph}: what comes in (M-Phase.xml\_in), what goes out (M-Phase.xml\_out) and the central cyclic part (M-Phase.xml\_scc).
+\\This decomposition corresponds to the idea of the bow-tie structure developed by Broder and colleagues\cite{broder2000graph}. In our example, the central cyclic part is the same as figure~\ref{Strongly_Connected_Component_of M-Phase_network}, the strongly connected component. In other cases, it can be composed from several strongly connected components, connected or disconnected.\\
+The Prune graph operation decomposes the current network into three parts: IN, OUT and SCC (the later can contain several strongly connected components).
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Prune_the_graph}
+\caption{Prune the graph. (a) Incoming flux: molecules involved in the IN part of the network, and (b) Outgoing flux: molecules involved in the OUT part of the network.}
+\label{Prune_the_graph}
+\end{figure}
+\subsection{Get Material Components}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Get material components\\
+This function uses node name semantics to isolate sub-networks in which each protein takes part. In our example(figure~\ref{Material_Components}), seven sub-networks are created: M-Phase.xml\_Cdc13, M-Phase.xml\_Cdc2, M-Phase.xml\_Rum1, M-Phase.xml\_APC, M-Phase.xml\_Slp1, M-Phase.xml\_Cdc25 and M-Phase.xml\_Wee1. Some major overlaps between sub-networks are expected, as it is the case for Cdc2 and Cdc13 which form a complex.\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Material_Components}
+\caption{Material Components}
+\label{Material_Components}
+\end{figure}
+\subsection{Get Cycle Decomposition}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Get cycle decomposition\\
+This command decomposes the network into relevant directed cycles\cite{gleiss2001relevant}, using a modification of the Vismara’s algorithm\cite{vismara1997union}. Often, this feature gives information about the life cycle of a protein or a complex, about the feedbacks of the studied network, etc(figure~\ref{Minimal_cycle_decomposition_of_the M-Phase}). Note that the union of all the cycles corresponds to the strongly connected component figure~\ref{Strongly_Connected_Component_of M-Phase_network}.\\
+\includegraphics[width=12pt,height=12pt]{graphics/warning}This operation can produce enormous number of cycles! Therefore it is rather suitable for analysis of small to moderate size networks. For a big network, one can start to understand the cyclic network structure by eliminating first the network hubs, which are contained in many network cycles. After that, the local, relatively short, cycles can be represented as meta-nodes (modules) and the analysis for cycles can be repeated.\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Minimal_cycle_decomposition_of_the_M-Phase}
+\caption{Minimal cycle decomposition of the M-Phase network.  Cycle 1 includes CDC2 and CDC13 proteins, Cycle 2 CDC25 and Cycle 3 shows the feedback existing between CDC13/CDC2 and CDC25.}
+\label{Minimal_cycle_decomposition_of_the M-Phase}
+\end{figure}
+\subsection{Path Analysis}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Path analysis\\
+In a network, it can become handy to find out if there exists a path (or paths) from one species to another, or to verify that a protein or a protein complex is reachable from a starting molecule(figure~\ref{Path_Analysis_All_the_paths}). Provided (an) initial source and target protein(s) that are selected first on the graph then in the dialog window, the command Path analysis can find: the shortest paths, the optimal and suboptimal shortest paths, or all the non-intersecting paths (does not include inner loops), using a finite number of intermediary nodes (use finite breadth search radius), for either directed or undirected paths (figure~\ref{Path_Analysis_Pop-up_window}).\\
+\includegraphics[width=12pt,height=12pt]{graphics/warning}In big networks the number of paths can be exponential! It is recommended to find the shortest path first, take its length and increment gradually the breadth search radius starting from this value to find the second shortest, third shortest, etc., paths.\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Path_Analysis_Pop-up_window}
+\caption{BiNoM Path Analysis: Pop-up window in which the source(s) and the target(s) need to be specified along with the type of paths (shortest, optimal shortest or all paths).}
+\label{Path_Analysis_Pop-up_window}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Path_Analysis_All_the_paths}
+\caption{Path Analysis: All the paths leading from one molecular species (Cdc13) to another (Cdc13\_ubi, ubiquitinated form of Cdc13) are highlighted in yellow.}
+\label{Path_Analysis_All_the_paths}
+\end{figure}
+\subsection{Extract subnetwork}
+\includegraphics{graphics/work_in_progress}
+\subsection{Calc centrality, Inbetweenness undirected, Inbetweenness directed}
+\includegraphics{graphics/work_in_progress}
+\subsection{Generate Modular View}
+Plugins$\Rightarrow$BiNoM$\Rightarrow$analysis$\Rightarrow$Generate modular view\\
+Given the initial diagram and some modules (which could be sub-networks of the initial network), it is possible to reconstruct a modular view of the network. For our example, we choose the initial network to be M-Phase.xml and the subparts or modules, the seven sub-networks corresponding to the material components described in (4). From these seven sub-networks only six are selected since two of them, Slp1 and APC, are exactly the same.\\
+The sub-networks or modules need to be specified in the “creating modular view” window (figure~\ref{Modular_view_Pop-up_window}).\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Modular_view_Pop-up_window}
+\caption{BiNoM modular view of the newtork: Pop-up window in which the initial graph and the modules are specified. }
+\label{Modular_view_Pop-up_window}
+\end{figure}
+\\There are different types of modular views. The modules are connected by: (1) the number of shared interactions (figure~\ref{Modular_view_The_resulting_modular_network}, upper panel); (2) the number of shared nodes (reactions + species) for which case the box “Compact module intersection” must be checked (figure~\ref{Modular_view_The_resulting_modular_network}, middle panel); and (3) the shared nodes and reactions showed explicitly (figure~\ref{Modular_view_The_resulting_modular_network}, lower panel).\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Modular_view_The_resulting_modular_network}
+\caption{BiNoM modular view of the newtork: The resulting modular network (upper panel) with compact module intersections (middle panel) and with explicit intersections (lower panel).}
+\label{Modular_view_The_resulting_modular_network}
+\end{figure}
+\subsection{Cluster Networks}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Cluster networks\\
+This command lumps together the modules that share a certain proportion of nodes. At a first glance, it can easily be concluded from Figure~\ref{BiNoM_modular_view_The_resulting_modular_network} (middle panel) that, for example, the modules M-Phase.xml\_Cdc13 and M-Phase.xml\_Cdc2 share a lot of proteins or protein complexes. Therefore, we can assume that these two modules will collapse into one big module. To determine the clusters, the intersection threshold can be set (from 0 to 100\% intersecting components). For a 30\% intersection threshold, Figure~\ref{Clusters_of_modules_using_the_material_decomposition} is obtained. Four clusters of modules were proposed and linked.\\
+An alternative modular view has been obtained using the cycle decomposition instead of the material decomposition. The cycles are presented in Figure~\ref{Minimal_cycle_decomposition_of_the M-Phase}. They are obtained by clustering the three cycles into two (cycle 1 + cycle2/cycle3) and organized into a modular view (Figure~\ref{Clusters_of_modules_using_the_cycle_decomposition}).\\
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Clusters_of_modules_using_the_material_decomposition}
+\caption{Clusters of modules. The obtained diagram is a compact modular view of the M-Phase network using the material decomposition and material components clustering}
+\label{Clusters_of_modules_using_the_material_decomposition}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Clusters_of_modules_using_the_cycle_decomposition}
+\caption{Clusters of modules. The obtained diagram is a compact modular view of the M-Phase network using the relevant cycle decomposition and cycle clustering}
+\label{Clusters_of_modules_using_the_cycle_decomposition}
+\end{figure}
+\subsection{Mono-molecular react.to edges}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Mono-molecular react. to edges\\
+This command transforms monomolecular (with one reactant and one product) reaction nodes into ‘influence’ edges. Thus, monomolecular (linear) reactions are represented as edges and the reaction graph is not bi-partite anymore. When the reaction nodes have the type of influence specified (through the ‘EFFECT’ attribute), the graph is transformed automatically into an influence graph (see Figure~\ref{Network_to_influence_graph}: upper panel: BioPAX network, lower panel, the equivalent influence network). Non-linear non-monomolecular reactions (such as complex assemblies) are not transformed and remain to be represented as network nodes.
+\begin{figure}
+\centering
+\includegraphics[width=14 cm]{graphics/Network_to_influence_graph}
+\caption{From a BioPAX network (upper panel) to an influence graph (lower panel).}
+\label{Network_to_influence_graph}
+\end{figure}
+\subsection{‘Linearize’ network}
+\includegraphics{graphics/work_in_progress}
+\subsection{Exclude intermediate nodes}
+\includegraphics{graphics/work_in_progress}
+\subsection{Extract Reaction Network}
+Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Extract reaction networks\\
+This function cleans up the diagram to only keep the reaction network. Only nodes with ‘XXXX\_REACTION’ and ‘XXXX\_SPECIES’ attributes (where XXXX stands for any word) are kept as a result of this operation. For example, it helps to clean the reaction network interface from the result of querying BioPAX index (which contains many other node types such as entities and publications.
+\subsection{Path consistency analysis}
+\includegraphics{graphics/work_in_progress}
+\subsection{OCSANA analysis}
+\includegraphics{graphics/work_in_progress}
+\subsection{Create neighborhood sets file}
+\includegraphics{graphics/work_in_progress}

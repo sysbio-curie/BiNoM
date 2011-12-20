@@ -1,0 +1,48 @@
+Module manager is useful for creating modular view of large networks without loosing details of modules (using “nest”, object of Cytoscape v7 and after).
+\subsection{Create network of modules}
+Create a new network from a list of sub-networks (sub-networks are selected in the network list).\\
+Nodes=modules, no edge. Visual style created in VizMapper for module network\\
+\includegraphics[width=12pt,height=12pt]{graphics/warning} Module names and node names must be different, all network names too.\\\\
+To go from module to sub-network: select node \textgreater Right click \textgreater Nested Network \textgreater Go to Nested Network.
+\subsection{Create connections between modules}
+Create edges linking modules from all edges of the selected network.\\
+Links are simplified, no distinction between left and right (molecule flow), no duplication if same interaction.\\
+Warning message if duplicated or absent nodes (may disturb links).
+\subsection{Create modules from networks}
+Create modules in the active network from a list of sub-networks (sub-networks are selected in the network list)\\
+All edges are kept. See edge attribute PREVIOUS\_ID for their origin.\\
+The attribute BIOPAX\_NODE\_TYPE is set to “pathway” (see visual style BiNoM BioPAX).\\
+\includegraphics[width=12pt,height=12pt]{graphics/warning} All nodes of sub-networks must be found once in the active network (no intersection between sub-networks).
+\subsection{Agglomerate the nearest nodes in modules}
+Create modules and a modular view by agglomerating the nearest nodes in the active network.\\\\
+Input 2 parameters to get not too big sub-networks containing not too far nodes:
+\begin{itemize}
+\item Maximal distance between nodes or modules in number of edges,
+\item Maximal number of nodes in modules.
+\end{itemize}
+Confirm creation if agree with displayed result (distance, number and size of modules).
+\subsection{List nodes of modules and network}
+List nodes of network and nodes included in modules.\\
+Result in text box can be simply copied in a spreadsheet through clipboard.
+\subsection{Find common nodes in modules}
+Display in text box the belonging matrix of nodes (modules in columns, nodes in rows, size of modules in last row, frequency in modules in last column); result more easily usable after copying in a spreadsheet.\\
+Create intersection edges with number of common nodes as attribute (COMMON\_NODES).\\
+Create node attribute containing the node numbers of modules (NODE\_NUMBER).\\\\
+Module Visual StyleCan be adapted to the wished visual aspect by hands in VizMapper, for example:
+\begin{itemize}
+\item To visualize NODE\_NUMBER: double click Node Size, select NODE\_NUMBER, continuous mapping, adjust width by graphical view.
+\item To visualize COMMON\_NODES double click Edge Line Width, select COMMON\_NODES, continuous mapping, adjust width by graphical view.
+\end{itemize}
+\subsection{Assign module names to node attribute}
+Create a node attribute (named as the modular network), containing module names 
+\subsection{List components of species in network and modules}
+List components of species (their names must respect BiNoM syntax).
+\subsection{Create network from union of selected modules}
+Create a network from union of selected modules and its corresponding module in the current network.
+\subsection{Create network from intersection of 2 selected modules}
+Create a network from intersection of 2 selected modules and its corresponding module.\\
+Confirm for deleting the common nodes in the selected modules.
+\subsection{Recreate lost connections inside modules}
+Recreate connections inside modules which may have been lost by modularizing operations.
+\subsection{Destroy networks unused as module}
+Select networks to be deleted among a list of networks which are not used as modules in the current network (simplify cleaning session)

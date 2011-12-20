@@ -653,6 +653,15 @@ public class SimpleTextInfluenceToBioPAX {
 		return res;
 	}
 	
+	/**
+	 * Construct BioPAX object from AIN data.
+	 * 
+	 * Modif ebonnet for BioPAX3: nameEntity is used to store all the entities, the property nameParticipant is not used anymore.
+	 * 
+	 * @param text text extracted from AIN file.
+	 * @param constitutiveReactions vector of constitutive reactions, e.g. forming a complex.
+	 * @throws Exception
+	 */
 	public  void makeBioPAX(String text, Vector constitutiveReactions) throws Exception{
 		SimpleTable vt = new SimpleTable();
 		nameEntity.clear();
@@ -896,7 +905,7 @@ public class SimpleTextInfluenceToBioPAX {
 				p.addComment("SHOW_TYPE: pathway");
 				*/
 				
-				// encode phenotype as an empty Pathway object
+				// encode phenotype as a protein, but show it as a Pathway via the comment SHOW_TYPE
 				Protein pa = biopax_DASH_level3_DOT_owlFactory.createProtein(biopax.namespaceString+sname, biopax.biopaxmodel);
 				pa.addName(sname);
 				pa.addComment("Phenotype from AIN file encoded as a pseudo-protein");

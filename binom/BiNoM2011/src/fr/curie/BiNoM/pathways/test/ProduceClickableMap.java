@@ -743,15 +743,18 @@ public class ProduceClickableMap {
 		}
 	}
 	
-	private static int write_tiles(final BufferedImage scaledImage, final File outdir,
-			final int scale_factor, final BufferedImage tiled, final Graphics2D g, int width, int height, int[] shifts)
+	private static int write_tiles
+	(
+		final BufferedImage scaledImage, final File outdir,
+		final int scale_factor, final BufferedImage tiled, final Graphics2D g,
+		int width, int height, int[] shifts
+	)
 	{
-		int xshift = shifts[0];
-		int yshift = shifts[1];
-		final int nx = (scaledImage.getWidth() + width - 1 + xshift) / width;
-		final int ny = (scaledImage.getHeight() + height - 1 + yshift) / height;
+		final int xshift = shifts[0];
+		final int yshift = shifts[1];
+		final int nx = 1 << scale_factor;
+		final int ny = nx;
 		final AffineTransform af = new AffineTransform();
-//		af.setToTranslation(xshift, yshift);
 		int count = 0;
 		final File zoom_dir = new File(outdir, scale_factor + "");
 		zoom_dir.mkdir();

@@ -132,7 +132,7 @@ public class ProduceClickableMap {
 	
 	private final String blog_name;
 	
-	public ProduceClickableMap(final String blog_name, File input, boolean show_def_compartement_names)
+	public ProduceClickableMap(final String blog_name, File input)
 	{
 		this.blog_name = blog_name;
 		assert input.canRead() : "cannot read " + input;
@@ -153,11 +153,11 @@ public class ProduceClickableMap {
 
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 		
-		calculate_all_modification_names(cd, _entityIDToEntityMap, _speciesIDToModificationMap, show_def_compartement_names);
+		calculate_all_modification_names(cd, _entityIDToEntityMap, _speciesIDToModificationMap);
 	}
 
 	static private void calculate_all_modification_names(SbmlDocument cd, final Map<String, EntityBase> _entityIDToEntityMap,
-		final Map<String, Modification> _speciesIDToModificationMap, boolean show_def_compartement_names)
+		final Map<String, Modification> _speciesIDToModificationMap)
 	{
 		/* this is really horrible but I need to have the name of the species and this can only 
 		 * be done once the maps are set up. Which maps? Who knows?
@@ -167,7 +167,7 @@ public class ProduceClickableMap {
 		{
 			try
 			{
-				m.calculateName(cd, show_def_compartement_names);
+				m.calculateName(cd);
 			}
 			catch (ClassCastException w)
 			{
@@ -180,7 +180,7 @@ public class ProduceClickableMap {
 			for (Modification m : e.getModifications())
 				try
 				{
-					m.calculateName(cd, show_def_compartement_names);
+					m.calculateName(cd);
 				}
 				catch (ClassCastException w)
 				{
@@ -294,7 +294,8 @@ public class ProduceClickableMap {
 				destination = new File("/bioinfo/http/prod/hosted/clickmap.curie.fr/html/maps");
 			else
 				destination = new File("/bioinfo/http/dev/hosted/clickmap-dev.curie.fr/html/maps");
-
+		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
+		
 		final Wordpress wp = open_wordpress(production, blog_name);
 
 		final File data_directory = new File("bin/data");
@@ -322,7 +323,7 @@ public class ProduceClickableMap {
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, show_default_compartement_name, modules);
+			master = process_a_map(blog_name, master_map_name, title, root, base, source_directory, make_tiles, wp, modules);
 		}
 		catch (IOException e)
 		{
@@ -335,7 +336,7 @@ public class ProduceClickableMap {
 		{
 			try
 			{
-				process_a_map(master, map_name, title, root, base, source_directory, make_tiles, show_default_compartement_name);
+				process_a_map(master, map_name, title, root, base, source_directory, make_tiles);
 			}
 			catch (IOException e)
 			{
@@ -596,9 +597,9 @@ public class ProduceClickableMap {
 	}
 
 	private static void process_a_map(final ProduceClickableMap master, final String map, String title, File destination, String base, File source_directory,
-		boolean make_tiles, boolean show_default_compartement_name) throws IOException
+		boolean make_tiles) throws IOException
 	{
-		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory, show_default_compartement_name);
+		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 
 		final File this_map_directory = mk_maps_directory(map, destination);
 
@@ -610,9 +611,9 @@ public class ProduceClickableMap {
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
-		boolean make_tiles, Wordpress wp, boolean show_default_compartement_name, Set<String> modules) throws IOException
+		boolean make_tiles, Wordpress wp, Set<String> modules) throws IOException
 	{
-		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory, show_default_compartement_name);
+		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
 
 		final File this_map_directory = mk_maps_directory(map, destination);
 
@@ -625,10 +626,9 @@ public class ProduceClickableMap {
 		return clMap;
 	}
 
-	private static ProduceClickableMap make_clickmap(final String blog_name, final String map, String base, File source_directory,
-                        boolean show_default_compartement_name)
+	private static ProduceClickableMap make_clickmap(final String blog_name, final String map, String base, File source_directory)
         {
-	        final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"), show_default_compartement_name);
+	        final ProduceClickableMap clMap = new ProduceClickableMap(blog_name, new File(source_directory, base + map + ".xml"));
 	        return clMap;
         }
 
@@ -3175,13 +3175,11 @@ public class ProduceClickableMap {
 			}
 			return name_;
 		}
-		void calculateName(SbmlDocument cd, boolean show_def_compartement_names)
+		void calculateName(SbmlDocument cd)
 		{
 			if (name_ == null && !isDegraded() && !isBad())
 			{
 				name_ = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd, modification_id, true, true);
-//				String n = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd, modification_id, false, true);
-//				assert n.equals(name_);
 				assert name_ != null && !name_.isEmpty() : modification_id;
 			}
 		}

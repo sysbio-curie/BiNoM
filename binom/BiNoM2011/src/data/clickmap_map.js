@@ -21,10 +21,29 @@ var filter = ".modification";
 
 var jtree;
 var map;
-var projection
+var projection;
+var to_open;
+
+function extend(bounds, marker)
+{
+//	bounds.extend(marker.getPosition());
+	var marker_width = 20; // should calculate this from the shape
+	var marker_height = 33; // should calculate this from the shape
+	
+	var map = marker.getMap();
+	var scale = 1 << map.getZoom();
+	var xoffset = marker_width / 2 / scale
+	var proj = map.getProjection();
+	var point = proj.fromLatLngToPoint(marker.getPosition());
+	var height_in_world_coords = marker_height / scale;
+	bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x - xoffset, point.y - height_in_world_coords)));
+	bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x + xoffset, point.y)));
+}
 
 function show_markers(markers)
 {
+	var bounds = new google.maps.LatLngBounds();
+	
 	markers.forEach
 	(
 		function(i)
@@ -37,6 +56,7 @@ function show_markers(markers)
 				function(i)
 				{
 					i.setVisible(false);
+					extend(bounds, i);
 				}
 			);
 			element.markers.forEach
@@ -57,6 +77,8 @@ function show_markers(markers)
 			);
 		}
 	);
+	if (!bounds.isEmpty())
+		map.panToBounds(bounds);
 }
 
 function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
@@ -108,11 +130,15 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 	var map_type = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
 			var ntiles = 1 << zoom;
+//			
 			if (coord.y < 0 || coord.y >= ntiles)
 				return null;
 			if (coord.x < 0 || coord.x >= ntiles)
 				return null;
-			return "tiles/" + zoom + "/" + coord.x + "_" + coord.y + ".png";
+			
+			var r = coord.x + "_" + coord.y;
+//			console.log(coord, zoom, x, y, ntiles, r);
+			return "tiles/" + zoom + "/" + r + ".png";
 		},
 		tileSize : new google.maps.Size(tile_width, tile_height),
 		maxZoom : max_zoom,
@@ -242,17 +268,18 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			"check_node.jstree",
 			function(event, data)
 			{
+				var bounds = new google.maps.LatLngBounds();
 				var f = function(index, element)
 				{
 					get_markers_for_modification(element, projection, map);
 					
-	//				console.log("check_node.jstree", "master", element);
 					element.markers.forEach
 					(
 						function(i)
 						{
 							if (!i.getVisible())
 							{
+								extend(bounds, i);
 								i.setVisible(true);
 								i.setAnimation(google.maps.Animation.DROP);
 							}
@@ -269,12 +296,15 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				if (!bounds.isEmpty())
+					map.panToBounds(bounds);
 			}
 		);
 
 };
 
-function clickmap_start(map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift) {
+function clickmap_start(map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
+{
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function()
 	{

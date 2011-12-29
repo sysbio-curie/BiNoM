@@ -26,22 +26,12 @@
 package fr.curie.BiNoM.pathways;
 
 
-import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.utils.*;
-
 import java.io.*;
 import java.util.*;
-
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.util.*;
-import com.hp.hpl.jena.shared.*;
-
-import org.apache.xmlbeans.*;
 import org.sbml.x2001.ns.celldesigner.*;
-
 import edu.rpi.cs.xgmml.*;
 
 /**
@@ -379,7 +369,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 								mtyp = cont.getClass().getName();
 								mtyp = Utils.replaceString(mtyp,"Impl","");
 								mtyp = Utils.replaceString(mtyp,"fr.curie.BiNoM.pathways.biopax.","");
-								//String mtypct = cont.getCONTROL_DASH_TYPE();
 								String mtypct = cont.getControlType();
 								if((mtypct==null)||(mtypct.equals(""))||(mtypct.toLowerCase().equals("nil")))
 									mtypct = "unknown";
@@ -442,7 +431,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			pathwaySteps.put(p.uri(),p);
 		}
 		
-		// test ebo
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalPathwayStep(biopax.model);
 		for (int i=0;i<pl.size();i++) {
 			PathwayStep p = (PathwayStep)pl.get(i);
@@ -451,7 +439,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllInteraction(biopax.model);
 		for (int i=0;i<pl.size();i++) { interactions.put(((Entity)pl.get(i)).uri(),pl.get(i));   }
-		//pl = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalInteraction(biopax.model);
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllMolecularInteraction(biopax.model);
 		for (int i=0;i<pl.size();i++) { interactions.put(((Entity)pl.get(i)).uri(),pl.get(i));   }
 		pl = biopax_DASH_level3_DOT_owlFactory.getAllControl(biopax.model);
@@ -516,7 +503,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			for (int i=0;i<stl.size();i++) {
 				PathwayStep ps = (PathwayStep)stl.get(i);
 				n = (GraphicNode)nodes.get(ps.uri());
-				//Vector uris = Utils.getPropertyURIs(ps,"NEXT-STEP");
 				Vector uris = Utils.getPropertyURIs(ps,"nextStep");
 				for (int j=0;j<uris.size();j++) {
 					String s = (String)uris.elementAt(j);
@@ -631,7 +617,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","PathwayStep",ObjectType.STRING);
 			Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",ps.uri(),ObjectType.STRING);
 		}
-		//Vector uris = Utils.getPropertyURIs(ps,"STEP-INTERACTIONS");
 		Vector uris = Utils.getPropertyURIs(ps,"stepProcess");
 		
 		for (int i=0;i<uris.size();i++) {
@@ -809,9 +794,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 							}
 						}
 					}
-					/*else{
-						System.out.println("WARNING!!! Null entity for participant "+Utils.cutUri(pep.uri()));
-					}*/
 				}
 			}
 		}
@@ -834,14 +816,6 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		il = biopax_DASH_level3_DOT_owlFactory.getAllModulation(biopax.model);
 		for (int i=0;i<il.size();i++) knownInteractions.put(((Interaction)il.get(i)).uri(),(Interaction)il.get(i));
 
-		/*
-	HashMap participants = new HashMap();
-	List ppl = biopax_DASH_level3_DOT_owlFactory.getAllphysicalEntityParticipant(biopax.model);
-	for (int i=0;i<ppl.size();i++) participants.put(((physicalEntityParticipant)ppl.get(i)).uri(),(physicalEntityParticipant)ppl.get(i));
-	ppl = biopax_DASH_level3_DOT_owlFactory.getAllsequenceParticipant(biopax.model);
-	for (int i=0;i<ppl.size();i++) participants.put(((physicalEntityParticipant)ppl.get(i)).uri(),(physicalEntityParticipant)ppl.get(i));
-		 */
-
 		il = biopax_DASH_level3_DOT_owlFactory.getAllMolecularInteraction(biopax.model);
 		for (int j=0;j<il.size();j++) {
 			MolecularInteraction pi = (MolecularInteraction)il.get(j);
@@ -858,11 +832,8 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 
 					for (int i=0;i<v.size();i++) {
 						String ur = (String)v.get(i);
-						//PhysicalEntity pep = (PhysicalEntity)participants.get(ur);
-						//GraphicNode n1 = (GraphicNode)nodes.get(pep.getPHYSICAL_DASH_ENTITY().uri());
 						GraphicNode n1 = (GraphicNode)nodes.get(ur);
 						if (n1==null) {
-							//System.out.println("ENTITY NOT FOUND ON THE GRAPH: "+Utils.cutUri(pep.getPHYSICAL_DASH_ENTITY().uri()));
 							System.out.println("ENTITY NOT FOUND ON THE GRAPH: "+Utils.cutUri(ur));
 						} else {
 							String id = n.getId()+" (physicalInteraction) "+n1.getId();

@@ -26,19 +26,11 @@
 
 package fr.curie.BiNoM.pathways;
 
-import fr.curie.BiNoM.pathways.*;
 import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.utils.*;
-import java.io.*;
 import java.util.*;
-
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.util.*;
-import com.hp.hpl.jena.shared.*;
 import com.ibm.adtech.jastor.JastorInvalidRDFNodeException;
-
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 
@@ -113,7 +105,6 @@ public class BioPAXToSBMLConverter {
 	 * List of compartments (represented as openControlledVocabulary objects)
 	 */
     public Vector compartments = null;
-    //HashMap compartmentsHash = new HashMap();
     /**
 	 * Map from BioPAX conversion (cutted) uris to 
 	 * SBML reactions (represented by ReactionDocument.Reaction objects)
@@ -153,7 +144,6 @@ public class BioPAXToSBMLConverter {
     		String desc = "";
     		desc += name+"\n";
     		for(int i=0;i<sinonymSpecies.size();i++){
-    			//physicalEntityParticipant prt = (physicalEntityParticipant)sinonymSpecies.elementAt(i);
     			PhysicalEntity prt = (PhysicalEntity) sinonymSpecies.elementAt(i);
     			int k = prt.uri().indexOf("#");
     			desc+= "\t"+prt.uri().substring(k+1,prt.uri().length())+"\n";
@@ -205,14 +195,8 @@ public class BioPAXToSBMLConverter {
     		BioPAXSpecies part = (BioPAXSpecies)independentSpeciesIds.get(Utils.cutUri(id));
     		// get the first identical species, as a PEP, now converted to a PhysicalEntity
     		PhysicalEntity pep = (PhysicalEntity)part.sinonymSpecies.elementAt(0);
-
-    		// test if the PEP as at least one physical entity defined
-    		//if(pep.getPHYSICAL_DASH_ENTITY()==null)
-    		//	System.out.println("WARNING: PHYSICAL_DASH_ENTITY is null for "+pep.uri());
-    		
     		// comment string
     		String comm = "";
-    		//if(pep.getPHYSICAL_DASH_ENTITY()!=null){
     		if(pep!=null){
     			// format comments as multi-lines string
     			comm = makeComment(pep.getComment());
@@ -321,7 +305,6 @@ public class BioPAXToSBMLConverter {
     	it = modlist.iterator();
     	while(it.hasNext()){
     		Modulation ct = (Modulation)it.next();
-    		//System.out.println("Adding modulation: "+ct.uri());
     		allReactions.put(ct.uri(),ct);
     		addControl(ct);
     	}
@@ -335,11 +318,6 @@ public class BioPAXToSBMLConverter {
     			addControl(contr);
     		}
     	}
-
-
-    	//AnnotationDocument.Annotation an = m.addNewAnnotation();
-
-
     } // end populateSBML function
 
     
@@ -351,14 +329,13 @@ public class BioPAXToSBMLConverter {
     	
     	makeLists();
     	
-    	
-    	// modif ebonnet
+    	// add complexes as participants
     	List l = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
     	for (int i=0;i<l.size();i++) {
-    		addParticipant((PhysicalEntity)l.get(i));
+    		addParticipant((Complex)l.get(i));
     	}
     	
-    	// First process complexes
+    	// Process building blocks of complexes
     	System.out.println("Finding included species...");
     	List allcompl = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
     	Iterator allcompi = allcompl.iterator();
@@ -366,32 +343,13 @@ public class BioPAXToSBMLConverter {
     		Complex compl = (Complex)allcompi.next();
     		complexList.put(Utils.cutUri(compl.uri()),compl);
     		Iterator comps = compl.getComponent();
-    		while(comps.hasNext()){
-    			//physicalEntityParticipant part = (physicalEntityParticipant)comps.next();
+    		while(comps.hasNext()) {
     			PhysicalEntity pe = (PhysicalEntity) comps.next();
-    			// modif ebonnet 12.2011: there is no PhysicalEntityParticipant in complexes, it's directly PhysicalEntity objects like proteins
-    			//addIncludedParticipant(pe);
+    			// modif EB 12.2011: there is no PhysicalEntityParticipant in complexes, it's directly PhysicalEntity objects like proteins
     			addParticipant(pe);
     		}
     	}
     	
-    	
-    	/*
-    	 * sequenceParticipants do not exist in Level 3
-    	 */
-    	/*
-    	// Second, process all others
-    	System.out.println("Finding species...");
-    	List allsparts = biopax_DASH_level3_DOT_owlFactory.getAllsequenceParticipant(biopax.model);
-    	Iterator allspartsi = allsparts.iterator();
-    	while(allspartsi.hasNext()){
-    		sequenceParticipant spart = (sequenceParticipant)allspartsi.next();
-    		if(spart.getPHYSICAL_DASH_ENTITY()==null)
-    			System.out.println("WARNING: PHYSICAL_DASH_ENTITY is null for "+Utils.cutUri(spart.uri()));
-    		else
-    			addParticipant(spart);
-    	}
-    	*/
     	
     	l = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalEntity(biopax.model);
     	for (int i=0;i<l.size();i++) {
@@ -419,11 +377,14 @@ public class BioPAXToSBMLConverter {
     	}
 
 
-    	// Now we will deal with the situation when some included species are erroneously used as reactants, products and controllers
-    	// This is, unfortunately, the case for NatureNCI BioPAX dump (24 April 2008)
-    	// modif ebonnet 12.2011 this is most probably obsolete
-    	//findIncludedSpeciesInvolvedInReactionsPatch();
-
+    	/* Now we will deal with the situation when some included species are erroneously used as reactants, products and controllers
+    	 * This is, unfortunately, the case for NatureNCI BioPAX dump (24 April 2008 - AZ)
+    	 * 
+    	 * modif EB 12.2011: this stuff is most probably obsolete due to novel BioPAX level 3 format, so let's remove the call
+    	 * 
+    	 *findIncludedSpeciesInvolvedInReactionsPatch();
+		*/
+    	
     	Set keys = independentSpeciesIds.keySet();
     	Iterator kit = keys.iterator();
     	int i = 0;
@@ -508,7 +469,6 @@ public class BioPAXToSBMLConverter {
     	Vector p = Utils.getPropertyURIs(inter,"participant");
     	for(int i=0;i<p.size();i++) pall.add(p.get(i));
     	
-    	// those properties are not defined for level3
     	p = Utils.getPropertyURIs(inter,"left");
     	for(int i=0;i<p.size();i++) pall.add(p.get(i));
     	p = Utils.getPropertyURIs(inter,"right");
@@ -523,15 +483,11 @@ public class BioPAXToSBMLConverter {
     		
     		if(includedSpecies.get(curi)!=null){
     			String pname = (String)bpnm.genericUtilityName.get(uri);
-    			// modif ebonnet
     			if (pname==null)
     				pname = (String)bpnm.getNameByUri(curi);
-    			//System.out.println("test" + pname + " uri " + uri);
     			PhysicalEntity part = (PhysicalEntity)includedSpecies.get(curi);
-    			//String id = pname;
     			String id = GraphUtils.correctId(pname);
     			String tpe = getTypeForParticipant(part);
-    			//System.out.println(part.uri());
     			BioPAXSpecies pt = (BioPAXSpecies)independentSpeciesIds.get(id);
     			if(pt==null){
     			    pt = new BioPAXSpecies();
@@ -542,11 +498,7 @@ public class BioPAXToSBMLConverter {
     			}
     			pt.sinonymSpecies.add(part);
     			independentSpecies.put(Utils.cutUri(part.uri()),pt);
-    			//System.out.println("test "+part.uri());
     		}
-//    		else {
-//    			System.out.println("test "+curi);
-//    		}
     	}
     }
 
@@ -556,17 +508,11 @@ public class BioPAXToSBMLConverter {
      * (add it to already specified species or create new species)
      */
     private void addParticipant(PhysicalEntity pe) throws Exception{
-    	//System.out.println("add participant "+pe.uri());
     	if(independentSpecies.get(Utils.cutUri(pe.uri()))==null) {
-    		/*
-    		 * modif ebonnet 12.2011 for correct AIN file import
-    		 */
     		if(includedSpecies.get(Utils.cutUri(pe.uri()))==null){
-    			//String pname = (String)bpnm.genericUtilityName.get(pe.uri());
     			String pname = bpnm.getNameByUri(pe.uri());
     			String id = GraphUtils.correctId(pname);
     			String tpe = getTypeForParticipant(pe);
-    			//System.out.println("adding indep species: "+pe.uri());
     			BioPAXSpecies pt = (BioPAXSpecies)independentSpeciesIds.get(id);
     			if(pt==null){
     				pt = new BioPAXSpecies();
@@ -585,7 +531,6 @@ public class BioPAXToSBMLConverter {
      * Adds included PhysicalEntity (such as the components of a complex)
      */
     public void addIncludedParticipant(PhysicalEntity pe) throws Exception{
-    	//System.out.println("test "+pe.uri());
     	if(independentSpecies.get(Utils.cutUri(pe.uri()))==null)
     		if(includedSpecies.get(Utils.cutUri(pe.uri()))==null){
     			includedSpecies.put(Utils.cutUri(pe.uri()),pe);
@@ -604,7 +549,7 @@ public class BioPAXToSBMLConverter {
     		BioPAXSpecies part = (BioPAXSpecies)independentSpeciesIds.get(id);;
     		PhysicalEntity pep = (PhysicalEntity)part.sinonymSpecies.elementAt(0);
     		
-    		// handle UCSD signaling gateway strange biopax3 format errors
+    		// modif EB: handle UCSD signaling gateway strange biopax3 format errors
     		try {
     			ControlledVocabulary comp = pep.getCellularLocation();
     			if(comp!=null) {
@@ -659,7 +604,6 @@ public class BioPAXToSBMLConverter {
     	Iterator products = null;
     	int nreact = 0;
     	int nprods = 0;
-    	//if((spont==null)||(spont.equals("L-R"))||(spont==false)){
     	if((spont==null)||(spont==false)||(dir.equals("REVERSIBLE"))||(dir.equals("PHYSIOL-LEFT-TO-RIGHT"))||(dir.equals("IRREVERSIBLE-LEFT-TO-RIGHT"))){
     		reactants = conv.getLeft();
     		products = conv.getRight();
@@ -713,7 +657,6 @@ public class BioPAXToSBMLConverter {
     	while(reactants.hasNext()){
     		PhysicalEntity pep = (PhysicalEntity)reactants.next();
     		BioPAXSpecies part = (BioPAXSpecies)independentSpecies.get(Utils.cutUri(pep.uri()));
-    		//System.out.println("test part = "+part+" uri = "+Utils.cutUri(pep.uri()));
     		if(id.equals("pid_i_205209"))
     			System.out.println("REACTANT "+part.id+"\t"+part.name+"\t"+Utils.cutUri(pep.uri()));
     		if(part!=null){
@@ -741,7 +684,6 @@ public class BioPAXToSBMLConverter {
     public void addInteractionReaction(Interaction inter, ListOfReactionsDocument.ListOfReactions lr) throws Exception{
     	ReactionDocument.Reaction reaction = lr.addNewReaction();
     	String comm = makeComment(inter.getComment());
-    	//if(inter instanceof physicalInteraction) comm+=" ; BIOPAX_REACTION_TYPE : physicalInteraction";
     	if(inter instanceof MolecularInteraction) comm+=" ; BIOPAX_REACTION_TYPE : MolecularInteraction";
     	if(inter instanceof BiochemicalReaction) comm+=" ; BIOPAX_REACTION_TYPE : interaction";
     	if(comm.length()>0){
@@ -758,22 +700,6 @@ public class BioPAXToSBMLConverter {
     	reaction.addNewListOfModifiers();
     }
 
-//    public String getControlledLowLevel(Control cntrl) throws Exception{
-//    	String controlled_uri = null;
-//    	controlled_uri = Utils.getPropertyURI(cntrl,"controlled");
-//    	if(controlled_uri==null){
-//    		Vector parts = Utils.getPropertyURIs(cntrl,"participant");
-//    		Iterator controller = cntrl.getController_asPhysicalEntity();
-//    		String controller_uri = controller.uri();
-//    		for(int i=0;i<parts.size();i++){
-//    			String uri = (String)parts.elementAt(i);
-//    			if(!uri.equals(controller_uri))
-//    				controlled_uri = uri;
-//    		}
-//    	}
-//    	return controlled_uri;
-//    }
-    
     public void addModifierToReaction(String reaction_id, BioPAXSpecies part){
 		ReactionDocument.Reaction reaction = (ReactionDocument.Reaction)reactions.get(reaction_id);
         if(reaction!=null){
@@ -786,17 +712,11 @@ public class BioPAXToSBMLConverter {
     }
 
     public void addControl(Control cntrl) throws Exception{
-    	// get controlled entity as string uri
-    	//String controlled_uri = getControlledLowLevel(cntrl);
     	String controlled_uri = Utils.getPropertyURI(cntrl, "controlled");
     	Vector<String> controller_vector = Utils.getPropertyURIs(cntrl, "controller");
     	if(controlled_uri!=null){
     		// add control uri to map of 'conversion' objects
     		bioPAXreactions.put(Utils.cutUri(cntrl.uri()),cntrl);
-    		// get controller for this conversion
-    		//physicalEntityParticipant controller = cntrl.getCONTROLLER();
-    		//physicalEntityParticipant controller = cntrl.get
-    		//if(controller!=null){
     		for (String controller_uri : controller_vector) {
     			// get BioPAXSpecies corresponding to controller uri 
     			BioPAXSpecies part = (BioPAXSpecies)independentSpecies.get(Utils.cutUri(controller_uri));
@@ -824,7 +744,6 @@ public class BioPAXToSBMLConverter {
     				}else{
     					if(cntrl instanceof Modulation){
     						Control cntrl2 = (Control)controls.get(controlled_uri);
-    						//String controlled_uri2 = getControlledLowLevel(cntrl2);
     						if (cntrl2 != null) {
     							String controlled_uri2 = Utils.getPropertyURI(cntrl2, "controlled");
     							reaction = (ReactionDocument.Reaction)reactions.get(controlled_uri2);                	   
@@ -877,8 +796,8 @@ public class BioPAXToSBMLConverter {
      */
     public String getTypeForParticipant(PhysicalEntity pe) throws Exception{
     	String tpe = "PhysicalEntity";
-    	//physicalEntity ent = part.getPHYSICAL_DASH_ENTITY();
     	if(pe != null){
+    		
     		if(complexList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Complex";
     		if(proteinList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Protein";
     		if(dnaList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Dna";
@@ -901,7 +820,6 @@ public class BioPAXToSBMLConverter {
     					tpe = st.nextToken().trim();
     				}
     		}
-
     	}
 	return tpe;
     }
@@ -933,6 +851,12 @@ public class BioPAXToSBMLConverter {
     	while(it.hasNext()){
     		SmallMolecule pe = (SmallMolecule)it.next();
     		smallMoleculeList.put(Utils.cutUri(pe.uri()),pe);
+    	}
+    	lst = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
+    	it = lst.iterator();
+    	while(it.hasNext()){
+    		Complex pe = (Complex)it.next();
+    		complexList.put(Utils.cutUri(pe.uri()),pe);
     	}
     }
 }

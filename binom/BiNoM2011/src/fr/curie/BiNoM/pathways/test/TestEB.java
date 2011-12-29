@@ -40,11 +40,11 @@ public class TestEB {
 		try {
 
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-short-metabolic-pathway.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/tmp.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_arf6.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_bcatenin.owl";
@@ -76,34 +76,36 @@ public class TestEB {
 //			}
 			
 			
-//			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter(); 
-//			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
+			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter(); 
+			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
+			System.out.println(gr.graphDocument.toString());
+			
 //			Graph graphDoc = XGMML.convertXGMMLToGraph(gr.graphDocument);
 //	    	Graph grres = BiographUtils.ShowMonoMolecularReactionsAsEdges(graphDoc);
 //	    	GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 	    	
 //	    	XGMML.saveToXGMML(grDoc, "/bioinfo/users/ebonnet/test.xgmml");
 			
-			BioPAX bp = new BioPAX();
-			bp.loadBioPAX(new FileInputStream(fn));
+//			BioPAX bp = new BioPAX();
+//			bp.loadBioPAX(new FileInputStream(fn));
 //			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
 //			
 //			String pname = ns.getNameByUri("http://www.biopax.org/release/biopax-level3.owl#(E2F4,E2F5)");
 //			System.out.println("pname = " +pname);
 //			System.out.println(GraphUtils.correctId(pname));
 			
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(bp.model);
-			
-			for (int i=0;i<l.size();i++) {
-				ProteinReference p = (ProteinReference) l.get(i);
-				//System.out.println(p.uri());
-				Iterator it = p.getName();
-				String name = "";
-				if (it.hasNext()) {
-					name = name + ":"+(String)it.next();
-				}
-				System.out.println(p.uri()+"\t"+name);
-			}
+//			List l = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(bp.model);
+//			
+//			for (int i=0;i<l.size();i++) {
+//				ProteinReference p = (ProteinReference) l.get(i);
+//				//System.out.println(p.uri());
+//				Iterator it = p.getName();
+//				String name = "";
+//				if (it.hasNext()) {
+//					name = name + ":"+(String)it.next();
+//				}
+//				System.out.println(p.uri()+"\t"+name);
+//			}
 
 //			l = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalReaction(bp.model);
 //			

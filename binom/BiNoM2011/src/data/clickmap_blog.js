@@ -19,29 +19,56 @@
  *
  * $Id$
  */
-var maps = Object();
+var maps;
 
-function is_map_open(map_name)
+var log;
+if (typeof window.console != 'undefined' && typeof window.console.log != 'undefined')
 {
-	return maps[map_name] && !maps[map_name].closed;
+    log = window.console.log;
+    log("log active", window);
+}
+else
+{
+	log = function() {}
 }
 
 function show_map_and_markers(blog_name, map_name, ids)
 {
-	if (is_map_open(map_name))
+	if (!maps)
 	{
-		if (maps[map_name].to_open.length < 1)
+		maps = Object();
+	}
+	
+	var map = maps[map_name];
+	if (map && !map.closed)
+	{
+		log("open2", maps);
+		
+		map = maps[map_name];
+		
+		if (!map.to_open)
 		{
-			maps[map_name].show_markers(ids);
+			log("open missing");
+			map.to_open = ids;
+		}
+		else if (map.to_open.length < 1)
+		{
+			log("open show_markers", maps);
+			map.show_markers(ids);
 		}
 		else
 		{
-			maps[map_name].to_open.concat(ids);
+			log("open concat", maps);
+			map.to_open.concat(ids);
 		}
+		map.focus();
 	}
 	else
 	{
-		maps[map_name] = window.open("/maps/" + blog_name + "/" + map_name, "map_" + map_name);
-		maps[map_name].to_open = ids;
+		log("not open", maps);
+		map = window.open("/maps/" + blog_name + "/" + map_name);
+		map.to_open = ids;
+		map.maps = maps;
+		maps[map_name] = map;
 	}
 }

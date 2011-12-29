@@ -269,7 +269,7 @@ public class ProduceClickableMap {
 				production = b.booleanValue();
 			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
 				show_default_compartement_name = b.booleanValue();
-			else if ((b = options.booleanOption("nodefcptname", "show default compartement name")) != null)
+			else if ((b = options.booleanOption("nodefcptname", "don't show default compartement name")) != null)
 				show_default_compartement_name = !b.booleanValue();
 			else
 				break;
@@ -365,6 +365,8 @@ public class ProduceClickableMap {
 					return false;
 				if (!name.startsWith(base))
 					return false;
+				if (base.isEmpty() && name.startsWith("."))
+					return false;
 				final String map_name = name.substring(0, name.length() - celldesigner_suffix.length());
 				if (map_name.substring(base.length(), map_name.length()).equals(master_map_name))
 					return false;
@@ -395,6 +397,7 @@ public class ProduceClickableMap {
 			System.exit(1);
 			return null;
 		}
+		Utils.eclipsePrintln("connected to blog " + blog_name);
 		return wp;
 	}
 
@@ -607,7 +610,7 @@ public class ProduceClickableMap {
 
 		clMap.generatePages(master.all_posts, new File(this_map_directory, right_panel_list), scales, master.master_format);
 		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
-		make_index_html(this_map_directory, title + " " + map, map, scales);
+		make_index_html(this_map_directory, master.blog_name, title + " " + map, map, scales);
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
@@ -622,7 +625,7 @@ public class ProduceClickableMap {
 		clMap.master_format = new FormatProteinNotes(modules, blog_name);
 		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales, clMap.master_format);
 		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
-		make_index_html(this_map_directory, title + " " + map, map, scales);
+		make_index_html(this_map_directory, blog_name, title + " " + map, map, scales);
 		return clMap;
 	}
 
@@ -1625,8 +1628,8 @@ public class ProduceClickableMap {
 		right.getParent().close();
 	
 		final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
-		item_line(modules.add(), "oval", "modules", "Oval", null).close();
-		item_line(modules.add(), "square", "modules", "Square", null).close();
+//		item_line(modules.add(), "oval", "modules", "Oval", null).close();
+//		item_line(modules.add(), "square", "modules", "Square", null).close();
 		modules.close();
 		
 		output.println("</root>");
@@ -2696,7 +2699,7 @@ public class ProduceClickableMap {
 			pmid_rule
 		};
 		protected static final Pattern pat_generic;
-		protected static final Pattern pat_simple;
+		protected static final Pattern pat_bubble;
 		protected static final Pattern pat_pmid;
 		static
 		{
@@ -2709,11 +2712,11 @@ public class ProduceClickableMap {
 			
 			for (final String[] s : urls)
 	                        add_link_rule(sb, s);
-			pat_simple = Pattern.compile(sb.toString() + "|(\n+)");
 			
 			for (final String tag : layer_tags)
 				sb.append("|\\b(").append(tag).append(":)([A-Z][A-Z0-9_]*)\\b");
 			pat_generic = Pattern.compile(sb.toString());
+			pat_bubble = Pattern.compile(sb.append("|(\n+)").toString());
 		}
 		private static StringBuilder add_link_rule(final StringBuilder sb, final String[] s)
                 {
@@ -2763,9 +2766,9 @@ public class ProduceClickableMap {
 		{
 			return notes == null ? fw : format(Utils.getValue(notes), fw, h, null, pat_pmid, cd, null);
 		}
-		StringBuffer simple(final StringBuffer res, String comment, SbmlDocument cd)
+		StringBuffer bubble(final StringBuffer res, String comment, List<Modification> modifs, SbmlDocument cd)
 		{
-			return format(comment, res, null_hasher, null, pat_simple, cd, null);
+			return format(comment, res, null_hasher, modifs, pat_bubble, cd, null);
 		}
 		StringBuffer complex(Complex complex, final StringBuffer res, Hasher h, SbmlDocument cd, List<Modification> modifications)
 		{
@@ -2967,7 +2970,15 @@ public class ProduceClickableMap {
 
 	private static StringBuffer bubble_to_post_link(int post_id, final StringBuffer notes, String blog_name)
 	{
-		return notes.append("<a href=\"/annotations/" + blog_name + "?p=").append(post_id).append("\" target=\"blog_").append(blog_name).append("\">");
+//		return notes.append("<a href=\"/annotations/" + blog_name + "?p=").append(post_id).append("\" target=\"blog_").append(blog_name).append("\">");
+		return notes.append(onclick_before)
+			.append("show_blog(")
+			.append(post_id)
+			.append(");")
+			.append(onclick_after)
+			.append(" title=\"post ")
+			.append(post_id)
+			.append("\">");
 	}
 	/*
 	private void create_entity_marker(FormatProteinNotes format, MarkerManager markers, int post_id, Notes celldesignerNotes, Entity ent) throws IOException
@@ -3039,7 +3050,7 @@ public class ProduceClickableMap {
 		body_buf.append("\n<p>");
 		
 		one_mod.set(0, modification);
-		format.simple(body_buf, ent.getComment(), cd);
+		format.bubble(body_buf, ent.getComment(), ent.getModifications(), cd);
 		
 		body_buf.append("<hr>\n<b>Modification:</b>");
 		visible_debug(body_buf, modification.getId());
@@ -3051,7 +3062,7 @@ public class ProduceClickableMap {
 			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>\nin ").append(modification.getName().substring(pos + 1));
 		body_buf.append("<br>\n");
 	
-		format.simple(body_buf, modification.getNotes(), cd);
+		format.bubble(body_buf, modification.getNotes(), Arrays.asList(modification), cd);
 		return body_buf.toString();
         }
 
@@ -5308,7 +5319,7 @@ public class ProduceClickableMap {
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final File this_map_directory, final String title, final String map_name, ImagesInfo scales) throws FileNotFoundException
+	private static void make_index_html(final File this_map_directory, final String blog_name, final String title, final String map_name, ImagesInfo scales) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
@@ -5338,7 +5349,8 @@ public class ProduceClickableMap {
 		
 		out.print("<body onload=\"");
 		out.print("clickmap_start(");
-		out.print("'" + map_name + "'");
+		out.print("'" + blog_name + "'");
+		out.print(", '" + map_name + "'");
 		out.print(", '#" + marker_div_name + "'");
 		out.print(", '" + map_div_name + "'");
 		out.print(", '" + right_panel_list + "'");

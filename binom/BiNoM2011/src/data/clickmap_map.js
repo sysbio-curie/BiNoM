@@ -24,6 +24,20 @@ var map;
 var projection;
 var to_open;
 
+var maps;
+var blog_name;
+
+var log;
+if (typeof window.console != 'undefined' && typeof window.console.log != 'undefined')
+{
+    log = window.console.log;
+    log("log active", window);
+}
+else
+{
+	log = function() {}
+}
+
 function extend(bounds, marker)
 {
 //	bounds.extend(marker.getPosition());
@@ -40,10 +54,9 @@ function extend(bounds, marker)
 	bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x + xoffset, point.y)));
 }
 
-function show_markers(markers)
+function show_markers_ref(markers, ref)
 {
 	var bounds = new google.maps.LatLngBounds();
-	
 	markers.forEach
 	(
 		function(i)
@@ -67,18 +80,24 @@ function show_markers(markers)
 					i.setAnimation(google.maps.Animation.DROP);
 				}
 			);
-			jQuery.jstree._reference(jtree).check_node(element);
+			ref.check_node(element);
 			element.peers.each
 			(
 				function(i)
 				{
-					jQuery.jstree._reference(jtree).check_node(this);
+					ref.check_node(this);
 				}
 			);
 		}
 	);
 	if (!bounds.isEmpty())
 		map.panToBounds(bounds);
+}
+
+function show_markers(markers)
+{
+	var ref = jQuery.jstree._reference(jtree);
+	show_markers_ref(markers, ref);
 }
 
 function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
@@ -303,25 +322,64 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 
 };
 
-function clickmap_start(map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
+function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
+	if (!maps)
+	{
+		maps = Object();
+	}
+	maps[map_name] = window;
+	
+	blog_name = blogname;
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
-	var whenready = function()
+	var whenready = function(e, data)
 	{
 		if (to_open && to_open.length > 0)
 		{
-			show_markers(to_open);
-			to_open = [];
+			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
+	        data.inst.open_all(-1, false); // otherwise the tree is not checked
+			show_markers_ref(to_open, data.inst);
+	        data.inst.close_all(-1, false); // -1 closes all nodes in the container
 		}
+		to_open = [];
 	};
 	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
 	var tell_opener = function()
 	{
-		if (window.opener && window.opener.maps)
-		{
-			window.opener.maps[map_name] = window;
-		};
+		var blog = maps[""];
+		if (blog && !blog.closed)
+			blog.maps = maps;
 	};
 	tell_opener();
 	setInterval(tell_opener, 100);
+}
+
+function show_blog(postid)
+{
+	var map = window.open("/annotations/" + blog_name + "/index.php?p=" + postid, "blog_" + blog_name);
+	maps[""] = map;
+	map.focus();
+}
+
+function show_map_and_markers(blog_name, map_name, ids)
+{
+	var map = maps[map_name];
+	if (map && !map.closed)
+	{
+		if (!map.to_open)
+			map.to_open = ids;
+		else if (map.to_open.length < 1)
+			map.show_markers(ids);
+		else
+			map.to_open.concat(ids);
+		map.focus();
+	}
+	else
+	{
+		log("not open is map", map, maps);
+		map = window.open("../" + map_name);
+		map.to_open = ids;
+		map.maps = maps;
+		maps[map_name] = map;
+	}
 }

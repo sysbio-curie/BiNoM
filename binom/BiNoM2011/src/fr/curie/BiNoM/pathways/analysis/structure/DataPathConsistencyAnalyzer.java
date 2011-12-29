@@ -79,6 +79,32 @@ public class DataPathConsistencyAnalyzer {
 	public ArrayList<Node> sideNodes = new ArrayList<Node>();
 
 	/**
+	 *  set of unique nodes from elementary paths
+	 */
+	public HashSet<Node> elemNodes = new HashSet<Node>();
+	
+	/**
+	 * elementary paths, set of paths sinking to target nodes
+	 */ 
+	public ArrayList<Path> elemPaths = new ArrayList<Path>();
+	
+	/**
+	 *  all individual nodes from elementary paths (target nodes excepted)
+	 */
+	public HashSet<Node> allNodes = new HashSet<Node>();
+
+
+	/**
+	 * Ocsana Omega scores map
+	 */
+	public HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>(elemNodes.size());
+	
+	/**
+	 * Ocsana Omega scores
+	 */
+	public ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>(elemNodes.size());
+	
+	/**
 	 * Report for the optimal cut set search
 	 */
 	public StringBuffer optCutSetReport = new StringBuffer();
@@ -988,12 +1014,7 @@ public class DataPathConsistencyAnalyzer {
 		return list;
 	}
 	
-	/**
-	 * Optimal cut set analysis.
-	 * 
-	 * @author ebonnet
-	 */
-	public void findOptimalCutSet() {
+	public void ocsanaScore() {
 		
 		this.optCutSetReport.append("--- Optimal cut set search report ---\n\n");
 		
@@ -1055,7 +1076,7 @@ public class DataPathConsistencyAnalyzer {
 		ArrayList<Path> splitPaths = new ArrayList<Path>();
 
 		// all individual nodes from elementary paths (target nodes excepted)
-		HashSet<Node> allNodes = new HashSet<Node>();
+		//HashSet<Node> allNodes = new HashSet<Node>();
 
 		// search paths between source and output nodes
 		for (Node so : sourceNodes) {
@@ -1136,13 +1157,13 @@ public class DataPathConsistencyAnalyzer {
 		 */
 
 		// elementary paths, set of paths sinking to target nodes
-		ArrayList<Path> elemPaths = new ArrayList<Path>();
+		//ArrayList<Path> elemPaths = new ArrayList<Path>();
 
 		// same but split in individual components
 		ArrayList<Path> elemSplitPaths = new ArrayList<Path>();
 
 		// set of unique nodes from elementary paths
-		HashSet<Node> elemNodes = new HashSet<Node>();
+		//HashSet<Node> elemNodes = new HashSet<Node>();
 
 		for (Node n : targetNodes) {
 			for (Path p : allPaths) {
@@ -1276,8 +1297,8 @@ public class DataPathConsistencyAnalyzer {
 				elemPathsByTarget.get(target).get(last).add(n.Id);
 		}
 		
-		HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>(elemNodes.size());
-		ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>(elemNodes.size());
+		//HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>(elemNodes.size());
+		//ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>(elemNodes.size());
 		
 		for (Node source : elemNodes) {
 			double omegaScore = 0;
@@ -1299,7 +1320,9 @@ public class DataPathConsistencyAnalyzer {
 			omegaScores.add(new OmegaScoreData(id, omegaScoreMap.get(id)));
 		}
 		Collections.sort(omegaScores);
-		
+	}
+	
+	public void ocsanaOptimalCutSet() {
 		/*
 		 * optimal cut set search
 		 */

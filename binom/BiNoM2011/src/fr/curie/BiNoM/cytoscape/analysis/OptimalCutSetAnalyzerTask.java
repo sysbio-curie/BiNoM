@@ -23,7 +23,8 @@ public class OptimalCutSetAnalyzerTask implements Task {
 	}
 
 	public void run() {
-		analyzer.findOptimalCutSet();
+		analyzer.ocsanaScore();
+		analyzer.ocsanaOptimalCutSet();
 		taskMonitor.setPercentCompleted(100);
 	}
 

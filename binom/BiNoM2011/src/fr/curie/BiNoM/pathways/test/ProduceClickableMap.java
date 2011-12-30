@@ -75,8 +75,9 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 
 public class ProduceClickableMap {
 	
-	private static final String entity_icons_directory = "entity_icons";
-	private static final String icons_directory = "icons";
+	private static final String icons_directory = "/map_icons";
+	private static final String doc_directory = "/doc";
+	private static final String entity_icons_directory = icons_directory + "/entity";
 	private static final String REACTION_CLASS_NAME = "REACTION";
 	private static final String PHENOTYPE_CLASS_NAME = "PHENOTYPE";
 	private static final String DRUG_CLASS_NAME = "DRUG";
@@ -122,7 +123,7 @@ public class ProduceClickableMap {
 	
 	public static String scriptFile = "";
 	
-	private String name = "";
+	final private String module_name;
 	
 	private static final String wordpress_username = "binom";
 	private static final String celldesigner_suffix = ".xml";
@@ -138,7 +139,7 @@ public class ProduceClickableMap {
 		assert input.canRead() : "cannot read " + input;
 		assert input.getName().endsWith(celldesigner_suffix) : "bad input file " + input + " (name must end in xml)";
 		
-		name = input.getName().substring(0, input.getName().length() - celldesigner_suffix.length());
+		module_name = input.getName().substring(0, input.getName().length() - celldesigner_suffix.length());
 
 		loadCellDesigner(input.getPath());
 		final Map<String, EntityBase> _entityIDToEntityMap = new HashMap<String, EntityBase>();
@@ -346,12 +347,32 @@ public class ProduceClickableMap {
 			}
 		}
 	}
-/*
-	private static ProduceClickableMap process_a_map(ProduceClickableMap master, File f, String title, File root, String base, File source_directory, boolean make_tiles, String key, boolean show_default_compartement_name) throws FileNotFoundException, Exception
+	
+	private String get_map_title()
 	{
-		return process_a_map(master, map_name, title, root, base, source_directory, make_tiles, key, show_default_compartement_name);
+		final Notes notes = cd.getSbml().getModel().getNotes();
+		final String v;
+		if (notes == null)
+			v = module_name;
+		else
+		{
+			final String text = Utils.getText(notes);
+			if (text == null)
+				v = module_name;
+			else
+			{
+				final String t = text.trim();
+				if (t.isEmpty())
+					v = module_name;
+				else
+				{
+					final int nl = t.indexOf('\n');
+					v = nl < 0 ? t : t.substring(0, nl);
+				}
+			}
+		}
+		return v;
 	}
-	*/
 
 	private static Set<String> get_module_list(final File source_directory, final String base)
 	{
@@ -610,7 +631,7 @@ public class ProduceClickableMap {
 
 		clMap.generatePages(master.all_posts, new File(this_map_directory, right_panel_list), scales, master.master_format);
 		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
-		make_index_html(this_map_directory, master.blog_name, title + " " + map, map, scales);
+		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales);
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, final String map, String title, File destination, String base, File source_directory,
@@ -625,7 +646,7 @@ public class ProduceClickableMap {
 		clMap.master_format = new FormatProteinNotes(modules, blog_name);
 		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales, clMap.master_format);
 		Utils.eclipsePrintln("scales " + scales.minzoom + " " + scales.maxzoom);
-		make_index_html(this_map_directory, blog_name, title + " " + map, map, scales);
+		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, scales);
 		return clMap;
 	}
 
@@ -667,6 +688,7 @@ public class ProduceClickableMap {
 		for (final String suffix : new String[]{"js", "css"})
 			for (final String base : new String[]{ included_blog_base, included_map_base })
 				copy_file_between_directories(source, destination, base + "." + suffix);
+		/*
 		for (final String dir_name : new String[]{icons_directory, entity_icons_directory})
 		{
 			final File src = new File(source, dir_name);
@@ -674,7 +696,7 @@ public class ProduceClickableMap {
 			dest.mkdir();
 			for (String f : src.list())
 				copy_file_between_directories(src, dest, f);
-		}
+		}*/
 				
 	}
 
@@ -794,7 +816,7 @@ public class ProduceClickableMap {
 	/* Function to find all coordinate information.
 	 * */
 	protected void findAllPlacesInCellDesigner(){
-		System.out.println("Finding places in CellDesigner: "+this.name);
+		System.out.println("Finding places in CellDesigner: "+this.module_name);
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;i++){
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 			final String species_id = spa.getSpecies();
@@ -1616,8 +1638,10 @@ public class ProduceClickableMap {
 
 	private static ItemCloser create_entity_header(final ItemCloser entities, final String[] s)
         {
-	        final String img = " <img border='0' src=\"" + common_directory_url + entity_icons_directory + "/" + s[0] + ".png\"/>";
-	        return item_line(entities , s[0], null, s[1] + img, s[0]);
+		final StringBuffer sb = new StringBuffer(s[1]).append(" <img border='0' src=");
+		html_quote(sb, entity_icons_directory + "/" + s[0] + ".png");
+		sb.append("/>");
+	        return item_line(entities , s[0], null, sb.toString(), s[0]);
         }
 	
 	static private void finish_right_panel_xml(final ItemCloser right)
@@ -2288,14 +2312,9 @@ public class ProduceClickableMap {
 
 	static private void show_map_icon(final StringBuffer fw, final String blog_name)
         {
-	        fw
-			.append("<img border='0' src='/maps/")
-			.append(blog_name)
-			.append('/')
-			.append(common_directory_name)
-			.append('/')
-			.append(icons_directory)
-			.append("/map.png' alt='map'>");
+	        fw.append("<img border='0' src=");
+	        html_quote(fw, icons_directory + "/misc/map.png");
+		fw.append(" alt='map'>");
         }
 
 	private StringBuffer show_reaction(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, AllPosts.Post post)
@@ -2950,7 +2969,9 @@ public class ProduceClickableMap {
 	{
 		notes.append(" ");
 		bubble_to_post_link(post_id, notes, blog_name);
-		notes.append("<img border='0' src='" + common_directory_url + icons_directory + "/blog.png' alt='blog'>").append("</a>");
+		notes.append("<img border='0' src=");
+		html_quote(notes, icons_directory + "/misc/blog.png");
+		notes.append(" alt='blog'>").append("</a>");
 	}
 	
 	static String href(int post_id, String text)
@@ -5328,7 +5349,7 @@ public class ProduceClickableMap {
 		out.println("<!-- $Id$ -->");
 		out.println("<head>");
 		out.println("<meta http-equiv='content-type' content='text/html;charset=UTF-8'/>");
-		out.println("<title>" + title + "</title>");
+		out.println("<title>" + blog_name + " &#x2014; " + title + "</title>");
 		/*
 		out.println("<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=" + key + "' type='text/javascript'></script>");
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
@@ -5373,15 +5394,30 @@ public class ProduceClickableMap {
 		out.println(")\">");
 		
 		out.println("<noscript>");
-		final StringBuilder sb = new StringBuilder();
-		sb.append("<b>JavaScript must be enabled in order for you to use ClickMap.</b>\n")
-			.append("However, it seems JavaScript is either disabled or not supported by your browser.\n")
-			.append("To view the maps, enable JavaScript by changing your browser options and then try again.");
-		final String message = sb.toString();
-		out.println(message);
+		out.println("JavaScript must be enabled in order for you to use NaviCell.");
+		out.println("However, it seems JavaScript is either disabled or not supported by your browser.");
+		out.println("To view the maps, enable JavaScript by changing your browser options and then try again.");
 		out.println("</noscript>");
-		out.println("<div id='header'><span id='pathway'>" + title + "</span> <span id='author'>by Institut Curie</span></div>");
-		out.println("<div id='" + map_div_name + "'>" + message + "</div>");
+		
+		out.print("<div id='header'>");
+		out.print(" <div class='header-left'>");
+		out.print("<a href='/' target='_blank'><img border='0' src=");
+		out.print(html_quote(new StringBuffer(), icons_directory + "/misc/map_top_panel_logo.png"));
+		out.print("/></a>");
+		out.print("</div>");
+		out.print(" <div class='header-centre'>");
+		out.print(title);
+		out.print("</div>");
+		out.print(" <div class='header-right'>");
+		html_in_new_window(out, "map_symbols", "map symbols");
+		out.print(" ");
+		html_in_new_window(out, "map_help", "help");
+		out.print("</div>");
+		out.println("</div>");
+	
+		
+		out.print("<div id='" + map_div_name);
+		out.println("'>The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.</div>");
 		out.println("<div id='side_bar'>");
 		
 		out.println("<div id='" + marker_div_name + "'></div>");
@@ -5392,5 +5428,15 @@ public class ProduceClickableMap {
 		out.flush();
 		assert !out.checkError();
 		out.close();
+	}
+
+	private static void html_in_new_window(final PrintStream out, String page, String text)
+	{
+		out.print("<a href=");
+		out.print(html_quote(new StringBuffer(), doc_directory + "/" + page + ".html"));
+		out.print("target='_blank'>");
+		out.print(text);
+		out.print("</a>");
+		
 	}
 }

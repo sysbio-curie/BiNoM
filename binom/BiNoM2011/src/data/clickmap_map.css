@@ -26,6 +26,25 @@ html, body {
 		font-size: 100%; /* http://www.w3schools.com/css/css_font.asp */
 }
 
+/* http://www.w3.org/TR/CSS2/text.html */
+/*#right { text-align: right }*/
+
+/* http://stackoverflow.com/questions/6472991/how-do-you-do-tab-stops-in-html-css */
+.header-right {
+    position:absolute;
+    right: 10px; 
+    top: 0; 
+}
+.header-left {
+    position:absolute;
+    left: 0px; 
+    top: 0; 
+}
+.header-centre {
+	font-size:1.4em;
+}
+
+
 #header {
 	position: relative;
 	padding-left: 1em;
@@ -39,8 +58,6 @@ html, body {
 	width: 84%;
 	line-height: 40px;
 	height: 40px;
-	
-	font-size:1.4em;
 }
 
 #map {

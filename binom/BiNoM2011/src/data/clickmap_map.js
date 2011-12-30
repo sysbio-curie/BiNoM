@@ -254,7 +254,10 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				"dots" : false,
 				"icons" : false
 			},
-			core : { "animation" : 200 },
+			core : {
+				"animation" : 200,
+				"initially_open" : [ "entities" ]
+			},
 			"xml_data" : {
 				"ajax" : {
 					"url" : source
@@ -329,7 +332,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		maps = Object();
 	}
 	maps[map_name] = window;
-	
+
 	blog_name = blogname;
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
@@ -337,9 +340,14 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		if (to_open && to_open.length > 0)
 		{
 			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
-	        data.inst.open_all(-1, false); // otherwise the tree is not checked
+			var e = $(panel_selector).find("#entities"); // $("#entities");
+			data.inst.open_all(e, false); // otherwise the tree is not checked
 			show_markers_ref(to_open, data.inst);
-	        data.inst.close_all(-1, false); // -1 closes all nodes in the container
+//			data.inst.close_all(e, false); // -1 closes all nodes in the container
+//			data.inst.open_node(e, false, true);
+			var children = data.inst._get_children(e);
+			for (var i in children)
+				data.inst.close_all(children[i], false);
 		}
 		to_open = [];
 	};

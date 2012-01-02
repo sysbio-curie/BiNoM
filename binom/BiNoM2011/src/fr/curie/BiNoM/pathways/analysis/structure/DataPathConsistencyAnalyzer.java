@@ -97,12 +97,12 @@ public class DataPathConsistencyAnalyzer {
 	/**
 	 * Ocsana Omega scores map
 	 */
-	public HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>(elemNodes.size());
+	public HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>();
 	
 	/**
 	 * Ocsana Omega scores
 	 */
-	public ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>(elemNodes.size());
+	public ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>();
 	
 	/**
 	 * Report for the optimal cut set search
@@ -125,8 +125,19 @@ public class DataPathConsistencyAnalyzer {
 	public HashMap<String, String> nodeID2attribute;
 
 	/**
+	 * Elementary paths matrix
+	 */
+	public int[][] pathMatrix;
+	
+	/**
+	 * Elementary paths matrix node names list
+	 */
+	public ArrayList<String> pathMatrixNodeList = new ArrayList<String>();
+	
+	public int pathMatrixNbRow, pathMatrixNbCol;
+	
+	/**
 	 * Simple data structure to store optimal cut sets data
-	 *
 	 */
 	private class optCutSetData implements Comparable {
 		
@@ -1014,6 +1025,10 @@ public class DataPathConsistencyAnalyzer {
 		return list;
 	}
 	
+	/**
+	 * Determine paths for Optimal combinations sets and calculate scores
+	 * for elementary nodes.
+	 */
 	public void ocsanaScore() {
 		
 		this.optCutSetReport.append("--- Optimal cut set search report ---\n\n");
@@ -1180,6 +1195,8 @@ public class DataPathConsistencyAnalyzer {
 //		printPaths(elemPaths);
 //		System.exit(1);
 		
+		fillPathMatrix(elemPaths);
+		
 		this.optCutSetReport.append("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes"+"\n\n");
 		System.out.println("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes.");
 		
@@ -1322,10 +1339,10 @@ public class DataPathConsistencyAnalyzer {
 		Collections.sort(omegaScores);
 	}
 	
+	/**
+	 * Optimal cut set search, sub-optimal, old algorithm
+	 */
 	public void ocsanaOptimalCutSet() {
-		/*
-		 * optimal cut set search
-		 */
 		
 		// store elementary nodes as an array of strings
 		ArrayList<String> elts  = new ArrayList<String>(elemNodes.size());
@@ -1609,35 +1626,6 @@ public class DataPathConsistencyAnalyzer {
 			String ef = e.getFirstAttributeValue("EFFECT");
 			String inter = e.getFirstAttributeValue("interaction");
 			
-//			if (ef != null) {
-//				if (ef.indexOf("ACTIVATION")>=0)
-//					e.setAttributeValueUnique("EFFECT", "activation", Attribute.ATTRIBUTE_TYPE_STRING);
-//				if (ef.indexOf("INHIBITION")>=0)
-//					e.setAttributeValueUnique("EFFECT", "inhibition", Attribute.ATTRIBUTE_TYPE_STRING);
-//			}
-//			
-//			
-//			if (ef != null && inter != null) { 
-//				if (ef.indexOf("inhibition")>=0 && inter.indexOf("inhibition")<0)
-//					e.setAttributeValueUnique("interaction", "inhibition", Attribute.ATTRIBUTE_TYPE_STRING);
-//
-//				if (ef.indexOf("activation")>=0 && inter.indexOf("activation")<0)
-//					e.setAttributeValueUnique("interaction", "activation", Attribute.ATTRIBUTE_TYPE_STRING);
-//			}
-//			
-//			if (ef == null && inter != null) {
-//				if (!(inter.indexOf("activation")>=0 || inter.indexOf("inhibition")>=0)) {
-//					e.setAttributeValueUnique("interaction", "activation", Attribute.ATTRIBUTE_TYPE_STRING);
-//					ctChanges++;
-//				}
-//			}
-//			
-//			if (ef == null && inter == null) {
-//				e.setAttributeValueUnique("EFFECT", "activation", Attribute.ATTRIBUTE_TYPE_STRING);
-//				ctChanges++;
-//			}
-			
-
 			boolean found = false;
 
 			if (ef != null && ef.indexOf("ACTIVATION")>=0) {
@@ -1739,10 +1727,12 @@ public class DataPathConsistencyAnalyzer {
 		return ret;
 	}
 	
-	
+	/**
+	 * Print out elementary path matrix data.
+	 * 
+	 * @param p elementary paths list
+	 */
 	public void printPaths (ArrayList<Path> p) {
-
-
 
 		try {
 			
@@ -1753,10 +1743,12 @@ public class DataPathConsistencyAnalyzer {
 			ArrayList<String> nodes = new ArrayList<String>();
 
 			for (int i=0;i<p.size();i++) {
+				// create path name
 				String pname = "p"+i;
 				if (!path.contains(pname))
 					path.add(pname);
 
+				// create a list of all nodes
 				for (int j=0;j<p.get(i).nodeSequence.size()-1;j++) {
 
 					Node n = p.get(i).nodeSequence.get(j);
@@ -1766,9 +1758,11 @@ public class DataPathConsistencyAnalyzer {
 				}
 			}
 
+			// write path names to output file
 			for (String s : nodes)
 				names.write(s+"\n");
 
+			// write path matrix to output file
 			for (int i=0;i<p.size();i++) {
 				String line = "";;
 				for (int j=0;j<nodes.size();j++) {
@@ -1800,6 +1794,55 @@ public class DataPathConsistencyAnalyzer {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Fill a matrix of integers with elementary paths data.
+	 * 
+	 * @param p elementary paths list
+	 */
+	public void fillPathMatrix(ArrayList<Path> p) {
+
+		ArrayList<String> path = new ArrayList<String>();
+
+		for (int i=0;i<p.size();i++) {
+			// create path name
+			String pname = "p"+i;
+			if (!path.contains(pname))
+				path.add(pname);
+
+			// create a list of all nodes
+			for (int j=0;j<p.get(i).nodeSequence.size()-1;j++) {
+
+				Node n = p.get(i).nodeSequence.get(j);
+
+				if(!pathMatrixNodeList.contains(n.Id))
+					pathMatrixNodeList.add(n.Id);
+			}
+		}
+		
+		pathMatrixNbCol = pathMatrixNodeList.size();
+		pathMatrixNbRow = path.size(); 
+
+		// create array of integers to store elementary paths
+		pathMatrix = new int[pathMatrixNbRow][pathMatrixNbCol];
+
+		// fill matrix with corresponding data
+		for (int i=0;i<pathMatrixNbRow;i++) {
+			for (int j=0;j<pathMatrixNbCol;j++) {
+				String n = pathMatrixNodeList.get(j);
+				Boolean b = false;
+				for (Node no : p.get(i).nodeSequence) {
+					if (n.equals(no.Id)) {
+						b = true;
+					}
+				}
+				if (b)
+					pathMatrix[i][j] = 1;
+				else
+					pathMatrix[i][j] = 0;
+			}
+		}
 	}
 	
 }

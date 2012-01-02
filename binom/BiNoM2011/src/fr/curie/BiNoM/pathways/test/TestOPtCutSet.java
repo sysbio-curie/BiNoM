@@ -5,11 +5,13 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
+import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzerDialog;
 import fr.curie.BiNoM.cytoscape.analysis.PathConsistencyAnalyzerReportDialog;
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
+import fr.curie.BiNoM.pathways.analysis.structure.OptimalCombinationAnalyzer;
 import fr.curie.BiNoM.pathways.utils.GraphUtils;
 
 
@@ -26,60 +28,48 @@ public class TestOPtCutSet {
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 			
 			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
 			
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
-
-//			System.out.println(dpc.checkEdgeInfluence()+" changes out of "+dpc.graph.Edges.size());
-//			int ct=0;
-//			for (Edge e : dpc.graph.Edges) {
-//				String ef = e.getFirstAttributeValue("EFFECT");
-//				String inter = e.getFirstAttributeValue("interaction");
-//				System.out.println(ct+":"+ef+":"+inter);
-//				ct++;
-//			}
-			
-			
-//			Vector<String> atts = GraphUtils.getAllAttributeNames(dpc.graph);
-//	    	
-//	    	for (int i=0;i<atts.size();i++)
-//	    		System.out.println(atts.get(i));
-			
-			
 			
 			/*
 			 * 
 			 * Graphical interface test
 			 */
-			JFrame window = new JFrame();
-			OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(window,"Optimal Combinations of Intervention Strategies for Network Analysis",true);
-			dialog.analyzer = dpc;
-			dialog.fillTheData();
-			dialog.setVisible(true);
 			
-			if (dialog.result>0) {
-				String report = dpc.optCutSetReport.toString();
-				PathConsistencyAnalyzerReportDialog reportForm = new PathConsistencyAnalyzerReportDialog(report);
-				reportForm.pop();
-			}
+//			JFrame window = new JFrame();
+//			OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(window,"Optimal Combinations of Intervention Strategies for Network Analysis",true);
+//			dialog.analyzer = dpc;
+//			dialog.fillTheData();
+//			dialog.setVisible(true);
+//			
+//			if (dialog.result>0) {
+//				String report = dpc.optCutSetReport.toString();
+//				PathConsistencyAnalyzerReportDialog reportForm = new PathConsistencyAnalyzerReportDialog(report);
+//				reportForm.pop();
+//			}
 
 			
 			/*
 			 * 
 			 * Non graphical test
 			 */
-//			ArrayList<Node> testSource = new ArrayList<Node>();
-//			ArrayList<Node> testTarget = new ArrayList <Node>();
-//			ArrayList<Node> testSide = new ArrayList<Node>();
+			ArrayList<Node> testSource = new ArrayList<Node>();
+			ArrayList<Node> testTarget = new ArrayList <Node>();
+			ArrayList<Node> testSide = new ArrayList<Node>();
 			
 			// toynet
-//			testSource.add(dpc.graph.getNode("I1"));
-//			testSource.add(dpc.graph.getNode("I2"));
-//			testTarget.add(dpc.graph.getNode("O1"));
-//			testTarget.add(dpc.graph.getNode("O2"));
+			testSource.add(dpc.graph.getNode("I1"));
+			testSource.add(dpc.graph.getNode("I2"));
+			
+			testTarget.add(dpc.graph.getNode("O1"));
+			//testTarget.add(dpc.graph.getNode("O2"));
+			
+			//testSide.add(dpc.graph.getNode("O2"));
 			
 			// merged 30pc no selection 
 //			testSource.add(dpc.graph.getNode("XN000017011"));
@@ -109,20 +99,37 @@ public class TestOPtCutSet {
 //			testTarget.add(dpc.graph.getNode("MO000058770"));
 //			testTarget.add(dpc.graph.getNode("MO000079681"));
 //			
-//			for (Node n : testSource)
-//				dpc.sourceNodes.add(n);
-//			
-//			for (Node n : testTarget)
-//				dpc.targetNodes.add(n);
-//			
-//			dpc.searchPathMode = dpc.SHORTEST_PATHS;
-//			dpc.maxSetSize = 20;
-//			dpc.maxSetNb = (long) 1e+6;
-//			
-//			dpc.findOptimalCutSet();
-//			
-//			System.out.println(dpc.optCutSetReport);
+			for (Node n : testSource)
+				dpc.sourceNodes.add(n);
 			
+			for (Node n : testTarget)
+				dpc.targetNodes.add(n);
+			
+			for (Node n : testSide)
+				dpc.sideNodes.add(n);
+			
+			dpc.searchPathMode = dpc.SHORTEST_PATHS;
+			dpc.maxSetSize = 20;
+			dpc.maxSetNb = (long) 1e+6;
+			
+			dpc.ocsanaScore();
+			//dpc.ocsanaOptimalCutSet();
+			//System.out.println(dpc.optCutSetReport);
+			
+			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+			oca.pathMatrix = dpc.pathMatrix;
+			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
+			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
+			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
+			//oca.printPathMatrix();
+			oca.checkRows();
+			//oca.printPathMatrix();
+			oca.searchHitSetSizeOne();
+			//oca.printPathMatrix();
+			
+			for (int i=0;i<oca.hitSetSizeOne.size();i++)
+				System.out.print(oca.hitSetSizeOne.get(i)+" ");
+			System.out.println();
 			
 		}
 		catch (Exception e) {

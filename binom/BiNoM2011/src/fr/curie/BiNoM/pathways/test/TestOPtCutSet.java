@@ -27,7 +27,8 @@ public class TestOPtCutSet {
 			
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 			
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
@@ -53,6 +54,7 @@ public class TestOPtCutSet {
 //				reportForm.pop();
 //			}
 
+			//System.exit(1);
 			
 			/*
 			 * 
@@ -65,40 +67,42 @@ public class TestOPtCutSet {
 			// toynet
 			testSource.add(dpc.graph.getNode("I1"));
 			testSource.add(dpc.graph.getNode("I2"));
-			
 			testTarget.add(dpc.graph.getNode("O1"));
-			//testTarget.add(dpc.graph.getNode("O2"));
-			
+			testTarget.add(dpc.graph.getNode("O2"));
 			//testSide.add(dpc.graph.getNode("O2"));
+
+			/* egfr linearized network
+			 * Source nodes: ar bir btc csrc egf epr erbb1 erbb2 erbb3 erbb4 hbegf mkp nrg1a nrg1b nrg2a nrg2b nrg3 nrg4 pdk1 pp2a pp2b pten ship2 tgfa 
+			 * Target nodes: elk1
+			 */
 			
-			// merged 30pc no selection 
-//			testSource.add(dpc.graph.getNode("XN000017011"));
-//			testSource.add(dpc.graph.getNode("MO000057270"));
-//			testSource.add(dpc.graph.getNode("MO000017272"));
-//			testSource.add(dpc.graph.getNode("MO000082277"));
-//			testSource.add(dpc.graph.getNode("MO000056897"));
-//			
-//			testTarget.add(dpc.graph.getNode("MO000079060"));
-//			testTarget.add(dpc.graph.getNode("MO000082708"));
-//			testTarget.add(dpc.graph.getNode("MO000083592"));
-//			testTarget.add(dpc.graph.getNode("MO000058770"));
-//			testTarget.add(dpc.graph.getNode("MO000079681"));
+//			testSource.add(dpc.graph.getNode("ar"));
+//			testSource.add(dpc.graph.getNode("bir"));
+//			testSource.add(dpc.graph.getNode("btc"));
+//			testSource.add(dpc.graph.getNode("csrc"));
+//			testSource.add(dpc.graph.getNode("egf"));
+//			testSource.add(dpc.graph.getNode("epr"));
+//			testSource.add(dpc.graph.getNode("erbb1"));
+//			testSource.add(dpc.graph.getNode("erbb2"));
+//			testSource.add(dpc.graph.getNode("erbb3"));
+//			testSource.add(dpc.graph.getNode("erbb4"));
+//			testSource.add(dpc.graph.getNode("hbegf"));
+//			testSource.add(dpc.graph.getNode("mkp"));
+//			testSource.add(dpc.graph.getNode("nrg1a"));
+//			testSource.add(dpc.graph.getNode("nrg1b"));
+//			testSource.add(dpc.graph.getNode("nrg2a"));
+//			testSource.add(dpc.graph.getNode("nrg2b"));
+//			testSource.add(dpc.graph.getNode("nrg3"));
+//			testSource.add(dpc.graph.getNode("nrg4"));
+//			testSource.add(dpc.graph.getNode("pdk1"));
+//			testSource.add(dpc.graph.getNode("pp2a"));
+//			testSource.add(dpc.graph.getNode("pp2b"));
+//			testSource.add(dpc.graph.getNode("pten"));
+//			testSource.add(dpc.graph.getNode("ship2"));
+//			testSource.add(dpc.graph.getNode("tgfa"));
+//			testTarget.add(dpc.graph.getNode("elk1"));
 			
 			
-			//merged 0 pc test
-//			testSource.add(dpc.graph.getNode("XN000017011"));
-//			testSource.add(dpc.graph.getNode("MO000057270"));
-//			testSource.add(dpc.graph.getNode("MO000017272"));
-//			testSource.add(dpc.graph.getNode("MO000082277"));
-//			testSource.add(dpc.graph.getNode("MO000056897"));
-//			testSource.add(dpc.graph.getNode("MO000063085"));
-//			
-//			testTarget.add(dpc.graph.getNode("MO000079060"));
-//			testTarget.add(dpc.graph.getNode("MO000082708"));
-//			testTarget.add(dpc.graph.getNode("MO000083592"));
-//			testTarget.add(dpc.graph.getNode("MO000058770"));
-//			testTarget.add(dpc.graph.getNode("MO000079681"));
-//			
 			for (Node n : testSource)
 				dpc.sourceNodes.add(n);
 			
@@ -108,7 +112,8 @@ public class TestOPtCutSet {
 			for (Node n : testSide)
 				dpc.sideNodes.add(n);
 			
-			dpc.searchPathMode = dpc.SHORTEST_PATHS;
+			dpc.searchPathMode = dpc.ALL_PATHS;
+			//dpc.searchPathMode = dpc.SHORTEST_PATHS;
 			dpc.maxSetSize = 20;
 			dpc.maxSetNb = (long) 1e+6;
 			
@@ -121,21 +126,17 @@ public class TestOPtCutSet {
 			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
 			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
 			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
-			//oca.printPathMatrix();
+
 			oca.checkRows();
-			//oca.printPathMatrix();
 			oca.searchHitSetSizeOne();
-			//oca.printPathMatrix();
-			
-			for (int i=0;i<oca.hitSetSizeOne.size();i++)
-				System.out.print(oca.hitSetSizeOne.get(i)+" ");
-			System.out.println();
-			
+			oca.printPathMatrix();
+			oca.convertPathMatrixToBinary();
+			//oca.savePathMatrix("/bioinfo/users/ebonnet/path_matrix", "/bioinfo/users/ebonnet/node_list");
+			oca.searchHitSetSizeTwo();
+			oca.searchHitSetFull(15);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }

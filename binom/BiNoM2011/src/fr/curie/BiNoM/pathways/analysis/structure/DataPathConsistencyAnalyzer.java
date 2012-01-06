@@ -1603,7 +1603,7 @@ public class DataPathConsistencyAnalyzer {
 	 * @param k the size of the subset
 	 * @return BigInteger the number of combinations
 	 */
-	private long calcCombinations(int n, int k) {
+	public long calcCombinations(int n, int k) {
 		BigInteger num = Utils.factorial(n);
 		BigInteger den = Utils.factorial(k);
 		den = den.multiply(Utils.factorial(n-k));

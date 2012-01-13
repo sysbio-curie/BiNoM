@@ -112,8 +112,8 @@ public class TestOPtCutSet {
 			for (Node n : testSide)
 				dpc.sideNodes.add(n);
 			
-			dpc.searchPathMode = dpc.ALL_PATHS;
-			//dpc.searchPathMode = dpc.SHORTEST_PATHS;
+			//dpc.searchPathMode = dpc.ALL_PATHS;
+			dpc.searchPathMode = dpc.SHORTEST_PATHS;
 			dpc.maxSetSize = 20;
 			dpc.maxSetNb = (long) 1e+6;
 			
@@ -130,10 +130,12 @@ public class TestOPtCutSet {
 			oca.checkRows();
 			oca.searchHitSetSizeOne();
 			oca.printPathMatrix();
-			oca.convertPathMatrixToBinary();
+			oca.convertPathMatrixColToBinary();
 			//oca.savePathMatrix("/bioinfo/users/ebonnet/path_matrix", "/bioinfo/users/ebonnet/node_list");
-			oca.searchHitSetSizeTwo();
-			oca.searchHitSetFull(15);
+			//oca.searchHitSetSizeTwo();
+			//oca.searchHitSetFull(10);
+			//oca.searchHitSetOpt(5);
+			oca.mainBerge();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

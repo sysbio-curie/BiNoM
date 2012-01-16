@@ -79,30 +79,88 @@ public class OptimalCombinationAnalyzer {
 	
 	public void mainBerge() {
 		
+		HashSet<BitSet> mcs = initFirstRowBerge();
+		mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(1));
+		for (int i=1;i<pathMatrixNbRow;i++) {
+			mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(i));
+			mcs = checkMinimalityBerge(mcs);
+		}
+		
+		for (BitSet b : mcs)
+			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+	}
+	
+	public HashSet<BitSet> checkMinimalityBerge(HashSet<BitSet> mcs) {
+		
+		for (BitSet b : mcs)
+			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+		System.out.println("//");
+		
+		HashSet<BitSet> flag = new HashSet<BitSet>();
+		
+		for (BitSet b1 : mcs) {
+			for (BitSet b2 : mcs) {
+				BitSet test = (BitSet) b1.clone();
+				test.and(b2);
+				if (test.cardinality() == b1.cardinality() && b2.cardinality() > b1.cardinality()) {
+					// b2 is a strict superset of b1, flag  for remove
+					flag.add(b2);
+					//System.out.println(convertBitSetToString(b1,pathMatrixNbCol));
+					//System.out.println(convertBitSetToString(b2,pathMatrixNbCol));
+					//System.out.println("//");
+				}
+			}
+		}
+		
+//		for (BitSet b : mcs) {
+//			if (!flag.contains(b))
+//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+//		}
+//		System.out.println("//");
+		
+		HashSet<BitSet> ret = new HashSet<BitSet>();
+		for (BitSet b : mcs)
+			if (!flag.contains(b))
+				ret.add(b);
+		
+//		for (BitSet b : ret)
+//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+		
+		return(ret);
+
+	}
+	
+	public HashSet<BitSet> createCandidateSetBerge(HashSet<BitSet> mcs, BitSet row) {
+		HashSet<BitSet> cand = new HashSet<BitSet>();
+		for (BitSet cs : mcs) {
+			// add each node of the row to previous hit set
+			for(int i=row.nextSetBit(0); i>=0; i=row.nextSetBit(i+1)) { // loop over bits set to 1 in BitSet object
+				BitSet newOne = (BitSet) cs.clone();
+				newOne.set(i);
+				cand.add(newOne);
+			}
+		}
+		return(cand);
+	}
+	
+	public HashSet<BitSet> initFirstRowBerge() {
+		
 		HashSet<BitSet> mcs = new HashSet<BitSet>();
 		
 		// initialize mcs with first row of the matrix
-		BitSet firstRow = pathMatrixBin.get(0);
-		System.out.println(convertBitSetToString(firstRow,pathMatrixNbCol));
+		BitSet firstRow = pathMatrixRowBin.get(0);
 		for (int i=0;i<pathMatrixNbCol;i++) {
 			BitSet tmp = new BitSet(pathMatrixNbCol);
 			tmp.set(i);
 			tmp.and(firstRow);
-			if (tmp.cardinality() == 0) {
+			if (tmp.cardinality() == 1) {
 				BitSet b = new BitSet(pathMatrixNbCol);
 				b.set(i);
 				mcs.add(b);
 			}
 		}
-		
-		System.out.println("first row:");
-		System.out.println(convertBitSetToString(firstRow,pathMatrixNbCol));
-		for (BitSet b : mcs) {
-			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
-		}
-		
+		return(mcs);
 	}
-	
 	/**
 	 * convert path matrix rows to BitSet objects
 	 */
@@ -113,6 +171,7 @@ public class OptimalCombinationAnalyzer {
 				if (pathMatrix[i][j] == 1)
 					b.set(j);
 			}
+			pathMatrixRowBin.add(b);
 		}
 	}
 	/**

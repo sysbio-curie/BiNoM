@@ -32,7 +32,7 @@ else
 	log = function() {}
 }
 
-function show_map_and_markers(blog_name, map_name, ids)
+function show_map_and_markers(map_name, ids)
 {
 	if (!maps)
 	{
@@ -42,7 +42,7 @@ function show_map_and_markers(blog_name, map_name, ids)
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
-		log("open2", maps);
+		log("open2", map_name, map, maps);
 		
 		map = maps[map_name];
 		
@@ -58,17 +58,34 @@ function show_map_and_markers(blog_name, map_name, ids)
 		}
 		else
 		{
-			log("open concat", maps);
+			log("open concat", map.to_open, ids, maps);
 			map.to_open.concat(ids);
 		}
 		map.focus();
 	}
 	else
 	{
-		log("not open", maps);
+		log("not open", map_name, maps);
 		map = window.open("/maps/" + blog_name + "/" + map_name);
 		map.to_open = ids;
 		map.maps = maps;
 		maps[map_name] = map;
 	}
 }
+
+$(document).ready(
+	function()
+	{
+		var f = function () {
+			var map = $(this).find("span.map").attr("title");
+			log("map", map);
+			var ids = [];
+			$(this).find("span.entity").each(function() { ids.push($(this).attr("title")); });
+			log("ids", ids);
+			show_map_and_markers(map, ids);
+			return false;
+		};
+		
+		$("a.show_map_and_markers").each(function(index, element) { element.onclick = f; });
+	}
+);

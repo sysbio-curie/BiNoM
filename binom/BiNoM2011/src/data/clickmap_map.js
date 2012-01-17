@@ -327,6 +327,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
+	log("clickmap_start", to_open);
 	if (!maps)
 	{
 		maps = Object();
@@ -337,6 +338,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
 	{
+		log("when ready", to_open);
 		if (to_open && to_open.length > 0)
 		{
 			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
@@ -346,10 +348,11 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 //			data.inst.close_all(e, false); // -1 closes all nodes in the container
 //			data.inst.open_node(e, false, true);
 			var children = data.inst._get_children(e);
-			for (var i in children)
+			for (var i = 0; i < children.length; i++)
 				data.inst.close_all(children[i], false);
 		}
 		to_open = [];
+		log("to_open set", to_open, to_open.length);
 	};
 	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
 	var tell_opener = function()

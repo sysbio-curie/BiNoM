@@ -232,13 +232,13 @@ public class ProduceClickableMap {
 		OptionParser options = new fr.curie.BiNoM.pathways.utils.OptionParser(args, null);
 		String title = null;
 		String base = null;
+		String wordpress = null;
 		File config = null;
 		File source_directory = null;
 		File destination = null;
 		@SuppressWarnings("unused")
 		boolean verbose = false;
 		boolean make_tiles = false;
-		boolean production = false;
 		String blog_name = null;
 		
 		Boolean show_default_compartement_name = null;
@@ -254,7 +254,9 @@ public class ProduceClickableMap {
 				base = s;
 			else if ((s = options.stringOption("name", "project name")) != null)
 				blog_name = s;
-			else if ((f = options.fileOption("destination", "destination directory")) != null)
+			else if ((s = options.stringRequiredOption("wordpress", "wordpress server")) != null)
+				wordpress = s;
+			else if ((f = options.fileRequiredOption("destination", "destination directory")) != null)
 				destination = f;
 			else if ((f = options.fileRequiredOption("config", "configuration file")) != null)
 				config = f;
@@ -266,8 +268,6 @@ public class ProduceClickableMap {
 				make_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("notile", "do not force tile creation")) != null)
 				make_tiles = !b.booleanValue();
-			else if ((b = options.booleanOption("production", "make the map on the production server")) != null)
-				production = b.booleanValue();
 			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
 				show_default_compartement_name = b.booleanValue();
 			else if ((b = options.booleanOption("nodefcptname", "don't show default compartement name")) != null)
@@ -290,14 +290,9 @@ public class ProduceClickableMap {
 			blog_name = configuration.getProperty("name", base);
 		if (source_directory == null)
 			source_directory = config.getParentFile();
-		if (destination == null)
-			if (production)
-				destination = new File("/bioinfo/http/prod/hosted/clickmap.curie.fr/html/maps");
-			else
-				destination = new File("/bioinfo/http/dev/hosted/clickmap-dev.curie.fr/html/maps");
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
-		final Wordpress wp = open_wordpress(production, blog_name);
+		final Wordpress wp = open_wordpress(wordpress, blog_name);
 
 		final File data_directory = new File("bin/data");
 		final File root = mk_maps_directory(blog_name, destination);
@@ -404,10 +399,10 @@ public class ProduceClickableMap {
 		return Collections.unmodifiableSet(list);
 	}
 
-	private static Wordpress open_wordpress(boolean production, String blog_name)
+	private static Wordpress open_wordpress(String wordpress, String blog_name)
 	{
 		final Wordpress wp;
-		final String url = "http://clickmap" + (production ? "" : "-dev") + ".curie.fr/annotations/" + blog_name + "/xmlrpc.php";
+		final String url = "http://" + wordpress + "/annotations/" + blog_name + "/xmlrpc.php";
 		try
 		{
 			wp = new Wordpress(wordpress_username, "dsf6%sk9Idqqf", url);
@@ -418,6 +413,27 @@ public class ProduceClickableMap {
 			System.exit(1);
 			return null;
 		}
+		
+		try
+                {
+//	                Utils.eclipsePrintln("testing blog " + blog_name + " " + wp.getUserInfo().getUrl());
+
+	                assert wp.getUserInfo().getUserid() != null : wp.getUserInfo();
+	                if (wp.getCategories().size() < 2)
+	                {
+				System.err.println("not enough categories for a usable blog " + wp.getCategories().size());
+				System.exit(1);
+				return null;
+	                }
+	                	
+                }
+                catch (XmlRpcFault e)
+                {
+			System.err.println("failed to query Wordpress at " + url + ": " + e.getMessage());
+			System.exit(1);
+			return null;
+                }
+		
 		Utils.eclipsePrintln("connected to blog " + blog_name);
 		return wp;
 	}
@@ -1031,15 +1047,18 @@ public class ProduceClickableMap {
 				e.printStackTrace();
 				return;
 			}
-			fill(userInfo.getUserid(), recentPosts, wp);
+			final Object userid = userInfo.getUserid();
+			assert userid != null : userInfo;
+			fill(userid, recentPosts, wp);
 			verbose("stored " + posts.size() + " posts");
 		}
-		private void fill(final String user_id, final List<Page> recentPosts, final Wordpress wp)
+		private void fill(final Object o_user_id, final List<Page> recentPosts, final Wordpress wp)
 		{
+			String user_id = String.valueOf(o_user_id);
 			int deleted = 0;
 			for (final Page p : recentPosts)
 			{
-				if (p.getMt_allow_comments() != 0 && user_id.equals(p.getUserid()))
+				if (p.getMt_allow_comments() != 0 && user_id.equals((String)p.getUserid()))
 				{
 					final String[] r = findIdAndHashInBody(p.getDescription());
 					if (r != null)
@@ -1112,12 +1131,24 @@ public class ProduceClickableMap {
 	}
 	
 
-	private void updateBlogPostIfRequired(final Wordpress wp, final AllPosts.Post info, String title, final String body)
+	private void updateBlogPostIfRequired(final Wordpress wp, final AllPosts.Post info, String title, String body)
         {
 		if (body == null)
 			return;
 //		assert !body.endsWith("\n") : "bodies must not end with a \\n: " + body;
-	        if (!body.trim().equals(info.getBody()) || !title.trim().equals(info.getTitle()))
+		body = body.trim();
+		title = title.trim();
+	        final boolean body_eq = body.equals(info.getBody());
+	        if (body_eq && !body_eq)
+	        {
+	        	int i = 0;
+	        	for (; i < body.length() && i < info.getBody().length(); i++)
+	        		if (body.charAt(i) != info.getBody().charAt(i))
+	        			break;
+	        	Utils.eclipsePrintln(info.getBody().substring(i));
+	        	Utils.eclipsePrintln(body.substring(i));
+	        }	
+		if (!body_eq || !title.equals(info.getTitle().trim()))
 	        	updateBlogPost(wp, info.getPostId(), title, body);
         }
 	static private String get_reference_id(final CelldesignerSpeciesIdentity identity)
@@ -2146,6 +2177,26 @@ public class ProduceClickableMap {
 			return sb.append('\'').append(s).append('\'');
 		return sb.append('"').append(s.replace('"', '\'')).append('"');
 	}
+	
+	static private StringBuffer do_span(StringBuffer fw, String class_name, String value)
+	{
+		fw.append("<span");
+		html_quote(fw.append(" class="), class_name);
+		html_quote(fw.append(" title="), value);
+		return fw.append(" />");
+	}
+	
+	static private StringBuffer show_map_and_markers_from_post(StringBuffer fw, String map, List<String> entities, String title, String blog_name)
+	{
+		fw.append(" <a href='/maps/javascript_required.html' class='show_map_and_markers' title=");
+		html_quote(fw, title);
+		fw.append(">");
+		do_span(fw, "map", map);
+		for (String e : entities)
+			do_span(fw, "entity", e);
+		show_map_icon(fw, blog_name);
+		return fw.append("</a>");
+	}
 
 	private void show_links_to_post_and_map(final String species_id, final Modification m, StringBuffer fw, final Hasher h, ReactionDisplayType pass2)
 	{
@@ -2155,17 +2206,24 @@ public class ProduceClickableMap {
                 	fw.append(m.getId());
                 else
                 {
+                	final String name = h.add(m.getName());
 	                final String folded = makeFoldable(h.add(m.getName()));
 	                if (pass2 == ReactionDisplayType.ReactionPass)
 	                {
 	                	assert h == null_hasher;
-	                	final StringBuffer title = new StringBuffer();
-	                	final boolean first = show_modifications(h, fw, Arrays.asList(m), title, onclick_before + "show_markers(");
-	                	if (first)
+	                	show_markers_from_map(name, Arrays.asList(m), fw);
+	                	/*
+	                	final List<String> markers = new ArrayList<String>();
+	                	final String title = show_modifications(h, Arrays.asList(m), markers);
+	                	if (markers.isEmpty())
 	                		fw.append(folded);
 	                	else
 	                	{
-	                		fw.append(")")
+	                		fw.append(js_show_markers).append("[");
+	                		int n = 0;
+	                		for (final String s : markers)
+	                			html_quote(fw.append(n++ > 0 ? ", " : ""), s);
+	                		fw.append("])")
 		                		.append(onclick_after)
 		                		.append(" title=\"")
 	                			.append(title)
@@ -2173,6 +2231,7 @@ public class ProduceClickableMap {
 		                		.append(folded)
 		                		.append("</a>");
 	                	}
+	                	*/
 	                }
 	                else
 	                {
@@ -2293,6 +2352,9 @@ public class ProduceClickableMap {
 
 	private StringBuffer show_reaction_on_map(ReactionDocument.Reaction r, final StringBuffer fw)
 	{
+		return show_map_and_markers_from_post(fw, master_map_name, Arrays.asList(r.getId()), r.getId(), blog_name);
+		
+		/*
 		fw.append(" ")
 			.append(onclick_before)
 			.append("show_map_and_markers(\"")
@@ -2308,6 +2370,7 @@ public class ProduceClickableMap {
 			.append("\">");
 		show_map_icon(fw, blog_name);
 		return fw.append("</a>");
+		*/
 	}
 
 	static private void show_map_icon(final StringBuffer fw, final String blog_name)
@@ -2702,7 +2765,7 @@ public class ProduceClickableMap {
 		{
 			Arrays.sort(layer_tags);
 		}
-		protected static final String[] pmid_rule = {"PMID", "www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&Cmd=ShowDetailView&TermToSearch=", "[0-9]+" };
+		protected static final String[] pmid_rule = {"PMID", "www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&amp;Cmd=ShowDetailView&amp;TermToSearch=", "[0-9]+" };
 		
 		protected static final String[][] urls = {
 //			{ "HUGO", "www.ncbi.nlm.nih.gov/sites/entrez?cmd=search&db=gene&dopt=full_report&term=" },
@@ -2730,7 +2793,10 @@ public class ProduceClickableMap {
                         pat_pmid = Pattern.compile(add_link_rule(new StringBuilder(sb), pmid_rule).toString());
 			
 			for (final String[] s : urls)
+			{
+				s[1] = s[1].replace("&", "&amp;");
 	                        add_link_rule(sb, s);
+			}
 			
 			for (final String tag : layer_tags)
 				sb.append("|\\b(").append(tag).append(":)([A-Z][A-Z0-9_]*)\\b");
@@ -3087,13 +3153,43 @@ public class ProduceClickableMap {
 		return body_buf.toString();
         }
 
-	static private void show_markers_from_map(EntityBase ent, final StringBuffer body_buf)
+	static private void show_markers_from_map(EntityBase ent, final StringBuffer fw)
         {
-	        final StringBuffer title = new StringBuffer();
-	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers))
-	        	body_buf.append(ent.getName());
-	        else
-	        	body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
+		show_markers_from_map(ent.getName(), ent.getModifications(), fw);
+        }
+	
+	static private void show_markers_from_map(String name, List<Modification> m, final StringBuffer fw)
+	{
+		
+	        final List<String> markers = new ArrayList<String>();
+	        
+	        final String title = show_modifications(null_hasher, m, markers);
+	        
+                final String folded = makeFoldable(name);
+	        
+        	if (markers.isEmpty())
+        		fw.append(folded);
+        	else
+        	{
+        		fw.append(js_show_markers).append("[");
+        		int n = 0;
+        		for (final String s : markers)
+        			html_quote(fw.append(n++ > 0 ? ", " : ""), s);
+        		fw.append("])")
+                		.append(onclick_after)
+                		.append(" title=\"")
+        			.append(title)
+                		.append("\">")
+                		.append(folded)
+                		.append("</a>");
+        	}
+	        
+	        
+	        
+//	        if (show_modifications(null_hasher, body_buf, ent.getModifications(), title, js_show_markers))
+//	        	body_buf.append(ent.getName());
+//	        else
+//	        	body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
         }
 
 	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, ReactionDisplayType pass2, AllPosts posts)
@@ -3186,7 +3282,9 @@ public class ProduceClickableMap {
 	
 	private static String makeFoldable(final String s)
 	{
-		return s.replace(":", ":<wbr>").replace("|", "|<wbr>");
+//		String code = "<wbr>";
+		String code = "&#8203;";
+		return s.replace(":", ":" + code).replace("|", "|" + code);
 	}
 	static private class Modification
 	{
@@ -3321,28 +3419,6 @@ public class ProduceClickableMap {
 				fw.append(folded);
 			
 			return show_shapes_on_map(h, fw, this, master_map_name, blog_name);
-
-/*
-			final Vector<String> shapes = getShapeIds(speciesAliases);
-			if (shapes != null && !shapes.isEmpty())
-			{
-				fw.append(" (");
-				fw.append(onclick_before).append("show_map_and_markers(\"")
-					.append(blog_name).append("\", \"")
-					.append(master_map_name).append("\", [");
-				int i = 0;
-				final StringBuffer title = new StringBuffer();
-				for (String shape_id : shapes)
-				{
-					fw.append(i++ > 0 ? ", " : "").append("\"").append(shape_id).append("\"");
-					title.append(i++ > 0 ? " " : "").append(shape_id);
-				}
-				fw.append("]);");
-				fw.append(onclick_after).append(" title=\"").append(title).append("\">");
-				fw.append("map").append("</a>").append(")");
-			}
-			return fw;
-			*/
 		}
 	};
 	
@@ -3492,51 +3568,28 @@ public class ProduceClickableMap {
 
 	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name)
 	{
-		final StringBuffer title = new StringBuffer();
-		final boolean first = show_modifications(h, fw, sps, title,
-			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
+//		final boolean first = show_modifications(h, fw, sps, title,
+//			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
 		
-		if (!first)
-		{
-			fw.append(")")
-				.append(onclick_after)
-				.append(" title='")
-				.append(title)
-				.append("'>");
-			show_map_icon(fw, blog_name);
-			fw.append("</a>");
-		}
-		//visible_debug(fw, ids);
-//		notes.append("<img border='0' src='" + common_directory_url + icons_directory + "/blog.png' alt='blog'>").append("</a>");
-
+		final List<String> markers = new ArrayList<String>();
+		final String title = show_modifications(h, sps, markers);
+		show_map_and_markers_from_post(fw, map_name, markers, title, blog_name);
+		
 		return fw;
 	}
 
-	static private boolean show_modifications(final Hasher h, final StringBuffer fw, final List<Modification> sps,
-		final StringBuffer title,
-		final String start
+	static private String show_modifications(final Hasher h, final List<Modification> sps, final List<String> markers
 	)
         {
-		boolean first = true;
+		final StringBuffer title = new StringBuffer();
 	        for (final Modification sp : sps)
 		{
-			if (first)
-			{
-				fw.append(start).append("[");
-				first = false;
-			}
-			else
-				fw.append(", ");
-			fw.append("\"").append(h.add(sp.getId())).append("\"");
-	        	
+			markers.add(h.add(sp.getId()));
 			title.append(title.length() == 0 ? "" : " ").append(sp.getId());
 		}
 		if (title.length() != 0)
 			title.append(" ");
-		title.append(sps.size()).append(" modifs");
-		if (!first)
-			fw.append("]");
-	        return first;
+		return title.append(sps.size()).append(" modifs").toString();
         }
 
 	private class Place{

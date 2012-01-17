@@ -54,6 +54,7 @@
 \usepackage{ifthen}  % Conditional 
 \usepackage{multicol}   %Columns
 \usepackage[utf8]{inputenc} %unicode support
+\usepackage{graphicx}
 %\usepackage[applemac]{inputenc} %applemac support if unicode package fails
 %\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
 \urlstyle{rm}
@@ -108,6 +109,8 @@
 
 %New style setting
 \newenvironment{bmcformat}{\baselineskip20pt\sloppy\setboolean{publ}{false}}{\baselineskip20pt\sloppy}
+
+
 
 % Begin ...
 \begin{document}
@@ -451,28 +454,60 @@ selected nodes and edges and also to show the clipboard content.
 
 \section*{Results and Discussion}
 
-[ biological case study RB/E2F goes here ]
+We propose to study a reaction network of the regulation of the protein RB (also referred to as RB1) \cite{calzone2008comprehensive} as an example of the use of BiNoM functions. The complete network contains about 78 proteins, 208 chemical species, and 165 biochemical reactions. For this study, we choose to concentrate on the G1 to S transition. For that, we used the intersection of the 208 species of RB/E2F network and the 280 species listed in Reactome for the G1-S transition (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical reactions (Figure \ref{Network_RB-E2F_G1S}.
 
-cairns:
+% Daniel vérifie les chiffres
+% doit-on expliquer en détails comment les sous-graphes sony sélectionnés ?
+% LC : Cite Reactome
 
-\subsection*{Import of the network}
+\begin{figure}
+%\centering
+%\includegraphics{Network_Rb_E2F_G1S}
+\caption{Network of the G1 to S transition corresponding to the intersection of RB-E2F network and G1/S network extracted from Reactome}
+\label{Network_Rb-E2F_G1S}
+\end{figure}
 
-\subsection*{Subnetwork extraction}
 
-\subsection*{Intersection with Reactome}
+% LC : expliquer le cycle cellulaire et le role de RB dans le cycle ???
+ 
 
-\subsection*{modularization} 
+%\subsection*{Import of the network}
 
-\begin{itemize}
-\item Import network. \textbf{Plugins - BiNoM IO - Import CellDesigner document
-from file}.  Choose G1S.xml
+%\subsection*{Subnetwork extraction}
 
-\item	Get material decomposition: 36 modules are created.Plugins BiNoM
-analysis - Get material components.
-\item	Clustering. \textbf{Plugins - BiNoM analysis - Cluster networks}. Select
-all networks except G1S and choose 25\% overlap. 7 networks are created.
+%\subsection*{Intersection with Reactome}
+
+\subsection*{Modularization} 
+
+The network is very detailed and may be hard to read at a first glance. To facilitate the reading of the content, we propose to organise the reaction network as a modular network. The species are clustered in groups, referred to as modules, in an semi-automatic manner. These modules are then linked by activating (pointed arrows) or inhibiting (T-shape arrows) influences according to what is known biologically about the interactions between these modules. A detailed method on the construction of this modular network is described below:
+
+% T arrows = blocking arrows
+% pointed arrows = > activation
+% LC : je ne sais pas comment le dire
+
+\begin{enumerate}
+\item Import network. \\
+\textbf{Plugins $\rightarrow$ BiNoM I/O $\rightarrow$ Import CellDesigner document
+from file}.  \\
+Choose G1S.xml
+
+% fournir le fichier xml correspondant
+
+\item	Decompose the network into subnetworks. \\
+We choose to decompose the network according to the different components present in the map rather than decomposing according to the cycles of the network. 
+\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Get Material Components…}.\\
+36 subnetworks are created.
+
+\item	Clustering. \\
+The resulting subnetworks may share a lot of species. To reduce the number of subnetworks, we cluster them with an overlap of 25\%. \\
+\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Cluster networks}. \\
+A pop-up window appears. Among the proposed networks, select all networks except G1S.xml and choose 25\% overlap. 7 networks are created.
+
 \item	Rename the newly-created clusters.
-
+It is important to rename right away the clusters with a name than illustrates the content of each of these clusters. 
+Choosing the appropriate name might be facilitated by listing the name of the components of the cluster: \textbf{Plugins $\rightarrow$ BiNoM module manager $\rightarrow$ List components of species in network and modules} \\
+To rename them, right-click on the Network panel.
+Here are the names we propose for these 7 clusters: 
 \begin{itemize}
 \item	E2F1\_RB
 \item	CycD1
@@ -516,7 +551,7 @@ duplication of edges in the merging process.
 \item	Network difference.
 \end{itemize}
 
-\end{itemize}
+\end{enumerate}
 
 \subsection*{Application of PIQuant on 2 GS networks (comprehensive + modular network), data from Stransky.}
 

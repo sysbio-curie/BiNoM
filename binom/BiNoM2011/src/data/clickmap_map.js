@@ -372,7 +372,7 @@ function show_blog(postid)
 	map.focus();
 }
 
-function show_map_and_markers(blog_name, map_name, ids)
+function show_map_and_markers(map_name, ids)
 {
 	var map = maps[map_name];
 	if (map && !map.closed)

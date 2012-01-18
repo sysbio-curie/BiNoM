@@ -2038,7 +2038,7 @@ public class ProduceClickableMap {
 		final String human_class = class_name_to_human_name_map.get(COMPLEX_CLASS_NAME);
 		fw.append("<b>").append(human_class).append(' ').append(h.add(complex.getName())).append("</b>");
 		visible_debug(fw, complex.getId());
-		show_shapes_on_map(h, fw, complex.getModifications(), master_map_name, blog_name);
+		show_shapes_on_map_from_post(h, fw, complex.getModifications(), master_map_name, blog_name);
 		
 		fw.append("<hr><b>Complex composition:</b>\n");
 		fw.append("<ol>\n");
@@ -2046,7 +2046,7 @@ public class ProduceClickableMap {
 			{
 				fw.append("<li>");
 				post_to_post_link_checked(component, makeFoldable(h.add(component.getName())), fw, pass2);
-				show_shapes_on_map(h, fw, component.getModifications(), master_map_name, blog_name);
+				show_shapes_on_map_from_post(h, fw, component.getModifications(), master_map_name, blog_name);
 			}
 		fw.append("</ol>\n");
 	        
@@ -2800,8 +2800,8 @@ public class ProduceClickableMap {
 			
 			for (final String tag : layer_tags)
 				sb.append("|\\b(").append(tag).append(":)([A-Z][A-Z0-9_]*)\\b");
-			pat_generic = Pattern.compile(sb.toString());
-			pat_bubble = Pattern.compile(sb.append("|(\n+)").toString());
+			pat_bubble = pat_generic = Pattern.compile(sb.toString());
+			//pat_bubble = Pattern.compile(sb.append("|(\n+)").toString());
 		}
 		private static StringBuilder add_link_rule(final StringBuilder sb, final String[] s)
                 {
@@ -2847,23 +2847,45 @@ public class ProduceClickableMap {
 			}
 			return sb.toString();
 		}
+		interface ShowShapesOnMap
+		{
+			StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name);
+		}
+		static final ShowShapesOnMap show_shapes_on_map_from_post = new ShowShapesOnMap()
+		{
+			@Override
+			public StringBuffer show_shapes_on_map(Hasher h, StringBuffer fw, List<Modification> sps, String map_name, String blog_name)
+			{
+				return ProduceClickableMap.show_shapes_on_map_from_post(h, fw, sps, map_name, blog_name);
+			}
+		};
+		static final ShowShapesOnMap show_shapes_on_map_from_bubble = new ShowShapesOnMap()
+		{
+			@Override
+			public StringBuffer show_shapes_on_map(Hasher h, StringBuffer fw, List<Modification> sps, String map_name, String blog_name)
+			{
+				return ProduceClickableMap.show_shapes_on_map_from_bubble(h, fw, sps, map_name, blog_name);
+			}
+		};
 		StringBuffer pmid(Notes notes, StringBuffer fw, Hasher h, SbmlDocument cd)
 		{
-			return notes == null ? fw : format(Utils.getValue(notes), fw, h, null, pat_pmid, cd, null);
+			return notes == null ? fw : format(Utils.getValue(notes), fw, h, null, pat_pmid, cd, null, show_shapes_on_map_from_post);
 		}
 		StringBuffer bubble(final StringBuffer res, String comment, List<Modification> modifs, SbmlDocument cd)
 		{
-			return format(comment, res, null_hasher, modifs, pat_bubble, cd, null);
+			return format(comment, res, null_hasher, modifs, pat_bubble, cd, null, show_shapes_on_map_from_bubble);
 		}
 		StringBuffer complex(Complex complex, final StringBuffer res, Hasher h, SbmlDocument cd, List<Modification> modifications)
 		{
-			return format(null, res, h, complex.getModifications(), pat_generic, cd, modifications);
+			return format(null, res, h, complex.getModifications(), pat_generic, cd, modifications, show_shapes_on_map_from_post);
 		}
 		StringBuffer full(final StringBuffer res, Hasher h, EntityBase ent, SbmlDocument cd, List<Modification> modifications)
 		{
-			return format(ent.getComment(), res, h, ent.getModifications(), pat_generic, cd, modifications).append('\n');
+			return format(ent.getComment(), res, h, ent.getModifications(), pat_generic, cd, modifications, show_shapes_on_map_from_post).append('\n');
 		}
-		private StringBuffer format(String note, final StringBuffer res, Hasher h, List<Modification> all, Pattern pat, SbmlDocument cd, List<Modification> comments)
+		private StringBuffer format(String note, final StringBuffer res, Hasher h, List<Modification> all, Pattern pat, SbmlDocument cd,
+			List<Modification> comments,
+			ShowShapesOnMap show_shapes_on_map)
 		{
 			final String comment = build_comment(note, comments);
 			
@@ -2903,8 +2925,12 @@ public class ProduceClickableMap {
 	                                	{
 	                                		block = tag;
 	                                		m.appendReplacement(res, "");
-	                                		res.append("<p style=\"background: ").append(get_colour(block)).append("\">");
-	                                		res.append("<b>").append(block).append("</b>");
+	                                		res.append("<p style=\"background: ")
+	                                			.append(get_colour(block))
+	                                			.append("\">")
+	                                			.append("<b>")
+	                                			.append(block)
+	                                			.append("</b><Br>");
 	                                		after_block = false;
 	                                	}
 	                                	else
@@ -2915,7 +2941,7 @@ public class ProduceClickableMap {
 	                                	m.appendReplacement(res, "");
 	                                	res.append(tag + arg);
 	                                	if (modules.contains(arg))
-	                                		show_shapes_on_map(h, res, all, arg, blog_name);
+	                                		show_shapes_on_map.show_shapes_on_map(h, res, all, arg, blog_name);
 	                                }
 	                                else
 	                                {	
@@ -3547,7 +3573,7 @@ public class ProduceClickableMap {
 	
 	private StringBuffer show_shapes_on_master_map(final Hasher h, StringBuffer fw, final EntityBase ent)
 	{
-		show_shapes_on_map(h, fw, ent.getModifications(), master_map_name, blog_name);
+		show_shapes_on_map_from_post(h, fw, ent.getModifications(), master_map_name, blog_name);
 		return fw;
 	}
 
@@ -3563,10 +3589,35 @@ public class ProduceClickableMap {
 	{
 		final List<Modification> l = new ArrayList<Modification>(1);
 		l.add(modif);
-		return show_shapes_on_map(h, fw, l, map_name, blog_name);
+		return show_shapes_on_map_from_post(h, fw, l, map_name, blog_name);
 	}
 
-	static private StringBuffer show_shapes_on_map(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name)
+	static private StringBuffer show_shapes_on_map_from_bubble(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name)
+	{
+//		final boolean first = show_modifications(h, fw, sps, title,
+//			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
+		
+		final List<String> markers = new ArrayList<String>();
+		final String title = show_modifications(h, sps, markers);
+		
+		if (markers.isEmpty())
+			return fw;
+
+		fw.append(onclick_before).append( "show_map_and_markers(");
+		html_quote(fw, map_name);
+		fw.append(", [");
+		int n = 0;
+		for (String e : markers)
+			html_quote(fw.append(n++ == 0 ? "" : ", "), e);
+		fw.append("]);").append(onclick_after);
+		
+		html_quote(fw.append(" title="), title);
+		fw.append(">");
+		show_map_icon(fw, blog_name);
+		return fw.append("</a>");
+	}
+
+	static private StringBuffer show_shapes_on_map_from_post(final Hasher h, StringBuffer fw, List<Modification> sps, final String map_name, final String blog_name)
 	{
 //		final boolean first = show_modifications(h, fw, sps, title,
 //			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");

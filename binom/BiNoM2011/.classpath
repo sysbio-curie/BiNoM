@@ -19,6 +19,6 @@
 	<classpathentry kind="lib" path="lib/jwordpress/commons-lang-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/jwordpress/xmlrpc-client-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/imgscalr-lib-3.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/wordpress-java"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/wordpress-java-0.4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

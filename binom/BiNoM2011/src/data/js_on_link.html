@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html  xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>
+<head>
+<title>Javascript on link</title>
+<script src='/usr/share/javascript/jquery/jquery.js' type='text/javascript'></script>
+
+<script type='text/javascript'>
+
+function load()
+{
+	var f= function(e)
+	{
+		var master = $(this).find("span.map").attr("title");
+		var ids = [];
+		$(this).find("span.entity").each(function() { ids.push($(this).attr("title")); });
+		alert('calling: ' + master + " " + ids);
+		return false;
+	};
+	
+	$("a.mlink").each(function(index, element) { element.onclick = f; });
+}
+
+$(document).ready(load);
+
+</script>
+
+</head>
+<body>
+
+<a href="foo1.html" class="mlink" id="link1">
+	<span class="map" title="master"/>
+	<span class="entity" title="re45"/>
+	<span class="entity" title="re47"/>
+	<span class="entity" title="re67"/>
+	link1</a>
+<a href="foo.html" class="mlink" id="link2">
+	<span class="map" title="OVAL"/>
+	<span class="entity" title="pr5"/>
+	<span class="entity" title="pr6"/>
+	<span class="entity" title="gn8"/>
+link2</a>
+
+
+</body>
+</html>

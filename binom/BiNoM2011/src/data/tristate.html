@@ -1,0 +1,571 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title></title>
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		
+		<style type="text/css" media="screen">
+			@import "http://sandbox.codioninteractive.com/plugins/tri-state-checkbox/tristate.css";
+			
+			h3 { margin: 0; padding: 0; }
+			h1 { margin: 0 0 20px 0; }
+		</style>
+<script language="javascript" type="text/javascript" src="http://clickmap.curie.fr/javascript/jquery/jquery.js"></script>
+	
+		<!--  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> -->
+		<script type="text/javascript" src="http://sandbox.codioninteractive.com/plugins/tri-state-checkbox/jquery.tristate.min.js"></script>
+
+		
+		<script type="text/javascript">
+			$(document).ready(function() {
+
+				if (true)
+					{
+						//choose text for the show/hide link - can contain HTML (e.g. an image)
+						var showText='Show';
+						var hideText='Hide';
+						
+						$('.toggle').append(' (<a href="#" class="toggleLink">'+showText+'</a>)');
+						$('.toggle').next().hide();
+						
+						//capture clicks on the toggle links
+						$('a.toggleLink').click(function() {
+						
+							var child = $(this).parent().parent().next();
+							//change the link depending on whether the element is shown or hidden
+							$(this).html(child.is(':visible') ? showText : hideText);
+							
+							//toggle the display - uncomment the next line for a basic "accordion" style
+							
+							child.toggle('fast');
+							
+							//return false so any link destination is not followed
+							return false;
+						
+						});
+					}
+				if (false)
+				$('ul.triState','').tristate({
+						heading: 'h3'
+				});
+				
+				if (true)
+				$('ul.triState','').tristate();
+				
+				toggle2();
+				
+			});
+			
+			function toggle2()
+			{
+				$('span.foo').toggle();
+			}
+		</script>
+	</head>
+	
+	<body>
+		<h1>Tristate Checkbox Example</h1>
+
+<ul class="triState">
+	<li><span class="label toggle">Protein 2</span>
+	<ul>
+		<li><span class="label toggle">Protein 1</span>
+		<ul>
+			<li><input type="checkbox" name="cboxA04" value="yes" onchange="toggle2()"/><label href="#" for="cboxA04" class="label">Modif 1.1</label></li>
+			<li><input type="checkbox" name="cboxA05" value="yes" /><label href="#" for="cboxA05" class="label">Modif 1.2</label></li>
+
+			<li><input type="checkbox" name="cboxA06" value="yes" /><label href="#" for="cboxA06" class="label">Modif 1.3</label></li>
+		</ul>
+		</li>
+		<li><span class="label toggle">Protein 2</span>
+		<ul>
+			<li><input type="checkbox" name="cboxB04" value="yes" /><label href="#" for="cboxB04" class="label">Modif 04</label></li>
+			<li><input type="checkbox" name="cboxB05" value="yes" /><label href="#" for="cboxB05" class="label">Modif 05</label></li>
+
+			<li><input type="checkbox" name="cboxB06" value="yes" /><label href="#" for="cboxB06" class="label">Modif 06</label></li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li><input type="checkbox" name="cboxB03" value="yes" /><label href="#" for="cboxB03" class="label">Item 03</label></li>
+</ul>
+
+
+<span class="foo">hello this if foo</span>
+
+<dl>
+<dt class="toggle"><input type="checkbox" name="cboxA01" value="yes" /><label href="#" for="cboxA01" class="label"> Entities</dt>
+<dd>
+<dl>
+<dt class="toggle">Proteins</dt>
+<dd>
+<dl>
+<dt class="toggle">CSA* (blog)</dt>
+<dd>
+<ul>
+<li>CSA*</li>
+<li>CSA*:Cul4|hyd:RBX1</li>
+</ul>
+</dd>
+<dt class="toggle">CSB* (blog)</dt>
+<dd>
+<ul>
+<li>CSB*</li>
+</ul>
+</dd>
+<dt class="toggle">NEDD4 (blog)</dt>
+<dd>
+<ul>
+<li>NEDD4</li>
+</ul>
+</dd>
+<dt class="toggle">NEDD8 (blog)</dt>
+<dd>
+<ul>
+<li>NEDD8</li>
+</ul>
+</dd>
+<dt class="toggle">XPB* (blog)</dt>
+<dd>
+<ul>
+<li>XPB*</li>
+<li>TFB5*:TFIIH1*:XPB*:XPD*</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+<li>Stuart:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">XPD* (blog)</dt>
+<dd>
+<ul>
+<li>XPD*</li>
+<li>TFB5*:TFIIH1*:XPB*:XPD*</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+<li>Stuart:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">TFB5* (blog)</dt>
+<dd>
+<ul>
+<li>TFB5*</li>
+<li>TFB5*:TFIIH1*:XPB*:XPD*</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+<dt class="toggle">SomeProtein (blog)</dt>
+<dd>
+<ul>
+</ul>
+</dd>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">hMutL* (blog)</dt>
+<dd>
+<ul>
+<li>MLH1:PMS1:hMutL*</li>
+</ul>
+</dd>
+<dt class="toggle">Transcription machine_br_(RNAPII) (blog)</dt>
+<dd>
+<ul>
+<li>Transcription machine_br_(RNAPII)</li>
+<li>Transcription machine_br_(RNAPII)|ubi</li>
+<li>TC-NER-DNA-st1:Transcription machine_br_(RNAPII)</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">ERBB2 (blog)</dt>
+<dd>
+<ul>
+<li>ERBB2@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Inna* (blog)</dt>
+<dd>
+<ul>
+<li>Inna*@Nucleus</li>
+<li>Inna*|Thr68_pho@Nucleus</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace@Nucleus</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace|hm2@Nucleus</li>
+<li>Inna*</li>
+<li>Inna*|gly|Ser24_pho</li>
+<li>Inna*|Thr68_pho|ubi|pho@Nucleus</li>
+<li>Inna*|Thr68_pho|ubi|pho@Mitochondria</li>
+<li>ATP:Inna*:Repaired DNA@Nucleus</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*</li>
+<li>Inna*|ace:Repaired DNA@Mitochondria</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+<li>Inna*|pal:Repaired DNA@Mitochondria</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*@Nucleus</li>
+<li>Inna*|Thr68_pho|pho|Ser24_ace:TFIIH1*@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Cul4 (blog)</dt>
+<dd>
+<ul>
+<li>Cul4</li>
+<li>Cul4|ubi|myr</li>
+<li>CSA*:Cul4|hyd:RBX1</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">RBX1 (blog)</dt>
+<dd>
+<ul>
+<li>RBX1</li>
+<li>CSA*:Cul4|hyd:RBX1</li>
+</ul>
+</dd>
+<dt class="toggle">TFIIH1* (blog)</dt>
+<dd>
+<ul>
+<li>TFIIH1*</li>
+<li>TFIIH1*@Nucleus</li>
+<li>TFB5*:TFIIH1*:XPB*:XPD*</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*@Nucleus</li>
+<li>Inna*|Thr68_pho|pho|Ser24_ace:TFIIH1*@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">MLH1 (blog)</dt>
+<dd>
+<ul>
+<li>MLH1</li>
+<li>MLH1:MLH3</li>
+<li>MLH1:PMS1:hMutL*</li>
+</ul>
+</dd>
+<dt class="toggle">MLH3 (blog)</dt>
+<dd>
+<ul>
+<li>MLH3</li>
+<li>MLH1:MLH3</li>
+</ul>
+</dd>
+<dt class="toggle">PMS1 (blog)</dt>
+<dd>
+<ul>
+<li>PMS1</li>
+<li>MLH1:PMS1:hMutL*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Genes</dt>
+<dd>
+<dl>
+<dt class="toggle">TC-NER-DNA-st3 (blog)</dt>
+<dd>
+<ul>
+<li>gTC-NER-DNA-st3</li>
+</ul>
+</dd>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>gAndrei*</li>
+</ul>
+</dd>
+<dt class="toggle">TC-NER-DNA-st2 (blog)</dt>
+<dd>
+<ul>
+<li>gTC-NER-DNA-st2</li>
+</ul>
+</dd>
+<dt class="toggle">Repaired DNA (blog)</dt>
+<dd>
+<ul>
+<li>gRepaired DNA</li>
+<li>gRepaired DNA@Nucleus</li>
+<li>ATP:Inna*:Repaired DNA@Nucleus</li>
+<li>Inna*|ace:Repaired DNA@Mitochondria</li>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+<li>Inna*|pal:Repaired DNA@Mitochondria</li>
+</ul>
+</dd>
+<dt class="toggle">TC-NER-DNA-st1 (blog)</dt>
+<dd>
+<ul>
+<li>TC-NER-DNA-st1:Transcription machine_br_(RNAPII)</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">RNAs</dt>
+<dd>
+<dl>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>rAndrei*</li>
+</ul>
+</dd>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">Inna (blog)</dt>
+<dd>
+<ul>
+<li>rInna@Nucleus</li>
+<li>rInna</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">antisense RNAs</dt>
+<dd>
+<dl>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>arAndrei*</li>
+</ul>
+</dd>
+<dt class="toggle">Inna (blog)</dt>
+<dd>
+<ul>
+<li>arInna@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Simple molecules</dt>
+<dd>
+<dl>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">ADP (blog)</dt>
+<dd>
+<ul>
+<li>ADP@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">ATP (blog)</dt>
+<dd>
+<ul>
+<li>ATP@Nucleus</li>
+<li>ATP:Inna*:Repaired DNA@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Ions</dt>
+<dd>
+<dl>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">Ca++ (blog)</dt>
+<dd>
+<ul>
+<li>Ca++@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Drugs</dt>
+<dd>
+<dl>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">Aspirin (blog)</dt>
+<dd>
+<ul>
+<li>Aspirin@Nucleus</li>
+<li>Aspirin</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Phenotypes</dt>
+<dd>
+<dl>
+<dt class="toggle">Apoptosis (blog)</dt>
+<dd>
+<ul>
+<li>Apoptosis</li>
+<li>Apoptosis@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Stuart (blog)</dt>
+<dd>
+<ul>
+<li>Stuart:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Unknown</dt>
+<dd>
+<dl>
+<dt class="toggle">Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">Andrei* (blog)</dt>
+<dd>
+<ul>
+<li>Andrei*</li>
+</ul>
+</dd>
+<dt class="toggle">BlackBox (blog)</dt>
+<dd>
+<ul>
+<li>BlackBox@Nucleus</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Complexes</dt>
+<dd>
+<dl>
+<dt class="toggle">Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*:Stuart*</li>
+</ul>
+</dd>
+<dt class="toggle">MLH1:MLH3 (blog)</dt>
+<dd>
+<ul>
+<li>MLH1:MLH3</li>
+</ul>
+</dd>
+<dt class="toggle">Cul4:Inna*:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII):XPB*:XPD* (blog)</dt>
+<dd>
+<ul>
+<li>Cul4|ubi|myr:Inna*|gly|Ser24_pho:Repaired DNA:TFB5*:TFIIH1*:Transcription machine_br_(RNAPII)|ubi:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">CSA*:Cul4:RBX1 (blog)</dt>
+<dd>
+<ul>
+<li>CSA*:Cul4|hyd:RBX1</li>
+</ul>
+</dd>
+<dt class="toggle">TC-NER-DNA-st1:Transcription machine_br_(RNAPII) (blog)</dt>
+<dd>
+<ul>
+<li>TC-NER-DNA-st1:Transcription machine_br_(RNAPII)</li>
+</ul>
+</dd>
+<dt class="toggle">ATP:Inna*:Repaired DNA (blog)</dt>
+<dd>
+<ul>
+<li>ATP:Inna*:Repaired DNA@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">Inna*:TFIIH1* (blog)</dt>
+<dd>
+<ul>
+<li>Inna*|Thr68_pho|pho|Ser24_ace:TFIIH1*@Nucleus</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*</li>
+<li>Inna*|Thr68_pho|ubi|Ser24_ace:TFIIH1*@Nucleus</li>
+</ul>
+</dd>
+<dt class="toggle">TFB5*:TFIIH1*:XPB*:XPD* (blog)</dt>
+<dd>
+<ul>
+<li>TFB5*:TFIIH1*:XPB*:XPD*</li>
+</ul>
+</dd>
+<dt class="toggle">MLH1:PMS1:hMutL* (blog)</dt>
+<dd>
+<ul>
+<li>MLH1:PMS1:hMutL*</li>
+</ul>
+</dd>
+<dt class="toggle">Inna*:Repaired DNA (blog)</dt>
+<dd>
+<ul>
+<li>Inna*|pal:Repaired DNA@Mitochondria</li>
+<li>Inna*|ace:Repaired DNA@Mitochondria</li>
+</ul>
+</dd>
+<dt class="toggle">Stuart:XPB*:XPD* (blog)</dt>
+<dd>
+<ul>
+<li>Stuart:XPB*:XPD*</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Reactions</dt>
+<dd>
+<dl>
+</dl>
+</dd>
+<dt class="toggle">Other</dt>
+<dd>
+<dl>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="toggle">Modules</dt>
+<dd>list of modules</dd></dl>
+	
+	</body>
+</html>

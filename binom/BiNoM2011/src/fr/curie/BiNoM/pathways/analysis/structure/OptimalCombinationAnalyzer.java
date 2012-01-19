@@ -81,50 +81,45 @@ public class OptimalCombinationAnalyzer {
 		
 		HashSet<BitSet> mcs = initFirstRowBerge();
 		mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(1));
+		long tic = System.currentTimeMillis();
+		Utils.printUsedMemory();
+		System.out.println("start");
 		for (int i=1;i<pathMatrixNbRow;i++) {
+			//System.out.println("round: "+i);
 			mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(i));
+			System.gc();
+			Utils.printUsedMemory();
+			//System.out.println("candidate set size: "+mcs.size());
 			mcs = checkMinimalityBerge(mcs);
 		}
-		
-		for (BitSet b : mcs)
-			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+		long toc = System.currentTimeMillis() - tic;
+		System.out.println("timing: "+toc);
+		System.out.println("final size: "+mcs.size());
+//		for (BitSet b : mcs)
+//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
 	}
 	
 	public HashSet<BitSet> checkMinimalityBerge(HashSet<BitSet> mcs) {
 		
-		for (BitSet b : mcs)
-			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
-		System.out.println("//");
-		
 		HashSet<BitSet> flag = new HashSet<BitSet>();
 		
 		for (BitSet b1 : mcs) {
-			for (BitSet b2 : mcs) {
-				BitSet test = (BitSet) b1.clone();
-				test.and(b2);
-				if (test.cardinality() == b1.cardinality() && b2.cardinality() > b1.cardinality()) {
-					// b2 is a strict superset of b1, flag  for remove
-					flag.add(b2);
-					//System.out.println(convertBitSetToString(b1,pathMatrixNbCol));
-					//System.out.println(convertBitSetToString(b2,pathMatrixNbCol));
-					//System.out.println("//");
+			if (!flag.contains(b1)) {
+				for (BitSet b2 : mcs) {
+					BitSet test = (BitSet) b1.clone();
+					test.and(b2);
+					if (test.cardinality() == b1.cardinality() && b2.cardinality() > b1.cardinality()) {
+						// b2 is a strict superset of b1, flag it
+						flag.add(b2);
+					}
 				}
 			}
 		}
-		
-//		for (BitSet b : mcs) {
-//			if (!flag.contains(b))
-//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
-//		}
-//		System.out.println("//");
 		
 		HashSet<BitSet> ret = new HashSet<BitSet>();
 		for (BitSet b : mcs)
 			if (!flag.contains(b))
 				ret.add(b);
-		
-//		for (BitSet b : ret)
-//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
 		
 		return(ret);
 
@@ -133,11 +128,23 @@ public class OptimalCombinationAnalyzer {
 	public HashSet<BitSet> createCandidateSetBerge(HashSet<BitSet> mcs, BitSet row) {
 		HashSet<BitSet> cand = new HashSet<BitSet>();
 		for (BitSet cs : mcs) {
-			// add each node of the row to previous hit set
-			for(int i=row.nextSetBit(0); i>=0; i=row.nextSetBit(i+1)) { // loop over bits set to 1 in BitSet object
-				BitSet newOne = (BitSet) cs.clone();
-				newOne.set(i);
-				cand.add(newOne);
+			/*
+			 * First test if the hit set and the row are disjoint, if yes generate new hit set 
+			 * by adding each node of the row to the hit set, otherwise just keep the hit set as it is,
+			 * because adding nodes would just create supersets. 
+			 */
+			BitSet testJoint = (BitSet) cs.clone();
+			testJoint.and(row);
+			if (testJoint.cardinality() == 0) {
+				// add each node of the row to previous hit set
+				for(int i=row.nextSetBit(0); i>=0; i=row.nextSetBit(i+1)) { // loop over bits set to 1 in BitSet object
+					BitSet newOne = (BitSet) cs.clone();
+					newOne.set(i);
+					cand.add(newOne);
+				}
+			}
+			else {
+				cand.add(cs);
 			}
 		}
 		return(cand);

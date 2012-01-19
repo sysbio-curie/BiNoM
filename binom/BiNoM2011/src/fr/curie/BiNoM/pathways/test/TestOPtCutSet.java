@@ -28,10 +28,10 @@ public class TestOPtCutSet {
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 			
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
 			
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
@@ -65,10 +65,10 @@ public class TestOPtCutSet {
 			ArrayList<Node> testSide = new ArrayList<Node>();
 			
 			// toynet
-			testSource.add(dpc.graph.getNode("I1"));
-			testSource.add(dpc.graph.getNode("I2"));
-			testTarget.add(dpc.graph.getNode("O1"));
-			testTarget.add(dpc.graph.getNode("O2"));
+//			testSource.add(dpc.graph.getNode("I1"));
+//			testSource.add(dpc.graph.getNode("I2"));
+//			testTarget.add(dpc.graph.getNode("O1"));
+//			testTarget.add(dpc.graph.getNode("O2"));
 			//testSide.add(dpc.graph.getNode("O2"));
 
 			/* egfr linearized network
@@ -76,31 +76,31 @@ public class TestOPtCutSet {
 			 * Target nodes: elk1
 			 */
 			
-//			testSource.add(dpc.graph.getNode("ar"));
-//			testSource.add(dpc.graph.getNode("bir"));
-//			testSource.add(dpc.graph.getNode("btc"));
-//			testSource.add(dpc.graph.getNode("csrc"));
-//			testSource.add(dpc.graph.getNode("egf"));
-//			testSource.add(dpc.graph.getNode("epr"));
-//			testSource.add(dpc.graph.getNode("erbb1"));
-//			testSource.add(dpc.graph.getNode("erbb2"));
-//			testSource.add(dpc.graph.getNode("erbb3"));
-//			testSource.add(dpc.graph.getNode("erbb4"));
-//			testSource.add(dpc.graph.getNode("hbegf"));
-//			testSource.add(dpc.graph.getNode("mkp"));
-//			testSource.add(dpc.graph.getNode("nrg1a"));
-//			testSource.add(dpc.graph.getNode("nrg1b"));
-//			testSource.add(dpc.graph.getNode("nrg2a"));
-//			testSource.add(dpc.graph.getNode("nrg2b"));
-//			testSource.add(dpc.graph.getNode("nrg3"));
-//			testSource.add(dpc.graph.getNode("nrg4"));
-//			testSource.add(dpc.graph.getNode("pdk1"));
-//			testSource.add(dpc.graph.getNode("pp2a"));
-//			testSource.add(dpc.graph.getNode("pp2b"));
-//			testSource.add(dpc.graph.getNode("pten"));
-//			testSource.add(dpc.graph.getNode("ship2"));
-//			testSource.add(dpc.graph.getNode("tgfa"));
-//			testTarget.add(dpc.graph.getNode("elk1"));
+			testSource.add(dpc.graph.getNode("ar"));
+			testSource.add(dpc.graph.getNode("bir"));
+			testSource.add(dpc.graph.getNode("btc"));
+			testSource.add(dpc.graph.getNode("csrc"));
+			testSource.add(dpc.graph.getNode("egf"));
+			testSource.add(dpc.graph.getNode("epr"));
+			testSource.add(dpc.graph.getNode("erbb1"));
+			testSource.add(dpc.graph.getNode("erbb2"));
+			testSource.add(dpc.graph.getNode("erbb3"));
+			testSource.add(dpc.graph.getNode("erbb4"));
+			testSource.add(dpc.graph.getNode("hbegf"));
+			testSource.add(dpc.graph.getNode("mkp"));
+			testSource.add(dpc.graph.getNode("nrg1a"));
+			testSource.add(dpc.graph.getNode("nrg1b"));
+			testSource.add(dpc.graph.getNode("nrg2a"));
+			testSource.add(dpc.graph.getNode("nrg2b"));
+			testSource.add(dpc.graph.getNode("nrg3"));
+			testSource.add(dpc.graph.getNode("nrg4"));
+			testSource.add(dpc.graph.getNode("pdk1"));
+			testSource.add(dpc.graph.getNode("pp2a"));
+			testSource.add(dpc.graph.getNode("pp2b"));
+			testSource.add(dpc.graph.getNode("pten"));
+			testSource.add(dpc.graph.getNode("ship2"));
+			testSource.add(dpc.graph.getNode("tgfa"));
+			testTarget.add(dpc.graph.getNode("elk1"));
 			
 			
 			for (Node n : testSource)

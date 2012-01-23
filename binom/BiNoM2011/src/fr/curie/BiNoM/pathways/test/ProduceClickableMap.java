@@ -548,14 +548,16 @@ public class ProduceClickableMap {
 					resize = image;
 				else
 				{
-					resize = Scalr.resize(image, Scalr.Method.QUALITY, tile_width << scale_factor, tile_height << scale_factor, Scalr.OP_ANTIALIAS);
-					Utils.eclipsePrintln("resized image " + file_number);
+					final int d = scale_factor - i;
+					final int w = image.getWidth() >> d;
+					resize = Scalr.resize(image, Scalr.Method.QUALITY, w, image.getHeight() >> d, Scalr.OP_ANTIALIAS);
+					Utils.eclipsePrintln("resized image " + file_number + " to " + i + " by " + d + " width " + image.getWidth() + " -> " + w);
 				}
 				final BufferedImage padded_image = new BufferedImage(tile_width << i, tile_height << i, BufferedImage.TYPE_INT_RGB);
-				padded_image.createGraphics().drawRenderedImage(image, null);
+				padded_image.createGraphics().drawRenderedImage(resize, null);
 				
-				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, scale_factor);
-				count += write_tiles(resize, outdir, i, tiled, g, tile_width, tile_height, shifts);
+				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, i);
+				count += write_tiles(padded_image, outdir, i, tiled, g, tile_width, tile_height, shifts);
 			}
 			last_found = scale_factor;
 		}
@@ -5479,8 +5481,8 @@ public class ProduceClickableMap {
 		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + included_map_base + ".css\"/>");
 		out.println("<script src='http://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='/maps/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='/maps/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
+		out.println("<script src='/lib/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
+		out.println("<script src='/lib/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
 	
 		out.println("<script src=\"" + common_directory_url + included_map_base + ".js\" type='text/javascript'></script>");
 

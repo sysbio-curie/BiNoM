@@ -396,11 +396,12 @@ public class ProduceClickableMap {
 		}
 		return Collections.unmodifiableSet(list);
 	}
+	private static final String blog_url_root = "annotations";
 
 	private static Wordpress open_wordpress(String wordpress, String blog_name)
 	{
 		final Wordpress wp;
-		final String url = "http://" + wordpress + "/annotations/" + blog_name + "/xmlrpc.php";
+		final String url = "http://" + wordpress + "/" + blog_url_root + "/" + blog_name + "/xmlrpc.php";
 		try
 		{
 			wp = new Wordpress(wordpress_username, "dsf6%sk9Idqqf", url);
@@ -3754,7 +3755,7 @@ public class ProduceClickableMap {
 			modifications.clear();
 			good2.post_translational.addAll(post_translational);
 			post_translational.clear();
-	       }
+		}
 	}
 	
 	static class Entity extends EntityBase {
@@ -5532,12 +5533,13 @@ public class ProduceClickableMap {
 		out.print(title);
 		out.print("</div>");
 		out.print(" <div class='header-right'>");
-		html_in_new_window(out, "map_symbols", "map symbols");
+		html_in_new_window(out, "/" + blog_url_root + "/" + blog_name, "<img alt='blog' border='0' src='/map_icons/misc/blog.png'>");
 		out.print(" ");
-		html_in_new_window(out, "map_help", "help");
+		doc_in_new_window(out, "map_symbols", "map symbols");
+		out.print(" ");
+		doc_in_new_window(out, "map_help", "help");
 		out.print("</div>");
 		out.println("</div>");
-	
 		
 		out.print("<div id='" + map_div_name);
 		out.println("'>The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.</div>");
@@ -5553,13 +5555,17 @@ public class ProduceClickableMap {
 		out.close();
 	}
 
-	private static void html_in_new_window(final PrintStream out, String page, String text)
+	private static void doc_in_new_window(final PrintStream out, String page, String text)
+	{
+		html_in_new_window(out, doc_directory + "/" + page + ".html", text);
+	}
+
+	private static void html_in_new_window(final PrintStream out, String url, String text)
 	{
 		out.print("<a href=");
-		out.print(html_quote(new StringBuffer(), doc_directory + "/" + page + ".html"));
-		out.print("target='_blank'>");
+		out.print(html_quote(new StringBuffer(), url));
+		out.print(" target='_blank'>");
 		out.print(text);
 		out.print("</a>");
-		
 	}
 }

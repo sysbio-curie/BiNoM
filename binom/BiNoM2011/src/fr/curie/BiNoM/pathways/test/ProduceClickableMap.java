@@ -3160,12 +3160,12 @@ public class ProduceClickableMap {
 							fw.append(sep).append(t[1]);
 						continue composants;
 					}
-				Utils.eclipseError("for " + name + " did not find " + t[0] + " in");
+				Utils.eclipseError("for " + name + " " + complex.getId() + " did not find " + t[0] + " in");
 				for (final Entity m : complex.getComponents())
 					System.err.print(" " + m.getName());
 				System.err.println();
 					
-				assert false : name + " " + t[0] + " " + complex.getPostTranslational().get(1).getName();
+//				assert false : name + " " + t[0];
 			}
 		}
 		return fw;
@@ -3322,7 +3322,7 @@ public class ProduceClickableMap {
 			{
 				final AllPosts.Post post = all_posts.lookup(r.getId());
 				if (post == null)
-					Utils.eclipseErrorln("missing post for reaction " + r.getId());
+					Utils.eclipsePrintln("missing post for reaction " + r.getId());
 				show_reaction(r, h, fw.append("<li>"), pass2, post).append("\n");
 			}
 			previous = r;

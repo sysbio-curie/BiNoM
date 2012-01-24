@@ -129,14 +129,14 @@ public class TestOPtCutSet {
 
 			oca.checkRows();
 			oca.searchHitSetSizeOne();
-			oca.printPathMatrix();
+			//oca.printPathMatrix();
 			oca.convertPathMatrixColToBinary();
 			oca.convertPathMatrixRowToBinary();
 			//oca.savePathMatrix("/bioinfo/users/ebonnet/path_matrix", "/bioinfo/users/ebonnet/node_list");
-			//oca.searchHitSetSizeTwo();
+			oca.searchHitSetSizeTwo();
 			//oca.searchHitSetFull(10);
-			//oca.searchHitSetOpt(5);
-			oca.mainBerge();
+			oca.searchHitSetOpt(4);
+			//oca.mainBerge();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

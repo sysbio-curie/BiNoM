@@ -82,13 +82,9 @@ public class OptimalCombinationAnalyzer {
 		HashSet<BitSet> mcs = initFirstRowBerge();
 		mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(1));
 		long tic = System.currentTimeMillis();
-		Utils.printUsedMemory();
-		System.out.println("start");
 		for (int i=1;i<pathMatrixNbRow;i++) {
 			//System.out.println("round: "+i);
 			mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(i));
-			System.gc();
-			Utils.printUsedMemory();
 			//System.out.println("candidate set size: "+mcs.size());
 			mcs = checkMinimalityBerge(mcs);
 		}
@@ -339,8 +335,9 @@ public class OptimalCombinationAnalyzer {
 	public void searchHitSetOpt(int max) {
 		
 		int setSize = 3;
+		
 		while (setSize <= max) {
-			
+			long totalTic = System.currentTimeMillis();
 			// stop if all elementary nodes are covered
 			if (hitSetNodeList.size() == pathMatrixNbCol) {
 				setSize--;
@@ -355,14 +352,14 @@ public class OptimalCombinationAnalyzer {
 			}
 			
 			System.out.println();
-			System.out.println("Search for hit set size "+ setSize);
+			System.out.println("search for hit set size "+ setSize);
+			System.out.println("nb combinations for this size: "+calcCombinations(pathMatrixNbCol, setSize));
 			
 			// generate combinations from previous set
-			System.out.println("Generating new combination set...");
 			System.out.println("seed set size: "+seedSetList.size());
 			
 			Long tic = System.currentTimeMillis();
-			ArrayList<HashSet<Integer>> newList = new ArrayList<HashSet<Integer>>();
+			HashSet<HashSet<Integer>> newList = new HashSet<HashSet<Integer>>();
 			int cpt = 0;
 			for (HashSet<Integer> set : seedSetList) {
 				// add new node to previous set
@@ -381,14 +378,13 @@ public class OptimalCombinationAnalyzer {
 			}
 			Long toc = System.currentTimeMillis() - tic;
 			
-			System.out.println("Nb combinations: "+calcCombinations(pathMatrixNbCol, setSize));
-			System.out.println("Nb enumerations: " + cpt);
-			System.out.println("time enumeration: " + toc);
+			System.out.println("nb iterations for new list: " + cpt);
+			System.out.println("time iterations: " + toc);
 			
 			// reset seed list
 			seedSetList = new ArrayList<HashSet<Integer>>();
 			
-			System.out.println("enumeration set size: "+newList.size());
+			System.out.println("new list size: "+newList.size());
 			int ct=0;
 			tic = System.currentTimeMillis();
 			for (HashSet<Integer> hs : newList) {
@@ -418,9 +414,9 @@ public class OptimalCombinationAnalyzer {
 							hitSetNodeList.add(i);
 						}
 						addHitSetBin(hs);
-						for (int i : hs)
-							System.out.print(pathMatrixNodeList.get(i)+":");
-						System.out.println();
+//						for (int i : hs)
+//							System.out.print(pathMatrixNodeList.get(i)+":");
+//						System.out.println();
 						ct++;
 					}
 				}
@@ -431,11 +427,15 @@ public class OptimalCombinationAnalyzer {
 				}
 			}
 			toc = System.currentTimeMillis() - tic;
-			System.out.println("time hitset + minimal: "+toc);
+			System.out.println("time true hitset + minimal: "+toc);
 			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
 			setSize++;
+			
+			long totalToc = System.currentTimeMillis() - totalTic;
+			System.out.println("total timing: "+totalToc);
 		}
+		
 	}
 	
 	/**

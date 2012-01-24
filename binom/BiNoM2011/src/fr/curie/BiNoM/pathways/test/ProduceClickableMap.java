@@ -4007,25 +4007,25 @@ public class ProduceClickableMap {
 	
 	private static String getStandardName(String comment){
 		String res = "";
-			  Vector refs = new Vector();
-			  try{
-				  
-			  String dbid = "";
-			  StringTokenizer st = new StringTokenizer(comment," >:;\r\n");
-			  String s = "";
-			  while(st.hasMoreTokens()){
-			    String ss = st.nextToken();
-			    //System.out.println(ss);
-			    if(ss.toLowerCase().equals("hugo")){
-				      if(st.hasMoreTokens()){
-					dbid = st.nextToken();
-					res+=dbid;
-				      }
-				    }
-			  }
-			  }catch(Exception e){
-			    e.printStackTrace();
-			  }
+		Vector refs = new Vector();
+		try{
+
+			String dbid = "";
+			StringTokenizer st = new StringTokenizer(comment," >:;\r\n");
+			String s = "";
+			while(st.hasMoreTokens()){
+				String ss = st.nextToken();
+				//System.out.println(ss);
+				if(ss.toLowerCase().equals("hugo")){
+					if(st.hasMoreTokens()){
+						dbid = st.nextToken();
+						res+=dbid;
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return res;
 	}
 	

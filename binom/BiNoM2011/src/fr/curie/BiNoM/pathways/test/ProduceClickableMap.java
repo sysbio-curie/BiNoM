@@ -100,7 +100,7 @@ public class ProduceClickableMap {
 	private final static String included_blog_base = "clickmap_blog";
 	private final static String included_map_base = "clickmap_map";
 	
-	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>(); 
+	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>();
 	public SbmlDocument cd = null;
 	private final HashMap<String, XmlObject> species = new HashMap<String, XmlObject>(); // not used
 	private final HashMap<String, Vector<String>> speciesAliases = new HashMap<String, Vector<String>>();
@@ -160,7 +160,7 @@ public class ProduceClickableMap {
 	static private void calculate_all_modification_names(SbmlDocument cd, final Map<String, EntityBase> _entityIDToEntityMap,
 		final Map<String, Modification> _speciesIDToModificationMap)
 	{
-		/* this is really horrible but I need to have the name of the species and this can only 
+		/* this is really horrible but I need to have the name of the species and this can only
 		 * be done once the maps are set up. Which maps? Who knows?
 		 */
 		int i =0;
@@ -848,7 +848,7 @@ public class ProduceClickableMap {
 			place.width = Float.parseFloat(spa.getCelldesignerBounds().getW());
 			place.height = Float.parseFloat(spa.getCelldesignerBounds().getH());
 			place.type = place.RECTANGLE;
-			place.sbmlid = species_id; 
+			place.sbmlid = species_id;
 			
 			Object obj = CellDesigner.entities.get(species_id);
 			//System.out.println(obj.getClass().getName().toLowerCase());
@@ -3936,7 +3936,7 @@ public class ProduceClickableMap {
 		  ListOfModifiersDocument.ListOfModifiers lm = r.getListOfModifiers();
 		  for(int j=0;j<r.getListOfReactants().sizeOfSpeciesReferenceArray();j++){
 		    String s = r.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
-		    // find bubble (marker) for s 
+		    // find bubble (marker) for s
 		    if(realNames){
 		      s = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbmlDoc,s,true,true);
 		    }
@@ -3984,7 +3984,7 @@ public class ProduceClickableMap {
 		    }
 		    if((s!=null)&&(!s.startsWith("null"))){
 		    //reactionString+=s;
-		    	if(insertLinks)		  
+		    	if(insertLinks)		
 		    		reactionString+="<a href='"+r.getListOfProducts().getSpeciesReferenceArray(j).getSpecies()+".html'>"+s+"</a>";
 		    	else
 		    		reactionString+=s;
@@ -4209,7 +4209,7 @@ public class ProduceClickableMap {
 		}
 	);
 
-	/* generates a polygon (for an image map) along reactions 
+	/* generates a polygon (for an image map) along reactions
 	 */
 	private void generatePlacesForReaction(ReactionDocument.Reaction r){
 		
@@ -4601,7 +4601,7 @@ public class ProduceClickableMap {
 	}
 	
 	/* generates submaps each representing a protein
-	 
+	
 	private void generatePartialMaps(String path, String pathname, String folder) throws Exception{
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;i++){
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
@@ -4950,7 +4950,7 @@ public class ProduceClickableMap {
 				snp.subnetwork.addNode(graph.getNode(nodes.get(i)));
 			snp.subnetwork.addConnections(graph);
 			snp.addFirstNeighbours(snp.subnetwork,graph,true);
-			reactions.clear(); 
+			reactions.clear();
 			for(int i=0;i<snp.subnetwork.Nodes.size();i++){
 				Node n = snp.subnetwork.Nodes.get(i);
 				String id = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
@@ -5059,7 +5059,7 @@ public class ProduceClickableMap {
 		script+="scrollY = document.body.scrollTop;\n";
 		script+="else\n";
 		script+="scrollY = document.documentElement.scrollTop;\n";
-		script+="}\n";   
+		script+="}\n";
 		script+="else\n";
 		script+="{\n";
 		script+="scrollX = window.pageXOffset;\n";
@@ -5097,16 +5097,16 @@ public class ProduceClickableMap {
 	private void makeMenu(){
 		menu = "<html>\n";
 		menu+= "<body>\n";
-		menu+= "<b>"+title+" pathway diagram:</b> (<a href=\"diagram_help.html\" target=\"info\">help</a>)<b>:</b> \n"; 
-		menu+= "<font size=+1><a href=\""+name+".html\" target=\"map\">DETAILED</a></font> -\n"; 
-		menu+= "<font size=-1><a href=\""+name+"_compressed.html\" target=\"map\">COMPRESSED</a></font> -\n"; 
-		menu+= "<font size=+0><a href=\""+name+"_structural.html\" target=\"map\">StRuCtUrAl</a></font> - \n"; 
+		menu+= "<b>"+title+" pathway diagram:</b> (<a href=\"diagram_help.html\" target=\"info\">help</a>)<b>:</b> \n";
+		menu+= "<font size=+1><a href=\""+name+".html\" target=\"map\">DETAILED</a></font> -\n";
+		menu+= "<font size=-1><a href=\""+name+"_compressed.html\" target=\"map\">COMPRESSED</a></font> -\n";
+		menu+= "<font size=+0><a href=\""+name+"_structural.html\" target=\"map\">StRuCtUrAl</a></font> - \n";
 		menu+= "<font size=+0><a href=\""+name+"_modular.html\" target=\"map\"><b>modular</b></a></font>\n";
-		menu+= "&nbsp;&nbsp;\n"; 
-		menu+= "<b>Panel:</b>\n"; 
-		menu+= "<a href=\"pages/"+name+"_list.html\" target=\"info\">all entities</a>\n"; 
 		menu+= "&nbsp;&nbsp;\n";
-		menu+= "<b>Element:</b>\n"; 
+		menu+= "<b>Panel:</b>\n";
+		menu+= "<a href=\"pages/"+name+"_list.html\" target=\"info\">all entities</a>\n";
+		menu+= "&nbsp;&nbsp;\n";
+		menu+= "<b>Element:</b>\n";
 		menu+= "<span id=\"showhide\"></span>\n";
 		menu+= "<form id='coords'>\n";
 		menu+= "<INPUT type=\"hidden\" id=\"xCoordHolder\">\n";
@@ -5135,17 +5135,17 @@ public class ProduceClickableMap {
 		frame = "<html>\n";
 		frame+="<frameset rows=\"40,100%\">\n";
 		frame+="<frame src=\"menu.html\" name=\"menu\">\n";
-		frame+="<FRAMESET COLS=\"80%,20%\">\n"; 
+		frame+="<FRAMESET COLS=\"80%,20%\">\n";
 		frame+="<FRAME SRC=\""+name+".html\" NAME=\"map\">\n";
 		frame+="<FRAME SRC=\"pages/"+name+"_list.html\"\n";
 		frame+="NAME=\"info\">\n";
-		frame+="</FRAMESET>\n"; 
-		frame+="</FRAMESET>\n"; 
+		frame+="</FRAMESET>\n";
+		frame+="</FRAMESET>\n";
 		frame+="</html>\n";
 	}
 	*/
 	/* for each XML file in the folder, generates an HTML image map
-	 */ 
+	 */
 	/*
 	private void convertXMLsInFolderToImageMaps(String folder,String pathToPages) throws Exception{
 		System.out.println("Creating image maps in folder "+folder+"...");
@@ -5197,7 +5197,7 @@ public class ProduceClickableMap {
 				String species = keys.next(); String moduleName = speciesModularModuleNameMap.get(species);
 				SbmlDocument cd = CellDesigner.loadCellDesigner(this.path+"/"+this.modulefolder+"/"+moduleName+"_c.xml");
 				Vector<String> allspecies = new Vector<String>();
-				Vector<String> allproteins = new Vector<String>(); 
+				Vector<String> allproteins = new Vector<String>();
 				Vector<String> allproteinnames = new Vector<String>();
 				for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 					SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -5419,7 +5419,7 @@ public class ProduceClickableMap {
 		private void check_write(String s) throws IOException
 		{
 			compare(s);
-			markers.write(s);		
+			markers.write(s);
 		}
 		private boolean initial_line(BufferedReader existing) throws IOException
 		{

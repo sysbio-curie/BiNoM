@@ -320,7 +320,6 @@ public class BioPAXGraphMapper {
 			  n.Attributes.add(new Attribute("BIOPAX_URI",pep.uri()));
 			  nodes.put(pep.uri(),n);
 		  }
-		  //TODO test thoroughly this part, not sure the changes will work as it should.
 		  PhysicalEntity ent = (PhysicalEntity)bs.sinonymSpecies.get(0);
 		  if(ent!=null){
 			  Node n1 = nodes.get(getID(ent));
@@ -618,7 +617,9 @@ public class BioPAXGraphMapper {
 			  n.Id = intn; 
 			  n.NodeLabel = intn;
 			  graph.addNode(n);
-			  n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","molecularInteraction"));
+			  /* modif ebo */
+			  //n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","molecularInteraction"));
+			  n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","MolecularInteraction"));
 			  n.Attributes.add(new Attribute("BIOPAX_URI",mi.uri()));
 			  nodes.put(intn,n);
 			  nodes.put(mi.uri(),n);
@@ -664,7 +665,9 @@ public class BioPAXGraphMapper {
           nodes.put(p.uri(),n);
           nodes.put(id,n);
           nodes.put(name,n);
-          n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","pathway"));
+          /* modif ebo */
+          //n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","pathway"));
+          n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","Pathway"));
           n.Attributes.add(new Attribute("BIOPAX_URI",p.uri()));
           connectEntityToPublications(p);
       }
@@ -725,7 +728,9 @@ public class BioPAXGraphMapper {
           graph.addNode(n);
           n.NodeLabel = Utils.cutUri(ps.uri());
           nodes.put(ps.uri(),n);
-          n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","pathwayStep"));
+          /* modif ebo */
+          //n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","pathwayStep"));
+          n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","PathwayStep"));
           n.Attributes.add(new Attribute("BIOPAX_URI",ps.uri()));
       }
       
@@ -836,7 +841,9 @@ public class BioPAXGraphMapper {
         n = new Node();  
         n.Id = name; n.NodeLabel = name;
         graph.addNode(n);
-        n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","publication"));
+        /* modif ebo */
+        //n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","publication"));
+        n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","Publication"));
         n.Attributes.add(new Attribute("BIOPAX_URI",pub.uri()));
         nodes.put(id,n);
         nodes.put(pub.uri(),n);

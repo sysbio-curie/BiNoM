@@ -265,33 +265,33 @@ public class BioPAXSelectEntitiesDialog extends JFrame {
 
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-                    setVisible(false);
-                    BioPAXGraphQuery query = new BioPAXGraphQuery();
-                    if(listOfNamesRB.isSelected()){
-                    	String text = textArea.getText();
-                    	StringTokenizer st = new StringTokenizer(text,"\n,; ");
-                    	Vector names = new Vector();
-                    	Vector xrefs = new Vector();
-                    	while(st.hasMoreTokens()){
-			    names.add(st.nextToken());
-			    xrefs.add(new Vector());
-                    	}
-                    	query = BioPAXGraphQuery.convertListOfNamesToQuery(names, xrefs);
-                    }else{
-			GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
-			query.input = XGMML.convertXGMMLToGraph(grDoc);
-			//for(int i=0;i<query.input.Nodes.size();i++)
-			//	   System.out.println("Query node : "+((fr.curie.BiNoM.pathways.analysis.structure.Node)query.input.Nodes.get(i)).Id);
-                    }
-                    int itype = 0, otype = 0;
-                    if(currentNetworkRB.isSelected()) itype = BioPAXSelectEntitiesTask.INPUT_CURRENT_NETWORK;
-                    if(listOfNamesRB.isSelected()) itype = BioPAXSelectEntitiesTask.INPUT_LISTOF_NAMES;
-                    if(outputCurrentNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_CURRENT_NETWORK;
-                    if(outputNewNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_NEW_NETWORK;
-                    BioPAXSelectEntitiesTask task = new BioPAXSelectEntitiesTask(query,itype,otype);
-                    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-                }
-	    });
+			setVisible(false);
+			BioPAXGraphQuery query = new BioPAXGraphQuery();
+			if(listOfNamesRB.isSelected()){
+				String text = textArea.getText();
+				StringTokenizer st = new StringTokenizer(text,"\n,; ");
+				Vector names = new Vector();
+				Vector xrefs = new Vector();
+				while(st.hasMoreTokens()){
+					names.add(st.nextToken());
+					xrefs.add(new Vector());
+				}
+				query = BioPAXGraphQuery.convertListOfNamesToQuery(names, xrefs);
+			}else{
+				GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
+				query.input = XGMML.convertXGMMLToGraph(grDoc);
+				//for(int i=0;i<query.input.Nodes.size();i++)
+				//	   System.out.println("Query node : "+((fr.curie.BiNoM.pathways.analysis.structure.Node)query.input.Nodes.get(i)).Id);
+			}
+			int itype = 0, otype = 0;
+			if(currentNetworkRB.isSelected()) itype = BioPAXSelectEntitiesTask.INPUT_CURRENT_NETWORK;
+			if(listOfNamesRB.isSelected()) itype = BioPAXSelectEntitiesTask.INPUT_LISTOF_NAMES;
+			if(outputCurrentNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_CURRENT_NETWORK;
+			if(outputNewNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_NEW_NETWORK;
+			BioPAXSelectEntitiesTask task = new BioPAXSelectEntitiesTask(query,itype,otype);
+			fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		}
+	});
 
 	cancelB = new JButton("Cancel");
 

@@ -134,8 +134,8 @@ public class TestOPtCutSet {
 			oca.convertPathMatrixRowToBinary();
 			//oca.savePathMatrix("/bioinfo/users/ebonnet/path_matrix", "/bioinfo/users/ebonnet/node_list");
 			oca.searchHitSetSizeTwo();
-			//oca.searchHitSetFull(10);
-			oca.searchHitSetOpt(4);
+			oca.searchHitSetFull(8);
+			//oca.searchHitSetOpt(5);
 			//oca.mainBerge();
 		}
 		catch (Exception e) {

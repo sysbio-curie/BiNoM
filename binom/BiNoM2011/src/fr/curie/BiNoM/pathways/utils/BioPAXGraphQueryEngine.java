@@ -96,20 +96,20 @@ public void doQuery(BioPAXGraphQuery q, int queryType){
   if(queryType==BioPAXGraphQuery.COMPLETE_REACTIONS)
     completeReactions();
   if(queryType==BioPAXGraphQuery.LIST_PROTEINS)
-    listObjects("protein");
+    listObjects("Protein");
   if(queryType==BioPAXGraphQuery.LIST_COMPLEXES)
-    listObjects("complex");
+    listObjects("Complex");
   if(queryType==BioPAXGraphQuery.LIST_REACTIONS){
-    listObjects("physicalInteraction");
-    listObjects("interaction");
-    listObjects("conversion");
-    listObjects("biochemicalReaction");
-    listObjects("complexAssembly");
-    listObjects("transport");
-    listObjects("transportWithBiochemicalReaction");
+    listObjects("MolecularInteraction");
+    listObjects("Interaction");
+    listObjects("Conversion");
+    listObjects("BiochemicalReaction");
+    listObjects("ComplexAssembly");
+    listObjects("Transport");
+    listObjects("TransportWithBiochemicalReaction");
   }
   if(queryType==BioPAXGraphQuery.LIST_SMALL_MOLECULES){
-    listObjects("smallMolecule");
+    listObjects("SmallMolecule");
   }
 }
 
@@ -122,10 +122,10 @@ private void selectEntities(){
     //if(nd.Id.equals("CDK1"))
     //	System.out.println();
     //System.out.println(nd.Id+"\t"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE"));
-    if(nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("protein")||
-       nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("gene")||
-       nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("dna")||
-       (nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("smallMolecule")&&(!excludeSmallMolecules))
+    if(nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Protein")||
+       nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Gene")||
+       nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Dna")||
+       (nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")&&(!excludeSmallMolecules))
        //||nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("complex")
        )if(nd.getFirstAttributeValue("BIOPAX_SPECIES")==null){
     Vector ndident = null;
@@ -138,7 +138,7 @@ private void selectEntities(){
       if(ndident!=null)
       for(int k=0;k<ndident.size();k++){
     	  Node n = (Node)ndident.get(k);
-    	  if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("smallMolecule")))
+    	  if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
     		  if(resultNodeList.indexOf(n)<0)
     			  resultNodeList.add(ndident.get(k));
       }
@@ -157,7 +157,7 @@ private void selectEntities(){
       if(ndident!=null)
       for(int k=0;k<ndident.size();k++){
     	  Node n = (Node)ndident.get(k);
-    	  if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("smallMolecule")))
+    	  if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
     		 if(resultNodeList.indexOf(n)<0) 
     		    resultNodeList.add(n);
       }
@@ -227,32 +227,20 @@ public void setDatabase(Graph graph){
   entityXREF = new HashMap();
   System.out.println("Found "+database.Nodes.size()+" nodes");
   for(int i=0;i<database.Nodes.size();i++){
-     //if(i==(int)(0.001f*i)*1000)
-     //  System.out.print(i+" ");
      fr.curie.BiNoM.pathways.analysis.structure.Node nd = (fr.curie.BiNoM.pathways.analysis.structure.Node)database.Nodes.get(i);
      Vector syns = nd.getAttributeValues("BIOPAX_NODE_SYNONYM");
      for(int j=0;j<syns.size();j++){
         String s = (String)syns.get(j); s = s.toLowerCase();
-        /*if(entitySynonym.get(s)!=null){
-          fr.curie.BiNoM.pathways.analysis.structure.Node nd1 = (fr.curie.BiNoM.pathways.analysis.structure.Node)entitySynonym.get(s);
-          System.out.println("WARNING!!! Duplicate name "+s+" for "+nd1.Id+" and "+nd.Id);
-        }*/
         Vector v = (Vector)entitySynonym.get(s);
         if(v==null) v = new Vector();
         v.add(nd); entitySynonym.put(s,v);
-        //System.out.println("Put "+s);
      }
      Vector xrefs = nd.getAttributeValues("BIOPAX_NODE_XREF");
      for(int j=0;j<xrefs.size();j++){
         String s = (String)xrefs.get(j); s = s.toLowerCase();
-        /*if(entityXREF.get(s)!=null){
-          fr.curie.BiNoM.pathways.analysis.structure.Node nd1 = (fr.curie.BiNoM.pathways.analysis.structure.Node)entityXREF.get(s);
-          System.out.println("WARNING!!! Duplicate XREF "+s+" for "+nd1.Id+" and "+nd.Id);
-        }*/
         Vector v = (Vector)entityXREF.get(s);
         if(v==null) v = new Vector();
         v.add(nd); entityXREF.put(correctXREF(s),v);
-        //System.out.println("Put "+s);
      }
      // we also add the BioPAX uri to XREF
      String s = nd.getFirstAttributeValue("BIOPAX_URI");
@@ -263,7 +251,6 @@ public void setDatabase(Graph graph){
     	 entityXREF.put(correctXREF(s).toLowerCase(),v);
      }
   }
-  System.out.println();
 }
 
 /**
@@ -295,7 +282,7 @@ private void addComplexes(boolean expand){
     	  type = "";
       }
       if(type.equals("CONTAINS")){
-        if(e.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("complex")){
+        if(e.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Complex")){
           boolean add = true;
           if(!expand){
             for(int k=0;k<e.Node2.incomingEdges.size();k++){
@@ -407,7 +394,7 @@ private void addConnectingReactions(){
               Edge es = (Edge)e.Node2.outcomingEdges.get(k);
               String id = es.Node2.Id;
               if(es.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
-              if((!excludeSmallMolecules)||(!es.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("smallMolecule")))
+              if((!excludeSmallMolecules)||(!es.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
                   nospecies = false;
               //if((query.input.getNode(id)!=null)&&(!id.equals(nd.Id)))
               if(query.input.getNode(id)!=null)
@@ -448,7 +435,7 @@ private void addConnectingReactions(){
               Edge es = (Edge)e.Node1.incomingEdges.get(k);
               String id = es.Node1.Id;
               if(es.Node1.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
-              if((!excludeSmallMolecules)||(!es.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("smallMolecule")))            	  
+              if((!excludeSmallMolecules)||(!es.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))            	  
                 nospecies = false;
               //if((query.input.getNode(id)!=null)&&(!id.equals(nd.Id)))
               if(query.input.getNode(id)!=null)
@@ -523,7 +510,7 @@ private void addPublications(){
     }else{
       for(int j=0;j<nd.incomingEdges.size();j++){
           Edge e = (Edge)nd.incomingEdges.get(j);
-          if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("publication")){
+          if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Publication")){
             e.Node1.NodeLabel = e.Node1.NodeLabel.replace('@','\t');
             if(query.result.getNode(e.Node1.Id)==null){
               String mes = (++npubs)+"\t"+e.Node1.NodeLabel+"\n";
@@ -557,7 +544,7 @@ private void listPublications(){
     }else{
       for(int j=0;j<nd.incomingEdges.size();j++){
           Edge e = (Edge)nd.incomingEdges.get(j);
-          if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("publication")){
+          if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Publication")){
             if(pubs.get(e.Node1.NodeLabel)==null){
               e.Node1.NodeLabel = e.Node1.NodeLabel.replace('@','\t');
               String mes = (++npubs)+"\t"+e.Node1.NodeLabel+"\n";
@@ -579,7 +566,7 @@ private void listObjects(String type){
     Node n = (Node)query.input.Nodes.get(i);
     query.result.addNode(n);
     Node nd = (Node)database.getNode(n.Id);
-    //System.out.println(nd.getFirstAttributeValue("BIOPAX_NODE_TYPE"));
+    //System.out.println(">>>"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE"));
     if(nd==null){
       System.out.println("QUERY ERROR: "+n.Id+" is not in the database");
     }else{

@@ -120,7 +120,7 @@ public static BioPAXGraphQuery convertListOfNamesToQuery(Vector names, Vector ID
   for(int i=0;i<names.size();i++){
     String name = (String)names.get(i);
     fr.curie.BiNoM.pathways.analysis.structure.Node nd = q.input.getCreateNode(name);
-    fr.curie.BiNoM.pathways.analysis.structure.Attribute at = new fr.curie.BiNoM.pathways.analysis.structure.Attribute("BIOPAX_NODE_TYPE","protein");
+    fr.curie.BiNoM.pathways.analysis.structure.Attribute at = new fr.curie.BiNoM.pathways.analysis.structure.Attribute("BIOPAX_NODE_TYPE","Protein");
     nd.Attributes.add(at);
     at = new fr.curie.BiNoM.pathways.analysis.structure.Attribute("BIOPAX_NODE_SYNONYM",name);
     nd.Attributes.add(at);

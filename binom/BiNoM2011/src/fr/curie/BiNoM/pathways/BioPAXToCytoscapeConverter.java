@@ -548,7 +548,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			n.setLabel(name);
 			nodes.put(p.uri(),n);
 			nodes.put(name,n);
-			Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","pathway",ObjectType.STRING);
+			Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","Pathway",ObjectType.STRING);
 			Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",p.uri(),ObjectType.STRING);	    
 		}
 

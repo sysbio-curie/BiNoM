@@ -280,6 +280,7 @@ public class OptimalCombinationAnalyzer {
 			CombinationGenerator cg = new CombinationGenerator(pathMatrixNbCol, setSize);
 			System.out.println("Combination set size: "+cg.getTotal());
 			int ct=0;
+			long tic = System.currentTimeMillis();
 			while(cg.hasMore()) {
 				indices = cg.getNext();
 				
@@ -320,12 +321,14 @@ public class OptimalCombinationAnalyzer {
 						addHitSetBin(novel);
 						hitSet.add(novel);
 						ct++;
-						for (int i : novel)
-							System.out.print(pathMatrixNodeList.get(i)+":");
-						System.out.println();
+//						for (int i : novel)
+//							System.out.print(pathMatrixNodeList.get(i)+":");
+//						System.out.println();
 					}
 				}
 			}
+			long toc = System.currentTimeMillis() - tic;
+			System.out.println("timing: "+toc);
 			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
 			setSize++;
@@ -387,10 +390,10 @@ public class OptimalCombinationAnalyzer {
 			System.out.println("new list size: "+newList.size());
 			int ct=0;
 			tic = System.currentTimeMillis();
-			for (HashSet<Integer> hs : newList) {
+			for (HashSet<Integer> candidateHitSet : newList) {
 				// check for true hitting set
 				BitSet b1 = new BitSet(pathMatrixNbRow);
-				Iterator<Integer> it = hs.iterator();
+				Iterator<Integer> it = candidateHitSet.iterator();
 				while(it.hasNext()) {
 					int i = it.next();
 					b1.or(pathMatrixColBin.get(i));
@@ -398,22 +401,22 @@ public class OptimalCombinationAnalyzer {
 
 				if (b1.cardinality() == pathMatrixNbRow) {
 					// now check if the set is minimal, i.e do not overlap with any previous hitting set
-					BitSet test = getBitSetRowHS(hs);
+					BitSet test = getBitSetRowHS(candidateHitSet);
 					boolean isMinimal = true;
 					for (BitSet bs : hitSetBin) {
-						BitSet b2 = (BitSet) bs.clone();
-						b2.and(test);
-						if (b2.cardinality() == bs.cardinality()) {
+						BitSet check = (BitSet) bs.clone();
+						check.and(test);
+						if (check.cardinality() == bs.cardinality()) {
 							isMinimal = false;
 							break;
 						}
 					}
 					if (isMinimal == true) {
-						hitSet.add(hs);
-						for (int i : hs) {
+						hitSet.add(candidateHitSet);
+						for (int i : candidateHitSet) {
 							hitSetNodeList.add(i);
 						}
-						addHitSetBin(hs);
+						addHitSetBin(candidateHitSet);
 //						for (int i : hs)
 //							System.out.print(pathMatrixNodeList.get(i)+":");
 //						System.out.println();
@@ -422,8 +425,8 @@ public class OptimalCombinationAnalyzer {
 				}
 				else {
 					// add set to seed list
-					if (!seedSetList.contains(hs))
-						seedSetList.add(hs);
+					//if (!seedSetList.contains(hs))
+					seedSetList.add(candidateHitSet);
 				}
 			}
 			toc = System.currentTimeMillis() - tic;

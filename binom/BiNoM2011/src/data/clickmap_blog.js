@@ -21,16 +21,18 @@
  */
 var maps;
 
-var log;
-if (typeof window.console != 'undefined' && typeof window.console.log != 'undefined')
-{
-    log = window.console.log;
-    log("log active", window);
+//http://www.clientcide.com/best-practices/dbug-a-consolelog-firebug-wrapper/
+dbug = {
+		firebug: false, debug: false, log: function(msg) {},
+		enable: function() { if(this.firebug) this.debug = true; dbug.log = console.debug; dbug.log('enabling dbug');	},
+		disable: function(){ if(this.firebug) this.debug = false; dbug.log = function(){}; }
 }
-else
-{
-	log = function() {}
+if (typeof console != "undefined") { // safari, firebug
+	if (typeof console.debug != "undefined") { // firebug
+		dbug.firebug = true; if(window.location.href.indexOf("debug=true")>0) dbug.enable();
+	}
 }
+
 
 function show_map_and_markers(map_name, ids)
 {
@@ -42,30 +44,30 @@ function show_map_and_markers(map_name, ids)
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
-		log("open2", map_name, map, maps);
+		dbug.log("open2", map_name, map, maps);
 		
 		map = maps[map_name];
 		
 		if (!map.to_open)
 		{
-			log("open missing");
+			dbug.log("open missing");
 			map.to_open = ids;
 		}
 		else if (map.to_open.length < 1)
 		{
-			log("open show_markers", maps);
+			dbug.log("open show_markers", maps);
 			map.show_markers(ids);
 		}
 		else
 		{
-			log("open concat", map.to_open, ids, maps);
+			dbug.log("open concat", map.to_open, ids, maps);
 			map.to_open.concat(ids);
 		}
 		map.focus();
 	}
 	else
 	{
-		log("not open", map_name, maps);
+		dbug.log("not open", map_name, maps);
 		map = window.open("/maps/" + blog_name + "/" + map_name);
 		map.to_open = ids;
 		map.maps = maps;
@@ -78,10 +80,10 @@ $(document).ready(
 	{
 		var f = function () {
 			var map = $(this).find("span.map").attr("title");
-			log("map", map);
+			dbug.log("map", map);
 			var ids = [];
 			$(this).find("span.entity").each(function() { ids.push($(this).attr("title")); });
-			log("ids", ids);
+			dbug.log("ids", ids);
 			show_map_and_markers(map, ids);
 			return false;
 		};

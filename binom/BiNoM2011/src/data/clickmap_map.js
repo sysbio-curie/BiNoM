@@ -27,15 +27,16 @@ var to_open;
 var maps;
 var blog_name;
 
-var log;
-if (typeof window.console != 'undefined' && typeof window.console.log != 'undefined')
-{
-    log = window.console.log;
-    log("log active", window);
+// http://www.clientcide.com/best-practices/dbug-a-consolelog-firebug-wrapper/
+dbug = {
+		firebug: false, debug: false, log: function(msg) {},
+		enable: function() { if(this.firebug) this.debug = true; dbug.log = console.debug; dbug.log('enabling dbug');	},
+		disable: function(){ if(this.firebug) this.debug = false; dbug.log = function(){}; }
 }
-else
-{
-	log = function() {}
+if (typeof console != "undefined") { // safari, firebug
+	if (typeof console.debug != "undefined") { // firebug
+		dbug.firebug = true; if(window.location.href.indexOf("debug=true")>0) dbug.enable();
+	}
 }
 
 function extend(bounds, marker)
@@ -63,7 +64,7 @@ function show_markers_ref(markers, ref)
 		{
 			var element = $("li#" + i).filter(".posttranslational")[0];
 			get_markers_for_modification(element, projection, map);
-//			console.log(element.attr("id"), markers.length);
+//			dbug.log(element.attr("id"), markers.length);
 			element.markers.forEach
 			(
 				function(i)
@@ -144,7 +145,7 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 		mapTypeId : id
 	});
 	
-//	console.log(width + " " +  height);
+//	dbug.log(width + " " +  height);
 	
 	var map_type = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
@@ -156,7 +157,7 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 				return null;
 			
 			var r = coord.x + "_" + coord.y;
-//			console.log(coord, zoom, x, y, ntiles, r);
+//			dbug.log(coord, zoom, x, y, ntiles, r);
 			return "tiles/" + zoom + "/" + r + ".png";
 		},
 		tileSize : new google.maps.Size(tile_width, tile_height),
@@ -185,7 +186,7 @@ function get_markers_for_modification(element, projection, map)
 		{
 			var element2 = $("li#" + id).filter(".posttranslational")[0];
 			get_markers_for_modification(element2, projection, map);
-	//		console.log("position is null", $(element).attr("id"), element.peers.length);
+	//		dbug.log("position is null", $(element).attr("id"), element.peers.length);
 		}
 		else
 		{
@@ -238,7 +239,7 @@ function get_markers_for_modification(element, projection, map)
 					this.markers = element.markers;
 				}
 			);
-//			console.log($(element).attr("id"), "created", element.markers.length);
+//			dbug.log($(element).attr("id"), "created", element.markers.length);
 		}
 	}
 	return element.markers;
@@ -327,7 +328,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
-	log("clickmap_start", to_open);
+	dbug.log("clickmap_start", to_open);
 	if (!maps)
 	{
 		maps = Object();
@@ -338,7 +339,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
 	{
-		log("when ready", to_open);
+		dbug.log("when ready", to_open);
 		if (to_open && to_open.length > 0)
 		{
 			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
@@ -352,7 +353,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 				data.inst.close_all(children[i], false);
 		}
 		to_open = [];
-		log("to_open set", to_open, to_open.length);
+		dbug.log("to_open set", to_open, to_open.length);
 	};
 	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
 	var tell_opener = function()
@@ -387,7 +388,7 @@ function show_map_and_markers(map_name, ids)
 	}
 	else
 	{
-		log("not open is map", map, maps);
+		dbug.log("not open is map", map, maps);
 		map = window.open("../" + map_name);
 		map.to_open = ids;
 		map.maps = maps;

@@ -1052,8 +1052,6 @@ public class ProduceClickableMap {
 							modules.add((String)k);
 					}
 					this.cls = c;
-					if (c == null)
-						verbose("post " + page_id + " " + title + " does not have a class");
 					Collections.sort(modules);
 				}
 				

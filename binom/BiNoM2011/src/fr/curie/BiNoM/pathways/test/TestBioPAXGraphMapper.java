@@ -34,7 +34,7 @@ public class TestBioPAXGraphMapper {
 			BioPAXGraphMapper mapper = new BioPAXGraphMapper();
 			mapper.biopax = biopax;
 			mapper.map();
-			mapper.graph.saveAsCytoscapeXGMML("/bioinfo/users/ebonnet/test.xgmml");
+			//mapper.graph.saveAsCytoscapeXGMML("/bioinfo/users/ebonnet/test.xgmml");
 			//return mapper.graph;
 
 			//Graph gr = graph;

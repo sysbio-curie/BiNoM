@@ -141,7 +141,6 @@ public class ProduceClickableMap
 	private static final String common_directory_url = "../" + common_directory_name + "/";
 	
 	private final String blog_name;
-	private String map_annotation;
 	private ImagesInfo scales;
 	private ItemCloser right_panel;
 	
@@ -324,7 +323,7 @@ public class ProduceClickableMap
 			return;
 		}
 		
-		final Map<String, String> modules = get_module_list(source_directory, base);
+		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
 
 		final ProduceClickableMap master;
 		try
@@ -352,7 +351,7 @@ public class ProduceClickableMap
 			}
 		}
 		
-		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales);
+		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, blog_name);
 		
 		remove_old_posts(wp, master.all_posts.getUnused());
 	}
@@ -383,9 +382,9 @@ public class ProduceClickableMap
 		return v;
 	}
 
-	private static Map<String, String> get_module_list(final File source_directory, final String base)
+	private static Map<String, ModuleInfo> get_module_list(final File source_directory, final String base)
 	{
-		final Map<String, String> list = new HashMap<String, String>();
+		final Map<String, ModuleInfo> list = new HashMap<String, ModuleInfo>();
 		final FilenameFilter is_good_xml_file = new FilenameFilter()
 		{
 			@Override
@@ -658,25 +657,27 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-		Wordpress wp, boolean make_tiles, Map<String, String> modules) throws IOException
+		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
-		modules.put(map, create_module_post(wp, master.all_posts, clMap.cd.getSbml().getModel(), map));
+		String module_notes = Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
+		final AllPosts.Post module_post = create_module_post(wp, master.all_posts, module_notes, map, master.blog_name);
+		modules.put(map, new ModuleInfo(module_notes, module_post));
 
 		final File this_map_directory = mk_maps_directory(map, destination);
 
 		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		clMap.generatePages(master.all_posts, new File(this_map_directory, right_panel_list), scales, master.master_format);
-		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales);
-
+		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post);
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-		Wordpress wp, boolean make_tiles, Map<String, String> modules) throws IOException
+		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
 	{
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
+		String module_notes = Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
 
 		final File this_map_directory = mk_maps_directory(map, destination);
 
@@ -684,8 +685,9 @@ public class ProduceClickableMap
 
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
 		clMap.right_panel = clMap.generatePages(wp, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
-		clMap.map_annotation = create_module_post(wp, clMap.all_posts, clMap.cd.getSbml().getModel(), map);
-		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales);
+		final AllPosts.Post module_post = create_module_post(wp, clMap.all_posts, module_notes, map, blog_name);
+		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post);
+		modules.put(map, new ModuleInfo(module_notes, module_post));
 		return clMap;
 	}
 
@@ -1884,7 +1886,29 @@ public class ProduceClickableMap
 		right_close(output);
 	}
 	
-	static private void finish_right_panel_xml(final ItemCloser right, Map<String, String> modules_set, Model model, ImagesInfo scales)
+	static private String make_module_bubble(String notes, String blog_name, int post_id)
+	{
+		String[] parts = notes.split("\n", 2);
+		StringBuffer fw = new StringBuffer();
+		fw.append("<b>").append(parts[0]).append("</b>");
+		bubble_to_post_link_with_anchor(post_id, fw, blog_name);
+		if (parts.length > 1)
+			fw.append("<br>\n").append(parts[1]);
+		return fw.toString();
+	}
+	
+	static class ModuleInfo
+	{
+		final private int post_id;
+		private final String notes;
+		ModuleInfo(String module_notes, AllPosts.Post module_post)
+		{
+			post_id = module_post.getPostId();
+			notes = module_notes;
+		}
+	}
+	
+	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set, Model model, ImagesInfo scales, String blog_name)
 	{
 		final PrintWriter output = right_close_entities(right);
 		
@@ -1912,7 +1936,7 @@ public class ProduceClickableMap
 		}
 	
 		final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
-		for (Entry<String, String> k : modules_set.entrySet())
+		for (Entry<String, ModuleInfo> k : modules_set.entrySet())
 		{
 			if (!positions.containsKey(k.getKey()))
 				Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
@@ -1932,7 +1956,7 @@ public class ProduceClickableMap
 					indent.getOutput().print(";");
 					indent.getOutput().print(scales.getY(position[1]));
 					indent.getOutput().println("\">");
-					content_line(indent.add(), k.getKey(), k.getValue());
+					content_line(indent.add(), k.getKey(), make_module_bubble(k.getValue().notes, blog_name, k.getValue().post_id));
 					indent.close();
 				}
 			}
@@ -2001,21 +2025,25 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
-	static private String create_module_post(final Wordpress wp, AllPosts all_posts, final Model model, final String map_name)
+	static private AllPosts.Post create_module_post(final Wordpress wp, AllPosts all_posts, final String module_notes, final String map_name, String blog_name)
 	{
-		String module_notes = Utils.getText(model.getNotes());
 		final Hasher h = new Hasher();
 		StringBuffer fw = create_buffer_for_post_body(h);
-		fw.append(module_notes);
+		String[] parts = module_notes.split("\n", 2);
+		fw.append("<b>").append(parts[0]).append("</b>");
+		show_map_and_markers_from_post(fw, map_name, Collections.<String>emptyList(), map_name, blog_name);
+		
+		if (parts.length > 1)
+			fw.append("<br>\n").append(parts[1]);
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
 		AllPosts.Post post = updateBlogPostId(wp, all_posts, id, map_name, body);
 		updateBlogPostIfRequired(wp, post, map_name, body, module_list_category_name, Collections.<String>emptyList(), all_posts);
-		return module_notes;
+		return post;
 
 	}
 
-	private ItemCloser generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, String> modules_set)
+	private ItemCloser generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set)
 		throws UnsupportedEncodingException, FileNotFoundException
 	{
 		all_posts = new AllPosts(wp);		
@@ -3346,10 +3374,17 @@ public class ProduceClickableMap
 	{
 		return post_to_post_link(post_id, fw).append(text).append("</a>");
 	}
+	
+	static StringBuffer post_link_base(int post_id, final StringBuffer notes)
+	{
+		return notes.append("index.php?p=").append(post_id);
+	}
 
 	static private StringBuffer post_to_post_link(int post_id, final StringBuffer notes)
 	{
-		return notes.append("<a href=\"index.php?p=").append(post_id).append("\">");
+		notes.append("<a href=\"");
+		post_link_base(post_id, notes);
+		return notes.append("\">");
 	}
 
 	private static StringBuffer bubble_to_post_link(int post_id, final StringBuffer notes, String blog_name)
@@ -5708,7 +5743,7 @@ public class ProduceClickableMap
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final File this_map_directory, final String blog_name, final String title, final String map_name, ImagesInfo scales) throws FileNotFoundException
+	private static void make_index_html(final File this_map_directory, final String blog_name, final String title, final String map_name, ImagesInfo scales, AllPosts.Post module_post) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
@@ -5777,7 +5812,7 @@ public class ProduceClickableMap
 		out.print(title);
 		out.print("</div>");
 		out.print(" <div class='header-right'>");
-		html_in_new_window(out, "/" + blog_url_root + "/" + blog_name, "<img alt='blog' border='0' src='/map_icons/misc/blog.png'>");
+		html_in_new_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='/map_icons/misc/blog.png'>");
 		out.print(" ");
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");

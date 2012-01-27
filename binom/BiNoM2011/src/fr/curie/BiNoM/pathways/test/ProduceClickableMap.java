@@ -79,7 +79,9 @@ import redstone.xmlrpc.XmlRpcFault;
 
 import fr.curie.BiNoM.pathways.utils.OptionParser;
 
-public class ProduceClickableMap {
+public class ProduceClickableMap
+{
+	private static final int maximum_number_of_posts = 20480; // might not be enough
 	
 	private static final String module_list_category_name = "module list";
 	private static final String icons_directory = "/map_icons";
@@ -1078,7 +1080,7 @@ public class ProduceClickableMap {
 			final List<Page> recentPosts;
 			try
 			{
-				recentPosts = wp.getRecentPosts(2048);
+				recentPosts = wp.getRecentPosts(maximum_number_of_posts);
 				verbose("retrieved " + recentPosts.size() + " posts");
 			}
 			catch (XmlRpcFault e)

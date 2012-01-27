@@ -248,7 +248,7 @@ public class ProduceClickableMap {
 		File destination = null;
 		@SuppressWarnings("unused")
 		boolean verbose = false;
-		boolean make_tiles = false;
+		boolean make_tiles = true;
 		String blog_name = null;
 		
 		Boolean show_default_compartement_name = null;

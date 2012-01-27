@@ -72,6 +72,7 @@ public class Utils {
 	}
 	
 	public static String eclipseParentErrorln(String s) {
+		System.out.flush();
 		System.err.println(eclipse(s, 2));
 		System.err.flush();
 		return s;
@@ -79,6 +80,7 @@ public class Utils {
 	
 	public static String eclipseErrorln(String s) {
 		String mess = eclipse(s, 0);
+		System.out.flush();
 		System.err.println(mess);
 		System.err.flush();
 		return s;
@@ -86,6 +88,7 @@ public class Utils {
 	
 	public static String eclipseError(String s) {
 		String mess = eclipse(s, 0);
+		System.out.flush();
 		System.err.print(mess);
 		System.err.flush();
 		return s;

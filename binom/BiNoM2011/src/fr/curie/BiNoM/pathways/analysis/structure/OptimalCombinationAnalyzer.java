@@ -164,6 +164,7 @@ public class OptimalCombinationAnalyzer {
 		}
 		return(mcs);
 	}
+	
 	/**
 	 * convert path matrix rows to BitSet objects
 	 */
@@ -251,7 +252,7 @@ public class OptimalCombinationAnalyzer {
 	
 	/**
 	 * Search for hitting sets for set size > 2. 
-	 * All combinations are generated for each set.
+	 * All combinations are generated for each set from scratch.
 	 * 
 	 * @param max maximum set size to search for.
 	 */
@@ -285,7 +286,6 @@ public class OptimalCombinationAnalyzer {
 				indices = cg.getNext();
 				
 				// check if the set is a hitting set
-				//BitSet b1 = (BitSet) pathMatrixBin.get(indices[0]).clone();
 				BitSet b1 = new BitSet(pathMatrixNbRow);
 				for (int i=0;i<indices.length;i++) {
 					b1.or(pathMatrixColBin.get(indices[i]));
@@ -304,15 +304,6 @@ public class OptimalCombinationAnalyzer {
 						}
 					}
 					if (isMinimal == true) {
-//						hitSet.add(new HashSet<Integer>());
-//						int index = hitSet.size()-1;
-//						for (int i=0;i<indices.length;i++) {
-//							hitSet.get(index).add(indices[i]);
-//							hitSetNodeList.add(indices[i]);
-//						}
-//						addHitSetBin(hitSet.get(index));
-//						ct++;
-						
 						HashSet<Integer> novel = new HashSet<Integer>();
 						for (int i=0;i<indices.length;i++) {
 							novel.add(indices[i]);

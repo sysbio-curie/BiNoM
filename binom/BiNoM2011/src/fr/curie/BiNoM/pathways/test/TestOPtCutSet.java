@@ -64,43 +64,45 @@ public class TestOPtCutSet {
 			ArrayList<Node> testTarget = new ArrayList <Node>();
 			ArrayList<Node> testSide = new ArrayList<Node>();
 			
-			// toynet
-//			testSource.add(dpc.graph.getNode("I1"));
-//			testSource.add(dpc.graph.getNode("I2"));
-//			testTarget.add(dpc.graph.getNode("O1"));
-//			testTarget.add(dpc.graph.getNode("O2"));
-			//testSide.add(dpc.graph.getNode("O2"));
+			/* toynet2 test 
+			 * the corresponding xgmml file should be loaded
+			 * uncomment lines below
+			*/
+			testSource.add(dpc.graph.getNode("I1"));
+			testSource.add(dpc.graph.getNode("I2"));
+			testTarget.add(dpc.graph.getNode("O1"));
+			testTarget.add(dpc.graph.getNode("O2"));
 
-			/* egfr linearized network
+			/* egfr linearized network test settings
 			 * Source nodes: ar bir btc csrc egf epr erbb1 erbb2 erbb3 erbb4 hbegf mkp nrg1a nrg1b nrg2a nrg2b nrg3 nrg4 pdk1 pp2a pp2b pten ship2 tgfa 
 			 * Target nodes: elk1
 			 */
 			
-			testSource.add(dpc.graph.getNode("ar"));
-			testSource.add(dpc.graph.getNode("bir"));
-			testSource.add(dpc.graph.getNode("btc"));
-			testSource.add(dpc.graph.getNode("csrc"));
-			testSource.add(dpc.graph.getNode("egf"));
-			testSource.add(dpc.graph.getNode("epr"));
-			testSource.add(dpc.graph.getNode("erbb1"));
-			testSource.add(dpc.graph.getNode("erbb2"));
-			testSource.add(dpc.graph.getNode("erbb3"));
-			testSource.add(dpc.graph.getNode("erbb4"));
-			testSource.add(dpc.graph.getNode("hbegf"));
-			testSource.add(dpc.graph.getNode("mkp"));
-			testSource.add(dpc.graph.getNode("nrg1a"));
-			testSource.add(dpc.graph.getNode("nrg1b"));
-			testSource.add(dpc.graph.getNode("nrg2a"));
-			testSource.add(dpc.graph.getNode("nrg2b"));
-			testSource.add(dpc.graph.getNode("nrg3"));
-			testSource.add(dpc.graph.getNode("nrg4"));
-			testSource.add(dpc.graph.getNode("pdk1"));
-			testSource.add(dpc.graph.getNode("pp2a"));
-			testSource.add(dpc.graph.getNode("pp2b"));
-			testSource.add(dpc.graph.getNode("pten"));
-			testSource.add(dpc.graph.getNode("ship2"));
-			testSource.add(dpc.graph.getNode("tgfa"));
-			testTarget.add(dpc.graph.getNode("elk1"));
+//			testSource.add(dpc.graph.getNode("ar"));
+//			testSource.add(dpc.graph.getNode("bir"));
+//			testSource.add(dpc.graph.getNode("btc"));
+//			testSource.add(dpc.graph.getNode("csrc"));
+//			testSource.add(dpc.graph.getNode("egf"));
+//			testSource.add(dpc.graph.getNode("epr"));
+//			testSource.add(dpc.graph.getNode("erbb1"));
+//			testSource.add(dpc.graph.getNode("erbb2"));
+//			testSource.add(dpc.graph.getNode("erbb3"));
+//			testSource.add(dpc.graph.getNode("erbb4"));
+//			testSource.add(dpc.graph.getNode("hbegf"));
+//			testSource.add(dpc.graph.getNode("mkp"));
+//			testSource.add(dpc.graph.getNode("nrg1a"));
+//			testSource.add(dpc.graph.getNode("nrg1b"));
+//			testSource.add(dpc.graph.getNode("nrg2a"));
+//			testSource.add(dpc.graph.getNode("nrg2b"));
+//			testSource.add(dpc.graph.getNode("nrg3"));
+//			testSource.add(dpc.graph.getNode("nrg4"));
+//			testSource.add(dpc.graph.getNode("pdk1"));
+//			testSource.add(dpc.graph.getNode("pp2a"));
+//			testSource.add(dpc.graph.getNode("pp2b"));
+//			testSource.add(dpc.graph.getNode("pten"));
+//			testSource.add(dpc.graph.getNode("ship2"));
+//			testSource.add(dpc.graph.getNode("tgfa"));
+//			testTarget.add(dpc.graph.getNode("elk1"));
 			
 			
 			for (Node n : testSource)
@@ -117,25 +119,48 @@ public class TestOPtCutSet {
 			dpc.maxSetSize = 20;
 			dpc.maxSetNb = (long) 1e+6;
 			
+			/*
+			 * determine paths and calculate scores for elementary nodes
+			 */
 			dpc.ocsanaScore();
 			//dpc.ocsanaOptimalCutSet();
 			//System.out.println(dpc.optCutSetReport);
 			
+			/*
+			 * data preprocessing
+			 * create path matrix
+			 */
 			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
 			oca.pathMatrix = dpc.pathMatrix;
 			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
 			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
 			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
-
+			
+			// check exception 1 nodes and remove them
 			oca.checkRows();
+			// search for hitting sets size 1 and remove them
 			oca.searchHitSetSizeOne();
 			//oca.printPathMatrix();
 			oca.convertPathMatrixColToBinary();
 			oca.convertPathMatrixRowToBinary();
 			//oca.savePathMatrix("/bioinfo/users/ebonnet/path_matrix", "/bioinfo/users/ebonnet/node_list");
+			
+			/*
+			 * brute force search 
+			 * loop over all possible combination set size and check for minimality and true hitting sets
+			 * no threshold is implemented here
+			 */
 			oca.searchHitSetSizeTwo();
 			oca.searchHitSetFull(8);
+			
+			// alternative: use seed list from previous stage
 			//oca.searchHitSetOpt(5);
+			
+			
+			/*
+			 * Berge's algorithm
+			 * brute force search lines should be commented to use this (and vice-versa)
+			 */
 			//oca.mainBerge();
 		}
 		catch (Exception e) {

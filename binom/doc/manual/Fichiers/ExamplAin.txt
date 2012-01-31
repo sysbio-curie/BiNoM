@@ -1,0 +1,191 @@
+ReviewRef(GS reviews)	ExperimentRef	Link	ChemType	Delay	Confidence	Tissue	Comments	
+PMID:11846025(GS:25)	.	(CCND.)->((CCND.):(CDK4,CDK6))	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	(CDK4,CDK6)->((CCND.):(CDK4,CDK6))	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	((CCND.):(CDK4,CDK6))->((E2F1,E2F2,E2F3,E2F4):RB1^p)	Phosphorylation	.	0.9	All	"curation with RB project, precision of E2F family member binding to RB"
+PMID:11846025(GS:25)	.	((CCND.):(CDK4,CDK6))->((E2F4,E2F5):RBL2^p)	Phosphorylation	.	0.9	All	"Other name for RBL1: p107, other name for RBL2: p130, curated with RB proejct"
+PMID:11846025(GS:25)	.	((E2F1,E2F2,E2F3,E2F4):RB1^p)->(E2F1,E2F2,E2F3,E2F4)	Release	.	0.9	All	"Curation with RB project: precision of E2F family"
+PMID:11846025(GS:25)	.	((E2F4,E2F5):RBL2^p)->(E2F4,E2F5)	Release	.	0.9	All
+PMID:11846025(GS:25)	.	(CCNE.)->((CCNE.):CDK2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	CDK2->((CCNE.):CDK2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->[cell_cycle_S]	Influence	.	0.8	All	"Phosphroylation of substrate like NPAT involved in activation of histone gene transcription"
+PMID:11846025(GS:25)	.	(E2F.)->[cell_cycle_S]	Influence	.	0.8	All	"Review mention (E2F.) family"
+PMID:11846025(GS:25)	.	((E2F1,E2F2,E2F3,E2F4):RB1)-|[cell_cycle_S]	Influence	.	0.8	All	"Review mention (E2F.) family, complex with RB has oposite effect than (E2F.) alone, curated by RB web page"
+PMID:11846025(GS:25)	.	((E2F4,E2F5):(RBL.))-|[cell_cycle_S]	Influence	.	0.8	All	"Review mention (E2F.) family, curated with RB project"
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->((E2F1,E2F2,E2F3,E2F4):RB1^p)	Phosphorylation	.	0.9	All	"Other phosphorylation site than ((CCND.):(CDK4,CDK6)), curated with RB project: precision of E2F family"
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->((E2F4,E2F5):RBL2^p)	Phosphorylation	.	0.9	All	"Other name for RBL2: p130, other phosphorylation site than ((CCND.):(CDK4,CDK6)), curated with RB project: precision of  E2F family"
+#PMID:11846025(GS:25)	.	((CCNE.):CDK2)->CDKN1B	Phosphorylation	.	0.9	All	"Other names for CDKN1B: p27KIP1, targeted for degradation, replaced by more precise degradation"
+#PMID:11846025(GS:25)	.	((CCNE.):CDK2)-|(CCNE.)	Phosphorylation	.	0.9	All	"Targeted for degradation, removed because more precise below"
+#PMID:11846025(GS:25)	.	(CCNE.)-|(CCNE.)	Phosphorylation	.	0.9	All	"Targeted for degradation, removed because more precise below"
+PMID:11846025(GS:25)	.	(CCNA.)->((CCNA.):CDK2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	CDK2->((CCNA.):CDK2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	(CCNA.)->((CCNA.):CDC2)	Binding	.	0.7	All	"Other name for CDC2:CDK1"
+PMID:11846025(GS:25)	.	CDC2->((CCNA.):CDC2)	Binding	.	0.7	All	"Other name for CDC2:CDK1"
+PMID:11846025(GS:25)	.	((CCNA.):CDK2)->[cell_cycle_G2]	Influence	.	0.8	"Control of S phase transisition, through phosphorylation of CDC6 (export from nucleus to avoid re-replication), HIRA (histone transcrition)"
+PMID:11846025(GS:25)	.	CCNB1->(CCNB1:CDC2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	CDC2->(CCNB1:CDC2)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	(CCNB1:CDC2)->[cell_cycle_M]	Influence	.	0.8	"Also late S, (CNB1:CDC2) targets genes necesssary for mitotic events"
+PMID:11846025(GS:25)	.	CCNH->(CCNH:CDK7)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	CDK7->(CCNH:CDK7)	Binding	.	0.9	All
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCND.):(CDK4,CDK6))	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNE.):CDK2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNA.):CDK2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->CDC25A	Phosphorylation	.	0.8	All
+PMID:11846025(GS:25)	.	CDC25A->((CCNE.):CDK2)	Activation	.	0.8	All
+PMID:11846025(GS:25)	.	CDC25A->((CCNA.):CDK2)	Activation	.	0.8	All
+PMID:11846025(GS:25)	.	WEE1-|((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thyr 15 that inibits the complex"
+PMID:11846025(GS:25)	.	WEE1-|(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thyr 15 that inibits the complex"
+PMID:11846025(GS:25)	.	WEE1-|((CCNA.):CDK2)	Phosphorylation	.	0.7	All	"Phosphorylation at Thyr 15 that inibits the complex, observed in vitro but not in vivo"
+PMID:11846025(GS:25)	.	WEE1-|((CCNE.):CDK2)	Phosphorylation	.	0.7	All	"Phosphorylation at Thyr 15 that inibits the complex, observed in vitro but not in vivo"
+PMID:11846025(GS:25)	.	PKMYT1-|((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 14 that inibits the complex"
+PMID:11846025(GS:25)	.	PKMYT1-|(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 14 that inibits the complex"
+PMID:11846025(GS:25)	.	(CDKN2.)-|((CCND.):(CDK4,CDK6))	Binding	.	0.9	All	"Other name for (CDKN2.): Ink4 familiy (p16, p15, p18, p19), prevent activation by phosphorylation and diminish the binding cyclin-cdk"
+#PMID:11846025(GS:25)	.	(CDKN1.)-|((CCND.):(CDK4,CDK6))	Binding	.	0.9	All	"Other name for (CDKN1.): Cip/Kip family, In vitro evidence"
+.	PMID:10385618(GS:32)	(CDKN1.)->((CCND.):(CDK4,CDK6))	Binding	.	0.7	All	"Other name for (CDKN1.): Cip/Kip family, in vitro and in vivo results, in contradiction with old knowledge, like in (GS:25)"
+PMID:11846025(GS:25)	.	(CDKN1.)-|((CCNE.):CDK2)	Binding	.	0.9	All	"Other name for (CDKN1.): Cip/Kip family, In vitro evidence"
+PMID:11846025(GS:25)	.	(CDKN1.)-|((CCNA.):CDK2)	Binding	.	0.9	All	"Other name for (CDKN1.): Cip/Kip family, In vitro evidence"
+PMID:11846025(GS:25)	.	(CDKN1.)-|((CCNA.):CDC2)	Binding	.	0.9	All	"Other name for (CDKN1.): Cip/Kip family, In vitro evidence"
+PMID:11846025(GS:25)	.	(E2F1,E2F2,E2F3)->(CCNE.)	Transcription	.	0.7	All	"Review mention (E2F.) family, curated by RB web page"
+PMID:11846025(GS:25)	.	(E2F1,E2F2,E2F3)->(CCNA.)	Transcription	.	0.7	All	"Review mention (E2F.) family, curated by RB web page"
+#PMID:11846025(GS:25)	.	GSK3B->((CCND.)^p:(CDK4,CDK6))	Phosphorylation	.	0.9	All	"Phosophorylation at Thr 286, removed because transiant effect"
+#PMID:11846025(GS:25)	.	((CCND.)^p:(CDK4,CDK6))->(CDK4,CDK6)	Unbinding	.	0.9	All	"Phosophorylation at Thr 286, removed because transient effect"
+#PMID:11846025(GS:25)	.	((CCND.)^p:(CDK4,CDK6))->(CCND.)^p	Unbinding	.	0.9	All	"Phosphorylation at Thr 286, removed because transiant effect"
+#PMID:11846025(GS:25)	.	(CUL1:RBX1:SKP1:SKP2)-|(CCND.)^p	Degradation	.	0.9	All	"Degradation by the complex SCF-SKP2, more precise in (GS:34)"
+#PMID:11846025(GS:25)	.	((CCNE.):CDK2)->((CCNE.)^p:CDK2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 380, auto-phosphorylation, removed because transiant effect"
+#PMID:11846025(GS:25)	.	((CCNE.)^p:CDK2)->CDK2	Unbinding	.	0.9	All	"Phosphorylation at Thr 380, not explicitly written in review, interpretation, removed because transiant effect"
+#PMID:11846025(GS:25)	.	((CCNE.)^p:CDK2)->(CCNE.)^p	Unbinding	.	0.9	All	"Phosphorylation at Thr 380, not explicitly written in review, interpretation, removed because transiant effect"
+#PMID:11846025(GS:25)	.	(CUL1:RBX1:SKP1:SKP2)-|(CCNE.)^p	Degradation	.	0.9	All	"Degradation by the complex SCF-SKP2, more precise in (GS:34); removed because transient effect"
+#PMID:11846025(GS:25)	.	(CUL1:RBX1:SKP1:SKP2)-|(CCND.)	Degradation	.	0.6	All	"Degradation by the complex SCF-SKP2, (CCND.) degradation can also occurs without phosphorylation, more precise in (GS:34), removed because transient effect"
+#PMID:11846025(GS:25)	.	(CUL1:RBX1:SKP1:SKP2)-|(CCNE.)	Degradation	.	0.6	All	"Degradation by the complex SCF-SKP2, (CCNE.) degradation can also occurs without phosphorylation, more precise in (GS:34), removed because transient effect"
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->CDKN1B^p	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 187, other name for CDKN1B: p27"
+#PMID:11846025(GS:25)	.	(CUL1:RBX1:SKP1:SKP2)-|CDKN1B^p	Degradation	.	0.9	All	"Other name for CDKN1B: p27, degradation by the complex SCF-SKP2, more precise in (GS:34), removed because transient effect"
+#PMID:11846025(GS:25)	.	[cell_cycle_M]->((CCNA.)^p:CDK2)	Phosphorylation	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	((CCNA.)^p:CDK2)->(CCNA.)^p	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	((CCNA.)^p:CDK2)->CDK2	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	[cell_cycle_M]->((CCNA.)^p:CDC2)	Phosphorylation	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	((CCNA.)^p:CDC2)->(CCNA.)^p	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	((CCNA.)^p:CDC2)->CDC2	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	[cell_cycle_anaphase]->(CCNB1^p:CDC2)	Phosphorylation	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	(CCNB1^p:CDC2)->CCNB1^p	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	(CCNB1^p:CDC2)->CDC2	Unbinding	.	0.9	All	"removed because transient effect"
+#PMID:11846025(GS:25)	.	CDC2->(ANAPC11:ANAPC2:CDC20)	Phosphorylation	.	0.9	All	"Phosphorylation of CDC20, after (GS:34) curation), removed because transient effect"
+#PMID:11846025(GS:25)	.	(ANAPC11:ANAPC2:CDC20)-|(CCNA.)^p	Degradation	.	0.9	All	"Degradation by APC-CDC20 complex, after (GS:34) curation, removed because transient effect"
+#PMID:11846025(GS:25)	.	(ANAPC11:ANAPC2:CDC20)-|CCNB1^p	Degradation	.	0.9	All	"Degradation by APC-CDC20 complex, after (GS:34) curation, removed because transient effect"
+PMID:11846025(GS:25)	PMID:9699647(GS:26)	TP53-|WEE1	"Inidirect transcription"	24h	0.6	"Rat embryo fibroblast, murine T-cells"	"WEE1 inhibition is independant of the cell-cycle phase"
+PMID:11846025(GS:25)	PMID:8288131(GS:27)	(TGFB.)->CDKN1B	Influence	15h	0.7	Mv1Lu
+PMID:11846025(GS:25)	PMID:10508164(GS:28)	MYC->(CCND1,CCND2)	Transcription	7days	0.7	"Rat1 fibroblast"
+PMID:11846025(GS:25)	PMID:10508164(GS:28)	MYC->(CCNE.)	Transcription	7days	0.7	"Rat1 fibroblast"
+PMID:11846025(GS:25)	PMID:10508164(GS:28)	((CCND.):(CDK4,CDK6))-|(CDKN1A,CDKN1B)	Binding	.	0.7	"Rat1 fibroblast"	"Other name for (CDKN1A,CDKN1B): (p21,p27), binding of cyclin D with p21,p27 prevents the latters to inhibit other cyclin"
+#
+PMID:11988758(GS:29)	.	(MAPK8,MAPK9,MAPK10)->JUN	Phosphorylation	0.9	.	"Activate AP1 transcriptional complex"
+PMID:11988758(GS:29)	.	JUN->CCND1	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN-|TP53	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN->FASLG	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN-|FAS	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+PMID:11988758(GS:29)	.	JUN->BCL2L11	"Indirect transcription"	.	0.8	.	"AP1 transcriptional effect"
+#
+.	PMID:17482685(GS:30)	E2F1->(FOXO1,FOXO3)	Transcription	.	0.6	"Neurobastoma cells"
+#PMID:11980909(GS:33)	.	((CCNA.):CDK2)-|(E2F1,E2F2,E2F3)	Phosphorylation	.	0.7	.	"Phosphorylation target for degradation, removed because transient effect"
+#
+PMID:12510147(GS:31)	.	TP53->IER3	Transcription	.	0.8	.
+PMID:12510147(GS:31)	.	(NFKB.)->IER3	Transcription	.	0.8	.	
+PMID:12510147(GS:31)	.	EP300->IER3	Transcription	.	0.4	.	"Sign is not sure"
+PMID:12510147(GS:31)	.	MYC-|IER3	Transcription	.	0.8	.
+#
+PMID:16633365(GS:34)	.	CUL1->(CUL1:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF complex"
+PMID:16633365(GS:34)	.	SKP1->(CUL1:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF complex"
+PMID:16633365(GS:34)	.	RBX1->(CUL1:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF complex"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1)->(CUL1:RBX1:SKP1:SKP2)	Binding	.	0.9	.	"Formation of SCF-SKP2 complex"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)->[cell_cycle_G2]	Degradation	.	0.9	.	"Interpretation of SCF-SKP2 complex effect"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)->[cell_cycle_M]	Degradation	.	0.9	.	"Interpretation of SCF-SKP2 complex effect"
+PMID:16633365(GS:34)	.	SKP2->(CUL1:RBX1:SKP1:SKP2)	Binding	.	0.9	.	"Formation of SCF-SKP2 complex"
+#PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|CDKN1A	Degradation	.	0.8	.	"On the figure of the review, other name for CDKN1A: p21, removed because transient effect"
+#PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|CDKN1C	Degradation	.	0.8	.	"On the figure of the review, other name for CDKN1C: p57, removed because transient effect"
+#PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|RBL2	Degradation	.	0.8	.	"On the figure of the review, other name for RBL2: p130, removed because transient effect"
+#PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|(CCNA.)^p	Degradation	.	0.8	.	"On the figure of the review, phosphorylated (CCNA.) because of (GS:25), removed because transient effect"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|MYC	Degradation	.	0.8	.	"On the figure of the review"
+#PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|E2F1	Degradation	.	0.8	.	"On the figure of the review, removed because transient effect"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1:SKP2)-|FOXO1	Degradation	.	0.8	.	"On the figure of the review"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1)->(CUL1:FBXW7:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF-FBW7 complex"
+PMID:16633365(GS:34)	.	FBXW7->(CUL1:FBXW7:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF-FBW7 complex"
+PMID:16633365(GS:34)	.	(CUL1:FBXW7:RBX1:SKP1)-|MYC	Degradation	.	0.8	.	"On the figure of the review"
+PMID:16633365(GS:34)	.	(CUL1:FBXW7:RBX1:SKP1)->[cell_cycle_G2]	Degradation	.	0.8	.	"On the figure of the review, phosphorylated (CCNE.), interpretation of complex effect"
+#PMID:16633365(GS:34)	.	(CUL1:FBXW7:RBX1:SKP1)-|(CCNE.)^p	Degradation	.	0.8	.	"On the figure of the review, phosphorylated (CCNE.) because of (GS:25), removed because transient effect"
+PMID:16633365(GS:34)	.	(CUL1:FBXW7:RBX1:SKP1)-|JUN	Degradation	.	0.8	.	"On the figure of the review"
+PMID:16633365(GS:34)	.	(CUL1:RBX1:SKP1)->(BTRC:CUL1:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF-betaTRCP complex"
+PMID:16633365(GS:34)	.	BTRC->(BTRC:CUL1:RBX1:SKP1)	Binding	.	0.9	.	"Formation of SCF-betaTRCP complex"
+PMID:16633365(GS:34)	.	(BTRC:CUL1:RBX1:SKP1)-|(NFKB1,NFKB2)	Degradation	.	0.8	.	"On the figure of the review, degrades also (IkBeta.)"
+PMID:16633365(GS:34)	.	(BTRC:CUL1:RBX1:SKP1)-|WEE1	Degradation	.	0.8	.	"On the figure of the review"
+PMID:16633365(GS:34)	.	ANAPC11->(ANAPC11:ANAPC2)	Binding	.	0.9	.	"Formation of APC complex"
+PMID:16633365(GS:34)	.	ANAPC2->(ANAPC11:ANAPC2)	Binding	.	0.9	.	"Formation of APC complex"
+PMID:16633365(GS:34)	.	CDC20->(ANAPC11:ANAPC2:CDC20)	Binding	.	0.9	.	"Formation of APC-CDC20 complex"
+PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2)->(ANAPC11:ANAPC2:CDC20)	Binding	.	0.9	.	"Formation of APC-CDC20 complex"
+PMID:16633365(GS:34)	.	FZR1->(ANAPC11:ANAPC2:FZR1)	Binding	.	0.9	.	"Formation of APC-CDH1 complex, other name for FZR1: CDH1"
+PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2)->(ANAPC11:ANAPC2:FZR1)	Binding	.	0.9	.	"Formation of APC-CDH1 complex, other name for FZR1: CDH1"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)-|(CCNA.)^p	Degradation	.	0.9	All	"Degradation by APC-CDH1 complex, other name for FZR1: CDH1, generalizaton of (GS:25), removed because transient effect"
+PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)->[cell_cycle_G1]	Degradation	.	0.9	All	"Interpertation of APC-CDH1 complex effect, other name for FZR1: CDH1"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:CDC20)-|CCNB1^p	Degradation	.	0.9	All	"Degradation by APC-CDH1 complex, other name for FZR1: CDH1, generalizaton of (GS:25), removed because transient effect"
+PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:CDC20)->[cell_cycle_anaphase]	Degradation	.	0.9	All	"Interpretation of APC-CDH1 complex effect, other name for FZR1: CDH1"
+#PMID:16633365(GS:34)	.	(BTRC:CUL1:RBX1:SKP1)->(ANAPC11:ANAPC2:CDC20)	"Ubiquidination, degradation"	.	0.9	.	"SCF-betaTRCP complex ubiquitinates EM1/2, that is unbound from CDC20 and degradated, resulting full activation of APC-CDC20 complex, removed because transient effect"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:CDC20)->(ANAPC11:ANAPC2:FZR1)	"Ubiquitination, degradation"	.	0.9	.	"APC-CDC20 ubiquitinates CDC20 that is degraded, leading to its transformation to APC-CDH1, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)-|(ANAPC11:ANAPC2:CDC20)	"Ubiquitination, degradation"	.	0.9	.	"APC-CDH1 ubiquitinates CDC20 that is degraded, removed because transient effect"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)->(ANAPC11:ANAPC2:FZR1)	"Ubiquitination, degradation"	.	0.9	.	"APC-CDH1 ubiquitinates CDC20 that is degraded, enhancing transformation of APC-CDC20 in APC-CDH1, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)-|(CUL1:RBX1:SKP1:SKP2)	"Ubiquitination, degradation"	.	0.9	.	"APC-CDH1 ubiquitinates SKP2 that is degraded, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	(ANAPC11:ANAPC2:FZR1)->(CUL1:RBX1:SKP1)	"Ubiquitination, degradation"	.	0.9	.	"APC-CDH1 ubiquitinates SKP2 that is degraded, other name for FZR1: CDH1, removed because transient effect, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNE.):CDK2)-|(ANAPC11:ANAPC2:FZR1)	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNE.):CDK2)->FZR1^p	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNE.):CDK2)->(ANAPC11:ANAPC2)	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNA.):CDK2)-|(ANAPC11:ANAPC2:FZR1)	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNA.):CDK2)->FZR1^p	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+#PMID:16633365(GS:34)	.	((CCNA.):CDK2)->(ANAPC11:ANAPC2)	Phosphorylation	.	0.9	.	"Phosphorylation of CDH1 separates it from APC, other name for FZR1: CDH1, removed because transient effect"
+.	PMID:12611887(GS:35)	E2F1->CCND3	Transcription	48h	0.6	"H1299 and in vitro"
+#
+.	PMID:10464245(GS:36)	(NFKB.)->CCND1	Transcription	24h	0.5	.
+.	PMID:12769843(GS:37)	SKP2->MYC	Transcription	48h	0.5	.	"Complex mechanism of activation and degradation"
+.	PMID:12769843(GS:37)	(CUL1:RBX1:SKP1:SKP2)-|MYC	Degradation	48h	0.5	.	"Complex mechanism of activation and degradation"
+#EWS_FLI1 targets
+.	PMID:15282325	EWS_FLI1-|IGFBP3	Transcription	.	0.5	.	
+.	PMID:10508522	EWS_FLI1-|TGFBR2	Transcription	.	0.5	.
+.	PMID:8164678	EWS_FLI1->MYC	Transcription	.	0.5	.
+.	PMID:15818598	EWS_FLI1->(CCNE.)	Transcription	.	0.5	.
+.	PMID:12527902	EWS_FLI1->CCND1	Transcription	.	0.5	.
+#
+.	PMID:10766737(GS:41)	(E2F1,E2F3)->E2F1	Transcription	.	0.4	"T98G human gliblastoma"	"Binding to promoter and general activating effects of (E2F1,E2F3)"
+.	PMID:10766737(GS:41)	E2F4-|E2F1	Transcription	.	0.4	"T98G human gliblastoma"	"Binding to promoter and general inhibiting effects of E2F4"
+#.	PMID:10766737(GS:41)	E2F2->E2F1	Transcription	.	0.3	"T98G human gliblastoma"	"low binding inding to promoter and general activating effects of E2F4, suppress in signaling version because low confidence"
+PMID:17100600(GS:38)	.	(E2F6,E2F7,E2F8)-|[cell_cycle_S]	Transcription	.	0.7	.	"(E2F6,E2F7,E2F8) have similar repressive role than (E2F4,E2F5), but in a RB independant manner"
+.	PMID:16179649(GS:39)	E2F1->E2F8	Transcription	16h	0.5	U2OS	"qPCR and Chip evidence"
+#.	PMID:16179649(GS:39)	E2F4-|E2F8	Transcription	.	0.3	U2OS	"Chip and analogy to other E2F4 targets, suppress in signaling version because low confidence"
+#.	PMID:16179649(GS:39)	E2F7-|E2F8	Transcription	.	0.3	U2OS	"Chip and analogy to other E2F7 targets, suppress in signaling version because low confidence"
+PMID:11846025(GS:25)	PMID:16179649(GS:39)	E2F8-|(CCNE.)	Transcription	.	0.5	All	"Review mention (E2F.) family, based E2F. binding promoters analysis in GS:39"
+PMID:11846025(GS:25)	PMID:16179649(GS:39)	E2F8-|(CCNA.)	Transcription	.	0.5	All	"Review mention (E2F.) family, based on E2F. binding promoters analysis in GS:39"
+.	PMID:16179649(GS:39)	E2F8-|E2F1	Transcription	.	0.4	U2OS	"based on analogy seen in GS:39 and transcriptional effect in GS:41"
+.	PMID:14633988(GS:40)	E2F1->E2F7	Transcription	12h	0.5	WI38	"qPCR and Chip evidence"
+
+.	PMID:14633988(GS:40)	E2F4-|E2F7	Transcription	12h	0.4	WI38	"Chip and analogy to other E2F4 targets"
+PMID:11846025(GS:25)	PMID:14633988(GS:40)	E2F7-|(CCNE.)	Transcription	.	0.5	All	"Review mention (E2F.) family, based on E2F. binding promoters analysis in GS:40"
+PMID:11846025(GS:25)	PMID:14633988(GS:40)	E2F7-|(CCNA.)	Transcription	.	0.5	All	"Review mention (E2F.) family, based on E2F. binding promoters analysis in GS:40"
+.	PMID:14633988(GS:40)	E2F8-|E2F1	Transcription	.	0.4	U2OS	"based on analogy seen in GS:40 and transcriptional effect in GS:41"
+.	PMID:16107498(GS:42)	E2F1->E2F6	Transcription	48h	0.5	HEK-293	
+.	PMID:10837247(GS:43)	CFLAR->(NFKB.)	"Post-transcriptional influence"	24h	0.5	293T	"Probably through binding with elements of NFKB pathways like IKK"
+.	PMID:10837247(GS:43)	CFLAR->(MAPK1,MAPK3)	"Post-transcriptional influence"	.	0.4	293T	"Data not shown in paper"
+#
+#Modification-reinterpretation:
+#Remove	      BCL2-|CYCS
+#Add	      BAX->CYCS
+#Add	      BID->BAX
+#Add	      BCL2L1-|BAX	"Constency links, hypothetical effect because BCL2L1 belongs to Bcl2 family, (other name for BCL2L1: Bcl-Xl), added after transpath curation, confidence: 0.6"
+#Remove	      BCL2L1-|CYCS
+#Add	      MCL1-|BAX	"Constency links, hypothetical effect because MCL1 belongs to Bcl2 family, (other name for BCL2L1: Bcl-Xl), added after transpath curation, confidence: 0.6"
+#Remove	      MCL1-|CYCS
+#Remove	      BCL2L11->CYCS
+#Remove		CFLAR-|FADD	"redondant with CFLAR-|CASP8"
+#Add	      BCL2L11-|BCL2	"Added after Transpath curation, new interpretation of CYCS activation"
+#Add	      BCL2L11-|BCL2L1
+#Remove		E2F2->[cell_cycle] "More precise in GS:25"
+#Remove	MYC-|CDKN1A	"Through cyclin D, (GS:28)
+#Remove	RAF1->(MAPK.)	"Already included in RAF1->(MAP2K1,MAP2K2)"
+#Add	RAF1->(MAPK8,MAPK9,MAPK10)	"Replace the RAF1->(MAPK.)"
+#Remove	CDKN1A->(MDM2:RB1:TP53)
+#Add	((CCNE.):CDK2)-|(MDM2:RB1:TP53)	"Replacement because ((CCNE.):CDK2) appears explicitly"

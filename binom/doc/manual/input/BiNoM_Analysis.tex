@@ -158,6 +158,7 @@ This function cleans up the diagram to only keep the reaction network. Only node
 \subsection{Path consistency analysis}
 \textbf{Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Path consistency analysis}\\
 This function is based on an algorithm of  Path Influence Quantification (PIQuant). Shortly, for every annotated nodes, the influence is computed by summing (optimal and sub-optimal) paths contribution (1/(length of the path)), multiplied by the nodes annotation that represent biological data. For global influence computation, influences are summed on all over the annotated nodes. The figure \ref{PIQuant_example} shows the computing in a simple example.\\\\
+\includegraphics[width=12pt,height=12pt]{graphics/warning} The edge attribute which signs influence is "EFFECT" which can take 2 values EFFECT:activation and EFFECT:inhibition. An AIN file updates this attribute (section~\ref{Import_AIN_file}) or it can be imported as an edge attribute by Cytoscape.
 \begin{figure}
 \centering
 \includegraphics[width=17 cm]{graphics/PIQuant_example}

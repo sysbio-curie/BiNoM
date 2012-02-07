@@ -1,0 +1,58 @@
+The purpose of the functions related to the query language is to work with huge BioPAX files and extract from the BioPAX documents only the information that is of interest. For this part, we will use the apoptosis example initially extracted from Reactome database: Apoptosis.owl. This set of functions can be used with big pathway databases already exported to BioPAX: Reactome, BioCyc, NetPath (see http://www.biopax.org for the complete list).
+
+\subsection{Generate Index}
+\textbf{Plugins$\Rightarrow$BiNoM BioPAX 3 Query$\Rightarrow$Generate Index}\\
+Using this function BiNoM maps the content of BioPAX file onto a labeled graph (referred to as index). It creates an *.xgmml file from an *.owl one (figure~\ref{Generate_BioPAX_Index}). For the definition of BioPAX index, see section~\ref{Standard_BioPAX_Interfaces}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=18 cm]{graphics/Generate_BioPAX_Index}
+\caption{Generate BioPAX Index.}
+\label{Generate_BioPAX_Index}
+\end{figure}
+
+\subsection{Load Index}
+\textbf{Plugins$\Rightarrow$BiNoM BioPAX 3 Query$\Rightarrow$Load Index}\\
+Once the xgmml is created, it can be loaded into memory. The index is global object, i.e. only one index can be used at a time.Load Index loads the index file from xgmml format (figure~\ref{Load_Index_Dialog}).\\\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=18 cm]{graphics/Load_Index_Dialog}
+\caption{Load Index dialog.}
+\label{Load_Index_Dialog}
+\end{figure}
+Together with the index, you can also upload a tab-delimited “accession number file” which corresponds to a list of synonyms for the genes/proteins ids used in a network (see an example of the content of some accession number file at figure~\ref{Accession_Number_File}). An entity in the index can be identified by its id, by any XREF attribute (see section~\ref{Standard_BioPAX_Interfaces}), by node name, or by any synonym from the accession table (if it is provided).
+\begin{figure}[h]
+\centering
+\includegraphics[width=14 cm]{graphics/Accession_Number_File}
+\caption{Example of accession Number file. First column is a synonym (which can have structure $\textless database\textgreater :\textless standard_id\textgreater)$, the second column is the id used inside the BioPAX file.}
+\label{Accession_Number_File}
+\end{figure}
+
+\subsection{Display Index Info}
+\textbf{Plugins$\Rightarrow$BiNoM BioPAX 3 Query$\Rightarrow$Display Index Info}\\
+This command opens a window indicating the name of the graph, the name of the file, the accession number file, when available, the number of records, and the various statistics of the index: number of publications, proteins, physicalEntities, complexes, biochemical reactions, pathways, pathwaySteps, catalyses, and modulations (necessary proteins for catalyses). See figure~\ref{BioPAX_Index_Info}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=18 cm]{graphics/BioPAX_Index_Info}
+\caption{Display Index info.}
+\label{BioPAX_Index_Info}
+\end{figure}
+
+\subsection{Select Entities}
+\textbf{Plugins$\Rightarrow$BiNoM BioPAX 3 Query$\Rightarrow$Select Entities}\\
+The BioPAX document is often too big to find the protein or gene that needs to be studied. To access it easily and rapidly, it is possible to find the component directly with this command and build a specific network around that molecule.\\\\
+For example, in Apoptosis.xgmml, we choose to find the caspases 8 and extend the network around it. When choosing Plugins => BiNoM BioPAX Query => Select entities from the index, a dialog window pops up and offers the possibility to find a protein or a gene by its name or id or XREF attribute or synonym, from the current network when a network is already opened, or from the list of identities associated with the BioPAX index (figure~\ref{Select_entities_from_index}).\\\\
+For our example, we choose the second option. To increase the probability to find the protein in the list, we propose, in figure~\ref{Select_entities_from_index}, three different versions of the same name: CASP8, Caspase8 or caspases\_8, all separated by space (the separator can be also comma and semi-colon or line-break symbol). One of them (CASP8) corresponds to the name from the BioPAX list and a new network is created with only one protein, CASP8 (= MCH5 in the index), at the center of it. The other ones were not found (see output in figure~\ref{xxx}). It is also possible to select more than one entity, in this case, the components all appear in the same window.\\\\
+The output is chosen to appear in a new network (selection is made at the bottom of the dialog window in figure~\ref{Select_entities_from_index}) but it is also an option to view several genes or proteins in the same network by checking “output in the current network”.\\\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=18 cm]{graphics/Select_entities_from_index}
+\caption{Select entities from the index.}
+\label{Select_entities_from_index}
+\end{figure}
+A network is created with only one node, caspase 8, called MCH5 in the index. Note that for this part, it is advised to use the BiNoM BioPAX visual style to view the resulting network.
+
+\subsection{Standard Query}
+
+\subsection{Index Path Analysis}
+
+\subsection{View Query Log}

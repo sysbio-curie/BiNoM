@@ -41,7 +41,7 @@ public class ImportFromSimpleTextInfluenceFile implements ActionListener {
 
 
 		JFrame window = new JFrame();
-		dialog = new ImportFromAINDialogFamily(window,"Defing families",true);
+		dialog = new ImportFromAINDialogFamily(window,"Defining families",true);
 		dialog.setVisible(true);
 		
 		if(dialog.result>0){

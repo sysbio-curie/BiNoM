@@ -31,10 +31,14 @@ import fr.curie.BiNoM.biopax.propedit.*;
 import cytoscape.Cytoscape;
 import cytoscape.CyNetwork;
 
+import fr.curie.BiNoM.pathways.biopax.biopax_DASH_level3_DOT_owlFactory;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 public class BioPAXPropertyBrowser extends BioPAXPropertyManager implements ActionListener {
 

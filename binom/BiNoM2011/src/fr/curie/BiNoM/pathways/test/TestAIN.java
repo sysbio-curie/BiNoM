@@ -36,7 +36,7 @@ public class TestAIN {
 			SimpleTextInfluenceToBioPAX.getInstance().userDefinedFamiliesExpand.clear();
 
 			JFrame window = new JFrame();
-			ImportFromAINDialogFamily dialog = new ImportFromAINDialogFamily(window,"Defing families",true);
+			ImportFromAINDialogFamily dialog = new ImportFromAINDialogFamily(window,"Defining families",true);
 			dialog.setVisible(true);
 
 			if(dialog.result>0) {
@@ -55,7 +55,7 @@ public class TestAIN {
 						BioPAXToCytoscapeConverter b2s = new BioPAXToCytoscapeConverter();
 						b2s.biopax = SimpleTextInfluenceToBioPAX.getInstance().biopax;
 						
-						//BioPAX.saveToFile("/bioinfo/users/ebonnet/test.owl",b2s.biopax.biopaxmodel);
+						BioPAX.saveToFile("/bioinfo/users/ebonnet/test/test.owl",b2s.biopax.biopaxmodel);
 						
 						BioPAXToCytoscapeConverter.Graph graph = b2s.convert
 						(b2s.REACTION_NETWORK_CONVERSION,b2s,
@@ -69,7 +69,7 @@ public class TestAIN {
 					    	Graph grres = BiographUtils.ShowMonoMolecularReactionsAsEdges(graphDoc);
 					    	GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 					    	
-					    	XGMML.saveToXGMML(grDoc, "/bioinfo/users/ebonnet/test.xgmml");
+					    	//XGMML.saveToXGMML(grDoc, "/bioinfo/users/ebonnet/test.xgmml");
 					    }
 					}
 				}

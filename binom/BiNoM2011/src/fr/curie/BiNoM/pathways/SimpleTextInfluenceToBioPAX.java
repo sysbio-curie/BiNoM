@@ -7,9 +7,11 @@ import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.utils.*;
 
+@SuppressWarnings("unchecked")
 public class SimpleTextInfluenceToBioPAX {
 
 	public  BioPAX biopax = null;
+	
 	public  HashMap nameEntity = new HashMap();
 	public  HashMap nameParticipant = new HashMap();
 	public HashMap nameElements = new HashMap();

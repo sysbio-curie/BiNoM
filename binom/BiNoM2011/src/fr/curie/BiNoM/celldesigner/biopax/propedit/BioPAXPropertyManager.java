@@ -34,6 +34,9 @@ import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 
 import fr.curie.BiNoM.pathways.wrappers.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.*;
 import javax.swing.JOptionPane;
 
@@ -54,55 +57,56 @@ abstract public class BioPAXPropertyManager extends PluginAction {
 
     Vector getSelectedBioPAXObjects() {
 
-	PluginModel model = plugin.getSelectedModel();
+    	PluginModel model = plugin.getSelectedModel();
 
-	BioPAXSourceDB bioPAXSourceDB = BioPAXSourceDB.getInstance();
-	BioPAX biopax = bioPAXSourceDB.getBioPAX(model.getName());
+    	BioPAXSourceDB bioPAXSourceDB = BioPAXSourceDB.getInstance();
+    	BioPAX biopax = bioPAXSourceDB.getBioPAX(model.getName());
 
-	if (biopax == null) {
-	    JOptionPane.showMessageDialog
-		(new java.awt.Frame(),
-		 "Warning: network is not associated with any BioPAX source file. You must first associate a BioPAX source to this network");
-	    return null;
-	}
+    	if (biopax == null) {
+    		JOptionPane.showMessageDialog
+    		(new java.awt.Frame(),
+    		"Warning: network is not associated with any BioPAX source file. You must first associate a BioPAX source to this network");
+    		return null;
+    	}
 
 
-	Vector bobj_v = new Vector();
-	PluginListOf list = plugin.getSelectedAllNode();
-	int size = list.size();
-	for (int m = 0; m < size; m++) {
-	    PluginSBase sbase = list.get(m);
-	    String name = null;
-	    if (sbase instanceof PluginSpeciesAlias) {
-		name = ((PluginSpeciesAlias)sbase).getName();
-	    }
-	    // must continue
-	    /*
+    	Vector bobj_v = new Vector();
+    	PluginListOf list = plugin.getSelectedAllNode();
+    	int size = list.size();
+
+    	for (int m = 0; m < size; m++) {
+    		PluginSBase sbase = list.get(m);
+    		String name = null;
+    		if (sbase instanceof PluginSpeciesAlias) {
+    			name = ((PluginSpeciesAlias)sbase).getName();
+    		}
+    		// must continue
+    		/*
 	    else if (sbase instanceof ..) {
 	    }
-	    */
+    		 */
 
-	    if (name == null) {
-		continue;
-	    }
+    		if (name == null) {
+    			continue;
+    		}
 
-	    String uri = bioPAXSourceDB.getURI(name);
-	    if (uri == null) {
-		continue;
-	    }
+    		String uri = bioPAXSourceDB.getURI(name);
+    		if (uri == null) {
+    			continue;
+    		}
+    		
+    		String uri_arr[] = uri.split(NetworkFactory.ATTR_SEP);
+    		for (int n = 0; n < uri_arr.length; n++) {
+    			BioPAXObject bobj = BioPAXObjectFactory.getInstance().getObject(uri_arr[n], biopax);
+    			if (bobj != null) {
+    				bobj_v.add(bobj);
+    			}
+    			else {
+    				System.out.println("ERROR: " + uri_arr[n]);
+    			}
+    		}
+    	}
 
-	    String uri_arr[] = uri.split(NetworkFactory.ATTR_SEP);
-	    for (int n = 0; n < uri_arr.length; n++) {
-		BioPAXObject bobj = BioPAXObjectFactory.getInstance().getObject(uri_arr[n], biopax);
-		if (bobj != null) {
-		    bobj_v.add(bobj);
-		}
-		else {
-		    System.out.println("ERROR: " + uri_arr[n]);
-		}
-	    }
-	}
-
-	return bobj_v;
+    	return bobj_v;
     }
 }

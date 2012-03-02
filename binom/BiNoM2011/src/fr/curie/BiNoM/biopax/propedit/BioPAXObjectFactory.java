@@ -100,26 +100,25 @@ public class BioPAXObjectFactory {
     public BioPAXObject getObject(String uri, BioPAX biopax) {
 
 	try {
-	    Method mth = owlFactCls.getMethod("getThing", clsParams);
-	    args[0] = uri;
-	    args[1] = biopax.model;
+		Method mth = owlFactCls.getMethod("getThing", clsParams);
+		args[0] = uri;
+		args[1] = biopax.model;
 
-	    Object robj = mth.invoke(null, args);
-	    BioPAXClassDescFactory clsDescFactory =
-		BioPAXClassDescFactory.getInstance(biopax);
-	    BioPAXClassDesc clsDesc = clsDescFactory.getClassDesc(BioPAXPropertyUtils.getClass(robj));
-	    if (clsDesc.getCanonName().equals("Thing")) {
-		return null;
-	    }
-	    return new BioPAXObject(clsDesc, robj, biopax);
+		Object robj = mth.invoke(null, args);
+		BioPAXClassDescFactory clsDescFactory = BioPAXClassDescFactory.getInstance(biopax);
+		BioPAXClassDesc clsDesc = clsDescFactory.getClassDesc(BioPAXPropertyUtils.getClass(robj));
+		if (clsDesc.getCanonName().equals("Thing")) {
+			return null;
+		}
+		return new BioPAXObject(clsDesc, robj, biopax);
 	}
 	catch(NoSuchMethodException ex) {
-	    ex.printStackTrace();
-	    return null;
+		ex.printStackTrace();
+		return null;
 	}
 	catch(Exception ex) {
-	    ex.printStackTrace();
-	    return null;
+		ex.printStackTrace();
+		return null;
 	}
     }
 

@@ -96,7 +96,7 @@ public class ImportFromAINTask implements Task {
 	
 
 	    if (cyNetwork != null) {
-		BioPAXSourceDB.getInstance().setBioPAX(cyNetwork, graph.biopax);
+	    	BioPAXSourceDB.getInstance().setBioPAX(cyNetwork, graph.biopax);
 	    }		
 	    
 	    

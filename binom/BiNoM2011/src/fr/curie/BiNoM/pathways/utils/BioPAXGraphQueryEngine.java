@@ -35,6 +35,7 @@ import edu.rpi.cs.xgmml.*;
 /**
  * The actual implementation of the standard query 
  */
+@SuppressWarnings("unchecked")
 public class BioPAXGraphQueryEngine {
 
 	/**
@@ -52,6 +53,7 @@ public class BioPAXGraphQueryEngine {
 	/**
 	 * Map from node names and synonyms to the Vector of Node objects
 	 */
+	
 	public HashMap entitySynonym = null;
 	/**
 	 * Map from node xrefs to the Vector of Node objects 
@@ -106,6 +108,9 @@ public class BioPAXGraphQueryEngine {
 	}
 
 	private void selectEntities(){
+
+		System.out.println(">>> call to select entities");
+
 		query.result = new fr.curie.BiNoM.pathways.analysis.structure.Graph();
 		int found = 0, total = 0;
 		for(int i=0;i<query.input.Nodes.size();i++){
@@ -115,63 +120,67 @@ public class BioPAXGraphQueryEngine {
 					nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Gene")||
 					nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Dna")||
 					(nd.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")&&(!excludeSmallMolecules))
-			)if(nd.getFirstAttributeValue("BIOPAX_SPECIES")==null){
-				Vector ndident = null;
-				Vector xrefs = nd.getAttributeValues("BIOPAX_NODE_XREF");
-				if(xrefs!=null)
-					for(int j=0;j<xrefs.size();j++){
-						String s = (String)xrefs.get(j); s = s.toLowerCase();
-						ndident = (Vector)entityXREF.get(s);
-						if(ndident!=null)
-							for(int k=0;k<ndident.size();k++){
-								Node n = (Node)ndident.get(k);
-								if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
-									if(resultNodeList.indexOf(n)<0)
-										resultNodeList.add(ndident.get(k));
-							}
+			) {
+//				if(nd.getFirstAttributeValue("BIOPAX_SPECIES")==null){
+					System.out.println(">>> biopax_species is null");
+					Vector ndident = null;
+					Vector xrefs = nd.getAttributeValues("BIOPAX_NODE_XREF");
+					if(xrefs!=null)
+						for(int j=0;j<xrefs.size();j++){
+							String s = (String)xrefs.get(j); s = s.toLowerCase();
+							ndident = (Vector)entityXREF.get(s);
+							if(ndident!=null)
+								for(int k=0;k<ndident.size();k++){
+									Node n = (Node)ndident.get(k);
+									if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
+										if(resultNodeList.indexOf(n)<0)
+											resultNodeList.add(ndident.get(k));
+								}
+						}
+					Vector syns = nd.getAttributeValues("BIOPAX_NODE_SYNONYM");
+					if(syns!=null){
+						if(syns.indexOf(nd.Id)<0) syns.add(nd.Id); 
+						for(int j=0;j<syns.size();j++){
+							String s = (String)syns.get(j); s = s.toLowerCase();
+							s = correctXREF(s);
+							ndident = (Vector)entitySynonym.get(s);
+							if(ndident!=null)
+								for(int k=0;k<ndident.size();k++){
+									Node n = (Node)ndident.get(k);
+									if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
+										if(resultNodeList.indexOf(n)<0) 
+											resultNodeList.add(n);
+								}
+						}
 					}
-				Vector syns = nd.getAttributeValues("BIOPAX_NODE_SYNONYM");
-				if(syns!=null){
-					if(syns.indexOf(nd.Id)<0) syns.add(nd.Id); 
-					for(int j=0;j<syns.size();j++){
-						String s = (String)syns.get(j); s = s.toLowerCase();
-						s = correctXREF(s);
-						ndident = (Vector)entitySynonym.get(s);
-						if(ndident!=null)
-							for(int k=0;k<ndident.size();k++){
-								Node n = (Node)ndident.get(k);
-								if((!excludeSmallMolecules)||(!n.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
-									if(resultNodeList.indexOf(n)<0) 
-										resultNodeList.add(n);
-							}
-					}
-				}
-				if(resultNodeList.size()!=0){
-					found++;
-					total++;
-					String mes = ""+(total)+"\t"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE")+":\t"+nd.Id+"\t"+resultNodeList.size()+" found";
-					System.out.print(mes);
-					BioPAXIndexRepository.getInstance().addToReport(mes);
-					System.out.print(":");
-					BioPAXIndexRepository.getInstance().addToReport(":");
-					for(int k=0;k<resultNodeList.size();k++){
-						fr.curie.BiNoM.pathways.analysis.structure.Node n = (Node)resultNodeList.get(k);
-						String uri = n.getFirstAttributeValue("BIOPAX_URI");
-						uri = Utils.cutUri(uri);
-						if(uri.length()>20) uri = uri.substring(0,20)+"..";
-						mes = "\t"+n.Id+"("+uri+")";
+					if(resultNodeList.size()!=0){
+						found++;
+						total++;
+						String mes = ""+(total)+"\t"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE")+":\t"+nd.Id+"\t"+resultNodeList.size()+" found";
 						System.out.print(mes);
 						BioPAXIndexRepository.getInstance().addToReport(mes);
-						query.result.addNode(n);
-					}
-					System.out.print("\n");
-					BioPAXIndexRepository.getInstance().addToReport("\n");
-				}else{
-					total++;
-					String mes = ""+(total)+"\t"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE")+":\t"+nd.Id+"\t"+"NOTHING\n";
-					System.out.print(mes);
-					BioPAXIndexRepository.getInstance().addToReport(mes);
-				} }
+						System.out.print(":");
+						BioPAXIndexRepository.getInstance().addToReport(":");
+						for(int k=0;k<resultNodeList.size();k++){
+							fr.curie.BiNoM.pathways.analysis.structure.Node n = (Node)resultNodeList.get(k);
+							String uri = n.getFirstAttributeValue("BIOPAX_URI");
+							uri = Utils.cutUri(uri);
+							if(uri.length()>20) uri = uri.substring(0,20)+"..";
+							mes = "\t"+n.Id+"("+uri+")";
+							System.out.print(mes);
+							BioPAXIndexRepository.getInstance().addToReport(mes);
+							query.result.addNode(n);
+						}
+						System.out.print("\n");
+						BioPAXIndexRepository.getInstance().addToReport("\n");
+					}else{
+						total++;
+						String mes = ""+(total)+"\t"+nd.getFirstAttributeValue("BIOPAX_NODE_TYPE")+":\t"+nd.Id+"\t"+"NOTHING\n";
+						System.out.print(mes);
+						BioPAXIndexRepository.getInstance().addToReport(mes);
+					} 
+//				} // end test BIOPAX_SPECIES
+			}
 		}
 		if(!excludeSmallMolecules){
 			String mes = "Total "+found+" proteins/genes/smallMolecules from the list were identified and "+query.result.Nodes.size()+" distinct entities have been found\n";
@@ -315,10 +324,10 @@ public class BioPAXGraphQueryEngine {
 					Edge e = (Edge)nd.outcomingEdges.get(j);
 					String type = e.getFirstAttributeValue("BIOPAX_EDGE_TYPE");
 					if(type.equals("SPECIESOF")){
-						if(e.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
+//						if(e.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
 							query.result.addNode(e.Node2);
 							species.add(e.Node2);
-						}
+//						}
 					}
 				}
 				String mes = "\n"+(i+1)+"."+n.NodeLabel+" "+n.getFirstAttributeValue("BIOPAX_NODE_TYPE")+" ("+species.size()+" species):\n";
@@ -338,11 +347,20 @@ public class BioPAXGraphQueryEngine {
 	}
 
 	private void addConnectingReactions(){
+		
+		/*
+		 * modif ebo 02.2012
+		 * 
+		 * BIOPAX_SPECIES attribute not used anymore, so disable all tests using it
+		 */
+		
 		database.calcNodesInOut();
 		query.result = new fr.curie.BiNoM.pathways.analysis.structure.Graph();
 		int nreactions = 0;
 		int leftrightreactions = 0;
+		
 		for(int i=0;i<query.input.Nodes.size();i++){
+			
 			Node n = (Node)query.input.Nodes.get(i);
 			query.result.addNode(n);
 			Node nd = (Node)database.getNode(n.Id);
@@ -351,20 +369,25 @@ public class BioPAXGraphQueryEngine {
 				System.out.println(mes);
 				BioPAXIndexRepository.getInstance().addToReport(mes);
 			}else{
-				if(nd.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
+				//if(nd.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
 					// as reactant
-					boolean include1 = false, include2 = false;
+					boolean include1 = false;
+					boolean include2 = false;
 					boolean nospecies = false;
+					
 					for(int j=0;j<nd.outcomingEdges.size();j++){
 						Edge e = (Edge)nd.outcomingEdges.get(j);
 						if(e.Node2.getFirstAttributeValue("BIOPAX_REACTION")!=null){
-							include1 = false; nospecies = true;
+							include1 = false; 
+							nospecies = true;
 							for(int k=0;k<e.Node2.outcomingEdges.size();k++){
 								Edge es = (Edge)e.Node2.outcomingEdges.get(k);
 								String id = es.Node2.Id;
-								if(es.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
-									if((!excludeSmallMolecules)||(!es.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))
+								//if(es.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null) {
+									if((!excludeSmallMolecules)||(!es.Node2.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule"))) {
 										nospecies = false;
+									}
+								//}
 								if(query.input.getNode(id)!=null)
 									include1 = true;
 							}
@@ -398,13 +421,15 @@ public class BioPAXGraphQueryEngine {
 					for(int j=0;j<nd.incomingEdges.size();j++){
 						Edge e = (Edge)nd.incomingEdges.get(j);
 						if(e.Node1.getFirstAttributeValue("BIOPAX_REACTION")!=null){
-							include2 = false; nospecies = true;
+							include2 = false; 
+							nospecies = true;
 							for(int k=0;k<e.Node1.incomingEdges.size();k++){
 								Edge es = (Edge)e.Node1.incomingEdges.get(k);
 								String id = es.Node1.Id;
-								if(es.Node1.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
+								//if(es.Node1.getFirstAttributeValue("BIOPAX_SPECIES")!=null) {
 									if((!excludeSmallMolecules)||(!es.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("SmallMolecule")))            	  
 										nospecies = false;
+								//}
 								if(query.input.getNode(id)!=null)
 									include2 = true;
 							}
@@ -434,9 +459,10 @@ public class BioPAXGraphQueryEngine {
 							query.result.addNode(e.Node1);
 						}
 					}
-				}
+//				} // end test BIOPAX_SPECIES
 			}
-		}
+		} // end loop over all query nodes
+		
 		query.result.addConnections(database);
 		for(int i=0;i<query.result.Nodes.size();i++){
 			Node nd = (Node)query.result.Nodes.get(i);
@@ -477,7 +503,7 @@ public class BioPAXGraphQueryEngine {
 			}else{
 				for(int j=0;j<nd.incomingEdges.size();j++){
 					Edge e = (Edge)nd.incomingEdges.get(j);
-					if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equals("Publication")){
+					if(e.Node1.getFirstAttributeValue("BIOPAX_NODE_TYPE").equalsIgnoreCase("Publication")){
 						e.Node1.NodeLabel = e.Node1.NodeLabel.replace('@','\t');
 						if(query.result.getNode(e.Node1.Id)==null){
 							String mes = (++npubs)+"\t"+e.Node1.NodeLabel+"\n";
@@ -612,7 +638,7 @@ public class BioPAXGraphQueryEngine {
 				System.out.println(mes);
 				BioPAXIndexRepository.getInstance().addToReport(mes);
 			}else{
-				if(nd.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
+//				if(nd.getFirstAttributeValue("BIOPAX_SPECIES")!=null){
 					// as reactant
 					boolean include1 = false, include2 = false;
 					boolean nospecies = false;
@@ -623,8 +649,8 @@ public class BioPAXGraphQueryEngine {
 							for(int k=0;k<e.Node2.outcomingEdges.size();k++){
 								Edge es = (Edge)e.Node2.outcomingEdges.get(k);
 								String id = es.Node2.Id;
-								if(es.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
-									nospecies = false;
+//								if(es.Node2.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
+//									nospecies = false;
 								if(query.input.getNode(id)!=null)
 									include1 = true;
 							}
@@ -659,8 +685,8 @@ public class BioPAXGraphQueryEngine {
 							for(int k=0;k<e.Node1.incomingEdges.size();k++){
 								Edge es = (Edge)e.Node1.incomingEdges.get(k);
 								String id = es.Node1.Id;
-								if(es.Node1.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
-									nospecies = false;
+//								if(es.Node1.getFirstAttributeValue("BIOPAX_SPECIES")!=null)
+//									nospecies = false;
 								if(query.input.getNode(id)!=null)
 									include2 = true;
 							}
@@ -685,7 +711,7 @@ public class BioPAXGraphQueryEngine {
 							query.result.addNode(e.Node1);
 						}
 					}
-				}
+//				}
 			}
 		}
 		query.result.addConnections(database);

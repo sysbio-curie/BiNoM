@@ -79,8 +79,8 @@ public class BioPAXSelectEntities implements ActionListener {
     	}else
     	(new BioPAXSelectEntitiesDialog()).raise(null);
     	
-		if(beng.query.result.Nodes.size()==0)
-			JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "No entities was found. It is possible that the database uses different entity names.\nYou can generate the full list of all entities names \nin the Plugins/BiNoM BioPAX query/Display Index Info dialog");
+//		if(beng.query.result.Nodes.size()==0)
+//			JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "No entities was found. It is possible that the database uses different entity names.\nYou can generate the full list of all entities names \nin the Plugins/BiNoM BioPAX query/Display Index Info dialog");
 
     }
 }

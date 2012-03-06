@@ -27,8 +27,9 @@ public class TestBioPAXQueryEngineEB {
 			
 		  	Vector names = new Vector();
         	Vector xrefs = new Vector();
+        	//names.add("SMAC@cytosol");
+        	//names.add("Oligomerization_of_BAK_at_the_mitochondrial_membrane");
         	names.add("SMAC@cytosol");
-        	names.add("Oligomerization_of_BAK_at_the_mitochondrial_membrane");
         	xrefs.add(new Vector());
         	xrefs.add(new Vector());
         	
@@ -36,11 +37,12 @@ public class TestBioPAXQueryEngineEB {
         	BioPAXGraphQuery query = BioPAXGraphQuery.convertListOfNamesToQuery(names, xrefs);
         	beng.doQuery(query, BioPAXGraphQuery.ADD_COMPLEXES_EXPAND);
         	beng.query.input = beng.query.result;
-        	beng.doQuery(query, BioPAXGraphQuery.ADD_ALL_REACTIONS);
-        	beng.query.input = beng.query.result;
-        	beng.doQuery(query, BioPAXGraphQuery.ADD_SPECIES);
-        	beng.query.input = beng.query.result;
-        	beng.doQuery(query,BioPAXGraphQuery.ADD_PUBLICATIONS);
+//        	beng.doQuery(query, BioPAXGraphQuery.ADD_ALL_REACTIONS);
+//        	beng.query.input = beng.query.result;
+//        	beng.doQuery(query, BioPAXGraphQuery.ADD_SPECIES);
+//        	beng.query.input = beng.query.result;
+//        	beng.doQuery(query,BioPAXGraphQuery.ADD_PUBLICATIONS);
+        	beng.doQuery(query, BioPAXGraphQuery.ADD_CONNECTING_REACTIONS);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

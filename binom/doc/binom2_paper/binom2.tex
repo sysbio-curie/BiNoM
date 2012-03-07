@@ -454,7 +454,15 @@ selected nodes and edges and also to show the clipboard content.
 
 \section*{Results and Discussion}
 
-We propose to study a reaction network of the regulation of the protein RB (also referred to as RB1) \cite{calzone2008comprehensive} as an example of the use of BiNoM functions. The complete network contains about 78 proteins, 208 chemical species, and 165 biochemical reactions. For this study, we choose to concentrate on the G1 to S transition. For that, we used the intersection of the 208 species of RB/E2F network and the 280 species listed in Reactome for the G1-S transition (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical reactions (Figure \ref{Network_RB-E2F_G1S}.
+We propose to study a reaction network of the regulation of the protein RB (also
+referred to as RB1) \cite{calzone2008comprehensive} as an example of the use of
+BiNoM functions. The complete network contains about 78 proteins, 208 chemical
+species, and 165 biochemical reactions. For this study, we choose to concentrate
+on the G1 to S transition. For that, we used the intersection of the 208 species
+of RB/E2F network and the 280 species listed in Reactome for the G1-S transition
+(referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
+subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
+reactions (Figure \ref{Network_RB-E2F_G1S}.
 
 % Daniel vérifie les chiffres
 % doit-on expliquer en détails comment les sous-graphes sony sélectionnés ?
@@ -479,7 +487,13 @@ We propose to study a reaction network of the regulation of the protein RB (also
 
 \subsection*{Modularization} 
 
-The network is very detailed and may be hard to read at a first glance. To facilitate the reading of the content, we propose to organise the reaction network as a modular network. The species are clustered in groups, referred to as modules, in an semi-automatic manner. These modules are then linked by activating (pointed arrows) or inhibiting (T-shape arrows) influences according to what is known biologically about the interactions between these modules. A detailed method on the construction of this modular network is described below:
+The network is very detailed and may be hard to read at a first glance. To
+facilitate the reading of the content, we propose to organise the reaction
+network as a modular network. The species are clustered in groups, referred to
+as modules, in an semi-automatic manner. These modules are then linked by
+activating (pointed arrows) or inhibiting (T-shape arrows) influences according
+to what is known biologically about the interactions between these modules. A
+detailed method on the construction of this modular network is described below:
 
 % T arrows = blocking arrows
 % pointed arrows = > activation
@@ -494,18 +508,25 @@ Choose G1S.xml
 % fournir le fichier xml correspondant
 
 \item	Decompose the network into subnetworks. \\
-We choose to decompose the network according to the different components present in the map rather than decomposing according to the cycles of the network. 
-\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Get Material Components…}.\\
+We choose to decompose the network according to the different components present
+in the map rather than decomposing according to the cycles of the network. 
+\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Get Material
+Components…}.\\
 36 subnetworks are created.
 
 \item	Clustering. \\
-The resulting subnetworks may share a lot of species. To reduce the number of subnetworks, we cluster them with an overlap of 25\%. \\
+The resulting subnetworks may share a lot of species. To reduce the number of
+subnetworks, we cluster them with an overlap of 25\%. \\
 \textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Cluster networks}. \\
-A pop-up window appears. Among the proposed networks, select all networks except G1S.xml and choose 25\% overlap. 7 networks are created.
+A pop-up window appears. Among the proposed networks, select all networks except
+G1S.xml and choose 25\% overlap. 7 networks are created.
 
 \item	Rename the newly-created clusters.
-It is important to rename right away the clusters with a name than illustrates the content of each of these clusters. 
-Choosing the appropriate name might be facilitated by listing the name of the components of the cluster: \textbf{Plugins $\rightarrow$ BiNoM module manager $\rightarrow$ List components of species in network and modules} \\
+It is important to rename right away the clusters with a name than illustrates
+the content of each of these clusters. 
+Choosing the appropriate name might be facilitated by listing the name of the
+components of the cluster: \textbf{Plugins $\rightarrow$ BiNoM module manager
+$\rightarrow$ List components of species in network and modules} \\
 To rename them, right-click on the Network panel.
 Here are the names we propose for these 7 clusters: 
 \begin{itemize}
@@ -635,23 +656,32 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 
 \section*{Figures}
   \subsection*{Figure 1 - Reaction network of the cell cycle}
-      BiNoM view of the BioPAX import of the cell cycle network model of Novak et al. \cite{novak1998model}.
+      BiNoM view of the BioPAX import of the cell cycle network model of Novak
+et al. \cite{novak1998model}.
 
   \subsection*{Figure 2 - Apoptosis pathway hierarchical structure}
-      BioPAX data extracted from the Reactome database \cite{joshi2005reactome}. The green nodes represent pathways, the pink triangular nodes denote steps, while grey nodes indicate reactions.
+      BioPAX data extracted from the Reactome database \cite{joshi2005reactome}.
+The green nodes represent pathways, the pink triangular nodes denote steps,
+while grey nodes indicate reactions.
 
-\subsection*{Figure 3 - Subnetworks obtained after pruning the graph}
-      (a) molecules associated to the input parts of the network (b) molecules associated with the output parts.
+   \subsection*{Figure 3 - Subnetworks obtained after pruning the graph}
+      (a) molecules associated to the input parts of the network (b) molecules
+associated with the output parts.
 
-\subsection*{Figure 4 - Subnetworks obtained after a decomposition in material components}
-      The two overlapping subnetworks correspond to the components Cdc13 and Cdc2. 
+   \subsection*{Figure 4 - Subnetworks obtained after a decomposition in
+material components}
+      The two overlapping subnetworks correspond to the components Cdc13 and
+Cdc2. 
 
 
   \subsection*{Figure xxx - BiNoM BioPAX property editor}
-      Example of the properties related to the entity CDC2 of the cell cycle model of Novak et al. \cite{novak1998model}.
+      Example of the properties related to the entity CDC2 of the cell cycle
+model of Novak et al. \cite{novak1998model}.
 
   \subsection*{Figure xxx - BiNoM Query result}
-      Subnetwork extracted from the human Apoptosis pathway, starting with the Caspase8 protein (=MCH5) and expanding to all protein complexes where this molecule is involved using the BiNoM Query functions.
+      Subnetwork extracted from the human Apoptosis pathway, starting with the
+Caspase8 protein (=MCH5) and expanding to all protein complexes where this
+molecule is involved using the BiNoM Query functions.
 
 
 

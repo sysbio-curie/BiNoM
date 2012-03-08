@@ -1638,13 +1638,15 @@ public class ProduceClickableMap
 		cdata_end_rep = cdata_end.substring(0, cdata_end.length() - 1) + "&zwnj;" + cdata_end.substring(cdata_end.length() - 1, cdata_end.length());
 	}
 	
+	private static final String default_language = "<name lang='en'>";
+
 	static private void content_line(ItemCloser indent, String content, String content2)
 	{
 		indent.indent().println("<content>");
-		indent.indent(1).print("<name lang='en' language='en'>");
+		indent.indent(1).print(default_language);
 		cdata(indent.getOutput(), content);
 		indent.getOutput().println("</name>");
-		indent.indent(1).print("<name lang='ln' language='ln'>");
+		indent.indent(1).print("<name lang='ln'>");
 		cdata(indent.getOutput(), content2);
 		indent.getOutput().println("</name>");
 		indent.indent().println("</content>");
@@ -1657,10 +1659,20 @@ public class ProduceClickableMap
 		output.print(cdata_end);
 	}
 	
+	static private void content_line_data(ItemCloser indent, String content)
+	{
+//		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
+		indent.indent().print("<content>");
+		indent.getOutput().print(default_language);
+		cdata(indent.getOutput(), content);
+		indent.getOutput().println("</name></content>");
+	}
+	
 	static private void content_line(ItemCloser indent, String content)
 	{
 //		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
-		indent.indent().print("<content><name>");
+		indent.indent().print("<content>");
+		indent.indent().print(default_language);
 		indent.getOutput().print(content);
 		indent.getOutput().println("</name></content>");
 	}
@@ -1860,7 +1872,7 @@ public class ProduceClickableMap
 			{
 				ItemCloser modif = item_list_start(entity.add(), m.getId(), "modification associated");
 				output.println(">");
-				content_line(modif.add(), m.getName());
+				content_line_data(modif.add(), m.getName());
 				modif.close();
 			}
 			else	
@@ -5817,9 +5829,12 @@ public class ProduceClickableMap
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");
 		doc_in_new_window(out, "map_help", "help");
+		
+		out.print(" <input type='text' size='14' id='query_text'/>");
+//		out.print("<input type='button' class='button' value='Search' id='search' style='' />");
 		out.print("</div>");
 		out.println("</div>");
-		
+
 		out.print("<div id='" + map_div_name);
 		out.println("'>The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.</div>");
 		out.println("<div id='side_bar'>");

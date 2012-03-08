@@ -245,9 +245,64 @@ function get_markers_for_modification(element, projection, map)
 	return element.markers;
 }
 
+// http://groups.google.com/group/jstree/browse_thread/thread/7ed7cd132d2c19b
+
+$.expr[':'].jstree_contains_plusTitle = function (a, i, m)
+{
+	var s = m[3].toLowerCase();
+	// http://stackoverflow.com/questions/1018855/finding-elements-with-text-using-jquery
+	var r = $(a).filter("a").parent().children().filter("a").filter(function(index) {
+		return $(this).children().length == 2 && $(this).text().toLowerCase().match(s);
+	});
+	if (r.length != 0)
+		return true;
+	// normal jstree_contains search first (see jquery.jstree.js line 3403)
+	if ((a.textContent || "").toLowerCase().indexOf(m[3].toLowerCase()) >= 0)
+		return false;
+	if ((a.innerText || "").toLowerCase().indexOf(m[3].toLowerCase()) >= 0)
+		return false;
+		// custom search within title if nothing found
+	if ((a.title || "").toLowerCase().indexOf(m[3].toLowerCase()) >= 0)
+		return false;
+	return false;
+	
+}; 
+
 function start_right_hand_panel(selector, source, map, projection, whenloaded)
 {
-	jtree = $(selector)
+	dbug.log("search setup");
+//	$("#search").click(function () {
+//		var t = $("#query_text").val();
+//
+//		dbug.log("about to search", selector);
+//		$(selector).jstree("search", t);
+//	});
+	
+	var tree = $(selector);
+	var search_field = $('#query_text');
+	var search_label = "\u2002Search\u00a0";
+	
+	//http://stackoverflow.com/questions/699065/submitting-a-form-on-enter-with-jquery
+	search_field.keypress(function(e) {
+        if(e.which == 13) {
+ //           jQuery('#search').focus().click();
+        	search_field.blur();
+    		var t = $(this).val();
+    		tree.jstree("search", t);
+           
+        }
+    });
+	search_field.val(search_label);
+	search_field.focus(function(e)
+	{
+		// http://drupal.org/node/154137
+		if ($(this).val() == search_label)
+		{
+			$(this).val("");
+		}
+    });
+
+	jtree = tree
 		.bind("loaded.jstree", whenloaded)
 		.jstree({
 			"themes" : {
@@ -270,7 +325,11 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			{
 				"checked_parent_open" : false
 			},
-			plugins : [ "themes", "xml_data", "ui", "checkbox", "languages" ],
+			"search" :
+			{
+				"search_method" : "jstree_contains_plusTitle"
+			},
+			plugins : [ "themes", "search", "xml_data", "ui", "checkbox", "languages" ],
 			html_titles : true
 		}).bind("uncheck_node.jstree", function(event, data) {
 			var f = function(index, element)
@@ -322,8 +381,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				if (!bounds.isEmpty())
 					map.panToBounds(bounds);
 			}
-		);
-
+		).bind("search.jstree", function (e, data) {
+//			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");
+		});
 };
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
@@ -375,6 +435,7 @@ function show_blog(postid)
 
 function show_map_and_markers(map_name, ids)
 {
+	dbug.log("foo");
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{

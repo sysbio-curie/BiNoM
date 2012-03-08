@@ -395,7 +395,7 @@ easily visualize and modify BioPAX files. To the best of our knowledge, there is
 no other software package allowing to view, query and edit BioPAX files than
 BiNoM at the moment.The functions are using
 java classes introspection techniques to build a BioPAX class tree. Then, the
-content of the file can easily be accessed. For example, the figure xxx is
+content of the file can easily be accessed. For example, the figure 5 is
 showing all the informations linked to the component CDC2 in the M-Phase model
 of Novak et al. \cite{novak1998model}, after a call to the BioPAX property
 editor function of the BiNoM menu. Details are given in the BiNoM manual on how
@@ -413,10 +413,10 @@ name (and/or by any synonym of the gene) and start building a network centered
 around this molecule of interest. The extension of the network is done by adding
 different type of entities: complexes where the molecule of interest is
 involved, chemical species, reactions (with the possibility of including all the
-sources and targets of the reactions) and related publications. The figure xxx
+sources and targets of the reactions) and related publications. The figure 6
 is showing an example of a small network extracted from the human apoptosis
 pathway downloaded from the Reactome database \cite{joshi2005reactome}, and
-centered on the Caspase8 (=MCH5) protein, with all the protein complexes where
+centered on the SMAC protein, with all the protein complexes where
 this protein is involved that were added using the BiNoM functions.
 
 
@@ -462,28 +462,14 @@ on the G1 to S transition. For that, we used the intersection of the 208 species
 of RB/E2F network and the 280 species listed in Reactome for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
-reactions (Figure \ref{Network_RB-E2F_G1S}.
+reactions (Figure 7).
 
 % Daniel vérifie les chiffres
 % doit-on expliquer en détails comment les sous-graphes sony sélectionnés ?
 % LC : Cite Reactome
 
-\begin{figure}
-%\centering
-%\includegraphics{Network_Rb_E2F_G1S}
-\caption{Network of the G1 to S transition corresponding to the intersection of RB-E2F network and G1/S network extracted from Reactome}
-\label{Network_Rb-E2F_G1S}
-\end{figure}
-
-
 % LC : expliquer le cycle cellulaire et le role de RB dans le cycle ???
- 
-
-%\subsection*{Import of the network}
-
-%\subsection*{Subnetwork extraction}
-
-%\subsection*{Intersection with Reactome}
+% EB: certainement!! 
 
 \subsection*{Modularization} 
 
@@ -491,91 +477,27 @@ The network is very detailed and may be hard to read at a first glance. To
 facilitate the reading of the content, we propose to organise the reaction
 network as a modular network. The species are clustered in groups, referred to
 as modules, in an semi-automatic manner. These modules are then linked by
-activating (pointed arrows) or inhibiting (T-shape arrows) influences according
-to what is known biologically about the interactions between these modules. A
-detailed method on the construction of this modular network is described below:
+activating or inhibiting influences according
+to the biological knowledge about the interactions between these modules. A
+detailed method on the construction of this modular network using BiNoM is
+described in the supplementary methods.
 
-% T arrows = blocking arrows
-% pointed arrows = > activation
-% LC : je ne sais pas comment le dire
+Briefly, we first decomposed the global network into its different components,
+by using the name semantics of each protein to isolate the sub-networks in which
+each protein is involved (function ``get material components''). The 36 networks
+that are created this way may share a lot of common species, so we went further
+by clustering the subnetworks having at least 25\% overlap. We renamed the 7
+clusters obtained with a name that illustrate the content and main function of
+the clusters (such as E2F1\_RB, Wee1, etc.). Then, we check the content of each 
+module, making modifications if necessary. For example, the module E2F1\_RB is
+further decomposed in three different modules containing the proteins RB, E2F1
+and E2F6. Finally, we created a final modular view, where we integrate the
+subnetworks we have previously created using a set of BiNoM functions for the
+management of modules. Our final modular view is composed of 9 modules, with 22
+edges connecting them (Figure 8).
 
-\begin{enumerate}
-\item Import network. \\
-\textbf{Plugins $\rightarrow$ BiNoM I/O $\rightarrow$ Import CellDesigner document
-from file}.  \\
-Choose G1S.xml
-
-% fournir le fichier xml correspondant
-
-\item	Decompose the network into subnetworks. \\
-We choose to decompose the network according to the different components present
-in the map rather than decomposing according to the cycles of the network. 
-\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Get Material
-Components…}.\\
-36 subnetworks are created.
-
-\item	Clustering. \\
-The resulting subnetworks may share a lot of species. To reduce the number of
-subnetworks, we cluster them with an overlap of 25\%. \\
-\textbf{Plugins $\rightarrow$ BiNoM Analysis $\rightarrow$ Cluster networks}. \\
-A pop-up window appears. Among the proposed networks, select all networks except
-G1S.xml and choose 25\% overlap. 7 networks are created.
-
-\item	Rename the newly-created clusters.
-It is important to rename right away the clusters with a name than illustrates
-the content of each of these clusters. 
-Choosing the appropriate name might be facilitated by listing the name of the
-components of the cluster: \textbf{Plugins $\rightarrow$ BiNoM module manager
-$\rightarrow$ List components of species in network and modules} \\
-To rename them, right-click on the Network panel.
-Here are the names we propose for these 7 clusters: 
-\begin{itemize}
-\item	E2F1\_RB
-\item	CycD1
-\item CycE\_A
-\item Wee1
-\item p21
-\item CycH
-\item CycB1
-\end{itemize}
-
-\item	Inside the clusters, check the content of the modules (manual curation
-of the modularization).
-
-\begin{itemize}
-\item	For cluster E2F1\_RB, separate RB from E2F1 and from E2F6 and create
-three different modules. \textbf{Select - Nodes - By Name}. Write E2F6. The
-nodes with E2F6 are highlighted.Select the reactions between the nodes.
-\textbf{Select - Nodes - First neighbours of selected nodes}. \textbf{File - New
-- Network - From selected nodes all edges}. Rename E2F1\_RB child Delete the
-nodes from E2F1\_RB network.
-\item	Do the same for pRB.
-\item	Rename the remaining network of E2F1\_RB, E2F1.
-\item	For cluster, CycB1, select CDC25 and create a new module with components
-including CDC25.
-\item	The resulting list of modules is:CDC25, CycB1, Wee1, CycH, p21, CycD1,
-CycE\_A, E2F1, RB and E2F6.
-\end{itemize}
-
-\item	Select modules to prepare the modular view. In the pop-up window, choose
-the 10 modules. \textbf{Plugins - BiNoM modules - Create nest network}.
-\item	Connect modules. Plugins - BiNoM modules - Update connections between
-nests.
-\item   Verify the resulting modular view
-
-\begin{itemize}
-\item	Merge networks (modules). \textbf{Plugins - Advanced network merge}.
-Choose union and the 10 modules. Resulting network: 209 nodes and 476
-edgesInitial network: 209 nodes and 266 edges LC: there seems that there was a
-duplication of edges in the merging process.
-\item	Update connections from other network.
-\item	Network difference.
-\end{itemize}
-
-\end{enumerate}
 
 \subsection*{Application of PIQuant on 2 GS networks (comprehensive + modular network), data from Stransky.}
-
 
 \section*{Conclusions}
 
@@ -673,16 +595,26 @@ material components}
       The two overlapping subnetworks correspond to the components Cdc13 and
 Cdc2. 
 
+   \subsection*{Figure 5 - Extra Information linked to the CDC2 protein}
+      The informations are automatically extracted from the BioPAX file upon
+import with the BiNoM I/O functions.
 
-  \subsection*{Figure xxx - BiNoM BioPAX property editor}
-      Example of the properties related to the entity CDC2 of the cell cycle
-model of Novak et al. \cite{novak1998model}.
-
-  \subsection*{Figure xxx - BiNoM Query result}
+  \subsection*{Figure 6 - Apoptosis pathway subnetwork}
       Subnetwork extracted from the human Apoptosis pathway, starting with the
-Caspase8 protein (=MCH5) and expanding to all protein complexes where this
+SMAC protein and expanding to all protein complexes where this
 molecule is involved using the BiNoM Query functions.
 
+
+  \subsection*{Figure 7 - G1/S network}
+	Network of the G1 to S transition corresponding to the intersection of
+RB-E2F network and G1/S network extracted from Reactome.
+      
+
+  \subsection*{Figure 8 - Modular view of the G1/S network}
+	Modular representation of the G1/S network, created by using a set of
+different BiNoM functions. Each node (pictured as a greeb octagon), represent a
+different module, or subnetwork. The edges connecting the modules represent the
+ known influences between modules. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -693,20 +625,20 @@ molecule is involved using the BiNoM Query functions.
 
 %% Use of \listoftables is discouraged.
 %%
-\section*{Tables}
-  \subsection*{Table 1 - Sample table title}
-    Here is an example of a \emph{small} table in \LaTeX\ using  
-    \verb|\tabular{...}|. This is where the description of the table 
-    should go. \par \mbox{}
-    \par
-    \mbox{
-      \begin{tabular}{|c|c|c|}
-        \hline \multicolumn{3}{|c|}{My Table}\\ \hline
-        A1 & B2  & C3 \\ \hline
-        A2 & ... & .. \\ \hline
-        A3 & ..  & .  \\ \hline
-      \end{tabular}
-      }
+%\section*{Tables}
+%  \subsection*{Table 1 - Sample table title}
+%    Here is an example of a \emph{small} table in \LaTeX\ using  
+%    \verb|\tabular{...}|. This is where the description of the table 
+%    should go. \par \mbox{}
+%    \par
+%    \mbox{
+%      \begin{tabular}{|c|c|c|}
+%        \hline \multicolumn{3}{|c|}{My Table}\\ \hline
+%        A1 & B2  & C3 \\ \hline
+%        A2 & ... & .. \\ \hline
+%        A3 & ..  & .  \\ \hline
+%      \end{tabular}
+%      }
 
 
 
@@ -717,15 +649,8 @@ molecule is involved using the BiNoM Query functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{Additional Files}
-  \subsection*{Additional file 1 --- Sample additional file title}
-    Additional file descriptions text (including details of how to
-    view the file, if it is in a non-standard format or the file extension). 
-This might
-    refer to a multi-page table or a figure.
-
-  \subsection*{Additional file 2 --- Sample additional file title}
-    Additional file descriptions text.
-
+  \subsection*{Supplementary methods}
+	Detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
 
 \end{bmcformat}
 \end{document}

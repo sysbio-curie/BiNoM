@@ -343,13 +343,11 @@ first all the elements associated with the \emph{input} parts of the network, a
 second with all the elements associated with the \emph{output} part and at last
 all the elements linked to the central, cyclic part. This type of approach
 corresponds to the bow-tie model of Broder and colleagues \cite{broder2000graph}.
-The figure 3 is showing an example of such a decomposition, from the cell cycle
-network model of Novak et al. \cite{novak1998model}.
 
 The decomposition in material components is using the node name semantics to
 isolate subnetworks in which each protein is involved. Major overlaps between
 the different subnetworks are to be expected, as some proteins are involved in
-several different complexes. The figure 4 is showing two examples of subnetworks
+several different complexes. The figure 3 is showing two examples of subnetworks
 obtained by material components decomposition applied to the cell cycle network
 model.
 
@@ -360,7 +358,8 @@ the different parts of the life cycle of a given protein or complex. Care must
 be taken when applying this approach, as the number of cycles can be huge for
 large network structures. For example, it might be preferable to eliminate first
 the network hubs, which are by definition highly connected, and also group short
-cycles in meta-nodes before applying the procedure. 
+cycles in meta-nodes before applying the procedure. The figure 4 is showing two
+cycles involving CDC25 after a cycle decomposition.
 
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
@@ -584,18 +583,19 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 et al. \cite{novak1998model}.
 
   \subsection*{Figure 2 - Apoptosis pathway hierarchical structure}
-      BioPAX data extracted from the Reactome database \cite{joshi2005reactome}.
+      Zoom on the BioPAX data extracted from the Reactome database \cite{joshi2005reactome}.
 The green nodes represent pathways, the pink triangular nodes denote steps,
 while grey nodes indicate reactions.
 
-   \subsection*{Figure 3 - Subnetworks obtained after pruning the graph}
-      (a) molecules associated to the input parts of the network (b) molecules
-associated with the output parts.
-
-   \subsection*{Figure 4 - Subnetworks obtained after a decomposition in
+   \subsection*{Figure 3 - Subnetworks obtained after a decomposition in
 material components}
       The two overlapping subnetworks correspond to the components Cdc13 and
 Cdc2. 
+
+   \subsection*{Figure 4 - CDC25 subnetworks obtained after a deccomposition in
+cycles}
+      Two cycles for the CDC25 protein found after the decomposition of the cell
+cycle network model of Novak et al. \cite{novak1998model}.
 
    \subsection*{Figure 5 - Extra Information linked to the CDC2 protein}
       The informations are automatically extracted from the BioPAX file upon

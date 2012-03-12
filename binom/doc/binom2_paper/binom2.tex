@@ -473,31 +473,33 @@ reactions (Figure 7).
 
 \subsection*{Modularization} 
 
-The network is very detailed and may be hard to read at a first glance. To
-facilitate the reading of the content, we propose to organise the reaction
+The raw G1/S network is very detailed and may be hard to read at a first glance.
+To facilitate the analysis of the content, we propose to organise the reaction
 network as a modular network. The species are clustered in groups, referred to
-as modules, in an semi-automatic manner. These modules are then linked by
-activating or inhibiting influences according
-to the biological knowledge about the interactions between these modules. A
-detailed method on the construction of this modular network using BiNoM is
-described in the supplementary methods.
+as modules, in an semi-automatic manner, using BiNoM functions and biological knowledge. Each module represent in fact a
+sequence of events occuring with a particular protein. The modules are then
+linked by activating or inhibiting influences according to the informations
+contained in the original diagram or derived from previous biological knowledge.
 
 Briefly, we first decomposed the global network into its different components,
-by using the name semantics of each protein to isolate the sub-networks in which
-each protein is involved (function ``get material components''). The 36 networks
-that are created this way may share a lot of common species, so we went further
-by clustering the subnetworks having at least 25\% overlap. We renamed the 7
-clusters obtained with a name that illustrate the content and main function of
-the clusters (such as E2F1\_RB, Wee1, etc.). Then, we check the content of each 
-module, making modifications if necessary. For example, the module E2F1\_RB is
+by using name semantics to isolate the sub-networks in which
+each protein is involved. The 36 networks that are created this way may share a
+lot of common species, so we went further
+by clustering the subnetworks having at least 25\% of common species. We renamed
+the 7 clusters obtained with a name that illustrate the content and the main
+function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
+content of each module, making modifications if necessary. For example, the
+module E2F1\_RB is
 further decomposed in three different modules containing the proteins RB, E2F1
 and E2F6. Finally, we created a final modular view, where we integrate the
 subnetworks we have previously created using a set of BiNoM functions for the
 management of modules. Our final modular view is composed of 9 modules, with 22
-edges connecting them (Figure 8).
+edges connecting them (Figure 8). A detailed tutorial on the construction of
+this modular network using BiNoM is described in the supplementary methods.
 
 
-\subsection*{Application of PIQuant on 2 GS networks (comprehensive + modular network), data from Stransky.}
+\subsection*{Application of PIQuant on 2 GS networks (comprehensive + modular
+network), data from Stransky.}
 
 \section*{Conclusions}
 
@@ -612,7 +614,7 @@ RB-E2F network and G1/S network extracted from Reactome.
 
   \subsection*{Figure 8 - Modular view of the G1/S network}
 	Modular representation of the G1/S network, created by using a set of
-different BiNoM functions. Each node (pictured as a greeb octagon), represent a
+different BiNoM functions. Each node (pictured as a green octagon), represents a
 different module, or subnetwork. The edges connecting the modules represent the
  known influences between modules. 
 

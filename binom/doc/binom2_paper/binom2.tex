@@ -423,12 +423,35 @@ $$
  PIQUANT_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-For example, a very simple influence network composed of seven nodes is shown on figure~\ref{piquantnetworks}.
+For example, a very simple influence network composed of seven nodes is shown on
+figure~\ref{piquantnetworks}a. The figures ~\ref{piquantnetworks}b and
+~\ref{piquantnetworks}c show 2 paths extracted from this network. Given that the
+node AC has an activity value of 2, and that the two paths have the same length
+equal to 3, we can calculate the PIQUANT score for the Ph node as:
 
+$$
+ PIQUANT_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{3}
+= 0.27
+$$
+
+In more realistic situations, we will have multiple source nodes with different
+activity values, and also multiple target nodes representing phenotypes of
+particular nodes of interest. We have implemented in BiNoM a set of functions
+that allow users to select source nodes, select target nodes, and choose among
+three different options for searching paths (shortest paths, optimal and
+suboptimal shortest paths, all non-intersecting paths). The software is then
+calculating PIQUANT scores for every target node specified, taking into account
+every possible path found by the algorithm. We describe a detailed and concrete
+application of the PIQUANT algorithm to a real biological network in the results
+section.
 
 \begin{figure}[h]
- \caption{\label{piquantnetworks}  \textbf{A simple influence network (a) and
-two paths (b,c) extracted from the network ending to the same node.}}
+ \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The 
+network is composed of seven nodes and nine edges (a). The two paths (b,c)
+extracted from this network start from the source node \textbf{Ac} and end at
+the target node \textbf{Ph} (which denotes a phenotype of interest). The node
+\textbf{Ac} is the only one for which
+an activity value is known (value=2).}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
 

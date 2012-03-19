@@ -282,13 +282,19 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	menuItem = new JMenuItem("OCSANA analysis...");
 	menuItem.addActionListener(new OptimalCutSetAnalyzer());
 	structAnaMenu.add(menuItem);
-	
+
+	structAnaMenu.addSeparator();
+    menuItem = new JMenuItem("About BiNoM...");
+    menuItem.addActionListener(new AboutBox());
+    structAnaMenu.add(menuItem);
+
 	structAnaMenu.addSeparator();
     
     createNeighborhoodSetsMenuItem = new JMenuItem("Create neighborhood sets file...");
     structAnaMenu.add(createNeighborhoodSetsMenuItem);
     createNeighborhoodSetsMenuItem.addActionListener(new createNeighborhoodSets());
-// Module manager begin
+
+    // Module manager begin
 	JMenu binomNestManagerMenu = new JMenu("BiNoM module manager");
 	plugInMenu.add(binomNestManagerMenu);
 	

@@ -42,7 +42,19 @@ public class DataPathConsistencyAnalyzer {
 	public double searchRadius = Double.MAX_VALUE;
 	
 	public static int PERMUTE_NODE_ACTIVITIES = 0;
-	 
+	
+	/**
+	 * Ocsana search option: Berge's algorithm
+	 */
+	public static int OCS_BERGE = 0;
+	/**
+	 * Ocsana search option: partial search
+	 */
+	public static int OCS_PARTIAL = 1;
+	/**
+	 * Ocsana search option by default
+	 */
+	public int ocsSearch = OCS_BERGE;
 
 	public Vector<Vector<Vector<Path>>> EnrichedNodePaths = new Vector<Vector<Vector<Path>>>(); 
 	public Vector<Node> EnrichedNodes = new Vector<Node>(); // Those nodes with present attribute which are selected by user
@@ -1026,8 +1038,10 @@ public class DataPathConsistencyAnalyzer {
 	}
 	
 	/**
-	 * Determine paths for Optimal combinations sets and calculate scores
+	 * Determine paths for optimal combinations sets analysis and calculate the scores
 	 * for elementary nodes.
+	 * 
+	 * @author ebo
 	 */
 	public void ocsanaScore() {
 		
@@ -1057,14 +1071,6 @@ public class DataPathConsistencyAnalyzer {
 			else
 				line += n.Id + "(" + nodeID2attribute.get(n.Id) + ")" + " ";
 		this.optCutSetReport.append("Side effect nodes: "+line+"\n\n");
-		
-//		for (int i=0;i<this.graph.Edges.size();i++) {
-//			Edge e = this.graph.Edges.get(i);
-//			for (int j=0;j< e.Attributes.size();j++) {
-//				Attribute att = (Attribute)e.Attributes.get(j);
-//				System.out.println(e.EdgeLabel+":"+att.name+"="+att.value);
-//			}
-//		}
 		
 		// convert every "neutral" edge to activation
 		int nbConversions = this.checkEdgeInfluence();
@@ -1338,6 +1344,105 @@ public class DataPathConsistencyAnalyzer {
 		}
 		Collections.sort(omegaScores);
 	}
+	
+	/**
+	 * Optimal cut set search
+	 */
+	public void ocsanaSearch() {
+		
+		/*
+		 * determine paths and calculate scores for elementary nodes
+		 */
+		ocsanaScore();
+		
+		/*
+		 * create ocs object and set data
+		 */
+		OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+		oca.pathMatrix = pathMatrix;
+		oca.pathMatrixNbCol = pathMatrixNbCol;
+		oca.pathMatrixNbRow = pathMatrixNbRow;
+		oca.pathMatrixNodeList = pathMatrixNodeList;
+
+		ArrayList<String> orderedNodesByScore = new ArrayList<String>();
+		for (OmegaScoreData osd : omegaScores) {
+			orderedNodesByScore.add(osd.nodeId);
+		}
+		oca.orderedNodesByScore = orderedNodesByScore;
+		
+		// check exception 1 nodes and put them aside
+		oca.checkRows();
+		
+		// search for hitting sets size 1 and put them aside
+		oca.searchHitSetSizeOne();
+		
+		// convert path matrix to BitSet objects; both rows and columns
+		oca.convertPathMatrixColToBinary();
+		oca.convertPathMatrixRowToBinary();
+		
+		if (ocsSearch == OCS_BERGE) {
+			/*
+			 * Full search with Berge's algorithm
+			 */
+			this.optCutSetReport.append("Search option: Berge's algorithm\n");
+			oca.mainBerge(true);
+		}
+		else {
+			/*
+			 * Enumeration approach
+			 */
+			oca.maxHitSetSize = this.maxSetSize;
+			oca.maxNbHitSet = this.maxSetNb;
+			// full enumeration
+//			this.optCutSetReport.append("Search option: full enumeration\n");
+//			oca.searchHitSetSizeTwo();
+//			oca.searchHitSetFull(this.maxSetSize);
+			
+			// partial search
+			oca.searchHitSetSizeTwo();
+			oca.searchHitSetPartial();
+		}
+		this.optCutSetReport.append("\n");
+		
+		ArrayList<HashSet<String>> hitSet = oca.formatHitSetSB();
+		
+		// calculate the score for each set and order them accordingly
+		ArrayList<optCutSetData> optCutSetList = new ArrayList<optCutSetData>();
+		
+		for (HashSet<String> set : hitSet) {
+			double score = 0.0;
+			for (String nodeID : set) {
+				score += omegaScoreMap.get(nodeID);
+			}
+			optCutSetList.add(new optCutSetData(set, score));
+		}
+		
+		Collections.sort(optCutSetList);
+
+		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal cut sets.\n\n");
+		
+		this.optCutSetReport.append("Cut set\tSize\tScore\n\n");
+		DecimalFormat df = new DecimalFormat("#.###");
+		for (optCutSetData d : optCutSetList) {
+			//this.optCutSetReport.append(d.optCutSet.toString()+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\n");
+			String str = "[";
+			for (String id : d.optCutSet)
+				if (nodeID2attribute == null)
+					str += id + " , ";
+				else
+					str += id + "(" + nodeID2attribute.get(id) + ")" + " , ";
+			str = str.substring(0, str.length()-3);
+			str += "]";
+			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\n");
+		}
+
+	
+	
+	
+	
+	}
+	
+	
 	
 	/**
 	 * Optimal cut set search, sub-optimal, old algorithm

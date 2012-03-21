@@ -19,12 +19,14 @@ public class OptimalCutSetAnalyzerTask implements Task {
 
 	public void halt() {
 		// TODO Auto-generated method stub
-
 	}
 
 	public void run() {
-		analyzer.ocsanaScore();
-		analyzer.ocsanaOptimalCutSet();
+		// old way
+		//analyzer.ocsanaScore();
+		//analyzer.ocsanaOptimalCutSet();
+		
+		analyzer.ocsanaSearch();
 		taskMonitor.setPercentCompleted(100);
 	}
 

@@ -63,6 +63,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 	private JRadioButton shortestPathRB;
 	private JRadioButton suboptimalShortestPathRB;
 	private JRadioButton allPathRB;
+	private JRadioButton bergeRB;
+	private JRadioButton partialRB;
 
 	private JCheckBox limitationRadius;
 	private JTextField searchRadius;
@@ -131,7 +133,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		attNames.insertItemAt("None", 0);
 		attNames.setSelectedIndex(0);
 
-		setSize(730, 600);
+		setSize(730, 640);
 
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
@@ -400,6 +402,35 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		 * Opt cut set specific parameters 
 		 */
 		
+		y++;
+		
+		bergeRB = new JRadioButton();
+		bergeRB.setText("Complete search (Berge's algorithm)");
+		bergeRB.setSelected(true);
+		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(bergeRB, c);
+		
+		y++;
+		partialRB = new JRadioButton();
+		partialRB.setText("Partial search");
+		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(partialRB, c);
+		
+		ButtonGroup OCSgroup = new ButtonGroup();
+		OCSgroup.add(bergeRB);
+		OCSgroup.add(partialRB);
+
+		y++;
 		JPanel p2 = new JPanel(new FlowLayout());
 		maxSetSize = new JTextField(4);
 		maxSetSize.setText("20");
@@ -473,6 +504,12 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 					if(allPathRB.isSelected()) 
 						analyzer.searchPathMode = analyzer.ALL_PATHS;
 
+					// minimal cut set options
+					if (bergeRB.isSelected())
+						analyzer.ocsSearch = analyzer.OCS_BERGE;
+					if(partialRB.isSelected())
+						analyzer.ocsSearch = analyzer.OCS_PARTIAL;
+					
 					if(limitationRadius.isSelected())
 						analyzer.searchRadius = Double.parseDouble(searchRadius.getText());
 					else

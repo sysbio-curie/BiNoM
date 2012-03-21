@@ -5,8 +5,11 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import com.ibm.icu.text.NumberFormat;
 
 import fr.curie.BiNoM.pathways.utils.CombinationGenerator;
 import fr.curie.BiNoM.pathways.utils.Utils;
@@ -51,50 +54,92 @@ public class OptimalCombinationAnalyzer {
 	 */
 	public ArrayList<String> hitSetSizeOne = new ArrayList<String>();
 	
-	public ArrayList<HashSet<Integer>> hitSet = new ArrayList<HashSet<Integer>>();
-	
-	public ArrayList<BitSet> hitSetBin = new ArrayList<BitSet>();
-	
 	/**
-	 * List of sets that are not hitting sets
+	 * Hitting sets encoded as a set of BitSet objects.
 	 */
-	public ArrayList<HashSet<Integer>> seedSetList = new ArrayList<HashSet<Integer>>();
+	public HashSet<BitSet> hitSetSB = new HashSet<BitSet>();
 	
 	/**
 	 * List of path matrix columns (nodes) encoded as binary (BitSet) objects.
 	 */
 	public ArrayList<BitSet> pathMatrixColBin = new ArrayList<BitSet>();
 	
+	/**
+	 * set of nodes representing the union of all hit sets
+	 */
 	public HashSet<Integer> hitSetNodeList = new HashSet<Integer>();
 	
-	// berge
+	/**
+	 * List of path matrix rows, encoded as BitSet objects.
+	 */
 	public ArrayList<BitSet> pathMatrixRowBin = new ArrayList<BitSet>();
+	
+	/**
+	 * List of nodes ordered by decreasing Ocsana score
+	 */
+	public ArrayList<String> orderedNodesByScore;
+	
+	/**
+	 * Maximum hit set size for partial search. 
+	 */
+	public long maxHitSetSize;
+	
+	/**
+	 * Maximum number of sets for partial search.
+	 */
+	public long maxNbHitSet;
 	
 	/**
 	 * Constructor
 	 */
 	public OptimalCombinationAnalyzer() {
-		// nothing here for the moment!
 	}
 	
-	public void mainBerge() {
+	/**
+	 * Implementation of Berge's algorithm to find minimal cut sets.
+	 * 
+	 * pathMatrixRowBin should be set.
+	 * 
+	 * @author ebo
+	 */
+	public void mainBerge(boolean printLog) {
 		
-		HashSet<BitSet> mcs = initFirstRowBerge();
-		mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(1));
-		long tic = System.currentTimeMillis();
+		System.out.println("Start Berge's algorithm search...");
+		
+		// Minimal cut set
+		hitSetSB = initFirstRowBerge();
+		hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(1));
+		long tic=0;
+		if(printLog)
+			tic = System.currentTimeMillis();
+		int maxSetSize=0;
 		for (int i=1;i<pathMatrixNbRow;i++) {
-			//System.out.println("round: "+i);
-			mcs = createCandidateSetBerge(mcs, pathMatrixRowBin.get(i));
-			//System.out.println("candidate set size: "+mcs.size());
-			mcs = checkMinimalityBerge(mcs);
+			hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
+			if (printLog)
+				System.out.println("Analyzing path number "+i);
+			if (hitSetSB.size() > maxSetSize)
+				maxSetSize = hitSetSB.size();
+			hitSetSB = checkMinimalityBerge(hitSetSB);
 		}
-		long toc = System.currentTimeMillis() - tic;
-		System.out.println("timing: "+toc);
-		System.out.println("final size: "+mcs.size());
+		long toc=0;
+		if (printLog) {
+			toc = System.currentTimeMillis() - tic;
+			System.out.println("timing: "+toc);
+			System.out.println("max set size: "+maxSetSize);
+			System.out.println("final mcs size: "+hitSetSB.size());
+		}
 //		for (BitSet b : mcs)
 //			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
 	}
 	
+	/**
+	 * Check and keep only minimal sets.
+	 * 
+	 * @param mcs sets
+	 * @return minimal sets
+	 * 
+	 * @author ebo
+	 */
 	public HashSet<BitSet> checkMinimalityBerge(HashSet<BitSet> mcs) {
 		
 		HashSet<BitSet> flag = new HashSet<BitSet>();
@@ -121,6 +166,15 @@ public class OptimalCombinationAnalyzer {
 
 	}
 	
+	/**
+	 * Create new candidate set by adding nodes from new row of the path matrix.
+	 * 
+	 * @param mcs minimal cut set
+	 * @param row new row as BitSet object
+	 * @return new set
+	 * 
+	 * @author ebo
+	 */
 	public HashSet<BitSet> createCandidateSetBerge(HashSet<BitSet> mcs, BitSet row) {
 		HashSet<BitSet> cand = new HashSet<BitSet>();
 		for (BitSet cs : mcs) {
@@ -146,6 +200,13 @@ public class OptimalCombinationAnalyzer {
 		return(cand);
 	}
 	
+	/**
+	 * Initialization of Berge's algorithm with the first row of the path matrix.
+	 * 
+	 * @return set
+	 * 
+	 * @author ebo
+	 */
 	public HashSet<BitSet> initFirstRowBerge() {
 		
 		HashSet<BitSet> mcs = new HashSet<BitSet>();
@@ -163,6 +224,52 @@ public class OptimalCombinationAnalyzer {
 			}
 		}
 		return(mcs);
+	}
+	
+	/**
+	 * Final format for hit set list.
+	 * 
+	 * @return list of sets (as string)
+	 */
+	public ArrayList<HashSet<String>> formatHitSetSB() {
+		
+		/*
+		 * Also add hit sets of size one and exception 1 nodes, if any were found previously
+		 * that is, if the lists are not empty.
+		 */
+		ArrayList<HashSet<String>> ret = new ArrayList<HashSet<String>>();
+		for (String node : hitSetSizeOne) {
+			HashSet<String> newset = new HashSet<String>();
+			newset.add(node);
+			for (String ex : exceptionNode) {
+				newset.add(ex);
+			}
+			ret.add(newset);
+		}
+		for (BitSet bs : hitSetSB) {
+			HashSet<String> newset = new HashSet<String>();
+			for(int i=bs.nextSetBit(0); i>=0; i=bs.nextSetBit(i+1)) {
+				newset.add(pathMatrixNodeList.get(i));
+			}
+			for (String ex : exceptionNode) {
+				newset.add(ex);
+			}
+			ret.add(newset);
+		}
+		return(ret);
+	}
+	
+	/**
+	 * Print out nodes corresponding to the bits set in the BitSet object.
+	 * 
+	 * @param b
+	 */
+	public void printHitSet (BitSet b) {
+		System.out.print("[");
+		for(int i=b.nextSetBit(0); i>=0; i=b.nextSetBit(i+1)) {
+			System.out.print(pathMatrixNodeList.get(i)+":");
+		}
+		System.out.println("]");
 	}
 	
 	/**
@@ -210,22 +317,11 @@ public class OptimalCombinationAnalyzer {
 	}
 	
 	/**
-	 * Add hitting set as BitSet object.
-	 * @param set
-	 */
-	public void addHitSetBin(HashSet<Integer> set) {
-		hitSetBin.add(new BitSet(pathMatrixNbCol));
-		for (int i : set) {
-			hitSetBin.get(hitSetBin.size()-1).set(i);
-		}
-	}
-	
-	/**
 	 * Convert an array of column indices to a BitSet object representing 
 	 * a row of the path matrix.
 	 * 
 	 * @param indices array of integers
-	 * @return
+	 * @return BitSet object
 	 */
 	public BitSet getBitSetRow(int[] indices) {
 		BitSet ret = new BitSet(pathMatrixNbCol);
@@ -258,6 +354,8 @@ public class OptimalCombinationAnalyzer {
 	 */
 	public void searchHitSetFull(int max) {
 		
+		System.out.println("starting full enumeration search...");
+		
 		int setSize = 3;
 		while (setSize <= max) {
 			
@@ -281,7 +379,6 @@ public class OptimalCombinationAnalyzer {
 			CombinationGenerator cg = new CombinationGenerator(pathMatrixNbCol, setSize);
 			System.out.println("Combination set size: "+cg.getTotal());
 			int ct=0;
-			long tic = System.currentTimeMillis();
 			while(cg.hasMore()) {
 				indices = cg.getNext();
 				
@@ -295,7 +392,7 @@ public class OptimalCombinationAnalyzer {
 					// now check if the set is minimal, i.e do not overlap with any previously defined hitting set
 					BitSet test = getBitSetRow(indices);
 					boolean isMinimal = true;
-					for (BitSet hs : hitSetBin) {
+					for (BitSet hs : hitSetSB) {
 						BitSet b2 = (BitSet) hs.clone();
 						b2.and(test);
 						if (b2.cardinality() == hs.cardinality()) {
@@ -304,133 +401,168 @@ public class OptimalCombinationAnalyzer {
 						}
 					}
 					if (isMinimal == true) {
-						HashSet<Integer> novel = new HashSet<Integer>();
+						BitSet nbs = new BitSet(pathMatrixNbCol);
 						for (int i=0;i<indices.length;i++) {
-							novel.add(indices[i]);
+							nbs.set(indices[i]);
 							hitSetNodeList.add(indices[i]);
 						}
-						addHitSetBin(novel);
-						hitSet.add(novel);
+						hitSetSB.add(nbs);
 						ct++;
-//						for (int i : novel)
-//							System.out.print(pathMatrixNodeList.get(i)+":");
-//						System.out.println();
 					}
 				}
 			}
-			long toc = System.currentTimeMillis() - tic;
-			System.out.println("timing: "+toc);
 			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
 			setSize++;
 		}
 	}
 
-	public void searchHitSetOpt(int max) {
+	
+	public void searchHitSetPartial() {
+		
+		System.out.println("starting partial enumeration search...");
+		
+		System.out.println("maxHitSetSize "+maxHitSetSize+" maxNbHitSet "+maxNbHitSet);
+		
+		HashMap<String, Integer> mapNodes = new HashMap<String, Integer>();
+		for (int i=0;i<pathMatrixNodeList.size();i++)
+			mapNodes.put(pathMatrixNodeList.get(i), i);
 		
 		int setSize = 3;
 		
-		while (setSize <= max) {
-			long totalTic = System.currentTimeMillis();
+		while (setSize <= maxHitSetSize) {
+			
 			// stop if all elementary nodes are covered
 			if (hitSetNodeList.size() == pathMatrixNbCol) {
 				setSize--;
 				System.out.println("Stop: all elementary nodes are covered. set size = "+setSize);
 				break;
 			}
-			// stop if we don't have seed sets 
-			if (seedSetList.size() == 0) {
-				setSize--;
-				System.out.println("Stop: seed set list equal zero.");
+			
+			// stop if setSize value is greater than the number of nodes
+			if (setSize > pathMatrixNbCol) {
+				System.out.println("Stop: setSize is greater than the number of nodes.");
 				break;
 			}
 			
-			System.out.println();
-			System.out.println("search for hit set size "+ setSize);
-			System.out.println("nb combinations for this size: "+calcCombinations(pathMatrixNbCol, setSize));
+			System.out.println("\nSearch for hit set size "+ setSize);
 			
-			// generate combinations from previous set
-			System.out.println("seed set size: "+seedSetList.size());
+			long nbComb =  calcCombinations(pathMatrixNbCol, setSize);
+			NumberFormat form = NumberFormat.getInstance();
+			form.setGroupingUsed(true);
 			
-			Long tic = System.currentTimeMillis();
-			HashSet<HashSet<Integer>> newList = new HashSet<HashSet<Integer>>();
-			int cpt = 0;
-			for (HashSet<Integer> set : seedSetList) {
-				// add new node to previous set
-				for (int i=0;i<pathMatrixNbCol;i++) {
-					if (!set.contains(i)) {
-						HashSet<Integer> tmp = new HashSet<Integer>();
-						for (int j : set) {
-							tmp.add(j);
-						}
-						tmp.add(i);
-						if (!newList.contains(tmp))
-							newList.add(tmp);
-					}
-					cpt++;
+			System.out.println("nbComb: "+form.format(nbComb));
+			
+			int selectionSize;
+			/*
+			 * this is a map from the selection index to the pathMatrixNode index
+			 */
+			HashMap<Integer, Integer> mapIdx = new HashMap<Integer, Integer>();
+			
+			if (nbComb > maxNbHitSet) {
+				
+				// select high scoring nodes
+				selectionSize = optimalSetSize(setSize, maxNbHitSet);
+				System.out.println("selection size: "+selectionSize);
+				
+				/*
+				 * Stop searching if the selection size is smaller than the current set size
+				 */
+				if (setSize > selectionSize)
+					break;
+				
+				for (int i=0;i<selectionSize;i++) {
+					String nodeID = orderedNodesByScore.get(i);
+					int nodeIndex = mapNodes.get(nodeID);
+					mapIdx.put(i, nodeIndex);
 				}
+				
+//				System.out.println("ordered nodes:");
+//				for (String id : orderedNodesByScore)
+//					System.out.print(id+":");
+//				System.out.println();
+//				
+//				System.out.println("pathMatrixNodeList:");
+//				for (String id : pathMatrixNodeList)
+//					System.out.print(id+":");
+//				System.out.println();
+//				
+//				System.out.println("selection index:");
+//				for (int i=0;i<selectionSize;i++) {
+//					System.out.print(mapIdx.get(i)+":");
+//				}
+//				System.out.println();
+				
 			}
-			Long toc = System.currentTimeMillis() - tic;
+			else {
+				// no selection
+				System.out.println("no selection");
+				for (int i=0;i<pathMatrixNbCol;i++)
+					mapIdx.put(i, i);
+				selectionSize = pathMatrixNbCol;
+			}
 			
-			System.out.println("nb iterations for new list: " + cpt);
-			System.out.println("time iterations: " + toc);
+			// generate all combinations and test them
+			int[] idx;
+			CombinationGenerator cg = new CombinationGenerator(selectionSize, setSize);
+			System.out.println("Combination set size: "+form.format(cg.getTotal()));
 			
-			// reset seed list
-			seedSetList = new ArrayList<HashSet<Integer>>();
-			
-			System.out.println("new list size: "+newList.size());
 			int ct=0;
-			tic = System.currentTimeMillis();
-			for (HashSet<Integer> candidateHitSet : newList) {
-				// check for true hitting set
+			while(cg.hasMore()) {
+				idx = cg.getNext();
+				
+				// check if the set is a hitting set
 				BitSet b1 = new BitSet(pathMatrixNbRow);
-				Iterator<Integer> it = candidateHitSet.iterator();
-				while(it.hasNext()) {
-					int i = it.next();
-					b1.or(pathMatrixColBin.get(i));
+				for (int i=0;i<idx.length;i++) {
+					b1.or(pathMatrixColBin.get(mapIdx.get(idx[i])));
 				}
 
 				if (b1.cardinality() == pathMatrixNbRow) {
-					// now check if the set is minimal, i.e do not overlap with any previous hitting set
-					BitSet test = getBitSetRowHS(candidateHitSet);
+					// now check if the set is minimal, i.e do not overlap with any previously defined hitting set
+					
+					/*
+					 * Build a BitSet corresponding to a row in the pathMatrix, with all
+					 * nodes of the set we are testing.
+					 */
+					BitSet test = new BitSet(pathMatrixNbCol);
+					for (int i=0;i<idx.length;i++) {
+						test.set(mapIdx.get(idx[i]));
+					}
+					/*
+					 * Now compare this BitSet to all the previously found hitting sets, and check
+					 * that there is no overlap.
+					 */
 					boolean isMinimal = true;
-					for (BitSet bs : hitSetBin) {
-						BitSet check = (BitSet) bs.clone();
-						check.and(test);
-						if (check.cardinality() == bs.cardinality()) {
+					for (BitSet hs : hitSetSB) {
+						BitSet b2 = (BitSet) hs.clone();
+						b2.and(test);
+						if (b2.cardinality() == hs.cardinality()) {
 							isMinimal = false;
 							break;
 						}
 					}
 					if (isMinimal == true) {
-						hitSet.add(candidateHitSet);
-						for (int i : candidateHitSet) {
-							hitSetNodeList.add(i);
+						/*
+						 * We have a new hitting set
+						 */
+						BitSet nbs = new BitSet(pathMatrixNbCol);
+						for (int i=0;i<idx.length;i++) {
+							nbs.set(mapIdx.get(idx[i]));
+							hitSetNodeList.add(mapIdx.get(idx[i]));
 						}
-						addHitSetBin(candidateHitSet);
-//						for (int i : hs)
-//							System.out.print(pathMatrixNodeList.get(i)+":");
-//						System.out.println();
+						hitSetSB.add(nbs);
 						ct++;
 					}
 				}
-				else {
-					// add set to seed list
-					//if (!seedSetList.contains(hs))
-					seedSetList.add(candidateHitSet);
-				}
 			}
-			toc = System.currentTimeMillis() - tic;
-			System.out.println("time true hitset + minimal: "+toc);
 			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
-			setSize++;
 			
-			long totalToc = System.currentTimeMillis() - totalTic;
-			System.out.println("total timing: "+totalToc);
+			setSize++;
 		}
-		
 	}
+
+	
 	
 	/**
 	 * Search for hit sets of size 2.
@@ -454,30 +586,21 @@ public class OptimalCombinationAnalyzer {
 			tmp.or(pathMatrixColBin.get(indices[1]));
 			if (tmp.cardinality() == pathMatrixNbRow) {
 				// we have a hitting set
-				hitSet.add(new HashSet<Integer>());
-				// index of last element added
-				int index = hitSet.size()-1;
-				hitSet.get(index).add(indices[0]);
-				hitSet.get(index).add(indices[1]);
 				hitSetNodeList.add(indices[0]);
 				hitSetNodeList.add(indices[1]);
-				addHitSetBin(hitSet.get(index));
+				BitSet nbs = new BitSet(pathMatrixNbCol);
+				nbs.set(indices[0]);
+				nbs.set(indices[1]);
+				hitSetSB.add(nbs);
 			}
-			else {
-				// not a hitting set, store the combination as a seed for next round
-				seedSetList.add(new HashSet<Integer>());
-				seedSetList.get(seedSetList.size()-1).add(indices[0]);
-				seedSetList.get(seedSetList.size()-1).add(indices[1]);
-			}
+//			else {
+//				// not a hitting set, store the combination as a seed for next round
+//				seedSetList.add(new HashSet<Integer>());
+//				seedSetList.get(seedSetList.size()-1).add(indices[0]);
+//				seedSetList.get(seedSetList.size()-1).add(indices[1]);
+//			}
 		}
-		
-		// print out sets
-		for (int i=0;i<hitSet.size();i++) {
-			HashSet<Integer> tmp = hitSet.get(i);
-			for (int j : tmp)
-				System.out.print(pathMatrixNodeList.get(j)+":");
-			System.out.println();
-		}
+		System.out.println("found "+hitSetSB.size()+" hitting sets");
 	}
 	
 	/**
@@ -533,6 +656,14 @@ public class OptimalCombinationAnalyzer {
 			pathMatrix = tmp;
 			pathMatrixNbCol = ctCol;
 			pathMatrixNodeList = l;
+			
+			// remove hit set size one nodes from the list of nodes ordered by score
+			for (int i =0;i<hitSetSizeOne.size();i++) {
+				int idx = orderedNodesByScore.indexOf(hitSetSizeOne.get(i));
+				if (idx >= 0) 
+					orderedNodesByScore.remove(idx);
+			}
+
 		}
 	}
 	
@@ -598,6 +729,13 @@ public class OptimalCombinationAnalyzer {
 			for (int i =0;i<exceptionNode.size();i++)
 				System.out.println(exceptionNode.get(i));
 			
+			// remove exception nodes from the list of nodes ordered by score
+			for (int i =0;i<exceptionNode.size();i++) {
+				int idx = orderedNodesByScore.indexOf(exceptionNode.get(i));
+				if (idx >= 0) 
+					orderedNodesByScore.remove(idx);
+			}
+			
 			// replace original data
 			pathMatrix = tmp;
 			pathMatrixNbRow = ctRow;
@@ -661,7 +799,7 @@ public class OptimalCombinationAnalyzer {
 	/**
 	 * Calculate the number of combinations of k size for a set of n elements.
 	 * 
-	 * @author ebonnet
+	 * @author ebo
 	 * 
 	 * @param n the total number of elements
 	 * @param k the size of the subset
@@ -673,4 +811,136 @@ public class OptimalCombinationAnalyzer {
 		den = den.multiply(Utils.factorial(n-k));
 		return num.divide(den).longValue();
 	}
+	
+	/**
+	 * Calculate the maximum set size so that the number of combination 
+	 * of size setSize are below a cutoff value.
+	 * 
+	 * @author ebo
+	 * 
+	 * @param int setSize - current hit set size
+	 * @param long maxNbSet - maximum number of sets cutoff value
+	 * @return int maxSetSize - maximum selection set size
+	 */
+	private int optimalSetSize(int setSize, long maxNbSet) {
+		
+		int n = setSize;
+		int k = setSize;
+		long comb = 0;
+		while(comb < maxNbSet) {
+			n++;
+			comb = calcCombinations(n,k);
+		}
+		n--;
+		return(n);
+	}
+
+//--------------------------------- legacy code ----------------------------------------------------
+	
+//	public void searchHitSetOpt(int max) {
+//		
+//		int setSize = 3;
+//		
+//		while (setSize <= max) {
+//			long totalTic = System.currentTimeMillis();
+//			// stop if all elementary nodes are covered
+//			if (hitSetNodeList.size() == pathMatrixNbCol) {
+//				setSize--;
+//				System.out.println("Stop: all elementary nodes are covered. set size = "+setSize);
+//				break;
+//			}
+//			// stop if we don't have seed sets 
+//			if (seedSetList.size() == 0) {
+//				setSize--;
+//				System.out.println("Stop: seed set list equal zero.");
+//				break;
+//			}
+//			
+//			System.out.println();
+//			System.out.println("search for hit set size "+ setSize);
+//			System.out.println("nb combinations for this size: "+calcCombinations(pathMatrixNbCol, setSize));
+//			
+//			// generate combinations from previous set
+//			System.out.println("seed set size: "+seedSetList.size());
+//			
+//			Long tic = System.currentTimeMillis();
+//			HashSet<HashSet<Integer>> newList = new HashSet<HashSet<Integer>>();
+//			int cpt = 0;
+//			for (HashSet<Integer> set : seedSetList) {
+//				// add new node to previous set
+//				for (int i=0;i<pathMatrixNbCol;i++) {
+//					if (!set.contains(i)) {
+//						HashSet<Integer> tmp = new HashSet<Integer>();
+//						for (int j : set) {
+//							tmp.add(j);
+//						}
+//						tmp.add(i);
+//						if (!newList.contains(tmp))
+//							newList.add(tmp);
+//					}
+//					cpt++;
+//				}
+//			}
+//			Long toc = System.currentTimeMillis() - tic;
+//			
+//			System.out.println("nb iterations for new list: " + cpt);
+//			System.out.println("time iterations: " + toc);
+//			
+//			// reset seed list
+//			seedSetList = new ArrayList<HashSet<Integer>>();
+//			
+//			System.out.println("new list size: "+newList.size());
+//			int ct=0;
+//			tic = System.currentTimeMillis();
+//			for (HashSet<Integer> candidateHitSet : newList) {
+//				// check for true hitting set
+//				BitSet b1 = new BitSet(pathMatrixNbRow);
+//				Iterator<Integer> it = candidateHitSet.iterator();
+//				while(it.hasNext()) {
+//					int i = it.next();
+//					b1.or(pathMatrixColBin.get(i));
+//				}
+//
+//				if (b1.cardinality() == pathMatrixNbRow) {
+//					// now check if the set is minimal, i.e do not overlap with any previous hitting set
+//					BitSet test = getBitSetRowHS(candidateHitSet);
+//					boolean isMinimal = true;
+//					for (BitSet bs : hitSetBin) {
+//						BitSet check = (BitSet) bs.clone();
+//						check.and(test);
+//						if (check.cardinality() == bs.cardinality()) {
+//							isMinimal = false;
+//							break;
+//						}
+//					}
+//					if (isMinimal == true) {
+//						hitSet.add(candidateHitSet);
+//						for (int i : candidateHitSet) {
+//							hitSetNodeList.add(i);
+//						}
+//						addHitSetBin(candidateHitSet);
+////						for (int i : hs)
+////							System.out.print(pathMatrixNodeList.get(i)+":");
+////						System.out.println();
+//						ct++;
+//					}
+//				}
+//				else {
+//					// add set to seed list
+//					//if (!seedSetList.contains(hs))
+//					seedSetList.add(candidateHitSet);
+//				}
+//			}
+//			toc = System.currentTimeMillis() - tic;
+//			System.out.println("time true hitset + minimal: "+toc);
+//			if (ct>0)
+//				System.out.println("found "+ct+ " hit sets size "+setSize);
+//			setSize++;
+//			
+//			long totalToc = System.currentTimeMillis() - totalTic;
+//			System.out.println("total timing: "+totalToc);
+//		}
+//		
+//	}
+
 }

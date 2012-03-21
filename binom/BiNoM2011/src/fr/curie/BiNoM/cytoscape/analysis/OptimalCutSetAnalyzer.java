@@ -27,6 +27,7 @@ public class OptimalCutSetAnalyzer implements ActionListener {
 	    		GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
 	    		
 	    		dialog.analyzer = new DataPathConsistencyAnalyzer();
+	    		
 //	    		try {
 //	    		dialog.analyzer.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
 //	    		}

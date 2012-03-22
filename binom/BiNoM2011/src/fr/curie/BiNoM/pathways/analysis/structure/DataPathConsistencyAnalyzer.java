@@ -146,7 +146,15 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public ArrayList<String> pathMatrixNodeList = new ArrayList<String>();
 	
+	/**
+	 * Path matrix number of rows and columns
+	 */
 	public int pathMatrixNbRow, pathMatrixNbCol;
+	
+	/**
+	 * List of optimal cut sets with their scores
+	 */
+	private ArrayList<optCutSetData> optCutSetList;
 	
 	/**
 	 * Simple data structure to store optimal cut sets data
@@ -1384,15 +1392,19 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			this.optCutSetReport.append("Search option: Berge's algorithm\n");
+			this.optCutSetReport.append("Search option: full search (Berge's algorithm)\n");
+			
 			oca.mainBerge(true);
 		}
 		else {
 			/*
 			 * Enumeration approach
 			 */
+			this.optCutSetReport.append("Search option: partial enumeration\n");
+			
 			oca.maxHitSetSize = this.maxSetSize;
 			oca.maxNbHitSet = this.maxSetNb;
+			
 			// full enumeration
 //			this.optCutSetReport.append("Search option: full enumeration\n");
 //			oca.searchHitSetSizeTwo();
@@ -1407,7 +1419,7 @@ public class DataPathConsistencyAnalyzer {
 		ArrayList<HashSet<String>> hitSet = oca.formatHitSetSB();
 		
 		// calculate the score for each set and order them accordingly
-		ArrayList<optCutSetData> optCutSetList = new ArrayList<optCutSetData>();
+		optCutSetList = new ArrayList<optCutSetData>();
 		
 		for (HashSet<String> set : hitSet) {
 			double score = 0.0;
@@ -1435,14 +1447,36 @@ public class DataPathConsistencyAnalyzer {
 			str += "]";
 			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\n");
 		}
-
-	
-	
-	
 	
 	}
 	
-	
+	/**
+	 * save optimal cut set list to a text file.
+	 * 
+	 * @param file
+	 */
+	public void saveOptCutSetData(File file) {
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			for (optCutSetData d : optCutSetList) {
+				String str = "";
+				for (String id : d.optCutSet)
+					if (nodeID2attribute == null)
+						str += id + ",";
+					else
+						str += id + "::" + nodeID2attribute.get(id) + ",";
+				str = str.substring(0, str.length()-1);
+				str += "\t";
+				str += d.optCutSetSize + "\t";
+				str += d.score;
+				out.write(str+"\n");
+			}
+			out.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Optimal cut set search, sub-optimal, old algorithm

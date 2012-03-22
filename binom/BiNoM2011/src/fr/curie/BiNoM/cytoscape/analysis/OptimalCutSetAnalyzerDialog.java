@@ -133,7 +133,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		attNames.insertItemAt("None", 0);
 		attNames.setSelectedIndex(0);
 
-		setSize(730, 640);
+		setSize(750, 650);
 
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
@@ -405,7 +405,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		
 		bergeRB = new JRadioButton();
-		bergeRB.setText("Complete search (Berge's algorithm)");
+		bergeRB.setText("Full search (Berge's algorithm)");
 		bergeRB.setSelected(true);
 		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
 		c = new GridBagConstraints();
@@ -417,7 +417,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		
 		y++;
 		partialRB = new JRadioButton();
-		partialRB.setText("Partial search");
+		partialRB.setText("Partial enumeration");
 		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
 		c = new GridBagConstraints();
 		c.gridx = x;
@@ -433,7 +433,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		JPanel p2 = new JPanel(new FlowLayout());
 		maxSetSize = new JTextField(4);
-		maxSetSize.setText("20");
+		maxSetSize.setText("10");
 		JLabel l1 = new JLabel("Max set size");
 		p2.add(l1);
 		p2.add(maxSetSize);
@@ -446,10 +446,10 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		
 		JPanel p3 = new JPanel(new FlowLayout());
-		JLabel l2 = new JLabel("Max set number ( x 1e+6 )");
+		JLabel l2 = new JLabel("Maximum number of hit sets ( x 1e+6 )");
 		p3.add(l2);
 		maxSetNb = new JTextField(4);
-		maxSetNb.setText("1");
+		maxSetNb.setText("50");
 		p3.add(maxSetNb);
 		c = new GridBagConstraints();
 		c.gridx = x;

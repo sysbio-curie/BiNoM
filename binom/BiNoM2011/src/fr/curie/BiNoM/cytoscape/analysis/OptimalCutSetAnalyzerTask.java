@@ -27,6 +27,7 @@ public class OptimalCutSetAnalyzerTask implements Task {
 		//analyzer.ocsanaOptimalCutSet();
 		
 		analyzer.ocsanaSearch();
+		
 		taskMonitor.setPercentCompleted(100);
 	}
 

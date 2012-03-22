@@ -1,5 +1,6 @@
 package fr.curie.BiNoM.pathways.analysis.structure;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -128,8 +129,11 @@ public class OptimalCombinationAnalyzer {
 			System.out.println("max set size: "+maxSetSize);
 			System.out.println("final mcs size: "+hitSetSB.size());
 		}
+		
 //		for (BitSet b : mcs)
 //			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
+		
+		//saveHitSetSB("/bioinfo/users/ebonnet/hit_set_berge");
 	}
 	
 	/**
@@ -560,6 +564,8 @@ public class OptimalCombinationAnalyzer {
 			
 			setSize++;
 		}
+		
+		//saveHitSetSB("/bioinfo/users/ebonnet/hit_set_partial");
 	}
 
 	
@@ -835,6 +841,25 @@ public class OptimalCombinationAnalyzer {
 		return(n);
 	}
 
+	
+	public void saveHitSetSB(String filename) {
+		
+		try {
+			BufferedWriter bf = new BufferedWriter(new FileWriter(filename));
+			for (BitSet b : hitSetSB) {
+				String str = "";
+				for(int i=b.nextSetBit(0); i>=0; i=b.nextSetBit(i+1)) {
+					str = str + pathMatrixNodeList.get(i) + "\t";
+				}
+				str = str.trim();
+				bf.write(str+"\n");
+			}
+			bf.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 //--------------------------------- legacy code ----------------------------------------------------
 	
 //	public void searchHitSetOpt(int max) {

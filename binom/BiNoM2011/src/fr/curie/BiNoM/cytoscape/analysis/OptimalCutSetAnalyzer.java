@@ -28,24 +28,15 @@ public class OptimalCutSetAnalyzer implements ActionListener {
 	    		
 	    		dialog.analyzer = new DataPathConsistencyAnalyzer();
 	    		
-//	    		try {
-//	    		dialog.analyzer.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
-//	    		}
-//	    		catch (Exception ex) {
-//	    			ex.printStackTrace();
-//	    		}
-	    		
 	    		dialog.analyzer.graph = XGMML.convertXGMMLToGraph(grDoc);
 	    		dialog.fillTheData();
 	    		dialog.setVisible(true);
 	    		
 	    		if (dialog.result>0) {
-					String report = dialog.analyzer.optCutSetReport.toString();
-					PathConsistencyAnalyzerReportDialog reportForm = new PathConsistencyAnalyzerReportDialog(report);
+					OptimalCutSetReportDialog reportForm = new OptimalCutSetReportDialog(dialog.analyzer);
 					reportForm.pop();
 				}
 	    		
 	    	}
 	    }
-	
 }

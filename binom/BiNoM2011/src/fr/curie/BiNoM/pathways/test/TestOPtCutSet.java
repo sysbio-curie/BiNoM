@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzerDialog;
+import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetReportDialog;
 import fr.curie.BiNoM.cytoscape.analysis.PathConsistencyAnalyzerReportDialog;
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
@@ -22,40 +23,60 @@ public class TestOPtCutSet {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		//noGraphTest();
+		graphTest();
+	}
+	
+
+	public static void graphTest() {
 		try {
-			
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
-			
+
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
+
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
+
+			/*
+			 * 
+			 * Graphical interface test
+			 */
+
+			JFrame window = new JFrame();
+			OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(window,"Optimal Combinations of Intervention Strategies for Network Analysis",true);
+			dialog.analyzer = dpc;
+			dialog.fillTheData();
+			dialog.setVisible(true);
+
+			if (dialog.result>0) {
+				OptimalCutSetReportDialog reportForm = new OptimalCutSetReportDialog(dpc);
+				reportForm.pop();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void noGraphTest() {
+		try {
+			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
+
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
 			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
-			
+
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
-			
-			/*
-			 * 
-			 * Graphical interface test
-			 */
-			
-//			JFrame window = new JFrame();
-//			OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(window,"Optimal Combinations of Intervention Strategies for Network Analysis",true);
-//			dialog.analyzer = dpc;
-//			dialog.fillTheData();
-//			dialog.setVisible(true);
-//			
-//			if (dialog.result>0) {
-//				String report = dpc.optCutSetReport.toString();
-//				PathConsistencyAnalyzerReportDialog reportForm = new PathConsistencyAnalyzerReportDialog(report);
-//				reportForm.pop();
-//			}
 
-			//System.exit(1);
-			
 			/*
 			 * 
 			 * Non graphical test
@@ -63,21 +84,21 @@ public class TestOPtCutSet {
 			ArrayList<Node> testSource = new ArrayList<Node>();
 			ArrayList<Node> testTarget = new ArrayList <Node>();
 			ArrayList<Node> testSide = new ArrayList<Node>();
-			
+
 			/* toynet2 test 
 			 * the corresponding xgmml file should be loaded
 			 * uncomment lines below
-			*/
-//			testSource.add(dpc.graph.getNode("I1"));
-//			testSource.add(dpc.graph.getNode("I2"));
-//			testTarget.add(dpc.graph.getNode("O1"));
-//			testTarget.add(dpc.graph.getNode("O2"));
+			 */
+			//			testSource.add(dpc.graph.getNode("I1"));
+			//			testSource.add(dpc.graph.getNode("I2"));
+			//			testTarget.add(dpc.graph.getNode("O1"));
+			//			testTarget.add(dpc.graph.getNode("O2"));
 
 			/* egfr linearized network test settings
 			 * Source nodes: ar bir btc csrc egf epr erbb1 erbb2 erbb3 erbb4 hbegf mkp nrg1a nrg1b nrg2a nrg2b nrg3 nrg4 pdk1 pp2a pp2b pten ship2 tgfa 
 			 * Target nodes: elk1
 			 */
-			
+
 			testSource.add(dpc.graph.getNode("ar"));
 			testSource.add(dpc.graph.getNode("bir"));
 			testSource.add(dpc.graph.getNode("btc"));
@@ -103,48 +124,49 @@ public class TestOPtCutSet {
 			testSource.add(dpc.graph.getNode("ship2"));
 			testSource.add(dpc.graph.getNode("tgfa"));
 			testTarget.add(dpc.graph.getNode("elk1"));
-//			testTarget.add(dpc.graph.getNode("erbb11"));
-//			testTarget.add(dpc.graph.getNode("pak1"));
-			
+			//			testTarget.add(dpc.graph.getNode("erbb11"));
+			//			testTarget.add(dpc.graph.getNode("pak1"));
+
 
 			for (Node n : testSource)
 				dpc.sourceNodes.add(n);
-			
+
 			for (Node n : testTarget)
 				dpc.targetNodes.add(n);
-			
+
 			for (Node n : testSide)
 				dpc.sideNodes.add(n);
-			
-//			dpc.searchPathMode = dpc.ALL_PATHS;
+
+			//			dpc.searchPathMode = dpc.ALL_PATHS;
 			dpc.searchPathMode = dpc.SHORTEST_PATHS;
 			dpc.maxSetSize = 10;
 			dpc.maxSetNb = (long) 1e6;
-			dpc.ocsSearch = dpc.OCS_PARTIAL;
-			
+			//dpc.ocsSearch = dpc.OCS_PARTIAL;
+			dpc.ocsSearch = dpc.OCS_BERGE;
+
 			dpc.ocsanaSearch();
 
-			//System.out.println(dpc.optCutSetReport);
-			
+			System.out.println(dpc.optCutSetReport);
+
 			/*
 			 * data preprocessing
 			 * create path matrix
 			 */
-//			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
-//			oca.pathMatrix = dpc.pathMatrix;
-//			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
-//			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
-//			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
-//			
-//			oca.checkRows();
-//			oca.searchHitSetSizeOne();
-//			oca.searchHitSetPartial();
-			
+			//			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+			//			oca.pathMatrix = dpc.pathMatrix;
+			//			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
+			//			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
+			//			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
+			//			
+			//			oca.checkRows();
+			//			oca.searchHitSetSizeOne();
+			//			oca.searchHitSetPartial();
+
 			/*
 			 * Berge's algorithm
 			 * brute force search lines should be commented to use this (and vice-versa)
 			 */
-//			oca.mainBerge(true);
+			//			oca.mainBerge(true);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

@@ -1411,7 +1411,7 @@ public class DataPathConsistencyAnalyzer {
 //			oca.searchHitSetFull(this.maxSetSize);
 			
 			// partial search
-			oca.searchHitSetSizeTwo();
+			//oca.searchHitSetSizeTwo();
 			oca.searchHitSetPartial();
 		}
 		this.optCutSetReport.append("\n");

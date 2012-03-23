@@ -110,30 +110,25 @@ public class OptimalCombinationAnalyzer {
 		// Minimal cut set
 		hitSetSB = initFirstRowBerge();
 		hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(1));
-		long tic=0;
-		if(printLog)
-			tic = System.currentTimeMillis();
+		long tic = System.currentTimeMillis();
 		int maxSetSize=0;
 		for (int i=1;i<pathMatrixNbRow;i++) {
 			hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
-			if (printLog)
-				System.out.println("Analyzing path number "+i);
-			if (hitSetSB.size() > maxSetSize)
-				maxSetSize = hitSetSB.size();
+			if (printLog) {
+				int pn = i+1;
+				System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow);
+				if (hitSetSB.size() > maxSetSize)
+					maxSetSize = hitSetSB.size();
+			}
 			hitSetSB = checkMinimalityBerge(hitSetSB);
 		}
 		long toc=0;
 		if (printLog) {
-			toc = System.currentTimeMillis() - tic;
-			System.out.println("timing: "+toc);
 			System.out.println("max set size: "+maxSetSize);
 			System.out.println("final mcs size: "+hitSetSB.size());
 		}
-		
-//		for (BitSet b : mcs)
-//			System.out.println(convertBitSetToString(b,pathMatrixNbCol));
-		
-		//saveHitSetSB("/bioinfo/users/ebonnet/hit_set_berge");
+		toc = System.currentTimeMillis() - tic;
+		System.out.println("timing: "+toc);
 	}
 	
 	/**
@@ -421,12 +416,20 @@ public class OptimalCombinationAnalyzer {
 		}
 	}
 
-	
+	/**
+	 * Search for minimal hit sets by partial enumeration.
+	 */
 	public void searchHitSetPartial() {
 		
 		System.out.println("starting partial enumeration search...");
-		
 		System.out.println("maxHitSetSize "+maxHitSetSize+" maxNbHitSet "+maxNbHitSet);
+		
+		long tic = System.currentTimeMillis();
+		
+		/*
+		 * First enumerate and test hit sets of size 2
+		 */
+		searchHitSetSizeTwo();
 		
 		HashMap<String, Integer> mapNodes = new HashMap<String, Integer>();
 		for (int i=0;i<pathMatrixNodeList.size();i++)
@@ -455,7 +458,7 @@ public class OptimalCombinationAnalyzer {
 			NumberFormat form = NumberFormat.getInstance();
 			form.setGroupingUsed(true);
 			
-			System.out.println("nbComb: "+form.format(nbComb));
+			System.out.println("calculated nb of combinations: "+form.format(nbComb));
 			
 			int selectionSize;
 			/*
@@ -463,6 +466,9 @@ public class OptimalCombinationAnalyzer {
 			 */
 			HashMap<Integer, Integer> mapIdx = new HashMap<Integer, Integer>();
 			
+			/*
+			 * Selection procedure
+			 */
 			if (nbComb > maxNbHitSet) {
 				
 				// select high scoring nodes
@@ -480,23 +486,6 @@ public class OptimalCombinationAnalyzer {
 					int nodeIndex = mapNodes.get(nodeID);
 					mapIdx.put(i, nodeIndex);
 				}
-				
-//				System.out.println("ordered nodes:");
-//				for (String id : orderedNodesByScore)
-//					System.out.print(id+":");
-//				System.out.println();
-//				
-//				System.out.println("pathMatrixNodeList:");
-//				for (String id : pathMatrixNodeList)
-//					System.out.print(id+":");
-//				System.out.println();
-//				
-//				System.out.println("selection index:");
-//				for (int i=0;i<selectionSize;i++) {
-//					System.out.print(mapIdx.get(i)+":");
-//				}
-//				System.out.println();
-				
 			}
 			else {
 				// no selection
@@ -509,7 +498,7 @@ public class OptimalCombinationAnalyzer {
 			// generate all combinations and test them
 			int[] idx;
 			CombinationGenerator cg = new CombinationGenerator(selectionSize, setSize);
-			System.out.println("Combination set size: "+form.format(cg.getTotal()));
+			System.out.println("effective nb of combinations: "+form.format(cg.getTotal()));
 			
 			int ct=0;
 			while(cg.hasMore()) {
@@ -565,7 +554,8 @@ public class OptimalCombinationAnalyzer {
 			setSize++;
 		}
 		
-		//saveHitSetSB("/bioinfo/users/ebonnet/hit_set_partial");
+		long toc = System.currentTimeMillis() - tic;
+		System.out.println("timing: "+toc);
 	}
 
 	

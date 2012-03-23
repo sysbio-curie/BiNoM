@@ -33,17 +33,16 @@ public class TestOPtCutSet {
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
 
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
 
 			/*
-			 * 
 			 * Graphical interface test
 			 */
 

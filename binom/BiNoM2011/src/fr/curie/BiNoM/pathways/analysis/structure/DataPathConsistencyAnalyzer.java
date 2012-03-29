@@ -52,6 +52,11 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public static int OCS_PARTIAL = 1;
 	/**
+	 * Ocsana search option: seed based search
+	 */
+	public static int OCS_SEED = 2;
+	
+	/**
 	 * Ocsana search option by default
 	 */
 	public int ocsSearch = OCS_BERGE;
@@ -159,7 +164,7 @@ public class DataPathConsistencyAnalyzer {
 	/**
 	 * Simple data structure to store optimal cut sets data
 	 */
-	private class optCutSetData implements Comparable {
+	public class optCutSetData implements Comparable {
 		
 		public HashSet<String> optCutSet;
 		public double score;
@@ -175,38 +180,6 @@ public class DataPathConsistencyAnalyzer {
 		public int compareTo(Object b) {
 			
 			optCutSetData m = (optCutSetData) b;
-
-			if(this.score < m.score) {
-				return 1;
-			} else if(this.score == m.score) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-	}
-
-	/**
-	 * Simple class to store Omega score data for optimal cut sets
-	 * elementary nodes.
-	 * 
-	 * @author ebonnet
-	 *
-	 */
-	private class OmegaScoreData implements Comparable {
-		
-		public String nodeId;
-		public double score;
-		
-		public OmegaScoreData(String id, double score) {
-			this.nodeId = id; 
-			this.score = score;
-		}
-
-		// sort by decreasing score value
-		public int compareTo(Object b) {
-			
-			OmegaScoreData m = (OmegaScoreData) b;
 
 			if(this.score < m.score) {
 				return 1;
@@ -1371,12 +1344,10 @@ public class DataPathConsistencyAnalyzer {
 		oca.pathMatrixNbCol = pathMatrixNbCol;
 		oca.pathMatrixNbRow = pathMatrixNbRow;
 		oca.pathMatrixNodeList = pathMatrixNodeList;
-
-		ArrayList<String> orderedNodesByScore = new ArrayList<String>();
-		for (OmegaScoreData osd : omegaScores) {
-			orderedNodesByScore.add(osd.nodeId);
-		}
-		oca.orderedNodesByScore = orderedNodesByScore;
+		oca.omegaScoreList = omegaScores;
+		
+		// initialization of the list of nodes ordered by score
+		oca.initOrderedNodesList();
 		
 		// check exception 1 nodes and put them aside
 		oca.checkRows();
@@ -1396,7 +1367,7 @@ public class DataPathConsistencyAnalyzer {
 			
 			oca.mainBerge(true);
 		}
-		else {
+		else if (ocsSearch == OCS_PARTIAL) {
 			/*
 			 * Enumeration approach
 			 */
@@ -1404,16 +1375,19 @@ public class DataPathConsistencyAnalyzer {
 			
 			oca.maxHitSetSize = this.maxSetSize;
 			oca.maxNbHitSet = this.maxSetNb;
-			
-			// full enumeration
-//			this.optCutSetReport.append("Search option: full enumeration\n");
-//			oca.searchHitSetSizeTwo();
-//			oca.searchHitSetFull(this.maxSetSize);
-			
-			// partial search
-			//oca.searchHitSetSizeTwo();
 			oca.searchHitSetPartial();
 		}
+		else if (ocsSearch == OCS_SEED) {
+			/*
+			 * Seed based enumeration approach
+			 */
+			this.optCutSetReport.append("Search option: seed based enumeration\n");
+			
+			oca.maxHitSetSize = this.maxSetSize;
+			oca.maxNbHitSet = this.maxSetNb;
+			oca.searchHitSetSeed();
+		}
+		
 		this.optCutSetReport.append("\n");
 		
 		ArrayList<HashSet<String>> hitSet = oca.formatHitSetSB();

@@ -65,6 +65,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 	private JRadioButton allPathRB;
 	private JRadioButton bergeRB;
 	private JRadioButton partialRB;
+	private JRadioButton seedRB;
 
 	private JCheckBox limitationRadius;
 	private JTextField searchRadius;
@@ -425,7 +426,6 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		bergeRB = new JRadioButton();
 		bergeRB.setText("Full search (Berge's algorithm)");
 		bergeRB.setSelected(true);
-		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -436,7 +436,6 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		partialRB = new JRadioButton();
 		partialRB.setText("Partial enumeration");
-		//shortestPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_SHORTEST_PATHS);
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -444,9 +443,20 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		c.anchor = GridBagConstraints.WEST;
 		panel.add(partialRB, c);
 		
+		y++;
+		seedRB = new JRadioButton();
+		seedRB.setText("Seed based enumeration");
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(seedRB, c);
+		
 		ButtonGroup OCSgroup = new ButtonGroup();
 		OCSgroup.add(bergeRB);
 		OCSgroup.add(partialRB);
+		OCSgroup.add(seedRB);
 
 		y++;
 		JPanel p2 = new JPanel(new FlowLayout());
@@ -527,6 +537,9 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 						analyzer.ocsSearch = analyzer.OCS_BERGE;
 					if(partialRB.isSelected())
 						analyzer.ocsSearch = analyzer.OCS_PARTIAL;
+					if(seedRB.isSelected())
+						analyzer.ocsSearch = analyzer.OCS_SEED;
+					
 					
 					if(limitationRadius.isSelected())
 						analyzer.searchRadius = Double.parseDouble(searchRadius.getText());

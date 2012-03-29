@@ -30,13 +30,14 @@ public class TestOPtCutSet {
 
 	public static void graphTest() {
 		try {
+			
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
 
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
@@ -66,15 +67,8 @@ public class TestOPtCutSet {
 		try {
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
 			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
-
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
 
 			/*
 			 * 
@@ -85,13 +79,11 @@ public class TestOPtCutSet {
 			ArrayList<Node> testSide = new ArrayList<Node>();
 
 			/* toynet2 test 
-			 * the corresponding xgmml file should be loaded
-			 * uncomment lines below
 			 */
-			//			testSource.add(dpc.graph.getNode("I1"));
-			//			testSource.add(dpc.graph.getNode("I2"));
-			//			testTarget.add(dpc.graph.getNode("O1"));
-			//			testTarget.add(dpc.graph.getNode("O2"));
+//			testSource.add(dpc.graph.getNode("I1"));
+//			testSource.add(dpc.graph.getNode("I2"));
+//			testTarget.add(dpc.graph.getNode("O1"));
+//			testTarget.add(dpc.graph.getNode("O2"));
 
 			/* egfr linearized network test settings
 			 * Source nodes: ar bir btc csrc egf epr erbb1 erbb2 erbb3 erbb4 hbegf mkp nrg1a nrg1b nrg2a nrg2b nrg3 nrg4 pdk1 pp2a pp2b pten ship2 tgfa 
@@ -136,30 +128,51 @@ public class TestOPtCutSet {
 			for (Node n : testSide)
 				dpc.sideNodes.add(n);
 
-			//			dpc.searchPathMode = dpc.ALL_PATHS;
+			//	dpc.searchPathMode = dpc.ALL_PATHS;
 			dpc.searchPathMode = dpc.SHORTEST_PATHS;
-			dpc.maxSetSize = 10;
-			dpc.maxSetNb = (long) 1e6;
 			//dpc.ocsSearch = dpc.OCS_PARTIAL;
-			dpc.ocsSearch = dpc.OCS_BERGE;
-
-			dpc.ocsanaSearch();
-
-			System.out.println(dpc.optCutSetReport);
+			//dpc.ocsSearch = dpc.OCS_BERGE;
+			//dpc.ocsanaSearch();
+			//System.out.println(dpc.optCutSetReport);
 
 			/*
 			 * data preprocessing
 			 * create path matrix
 			 */
-			//			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
-			//			oca.pathMatrix = dpc.pathMatrix;
-			//			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
-			//			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
-			//			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
-			//			
-			//			oca.checkRows();
-			//			oca.searchHitSetSizeOne();
-			//			oca.searchHitSetPartial();
+			dpc.ocsanaScore();
+			OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+			oca.pathMatrix = dpc.pathMatrix;
+			oca.pathMatrixNbCol = dpc.pathMatrixNbCol;
+			oca.pathMatrixNbRow = dpc.pathMatrixNbRow;
+			oca.pathMatrixNodeList = dpc.pathMatrixNodeList;
+			oca.omegaScoreList = dpc.omegaScores;
+			
+			oca.initOrderedNodesList();
+			
+			oca.checkRows();
+			oca.searchHitSetSizeOne();
+
+			// convert path matrix to BitSet objects; both rows and columns
+			oca.convertPathMatrixColToBinary();
+			oca.convertPathMatrixRowToBinary();
+
+			oca.searchHitSetSizeTwo();
+			
+			oca.printSeedList();
+			
+			oca.maxNbHitSet = (long)50e6;
+			oca.maxHitSetSize = 10;
+			
+			long tic = System.currentTimeMillis();
+			//oca.searchHitSetSeed();
+			//oca.searchHitSetPartial();
+			oca.mainBerge(false);
+			long toc = System.currentTimeMillis() - tic;
+			System.out.println("global timing: "+toc);
+			oca.saveHitSetSB("/bioinfo/users/ebonnet/test2");
+			//oca.printHitSetList();
+			
+			//	oca.searchHitSetPartial();
 
 			/*
 			 * Berge's algorithm

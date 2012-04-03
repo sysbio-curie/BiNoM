@@ -85,6 +85,8 @@ public class ProduceClickableMap
 	
 	private static final String module_list_category_name = "module list";
 	private static final String icons_directory = "/map_icons";
+
+	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = "/doc";
 	private static final String entity_icons_directory = icons_directory + "/entity";
 	private static final String REACTION_CLASS_NAME = "REACTION";
@@ -1644,7 +1646,8 @@ public class ProduceClickableMap
 	{
 		indent.indent().println("<content>");
 		indent.indent(1).print(default_language);
-		cdata(indent.getOutput(), content);
+		indent.getOutput().print(content);
+//		cdata(indent.getOutput(), content);
 		indent.getOutput().println("</name>");
 		indent.indent(1).print("<name lang='ln'>");
 		cdata(indent.getOutput(), content2);
@@ -1664,7 +1667,8 @@ public class ProduceClickableMap
 //		output.println("<content><name><![CDATA[" + content + "]]></name></content>");
 		indent.indent().print("<content>");
 		indent.getOutput().print(default_language);
-		cdata(indent.getOutput(), content);
+		indent.getOutput().print(content);
+		//cdata(indent.getOutput(), content);
 		indent.getOutput().println("</name></content>");
 	}
 	
@@ -1754,6 +1758,13 @@ public class ProduceClickableMap
 		return indent;
 	}
 	
+	private static String make_right_hand_link_to_blog(int postid, String name)
+	{
+		StringBuffer sb = new StringBuffer("<img align='top' class='blogfromright' border='0' src='/map_icons/misc/blog.png' alt='");
+		sb.append(postid).append("'/> ").append(name);
+		return sb.toString();
+	}
+	
 	private static void modification_line(final ItemCloser indent, Modification m,
 		Map<String, Vector<String>> speciesAliases,
 		Map<String, Vector<Place>> placeMap,
@@ -1764,7 +1775,6 @@ public class ProduceClickableMap
 		item_list_start(indent, m.getId(), "modification posttranslational");
 		indent.getOutput().print(" position=\"");
 		boolean first = true;
-		final int z = 1 << scales.maxzoom;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
 		{
 			final Vector<Place> places = placeMap.get(shape_id);
@@ -1840,7 +1850,7 @@ public class ProduceClickableMap
 			final FormatProteinNotes format, final SbmlDocument cd, final String blog_name, ImagesInfo scales, final PrintWriter output,
 			final ItemCloser cls, final EntityBase ent)
 	{
-		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, ent.getName(), null);
+		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, make_right_hand_link_to_blog(ent.getPostId(), ent.getName()), null);
 		
 		class Modif
 		{
@@ -1961,6 +1971,7 @@ public class ProduceClickableMap
 					Utils.eclipseErrorln("no post of module " + k.getKey());
 				else
 				{
+					final int post_id = k.getValue().post_id;
 					ItemCloser indent = modules.add();
 					item_list_start(indent, make_module_id(k.getKey()), "modification posttranslational");
 					indent.getOutput().print(" position=\"");
@@ -1968,7 +1979,7 @@ public class ProduceClickableMap
 					indent.getOutput().print(";");
 					indent.getOutput().print(scales.getY(position[1]));
 					indent.getOutput().println("\">");
-					content_line(indent.add(), k.getKey(), make_module_bubble(k.getValue().notes, blog_name, k.getValue().post_id));
+					content_line(indent.add(), make_right_hand_link_to_blog(post_id, k.getKey()), make_module_bubble(k.getValue().notes, blog_name, post_id));
 					indent.close();
 				}
 			}
@@ -1994,7 +2005,7 @@ public class ProduceClickableMap
 		return output;
 	}
 	
-	private void reaction_line(final ItemCloser indent, ReactionDocument.Reaction r, String bubble, ImagesInfo scales)
+	private void reaction_line(final ItemCloser indent, ReactionDocument.Reaction r, String bubble, ImagesInfo scales, int post_id)
 	{
 		final Pair position = findCentralPlaceForReaction(r);
 		final float x = (Float)position.o1;
@@ -2005,7 +2016,7 @@ public class ProduceClickableMap
 		indent.getOutput().print(";");
 		indent.getOutput().print(scales.getY(y));
 		indent.getOutput().println("\">");
-		content_line(indent.add(), r.getId(), bubble);
+		content_line(indent.add(), make_right_hand_link_to_blog(post_id, r.getId()), bubble);
 		indent.close();
 	}
 	
@@ -2026,7 +2037,7 @@ public class ProduceClickableMap
 			final AllPosts.Post post = posts.lookup(r.getId());
 			
 			final String bubble = createReactionBubble(r, post.getPostId(), format);
-			reaction_line(right.add(), r, bubble, scales);
+			reaction_line(right.add(), r, bubble, scales, post.getPostId());
 		}
 		
 		finish_right_panel_xml(right);
@@ -2055,7 +2066,10 @@ public class ProduceClickableMap
 
 	}
 
-	private ItemCloser generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set)
+	private ItemCloser generatePages(final Wordpress wp, File rpanel_index, ImagesInfo scales,
+		final FormatProteinNotes format,
+		Map<String, ModuleInfo> modules_set
+	)
 		throws UnsupportedEncodingException, FileNotFoundException
 	{
 		all_posts = new AllPosts(wp);		
@@ -2088,7 +2102,7 @@ public class ProduceClickableMap
 			final AllPosts.Post post = updateBlogPostId(wp, all_posts, r.getId(), title, body);
 			
 			final String bubble = createReactionBubble(r, post.getPostId(), format);
-			reaction_line(right.add(), r, bubble, scales);
+			reaction_line(right.add(), r, bubble, scales, post.getPostId());
 			
 			updateBlogPostIfRequired(wp, post, title, body, REACTION_CLASS_NAME, modules, all_posts);
 		}
@@ -3373,7 +3387,7 @@ public class ProduceClickableMap
 		notes.append(" ");
 		bubble_to_post_link(post_id, notes, blog_name);
 		notes.append("<img border='0' src=");
-		html_quote(notes, icons_directory + "/misc/blog.png");
+		html_quote(notes, blog_icon);
 		notes.append(" alt='blog'>").append("</a>");
 	}
 	
@@ -5824,7 +5838,7 @@ public class ProduceClickableMap
 		out.print(title);
 		out.print("</div>");
 		out.print(" <div class='header-right'>");
-		html_in_new_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='/map_icons/misc/blog.png'>");
+		html_in_new_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='" + blog_icon + "'>");
 		out.print(" ");
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");

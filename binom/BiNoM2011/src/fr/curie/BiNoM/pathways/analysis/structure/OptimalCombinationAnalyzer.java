@@ -628,6 +628,8 @@ public class OptimalCombinationAnalyzer {
 		int setSize = 3;
 		
 		System.out.println("Start seed enumeration search...");
+		long tic = System.currentTimeMillis();
+		
 		/*
 		 * Initialize seed list with all combinations of size 2
 		 */
@@ -662,13 +664,13 @@ public class OptimalCombinationAnalyzer {
 			 * This number depends on the maximum number of hit sets parameter.
 			 */
 			int seedListIterations = (int)(this.maxNbHitSet / (this.pathMatrixNbCol - setSize));
-			System.out.println("max seed list iterations: "+seedListIterations);
+			//System.out.println("max seed list iterations: "+seedListIterations);
 			
 			/*
 			 * Build the new hit set candidates list from previous seed list.
 			 */
 			System.out.println("start building new set...");
-			long tic = System.currentTimeMillis();
+			//long tic = System.currentTimeMillis();
 			HashSet<BitSet> newList = new HashSet<BitSet>();
 			int count=0;
 			for (int i=0; i<seedListIterations; i++) {
@@ -698,14 +700,14 @@ public class OptimalCombinationAnalyzer {
 					}
 				}
 				else {
-					System.out.println("break at it="+i);
+					//System.out.println("break at it="+i);
 					break;
 				}
 			}
 			
-			long toc = System.currentTimeMillis()-tic;
-			System.out.println("timing: "+toc);
-			System.out.println("number of iterations done: "+count);	
+			//long toc = System.currentTimeMillis()-tic;
+			//System.out.println("timing: "+toc);
+			//System.out.println("number of iterations done: "+count);	
 			System.out.println("new candidate hit set list size: "+newList.size());
 			
 //			for (BitSet b : newList)
@@ -715,7 +717,7 @@ public class OptimalCombinationAnalyzer {
 			seedSetList = new ArrayList<SeedSet>();
 			
 			System.out.println("checking candidate sets...");
-			tic = System.currentTimeMillis();
+			//tic = System.currentTimeMillis();
 			int ct=0;
 			for (BitSet candidateHitSet : newList) {
 				
@@ -761,13 +763,15 @@ public class OptimalCombinationAnalyzer {
 					seedSetList.add(new SeedSet(candidateHitSet, candidateHitSetScore));
 				}
 			}
-			toc = System.currentTimeMillis() - tic;
-			System.out.println("timing: "+toc);
+			//toc = System.currentTimeMillis() - tic;
+			//System.out.println("timing: "+toc);
 			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
 
 			setSize++;
 		}
+		long toc = System.currentTimeMillis() - tic;
+		System.out.println("timing: "+toc);
 	}
 	
 	/**
@@ -821,6 +825,21 @@ public class OptimalCombinationAnalyzer {
 //			System.out.println("set score: "+s.setScore);
 //		}
 		System.out.println("seed set list size: "+seedSetList.size());
+	}
+	
+	/**
+	 * Select hit sets that have a size below a certain threshold.
+	 * 
+	 * @param maxSize size threshold
+	 */
+	public void selectHitSetSize(int maxSize) {
+		HashSet<BitSet> n = new HashSet<BitSet>();
+		for (BitSet b : hitSetSB) {
+			if (b.cardinality() <= maxSize) {
+				n.add(b);
+			}
+		}
+		hitSetSB = n;
 	}
 	
 	/**

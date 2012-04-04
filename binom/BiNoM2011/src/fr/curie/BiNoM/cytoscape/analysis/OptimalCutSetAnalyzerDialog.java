@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,6 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -45,7 +47,7 @@ import fr.curie.BiNoM.pathways.utils.Utils;
  * @author eric
  *
  */
-public class OptimalCutSetAnalyzerDialog extends JDialog {
+public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private static final int MAX_ROWS = 20;
@@ -134,7 +136,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		attNames.insertItemAt("None", 0);
 		attNames.setSelectedIndex(0);
 
-		setSize(770, 660);
+		setSize(770, 680);
 
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
@@ -397,6 +399,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 
 		searchRadius = new JTextField(4);
 		searchRadius.setText("  "+(new StructureAnalysisUtils.Option()).searchRadius);
+		searchRadius.setEnabled(false);
 		limitationRadius.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				searchRadius.setEnabled(limitationRadius.isSelected());
@@ -426,6 +429,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		bergeRB = new JRadioButton();
 		bergeRB.setText("Full search (Berge's algorithm)");
 		bergeRB.setSelected(true);
+		bergeRB.setActionCommand("berge");
+		bergeRB.addActionListener(this);
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -436,6 +441,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		partialRB = new JRadioButton();
 		partialRB.setText("Partial enumeration");
+		partialRB.setActionCommand("enum");
+		partialRB.addActionListener(this);
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -446,6 +453,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		y++;
 		seedRB = new JRadioButton();
 		seedRB.setText("Seed based enumeration");
+		seedRB.setActionCommand("enum");
+		seedRB.addActionListener(this);
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -457,12 +466,12 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		OCSgroup.add(bergeRB);
 		OCSgroup.add(partialRB);
 		OCSgroup.add(seedRB);
-
+		
 		y++;
 		JPanel p2 = new JPanel(new FlowLayout());
 		maxSetSize = new JTextField(4);
-		maxSetSize.setText("10");
-		JLabel l1 = new JLabel("Max set size");
+		maxSetSize.setText("inf");
+		JLabel l1 = new JLabel("Max. set size");
 		p2.add(l1);
 		p2.add(maxSetSize);
 		c = new GridBagConstraints();
@@ -477,7 +486,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 		JLabel l2 = new JLabel("Max. Nb of (million) hit sets");
 		p3.add(l2);
 		maxSetNb = new JTextField(4);
-		maxSetNb.setText("50");
+		maxSetNb.setEnabled(false);
 		p3.add(maxSetNb);
 		c = new GridBagConstraints();
 		c.gridx = x;
@@ -546,8 +555,40 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 					else
 						analyzer.searchRadius = Double.MAX_VALUE;
 					
-					analyzer.maxSetSize = Integer.parseInt(maxSetSize.getText());
-					analyzer.maxSetNb = Long.parseLong(maxSetNb.getText()) * (long) 1e+6;
+					if (maxSetSize.getText().equalsIgnoreCase("inf"))
+						analyzer.useMaxSetSize = false;
+					else {
+						analyzer.useMaxSetSize = true;
+						try {
+							analyzer.maxSetSize = Integer.parseInt(maxSetSize.getText());
+							if (analyzer.maxSetSize <= 0) {
+								JOptionPane.showMessageDialog(new Frame(), "Max. set size should be 'inf' or a positive integer > 0.");
+								resetAnalyzer();
+								return;
+							}
+						}
+						catch (NumberFormatException  nfe) {
+							JOptionPane.showMessageDialog(new Frame(), "Max. set size should be 'inf' or a positive integer > 0.");
+							resetAnalyzer();
+							return;
+						}
+					}
+					
+					if (maxSetNb.getText().length()>0) {
+						try {
+							analyzer.maxSetNb = Long.parseLong(maxSetNb.getText()) * (long) 1e+6;
+							if (analyzer.maxSetNb <= 0) {
+								JOptionPane.showMessageDialog(new Frame(), "Max. Nb of sets should be a positive integer > 0.");
+								resetAnalyzer();
+								return;
+							}
+						}
+						catch (NumberFormatException nfe) {
+							JOptionPane.showMessageDialog(new Frame(), "Max. Nb of sets should be a positive integer > 0.");
+							resetAnalyzer();
+							return;
+						}
+					}
 					
 					OptimalCutSetAnalyzerTask task = new OptimalCutSetAnalyzerTask(analyzer);
 					fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
@@ -571,11 +612,32 @@ public class OptimalCutSetAnalyzerDialog extends JDialog {
 
 		buttonPanel.add(cancelB);
 
+		
+		
 		getContentPane().setLayout(new BorderLayout());
 		JScrollPane jpane = new JScrollPane(panel);
 		getContentPane().add(jpane, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
+	
+	public void resetAnalyzer () {
+		analyzer.sourceNodes.clear();
+		analyzer.targetNodes.clear();
+		analyzer.sideNodes.clear();
+	}
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand().equals("berge")) {
+			maxSetSize.setText("inf");
+			maxSetNb.setText("");
+			maxSetNb.setEnabled(false);
+		}
+		if (e.getActionCommand().equals("enum")) {
+			maxSetSize.setText("10");
+			maxSetNb.setText("50");
+			maxSetNb.setEnabled(true);
+		}
+	}
+	
 	
 	/**
 	 * Select specific items in a JList.

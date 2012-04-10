@@ -283,11 +283,13 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	menuItem.addActionListener(new OptimalCutSetAnalyzer());
 	structAnaMenu.add(menuItem);
 
-	structAnaMenu.addSeparator();
+
+    structAnaMenu.addSeparator();
     menuItem = new JMenuItem("About BiNoM...");
     menuItem.addActionListener(new AboutBox());
     structAnaMenu.add(menuItem);
 
+	
 	structAnaMenu.addSeparator();
     
     createNeighborhoodSetsMenuItem = new JMenuItem("Create neighborhood sets file...");
@@ -350,27 +352,28 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	binomNestManagerMenu.add(menuItem);
 	menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
 // Module manager end 	
-		JMenu binomBioPAXUtilsMenu = new JMenu("BiNoM BioPAX 3 Utils");
-        plugInMenu.add(binomBioPAXUtilsMenu);
+	
+	JMenu binomBioPAXUtilsMenu = new JMenu("BiNoM BioPAX 3 Utils");
+	plugInMenu.add(binomBioPAXUtilsMenu);
 
-        menuItem = new JMenuItem
-	    ("BioPAX 3 Property Editor...");
-        binomBioPAXUtilsMenu.add(menuItem);
-        menuItem.addActionListener(new BioPAXPropertyBrowser());
+	menuItem = new JMenuItem
+	("BioPAX 3 Property Editor...");
+	binomBioPAXUtilsMenu.add(menuItem);
+	menuItem.addActionListener(new BioPAXPropertyBrowser());
 
-        menuItem = new JMenuItem
-	    ("BioPAX 3 Class Tree...");
-        binomBioPAXUtilsMenu.add(menuItem);
-        menuItem.addActionListener(new BioPAXClassTree());
+	menuItem = new JMenuItem
+	("BioPAX 3 Class Tree...");
+	binomBioPAXUtilsMenu.add(menuItem);
+	menuItem.addActionListener(new BioPAXClassTree());
 
-        toggleBioPAXNameMenuItem = new JMenuItem
-	    ("Toggle BioPAX 3 Naming Service");
-        binomBioPAXUtilsMenu.add(toggleBioPAXNameMenuItem);
-        toggleBioPAXNameMenuItem.addActionListener(new BioPAXToggleNamingService());
+	toggleBioPAXNameMenuItem = new JMenuItem
+	("Toggle BioPAX 3 Naming Service");
+	binomBioPAXUtilsMenu.add(toggleBioPAXNameMenuItem);
+	toggleBioPAXNameMenuItem.addActionListener(new BioPAXToggleNamingService());
 
-        syncBioPAXMenuItem = new JMenuItem("Synchronize networks with BioPAX 3...");
-        binomBioPAXUtilsMenu.add(syncBioPAXMenuItem);
-        syncBioPAXMenuItem.addActionListener(new BioPAXSyncNetworks());
+	syncBioPAXMenuItem = new JMenuItem("Synchronize networks with BioPAX 3...");
+	binomBioPAXUtilsMenu.add(syncBioPAXMenuItem);
+	syncBioPAXMenuItem.addActionListener(new BioPAXSyncNetworks());
 
 	binomIOMenu.addMenuListener(new MenuListener() {
 		public void menuCanceled(MenuEvent e) { }

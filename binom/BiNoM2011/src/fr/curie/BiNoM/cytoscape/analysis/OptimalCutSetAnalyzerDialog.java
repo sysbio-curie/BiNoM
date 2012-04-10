@@ -597,6 +597,12 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 					setVisible(false);
 					return;
 				}
+				else {
+					// zero selection
+					JOptionPane.showMessageDialog(new Frame(), "At least one source node and one target node should be selected.");
+					resetAnalyzer();
+					return;
+				}
 			}
 		});
 

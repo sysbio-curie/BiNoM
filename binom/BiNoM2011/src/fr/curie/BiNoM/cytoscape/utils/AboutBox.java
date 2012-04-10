@@ -34,6 +34,7 @@ public class AboutBox implements ActionListener {
 		content.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		content.add(backgroundLabel);
 		
+		// add content
 		addALabel("---", content);
 		addALabel("BiNoM version 2.0",content);
 		addALabel("Copyright (c) 2006 Institut Curie",content);
@@ -44,9 +45,9 @@ public class AboutBox implements ActionListener {
 		addALabel("Eric Bonnet",content);
 		addALabel("Laurence Calzone",content);
 		addALabel("Daniel Rovera",content);
-		addALabel("Eric Viara",content);
 		addALabel("Gautier Stoll",content);
 		addALabel("Paola Vera-Licona",content);
+		addALabel("Eric Viara",content);
 		addALabel("Emmanuel Barillot",content);
 		addALabel("Andrei Zinovyev",content);
 		addALabel("---", content);

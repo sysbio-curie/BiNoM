@@ -46,6 +46,7 @@ public class AboutBox implements ActionListener {
 		addALabel("Daniel Rovera",content);
 		addALabel("Eric Viara",content);
 		addALabel("Gautier Stoll",content);
+		addALabel("Paola Vera-Licona",content);
 		addALabel("Emmanuel Barillot",content);
 		addALabel("Andrei Zinovyev",content);
 		addALabel("---", content);

@@ -25,6 +25,8 @@ public class TestOPtCutSet {
 	public static void main(String[] args) {
 		//noGraphTest();
 		graphTest();
+		//OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+		//oca.testSeedSet();
 	}
 	
 
@@ -114,8 +116,8 @@ public class TestOPtCutSet {
 			testSource.add(dpc.graph.getNode("ship2"));
 			testSource.add(dpc.graph.getNode("tgfa"));
 			testTarget.add(dpc.graph.getNode("elk1"));
-			//			testTarget.add(dpc.graph.getNode("erbb11"));
-			//			testTarget.add(dpc.graph.getNode("pak1"));
+			//testTarget.add(dpc.graph.getNode("erbb11"));
+			//testTarget.add(dpc.graph.getNode("pak1"));
 
 
 			for (Node n : testSource)
@@ -155,29 +157,16 @@ public class TestOPtCutSet {
 			oca.convertPathMatrixColToBinary();
 			oca.convertPathMatrixRowToBinary();
 
-			oca.searchHitSetSizeTwo();
-			
-			oca.printSeedList();
-			
 			oca.maxNbHitSet = (long)50e6;
 			oca.maxHitSetSize = 10;
 			
 			long tic = System.currentTimeMillis();
-			//oca.searchHitSetSeed();
+			oca.searchHitSetSeed();
 			//oca.searchHitSetPartial();
-			oca.mainBerge(false);
-			long toc = System.currentTimeMillis() - tic;
-			System.out.println("global timing: "+toc);
-			oca.saveHitSetSB("/bioinfo/users/ebonnet/test2");
-			//oca.printHitSetList();
+			//oca.mainBerge(false);
+			//long toc = System.currentTimeMillis() - tic;
+			//System.out.println("global timing: "+toc);
 			
-			//	oca.searchHitSetPartial();
-
-			/*
-			 * Berge's algorithm
-			 * brute force search lines should be commented to use this (and vice-versa)
-			 */
-			//			oca.mainBerge(true);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

@@ -274,7 +274,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	structAnaMenu.add(menuItem);
 	
 	structAnaMenu.addSeparator();
-	menuItem = new JMenuItem("Path consistency analysis...");
+	menuItem = new JMenuItem("Path Influence Quantification analysis...");
 	menuItem.addActionListener(new PathConsistencyAnalyzer());
 	structAnaMenu.add(menuItem);
 	

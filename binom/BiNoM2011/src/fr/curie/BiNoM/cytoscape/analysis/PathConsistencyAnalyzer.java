@@ -17,7 +17,7 @@ public class PathConsistencyAnalyzer implements ActionListener{
     public void actionPerformed(ActionEvent e){
     	if(Cytoscape.getCurrentNetwork()!=null){
     		
-    		PathConsistencyAnalyzerDialog dialog = new PathConsistencyAnalyzerDialog(Cytoscape.getDesktop(),"Path consistency analyzer",true);
+    		PathConsistencyAnalyzerDialog dialog = new PathConsistencyAnalyzerDialog(Cytoscape.getDesktop(),"Path Influence Quantification analyzer",true);
     		
     		GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
     		

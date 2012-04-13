@@ -135,7 +135,6 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 	targetList.setVisibleRowCount(sourceList.getVisibleRowCount());
 	targetList.setSelectedIndices(indicesTarget);
 	
-	//setSize(760, 750);
 	setSize(900, 750);
 	
 	setLocation((screenSize.width - getSize().width) / 2,
@@ -157,7 +156,7 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 	}
 
 	x = 1;
-	label = new JLabel("Path Consistency Analyzer: Step 1, Path generation");
+	label = new JLabel("Path Influence Quantification Analyzer: Step 1, Path generation");
 	label.setFont(BOLD_FONT);
 	c = new GridBagConstraints();
 	c.gridx = x;
@@ -359,24 +358,6 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 	y++;
 	y = GraphicUtils.addHSepPanel(panel, 1, y, 3, 2);
 
-	// minimal cut set search
-	/*JPanel pp = new JPanel(new BorderLayout());
-	mcsCB = new JCheckBox();
-	mcsCB.setText("Minimal Cut Set search");
-	mcsCB.setSelected(false);
-	pp.add(mcsCB,BorderLayout.WEST);
-	
-	mcsTF = new JTextField(4);
-	mcsTF.setText("10");
-	pp.add(mcsTF,BorderLayout.CENTER);
-	
-	c = new GridBagConstraints();
-	c.gridx = x;
-	c.gridy = y+1;
-	c.anchor = GridBagConstraints.WEST;
-	
-	panel.add(pp,c);*/
-
 	JPanel buttonPanel = new JPanel();
 	okB = new JButton("OK");
 
@@ -407,23 +388,13 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 				else
 					analyzer.searchRadius = Double.MAX_VALUE;
 				
-				/*if (mcsCB.isSelected()) {
-					analyzer.nbMinimalCutSetSearchIterations = Integer.parseInt(mcsTF.getText());
-					analyzer.doMinimalCutSetSearch = true;
-				}*/
-				
 				PathConsistencyAnalyzerTask task = new PathConsistencyAnalyzerTask(analyzer);
 				fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
 
-//				if (analyzer.doMinimalCutSetSearch)
-//					result = 2;
-//				else
-//					result = 1;
 				
 				result = 1;
 
 				setVisible(false);
-				//System.out.println(mcsCB.isSelected()+"  "+mcsTF.getText());
 				return;
 			}
 		}
@@ -441,17 +412,6 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 
 	buttonPanel.add(cancelB);
 	
-	/*
-	  c = new GridBagConstraints();
-	  c.ipady = 30;
-	  c.gridx = 0;
-	  c.gridy = y;
-	  c.gridwidth = 3;
-	  c.anchor = GridBagConstraints.CENTER;
-
-	  panel.add(buttonPanel, c);
-	*/
-
 	getContentPane().setLayout(new BorderLayout());
 	JScrollPane jpane = new JScrollPane(panel);
 	getContentPane().add(jpane, BorderLayout.CENTER);
@@ -473,8 +433,6 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 	    }
     	
     	analyzer.AllNodesWithActivities = activeNodes;
-    	
-    	//Collections.sort(dataActive);
     	
     	int indicesActive[] = new int[dataActive.size()];
     	for(int i=0;i<indicesActive.length;i++)

@@ -17,7 +17,7 @@ public class testCellDesigner {
 	public static void main(String[] args) {
 		try{
 			
-			SbmlDocument cd6 = CellDesigner.loadCellDesigner("C:/Datas/ClickableMap/2011_10_05_Model/2011_10_05_Model_Mistakes/2011_10_05_Model_master_mistakes_OVAL.xml");
+			/*SbmlDocument cd6 = CellDesigner.loadCellDesigner("C:/Datas/ClickableMap/2011_10_05_Model/2011_10_05_Model_Mistakes/2011_10_05_Model_master_mistakes_OVAL.xml");
 			if(cd6.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers()!=null)
 			for(int i=0;i<cd6.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray();i++){
 				CelldesignerLayerDocument.CelldesignerLayer layer = cd6.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i);
@@ -40,17 +40,21 @@ public class testCellDesigner {
 			moveSpeciesNotesToProteinNotes(cd5);
 			CellDesigner.saveCellDesigner(cd5, "c:/datas/rbmaps1/rb25_c.xml");
 			//CellDesigner.saveCellDesigner(cd5, "c:/datas/binomtest/testNotes_c.xml");
-			System.exit(0);
+			System.exit(0);*/
 			
 			
 			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/M-Phase2.xml");
-			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/test.xml");
+			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/test_infl.xml");
+			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/louvard/Notch_p53_29_deg.xml");
 			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/TestPos.xml");
 			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/TestPos.xgmml"));
 			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/M-Phase2.xgmml"));
-			GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/test.xgmml"));
-			modifyPositionOfSpecies(cd4,gr);
-			CellDesigner.saveCellDesigner(cd4, "c:/datas/binomtest/test_pos.xml");
+			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/test.xgmml"));
+			//modifyPositionOfSpecies(cd4,gr);
+			
+			addHypotheticalInfluences(cd4);
+			
+			CellDesigner.saveCellDesigner(cd4, "c:/datas/louvard/Notch_p53_29_deg1.xml");
 			System.exit(0);
 			
 			
@@ -408,6 +412,139 @@ public class testCellDesigner {
 				}
 				}
 		}
+	}
+	
+	public static void addHypotheticalInfluences(SbmlDocument cd4){
+		
+		Vector<String> newids = new Vector<String>();
+		
+		for(int i=0;i<cd4.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
+			ReactionDocument.Reaction r = cd4.getSbml().getModel().getListOfReactions().getReactionArray(i);
+			String type = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
+			
+			Vector<String> listOfReactantSpecies = new Vector<String>();
+			Vector<String> listOfReactantAliases = new Vector<String>();
+			for(int j=0;j<r.getListOfReactants().sizeOfSpeciesReferenceArray();j++)
+				listOfReactantSpecies.add(r.getListOfReactants().getSpeciesReferenceArray(j).getSpecies());
+			for(int j=0;j<r.getListOfReactants().sizeOfSpeciesReferenceArray();j++)
+				listOfReactantAliases.add(Utils.getValue(r.getListOfReactants().getSpeciesReferenceArray(j).getAnnotation().getCelldesignerAlias()));
+
+			Vector<String> listOfProductSpecies = new Vector<String>();
+			Vector<String> listOfProductAliases = new Vector<String>();
+			for(int j=0;j<r.getListOfProducts().sizeOfSpeciesReferenceArray();j++)
+				listOfProductSpecies.add(r.getListOfProducts().getSpeciesReferenceArray(j).getSpecies());
+			for(int j=0;j<r.getAnnotation().getCelldesignerBaseProducts().sizeOfCelldesignerBaseProductArray();j++)
+				listOfProductAliases.add(Utils.getValue(r.getListOfProducts().getSpeciesReferenceArray(j).getAnnotation().getCelldesignerAlias()));
+			
+			HashMap<String, String> speciesTypes = new HashMap<String, String>();
+			for(int j=0;j<cd4.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();j++){
+				SpeciesDocument.Species sp = cd4.getSbml().getModel().getListOfSpecies().getSpeciesArray(j);
+				speciesTypes.put(sp.getId(), Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
+			}
+			
+			if(type.equals("HETERODIMER_ASSOCIATION")){
+				System.out.println(r.getId()+" / "+listOfReactantSpecies.size()+" / "+listOfReactantAliases.size());
+				for(int j=0;j<listOfReactantSpecies.size();j++)
+					for(int k=0;k<listOfReactantSpecies.size();k++)if(k!=j){
+						String id = "re_"+listOfReactantSpecies.get(j)+"_"+listOfReactantSpecies.get(k);
+						if(id.equals("re_s90_s21"))
+								System.out.println();
+						if(newids.contains(id))
+							id = id+"_";
+						newids.add(id);
+						addTransition(cd4, id, "NEGATIVE_INFLUENCE", "ff00aa00", listOfReactantSpecies.get(j), listOfReactantAliases.get(j), listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
+					}
+			}else{
+
+				// Check if one of the products is a phenotype
+				boolean isPhenotype = false;
+				for(int j=0;j<listOfProductSpecies.size();j++)
+					if(speciesTypes.get(listOfProductSpecies.get(j)).equals("PHENOTYPE"))
+						isPhenotype = true;
+				
+				if(!isPhenotype){
+				if(r.getListOfModifiers()!=null)
+				for(int j=0;j<r.getListOfModifiers().sizeOfModifierSpeciesReferenceArray();j++){
+					ModifierSpeciesReferenceDocument.ModifierSpeciesReference msr = r.getListOfModifiers().getModifierSpeciesReferenceArray(j);
+					String mod_species = msr.getSpecies();
+					String mod_alias = Utils.getValue(msr.getAnnotation().getCelldesignerAlias());
+					
+					int sign_of_influence = 0;
+					String typeMod = "";
+					for(int k=0; k<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();k++){
+						CelldesignerModificationDocument.CelldesignerModification cm = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(k);
+						if(cm.getModifiers().equals(mod_species)){
+							typeMod = cm.getType();
+						}
+					}
+					if(typeMod.equals("CATALYSIS")) sign_of_influence = +1;
+					if(typeMod.equals("INHIBITION")) sign_of_influence = -1;
+					if(typeMod.equals("UNKNOWN_CATALYSIS")) sign_of_influence = +1;
+					if(typeMod.equals("UNKNOWN_INHIBITION")) sign_of_influence = -1;
+					if(typeMod.equals("PHYSICAL_STIMULATION")) sign_of_influence = +1;
+										
+					if(sign_of_influence!=0)
+					for(int k=0;k<listOfReactantSpecies.size();k++){
+						String reactType = speciesTypes.get(listOfReactantSpecies.get(k));
+						if(!reactType.equals("GENE")){
+						String id = "re_"+mod_species+"_"+listOfReactantSpecies.get(k);
+						if(sign_of_influence!=0){
+							if(newids.contains(id))
+								id = id+"_";
+							newids.add(id);
+						}
+						if(sign_of_influence==+1)
+							addTransition(cd4, id, "POSITIVE_INFLUENCE", "ffaa0000", mod_species, mod_alias, listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
+						if(sign_of_influence==-1)
+							addTransition(cd4, id, "NEGATIVE_INFLUENCE", "ff00aa00", mod_species, mod_alias, listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
+						}
+					}
+				}	
+				}
+				
+			}
+		}
+	}
+	
+	public static void addTransition(SbmlDocument cd4, String id, String type, String color, String species1, String alias1, String species2, String alias2){
+		ReactionDocument.Reaction r = cd4.getSbml().getModel().getListOfReactions().addNewReaction();
+		
+		r.setId(id);
+
+		AnnotationDocument.Annotation an = r.addNewAnnotation();
+		XmlString xs = XmlString.Factory.newInstance();
+		xs.setStringValue(type);
+		an.addNewCelldesignerReactionType().set(xs);
+				
+		
+		SpeciesReferenceDocument.SpeciesReference spr = r.addNewListOfProducts().addNewSpeciesReference();
+		spr.setSpecies(species2);
+		xs = XmlString.Factory.newInstance();
+		xs.setStringValue(alias2);
+		spr.addNewAnnotation().addNewCelldesignerAlias().set(xs);
+
+		spr = r.addNewListOfReactants().addNewSpeciesReference();
+		spr.setSpecies(species1);
+		xs = XmlString.Factory.newInstance();
+		xs.setStringValue(alias1);
+		spr.addNewAnnotation().addNewCelldesignerAlias().set(xs);		
+		
+		CelldesignerBaseReactantDocument.CelldesignerBaseReactant cbr = an.addNewCelldesignerBaseReactants().addNewCelldesignerBaseReactant();
+		xs = XmlString.Factory.newInstance();
+		xs.setStringValue(species1);
+		cbr.setSpecies(xs);
+		cbr.setAlias(alias1);
+
+		CelldesignerBaseProductDocument.CelldesignerBaseProduct cbp = an.addNewCelldesignerBaseProducts().addNewCelldesignerBaseProduct();
+		xs = XmlString.Factory.newInstance();
+		xs.setStringValue(species2);
+		cbp.setSpecies(xs);
+		cbp.setAlias(alias2);
+		
+		CelldesignerLineDocument.CelldesignerLine cl = an.addNewCelldesignerLine();
+		cl.setWidth("1.0");
+		cl.setColor(color);
+		
 	}
 
 }

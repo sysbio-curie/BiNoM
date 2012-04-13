@@ -94,6 +94,8 @@ public class BiographUtils extends Graph {
         		sign_in = -1;
         	if(at.value.toLowerCase().indexOf("suppression")>=0)
         		sign_in = -1;
+        	if(at.value.toLowerCase().indexOf("negative")>=0)
+        		sign_in = -1;        	
         	}
         }
         
@@ -106,6 +108,7 @@ public class BiographUtils extends Graph {
         		if(at.value.toLowerCase().indexOf("inhibition")>=0) sign_in = -1;
         		if(at.value.toLowerCase().indexOf("suppression")>=0) sign_in = -1;
         		if(at.value.toLowerCase().indexOf("repression")>=0) sign_in = -1;
+        		if(at.value.toLowerCase().indexOf("negative")>=0) sign_in = -1;
         	}
         	e.Attributes.add(at);
         	}

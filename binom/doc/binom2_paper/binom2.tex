@@ -427,18 +427,19 @@ as a threshold to create the clusters.
 
 In this version of BiNoM, we have introduced a novel approach to quantify the
 influence of one or more molecular paths on a given set of valuable target
-nodes. A path $k$ is defined as a the sequence of consecutive connected nodes
+nodes, named PIQuant (Pathway Influence Quantification). A path $k$ is defined
+as a the sequence of consecutive connected nodes
 between a source node $A$ and a target node $B$ (without repetition of any node
 or edge). We also define the activity $\alpha$ of a path as a signed real number
 representing for example the expression ratio of a given gene, the sign $\sigma$
 of the path as the product of the signs of every edge of the path and finally
 the length $\lambda$ of the path as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. Then the PIQUANT score for a set of $q$ paths for a given
+on the target node. Then the PIQuant score for a set of $q$ paths for a given
 target node $O$ of interest is defined as:
 
 $$
- PIQUANT_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
+ PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
 For example, a very simple influence network composed of seven nodes is shown on
@@ -448,7 +449,7 @@ node AC has an activity value of 2, and that the two paths have the same length
 equal to 3, we can calculate the PIQUANT score for the Ph node as:
 
 $$
- PIQUANT_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{3}
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{3}
 = 0.27
 $$
 

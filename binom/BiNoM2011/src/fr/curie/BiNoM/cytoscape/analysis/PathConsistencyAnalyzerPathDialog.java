@@ -147,7 +147,7 @@ public class PathConsistencyAnalyzerPathDialog extends JDialog {
 		}
 
 		x = 1;
-		label = new JLabel("Path Consistency Analyzer: Step 2, path analysis");
+		label = new JLabel("Path Influence Quantification Analyzer: Step 2, path analysis");
 		label.setFont(BOLD_FONT);
 		c = new GridBagConstraints();
 		c.gridx = x;

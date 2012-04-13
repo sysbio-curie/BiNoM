@@ -391,7 +391,6 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 				PathConsistencyAnalyzerTask task = new PathConsistencyAnalyzerTask(analyzer);
 				fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
 
-				
 				result = 1;
 
 				setVisible(false);

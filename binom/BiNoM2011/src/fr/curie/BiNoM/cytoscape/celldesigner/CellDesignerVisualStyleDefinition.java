@@ -67,6 +67,10 @@ public class CellDesignerVisualStyleDefinition
     public static final String NODE_INHIBITION = "INHIBITION";    
     public static final String NODE_CATALYSIS = "CATALYSIS";    
 
+    public static final String NODE_POSITIVE_INFLUENCE = "POSITIVE_INFLUENCE";    
+    public static final String NODE_NEGATIVE_INFLUENCE = "NEGATIVE_INFLUENCE";    
+    
+
     public static final String NODE_TRANSPORT = "TRANSPORT";
     
     public static final String NODE_PATHWAY = "PATHWAY";    
@@ -85,7 +89,10 @@ public class CellDesignerVisualStyleDefinition
     public static final String EDGE_TRANSCRIPTIONAL_INHIBITION = "TRANSCRIPTIONAL_INHIBITION";
     public static final String EDGE_TRANSCRIPTIONAL_ACTIVATION = "TRANSCRIPTIONAL_ACTIVATION";
     public static final String EDGE_INTERSECTION = "INTERSECTION";
+    public static final String EDGE_POSITIVE_INFLUENCE = "POSITIVE_INFLUENCE";
+    public static final String EDGE_NEGATIVE_INFLUENCE = "NEGATIVE_INFLUENCE";
 
+    
     private CellDesignerVisualStyleDefinition() {
 	super("BiNoM CellDesigner");
 
@@ -170,6 +177,12 @@ public class CellDesignerVisualStyleDefinition
         nodeShapeMapping.add(new ObjectMapping
                 (NODE_CATALYSIS,
                 		NodeShape.DIAMOND));
+        nodeShapeMapping.add(new ObjectMapping
+                (NODE_POSITIVE_INFLUENCE,
+                		NodeShape.DIAMOND));
+        nodeShapeMapping.add(new ObjectMapping
+                (NODE_NEGATIVE_INFLUENCE,
+                		NodeShape.DIAMOND));
 
 
         nodeShapeMapping.add(new ObjectMapping
@@ -233,6 +246,12 @@ public class CellDesignerVisualStyleDefinition
         nodeSizeMapping.add(new ObjectMapping
                 (NODE_CATALYSIS,
                  new Double(20)));
+        nodeSizeMapping.add(new ObjectMapping
+                (NODE_POSITIVE_INFLUENCE,
+                 new Double(20)));
+        nodeSizeMapping.add(new ObjectMapping
+                (NODE_NEGATIVE_INFLUENCE,
+                 new Double(20)));
 
         nodeSizeMapping.add(new ObjectMapping
                              (NODE_TRANSPORT,
@@ -290,6 +309,12 @@ public class CellDesignerVisualStyleDefinition
         nodeColorMapping.add(new ObjectMapping
                 (NODE_CATALYSIS,
                  Color.gray));
+        nodeColorMapping.add(new ObjectMapping
+                (NODE_POSITIVE_INFLUENCE,
+                 Color.red));
+        nodeColorMapping.add(new ObjectMapping
+                (NODE_NEGATIVE_INFLUENCE,
+                 Color.green));
 
         nodeColorMapping.add(new ObjectMapping
                              (NODE_TRANSPORT,
@@ -363,6 +388,10 @@ public class CellDesignerVisualStyleDefinition
     edgeTargetArrowMapping.add(new ObjectMapping
     			(EDGE_TRANSCRIPTIONAL_INHIBITION, new Arrow(ArrowShape.T,Color.BLUE)));
     edgeTargetArrowMapping.add(new ObjectMapping
+			(EDGE_NEGATIVE_INFLUENCE, new Arrow(ArrowShape.T,Color.GREEN)));
+	edgeTargetArrowMapping.add(new ObjectMapping
+			(EDGE_POSITIVE_INFLUENCE, new Arrow(ArrowShape.ARROW,Color.RED)));
+    edgeTargetArrowMapping.add(new ObjectMapping
                 (EDGE_INTERSECTION, new Arrow(ArrowShape.DIAMOND,Color.CYAN)));
 
 	/*edgeTargetArrowMapping.add(new ObjectMapping
@@ -401,7 +430,12 @@ public class CellDesignerVisualStyleDefinition
 
 	edgeLineColorMapping.add(new ObjectMapping
 				 (EDGE_TRANSCRIPTIONAL_ACTIVATION, Color.RED));
-        edgeLineColorMapping.add(new ObjectMapping
+	edgeLineColorMapping.add(new ObjectMapping
+			 (EDGE_POSITIVE_INFLUENCE, Color.RED));
+	edgeLineColorMapping.add(new ObjectMapping
+			 (EDGE_NEGATIVE_INFLUENCE, Color.GREEN));
+
+	edgeLineColorMapping.add(new ObjectMapping
                                  (EDGE_TRANSCRIPTIONAL_INHIBITION, Color.BLUE));
         edgeLineColorMapping.add(new ObjectMapping
                 (EDGE_INTERSECTION, Color.CYAN));

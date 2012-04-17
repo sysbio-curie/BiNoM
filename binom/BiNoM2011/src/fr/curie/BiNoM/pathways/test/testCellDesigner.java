@@ -493,9 +493,9 @@ public class testCellDesigner {
 								id = id+"_";
 							newids.add(id);
 						}
-						if(sign_of_influence==+1)
-							addTransition(cd4, id, "POSITIVE_INFLUENCE", "ffaa0000", mod_species, mod_alias, listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
 						if(sign_of_influence==-1)
+							addTransition(cd4, id, "POSITIVE_INFLUENCE", "ffaa0000", mod_species, mod_alias, listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
+						if(sign_of_influence==+1)
 							addTransition(cd4, id, "NEGATIVE_INFLUENCE", "ff00aa00", mod_species, mod_alias, listOfReactantSpecies.get(k), listOfReactantAliases.get(k));
 						}
 					}

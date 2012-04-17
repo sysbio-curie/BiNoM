@@ -17,13 +17,24 @@ public class TestAutomaticStructureAnalysis {
 	public static void main(String[] args) {
 		try{
 			
+			GraphDocument grd = XGMML.loadFromXMGML("c:/datas/binomtest/testMaterialComponents.xgmml");
+			Graph graph = XGMML.convertXGMMLToGraph(grd);
+			Vector v = BiographUtils.calcAllMaterialComponents(graph);
+			for(int i=0;i<v.size();i++){
+				Graph g = (Graph)v.get(i);
+				System.out.println("Graph "+g.name);
+				for(int j=0;j<g.Nodes.size();j++)if(!((Node)g.Nodes.get(j)).Id.startsWith("re")){
+					System.out.println("\t\t"+((Node)g.Nodes.get(j)).Id);
+				}
+			}
+		
 			
-			GraphDocument grd = XGMML.loadFromXMGML("c:/datas/binomtest/test2.xgmml");
+			/*GraphDocument grd = XGMML.loadFromXMGML("c:/datas/binomtest/test2.xgmml");
 			Graph graph = XGMML.convertXGMMLToGraph(grd);
 			Vector v = GraphAlgorithms.CycleDecomposition(graph, 1);
 			for(int i=0;i<v.size();i++){
 				XGMML.saveToXGMML(XGMML.convertGraphToXGMML((Graph)v.get(i)), "c:/datas/binomtest/test2_"+(i+1)+".xgmml");
-			}
+			}*/
 			System.exit(0);
 			
             /*GraphDocument gr1 = (CellDesignerToCytoscapeConverter.convert("c:/datas/binomtest/test1/M-Phase2.xml")).graphDocument;

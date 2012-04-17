@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.*;
 
-import vdaoengine.utils.Utils;
 
 /**
  * Set of functions using specific graph node semantics of BiNoM 
@@ -90,6 +89,8 @@ public class BiographUtils extends Graph {
         		edgetype = at.value;
         	if(at.value.toLowerCase().indexOf("activation")>=0)
         		sign_in = 1;
+        	if(at.value.toLowerCase().indexOf("positive")>=0)
+        		sign_in = 1;
         	if(at.value.toLowerCase().indexOf("inhibition")>=0)
         		sign_in = -1;
         	if(at.value.toLowerCase().indexOf("suppression")>=0)
@@ -113,21 +114,32 @@ public class BiographUtils extends Graph {
         	e.Attributes.add(at);
         	}
         }
+
+        vin = n.getAttributesWithSubstringInName("NODE_TYPE");
+        //System.out.println("---------- "+vin.size()+" attributes found with NODE_TYPE");
+        for(int kk=0;kk<vin.size();kk++){
+        	Attribute att = (Attribute)vin.get(kk);
+        	//System.out.println("---------- "+att.value);
+        	e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE",att.value,Attribute.ATTRIBUTE_TYPE_STRING);
+        	e.setAttributeValueUnique("BIOPAX_EDGE_TYPE",att.value,Attribute.ATTRIBUTE_TYPE_STRING);
+        	//System.out.println("\tCELLDESIGNER_EDGE_TYPE = "+e.getFirstAttributeValue("CELLDESIGNGER_EDGE_TYPE"));
+        }
+        
         
         if(sign_in*sign_out<0){
         	e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", "INHIBITION",Attribute.ATTRIBUTE_TYPE_STRING);
         	e.setAttributeValueUnique("interaction", "INHIBITION",Attribute.ATTRIBUTE_TYPE_STRING);
-        	e.setAttributeValueUnique("CELLDESIGNGER_EDGE_TYPE", "INHIBITION",Attribute.ATTRIBUTE_TYPE_STRING);
+        	e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "INHIBITION",Attribute.ATTRIBUTE_TYPE_STRING);
         }
         if(sign_in*sign_out>0){
         	e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", "ACTIVATION",Attribute.ATTRIBUTE_TYPE_STRING);
         	e.setAttributeValueUnique("interaction", "ACTIVATION",Attribute.ATTRIBUTE_TYPE_STRING);
-        	e.setAttributeValueUnique("CELLDESIGNGER_EDGE_TYPE", "ACTIVATION",Attribute.ATTRIBUTE_TYPE_STRING);
+        	e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "ACTIVATION",Attribute.ATTRIBUTE_TYPE_STRING);
         }
         if(!edgetype.equals("")){
         	e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", edgetype,Attribute.ATTRIBUTE_TYPE_STRING);
         	e.setAttributeValueUnique("interaction", "UNDEFINED",Attribute.ATTRIBUTE_TYPE_STRING);
-        	e.setAttributeValueUnique("CELLDESIGNGER_EDGE_TYPE", edgetype,Attribute.ATTRIBUTE_TYPE_STRING);
+        	e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", edgetype,Attribute.ATTRIBUTE_TYPE_STRING);
         }
         
         /*e.Id = e.Node1.Id+"_"+e.Node2.Id;
@@ -273,7 +285,8 @@ public class BiographUtils extends Graph {
  * @return
  */
 public static Graph getSubGraphByLabelInclusions(Graph gri, String label){
-  Graph gr = gri.getNodesByLabelInclusion(label);
+  //Graph gr = gri.getNodesByLabelInclusion(label);
+  Graph gr = BiographUtils.getMaterialComponentForEntityName(gri,label);
   gri.calcNodesInOut();
   for(int i=0;i<gri.Nodes.size();i++){
      Node n = (Node)gri.Nodes.elementAt(i);
@@ -293,6 +306,39 @@ public static Graph getSubGraphByLabelInclusions(Graph gri, String label){
   }
   gr.addConnections(gri);
   return gr;
+}
+
+/**
+ * Extract a material component subgraph
+ * 
+ */
+public static Graph getMaterialComponentForEntityName(Graph graph, String name){
+    Graph gr = new Graph();
+    for(int i=0;i<graph.Nodes.size();i++){
+      Node nn = (Node)graph.Nodes.elementAt(i);
+      String speciesId = nn.Id;
+      Vector<String> listOfEntityNames = getListOfEntityNamesFromId(speciesId);
+      if(listOfEntityNames.contains(name))
+      		gr.addNode(nn);
+    }
+    gr.addConnections(graph);
+    return gr;
+}
+
+public static Vector<String> getListOfEntityNamesFromId(String id){
+	Vector<String> list = new Vector<String>();
+	
+	StringTokenizer st = new StringTokenizer(id,"@");
+	id = st.nextToken();
+	id = fr.curie.BiNoM.pathways.utils.Utils.replaceString(id, "("," ");
+	id = fr.curie.BiNoM.pathways.utils.Utils.replaceString(id, ")"," ");
+	id = fr.curie.BiNoM.pathways.utils.Utils.replaceString(id, ":"," ");
+	id = fr.curie.BiNoM.pathways.utils.Utils.replaceString(id, "|"," ");
+	id = fr.curie.BiNoM.pathways.utils.Utils.replaceString(id, "'"," ");
+	st = new StringTokenizer(id," ");
+	while(st.hasMoreTokens())
+		list.add(st.nextToken());
+	return list;
 }
 
 /**
@@ -338,7 +384,7 @@ private static Vector calcMaterialComponents(Graph gri, Node n, Vector cyc){
     
     // remove compartment string if any
     //StringTokenizer st1 = new StringTokenizer(s,"_");
-    StringTokenizer st1 = new StringTokenizer(s,"@_");
+    StringTokenizer st1 = new StringTokenizer(s,"()@_");
     String label = st1.nextToken();
     boolean doit = true;
     for(int i=0;i<cyc.size();i++){

@@ -232,7 +232,7 @@ bla bla bla
 
 
 \section*{Implementation}
-The BiNoM software is implemented in the java programming language, as a plugin
+The BiNoM software is implemented in the Java programming language, as a plugin
 for the network visualization and analysis software package Cytoscape
 \cite{cline2007integration}. Although the primary use of BiNoM is through the
 Cytoscape software, the underlying logic of all BiNoM functions is completely
@@ -336,7 +336,10 @@ Cdc13:Cdc2$|$Thr167\_pho@cytoplasm indicate a protein complex located in the
 cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
 position 167 on a threonin residue.
 
-BiNoM allows the interconversion of CellDesigner files to BioPAX, and from a BioPAX
+BiNoM was not designed to be a universal tool for converting any Systems Biology
+file format into another, but instead to facilitate the import/ export
+operations for a limited but useful and often encountered set of cases. BiNoM allows the
+interconversion of CellDesigner files to BioPAX, and from a BioPAX
 reaction network to SBML level 2 (not to the CellDesigner dialect). The
 cytoscape networks must be associated to existing CellDesigner or BioPAX files
 prior to this operation (see the BiNoM manual for more details). While the
@@ -407,11 +410,18 @@ cycles involving CDC25 after a cycle decomposition.
  \center{\includegraphics[width=0.7\textwidth]{figures/mphase_cdc25_cycles.png}}
 \end{figure}
 
+%
+% AZ: check description of shortest path and sub-optimal path search and add 
+% a description for all non intersecting paths
+% 
+
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
-all non-intersecting paths [ comment: maybe the priciple of the algorithms
-should be explained here in more details]. As usual, some care must be taken
-before launching those functions, as the number of paths between nodes can be
+all non-intersecting paths. The shortest path is calculated as the path having
+the minimal sum of weights of the edges composing the path (Dijkstra's
+algorithm) while the sub-optimal path is constructed by removing all edges in
+all shortest paths one by one and finding the shortest path. As usual, some care
+must be taken before launching those functions, as the number of paths between nodes can be
 very large for big networks.
 
 Obviously, the result of some decomposition functions will result in subnetworks
@@ -454,6 +464,17 @@ $$
 = 0.27
 $$
 
+
+Any given path can have either a positive or negative
+sign, depending on the sign of the different influences composing the path. We
+denominate a path that has a positive sign as \textit{consistent} while a path
+with a negative sign will be called \textit{inconsistent}. 
+For example, the path shown on figure~\ref{piquantnetworks}b is consistent while
+the path on the figure~\ref{piquantnetworks}c is inconsistent. In order to
+facilitate the analysis, we have implemented an option to keep only consistent
+paths for calculating the PIQuant score.
+
+
 In more realistic situations, we will have multiple source nodes with different
 activity values, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
@@ -461,9 +482,10 @@ that allow users to select source nodes, select target nodes, and choose among
 three different options for searching paths (shortest paths, optimal and
 suboptimal shortest paths, all non-intersecting paths). The software is then
 calculating PIQUANT scores for every target node specified, taking into account
-every possible path found by the algorithm. We describe a detailed and concrete
-application of the PIQUANT algorithm to a real biological network in the results
-section.
+every possible path found by the algorithm. We have also implemented a
+randomization test to estimate p-values for each path. We describe a detailed
+and concrete application of the PIQUANT algorithm to a real biological network
+in the results section.
 
 \begin{figure}[h]
  \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The 

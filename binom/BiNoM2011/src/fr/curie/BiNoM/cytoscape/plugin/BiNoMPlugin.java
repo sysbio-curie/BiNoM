@@ -545,7 +545,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
      */
     public String describe() {
         StringBuffer sb = new StringBuffer();
-        sb.append("BiNoM plugin, see http://bioinfo.curie.fr/projects/binom ");
+        sb.append("BiNoM plugin, see http://bioinfo-out.curie.fr/projects/binom/");
         return sb.toString();
     }
 

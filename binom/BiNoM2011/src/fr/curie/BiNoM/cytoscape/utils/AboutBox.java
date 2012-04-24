@@ -51,7 +51,7 @@ public class AboutBox implements ActionListener {
 		addALabel("Emmanuel Barillot",content);
 		addALabel("Andrei Zinovyev",content);
 		addALabel("---", content);
-		addALabel("http://bioinfo-out.curie.fr/projects/binom/", content);
+		addALabel("http://binom.curie.fr/", content);
 		addALabel("---", content);
 		dialog.setTitle("About BiNoM");
 		dialog.setModal(true);

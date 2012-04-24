@@ -129,10 +129,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
         binomIOMenu.add(menuItem);
         menuItem.addActionListener(new CellDesignerImportFromFile());
 
-        menuItem = new JMenuItem
-	    ("Import CellDesigner Document from URL...");
-
-        binomIOMenu.add(menuItem);
+        // this has never been implemented
+//        menuItem = new JMenuItem
+//	    ("Import CellDesigner Document from URL...");
+//        binomIOMenu.add(menuItem);
         
         binomIOMenu.addSeparator();
         

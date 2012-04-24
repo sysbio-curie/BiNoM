@@ -62,7 +62,9 @@ public class CellDesigner2BioPAX {
     //String prefix = "c:/datas/calzone/test/phosphotest";
       //String prefix = "c:/datas/calzone/rbe2f_clean";
      //String prefix = "C:/Datas/Basal/220310/CC_DNArepair_22_03_2010_DNA stage_uniform";
-    	String prefix = "C:/Datas/binomtest/M-Phase2_ver41";
+    //String prefix = "C:/Datas/binomtest/M-Phase2_ver41";
+    	String prefix = "C:/Datas/binomtest/BioPAX3/M-Phase2";
+    	//String prefix = "C:/Datas/binomtest/BioPAX3/simplest";
 
     if(args.length>0){
       prefix = args[0];

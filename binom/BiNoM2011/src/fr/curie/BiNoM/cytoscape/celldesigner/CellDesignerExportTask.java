@@ -349,7 +349,7 @@ public class CellDesignerExportTask implements Task {
 	    if(options.insertHypotheticalInfluences_complexMutualInhibition){
 	    	addHypotheticalInfluences(sbml,true,false);
 	    }
-	    if(options.insertHypotheticalInfluences_inhCatalysisProduct){
+	    if(options.insertHypotheticalInfluences_inhCatalysisReactant){
 	    	addHypotheticalInfluences(sbml,false,true);
 	    }
 	    
@@ -710,7 +710,7 @@ public class CellDesignerExportTask implements Task {
 		} 
 		
 		
-		public static void addHypotheticalInfluences(SbmlDocument cd4, boolean complexMutualInhibition, boolean inhCatalysisProduct){
+		public static void addHypotheticalInfluences(SbmlDocument cd4, boolean complexMutualInhibition, boolean inhCatalysisReactant){
 			
 			Vector<String> newids = new Vector<String>();
 			
@@ -753,7 +753,7 @@ public class CellDesignerExportTask implements Task {
 						}
 					}
 				}else{
-					if(inhCatalysisProduct){
+					if(inhCatalysisReactant){
 					// Check if one of the products is a phenotype
 					boolean isPhenotype = false;
 					for(int j=0;j<listOfProductSpecies.size();j++)

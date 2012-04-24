@@ -83,7 +83,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	    public boolean removeComplexNames = false;
 	    public boolean removeResiduesNames = false;
 	    public boolean insertHypotheticalInfluences_complexMutualInhibition = false;
-	    public boolean insertHypotheticalInfluences_inhCatalysisProduct = false;
+	    public boolean insertHypotheticalInfluences_inhCatalysisReactant = false;
 	    public float scaleFactor = 1f;
 	    public int SCALING_POSITION = 1;
 	    public int SCALING_SHAPE = 2;
@@ -96,7 +96,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
     private JCheckBox cbmergeIfFileExists;
     private JCheckBox cbremoveLineBreakPoints;
     private JCheckBox cbinsertHypotheticalInfluences_complexMutualInhibition;
-    private JCheckBox cbinsertHypotheticalInfluences_inhCatalysisProduct;
+    private JCheckBox cbinsertHypotheticalInfluences_inhCatalysisReactant;
     
     private JCheckBox cbremoveComplexNames;
     private JCheckBox cbremoveResiduesNames;
@@ -376,7 +376,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	panel.add(cbinsertHypotheticalInfluences_complexMutualInhibition,c);
 	
 	x=0;
-	lab1 = new JLabel("Add influence of catalyst on product");
+	lab1 = new JLabel("Add influence of catalyst on reactant");
 	c = new GridBagConstraints();
 	c.gridx = x++;
 	c.gridy = y;
@@ -386,7 +386,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	c.fill = GridBagConstraints.NONE;
 	panel.add(lab1,c);
 	
-	cbinsertHypotheticalInfluences_inhCatalysisProduct = new JCheckBox();
+	cbinsertHypotheticalInfluences_inhCatalysisReactant = new JCheckBox();
 	c = new GridBagConstraints();
 	c.gridx = x;
 	c.gridy = y++;
@@ -394,7 +394,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	c.weightx = 0.0;
 	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
-	panel.add(cbinsertHypotheticalInfluences_inhCatalysisProduct,c);
+	panel.add(cbinsertHypotheticalInfluences_inhCatalysisReactant,c);
 	
 	
 	JPanel buttonPanel = new JPanel();
@@ -422,7 +422,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
             if(rbScalingShape.isSelected())
             	options.typeOfScaling = options.SCALING_SHAPE;
             options.insertHypotheticalInfluences_complexMutualInhibition = cbinsertHypotheticalInfluences_complexMutualInhibition.isSelected();
-            options.insertHypotheticalInfluences_inhCatalysisProduct = cbinsertHypotheticalInfluences_inhCatalysisProduct.isSelected();
+            options.insertHypotheticalInfluences_inhCatalysisReactant = cbinsertHypotheticalInfluences_inhCatalysisReactant.isSelected();
             
 			CellDesignerExportTask task = new CellDesignerExportTask(cdfile,options);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);

@@ -144,6 +144,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		ModuleVisualStyle.create();
 	}
 
+	
 	public BiNoMPlugin() {
 
 		CytoscapeDesktop desktop = Cytoscape.getDesktop();
@@ -152,8 +153,14 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		initVisualStyles();
 
 		JMenu plugInMenu = cyMenus.getOperationsMenu();
+		JMenu binomMainMenu = new JMenu("BiNoM 2.0");
+		plugInMenu.add(binomMainMenu);
+		
+		/*
+		 * Input Output functions menu
+		 */
 		JMenu binomIOMenu = new JMenu("BiNoM I/O");
-		plugInMenu.add(binomIOMenu);
+		binomMainMenu.add(binomIOMenu);
 
 		JMenuItem menuItem = new JMenuItem
 		("Import BioPAX 3 Document from file...");
@@ -236,10 +243,12 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		modifyCellDesignerNotesMenuItem.addActionListener(new modifyCellDesignerNotes());
 
 
-
+		/*
+		 * Analysis functions menu
+		 */
 
 		JMenu structAnaMenu = new JMenu("BiNoM Analysis");
-		plugInMenu.add(structAnaMenu);
+		binomMainMenu.add(structAnaMenu);
 
 		menuItem = new JMenuItem("Get Connected Components...");
 		menuItem.addActionListener(new ConnectedComponents());
@@ -321,12 +330,6 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		 */
 
 		structAnaMenu.addSeparator();
-		menuItem = new JMenuItem("About BiNoM...");
-		menuItem.addActionListener(new AboutBox());
-		structAnaMenu.add(menuItem);
-
-
-		structAnaMenu.addSeparator();
 
 		createNeighborhoodSetsMenuItem = new JMenuItem("Create neighborhood sets file...");
 		structAnaMenu.add(createNeighborhoodSetsMenuItem);
@@ -334,7 +337,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 
 		// Module manager begin
 		JMenu binomNestManagerMenu = new JMenu("BiNoM module manager");
-		plugInMenu.add(binomNestManagerMenu);
+		binomMainMenu.add(binomNestManagerMenu);
 
 		menuItem=new JMenuItem(CreateNestNetwork.title);
 		binomNestManagerMenu.add(menuItem);
@@ -389,8 +392,12 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
 		// Module manager end 	
 
+		/*
+		 * BioPAX 3 utils menu
+		 */
+		
 		JMenu binomBioPAXUtilsMenu = new JMenu("BiNoM BioPAX 3 Utils");
-		plugInMenu.add(binomBioPAXUtilsMenu);
+		binomMainMenu.add(binomBioPAXUtilsMenu);
 
 		menuItem = new JMenuItem
 		("BioPAX 3 Property Editor...");
@@ -421,9 +428,14 @@ public class BiNoMPlugin extends CytoscapePlugin {
 			}
 		});
 
+		
+		/*
+		 * BioPAX 3 query menu
+		 */
+		
 		JMenu binomBioPAXQueryMenu = new JMenu("BiNoM BioPAX 3 Query ");
 
-		plugInMenu.add(binomBioPAXQueryMenu);
+		binomMainMenu.add(binomBioPAXQueryMenu);
 
 		JMenuItem generateIndexMenuItem = new JMenuItem("Generate Index");
 		binomBioPAXQueryMenu.add(generateIndexMenuItem);
@@ -455,11 +467,13 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomBioPAXQueryMenu.add(viewQueryLogMenuItem);
 		viewQueryLogMenuItem.addActionListener(new BioPAXViewQueryLog());
 
-		// -------------------- Utilities
+		/*
+		 * Utilities menu
+		 */
 
 		JMenu binomUtilsMenu = new JMenu("BiNoM Utilities");
 
-		plugInMenu.add(binomUtilsMenu);
+		binomMainMenu.add(binomUtilsMenu);
 
 		selectEdgesBetweendSelectedNodesMenuItem = new JMenuItem("Select Edges between Selected Nodes");
 		binomUtilsMenu.add(selectEdgesBetweendSelectedNodesMenuItem);
@@ -538,7 +552,412 @@ public class BiNoMPlugin extends CytoscapePlugin {
 				pasteNodesAndEdgesMenuItem.setEnabled(!NodesAndEdgesClipboard.getInstance().isEmpty());
 			}
 		});
+		
+		
+		menuItem = new JMenuItem("About BiNoM...");
+		menuItem.addActionListener(new AboutBox());
+		binomMainMenu.add(menuItem);
+
 	}
+
+	
+	
+// old style menu	
+//	public BiNoMPlugin() {
+//
+//		CytoscapeDesktop desktop = Cytoscape.getDesktop();
+//		CyMenus cyMenus = desktop.getCyMenus();
+//
+//		initVisualStyles();
+//
+//		JMenu plugInMenu = cyMenus.getOperationsMenu();
+//		JMenu binomIOMenu = new JMenu("BiNoM I/O");
+//		plugInMenu.add(binomIOMenu);
+//
+//		JMenuItem menuItem = new JMenuItem
+//		("Import BioPAX 3 Document from file...");
+//		binomIOMenu.add(menuItem);
+//		menuItem.addActionListener(new BioPAXImportFromFile());
+//
+//		menuItem = new JMenuItem
+//		("Import BioPAX 3 Document from URL...");
+//		binomIOMenu.add(menuItem);
+//		menuItem.addActionListener(new BioPAXImportFromURL());
+//
+//		binomIOMenu.addSeparator();
+//
+//		menuItem = new JMenuItem
+//		("Import CellDesigner Document from file...");
+//		binomIOMenu.add(menuItem);
+//		menuItem.addActionListener(new CellDesignerImportFromFile());
+//
+//		binomIOMenu.addSeparator();
+//
+//		menuItem = new JMenuItem
+//		("Import CSML Document from file...");
+//		binomIOMenu.add(menuItem);
+//		menuItem.addActionListener(new CSMLImportFromFile());
+//
+//		binomIOMenu.addSeparator();
+//
+//		menuItem = new JMenuItem
+//		("Import influence network from AIN file...");
+//		binomIOMenu.add(menuItem);
+//		menuItem.addActionListener(new ImportFromSimpleTextInfluenceFile());
+//
+//		binomIOMenu.addSeparator();
+//
+//		exportBioPAXMenuItem = new JMenuItem("Export current network to BioPAX 3...");
+//		binomIOMenu.add(exportBioPAXMenuItem);
+//		exportBioPAXMenuItem.addActionListener(new BioPAXExportToFile());
+//
+//		exportCellDesignerMenuItem = new JMenuItem("Export current network to CellDesigner...");
+//		binomIOMenu.add(exportCellDesignerMenuItem);
+//		exportCellDesignerMenuItem.addActionListener(new CellDesignerExportToFile());
+//
+//		exportSBMLMenuItem = new JMenuItem("Export current network to SBML...");
+//		binomIOMenu.add(exportSBMLMenuItem);
+//		exportSBMLMenuItem.addActionListener(new SBMLExportToFile());
+//
+//
+//		binomIOMenu.addSeparator();        
+//
+//		associateBioPAXMenuItem = new JMenuItem("Associate BioPAX 3 Source...");
+//		binomIOMenu.add(associateBioPAXMenuItem);
+//		associateBioPAXMenuItem.addActionListener(BioPAXAssociateSource.getInstance());
+//
+//		saveBioPAXMenuItem = new JMenuItem("Save whole associated BioPAX 3 as...");
+//		binomIOMenu.add(saveBioPAXMenuItem);
+//		saveBioPAXMenuItem.addActionListener(new BioPAXSaveAssociated());
+//
+//		associateCellDesignerMenuItem = new JMenuItem("Associate CellDesigner Source...");
+//		binomIOMenu.add(associateCellDesignerMenuItem);
+//		associateCellDesignerMenuItem.addActionListener(CellDesignerAssociateSource.getInstance());
+//
+//		binomIOMenu.addSeparator();        
+//
+//		listAllReactionsMenuItem = new JMenuItem("List all reactions...");
+//		binomIOMenu.add(listAllReactionsMenuItem);
+//		listAllReactionsMenuItem.addActionListener(new ListAllReactions());
+//
+//		listAllNodesMenuItem = new JMenuItem("List all nodes...");
+//		binomIOMenu.add(listAllNodesMenuItem);
+//		listAllNodesMenuItem.addActionListener(new ListAllNodes());
+//
+//		binomIOMenu.addSeparator();
+//
+//		colorCellDesignerProteinsMenuItem = new JMenuItem("Color CellDesigner proteins...");
+//		binomIOMenu.add(colorCellDesignerProteinsMenuItem);
+//		colorCellDesignerProteinsMenuItem.addActionListener(new colorCellDesignerProteins());
+//
+//		modifyCellDesignerNotesMenuItem = new JMenuItem("Modify CellDesigner notes...");
+//		binomIOMenu.add(modifyCellDesignerNotesMenuItem);
+//		modifyCellDesignerNotesMenuItem.addActionListener(new modifyCellDesignerNotes());
+//
+//
+//
+//
+//		JMenu structAnaMenu = new JMenu("BiNoM Analysis");
+//		plugInMenu.add(structAnaMenu);
+//
+//		menuItem = new JMenuItem("Get Connected Components...");
+//		menuItem.addActionListener(new ConnectedComponents());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Get Strongly Connected Components...");
+//		menuItem.addActionListener(new StronglyConnectedComponents());
+//		structAnaMenu.add(menuItem);
+//
+//
+//		menuItem = new JMenuItem("Prune Graph...");
+//		menuItem.addActionListener(new PruneGraph());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Get Material Components...");
+//		menuItem.addActionListener(new MaterialComponents());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Get Cycle Decomposition...");
+//		menuItem.addActionListener(new CycleDecomposition());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Path Analysis...");
+//		menuItem.addActionListener(new PathAnalysis());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Extract subnetwork...");
+//		menuItem.addActionListener(new ExtractSubnetwork());
+//		structAnaMenu.add(menuItem);
+//
+//		JMenu centralityMenu = new JMenu("Calc centrality...");
+//		structAnaMenu.add(centralityMenu);
+//
+//		menuItem = new JMenuItem("Inbetweenness undirected");
+//		CalcCentrality ccu = new CalcCentrality();
+//		ccu.directed = false;
+//		menuItem.addActionListener(ccu);
+//		centralityMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Inbetweenness directed");
+//		CalcCentrality ccd = new CalcCentrality();
+//		ccd.directed = true;
+//		menuItem.addActionListener(ccd);
+//		centralityMenu.add(menuItem);
+//
+//		structAnaMenu.addSeparator();
+//
+//		menuItem = new JMenuItem("Cluster Networks...");
+//		menuItem.addActionListener(new ClusterNetworks());
+//		structAnaMenu.add(menuItem);
+//
+//		structAnaMenu.addSeparator();
+//		menuItem = new JMenuItem("Mono-molecular react.to edges...");
+//		menuItem.addActionListener(new MonoMolecularReactionsAsEdges());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("\'Linearize\' network...");
+//		menuItem.addActionListener(new LinearizeNetwork());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Exclude intermediate nodes...");
+//		menuItem.addActionListener(new ExcludeIntermediateNodes());
+//		structAnaMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Extract Reaction Network...");
+//		menuItem.addActionListener(new ExtractReactionNetwork());
+//		structAnaMenu.add(menuItem);
+//
+//		structAnaMenu.addSeparator();
+//		menuItem = new JMenuItem("Path Influence Quantification analysis...");
+//		menuItem.addActionListener(new PathConsistencyAnalyzer());
+//		structAnaMenu.add(menuItem);
+//
+//		/*
+//	structAnaMenu.addSeparator();
+//	menuItem = new JMenuItem("OCSANA analysis...");
+//	menuItem.addActionListener(new OptimalCutSetAnalyzer());
+//	structAnaMenu.add(menuItem);
+//		 */
+//
+//		structAnaMenu.addSeparator();
+//		menuItem = new JMenuItem("About BiNoM...");
+//		menuItem.addActionListener(new AboutBox());
+//		structAnaMenu.add(menuItem);
+//
+//
+//		structAnaMenu.addSeparator();
+//
+//		createNeighborhoodSetsMenuItem = new JMenuItem("Create neighborhood sets file...");
+//		structAnaMenu.add(createNeighborhoodSetsMenuItem);
+//		createNeighborhoodSetsMenuItem.addActionListener(new createNeighborhoodSets());
+//
+//		// Module manager begin
+//		JMenu binomNestManagerMenu = new JMenu("BiNoM module manager");
+//		plugInMenu.add(binomNestManagerMenu);
+//
+//		menuItem=new JMenuItem(CreateNestNetwork.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new CreateNestNetwork());
+//
+//		menuItem=new JMenuItem(CreateConnectionsBetweenNests.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new CreateConnectionsBetweenNests());
+//
+//		menuItem=new JMenuItem(PackInNestNode.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new PackInNestNode());
+//
+//		menuItem=new JMenuItem(ClusterByShortPath.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new ClusterByShortPath());
+//
+//		binomNestManagerMenu.addSeparator();		
+//
+//		menuItem=new JMenuItem(ListNodesByNest.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new ListNodesByNest());
+//
+//		menuItem=new JMenuItem(FindCommonNodes.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new FindCommonNodes());
+//
+//		menuItem=new JMenuItem(NestInNodeAttribute.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new NestInNodeAttribute());
+//
+//		menuItem=new JMenuItem(ListComponents.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new ListComponents());
+//
+//		binomNestManagerMenu.addSeparator();		
+//
+//		menuItem=new JMenuItem(MergeSelectedNests.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new MergeSelectedNests());	
+//
+//		menuItem=new JMenuItem(InterOf2SelectedNests.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new InterOf2SelectedNests());
+//
+//		menuItem=new JMenuItem(RecreateLostConnectionsInsideNests.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new RecreateLostConnectionsInsideNests());
+//
+//		menuItem=new JMenuItem(DestroyUnusedNetworksAsNest.title);
+//		binomNestManagerMenu.add(menuItem);
+//		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
+//		// Module manager end 	
+//
+//		JMenu binomBioPAXUtilsMenu = new JMenu("BiNoM BioPAX 3 Utils");
+//		plugInMenu.add(binomBioPAXUtilsMenu);
+//
+//		menuItem = new JMenuItem
+//		("BioPAX 3 Property Editor...");
+//		binomBioPAXUtilsMenu.add(menuItem);
+//		menuItem.addActionListener(new BioPAXPropertyBrowser());
+//
+//		menuItem = new JMenuItem
+//		("BioPAX 3 Class Tree...");
+//		binomBioPAXUtilsMenu.add(menuItem);
+//		menuItem.addActionListener(new BioPAXClassTree());
+//
+//		toggleBioPAXNameMenuItem = new JMenuItem
+//		("Toggle BioPAX 3 Naming Service");
+//		binomBioPAXUtilsMenu.add(toggleBioPAXNameMenuItem);
+//		toggleBioPAXNameMenuItem.addActionListener(new BioPAXToggleNamingService());
+//
+//		syncBioPAXMenuItem = new JMenuItem("Synchronize networks with BioPAX 3...");
+//		binomBioPAXUtilsMenu.add(syncBioPAXMenuItem);
+//		syncBioPAXMenuItem.addActionListener(new BioPAXSyncNetworks());
+//
+//		binomIOMenu.addMenuListener(new MenuListener() {
+//			public void menuCanceled(MenuEvent e) { }
+//			public void menuDeselected(MenuEvent e) { }
+//
+//			public void menuSelected(MenuEvent e) {
+//				CyNetwork cyNetwork = Cytoscape.getCurrentNetwork();
+//				toggleBioPAXNameMenuItem.setText(BioPAXToggleNamingService.getNamingServiceMode() ? "Use Simplified URI Names" : "Use Naming Service Names");
+//			}
+//		});
+//
+//		JMenu binomBioPAXQueryMenu = new JMenu("BiNoM BioPAX 3 Query ");
+//
+//		plugInMenu.add(binomBioPAXQueryMenu);
+//
+//		JMenuItem generateIndexMenuItem = new JMenuItem("Generate Index");
+//		binomBioPAXQueryMenu.add(generateIndexMenuItem);
+//		generateIndexMenuItem.addActionListener(new BioPAXGenerateIndex());
+//
+//		JMenuItem loadIndexMenuItem = new JMenuItem("Load Index");
+//		binomBioPAXQueryMenu.add(loadIndexMenuItem);
+//		loadIndexMenuItem.addActionListener(new BioPAXLoadIndex());
+//
+//		JMenuItem displayIndexInfoMenuItem = new JMenuItem("Display Index Info");
+//		binomBioPAXQueryMenu.add(displayIndexInfoMenuItem);
+//		displayIndexInfoMenuItem.addActionListener(new BioPAXDisplayIndexInfo());
+//
+//		binomBioPAXQueryMenu.addSeparator();
+//
+//		JMenuItem selectEntitiesMenuItem = new JMenuItem("Select Entities");
+//		binomBioPAXQueryMenu.add(selectEntitiesMenuItem);
+//		selectEntitiesMenuItem.addActionListener(new BioPAXSelectEntities());
+//
+//		JMenuItem standardQueryMenuItem = new JMenuItem("Standard Query");
+//		binomBioPAXQueryMenu.add(standardQueryMenuItem);
+//		standardQueryMenuItem.addActionListener(new BioPAXStandardQuery());
+//
+//		JMenuItem pathIndexAnalysisItem = new JMenuItem("Index Path Analysis");
+//		binomBioPAXQueryMenu.add(pathIndexAnalysisItem);
+//		pathIndexAnalysisItem.addActionListener(new BioPAXIndexPathAnalysis());
+//
+//		JMenuItem viewQueryLogMenuItem = new JMenuItem("View Query Log");
+//		binomBioPAXQueryMenu.add(viewQueryLogMenuItem);
+//		viewQueryLogMenuItem.addActionListener(new BioPAXViewQueryLog());
+//
+//		// -------------------- Utilities
+//
+//		JMenu binomUtilsMenu = new JMenu("BiNoM Utilities");
+//
+//		plugInMenu.add(binomUtilsMenu);
+//
+//		selectEdgesBetweendSelectedNodesMenuItem = new JMenuItem("Select Edges between Selected Nodes");
+//		binomUtilsMenu.add(selectEdgesBetweendSelectedNodesMenuItem);
+//		selectEdgesBetweendSelectedNodesMenuItem.addActionListener(new SelectEdgesBetweenSelectedNodes());
+//		selectEdgesBetweendSelectedNodesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F8, 0));
+//
+//
+//		menuItem = new JMenuItem("Select upstream neighbours");
+//		menuItem.addActionListener(new SelectUpstreamNeighbours());
+//		binomUtilsMenu.add(menuItem);
+//		menuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
+//
+//		menuItem = new JMenuItem("Select downstream neighbours");
+//		menuItem.addActionListener(new SelectDownstreamNeighbours());
+//		binomUtilsMenu.add(menuItem);
+//		menuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));		
+//
+//		menuItem = new JMenuItem("Double Network Differences");
+//		menuItem.addActionListener(new DoubleNetworkDifference());
+//		binomUtilsMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Update Networks");
+//		menuItem.addActionListener(new NetworksUpdate());
+//		binomUtilsMenu.add(menuItem);
+//
+//		menuItem = new JMenuItem("Update connections from other network");
+//		menuItem.addActionListener(new EdgesFromOtherNetwork());
+//		binomUtilsMenu.add(menuItem);
+//
+//		mergeNetworksAndFilterMenuItem  = new JMenuItem("Merge Networks and Filter by Frequency");
+//		mergeNetworksAndFilterMenuItem.addActionListener(new MergeNetworksAndFilter());
+//		binomUtilsMenu.add(mergeNetworksAndFilterMenuItem);
+//
+//
+//		JMenu clipboardMenu = new JMenu("Clipboard");
+//
+//		binomUtilsMenu.add(clipboardMenu);
+//
+//		setNodesAndEdgesMenuItem = new JMenuItem("Copy Selected Nodes and Edges to Clipboard");
+//		clipboardMenu.add(setNodesAndEdgesMenuItem);
+//		setNodesAndEdgesMenuItem.addActionListener(new CopySelectedNodesAndEdges(true));
+//
+//		addNodesAndEdgesMenuItem = new JMenuItem("Add Selected Nodes and Edges to Clipboard");
+//		clipboardMenu.add(addNodesAndEdgesMenuItem);
+//		addNodesAndEdgesMenuItem.addActionListener(new CopySelectedNodesAndEdges(false));
+//
+//		pasteNodesAndEdgesMenuItem = new JMenuItem("Paste Nodes and Edges from Clipboard");
+//		clipboardMenu.add(pasteNodesAndEdgesMenuItem);
+//		pasteNodesAndEdgesMenuItem.addActionListener(new PasteNodesAndEdges());
+//
+//		showClipboardContentsMenuItem = new JMenuItem("Show Clipboard Contents");
+//		clipboardMenu.add(showClipboardContentsMenuItem);
+//		showClipboardContentsMenuItem.addActionListener(new ShowClipboardContents());
+//
+//		clipboardMenu.addMenuListener(new MenuListener() {
+//			public void menuCanceled(MenuEvent e) { }
+//			public void menuDeselected(MenuEvent e) { }
+//
+//			public void menuSelected(MenuEvent e) {
+//				CyNetworkView view = Cytoscape.getCurrentNetworkView();
+//
+//				selectEdgesBetweendSelectedNodesMenuItem.setEnabled
+//				(view != null && view.getSelectedNodes().size() != 0);
+//
+//				setNodesAndEdgesMenuItem.setEnabled
+//				(view != null &&
+//						(view.getSelectedNodes().size() != 0 ||
+//								(view.getSelectedEdges().size() != 0)));
+//
+//				addNodesAndEdgesMenuItem.setEnabled
+//				(view != null &&
+//						(view.getSelectedNodes().size() != 0 ||
+//								(view.getSelectedEdges().size() != 0)));
+//
+//				showClipboardContentsMenuItem.setEnabled(!NodesAndEdgesClipboard.getInstance().isEmpty());
+//				pasteNodesAndEdgesMenuItem.setEnabled(!NodesAndEdgesClipboard.getInstance().isEmpty());
+//			}
+//		});
+//	}
 
 	/**
 	 * Gives a description of this plugin.

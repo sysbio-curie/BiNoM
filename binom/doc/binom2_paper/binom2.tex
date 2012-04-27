@@ -624,11 +624,27 @@ RB-E2F network and G1/S network extracted from Reactome.}
 \end{figure}
 
 
-\subsection*{Application of PIQuant on 2 GS networks (comprehensive + modular
-network), data from Stransky.}
+\subsection*{Application of PIQuant on RB influence network, data from Stransky.}
 %
 % PIQuant analysis here (GS)
 %
+As described above, PIQuant algorithm confront data to an influnce network. Here, we apply PIQuant algorithm to an influence version of the network above, exctracted by BIOCHAM(ref). The data are extracted from transcriptome data of bladder cancer tissu (compared to normal tissu ref). More precisely, for each gene, the t-statistics is computed (between cancer and normal tissu). These data are considered as nodes annotation and are implemented in the cytoscape session of the influence network. Figure~\ref{InflAnnotNet} represent this influence network with the annotation.  
+
+\begin{figure}[h]
+  \caption{\label{InflAnnotNet} \textbf{Annoted influence network.}
+    Influence network opbtained from BIOCHAM. Color represent differential expression obtained from transcrpotme data (red for positive, green for negative). The three grey nodes act on the three cell cycle checkpoints, G1, S, M.}
+  \center{\includegraphics[width=0.7\textwidth]{figures/Cell_cycle_Expr.pdf}}
+\end{figure}[h]
+
+Application of PIQuant to this network and its annotation produces the Figure~\ref{PIQuantHeatMap}.
+
+\begin{figure}[h]
+  \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of PIQuant.}
+    Results of PIQuant algorithm applied to the influence network. Color intensities a proportional to PIQuant score (red positive, green negative).}
+  \center{\includegraphics[width=0.7\textwidth]{figures/heatmapPathInfluence.pdf}}
+\end{figure}[h]
+
+
 
 \subsection*{Modularization} 
 

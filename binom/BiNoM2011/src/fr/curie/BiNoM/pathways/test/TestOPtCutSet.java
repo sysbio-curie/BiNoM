@@ -119,7 +119,6 @@ public class TestOPtCutSet {
 			//testTarget.add(dpc.graph.getNode("erbb11"));
 			//testTarget.add(dpc.graph.getNode("pak1"));
 
-
 			for (Node n : testSource)
 				dpc.sourceNodes.add(n);
 

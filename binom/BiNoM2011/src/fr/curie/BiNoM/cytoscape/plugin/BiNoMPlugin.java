@@ -50,6 +50,7 @@ import fr.curie.BiNoM.cytoscape.analysis.ExtractSubnetwork;
 import fr.curie.BiNoM.cytoscape.analysis.LinearizeNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.MaterialComponents;
 import fr.curie.BiNoM.cytoscape.analysis.MonoMolecularReactionsAsEdges;
+import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.PathAnalysis;
 import fr.curie.BiNoM.cytoscape.analysis.PathConsistencyAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.PruneGraph;
@@ -322,12 +323,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem.addActionListener(new PathConsistencyAnalyzer());
 		structAnaMenu.add(menuItem);
 
-		/*
-	structAnaMenu.addSeparator();
-	menuItem = new JMenuItem("OCSANA analysis...");
-	menuItem.addActionListener(new OptimalCutSetAnalyzer());
-	structAnaMenu.add(menuItem);
-		 */
+		structAnaMenu.addSeparator();
+		menuItem = new JMenuItem("OCSANA analysis...");
+		menuItem.addActionListener(new OptimalCutSetAnalyzer());
+		structAnaMenu.add(menuItem);
 
 		structAnaMenu.addSeparator();
 
@@ -335,7 +334,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		structAnaMenu.add(createNeighborhoodSetsMenuItem);
 		createNeighborhoodSetsMenuItem.addActionListener(new createNeighborhoodSets());
 
-		// Module manager begin
+		/*
+		 * Module manager menu functions
+		 */
+		
 		JMenu binomNestManagerMenu = new JMenu("BiNoM module manager");
 		binomMainMenu.add(binomNestManagerMenu);
 
@@ -390,7 +392,6 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(DestroyUnusedNetworksAsNest.title);
 		binomNestManagerMenu.add(menuItem);
 		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
-		// Module manager end 	
 
 		/*
 		 * BioPAX 3 utils menu

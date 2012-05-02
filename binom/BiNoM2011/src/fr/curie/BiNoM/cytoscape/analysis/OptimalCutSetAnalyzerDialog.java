@@ -450,22 +450,22 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		c.anchor = GridBagConstraints.WEST;
 		panel.add(partialRB, c);
 		
-		y++;
-		seedRB = new JRadioButton();
-		seedRB.setText("Seed based enumeration");
-		seedRB.setActionCommand("enum");
-		seedRB.addActionListener(this);
-		c = new GridBagConstraints();
-		c.gridx = x;
-		c.gridy = y;
-		c.gridwidth = 3;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(seedRB, c);
+//		y++;
+//		seedRB = new JRadioButton();
+//		seedRB.setText("Seed based enumeration");
+//		seedRB.setActionCommand("enum");
+//		seedRB.addActionListener(this);
+//		c = new GridBagConstraints();
+//		c.gridx = x;
+//		c.gridy = y;
+//		c.gridwidth = 3;
+//		c.anchor = GridBagConstraints.WEST;
+//		panel.add(seedRB, c);
 		
 		ButtonGroup OCSgroup = new ButtonGroup();
 		OCSgroup.add(bergeRB);
 		OCSgroup.add(partialRB);
-		OCSgroup.add(seedRB);
+		//OCSgroup.add(seedRB);
 		
 		y++;
 		JPanel p2 = new JPanel(new FlowLayout());
@@ -546,8 +546,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						analyzer.ocsSearch = analyzer.OCS_BERGE;
 					if(partialRB.isSelected())
 						analyzer.ocsSearch = analyzer.OCS_PARTIAL;
-					if(seedRB.isSelected())
-						analyzer.ocsSearch = analyzer.OCS_SEED;
+//					if(seedRB.isSelected())
+//						analyzer.ocsSearch = analyzer.OCS_SEED;
 					
 					
 					if(limitationRadius.isSelected())

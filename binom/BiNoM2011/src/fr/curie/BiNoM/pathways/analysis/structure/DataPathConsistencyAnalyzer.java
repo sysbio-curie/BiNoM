@@ -33,7 +33,6 @@ public class DataPathConsistencyAnalyzer {
 	public float SA_targetScoreRandomDistribution[][] = null;
 	public float SA_observedPathScores[] = null;
 	public float SA_pathScoresRandomDistribution[][] = null;
-
 	
 	public int searchPathMode = SHORTEST_PATHS; 
 	public static int SHORTEST_PATHS = 0;
@@ -83,6 +82,11 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	
 	/**
+	 * System independent newline character
+	 */
+	public static String newline = System.getProperty("line.separator");
+	
+	/**
 	 * List of source nodes
 	 */
 	public ArrayList<Node> sourceNodes = new ArrayList<Node>();
@@ -117,6 +121,17 @@ public class DataPathConsistencyAnalyzer {
 	 * Ocsana Omega scores map
 	 */
 	public HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>();
+	
+	/**
+	 * Ocsana omega score, taking into account targets only. 
+	 */
+	public HashMap<String, Double> omegaTargetScoreMap = new HashMap<String, Double>();
+	
+	/**
+	 * Ocsana omega score, taking into account side-effect nodes only.
+	 */
+	public HashMap<String, Double> omegaSideEffectScoreMap = new HashMap<String, Double>();
+
 	
 	/**
 	 * Ocsana Omega scores
@@ -175,6 +190,8 @@ public class DataPathConsistencyAnalyzer {
 		
 		public HashSet<String> optCutSet;
 		public double score;
+		public double targetScore;
+		public double sideEffectScore;
 		public int optCutSetSize;
 		
 		public optCutSetData(HashSet<String> optCutSet, double score) {
@@ -182,15 +199,25 @@ public class DataPathConsistencyAnalyzer {
 			this.score = score;
 			this.optCutSetSize = optCutSet.size();
 		}
-
-		// sort by decreasing score value
+		
+		public optCutSetData(HashSet<String> optCutSet, double score, double targetScore, double sideEffectScore) {
+			this.optCutSet = optCutSet; 
+			this.score = score;
+			this.optCutSetSize = optCutSet.size();
+			this.targetScore = targetScore;
+			this.sideEffectScore = sideEffectScore;
+		}
+		
+		/*
+		 * Sort by decreasing absolute value of the score.
+		 */
 		public int compareTo(Object b) {
 			
 			optCutSetData m = (optCutSetData) b;
 
-			if(this.score < m.score) {
+			if(Math.abs(this.score) < Math.abs(m.score)) {
 				return 1;
-			} else if(this.score == m.score) {
+			} else if(Math.abs(this.score) == Math.abs(m.score)) {
 				return 0;
 			} else {
 				return -1;
@@ -837,7 +864,7 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public void ocsanaScore() {
 		
-		this.optCutSetReport.append("--- Optimal cut set search report ---\n\n");
+		this.optCutSetReport.append("--- Optimal cut set search report ---"+newline+newline);
 		
 		String line = "";
 		for (Node n : this.sourceNodes)
@@ -846,7 +873,7 @@ public class DataPathConsistencyAnalyzer {
 			else
 				line += n.Id + "(" + nodeID2attribute.get(n.Id) + ")" + " ";
 		
-		this.optCutSetReport.append("Source nodes: "+line+"\n");
+		this.optCutSetReport.append("Source nodes: "+line+newline);
 		
 		line = "";
 		for (Node n : this.targetNodes)
@@ -854,7 +881,7 @@ public class DataPathConsistencyAnalyzer {
 				line += n.Id + " ";
 			else
 				line += n.Id + "(" + nodeID2attribute.get(n.Id) + ")" + " ";
-		this.optCutSetReport.append("Target nodes: "+line+"\n");
+		this.optCutSetReport.append("Target nodes: "+line+newline);
 		
 		line = "";
 		for (Node n : this.sideNodes)
@@ -862,7 +889,7 @@ public class DataPathConsistencyAnalyzer {
 				line += n.Id + " ";
 			else
 				line += n.Id + "(" + nodeID2attribute.get(n.Id) + ")" + " ";
-		this.optCutSetReport.append("Side effect nodes: "+line+"\n\n");
+		this.optCutSetReport.append("Side effect nodes: "+line+newline+newline);
 		
 		// convert every "neutral" edge to activation
 		int nbConversions = this.checkEdgeInfluence();
@@ -995,16 +1022,16 @@ public class DataPathConsistencyAnalyzer {
 		
 		fillPathMatrix(elemPaths);
 		
-		this.optCutSetReport.append("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes"+"\n\n");
+		this.optCutSetReport.append("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes"+newline+newline);
 		System.out.println("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes.");
 		
 		for (Path p : elemPaths) {
 			if (nodeID2attribute == null) {
-				this.optCutSetReport.append(p.label+"\n");
+				this.optCutSetReport.append(p.label+newline);
 				System.out.println(p.label);
 			}
 			else {
-				this.optCutSetReport.append(formatPathLabel(p)+"\n");
+				this.optCutSetReport.append(formatPathLabel(p)+newline);
 				System.out.println(formatPathLabel(p));
 			}
 		}
@@ -1015,12 +1042,25 @@ public class DataPathConsistencyAnalyzer {
 				}
 			}
 		}
-		this.optCutSetReport.append("\n");
+		this.optCutSetReport.append(newline);
 
-		// score values are stored in an array, with a map [target x nodes] pointing to the indexes.
+		/*
+		 *  Score values are stored in an array, with a map [target x nodes] pointing to the indexes.
+		 */
 		int ct = 0;
 		HashMap<Node, HashMap<Node, Integer>> scoreMap = new HashMap<Node, HashMap<Node, Integer>>();
+		/*
+		 * Overall score, the value of this score will be set to 0 if the score is becoming negative
+		 */
 		double [] scoreVal = new double[targetNodes.size() * allNodes.size()];
+		/*
+		 * Score taking into account the targets only
+		 */
+		double [] targetScoreVal = new double[targetNodes.size() * allNodes.size()];
+		/*
+		 * Score for side effect nodes
+		 */
+		double [] sideEffectScoreVal = new double[targetNodes.size() * allNodes.size()];
 		
 		for (Node t : targetNodes)
 			scoreMap.put(t, new HashMap<Node, Integer>());
@@ -1030,14 +1070,10 @@ public class DataPathConsistencyAnalyzer {
 				//System.out.println(t.Id+"--"+s.Id);
 				scoreMap.get(t).put(s, ct);
 				scoreVal[ct] = 0.0;
+				targetScoreVal[ct] = 0.0;
+				sideEffectScoreVal[ct] = 0.0;
 				ct++;
 			}
-		
-//		for (Node t : targetNodes)
-//			for (Node s : elemNodes) {
-//				int idx = scoreMap.get(t).get(s);
-//				System.out.println(t.Id+"-"+s.Id+" = "+scoreVal[idx]);
-//			}
 		
 //		System.out.println("\nScores");
 		for (Path p : elemSplitPaths) {
@@ -1046,17 +1082,19 @@ public class DataPathConsistencyAnalyzer {
 			int idx = scoreMap.get(target).get(source);
 			double sco = p.influence / p.length;
 			scoreVal[idx] += p.influence / p.length;
+			targetScoreVal[idx] += sco;
 //			System.out.println(source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
 		}
 
-
 		// negative scores are set to 0
-		for (Node t : targetNodes)
-			for (Node s : elemNodes) {
-				int idx = scoreMap.get(t).get(s);
-				if (scoreVal[idx] < 0)
-					scoreVal[idx] = 0;
-			}
+//		for (Node t : targetNodes)
+//			for (Node s : elemNodes) {
+//				int idx = scoreMap.get(t).get(s);
+//				if (scoreVal[idx] < 0)
+//					scoreVal[idx] = 0;
+//				if (targetScoreVal[idx] < 0)
+//					targetScoreVal[idx] = 0;
+//			}
 
 //		System.out.println("\nPenalty scores");
 		for (Node source : elemNodes) {
@@ -1070,6 +1108,7 @@ public class DataPathConsistencyAnalyzer {
 							// do not take into account the sign for the penalty score
 							double sco = Math.abs(ps.influence / ps.length);
 							scoreVal[idx] -= Math.abs(ps.influence / ps.length);
+							sideEffectScoreVal[idx] += Math.abs(sco);
 //							System.out.println(source.Id+":"+target.Id+" "+ps.label+" infl="+ps.influence+" len="+ps.length+" score="+sco+" val="+scoreVal[idx]);
 						}
 					}
@@ -1078,22 +1117,27 @@ public class DataPathConsistencyAnalyzer {
 		}
 
 		// negative scores are set to 0
-		for (Node t : targetNodes)
-			for (Node s : elemNodes) {
-				int idx = scoreMap.get(t).get(s);
-				if (scoreVal[idx] < 0)
-					scoreVal[idx] = 0;
-			}
+//		for (Node t : targetNodes)
+//			for (Node s : elemNodes) {
+//				int idx = scoreMap.get(t).get(s);
+//				if (scoreVal[idx] < 0)
+//					scoreVal[idx] = 0;
+//				if (targetScoreVal[idx] < 0)
+//					targetScoreVal[idx] = 0;
+//			}
 
 		
 		System.out.println("\nScores:");
+		DecimalFormat df = new DecimalFormat("#.###");
 		for (Node t : targetNodes)
 			for (Node s : elemNodes) {
 				int idx = scoreMap.get(t).get(s);
 				if (nodeID2attribute == null)
-					System.out.println(t.Id+"-"+s.Id+" = "+scoreVal[idx]);
+					//System.out.println(t.Id+"-"+s.Id+" = "+df.format(scoreVal[idx]) + " " + df.format(targetScoreVal[idx]) + " " + df.format(sideEffectScoreVal[idx]));
+					System.out.println(t.Id+"-"+s.Id+" = "+df.format(scoreVal[idx]) );
 				else
-					System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+scoreVal[idx]);
+					//System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+df.format(scoreVal[idx])+ " " + df.format(targetScoreVal[idx]) + " " + df.format(sideEffectScoreVal[idx]));
+					System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+df.format(scoreVal[idx]));
 			}
 	
 		
@@ -1112,11 +1156,10 @@ public class DataPathConsistencyAnalyzer {
 				elemPathsByTarget.get(target).get(last).add(n.Id);
 		}
 		
-		//HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>(elemNodes.size());
-		//ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>(elemNodes.size());
-		
 		for (Node source : elemNodes) {
 			double omegaScore = 0;
+			double omegaTargetScore = 0;
+			double omegaSideEffectScore = 0;
 			for (Node target : targetNodes) {
 				int factor = 0;
 				for (int i=0;i<elemPathsByTarget.get(target).size();i++) {
@@ -1126,9 +1169,13 @@ public class DataPathConsistencyAnalyzer {
 				}
 				double tmp = factor * scoreVal[scoreMap.get(target).get(source)];
 				omegaScore += tmp;
+				omegaTargetScore += factor * targetScoreVal[scoreMap.get(target).get(source)];
+				omegaSideEffectScore += factor * sideEffectScoreVal[scoreMap.get(target).get(source)];
 				//System.out.println("source="+source.Id+" target="+target.Id+" factor="+factor+" om="+omegaScore + " score="+ scoreVal[scoreMap.get(target).get(source)]);
 			}
 			omegaScoreMap.put(source.Id, omegaScore);
+			omegaTargetScoreMap.put(source.Id, omegaTargetScore);
+			omegaSideEffectScoreMap.put(source.Id, omegaSideEffectScore);
 		}
 		
 		for (String id : omegaScoreMap.keySet()) {
@@ -1159,6 +1206,7 @@ public class DataPathConsistencyAnalyzer {
 		oca.pathMatrixNbRow = pathMatrixNbRow;
 		oca.pathMatrixNodeList = pathMatrixNodeList;
 		oca.omegaScoreList = omegaScores;
+		oca.report = optCutSetReport;
 		
 		// initialization of the list of nodes ordered by score
 		oca.initOrderedNodesList();
@@ -1177,12 +1225,12 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			this.optCutSetReport.append("Search option: full search (Berge's algorithm)\n");
+			this.optCutSetReport.append("Search option: full search (Berge's algorithm)"+newline);
 			
 			oca.mainBerge(true);
 			
 			if (this.useMaxSetSize == true) {
-				this.optCutSetReport.append("Selecting hit sets having a size <= "+this.maxSetSize+"\n");
+				this.optCutSetReport.append("Selecting hit sets having a size <= "+this.maxSetSize+newline);
 				/*
 				 * take into account exception nodes for the max set size cutoff
 				 */
@@ -1196,7 +1244,7 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: partial enumeration\n");
+			this.optCutSetReport.append("Search option: partial enumeration"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
@@ -1214,7 +1262,7 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Seed based enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: seed based enumeration\n");
+			this.optCutSetReport.append("Search option: seed based enumeration"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
@@ -1229,7 +1277,7 @@ public class DataPathConsistencyAnalyzer {
 			oca.searchHitSetSeed();
 		}
 		
-		this.optCutSetReport.append("\n");
+		this.optCutSetReport.append(newline);
 		
 		ArrayList<HashSet<String>> hitSet = oca.formatHitSetSB();
 		
@@ -1238,20 +1286,24 @@ public class DataPathConsistencyAnalyzer {
 		
 		for (HashSet<String> set : hitSet) {
 			double score = 0.0;
+			double targetScore = 0.0;
+			double sideEffectScore = 0.0;
 			for (String nodeID : set) {
 				score += omegaScoreMap.get(nodeID);
+				targetScore += this.omegaTargetScoreMap.get(nodeID);
+				sideEffectScore += this.omegaSideEffectScoreMap.get(nodeID);
 			}
-			optCutSetList.add(new optCutSetData(set, score));
+			//optCutSetList.add(new optCutSetData(set, score));
+			optCutSetList.add(new optCutSetData(set, score, targetScore, sideEffectScore));
 		}
 		
 		Collections.sort(optCutSetList);
 
-		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal cut sets.\n\n");
+		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal cut sets."+newline+newline);
 		
-		this.optCutSetReport.append("Cut set\tSize\tScore\n\n");
+		this.optCutSetReport.append("Cut set\tSize\tScore\tTarget-Score\tSide-Effect-Score"+newline+newline);
 		DecimalFormat df = new DecimalFormat("#.###");
 		for (optCutSetData d : optCutSetList) {
-			//this.optCutSetReport.append(d.optCutSet.toString()+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\n");
 			String str = "[";
 			for (String id : d.optCutSet)
 				if (nodeID2attribute == null)
@@ -1260,7 +1312,7 @@ public class DataPathConsistencyAnalyzer {
 					str += id + "(" + nodeID2attribute.get(id) + ")" + " , ";
 			str = str.substring(0, str.length()-3);
 			str += "]";
-			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\n");
+			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\t"+df.format(d.targetScore)+"\t"+df.format(d.sideEffectScore)+newline);
 		}
 	
 	}
@@ -1284,7 +1336,11 @@ public class DataPathConsistencyAnalyzer {
 				str += "\t";
 				str += d.optCutSetSize + "\t";
 				str += d.score;
-				out.write(str+"\n");
+				str += "\t";
+				str += d.targetScore;
+				str += "\t";
+				str += d.sideEffectScore;
+				out.write(str+newline);
 			}
 			out.close();
 		}

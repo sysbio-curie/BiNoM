@@ -624,17 +624,26 @@ RB-E2F network and G1/S network extracted from Reactome.}
 \end{figure}
 
 
-\subsection*{Application of PIQuant on RB influence network, data from Stransky.}
-%
-% PIQuant analysis here (GS)
-%
-As described above, PIQuant algorithm confront data to an influnce network. Here, we apply PIQuant algorithm to an influence version of the network above, exctracted by BIOCHAM(ref). The data are extracted from transcriptome data of bladder cancer tissu (compared to normal tissu ref). More precisely, for each gene, the t-statistics is computed (between cancer and normal tissu). These data are considered as nodes annotation and are implemented in the cytoscape session of the influence network. Figure~\ref{InflAnnotNet} represent this influence network with the annotation.  
+\subsection*{Application of PIQuant on an influence network.}
+As described above, the PIQuant algorithm can be used to perform a quantitative
+analysis on an influence network. We applied PIQuant to the influence network of
+the cell cycle G1/S transition that was constructed as described in the
+previous paragraph. We used expression data from a study of 57 bladder cancer
+tissue samples compared to normal samples \cite{stransky2006regional}. More
+precisely, for each gene, the differential expression between tumior and normal
+is assesed by a t-test. These data are considered as nodes annotation and are
+implemented in the cytoscape session of the influence network.
+Figure~\ref{InflAnnotNet} represent this influence network with the annotation.
+ 
 
 \begin{figure}[h]
   \caption{\label{InflAnnotNet} \textbf{Annoted influence network.}
-    Influence network opbtained from BIOCHAM. Color represent differential expression obtained from transcrpotme data (red for positive, green for negative). The three grey nodes act on the three cell cycle checkpoints, G1, S, M.}
+    Influence network of the cell cycle G1/S transition. Color represent differential
+expression obtained from transcriptome data (red for positive, green for
+negative). The three grey nodes act on the three cell cycle checkpoints, G1, S,
+M.}
   \center{\includegraphics[width=0.7\textwidth]{figures/Cell_cycle_Expr.pdf}}
-\end{figure}[h]
+\end{figure}
 
 Application of PIQuant to this network and its annotation produces the Figure~\ref{PIQuantHeatMap}.
 
@@ -642,7 +651,7 @@ Application of PIQuant to this network and its annotation produces the Figure~\r
   \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of PIQuant.}
     Results of PIQuant algorithm applied to the influence network. Color intensities a proportional to PIQuant score (red positive, green negative).}
   \center{\includegraphics[width=0.7\textwidth]{figures/heatmapPathInfluence.pdf}}
-\end{figure}[h]
+\end{figure}
 
 
 

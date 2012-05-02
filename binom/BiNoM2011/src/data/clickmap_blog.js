@@ -22,52 +22,70 @@
 var maps;
 
 //http://www.clientcide.com/best-practices/dbug-a-consolelog-firebug-wrapper/
-dbug = {
-		firebug: false, debug: false, log: function(msg) {},
-		enable: function() { if(this.firebug) this.debug = true; dbug.log = console.debug; dbug.log('enabling dbug');	},
-		disable: function(){ if(this.firebug) this.debug = false; dbug.log = function(){}; }
-}
-if (typeof console != "undefined") { // safari, firebug
-	if (typeof console.debug != "undefined") { // firebug
-		dbug.firebug = true; if(window.location.href.indexOf("debug=true")>0) dbug.enable();
-	}
-}
+//dbug = {
+//		firebug: false, debug: false, log: function(msg) {},
+//		enable: function() { if(this.firebug) this.debug = true; dbug.log = console.debug; dbug.log('enabling dbug');	},
+//		disable: function(){ if(this.firebug) this.debug = false; dbug.log = function(){}; }
+//}
+//if (typeof console != "undefined") { // safari, firebug
+//	if (typeof console.debug != "undefined") { // firebug
+//		dbug.firebug = true; if(window.location.href.indexOf("debug=true")>0) dbug.enable();
+//	}
+//}
 
+// http://www.contentwithstyle.co.uk/content/make-sure-that-firebug-console-debug-doesnt-break-everything/index.html
+var dbug = new function() {
+	  this.log = function(str) {
+	    try {
+	      console.log(str);
+	    } catch(e) {
+	      // do nothing
+	    }
+	  };
+	};
+	
+if(!window.console) {
+	  window.console = new function() {
+	    this.log = function(str) {};
+	    this.dir = function(str) {};
+	  };
+	}
 
 function show_map_and_markers(map_name, ids)
 {
 	if (!maps)
 	{
 		maps = Object();
+		maps[""] = window;
 	}
 	
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
-		dbug.log("open2", map_name, map, maps);
+		console.log("open2", map_name, map, maps);
 		
 		map = maps[map_name];
 		
 		if (!map.to_open)
 		{
-			dbug.log("open missing");
+			console.log("open missing");
 			map.to_open = ids;
 		}
 		else if (map.to_open.length < 1)
 		{
-			dbug.log("open show_markers", maps);
+			console.log("open show_markers", map);
 			map.show_markers(ids);
 		}
 		else
 		{
-			dbug.log("open concat", map.to_open, ids, maps);
+			console.log("open concat", map.to_open, ids, map);
 			map.to_open.concat(ids);
 		}
 		map.focus();
 	}
 	else
 	{
-		dbug.log("not open", map_name, maps);
+		console.log("not open", map_name, maps);
 		map = window.open("/maps/" + blog_name + "/" + map_name);
 		map.to_open = ids;
 		map.maps = maps;
@@ -80,10 +98,10 @@ $(document).ready(
 	{
 		var f = function () {
 			var map = $(this).find("span.map").attr("title");
-			dbug.log("map", map);
+			console.log("map", map);
 			var ids = [];
 			$(this).find("span.entity").each(function() { ids.push($(this).attr("title")); });
-			dbug.log("ids", ids);
+			console.log("ids", ids);
 			show_map_and_markers(map, ids);
 			return false;
 		};

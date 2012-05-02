@@ -17,7 +17,7 @@
   *    $Id$
   */
 
-var filter = ".modification";
+var filter = ".navicell";
 
 var jtree;
 var map;
@@ -27,16 +27,14 @@ var to_open;
 var maps;
 var blog_name;
 
-// http://www.clientcide.com/best-practices/dbug-a-consolelog-firebug-wrapper/
-dbug = {
-		firebug: false, debug: false, log: function(msg) {},
-		enable: function() { if(this.firebug) this.debug = true; dbug.log = console.debug; dbug.log('enabling dbug');	},
-		disable: function(){ if(this.firebug) this.debug = false; dbug.log = function(){}; }
-}
-if (typeof console != "undefined") { // safari, firebug
-	if (typeof console.debug != "undefined") { // firebug
-		dbug.firebug = true; if(window.location.href.indexOf("debug=true")>0) dbug.enable();
-	}
+// http://www.contentwithstyle.co.uk/content/make-sure-that-firebug-console-debug-doesnt-break-everything/index.html
+if(!window.console)
+{
+	window.console = new function()
+	{
+		this.log = function(str) {};
+		this.dir = function(str) {};
+	};
 }
 
 function extend(bounds, marker)
@@ -58,35 +56,44 @@ function extend(bounds, marker)
 function show_markers_ref(markers, ref)
 {
 	var bounds = new google.maps.LatLngBounds();
-	markers.forEach
+	$.each
 	(
-		function(i)
+		markers,
+		function (key, id)
 		{
-			var element = $("li#" + i).filter(".posttranslational")[0];
-			get_markers_for_modification(element, projection, map);
-//			dbug.log(element.attr("id"), markers.length);
-			element.markers.forEach
+			var elements = $("li#" + id + filter);
+//			alert("found " + elements.length + " for " + id);
+			elements.each
 			(
-				function(i)
+				function ()
 				{
-					i.setVisible(false);
-					extend(bounds, i);
-				}
-			);
-			element.markers.forEach
-			(
-				function(i)
-				{
-					i.setVisible(true);
-					i.setAnimation(google.maps.Animation.DROP);
-				}
-			);
-			ref.check_node(element);
-			element.peers.each
-			(
-				function(i)
-				{
+//					alert("show_markers_ref lookup " + this + " for " + id);
+					get_markers_for_modification(this, projection, map);
+		//			console.log(element.attr("id"), markers.length);
+					this.markers.forEach
+					(
+						function(i)
+						{
+							i.setVisible(false);
+							extend(bounds, i);
+						}
+					);
+					this.markers.forEach
+					(
+						function(i)
+						{
+							i.setVisible(true);
+							i.setAnimation(google.maps.Animation.DROP);
+						}
+					);
 					ref.check_node(this);
+					this.peers.each
+					(
+						function(i)
+						{
+							ref.check_node(this);
+						}
+					);
 				}
 			);
 		}
@@ -145,7 +152,7 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 		mapTypeId : id
 	});
 	
-//	dbug.log(width + " " +  height);
+//	console.log(width + " " +  height);
 	
 	var map_type = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
@@ -157,7 +164,7 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 				return null;
 			
 			var r = coord.x + "_" + coord.y;
-//			dbug.log(coord, zoom, x, y, ntiles, r);
+//			console.log(coord, zoom, x, y, ntiles, r);
 			return "tiles/" + zoom + "/" + r + ".png";
 		},
 		tileSize : new google.maps.Size(tile_width, tile_height),
@@ -180,56 +187,75 @@ function get_markers_for_modification(element, projection, map)
 {
 	if (element.markers == null)
 	{
-		var id = $(element).attr("id");
 		var position = $(element).attr("position");
 		if (position == null)
 		{
-			var element2 = $("li#" + id).filter(".posttranslational")[0];
-			get_markers_for_modification(element2, projection, map);
-	//		dbug.log("position is null", $(element).attr("id"), element.peers.length);
+//			var element2 = $("li#" + id).filter(".posttranslational")[0];
+//			if (element2 == null)
+//				alert("element2 " + element2);
+//			else
+//				get_markers_for_modification(element2, projection, map);
+	//		console.log("position is null", $(element).attr("id"), element.peers.length);
+			// var selector = "li." + id;
+			//var selector = "#" + id;
+//			var nid = $(element).attr("nid");
+			var cls = $(element).attr("class");
+			var nid = /\bs\d+\b/.exec(cls);
+			var selector = "li#" + nid;
+			var idl = $(selector);
+//			alert("get_markers_for_modification here " + selector + " " + idl.length + " " + cls);
+			posttranslational.each
+			(
+				function ()
+				{
+					get_markers_for_modification(this, projection, map);
+				}
+			);
+//			alert("get_markers_for_modification here " + posttranslational + " " + element.peers);
 		}
 		else
 		{
+			var id = $(element).attr("id");
+//			alert("get_markers_for_modification create " + id);
 			element.markers = Array();
-			position.split(" ").forEach
-			(
-				function(item)
-				{
-					var xy = item.split(";");
-					var p = new google.maps.Point(xy[0], xy[1]);
-					var name = jtree.jstree("get_text", element, "en");
-					var marker = new google.maps.Marker
-					(
-							{
-								position: projection.fromPointToLatLng(p),
-								map: map,
-								title: name + " (" + id + ")",
-								visible: false
-							}
-					);
-					google.maps.event.addListener
-					(
-						marker, 'click', function()
+			var positions = position.split(" ");
+			for (var index = 0; index < positions.length; index++)
+			{
+				var item = positions[index];
+				var xy = item.split(";");
+				var p = new google.maps.Point(xy[0], xy[1]);
+				var name = jtree.jstree("get_text", element, "en");
+				var marker = new google.maps.Marker
+				(
 						{
-							if (element.bubble == null)
-							{
-		//						var ln = data.inst.get_text(element, 'ln');
-								var ln = jtree.jstree("get_text", element, "ln");
-								element.bubble = new google.maps.InfoWindow
-								(
-									{
-										content: ln,
-										maxWidth: 350
-									}
-								);
-							}
-							element.bubble.open(map, marker);
+							position: projection.fromPointToLatLng(p),
+							map: map,
+							title: name + " (" + id + ")",
+							visible: false
 						}
-					);
-					element.markers.push(marker);
-				}
-			);
-			element.peers = $("li#" + id).filter(".associated");
+				);
+				google.maps.event.addListener
+				(
+					marker, 'click', function()
+					{
+						if (element.bubble == null)
+						{
+	//						var ln = data.inst.get_text(element, 'ln');
+							var ln = jtree.jstree("get_text", element, "ln");
+							element.bubble = new google.maps.InfoWindow
+							(
+								{
+									content: ln,
+									maxWidth: 350
+								}
+							);
+						}
+						element.bubble.open(map, marker);
+					}
+				);
+				element.markers.push(marker);
+			};
+			element.peers = $("li." + id);
 			element.peers.each
 			(
 				function()
@@ -239,7 +265,7 @@ function get_markers_for_modification(element, projection, map)
 					this.markers = element.markers;
 				}
 			);
-//			dbug.log($(element).attr("id"), "created", element.markers.length);
+//			console.log($(element).attr("id"), "created", element.markers.length);
 		}
 	}
 	return element.markers;
@@ -270,11 +296,11 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 
 function start_right_hand_panel(selector, source, map, projection, whenloaded)
 {
-	dbug.log("search setup");
+	console.log("search setup");
 //	$("#search").click(function () {
 //		var t = $("#query_text").val();
 //
-//		dbug.log("about to search", selector);
+//		console.log("about to search", selector);
 //		$(selector).jstree("search", t);
 //	});
 	
@@ -334,7 +360,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 		}).bind("uncheck_node.jstree", function(event, data) {
 			var f = function(index, element)
 			{
-				element.markers.forEach(function(i) { i.setVisible(false); });
+				$.each(element.markers, function(key, i) { i.setVisible(false); });
 				element.peers.each
 				(
 					function()
@@ -343,7 +369,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 					}
 				);
 			};
-			$(this).jstree("get_unchecked",data.args[0],true).filter(filter).each(f);
+			$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
 			$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 		}).bind
 		(
@@ -355,9 +381,8 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				{
 					get_markers_for_modification(element, projection, map);
 					
-					element.markers.forEach
-					(
-						function(i)
+					$.each(element.markers,
+						function(key, i)
 						{
 							if (!i.getVisible())
 							{
@@ -369,7 +394,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 					);
 					element.peers.each
 					(
-						function(i)
+						function ()
 						{
 							jQuery.jstree._reference(jtree).check_node(this);
 						}
@@ -378,6 +403,8 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+//				jtree.jstree("get_checked", data.args[0], true).each(f);
+//				$(data.args[0].parentNode.parentNode).each(f);
 				if (!bounds.isEmpty())
 					map.panToBounds(bounds);
 			}
@@ -388,7 +415,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
-	dbug.log("clickmap_start", to_open);
+	console.log("clickmap_start", to_open);
 	if (!maps)
 	{
 		maps = Object();
@@ -399,7 +426,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
 	{
-		dbug.log("when ready", to_open);
+		console.log("when ready", to_open);
 		if (to_open && to_open.length > 0)
 		{
 			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
@@ -413,17 +440,22 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 				data.inst.close_all(children[i], false);
 		}
 		to_open = [];
-		dbug.log("to_open set", to_open, to_open.length);
+		console.log("to_open set", to_open, to_open.length);
 	};
 	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
 	var tell_opener = function()
 	{
 		var blog = maps[""];
 		if (blog && !blog.closed)
+		{
+			console.log("tell_opener yes", blog, maps);
 			blog.maps = maps;
+		}
+		else
+			console.log("tell_opener no", maps);
 	};
 	tell_opener();
-	setInterval(tell_opener, 100);
+	setInterval(tell_opener, 1000);
 }
 
 function show_blog(postid)
@@ -435,7 +467,7 @@ function show_blog(postid)
 
 function show_map_and_markers(map_name, ids)
 {
-	dbug.log("foo");
+	console.log("show_map_and_markers", map_name, ids);
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
@@ -449,7 +481,7 @@ function show_map_and_markers(map_name, ids)
 	}
 	else
 	{
-		dbug.log("not open is map", map, maps);
+		console.log("not open is map", map, maps);
 		map = window.open("../" + map_name);
 		map.to_open = ids;
 		map.maps = maps;

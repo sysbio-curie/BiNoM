@@ -46,25 +46,41 @@ The “Import CellDesigner Document from file” function imports a model from C
 \label{Cytoscape_view_of_yeast_cell_division}
 \end{figure}
 \\Figure~\ref{CellDesigner_view_of_yeast_cell_division}~and~\ref{Cytoscape_view_of_yeast_cell_division} show the same model viewed by CellDesigner and Cytoscape respectively. The layout information from CellDesigner is imported automatically into Cytoscape.\\\\
-In specie notes in CellDesigner “Attribute name:Value” as HUGO:E2F1 (without blank) is converted in Cytoscape as the attribute HUGO with the value E2F1 for the specie.\\\\
-\textbf{Plugins$\Rightarrow$BiNoM I/O$\Rightarrow$Import CellDesigner Document from URL}\\
-A CellDesigner document can also be imported directly from a URL. The web address must be typed in the dialog window.
+In species notes in CellDesigner “Attribute name:Value” as HUGO:E2F1 (without blank) is converted in Cytoscape as the attribute HUGO with the value E2F1 for the specie.\\\\
 
 \subsection{Import CSML document}
+
 \textbf{Plugins$\Rightarrow$BiNoM I/O$\Rightarrow$Import CSML document}\\
 BiNoM imports a CSML (Cell System Markup Language, csml.org)
 
 \subsection{Import influence network from AIN file} \label{Import_AIN_file}
-The precise format of the influence file (AIN) is described in the appendices (section~\ref{AIN_file_format}). It is an annotated list of links between genes, in a simple ASCII format.\\\\
+
 \textbf{Plugins$\Rightarrow$BiNoM I/O$\Rightarrow$Import AIN file}\\
-The AIN file of the apoptosis model ExamplApop.txt is imported. First, the user is asked to manage the families (groups of genes or proteins, see the appendices for a precise description): they can be expanded (replacing the family by all its members) or collapsed (replacing all family members by the name of the family). See figure~\ref{AIN_dialog_for_families_management}.\\\\
+
+This option proposes to automatically import an influence network in Cytoscape
+from a simple tab-delimited text file. We call the format of the
+text file AIN (Annotated Influence Network). Basically each row of the text file is encoding an
+interaction between two species, with a few optional descriptive fields. The precise
+format for each field is described in the appendices (section~\ref{AIN_file_format}). 
+
+The AIN file of the apoptosis model ExamplApop.txt is imported. First, the user
+is asked to manage the families (groups of genes or proteins, see the appendices
+for a precise description): they can be expanded (replacing the family by all
+its members) or collapsed (replacing all family members by the name of the
+family). See figure~\ref{AIN_dialog_for_families_management}.\\\\
+
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/AIN_dialog_for_families_management}
-\caption{Dialog window for families management when importing apoptosis influence file. BiNoM recognizes AIN format for families and proposes to either collapse or expand them.}
+\caption{Dialog window for families management when importing apoptosis influence file. BiNoM automatically detects gene families and proposes to either collapse or expand them.}
 \label{AIN_dialog_for_families_management}
 \end{figure}
-Then a dialog window proposes to add constitutive reactions: influences that link proteins (or families) to their complexes and proteins (or families) to their phosphorylated state. See figure~\ref{AIN_dialog_for_constitutive_reactions}.\\\\
+
+Then a dialog window proposes to add constitutive reactions: influences that
+link proteins (or families) to their complexes and proteins (or families) to
+their phosphorylated state. See
+figure~\ref{AIN_dialog_for_constitutive_reactions}.\\\\
+
 \begin{figure}
 \centering
 \includegraphics[width=0.5\textwidth]{graphics/AIN_dialog_for_constitutive_reactions}
@@ -86,7 +102,7 @@ The Cytoscape networks can be exported in BioPAX and CellDesigner by:
 \end{itemize}
 More precisely, BiNoM is able to convert CellDesigner to BioPAX, and BioPAX reaction network interface to pure SBML. BiNoM is also able to export only a part of CellDesigner and BioPAX file, visible in the current Cytoscape network (interface). During the export operation, BiNoM is also able to merge a part of associated BioPAX file with already saved another part. BiNoM can modify the content of a BioPAX file. \\\\
 \includegraphics[width=12pt,height=12pt]{graphics/warning} BiNoM is NOT able to create CellDesigner file with all graphical notations from BioPAX or from scratch, and it is not able to modify the content of a CellDesigner file.\\\\
-Here are the typical scenarios when BiNoM export operations can help.
+Here are the typical scenarios where BiNoM export operations can be useful.
 \begin{enumerate}
 \item User imports a big BioPAX file as reaction network and using Cytoscape creates a new subnetwork from the global reaction graph. After he can export this subnetwork into a separate self-containing BioPAX file.
 \item User imports the pathway structure of a big BioPAX file and selects only a few pathway or pathwayStep nodes he is interested in. After he can export a part of the BioPAX file necessary to define these pathways.

@@ -1,41 +1,75 @@
 \documentclass[11pt]{article} 
 \usepackage{geometry}
 \geometry{a4paper}
-\geometry{margin=0.5in}
+%\geometry{margin=0.5in}
 \usepackage{graphicx}
 \begin{document}
 \title{\huge{BiNoM: Biological Network Manager \\ Version 2.0 Manual}}
 \maketitle
 \tableofcontents
 \newpage
+
 \section{Introduction}
-BiNoM (BIological NetwOrk Manager) is a Cytoscape plugin, developed to facilitate the manipulation of biological networks represented in standard systems biology formats and to carry out studies on the network structure. BiNoM provides the user with a complete interface for the analysis of biological networks in Cytoscape environment.\\\\
-In an effort to exchange and curate pathway database knowledge, several standard formats have been developed (SBML, BioPAX \cite{stromback2005representation} and others). Many softwares, which are centered on the description and representation of biological pathways, adopted these standards. CellDesigner\cite{kitano2005using} and Cytoscape\cite{shannon2003cytoscape}, for instance, allow the visualization and manipulation of networks but meet some limitations. BiNoM was designed to facilitate the use of systems biology standards, the extraction and organization of information from pathway databases through BioPAX interface.\\\\
-BiNoM concentrates on the following aspects: the import and export of BioPAX and (CellDesigner) SBML files and the conversion between them; the structural analysis of biological networks including decomposition of networks into modules, path analysis, etc.; the BioPAX query engine which provides the extraction of information from huge BioPAX files such as whole pathway databases; and various operations on graphs not offered by Cytoscape such as clipboard operations and comparison of networks.\\
-This manual describes only the functions of plugin-in BiNoM. Cytoscape proposes some functions close to those of BiNoM (import, export, set operations ...) which are explained in Cytoscape manual (http://www.cytoscape.org).
-\\\\
-BiNoM plugin with documentation, API and source code is available for download at: http://bioinfo.curie.fr/projects/binom/.\\\\
+BiNoM (BIological NetwOrk Manager) is a Cytoscape plugin, developed to
+facilitate the manipulation of biological networks represented in standard
+systems biology formats and to carry out studies on the network structure. BiNoM
+provides the user with a complete interface for the analysis of biological
+networks in Cytoscape environment.\\
+
+In an effort to exchange and curate pathway database knowledge, several standard
+formats have been developed (SBML, BioPAX \cite{stromback2005representation} and
+others). Many softwares, which are centered on the description and
+representation of biological pathways, adopted these standards.
+CellDesigner\cite{kitano2005using} and Cytoscape\cite{shannon2003cytoscape}, for
+instance, allow the visualization and manipulation of networks but meet some
+limitations. BiNoM was designed to facilitate the use of systems biology
+standards, the extraction and organization of information from pathway databases
+through BioPAX interface.\\
+
+BiNoM concentrates on the following aspects: the import and export of BioPAX and
+(CellDesigner) SBML files and the conversion between them; the structural
+analysis of biological networks including decomposition of networks into
+modules, path analysis, etc.; the BioPAX query engine which provides the
+extraction of information from huge BioPAX files such as whole pathway
+databases; and various operations on graphs not offered by Cytoscape such as
+clipboard operations and comparison of networks.\\
+
+This manual describes only the functions of plugin-in BiNoM. Cytoscape proposes
+some functions close to those of BiNoM (import, export, set operations ...)
+which are explained in Cytoscape manual (http://www.cytoscape.org).\\
+
+BiNoM plugin with documentation, API and source code is available for download
+at: http://bioinfo.curie.fr/projects/binom/.\\
+
 \section{BiNoM I/O}
 \input{input/BiNoM_I_O}
 \clearpage
+
 \section{BiNoM Analysis}
 \input{input/BiNoM_Analysis}
 \clearpage
+
 \section{BiNoM Module Manager}
 \input{input/BiNoM_Module_Manager}
 \clearpage
+
 \section{BiNoM BioPAX3 Utils}
 \input{input/BiNoM_BioPAX3_Utils}
 \clearpage
+
 \section{BiNoM BioPAX3 Query}
 \input{input/BiNoM_BioPAX3_Query}
 \clearpage
+
 \section{BiNoM Utilities}
 \input{input/BiNoM_Utilities}
 \clearpage
+
 \section{Appendices}
 \input{input/BiNoM_Appendices}
+
 \clearpage
- \bibliographystyle{plain}
- \bibliography{BiNoM_Manual}
+\bibliographystyle{plain}
+\bibliography{BiNoM_Manual_v2}
+
 \end{document}

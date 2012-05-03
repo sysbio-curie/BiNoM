@@ -1,7 +1,7 @@
 We illustrate, here, the different functions of BiNoM related to the structural analysis, using the modified version of the Novak et al. model, M-Phase.xml as an example (figure~\ref{Cytoscape_view_of_the_M-Phase_network}).
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Cytoscape_view_of_the_M-Phase_network.png}
+\includegraphics[width=0.8\textwidth]{graphics/Cytoscape_view_of_the_M-Phase_network.png}
 \caption{Cytoscape view of the M-Phase network}
 \label{Cytoscape_view_of_the_M-Phase_network}
 \end{figure}
@@ -14,7 +14,7 @@ This command dissociates the unconnected subparts of the network. In our case, s
 Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Get strongly connected components\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Strongly_Connected_Component_of_M-Phase_network.png}
+\includegraphics[width=0.8\textwidth]{graphics/Strongly_Connected_Component_of_M-Phase_network.png}
 \caption{Strongly Connected Component of M-Phase network}
 \label{Strongly_Connected_Component_of M-Phase_network}
 \end{figure}
@@ -27,7 +27,7 @@ Pruning the graph is equivalent to separating the network into three parts(figur
 The Prune graph operation decomposes the current network into three parts: IN, OUT and SCC (the later can contain several strongly connected components).
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Prune_the_graph}
+\includegraphics[width=0.8\textwidth]{graphics/Prune_the_graph}
 \caption{Prune the graph. (a) Incoming flux: molecules involved in the IN part of the network, and (b) Outgoing flux: molecules involved in the OUT part of the network.}
 \label{Prune_the_graph}
 \end{figure}
@@ -37,7 +37,7 @@ The Prune graph operation decomposes the current network into three parts: IN, O
 This function uses node name semantics to isolate sub-networks in which each protein takes part. In our example(figure~\ref{Material_Components}), seven sub-networks are created: M-Phase.xml\_Cdc13, M-Phase.xml\_Cdc2, M-Phase.xml\_Rum1, M-Phase.xml\_APC, M-Phase.xml\_Slp1, M-Phase.xml\_Cdc25 and M-Phase.xml\_Wee1. Some major overlaps between sub-networks are expected, as it is the case for Cdc2 and Cdc13 which form a complex.\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Material_Components}
+\includegraphics[width=0.8\textwidth]{graphics/Material_Components}
 \caption{Material Components}
 \label{Material_Components}
 \end{figure}
@@ -48,7 +48,7 @@ This command decomposes the network into relevant directed cycles\cite{gleiss200
 \includegraphics[width=12pt,height=12pt]{graphics/warning} This operation can produce enormous number of cycles! Therefore it is rather suitable for analysis of small to moderate size networks. For a big network, one can start to understand the cyclic network structure by eliminating first the network hubs, which are contained in many network cycles. After that, the local, relatively short, cycles can be represented as meta-nodes (modules) and the analysis for cycles can be repeated.\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Minimal_cycle_decomposition_of_the_M-Phase}
+\includegraphics[width=0.8\textwidth]{graphics/Minimal_cycle_decomposition_of_the_M-Phase}
 \caption{Minimal cycle decomposition of the M-Phase network.  Cycle 1 includes CDC2 and CDC13 proteins, Cycle 2 CDC25 and Cycle 3 shows the feedback existing between CDC13/CDC2 and CDC25.}
 \label{Minimal_cycle_decomposition_of_the M-Phase}
 \end{figure}
@@ -59,13 +59,13 @@ In a network, it can become handy to find out if there exists a path (or paths) 
 \includegraphics[width=12pt,height=12pt]{graphics/warning} In big networks the number of paths can be exponential! It is recommended to find the shortest path first, take its length and increment gradually the breadth search radius starting from this value to find the second shortest, third shortest, etc., paths.\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Path_Analysis_Pop-up_window}
+\includegraphics[width=0.8\textwidth]{graphics/Path_Analysis_Pop-up_window}
 \caption{BiNoM Path Analysis: Pop-up window in which the source(s) and the target(s) need to be specified along with the type of paths (shortest, optimal shortest or all paths).}
 \label{Path_Analysis_Pop-up_window}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Path_Analysis_All_the_paths}
+\includegraphics[width=0.8\textwidth]{graphics/Path_Analysis_All_the_paths}
 \caption{Path Analysis: All the paths leading from one molecular species (Cdc13) to another (Cdc13\_ubi, ubiquitinated form of Cdc13) are highlighted in yellow.}
 \label{Path_Analysis_All_the_paths}
 \end{figure}
@@ -75,7 +75,7 @@ In a network, it can become handy to find out if there exists a path (or paths) 
 Extract a subnetwork from selected nodes of a network with various options (figure~\ref{Extract_subnetwork_dialog}).
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Extract_subnetwork_dialog}
+\includegraphics[width=0.8\textwidth]{graphics/Extract_subnetwork_dialog}
 \caption{Dialog of extract subnetwork showing options.}
 \label{Extract_subnetwork_dialog}
 \end{figure}
@@ -91,31 +91,31 @@ Given the initial diagram and some modules (which could be sub-networks of the i
 The sub-networks or modules need to be specified in the “creating modular view” window (figure~\ref{Modular_view_Pop-up_window}).\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Modular_view_Pop-up_window}
+\includegraphics[width=0.8\textwidth]{graphics/Modular_view_Pop-up_window}
 \caption{BiNoM modular view of the newtork: Pop-up window in which the initial graph and the modules are specified. }
 \label{Modular_view_Pop-up_window}
 \end{figure}
 \\There are different types of modular views. The modules are connected by: (1) the number of shared interactions (figure~\ref{Modular_view_The_resulting_modular_network}, upper panel); (2) the number of shared nodes (reactions + species) for which case the box “Compact module intersection” must be checked (figure~\ref{Modular_view_The_resulting_modular_network}, middle panel); and (3) the shared nodes and reactions showed explicitly (figure~\ref{Modular_view_The_resulting_modular_network}, lower panel).
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Modular_view_The_resulting_modular_network}
+\includegraphics[width=0.8\textwidth]{graphics/Modular_view_The_resulting_modular_network}
 \caption{BiNoM modular view of the newtork: The resulting modular network (upper panel) with compact module intersections (middle panel) and with explicit intersections (lower panel).}
 \label{Modular_view_The_resulting_modular_network}
 \end{figure}
 
 \subsection{Cluster Networks}
 \textbf{Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Cluster networks}\\
-This command lumps together the modules that share a certain proportion of nodes. At a first glance, it can easily be concluded from Figure~\ref{BiNoM_modular_view_The_resulting_modular_network} (middle panel) that, for example, the modules M-Phase.xml\_Cdc13 and M-Phase.xml\_Cdc2 share a lot of proteins or protein complexes. Therefore, we can assume that these two modules will collapse into one big module. To determine the clusters, the intersection threshold can be set (from 0 to 100\% intersecting components). For a 30\% intersection threshold, Figure~\ref{Clusters_of_modules_using_the_material_decomposition} is obtained. Four clusters of modules were proposed and linked.\\\\
+This command lumps together the modules that share a certain proportion of nodes. At a first glance, it can easily be concluded from Figure~\ref{Modular_view_The_resulting_modular_network} (middle panel) that, for example, the modules M-Phase.xml\_Cdc13 and M-Phase.xml\_Cdc2 share a lot of proteins or protein complexes. Therefore, we can assume that these two modules will collapse into one big module. To determine the clusters, the intersection threshold can be set (from 0 to 100\% intersecting components). For a 30\% intersection threshold, Figure~\ref{Clusters_of_modules_using_the_material_decomposition} is obtained. Four clusters of modules were proposed and linked.\\\\
 An alternative modular view has been obtained using the cycle decomposition instead of the material decomposition. The cycles are presented in Figure~\ref{Minimal_cycle_decomposition_of_the M-Phase}. They are obtained by clustering the three cycles into two (cycle 1 + cycle2/cycle3) and organized into a modular view (Figure~\ref{Clusters_of_modules_using_the_cycle_decomposition}).\\
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Clusters_of_modules_using_the_material_decomposition}
+\includegraphics[width=0.8\textwidth]{graphics/Clusters_of_modules_using_the_material_decomposition}
 \caption{Clusters of modules. The obtained diagram is a compact modular view of the M-Phase network using the material decomposition and material components clustering}
 \label{Clusters_of_modules_using_the_material_decomposition}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Clusters_of_modules_using_the_cycle_decomposition}
+\includegraphics[width=0.8\textwidth]{graphics/Clusters_of_modules_using_the_cycle_decomposition}
 \caption{Clusters of modules. The obtained diagram is a compact modular view of the M-Phase network using the relevant cycle decomposition and cycle clustering}
 \label{Clusters_of_modules_using_the_cycle_decomposition}
 \end{figure}
@@ -125,7 +125,7 @@ An alternative modular view has been obtained using the cycle decomposition inst
 This command transforms monomolecular (with one reactant and one product) reaction nodes into ‘influence’ edges. Thus, monomolecular (linear) reactions are represented as edges and the reaction graph is not bi-partite anymore. When the reaction nodes have the type of influence specified (through the ‘EFFECT’ attribute), the graph is transformed automatically into an influence graph (see Figure~\ref{Network_to_influence_graph}: upper panel: BioPAX network, lower panel, the equivalent influence network). Non-linear non-monomolecular reactions (such as complex assemblies) are not transformed and remain to be represented as network nodes.
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Network_to_influence_graph}
+\includegraphics[width=0.8\textwidth]{graphics/Network_to_influence_graph}
 \caption{From a BioPAX network (upper panel) to an influence graph (lower panel).}
 \label{Network_to_influence_graph}
 \end{figure}
@@ -136,7 +136,7 @@ Remove reactions and reconnect edges according to a supposed influence (figure~\
 \includegraphics[width=12pt,height=12pt]{graphics/warning} The got network is not an influence network in the biological sense. But, it can be used to build an influence network.
 \begin{figure}
 \centering
-\includegraphics[width=14 cm]{graphics/Linearized_Network_M-Phase}
+\includegraphics[width=0.8\textwidth]{graphics/Linearized_Network_M-Phase}
 \caption{Result of applying "Linearize network" to M-Phase.}
 \label{Linearized_Network_M-Phase}
 \end{figure}
@@ -161,7 +161,7 @@ This function is based on an algorithm of  Path Influence Quantification (PIQuan
 \includegraphics[width=12pt,height=12pt]{graphics/warning} The edge attribute which signs influence is "EFFECT" which can take 2 values EFFECT:activation and EFFECT:inhibition. An AIN file updates this attribute (section~\ref{Import_AIN_file}) or it can be imported as an edge attribute by Cytoscape.\\\\
 \begin{figure}
 \centering
-\includegraphics[width=17 cm]{graphics/PIQuant_example}
+\includegraphics[width=0.8\textwidth]{graphics/PIQuant_example}
 \caption{Computing influence in a simple example.}
 \label{PIQuant_example}
 \end{figure}
@@ -176,7 +176,7 @@ Step 1 see figure~\ref{Path_consistency_analyser_Dialog1}:
 \end{itemize}
 \begin{figure}
 \centering
-\includegraphics[width=19 cm]{graphics/Path_consistency_analyser_Dialog1}
+\includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog1}
 \caption{Path consistency analysis: dialog of step 1, select attribute, sources, targets and options.}
 \label{Path_consistency_analyser_Dialog1}
 \end{figure}
@@ -189,14 +189,15 @@ Step 2 see figure~\ref{Path_consistency_analyser_Dialog2}:
 \end{itemize}
 \begin{figure}
 \centering
-\includegraphics[width=19 cm]{graphics/Path_consistency_analyser_Dialog2}
+\includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog2}
 \caption{Path consistency analysis: dialog of step 2, display paths and activities, get all results}
 \label{Path_consistency_analyser_Dialog2}
 \end{figure}  
 
 \subsection{OCSANA analysis}
 \textbf{Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$OCSANA analysis}\\
-\includegraphics{graphics/work_in_progress}
+
+Work in progress.
 
 \subsection{Create neighborhood sets file}
 \textbf{Plugins$\Rightarrow$BiNoM analysis$\Rightarrow$Create neighborhood sets file}\\

@@ -5,7 +5,7 @@ The purpose of the functions related to the query language is to work with huge 
 Using this function BiNoM maps the content of BioPAX file onto a labeled graph (referred to as index). It creates an *.xgmml file from an *.owl one (figure~\ref{Generate_BioPAX_Index}). For the definition of BioPAX index, see section~\ref{Standard_BioPAX_Interfaces}.
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Generate_BioPAX_Index}
+\includegraphics[width=0.8\textwidth]{graphics/Generate_BioPAX_Index}
 \caption{Generate BioPAX Index.}
 \label{Generate_BioPAX_Index}
 \end{figure}
@@ -15,7 +15,7 @@ Using this function BiNoM maps the content of BioPAX file onto a labeled graph (
 Once the xgmml is created, it can be loaded into memory. The index is global object, i.e. only one index can be used at a time.Load Index loads the index file from xgmml format (figure~\ref{Load_Index_Dialog}).\\\\
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Load_Index_Dialog}
+\includegraphics[width=0.8\textwidth]{graphics/Load_Index_Dialog}
 \caption{Load Index dialog.}
 \label{Load_Index_Dialog}
 \end{figure}
@@ -32,7 +32,7 @@ Together with the index, you can also upload a tab-delimited “accession number
 This command opens a window indicating the name of the graph, the name of the file, the accession number file, when available, the number of records, and the various statistics of the index: number of publications, proteins, physicalEntities, complexes, biochemical reactions, pathways, pathwaySteps, catalyses, and modulations (necessary proteins for catalyses). See figure~\ref{BioPAX_Index_Info}.
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/BioPAX_Index_Info}
+\includegraphics[width=0.8\textwidth]{graphics/BioPAX_Index_Info}
 \caption{Display Index info.}
 \label{BioPAX_Index_Info}
 \end{figure}
@@ -45,7 +45,7 @@ For our example, we choose the second option. To increase the probability to fin
 The output is chosen to appear in a new network (selection is made at the bottom of the dialog window in figure~\ref{Select_entities_from_index}) but it is also an option to view several genes or proteins in the same network by checking “output in the current network”.\\\\
 \begin{figure}[h]
 \centering
-\includegraphics[width=14 cm]{graphics/Select_entities_from_index}
+\includegraphics[width=0.8\textwidth]{graphics/Select_entities_from_index}
 \caption{Select entities from the index.}
 \label{Select_entities_from_index}
 \end{figure}
@@ -57,7 +57,7 @@ This command proceeds through a series of actions that will extend or make the s
 Let’s start with diverse queries from the network created for the Caspase 8 entity. A dialog window opens as figure~\ref{Standard_Query_Dialog}.\\\\
 \begin{figure}[h]
 \centering
-\includegraphics[width=12 cm]{graphics/Standard_Query_Dialog}
+\includegraphics{graphics/Standard_Query_Dialog}
 \caption{BioPAX Standard Query: dialog window.}
 \label{Standard_Query_Dialog}
 \end{figure}
@@ -74,7 +74,7 @@ Once you decide on which proteins you wish to work, you can:
 \end{itemize}
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_Add_complexes}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_Add_complexes}
 \caption{BioPAX Standard Query: Add complexes with (a) the « no expand” or (b) “expand” option.}
 \label{Standard_Query_Add_complexes}
 \end{figure}
@@ -82,7 +82,7 @@ Once you decide on which proteins you wish to work, you can:
 This function adds, for each species, the cellular location and its specified modifications. It is linked to the protein with a grey edge (see figure~\ref{Standard_Query_Chemical_species}).
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_Chemical_species}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_Chemical_species}
 \caption{Chemical species. Cellular locations of all forms of MCH5.}
 \label{Standard_Query_Chemical_species}
 \end{figure}
@@ -91,21 +91,21 @@ This function adds, for each species, the cellular location and its specified mo
 \item “connecting reactions” connects all present species that have common reactions (connected by a yellow node in figure~\ref{Standard_Query_All_connecting_reactions}).
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_All_connecting_reactions}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_All_connecting_reactions}
 \caption{Adding reactions: example when all connecting reactions.}
 \label{Standard_Query_All_connecting_reactions}
 \end{figure}
 \item “all reactions” includes all the reactions involving the chemical species (figure~\ref{Standard_Query_Adding_all_reactions}).
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_Adding_all_reactions}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_Adding_all_reactions}
 \caption{Adding reactions: example adding all reactions.}
 \label{Standard_Query_Adding_all_reactions}
 \end{figure}
 \item “make reactions complete” adds all the sources and targets of the reactions (figure~\ref{Standard_Query_Making_reactions_complete}) listed in the BioPAX index, including, for example, the pathway nodes and publications links.
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_Making_reactions_complete}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_Making_reactions_complete}
 \caption{Adding reactions: example when making the reactions complete.}
 \label{Standard_Query_Making_reactions_complete}
 \end{figure}
@@ -114,7 +114,7 @@ This function adds, for each species, the cellular location and its specified mo
 When available, this function adds all the references associated with a reaction (see figure~\ref{Standard_Query_Adding_publications}).
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Standard_Query_Adding_publications}
+\includegraphics[width=0.8\textwidth]{graphics/Standard_Query_Adding_publications}
 \caption{Adding publications.}
 \label{Standard_Query_Adding_publications}
 \end{figure}
@@ -138,7 +138,7 @@ produce the following network connecting CASP8 and FAS proteins (it also involve
 }
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/Index_Path_Analysis}
+\includegraphics[width=0.8\textwidth]{graphics/Index_Path_Analysis}
 \caption{Index path Analysis with CASP8 and FAS.}
 \label{Index_Path_Analysis}
 \end{figure}
@@ -148,7 +148,7 @@ produce the following network connecting CASP8 and FAS proteins (it also involve
 In this window (figure~\ref{BioPAXViewQueryLogDialog}), are recapitulated all the queries done during the session.
 \begin{figure}[h]
 \centering
-\includegraphics[width=18 cm]{graphics/BioPAXViewQueryLogDialog}
+\includegraphics[width=0.8\textwidth]{graphics/BioPAXViewQueryLogDialog}
 \caption{View Query Log Dialog}
 \label{BioPAXViewQueryLogDialog}
 \end{figure}

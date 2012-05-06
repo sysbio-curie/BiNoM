@@ -16,7 +16,7 @@ import cytoscape.util.CytoscapeAction;
  */
 public class PackInNestNode extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create modules from networks";
+	final public static String title="Create Modules from Networks";
 	private final String attrName="PREVIOUS_ID";
 	public void actionPerformed(ActionEvent v){
 		CyNetwork currentNW=Cytoscape.getCurrentNetwork();

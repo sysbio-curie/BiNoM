@@ -338,7 +338,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		 * Module manager menu functions
 		 */
 		
-		JMenu binomNestManagerMenu = new JMenu("BiNoM module manager");
+		JMenu binomNestManagerMenu = new JMenu("BiNoM Module Manager");
 		binomMainMenu.add(binomNestManagerMenu);
 
 		menuItem=new JMenuItem(CreateNestNetwork.title);

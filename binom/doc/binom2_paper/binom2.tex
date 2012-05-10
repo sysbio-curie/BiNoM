@@ -225,36 +225,59 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 \section*{Background}
 
 Biological pathways and networks represent sets of interactions, or functional
-relationships, occurring at the molecular level in living cells (adriaens et al,
-cary et al). Such representations represent now a large body of knowledge that
-are often organized in publicly available repositories such as the KEGG database
-(ref), Reactome (ref), MINT (ref) or the Cancer Cell Map
-(http://cancer.cellmap.org/cellmap/). All these pathway and biological networks
-databases facilitate a large spectrum of analysis, improving our understanding
-of cellular systems. For example, it is now a very common practise to cross the
-output of high-throughput experiments, such as mRNA or protein expression
-levels, with with a set of curated biological pathways in order to efficiently
-visualize changes and formulate new hypotheses about biological processes
-(Saraiya et al, Gehlenborg et al). The development of those pathway repositories
-has also fueled the creation of standard representations and formats, to
-facilitate the exchange and representation of data, such as BioPAX (ref), SBML
-and SBGN (ref). Ultimately, those integrated systems will facilitate
+relationships, occurring at the molecular level in living cells
+\cite{adriaens2008public, cary2005pathway}. Such representations represent now a
+large body of knowledge that are often organized in publicly available
+repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
+\cite{joshi2005reactome}, MINT \cite{zanzoni2002mint} or the Cancer Cell Map
+(\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
+networks databases facilitate a large spectrum of analysis, improving our
+understanding of cellular systems. For example, it is now a very common practise
+to cross the output of high-throughput experiments, such as mRNA or protein
+expression levels, with with a set of curated biological pathways in order to
+efficiently visualize changes and formulate new hypotheses about biological
+processes (Saraiya et al, Gehlenborg et al). The development of those pathway
+repositories has also fueled the creation of standard representations and
+formats, to facilitate the exchange and representation of data, such as the
+Biological Pathway Exchange standard (BioPAX) \cite{demir2010biopax}, the
+Systems Biology Markup Language (SBML) \cite{hucka2003systems} or the Systems
+Biology Graphical Notation (SBGN) \cite{le2009systems}. The Pathway resource
+list website counts more than 300 web-accessible biological pathway and network
+databases \cite{bader2006pathguide}, many of which are using the SBML and BioPAX
+standard formats. Ultimately, those integrated resources will facilitate
 computational models building and their experimental validation, a cycle that is
-the cornerstone of the Systems Biology initiative (Karlebach and Shamir, kitano,
-ideker).
+the cornerstone of the Systems Biology initiative \cite{karlebach2008modelling,
+kitano2002systems, ideker2001new}.
 
 As a consequence, there is a need for the precise and accurate reconstruction of
 pathways and large scale molecular maps covering fundamental biological
 processes. Such maps are often constructed by manual curation of literature or
-automated curation from pathway databases (Bauer-Mehren et al). They also often
-focus on the regulation of biological processes involved in diseases such as
-cancer (Oda et al 2005, Oda and Kitano 2006, Calzone et al 2008, Caron et al
-2010). However, the scale of such maps, even when they are focusing on a
-particular process, is quite large, with hundreds of species and interaction.
-The analysis and interpretation of such large scale maps is therefore not a
-straightforward task. Several computational tools have been developed to
-facilitate the visualization, curation and analysis of pathways (adriaens et
-al). We have created BiNoM, a cytoscape plugin ….
+automated curation from pathway databases \cite{bauer2009pathway}. They also
+often focus on the regulation of biological processes involved in diseases such
+as cancer \cite{oda2005comprehensive, oda2006comprehensive,
+calzone2008comprehensive, caron2010comprehensive}. However, the scale of such
+maps, even when they are focusing on a particular process, is quite large, with
+hundreds of species and interactions. The analysis and interpretation of such
+large scale maps is therefore not a straightforward task. Several computational
+tools have been developed to facilitate the visualization, curation and analysis
+of pathways \cite{adriaens2008public}. For example, CellDesigner is a user-friendly software package
+for the graphical edition of biological pathways diagrams
+\cite{funahashi2003celldesigner}, and it is using a dialect
+of SBML to store all the information contained in the graphs. We have created BiNoM
+\cite{zinovyev2008binom}, a software plugin for the popular Cytoscape network
+vizualization and analysis tool \cite{cline2007integration}. BiNoM facilitate
+the usage and analysis of biological networks in standard Systems Biology
+formats (SBML, SBGN, BioPAX). More specifically, BiNoM implements several
+functions based on graph operations for the structural analysis of biological
+networks. Those functions can be used to reduce the complexity and extract
+meaningfull subnetworks from large scale molecular maps. Furthermore, BiNoM has
+several built-in functions for accessing standard Systems Biology file formats. 
+Here, we provide a detailed view on the functions implemented in BiNoM for the
+analysis of large scale molecular maps. We also highlight novel functions that
+were implemented recently, such as the support of the latest BioPAX
+specification (BioPAX level 3) and an algorithmic approach for the
+quantification of pathways analysis. We illustrate the usage of BiNoM with the
+analysis of a molecular network of the G1/S transition of the cell cycle.
 
 
 \section*{Implementation}
@@ -268,7 +291,8 @@ can be done through the Cytoscape plugin manager, or alternatively the user can
 also download
 the plugin together with a manual and the source code from the BiNoM website
 \url{http://binom.curie.fr/}. We have also recently published a 
-detailed tutorial on how to use the main BiNoM functions \cite{binomBookChapter}.
+detailed tutorial on how to use the main BiNoM functions
+\cite{binomBookChapter}.
 
 
 BiNoM is designed to handle different systems biology file formats and to
@@ -278,25 +302,6 @@ Analysis, BioPAX utils \& query, Module manager and Utilities.
 
 
 \subsection*{BiNoM Input/Output}
-In the recent years, efforts have been made to standardize pathway data
-representation in order to facilitate the interpretation, exchange and
-integration of biological knowledge \cite{klipp2007systems}. As a result,
-several complementary community standards have emerged, such as the Systems
-Biology Markup Language (SBML) \cite{hucka2003systems}, Biological Pathway
-Exchange (BioPAX) \cite{demir2010biopax} and Systems Biology Graphical notation
-(SBGN) \cite{le2009systems}. While both SBML and BioPAX are machine-readable
-formats, the former is focusing on mathematical modeling and the latter is
-centered on qualitative pathway knowledge. Both formats are now widely used by a
-large variety of resources. At the moment, there are more than 40 databases and
-online resources supporting the BioPAX format, and 33 for the SBML format
-(\url{http://www.pathguide.org/}), such as the Biomodels repository
-\cite{le2006biomodels}, the Reactome  \cite{joshi2005reactome}, MINT
-\cite{zanzoni2002mint} and PANTHER \cite{mi2010panther} databases. 
-Several software packages are also using those format to store and exchange data
-easily. For example, CellDesigner is a popular user-friendly software package
-for the graphical edition of biological pathways diagrams
-\cite{funahashi2003celldesigner}, and it is using a dialect
-of SBML to store all the information contained in the graphs.
 
 BiNoM allows the user to import and export SBML level 2 files, as well as
 CellDesigner 3.x and 4.x file formats \cite{zinovyev2008binom}. The BioPAX

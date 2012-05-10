@@ -229,24 +229,26 @@ relationships, occurring at the molecular level in living cells
 \cite{adriaens2008public, cary2005pathway}. Such representations represent now a
 large body of knowledge that are often organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
-\cite{joshi2005reactome}, MINT \cite{zanzoni2002mint} or the Cancer Cell Map
+\cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, BioModels
+\cite{le2006biomodels} or the Cancer Cell Map
 (\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
 networks databases facilitate a large spectrum of analysis, improving our
 understanding of cellular systems. For example, it is now a very common practise
 to cross the output of high-throughput experiments, such as mRNA or protein
 expression levels, with with a set of curated biological pathways in order to
 efficiently visualize changes and formulate new hypotheses about biological
-processes (Saraiya et al, Gehlenborg et al). The development of those pathway
-repositories has also fueled the creation of standard representations and
-formats, to facilitate the exchange and representation of data, such as the
-Biological Pathway Exchange standard (BioPAX) \cite{demir2010biopax}, the
-Systems Biology Markup Language (SBML) \cite{hucka2003systems} or the Systems
-Biology Graphical Notation (SBGN) \cite{le2009systems}. The Pathway resource
-list website counts more than 300 web-accessible biological pathway and network
-databases \cite{bader2006pathguide}, many of which are using the SBML and BioPAX
-standard formats. Ultimately, those integrated resources will facilitate
-computational models building and their experimental validation, a cycle that is
-the cornerstone of the Systems Biology initiative \cite{karlebach2008modelling,
+processes \cite{saraiya2005visualizing, gehlenborg2010visualization}. The
+development of those pathway repositories has also fueled the creation of
+standard representations and formats, to facilitate the exchange and
+representation of data, such as the Biological Pathway Exchange standard
+(BioPAX) \cite{demir2010biopax}, the Systems Biology Markup Language (SBML)
+\cite{hucka2003systems} or the Systems Biology Graphical Notation (SBGN)
+\cite{le2009systems}. The Pathway resource list website counts more than 300
+web-accessible biological pathway and network databases
+\cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
+formats. Ultimately, those integrated resources will facilitate computational
+models building and their experimental validation, a cycle that is the
+cornerstone of the Systems Biology initiative \cite{karlebach2008modelling,
 kitano2002systems, ideker2001new}.
 
 As a consequence, there is a need for the precise and accurate reconstruction of
@@ -260,25 +262,28 @@ maps, even when they are focusing on a particular process, is quite large, with
 hundreds of species and interactions. The analysis and interpretation of such
 large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
-of pathways \cite{adriaens2008public}. For example, CellDesigner is a user-friendly software package
+of pathways \cite{adriaens2008public}. For example, CellDesigner is a
+user-friendly software package
 for the graphical edition of biological pathways diagrams
 \cite{funahashi2003celldesigner}, and it is using a dialect
-of SBML to store all the information contained in the graphs. We have created BiNoM
-\cite{zinovyev2008binom}, a software plugin for the popular Cytoscape network
-vizualization and analysis tool \cite{cline2007integration}. BiNoM facilitate
-the usage and analysis of biological networks in standard Systems Biology
-formats (SBML, SBGN, BioPAX). More specifically, BiNoM implements several
-functions based on graph operations for the structural analysis of biological
-networks. Those functions can be used to reduce the complexity and extract
-meaningfull subnetworks from large scale molecular maps. Furthermore, BiNoM has
-several built-in functions for accessing standard Systems Biology file formats. 
+of SBML to store all the information contained in the graphs. We have created
+BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
+network vizualization and analysis tool \cite{cline2007integration}. BiNoM
+facilitate the usage and analysis of biological networks in standard Systems
+Biology formats (SBML, SBGN, BioPAX). More specifically, BiNoM implements
+several functions based on graph operations for the structural analysis of
+biological networks. Those functions can be used to reduce the complexity and
+extract meaningfull subnetworks from large scale molecular maps. Furthermore,
+BiNoM has several built-in functions for accessing standard Systems Biology file
+formats. 
 Here, we provide a detailed view on the functions implemented in BiNoM for the
 analysis of large scale molecular maps. We also highlight novel functions that
 were implemented recently, such as the support of the latest BioPAX
 specification (BioPAX level 3) and an algorithmic approach for the
-quantification of pathways analysis. We illustrate the usage of BiNoM with the
-analysis of a molecular network of the G1/S transition of the cell cycle.
-
+quantification of pathways on influence networks (PIQuant). We illustrate the
+usage of the BiNoM functions with a detailed analysis of a molecular network
+representing the G1/S transition of the cell cycle, a central mechanism for
+tumor development and progression.
 
 \section*{Implementation}
 The BiNoM software is implemented in the Java programming language, as a plugin
@@ -303,12 +308,34 @@ Analysis, BioPAX utils \& query, Module manager and Utilities.
 
 \subsection*{BiNoM Input/Output}
 
+BiNoM functions facilitate the import and export of standard Systems Biology
+file formats, but is not designed to be a universal converter. The goal is more
+to provide robust functions for a limited number of useful conversion
+scenarios: 
+
+\begin{itemize}
+
+\item Interconversion of CellDesigner files to BioPAX, and from a BioPAX
+reaction network to SBML level 2 (not to the CellDesigner dialect). While the
+content of BioPAX files can be altered using BiNoM functions, it is not possible
+to create a CellDesigner file from scratch or using the graphical notations from
+a BioPAX file. 
+
+\item Import of a BioPAX file as a
+reaction network or a pathway structure, and creation of a subnetwork saved as a new BioPAX file. 
+
+\item Import of a BioPAX file, selection of a subnetwork of interest saves as a SBML file for
+the creation of a computational model using an appropriate software package.
+
+\item Import a large CellDesigner map and export only a subnetwork as a new CellDesigner file.  
+
+\end{itemize}
+
 BiNoM allows the user to import and export SBML level 2 files, as well as
 CellDesigner 3.x and 4.x file formats \cite{zinovyev2008binom}. The BioPAX
 community has recently made a major update of the BioPAX standard, producing a
 new specification known as BioPAX Level 3 (\url{http://www.biopax.org/}). This
-format
-supports metabolic pathways, signaling pathways (including states of molecules
+format supports metabolic pathways, signaling pathways (including states of molecules
 and generic molecules), gene regulatory networks, molecular interactions and
 genetic interactions. Due to major changes in the
 specification, the BioPAX level 3 is incompatible with the level 2 file format.
@@ -363,24 +390,6 @@ Cdc13:Cdc2$|$Thr167\_pho@cytoplasm indicate a protein complex located in the
 cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
 position 167 on a threonin residue.
 
-BiNoM was not designed to be a universal tool for converting any Systems Biology
-file format into another, but instead to facilitate the import/ export
-operations for a limited but useful and often encountered set of cases. BiNoM allows the
-interconversion of CellDesigner files to BioPAX, and from a BioPAX
-reaction network to SBML level 2 (not to the CellDesigner dialect). The
-cytoscape networks must be associated to existing CellDesigner or BioPAX files
-prior to this operation (see the BiNoM manual for more details). While the
-content of BioPAX files can be altered using BiNoM functions, it is not possible
-to create a CellDesigner file from scratch or using the graphical notations from
-a BioPAX file. In fact there are a couple of typical scenarios where BiNoM I/O
-functions can help the user. For example, after the import of a BioPAX file as a
-reaction network or a pathway structure, the user can create a subnetwork (or
-subpathway) and save it as a new BioPAX file. Another example would be to import
-a BioPAX file, select a subnetwork of interest and save it as a SBML file for
-the creation of a computational model using an appropriate software package.
-At last, a user might want to import a large CellDesigner map and export only a
-subnetwork as a new CellDesigner file.  
-
 
 \subsection*{BiNoM Analysis}
 The central goal of the BiNoM software package is to provide efficient methods
@@ -395,9 +404,7 @@ analysis and network clustering.
 A trivial approach to split a network is to dissociate the unconnected subparts
 of the network. A more sophisticated one consist in decomposing the network into
 strongly connected components, using the algorithm of Tarjan
-\cite{tarjan1972depth}.
-
-It is also possible to prune the network into three different parts:
+\cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
 first all the elements associated with the \emph{input} parts of the network, a
 second with all the elements associated with the \emph{output} part and at last
 all the elements linked to the central, cyclic part. This type of approach
@@ -477,7 +484,7 @@ For example, a very simple influence network composed of seven nodes is shown on
 figure~\ref{piquantnetworks}a. The figures ~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c show 2 paths extracted from this network. Given that the
 node AC has an activity value of 2, and that the two paths have the same length
-equal to 3, we can calculate the PIQUANT score for the Ph node as:
+equal to 3, we can calculate the PIQUANT score for the node Ph as:
 
 $$
  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{3}
@@ -532,7 +539,7 @@ such as the \textit{Homo sapiens} network from the reactome database
 BiNoM implements a set of functions precisely aiming to allow end users to
 easily visualize and modify BioPAX files. To the best of our knowledge, there is
 no other software package allowing to view, query and edit BioPAX files than
-BiNoM at the moment.The functions are using
+BiNoM at the moment. The functions are using
 java classes introspection techniques to build a BioPAX class tree. Then, the
 content of the file can easily be accessed. For example, the figure~\ref{biopaxtrailprop} is
 showing all the informations linked to the TRAIL protein, after a call to the
@@ -565,7 +572,7 @@ sources and targets of the reactions) and related publications. The figure~\ref{
 is showing an example of a small network extracted from the human apoptosis
 pathway downloaded from the Reactome database \cite{joshi2005reactome}, and
 centered on the SMAC protein, with all the protein complexes where
-this protein is involved that were added using the BiNoM functions.
+this protein is involved that were added using the BiNoM BioPAX Query functions.
 
 
 \begin{figure}[h]
@@ -635,7 +642,8 @@ RB-E2F network and G1/S network extracted from Reactome.}
 \subsection*{Application of PIQuant on an influence network.}
 As described above, the PIQuant algorithm can be used to perform a quantitative
 analysis on an influence network. We applied PIQuant to an influence network of
-cell cycle G1/S transition, that was constructed by applying BIOCHAM (ref) to the network described in the
+cell cycle G1/S transition, that was constructed by applying BIOCHAM
+\cite{calzone2006biocham} to the network described in the
 previous paragraph. We used expression data from a study of 57 bladder cancer
 tissue samples compared to normal samples \cite{stransky2006regional}. More
 precisely, for each gene, the differential expression between tumor and normal
@@ -706,6 +714,8 @@ different module, or subnetwork. The edges connecting the modules represent the
  \center{\includegraphics[width=0.7\textwidth]{figures/G1S_modular.png}}
 \end{figure}
 
+[[ Discuss the results: describe the modular representation. what can be concluded/done with this modular representation? ]]
+
 
 \section*{Conclusions}
 
@@ -744,7 +754,7 @@ different module, or subnetwork. The edges connecting the modules represent the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
   \ifthenelse{\boolean{publ}}{\small}{}
-  EB, LC, DR and AZ are members of the team ‘‘Computational Systems Biology of
+  EB, LC, DR, GS, EmB and AZ are members of the team ‘‘Computational Systems Biology of
 Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

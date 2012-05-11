@@ -516,6 +516,13 @@ are kept, PIQuant score of AC to Ph becomes:
 $$
  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
 $$
+The biological interpretation of inconsistent paths removal can be detailed, using this example. 
+According to the network, there is an influence of Ac to Ph that goes through D. But if this path
+is effective, D annotation would have the same sign than Ac annotation, because Ac activates D indirectly. 
+In our case, the sign of D annotation is opposite to the sign of AC annotation, meaning that there is another 
+(unknown) effect on D that blocks the signal. Therefore, the path from Ac to Ph that goes through D should not 
+be used to compute PIQuant score. Practically, we think that this option should be often used, keeping
+its biological interpretation in mind.
 
 
 In more realistic situations, we will have multiple source nodes with different
@@ -538,7 +545,6 @@ the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
 \textbf{Ac} and \textbf{D} are annotated, by the values $2.0$ and $-1.0$ respectively.}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
-
 
 \subsection*{BiNoM BioPAX utils \& query}
 The BioPAX format was primarily conceived as a standard facilitating the

@@ -673,7 +673,9 @@ data from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. We construct a text file listing nodes of the influence network 
-and their annotation. We import this file using Cytoscape function 
+and their annotation. We assess annotations only to nodes that can be directly influenced by a 
+mRNA level. When a complex is annotated, it means that one of the partner has no unbound state in the network. 
+We import this file using Cytoscape function 
 ``import'' $>$ ``Nodes attributes'' 
 in the cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network with the annotation.
@@ -694,7 +696,9 @@ We take all annotated nodes as active nodes,
 took the grey nodes of Figure~\ref{InflAnnotNet} as targets, selected optimal and sub-optimal 
 shortest path. We run a test significance and get the report table (``Get report''). We extract 
 the ``Node influence table'' that represent the PIQuant score for each annotated nodes to each 
-cell-cycle phase markers. This is represented in Figure~\ref{PIQuantHeatMap}.  
+cell-cycle phase markers. This is represented in Figure~\ref{PIQuantHeatMap}. The global effect illustrated
+by this figure is expected: the effect of the annotation to the cell-cycle phases is mainly positive,
+implying that proliferation is enhanced in tumor cell.   
 
 \begin{figure}[h]
   \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of PIQuant.}

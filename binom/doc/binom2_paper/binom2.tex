@@ -462,19 +462,23 @@ or protein complexes. To determine the size of the clusters, the user can
 specify a percentage of intersection (ranging from 0 to 100\%) that will be used
 as a threshold to create the clusters.
 
-
 In this version of BiNoM, we have introduced a novel approach to quantify the
-influence of one or more molecular paths on a given set of valuable target
-nodes, named PIQuant (Pathway Influence Quantification). A path $k$ is defined
+influence of one or more annotated source nodes on a given set of valuable target nodes, 
+named PIQuant (Pathway Influence Quantification). Consider that the source nodes are 
+ \textit{annotated} by a signed real number, representing for example the expression ratio 
+of a given gene.
+For this, a set of paths from source nodes to target nodes is extracted (indexed from $1$ to $q$). 
+ A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
-between a source node $A$ and a target node $B$ (without repetition of any node
-or edge). We also define the activity $\alpha$ of a path as a signed real number
-representing for example the expression ratio of a given gene, the sign $\sigma$
-of the path as the product of the signs of every edge of the path and finally
-the length $\lambda$ of the path as the number of edges in the path. We also
+between a source node and a target node (without repetition of any node
+or edge). We also define the activity $\alpha_k$ of the path $k$ as the annotation
+of its source node. We define the sign $\sigma_k$
+of the path $k$ as the product of the signs of every edge of the path and finally
+the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. Then the PIQuant score for a set of $q$ paths for a given
-target node $O$ of interest is defined as:
+on the target node. Then the PIQuant score for a set of $q$ paths (from a set of 
+source nodes, to a set of 
+target nodes) is defined as:
 
 $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
@@ -483,7 +487,7 @@ $$
 For example, a very simple influence network composed of seven nodes is shown on
 figure~\ref{piquantnetworks}a. The figures ~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c show 2 paths extracted from this network. Given that the
-node AC has an activity value of 2, and that the two paths have the same length
+node AC is annotated by the value $2.0$, and that the two paths have the same length
 equal to 3, we can calculate the PIQUANT score for the node Ph as:
 
 $$
@@ -492,10 +496,15 @@ $$
 $$
 
 
-Any given path can have either a positive or negative
-sign, depending on the sign of the different influences composing the path. We
-denominate a path that has a positive sign as \textit{consistent} while a path
-with a negative sign will be called \textit{inconsistent}. 
+It is possible that a path has intermediate nodes that are annotated nodes, 
+in addition to the source node.
+In that case, the intermediate node is \textit{consistent} if the sign of its 
+annotation is
+the same than the sign of the source node annotation multiplied by the sign of the 
+path from the source node
+to the intermediate node. If signs are opposite, the node is \textit{inconsistent}. 
+A path is \textit{consistent} if each annotated intermediate nodes are consistent. 
+A path is \textit{inconsistent} if at least one intermediate node is \textit{inconsistent}.
 For example, the path shown on figure~\ref{piquantnetworks}b is consistent while
 the path on the figure~\ref{piquantnetworks}c is inconsistent. In order to
 facilitate the analysis, we have implemented an option to keep only consistent
@@ -503,7 +512,7 @@ paths for calculating the PIQuant score.
 
 
 In more realistic situations, we will have multiple source nodes with different
-activity values, and also multiple target nodes representing phenotypes of
+ annotation, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
 that allow users to select source nodes, select target nodes, and choose among
 three different options for searching paths (shortest paths, optimal and
@@ -518,9 +527,8 @@ in the results section.
  \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The 
 network is composed of seven nodes and nine edges (a). The two paths (b,c)
 extracted from this network start from the source node \textbf{Ac} and end at
-the target node \textbf{Ph} (which denotes a phenotype of interest). The node
-\textbf{Ac} is the only one for which
-an activity value is known (value=2).}
+the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
+\textbf{Ac} and \textbf{D} are annotated, by the values $2.0$ and $1.0$ respectively.}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
 

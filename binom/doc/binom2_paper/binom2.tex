@@ -485,13 +485,15 @@ $$
 $$
 
 For example, a very simple influence network composed of seven nodes is shown on
-figure~\ref{piquantnetworks}a. The figures ~\ref{piquantnetworks}b and
+figure~\ref{piquantnetworks}a. AC is taken as source node, Ph as target node. 
+The figures ~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c show 2 paths extracted from this network. Given that the
-node AC is annotated by the value $2.0$, and that the two paths have the same length
-equal to 3, we can calculate the PIQUANT score for the node Ph as:
+node AC is annotated by the value $2.0$, and that the first path has a length
+equal to 3, the second a length equal to 5, we can calculate the PIQuant score 
+of the node AC to the node Ph as:
 
 $$
- PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{3}
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{5}
 = 0.27
 $$
 
@@ -508,7 +510,12 @@ A path is \textit{inconsistent} if at least one intermediate node is \textit{inc
 For example, the path shown on figure~\ref{piquantnetworks}b is consistent while
 the path on the figure~\ref{piquantnetworks}c is inconsistent. In order to
 facilitate the analysis, we have implemented an option to keep only consistent
-paths for calculating the PIQuant score.
+paths for calculating the PIQuant score. In the example above, if only consistent paths 
+are kept, PIQuant score of AC to Ph becomes:
+
+$$
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
+$$
 
 
 In more realistic situations, we will have multiple source nodes with different
@@ -528,7 +535,7 @@ in the results section.
 network is composed of seven nodes and nine edges (a). The two paths (b,c)
 extracted from this network start from the source node \textbf{Ac} and end at
 the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
-\textbf{Ac} and \textbf{D} are annotated, by the values $2.0$ and $1.0$ respectively.}
+\textbf{Ac} and \textbf{D} are annotated, by the values $2.0$ and $-1.0$ respectively.}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
 
@@ -661,7 +668,7 @@ tissue samples compared to normal tissue \cite{stransky2006regional}. For each
 gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. We construct a text file listing nodes of the influence network 
 and their annotation. We import this file using Cytoscape function 
-``import'' > ``Nodes attributes'' 
+``import'' $>$ ``Nodes attributes'' 
 in the cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network with the annotation.
  

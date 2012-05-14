@@ -184,8 +184,20 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 
 \begin{abstract}
         
-[[ to be written (AZ and EB) ]]
-
+Public repositories of biological pathways and networks have greatly expanded in
+recent years. Such databases facilitate the analysis of high-throughput
+experimental work and the formulation of new biological hypotheses to be
+ tested, a fundamental principle of the Systems Biology approach.
+However, large scale molecular maps are not always easy to mine and interpret.
+Several computational tools have been created to facilitate this task. We
+have developped BiNoM (Biological Network Manager), a Cytoscape plugin that is
+providing several functions for the import-export of standard Systems Biology
+file formats, and also a set of functions to analyze and reduce the complexity
+of large biological networks. Here, we provide an overview of the BiNoM
+functions, we detail novel aspects such as the support of the BioPAX level 3
+format and an algorithm for the quantification of pathways for influence
+networks and we illustrate all these functions on a detailed biological case
+study of a network representing the G1/S transition of the cell cycle.
         
 \end{abstract}
 
@@ -226,25 +238,25 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 
 Biological pathways and networks represent sets of interactions, or functional
 relationships, occurring at the molecular level in living cells
-\cite{adriaens2008public, cary2005pathway}. Such representations represent now a
-large body of knowledge that are often organized in publicly available
+\cite{adriaens2008public, cary2005pathway}. Such representations represent now
+a large body of knowledge that are often organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
 \cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, BioModels
 \cite{le2006biomodels} or the Cancer Cell Map
 (\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
 networks databases facilitate a large spectrum of analysis, improving our
-understanding of cellular systems. For example, it is now a very common practise
-to cross the output of high-throughput experiments, such as mRNA or protein
-expression levels, with with a set of curated biological pathways in order to
-efficiently visualize changes and formulate new hypotheses about biological
-processes \cite{saraiya2005visualizing, gehlenborg2010visualization}. The
-development of those pathway repositories has also fueled the creation of
-standard representations and formats, to facilitate the exchange and
-representation of data, such as the Biological Pathway Exchange standard
-(BioPAX) \cite{demir2010biopax}, the Systems Biology Markup Language (SBML)
-\cite{hucka2003systems} or the Systems Biology Graphical Notation (SBGN)
-\cite{le2009systems}. The Pathway resource list website counts more than 300
-web-accessible biological pathway and network databases
+understanding of cellular systems. For example, it is now a very common
+practise to cross the output of high-throughput experiments, such as mRNA or
+protein expression levels, with with a set of curated biological pathways in
+order to efficiently visualize changes and formulate new hypotheses about
+biological processes \cite{saraiya2005visualizing,
+gehlenborg2010visualization}. The development of those pathway repositories has
+also fueled the creation of standard representations and formats, to facilitate
+the exchange and representation of data, such as the Biological Pathway
+Exchange standard (BioPAX) \cite{demir2010biopax}, the Systems Biology Markup
+Language (SBML) \cite{hucka2003systems} or the Systems Biology Graphical
+Notation (SBGN) \cite{le2009systems}. The Pathway resource list website counts
+more than 300 web-accessible biological pathway and network databases
 \cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
 formats. Ultimately, those integrated resources will facilitate computational
 models building and their experimental validation, a cycle that is the
@@ -673,11 +685,11 @@ In order to construct the annotation of this network, we use expression
 data from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
-is assessed by a t-test. We construct a text file listing nodes of the influence network 
+is assessed by a t-test. The t-test statistic value is used as the annotation for each gene. We construct a text file listing nodes of the influence network 
 and their annotation. We assign annotations only to nodes that can be directly influenced by a 
 mRNA level. When a complex is annotated, it means that one of the partners has no unbound state in the network. 
-We import this file using Cytoscape function 
-``import'' $>$ ``Nodes attributes'' 
+We import this file using the Cytoscape function 
+``Import $>$ Nodes attributes'' 
 in the cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network with the annotation.
  
@@ -687,26 +699,27 @@ Figure~\ref{InflAnnotNet} represents this influence network with the annotation.
     Influence network of the cell cycle G1/S transition. Colors represent differential
 expression obtained from transcriptome data compared to normal tissue. Color 
 intensities are proportional to the t-statistics (red for positive, green for
-negative). The three grey nodes are markers for cell-cycle phases: G1, S, M.}
+negative). The three grey nodes are markers for the different cell-cycle phases: G1, S, M.}
   \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
 \end{figure}
 
-PIQuant is applied to this network and its annotation: we 
-run ``Plugins'' $>$ ``BiNoM 2.0'' $>$ ``BiNoM Analysis'' $>$ ``Path Influence Quantification analysis''. 
-We take all annotated nodes as active nodes, 
-took the grey nodes of Figure~\ref{InflAnnotNet} as targets, selected optimal and sub-optimal 
-shortest path. We run a test significance and get the report table (``Get report''). We extract 
-the ``Node influence table'' that represent the PIQuant score for each annotated nodes to each 
-cell-cycle phase markers. This is represented in Figure~\ref{PIQuantHeatMap}. The global effect illustrated
-by this figure is expected: the effect of the annotation to the cell-cycle phases is mainly positive,
-implying that proliferation is enhanced in tumor cell.   
+PIQuant is applied to this network and its annotation, by using the function
+``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
+analysis''. We take all annotated nodes as active nodes, the grey nodes of
+Figure~\ref{InflAnnotNet} as targets, and we select optimal and sub-optimal 
+shortest path. We run a test significance and get the report table. In this
+report, the ``Node influence table'' represents the global PIQuant score from
+each annotated nodes to each cell-cycle phase markers. Those values are
+represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
+genes are over-expressed relative to the normal cells in the M and S phases (red
+coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
 
 \begin{figure}[h]
   \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of PIQuant.}
     Results of PIQuant algorithm applied to the influence network. Color
 intensities are proportional to PIQuant score (red positive, green negative).
 Each line represent a source node, each column represent a cell-cycle phase.}
-  \center{\includegraphics[width=0.7\textwidth]{figures/heatmapPathInfluence.pdf}}
+  \center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
 \end{figure}
 
 

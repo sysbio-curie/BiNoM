@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Fri Apr 13 16:15:09 CEST 2012
+#Tue May 15 11:16:21 CEST 2012
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
@@ -10,5 +10,5 @@ manifest.mainclass=
 manifest.file=manifest.txt
 jarname.isextern=false
 onejar.expand=
-excludes=<po|BiNoM2011>~data/~clickmap_blog.css;<po|BiNoM2011>~data/~clickmap_map.js;<po|BiNoM2011>~data/~clickmap_blog.js;<po|BiNoM2011>~data/~clickmap_map.css;<po|BiNoM2011>~fr/~curie/~BiNoM/~celldesigner/;<jar|VDAOEngine.jar>;<jar|cytoscape270.jar>;<jar|giny.jar>;<jar|celldesigner.jar>;<jar|CellDesigner401Jars.jar>;<jar|commons-collections-3.2.jar>;<jar|commons-configuration-1.5.jar>;<jar|commons-lang-2.3.jar>;<jar|xmlrpc-client-1.1.jar>;<jar|imgscalr-lib-3.1.jar>;<jar|jwordpress-0.4.jar>
+excludes=<po|BiNoM2011>~data/~clickmap_map.js;<po|BiNoM2011>~data/~clickmap_map.css;<po|BiNoM2011>~data/~clickmap_blog.css;<po|BiNoM2011>~data/~clickmap_blog.js;<po|BiNoM2011>~fr/~curie/~BiNoM/~celldesigner/;<jar|VDAOEngine.jar>;<jar|cytoscape270.jar>;<jar|giny.jar>;<jar|celldesigner.jar>;<jar|CellDesigner401Jars.jar>;<jar|commons-collections-3.2.jar>;<jar|commons-configuration-1.5.jar>;<jar|commons-lang-2.3.jar>;<jar|xmlrpc-client-1.1.jar>;<jar|imgscalr-lib-3.1.jar>;<jar|jwordpress-0.4.jar>
 includes=

@@ -27,10 +27,16 @@ public class MergingMapsDialog extends JDialog {
 	private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 	private JList mergeListProtein;
 	private JList mergeListSpecies;
-	private JTable tableProtein;
+	private JTable tableSpecies;
 	private JLabel label1;
+	private JButton buttonMerge;
+	private JButton buttonDisplay;
 	private ArrayList<File> fileList;
+	
 	private MergingMapsProcessor mmProc;
+	
+	private int numFiles;
+	private int numStep;
 	
 	
 	public MergingMapsDialog(JFrame frame, String mess, boolean modal){
@@ -41,14 +47,16 @@ public class MergingMapsDialog extends JDialog {
 	
 	public void setFileList(ArrayList<File> f) {
 		this.fileList = f;
+		this.numFiles = fileList.size();		
 	}
 	
 	private void init() {
 		
 		setSize(600,600);
 		setLocation((screenSize.width - getSize().width) / 2,(screenSize.height - getSize().height) / 2);
-		fileList = new ArrayList<File>();
-		mmProc = new MergingMapsProcessor();
+
+		this.numStep = 0;
+		this.mmProc = new MergingMapsProcessor();
 		
 		JPanel p = new JPanel(new GridBagLayout());
 		int y = 1;
@@ -66,9 +74,27 @@ public class MergingMapsDialog extends JDialog {
 		
 		y++;
 		
-		tableProtein = new JTable();
-		tableProtein.setModel(new DefaultTableModel());
-		JScrollPane scrollPane = new JScrollPane(tableProtein);
+		buttonDisplay = new JButton("Display");
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = y;
+		c.gridwidth = 3;
+		c.weightx = 0.5;
+		c.anchor = GridBagConstraints.WEST;
+		c.insets = new Insets(10,10,10,10);
+		buttonDisplay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displaySpecies();
+			}
+		});
+
+		p.add(buttonDisplay, c);
+		
+		y++;
+		
+		tableSpecies = new JTable();
+		tableSpecies.setModel(new DefaultTableModel());
+		JScrollPane scrollPane = new JScrollPane(tableSpecies);
 		c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = y;
@@ -81,8 +107,9 @@ public class MergingMapsDialog extends JDialog {
 		p.add(scrollPane, c);
 		
 		y++;
-		
-		JButton buttonNext = new JButton("Next >>");
+
+
+		buttonMerge = new JButton("Merge");
 		c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = y;
@@ -91,13 +118,14 @@ public class MergingMapsDialog extends JDialog {
 		c.anchor = GridBagConstraints.WEST;
 		//c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(10,10,10,10);
-		buttonNext.addActionListener(new ActionListener() {
+		buttonMerge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// do something!
+				mergeMaps();
 			}
 		});
+		buttonMerge.setEnabled(false);
 
-		p.add(buttonNext, c);
+		p.add(buttonMerge, c);
 
 		
 		
@@ -125,7 +153,7 @@ public class MergingMapsDialog extends JDialog {
 		pack();
 	}
 	
-	private void setTableProteinData(Vector<String> data) {
+	private void setTableData(Vector<String> data) {
 		int nbRows = data.size();
 		String[] colNames = {"1", "2", "3", "4", "5", "6", "7", "8"};
 		String[][] tableData = new String[nbRows][4];
@@ -133,8 +161,62 @@ public class MergingMapsDialog extends JDialog {
 			String[] tk = data.get(i).split("\\t");
 			tableData[i] = tk;
 		}
-		DefaultTableModel tm = (DefaultTableModel) tableProtein.getModel();
+		DefaultTableModel tm = (DefaultTableModel) tableSpecies.getModel();
 		tm.setDataVector(tableData, colNames);
+	}
+	
+	private void displaySpecies() {
+		
+		this.numStep++;
+		
+		if (numStep < numFiles) {
+			if (numStep == 1) {
+				// first two files
+				this.mmProc.setAndLoadFileName1(fileList.get(0).getAbsolutePath());
+				this.mmProc.setAndLoadFileName2(fileList.get(1).getAbsolutePath());
+				this.mmProc.setMergeLists();
+				// set JTable here with data
+			}
+			else {
+				// the rest of the world!
+				this.mmProc.setAndLoadFileName2(fileList.get(numStep).getAbsolutePath());
+				this.mmProc.setMergeLists();
+				// set JTable here with data
+			}
+			this.buttonDisplay.setEnabled(false);
+			this.buttonMerge.setEnabled(true);
+		}
+		
+	}
+	
+	private void mergeMaps() {
+		this.buttonDisplay.setEnabled(true);
+		this.buttonMerge.setEnabled(false);
+//		for (File f : this.fileList)
+//			System.out.println(">>>"+f.getAbsolutePath());
+		
+//		this.numStep++;
+		
+//		this.label1.setText(Integer.toString(numStep));
+//		if (this.numStep > 10)
+//			this.buttonNext.setEnabled(false);
+		
+//		if (numStep < numFiles) {
+//			
+//			if (numStep == 1) {
+//				// first two files
+//				this.mmProc.setAndLoadFileName1(fileList.get(0).getAbsolutePath());
+//				this.mmProc.setAndLoadFileName2(fileList.get(1).getAbsolutePath());
+//				this.mmProc.mergeTwoMaps();
+//			}
+//			else {
+//				// the rest of the world!
+//				this.mmProc.setAndLoadFileName2(fileList.get(numStep).getAbsolutePath());
+//				this.mmProc.mergeTwoMaps();
+//			}
+//			
+//			
+//		}
 		
 	}
 }

@@ -14,11 +14,11 @@
 	<classpathentry kind="lib" path="lib/celldesigner.jar"/>
 	<classpathentry kind="lib" path="lib/CellDesigner401Jars.jar"/>
 	<classpathentry kind="lib" path="lib/binomlibext.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/jwordpress-0.4.jar"/>
 	<classpathentry kind="lib" path="lib/jwordpress/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/jwordpress/commons-configuration-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/jwordpress/commons-lang-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/jwordpress/xmlrpc-client-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/imgscalr-lib-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/jwordpress/jwordpress-0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

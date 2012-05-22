@@ -220,7 +220,12 @@ public class MergingMapsProcessor {
 			}
 		}
 
-		// find proteins sharing same name, save them to "P" file
+		/*
+		 *  before: find proteins sharing the same name, save them to "P" file
+		 *  
+		 *  now: for proteins having same name add string "id1-name1-id2-name2" to vector proteinMap
+		 *  
+		 */
 		//FileWriter fw = new FileWriter(prefix+"P.txt");
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
@@ -253,6 +258,9 @@ public class MergingMapsProcessor {
 			SpeciesDocument.Species sp = species2.get(spId);
 			if(sp!=null){
 				String spName = c2c.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), spId, Utils.getValue(sp.getName()), sp.getCompartment(), true, true, "", cd2);
+				/*
+				 * check if species alias 2 name is contained in map 1
+				 */
 				if(speciesIds.containsKey(spName)){
 					String id1 = speciesIds.get(spName); 
 					Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> vsa = speciesAliases.get(id1);
@@ -260,7 +268,8 @@ public class MergingMapsProcessor {
 						System.out.println("Vector of aliases is not found for "+id1);
 					//fw.write(vsa.get(0).getId()+"\t"+id1+"\t"+species.get(id1).getCompartment()+"\t"+spName+"\t"+cas.getId()+"\t"+spId+"\t"+sp.getCompartment()+"\t"+spName+"\n");
 					speciesMap.add(vsa.get(0).getId()+"\t"+id1+"\t"+species.get(id1).getCompartment()+"\t"+spName+"\t"+cas.getId()+"\t"+spId+"\t"+sp.getCompartment()+"\t"+spName);
-				}}
+				}
+			}
 		}
 		//fw.close();
 	}

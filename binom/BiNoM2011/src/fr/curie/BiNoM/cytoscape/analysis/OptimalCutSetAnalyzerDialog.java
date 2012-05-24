@@ -68,6 +68,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 	private JRadioButton bergeRB;
 	private JRadioButton partialRB;
 	private JRadioButton seedRB;
+	private JRadioButton inverseRB;
+	private JRadioButton logisticRB;
 
 	private JCheckBox limitationRadius;
 	private JTextField searchRadius;
@@ -136,7 +138,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		attNames.insertItemAt("None", 0);
 		attNames.setSelectedIndex(0);
 
-		setSize(770, 680);
+		setSize(770, 720);
 
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
@@ -252,6 +254,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		c.fill = GridBagConstraints.HORIZONTAL;
 		scrollPane.setPreferredSize(new Dimension(SCROLL_WIDTH, SCROLL_HEIGHT));
 		panel.add(scrollPane, c);
+		
 		
 		/*
 		 * set list buttons for source, target and side-effect nodes
@@ -411,6 +414,44 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		y = GraphicUtils.addHSepPanel(panel, 1, y, 5, 2);
 		y++;
 		
+		/*
+		 * Equation for calculating the score
+		 */
+		
+		y++;
+		JLabel labScore = new JLabel("Choose equation for the score");
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(labScore, c);
+		
+		y++;
+		inverseRB = new JRadioButton("Inverse");
+		inverseRB.setSelected(true);
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		//c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(inverseRB, c);
+		
+		logisticRB = new JRadioButton("Logistic");
+		logisticRB.setSelected(false);
+		c = new GridBagConstraints();
+		c.gridx = x+2;
+		c.gridy = y;
+		//c.gridwidth = 3;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(logisticRB, c);
+		
+		ButtonGroup Equationgroup = new ButtonGroup();
+		Equationgroup.add(inverseRB);
+		Equationgroup.add(logisticRB);
+
+		y++;
+		y = GraphicUtils.addHSepPanel(panel, 1, y, 5, 2);
 		
 		/*
 		 * Opt cut set specific parameters 
@@ -540,7 +581,13 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						analyzer.searchPathMode = analyzer.SUBOPTIMAL_SHORTEST_PATHS;
 					if(allPathRB.isSelected()) 
 						analyzer.searchPathMode = analyzer.ALL_PATHS;
-
+					
+					// equation for calculating the score
+					if (inverseRB.isSelected())
+						analyzer.useInverseFunction = true;
+					else 
+						analyzer.useInverseFunction = false;
+					
 					// minimal cut set options
 					if (bergeRB.isSelected())
 						analyzer.ocsSearch = analyzer.OCS_BERGE;

@@ -85,7 +85,19 @@ public class MergingMapsProcessor {
 		CellDesigner.saveCellDesigner(cd1, fileName);
 	}
 	
+	public Vector<String> getSpeciesMap() {
+		return this.speciesMap;
+	}
 	
+	public void setSpeciesMap(Vector<String> data) {
+		this.speciesMap = data;
+	}
+	
+	public void printSpeciesMap() {
+		System.out.println("#----- species map---------");
+		for (String s : this.speciesMap)
+			System.out.println(s);
+	}
 //	private void setCandidateMergingLists() {
 //		// load file1 in a string
 //		String file1Text = Utils.loadString(fileName1);

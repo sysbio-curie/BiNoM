@@ -82,6 +82,11 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	
 	/**
+	 * Type of function for the score
+	 */
+	public boolean useInverseFunction;
+	
+	/**
 	 * System independent newline character
 	 */
 	public static String newline = System.getProperty("line.separator");
@@ -1080,10 +1085,18 @@ public class DataPathConsistencyAnalyzer {
 			Node target = p.nodeSequence.get(p.target);
 			Node source = p.nodeSequence.get(p.source);
 			int idx = scoreMap.get(target).get(source);
-			double sco = p.influence / p.length;
-			scoreVal[idx] += p.influence / p.length;
+			double sco = 0.0;
+			/*
+			 * use either the inverse or the logistic function for calculating the score
+			 */
+			if (this.useInverseFunction == true)
+				sco = p.influence / p.length;
+			else
+				sco = p.influence * (1 / (1 + Math.exp(-1 * p.length)));
+			
+			scoreVal[idx] += sco;
 			targetScoreVal[idx] += sco;
-//			System.out.println(source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
+			//System.out.println("score: "+source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
 		}
 
 		// negative scores are set to 0
@@ -1105,10 +1118,19 @@ public class DataPathConsistencyAnalyzer {
 						Node split_source = ps.nodeSequence.get(ps.source); 
 						if (split_target == side && split_source == source) {
 							int idx = scoreMap.get(target).get(source);
-							// do not take into account the sign for the penalty score
-							double sco = Math.abs(ps.influence / ps.length);
-							scoreVal[idx] -= Math.abs(ps.influence / ps.length);
-							sideEffectScoreVal[idx] += Math.abs(sco);
+							/*
+							 * Do not take into account the sign for the penalty score
+							 * so take the absolute value.
+							 * Use inverse or logistic function for calculating the score.
+							 */
+							double sco = 0.0;
+							if (this.useInverseFunction == true) 
+								sco = Math.abs(ps.influence / ps.length);
+							else
+								sco = Math.abs(ps.influence * (1 / (1 + Math.exp(-1 * ps.length))));
+							
+							scoreVal[idx] -= sco;
+							sideEffectScoreVal[idx] += sco;
 //							System.out.println(source.Id+":"+target.Id+" "+ps.label+" infl="+ps.influence+" len="+ps.length+" score="+sco+" val="+scoreVal[idx]);
 						}
 					}

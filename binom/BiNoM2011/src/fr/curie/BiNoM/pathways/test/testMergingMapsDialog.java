@@ -15,10 +15,9 @@ public class testMergingMapsDialog {
 		ArrayList<File> l = new ArrayList<File>();
 		l.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml"));
 		l.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a2.xml"));
-		//l.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a3.xml"));
+		l.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a3.xml"));
 		
-		MergingMapsDialog mp = new MergingMapsDialog(w,"Merge Cell Designer maps",true);
-		mp.setFileList(l);
+		MergingMapsDialog mp = new MergingMapsDialog(w,"Merge Cell Designer maps",true, l);
 		mp.setVisible(true);
 		
 //		MergingMapsSelectFilesDialog sf = new MergingMapsSelectFilesDialog(w, "Merging Maps Step 1", true);

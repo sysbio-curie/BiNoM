@@ -32,7 +32,7 @@ public class MergingMapsDialog extends JDialog {
 	private JTable tableSpecies;
 	private JLabel label1;
 	
-	private JButton buttonDisplay;
+//	private JButton buttonDisplay;
 	private JButton buttonMerge;
 	private JButton buttonSave;
 	
@@ -44,6 +44,7 @@ public class MergingMapsDialog extends JDialog {
 	
 	private int numFiles;
 	private int numStep;
+	private int stepMax;
 	
 	private class MyTableModel extends AbstractTableModel {
         private String[] columnNames = {"Alias", "Species", "Compartment", "Name", "Alias", "Species", "Compartment", "Name", "Select"};
@@ -105,15 +106,13 @@ public class MergingMapsDialog extends JDialog {
 		}
     }
  
-	public MergingMapsDialog(JFrame frame, String mess, boolean modal){
+	public MergingMapsDialog(JFrame frame, String mess, boolean modal, ArrayList<File> fl){
 		// call JDialog constructor
 		super(frame, mess, modal);
+		this.fileList = fl;
+		this.numFiles = fl.size();
+		this.stepMax = numFiles - 1;
 		init();
-	}
-	
-	public void setFileList(ArrayList<File> f) {
-		this.fileList = f;
-		this.numFiles = fileList.size();		
 	}
 	
 	private void init() {
@@ -121,7 +120,7 @@ public class MergingMapsDialog extends JDialog {
 		setSize(600,600);
 		setLocation((screenSize.width - getSize().width) / 2,(screenSize.height - getSize().height) / 2);
 
-		this.numStep = 0;
+		this.numStep = 1;
 		this.mmProc = new MergingMapsProcessor();
 		
 		fc = new JFileChooser();
@@ -129,7 +128,7 @@ public class MergingMapsDialog extends JDialog {
 		JPanel p = new JPanel(new GridBagLayout());
 		int y = 1;
 		
-		label1 = new JLabel("Merging step x/N");
+		label1 = new JLabel("Merging step: "+numStep+" / "+stepMax);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = y;
@@ -139,24 +138,6 @@ public class MergingMapsDialog extends JDialog {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(10,10,10,10);
 		p.add(label1, c);
-		
-		y++;
-		
-		buttonDisplay = new JButton("Display");
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = y;
-		c.gridwidth = 3;
-		c.weightx = 0.5;
-		c.anchor = GridBagConstraints.WEST;
-		c.insets = new Insets(10,10,10,10);
-		buttonDisplay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				displaySpecies();
-			}
-		});
-
-		p.add(buttonDisplay, c);
 		
 		y++;
 		
@@ -174,6 +155,7 @@ public class MergingMapsDialog extends JDialog {
 		c.insets = new Insets(10,10,10,10);
 		scrollPane.setPreferredSize(new Dimension(580, 180));
 		p.add(scrollPane, c);
+		this.initDisplaySpecies();
 		
 		y++;
 
@@ -192,7 +174,7 @@ public class MergingMapsDialog extends JDialog {
 				mergeMaps();
 			}
 		});
-		buttonMerge.setEnabled(false);
+		buttonMerge.setEnabled(true);
 
 		p.add(buttonMerge, c);
 
@@ -220,15 +202,10 @@ public class MergingMapsDialog extends JDialog {
 
 		p.add(buttonSave, c);
 		
-		// Ok - Cancel buttons
+		/*
+		 * Cancel button panel
+		 */
 		JPanel buttonPanel = new JPanel();
-//		JButton okB = new JButton("Ok");
-//		okB.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				// do something !
-//			}
-//		});
-//		buttonPanel.add(okB);
 
 		JButton cancelB = new JButton("Cancel");
 		cancelB.addActionListener(new ActionListener() {
@@ -246,16 +223,6 @@ public class MergingMapsDialog extends JDialog {
 	
 	private void setTableData(Vector<String> data) {
 		
-//		int nbRows = data.size();
-//		String[] colNames = {"Alias", "Species", "Compartment", "Name", "Alias", "Species", "Compartment", "Name", "Select"};
-//		String[][] tableData = new String[nbRows][4];
-//		for (int i=0;i<data.size();i++) {
-//			String[] tk = data.get(i).split("\\t");
-//			tableData[i] = tk;
-//		}
-//		DefaultTableModel tm = (DefaultTableModel) tableSpecies.getModel();
-//		tm.setDataVector(tableData, colNames);
-		
 		int nbRows = data.size();
 		String[] colNames = {"Alias", "Species", "Compartment", "Name", "Alias", "Species", "Compartment", "Name", "Select"};
 		Object[][] tableData = new Object[nbRows][colNames.length];
@@ -272,48 +239,43 @@ public class MergingMapsDialog extends JDialog {
 		tm.fireTableDataChanged();
 	}
 	
-	private void displaySpecies() {
-		
-		this.numStep++;
-		
-		if (numStep < numFiles) {
-			if (numStep == 1) {
-				System.out.println("merging first two files");
-				// first two files
-				System.out.println("set file names");
-				this.mmProc.setAndLoadFileName1(fileList.get(0).getAbsolutePath());
-				this.mmProc.setAndLoadFileName2(fileList.get(1).getAbsolutePath());
-				System.out.println("set merge lists");
-				this.mmProc.setMergeLists();
-				this.setTableData(this.mmProc.getSpeciesMap());
-			}
-			else {
-				// the rest of the world!
-				this.mmProc.setAndLoadFileName2(fileList.get(numStep).getAbsolutePath());
-				this.mmProc.setMergeLists();
-				this.setTableData(this.mmProc.getSpeciesMap());
-			}
-			this.buttonDisplay.setEnabled(false);
-			this.buttonMerge.setEnabled(true);
-		}
+	/**
+	 * Initialize the table display with the first two files
+	 */
+	private void initDisplaySpecies() {
+		this.mmProc.setAndLoadFileName1(fileList.get(0).getAbsolutePath());
+		this.mmProc.setAndLoadFileName2(fileList.get(1).getAbsolutePath());
+		this.mmProc.setMergeLists();
+		this.setTableData(this.mmProc.getSpeciesMap());
 	}
 	
+	/**
+	 * Update the species map with the data from the table, set and display next round.
+	 */
 	private void mergeMaps() {
 		
-		this.buttonDisplay.setEnabled(true);
-		this.buttonMerge.setEnabled(false);
+		// update data and merge 
 		this.updateSpeciesMap();
 		this.mmProc.mergeTwoMaps();
 		
 		System.out.println("numSteps: "+numStep);
 		System.out.println("numFiles: "+numFiles);
 		
-		if (this.numStep == numFiles-1) {
+		// move to next file in the list
+		this.numStep++;
+		
+		if (this.numStep == numFiles) {
 			// we have merged all the files, save result and close
-			//this.mmProc.saveCd1File("/bioinfo/users/ebonnet/test.xml");
-			//this.setVisible(false);
 			this.buttonMerge.setEnabled(false);
+			this.tableSpecies.setEnabled(false);
 			this.buttonSave.setEnabled(true);
+		}
+		else {
+			// move to next file, create lists and display species map 
+			this.mmProc.setAndLoadFileName2(fileList.get(numStep).getAbsolutePath());
+			this.mmProc.setMergeLists();
+			this.setTableData(this.mmProc.getSpeciesMap());
+			this.label1.setText("Merging step: "+numStep+" / "+stepMax);
 		}
 	}
 	
@@ -325,6 +287,7 @@ public class MergingMapsDialog extends JDialog {
 		this.mmProc.saveCd1File(fileName);
 		this.setVisible(false);
 	}
+	
 	/**
 	 * Replace the speciesMap vector of the processor with the data from the JTable, updated by the user.
 	 */
@@ -338,6 +301,7 @@ public class MergingMapsDialog extends JDialog {
 		
 		for (int i=0;i<nbRow;i++) {
 			boolean b = (Boolean) this.tableSpecies.getModel().getValueAt(i, 8);
+			// if the row is checked, include it in the list of species to merge
 			if (b) {
 				String str = "";
 				for (int j=0;j<nbCol-1;j++) {

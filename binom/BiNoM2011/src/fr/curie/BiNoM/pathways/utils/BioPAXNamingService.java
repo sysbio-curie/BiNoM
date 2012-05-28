@@ -77,6 +77,9 @@ public class BioPAXNamingService {
 	 */
 	private HashMap<String, Integer> uri2SequenceSitePosition = new HashMap<String, Integer>();
 	
+	private HashMap<String, Entity> listOfComplexComponents = new HashMap<String, Entity>();
+
+	
 	
 	/**
 	 * Empty constructor
@@ -113,6 +116,18 @@ public class BioPAXNamingService {
 	 * @throws Exception
 	 */
 	public void generateNames(BioPAX biopax, boolean verbose) throws Exception{
+		
+		// Populate list of complex modifications
+		
+		List listOfComplexes = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
+		for(int i=0;i<listOfComplexes.size();i++){ 
+			Complex compl = (Complex)listOfComplexes.get(i);
+			Iterator<PhysicalEntity> it = compl.getComponent();
+			while(it.hasNext()){
+				PhysicalEntity pent = it.next();
+				listOfComplexComponents.put(pent.uri(), pent);
+		}}
+
 		
 		
 		/*
@@ -460,8 +475,13 @@ public class BioPAXNamingService {
 			name = createNameForComplex((Complex) pe);
 		}
 		else if (pe instanceof Protein) {
-			name = getShortestName(pe.getName());
 			
+			if(((Protein) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+				name = getShortestName(((Protein) pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
+			//System.out.println("Protein "+pe.uri()+"\t"+name);
 			// add ModificationFeatures such as phosphorylations.
 			Iterator it = ((Protein)pe).getFeature();
 			while(it.hasNext()) {
@@ -470,6 +490,7 @@ public class BioPAXNamingService {
 				if (str != null) {
 					name += "|" + str;
 				}
+				System.out.println("\t\tFeature:"+name);
 			}
 			
 			// add cellular compartment to the name, remove compartment string if already there
@@ -485,8 +506,20 @@ public class BioPAXNamingService {
 			name = getShortestName(pe.getName());
 			name = addCellularCompartmentName(name, ((SmallMolecule) pe).getCellularLocation());
 		}
-		else if (pe instanceof Rna) {
-			name = getShortestName(pe.getName());
+		else if (pe instanceof Rna){
+			if(((Rna) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+				name = getShortestName(((Rna)pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
+			name = addCellularCompartmentName(name, ((Rna) pe).getCellularLocation());
+		}
+		else if (pe instanceof Dna){
+			if(((Dna) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+				name = getShortestName(((Dna)pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
 			name = addCellularCompartmentName(name, ((Rna) pe).getCellularLocation());
 		}
 		else if (pe instanceof PhysicalEntity) {
@@ -638,7 +671,7 @@ public class BioPAXNamingService {
 							names.add(tk[0]);
 					}
 					else {
-						// entity is not is uri2name list
+						// entity is not in uri2name list
 						String n = getShortestName(pe.getName());
 						int coef = cs.getStoichiometricCoefficient().intValue();
 						for (int i=0;i<coef;i++)

@@ -262,10 +262,11 @@ public class parseCellDesigner {
 
   public static void printPhenotypeList(SbmlDocument.Sbml sbml){
     //Phenotypes are treated as proteins
-    Vector species = CellDesignerToBioPAXConverter.getSpecies(sbml);
+    HashMap<String, SpeciesDocument.Species> species = CellDesignerToBioPAXConverter.getSpecies(sbml);
     int k = 0;
-    for(int i=0;i<species.size();i++){
-      SpeciesDocument.Species sp = (SpeciesDocument.Species)species.elementAt(i);
+    Iterator<String> its = species.keySet().iterator();
+    while(its.hasNext()){
+      SpeciesDocument.Species sp = species.get(its.next());
       if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
         String cl = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
         if(cl.equals("PHENOTYPE")){

@@ -158,7 +158,7 @@ public class BioPAXToSBMLConverter {
      */
     public void populateSbml() throws Exception {
     	
-    	bpnm.generateNames(biopax,false);
+    	bpnm.generateNames(biopax,true);
     	findIndependentSpecies();
     	compartments = getAllCompartments();
 
@@ -247,7 +247,8 @@ public class BioPAXToSBMLConverter {
     		allReactions.put(tr.uri(),tr);
     		addConversionReaction(tr,lr);
     	}
-    	reactionList = biopax_DASH_level3_DOT_owlFactory.getAllComplexAssembly(biopax.model);
+    	
+       	reactionList = biopax_DASH_level3_DOT_owlFactory.getAllComplexAssembly(biopax.model);
     	it = reactionList.iterator();
     	while(it.hasNext()){
     		ComplexAssembly ca = (ComplexAssembly)it.next();
@@ -283,17 +284,26 @@ public class BioPAXToSBMLConverter {
     			addInteractionReaction(inter,lr);
     		}
     	}
+
+    	// interaction should appear but not controls
+    	List<Control> ccontrolList = biopax_DASH_level3_DOT_owlFactory.getAllControl(biopax.model);
+    	HashSet<String> allControls = new HashSet<String>();
+    	it = ccontrolList.iterator();
+    	while(it.hasNext()){
+    		allControls.add(((Control)it.next()).uri());
+    	}
     	reactionList = biopax_DASH_level3_DOT_owlFactory.getAllInteraction(biopax.model);
     	it = reactionList.iterator();
     	while(it.hasNext()){
     		Interaction inter = (Interaction)it.next();
     		if(allReactions.get(inter.uri())==null){
     			allReactions.put(inter.uri(),inter);
-    			addInteractionReaction(inter,lr);
+    			if(!allControls.contains(inter.uri()))
+    				addInteractionReaction(inter,lr);
     		}
     	}
 
-    	// Now process controls
+    	// Now process controls 
     	List catlist  = biopax_DASH_level3_DOT_owlFactory.getAllCatalysis(biopax.model);
     	it = catlist.iterator();
     	while(it.hasNext()){
@@ -318,6 +328,9 @@ public class BioPAXToSBMLConverter {
     			addControl(contr);
     		}
     	}
+    	
+    	
+    	
     } // end populateSBML function
 
     
@@ -345,8 +358,7 @@ public class BioPAXToSBMLConverter {
     		Iterator comps = compl.getComponent();
     		while(comps.hasNext()) {
     			PhysicalEntity pe = (PhysicalEntity) comps.next();
-    			// modif EB 12.2011: there is no PhysicalEntityParticipant in complexes, it's directly PhysicalEntity objects like proteins
-    			addParticipant(pe);
+    			addIncludedParticipant(pe);
     		}
     	}
     	
@@ -597,6 +609,7 @@ public class BioPAXToSBMLConverter {
     }
 
     public void addConversionReaction(Conversion conv, ListOfReactionsDocument.ListOfReactions lr) throws Exception{
+    	System.out.println("Conversion: "+conv.uri());
     	Boolean spont = conv.getSpontaneous();
     	String dir = conv.getConversionDirection();
     	
@@ -682,6 +695,7 @@ public class BioPAXToSBMLConverter {
     }
     
     public void addInteractionReaction(Interaction inter, ListOfReactionsDocument.ListOfReactions lr) throws Exception{
+    	System.out.println("Interaction: "+inter.uri());
     	ReactionDocument.Reaction reaction = lr.addNewReaction();
     	String comm = makeComment(inter.getComment());
     	if(inter instanceof MolecularInteraction) comm+=" ; BIOPAX_REACTION_TYPE : MolecularInteraction";
@@ -712,6 +726,7 @@ public class BioPAXToSBMLConverter {
     }
 
     public void addControl(Control cntrl) throws Exception{
+    	System.out.println("Control: "+cntrl.uri());
     	String controlled_uri = Utils.getPropertyURI(cntrl, "controlled");
     	Vector<String> controller_vector = Utils.getPropertyURIs(cntrl, "controller");
     	if(controlled_uri!=null){

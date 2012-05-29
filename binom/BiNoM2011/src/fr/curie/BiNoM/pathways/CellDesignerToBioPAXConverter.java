@@ -110,8 +110,8 @@ public class CellDesignerToBioPAXConverter {
 		CellDesignerToBioPAXConverter.useBiopaxModelOntology = false;
 		BioPAX.addBiopaxModelOntology = CellDesignerToBioPAXConverter.useBiopaxModelOntology;
 		alwaysMentionCompartment = true;
-		biopax.makeCompartments();
-		createCellDesignerTerms();
+		//biopax.makeCompartments();
+		//createCellDesignerTerms();
 		compartmentHash = getCompartmentHash(sbml.getSbml());
 		CellDesigner.entities = CellDesigner.getEntities(sbml);
 		return populateModel();
@@ -311,6 +311,13 @@ public class CellDesignerToBioPAXConverter {
 							}
 						}
 					}
+			}
+			
+			// Now let us create all species
+			for(int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++){
+				SpeciesDocument.Species sp = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
+				PhysicalEntity ent = createEntityForSpecies(sp.getId(),species,complexes_list,entities,entityReferences,sbml.getSbml(),biopax,sp.getId());
+				entities.put(sp.getId(), ent);
 			}
 
 			// Interactions
@@ -702,8 +709,8 @@ public class CellDesignerToBioPAXConverter {
 				if(si!=null)
 					cl = Utils.getValue(si.getCelldesignerClass());
 
-				//if((si!=null)&&(si.getCelldesignerState()!=null)&&(si.getCelldesignerState().getCelldesignerHomodimer()!=null)){
-				if((si!=null)&&(si.getCelldesignerState()!=null)){
+				if((si!=null)&&(si.getCelldesignerState()!=null)&&(si.getCelldesignerState().getCelldesignerHomodimer()!=null)){
+				//if((si!=null)&&(si.getCelldesignerState()!=null)){
 					boolean reacfound = false;
 					for(int kk=0;kk<reactions.size();kk++){
 						ReactionDocument.Reaction r = (ReactionDocument.Reaction)reactions.elementAt(kk);
@@ -846,7 +853,7 @@ public class CellDesignerToBioPAXConverter {
 												comp = biopax.getCompartment(compname);
 							}
 
-							//pep.setCellularLocation((CellularLocationVocabulary)comp);
+							pep.setCellularLocation((CellularLocationVocabulary)comp);
 
 
 							if(sp!=null)
@@ -873,10 +880,23 @@ public class CellDesignerToBioPAXConverter {
 												else
 													s+="_"+resname+"_"+stt;
 												stt = Utils.replaceString(stt," ","_");
+												
 												ModificationFeature sf = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+sp_id+""+s,biopax.biopaxmodel);
 												String state = cm.getState().getStringValue();
 												if(state.equals("unknown")) state+="_modification";
-												sf.setModificationType((SequenceModificationVocabulary)cellDesignerTerms.get(state));
+												
+												
+												SequenceModificationVocabulary modif = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+stt, biopax.biopaxmodel);
+												modif.addTerm(stt);
+												sf.setModificationType(modif);
+												
+												//sf.setModificationType((SequenceModificationVocabulary)cellDesignerTerms.get(state));
+												
+												//SequenceSite site = biopax_DASH_level3_DOT_owlFactory.createSequenceSite(biopax.namespaceString+sp_id+""+s+"_site",biopax.biopaxmodel);;
+												//sf.addFeatureLocation(site);
+												//sf.setModificationType(modificationType);
+												
+												
 												pep.addFeature(sf);
 										}
 								}

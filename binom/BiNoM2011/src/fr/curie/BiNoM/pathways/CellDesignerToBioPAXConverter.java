@@ -874,20 +874,22 @@ public class CellDesignerToBioPAXConverter {
 												String resname = CellDesignerToCytoscapeConverter.getNameOfModificationResidue(sbml,si,cm.getResidue());
 												String stt = cm.getState().getStringValue();
 												stt = stt.substring(0,3);
+												stt = Utils.replaceString(stt," ","_");
 												String s = "";
 												if(resname==null)
-													s+="_s"+(j+1)+"_"+stt;
+													s+="s"+(j+1)+"_"+stt;
 												else
-													s+="_"+resname+"_"+stt;
-												stt = Utils.replaceString(stt," ","_");
+													s+=""+resname+"_"+stt;
 												
-												ModificationFeature sf = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+sp_id+""+s,biopax.biopaxmodel);
+												
+												ModificationFeature sf = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+sp_id+"_"+s,biopax.biopaxmodel);
 												String state = cm.getState().getStringValue();
 												if(state.equals("unknown")) state+="_modification";
 												
 												
-												SequenceModificationVocabulary modif = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+stt, biopax.biopaxmodel);
-												modif.addTerm(stt);
+												SequenceModificationVocabulary modif = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+s, biopax.biopaxmodel);
+												modif.addTerm(s);
+												//System.out.println("MODIFICATION: "+s+" resname"+resname);
 												sf.setModificationType(modif);
 												
 												//sf.setModificationType((SequenceModificationVocabulary)cellDesignerTerms.get(state));

@@ -174,12 +174,13 @@ public class MergingMapsProcessor {
 		for(int i=0;i<ids.size();i++)
 			System.out.print(ids.get(i)+" ");
 		System.out.println("\n"+ids.size());
-		for(int i=0;i<ids.size();i++)if(!ids.get(i).equals("default")){
-			if(i==(int)(0.02f*i)*50)
-				System.out.print(i+" ");
-			text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
-			text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
-	    }
+		for(int i=0;i<ids.size();i++)
+			if(!ids.get(i).equals("default")){
+				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
+				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
+				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
+				text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
+			}
 		System.out.println();
 		return text;
 	}

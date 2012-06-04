@@ -21,7 +21,7 @@ import fr.curie.BiNoM.cytoscape.utils.TextBoxDialog;
  */
 public class ClusterByShortPath extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Agglomerate the Nearest Nodes in Modules";
+	final public static String title="Agglomerate the nearest nodes in modules";
 	private int maxPathLength;
 	int sizeCeiling;
 	String maxPathLengthS;

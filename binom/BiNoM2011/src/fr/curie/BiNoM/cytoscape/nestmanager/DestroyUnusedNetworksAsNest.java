@@ -22,7 +22,7 @@ import giny.model.GraphPerspective;
  */
 public class DestroyUnusedNetworksAsNest extends CytoscapeAction {
 	private static final long serialVersionUID = 1L;
-	final public static String title="Destroy Networks Unused as Module";
+	final public static String title="Destroy networks unused as module";
 	public void actionPerformed(ActionEvent e) {		
 		HashSet<String> usedNetworks=new HashSet<String>();
 		for(CyNode node:NestUtils.getNodeList(Cytoscape.getCurrentNetwork())){

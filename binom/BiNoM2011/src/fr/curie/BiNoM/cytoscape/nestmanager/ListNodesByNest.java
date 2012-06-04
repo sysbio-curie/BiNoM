@@ -18,7 +18,7 @@ import cytoscape.util.CytoscapeAction;
  */
 public class ListNodesByNest extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="List Nodes of Modules and Network";
+	final public static String title="List nodes of modules and network";
 	public void actionPerformed(ActionEvent e){		
 		CyNetwork network=Cytoscape.getCurrentNetwork();
 		String text="Network\tNode\r\n";

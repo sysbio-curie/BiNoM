@@ -16,7 +16,7 @@ import cytoscape.util.CytoscapeAction;
  */
 public class NestInNodeAttribute extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Assign Module Names to Node Attribute";
+	final public static String title="Assign module names to node attribute";
 	public void actionPerformed(ActionEvent e){
 		String nodeAttr="IN_"+Cytoscape.getCurrentNetwork().getTitle();	
 		for(CyNode nest:NestUtils.getNodeList(Cytoscape.getCurrentNetwork())){

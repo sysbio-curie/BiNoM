@@ -20,7 +20,7 @@ import fr.curie.BiNoM.cytoscape.lib.TaskManager;
  */
 public class RecreateLostConnectionsInsideNests  extends CytoscapeAction {
 	private static final long serialVersionUID = 1L;
-	final public static String title="Recreate Lost Connections inside Modules";
+	final public static String title="Recreate lost connections inside modules";
 	private CyNetwork referenceNW;
 	void updateConnections(CyNetwork network){
 		if(network==referenceNW) return;

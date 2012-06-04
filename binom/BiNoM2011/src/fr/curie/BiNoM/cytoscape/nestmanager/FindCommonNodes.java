@@ -27,7 +27,7 @@ import cytoscape.util.CytoscapeAction;
  */
 public class FindCommonNodes extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Find Common Nodes in Modules";
+	final public static String title="Find common nodes in modules";
 	final String interaction="INTERSECTION";
 	final String edgeAttr="COMMON_NODES";
 	final String nodeAttr="NODE_NUMBER";

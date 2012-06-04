@@ -17,7 +17,7 @@ import cytoscape.view.CyNetworkView;
  */
 public class CreateNestNetwork  extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create Network of Modules";
+	final public static String title="Create network of modules";
 	public void actionPerformed(ActionEvent e){
 		TreeMap<String,CyNetwork> networks=NestUtils.getNetworksMap();
 		ArrayList<String> selection=NestUtils.selectNetworks(networks,title,"Select networks to be nested");

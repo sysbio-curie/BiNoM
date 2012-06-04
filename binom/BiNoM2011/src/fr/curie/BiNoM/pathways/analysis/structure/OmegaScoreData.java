@@ -9,17 +9,15 @@ package fr.curie.BiNoM.pathways.analysis.structure;
  *
  */
 public class OmegaScoreData implements Comparable<OmegaScoreData> {
-	
 	/**
 	 * Node ID
 	 */
 	public String nodeId;
-	
 	/**
-	 * Ocsana overall omega score.
+	 * Ocsana omega score
 	 */
 	public double score;
-
+	
 	public OmegaScoreData(String id, double score) {
 		this.nodeId = id; 
 		this.score = score;

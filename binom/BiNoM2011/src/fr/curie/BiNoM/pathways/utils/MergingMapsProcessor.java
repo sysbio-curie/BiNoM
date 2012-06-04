@@ -28,15 +28,13 @@ import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 /**
  * Cell designer merging maps algorithms.
- * 
- * Most of the original code from AZ, additions and wrappers from EB.
- * 
- *  
  */
 public class MergingMapsProcessor {
 
-	private Vector<String> proteinMap;
-	private Vector<String> speciesMap;
+	public String fileName1;
+	public String fileName2;
+	public Vector<String> proteinMap;
+	public Vector<String> speciesMap;
 	private SbmlDocument cd1;
 	private SbmlDocument cd2;
 	
@@ -44,82 +42,44 @@ public class MergingMapsProcessor {
 	 * Constructor
 	 */
 	public MergingMapsProcessor() {
-		// void. void. void.
-	}
-
-//  ------ full process to merge two maps ---------------------------------------------	
-//	String file1Text = Utils.loadString(fileName1);
-//	file1Text = addPrefixToIds(file1Text,"rb_");
-//	cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-//	countAll(cd1);
-//	cd2 = CellDesigner.loadCellDesigner(fileName2);
-//	produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
-//	mergeDiagrams(cd1,cd2);
-//	rewireDiagram(cd1, speciesMap,proteinMap);
-//	CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/rew.xml");
-//	--------------------------------------------------------------------------------
-	
-	public void setAndLoadFileName1(String fileName) {
-		String file1Text = Utils.loadString(fileName);
-		file1Text = addPrefixToIds(file1Text,"rb_");
-		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-		countAll(cd1);
-	}
-	
-	public void setAndLoadFileName2 (String fileName) {
-		this.cd2 = CellDesigner.loadCellDesigner(fileName);
-	}
-	
-	public void setMergeLists() {
 		proteinMap = new Vector<String>();
 		speciesMap = new Vector<String>();
+	}
+	
+	public void setCandidateMergingLists() {
+		// load file1 in a string
+		String file1Text = Utils.loadString(fileName1);
+		
+		// add a prefix to all IDs
+		file1Text = addPrefixToIds(file1Text,"rb_");
+		
+		// load file1_id in SbmlDocument object
+		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
+		System.out.println("Loaded.");
+		
+		countAll(cd1);
+		
+		// load file 2 as SbmlDocument object
+		cd2 = CellDesigner.loadCellDesigner(fileName2);
+		
+		// define and write maps of common things to file(s)
 		produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
 	}
 	
-	public void mergeTwoMaps() {
+	public void mergeMaps() {
+		// do full process for testing
+		String file1Text = Utils.loadString(fileName1);
+		file1Text = addPrefixToIds(file1Text,"rb_");
+		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
+		countAll(cd1);
+		cd2 = CellDesigner.loadCellDesigner(fileName2);
+		produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
 		mergeDiagrams(cd1,cd2);
 		rewireDiagram(cd1, speciesMap,proteinMap);
+		CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/rew.xml");
 	}
 	
-	public void saveCd1File(String fileName) {
-		CellDesigner.saveCellDesigner(cd1, fileName);
-	}
-	
-	public Vector<String> getSpeciesMap() {
-		return this.speciesMap;
-	}
-	
-	public void setSpeciesMap(Vector<String> data) {
-		this.speciesMap = data;
-	}
-	
-	public void printSpeciesMap() {
-		System.out.println("#----- species map---------");
-		for (String s : this.speciesMap)
-			System.out.println(s);
-	}
-//	private void setCandidateMergingLists() {
-//		// load file1 in a string
-//		String file1Text = Utils.loadString(fileName1);
-//		
-//		// add a prefix to all IDs
-//		file1Text = addPrefixToIds(file1Text,"rb_");
-//		
-//		// load file1_id in SbmlDocument object
-//		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-//		System.out.println("Loaded.");
-//		
-//		countAll(cd1);
-//		
-//		// load file 2 as SbmlDocument object
-//		cd2 = CellDesigner.loadCellDesigner(fileName2);
-//		
-//		// define and write maps of common things
-//		produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
-//	}
-	
-	
-	private static void countAll(SbmlDocument cd){
+	public static void countAll(SbmlDocument cd){
 		
 		HashMap<String,Integer> rt = new HashMap<String,Integer>();
 		
@@ -169,23 +129,22 @@ public class MergingMapsProcessor {
 		System.out.println("RNA\t"+cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray());
 	}
 	
-	private static String addPrefixToIds(String text, String prefix){
+	public static String addPrefixToIds(String text, String prefix){
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++)
 			System.out.print(ids.get(i)+" ");
 		System.out.println("\n"+ids.size());
-		for(int i=0;i<ids.size();i++)
-			if(!ids.get(i).equals("default")){
-				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
-				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
-				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
-				text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
-			}
+		for(int i=0;i<ids.size();i++)if(!ids.get(i).equals("default")){
+			if(i==(int)(0.02f*i)*50)
+				System.out.print(i+" ");
+			text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
+			text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
+	    }
 		System.out.println();
 		return text;
 	}
 	
-	private void mergeDiagrams(SbmlDocument cd, SbmlDocument cd2){
+	public void mergeDiagrams(SbmlDocument cd, SbmlDocument cd2){
 		// Compartments
 		for(int i=0;i<cd2.getSbml().getModel().getListOfCompartments().sizeOfCompartmentArray();i++)
 			if(!cd2.getSbml().getModel().getListOfCompartments().getCompartmentArray(i).getId().equals("default"))
@@ -217,7 +176,7 @@ public class MergingMapsProcessor {
 	}
 	
 	
-	private void produceCandidateMergeLists(SbmlDocument cd, SbmlDocument cd2, Vector<String> proteinMap, Vector<String> speciesMap) {
+	public void produceCandidateMergeLists(SbmlDocument cd, SbmlDocument cd2, Vector<String> proteinMap, Vector<String> speciesMap) {
 
 		// map of protein names to IDs for file1
 		HashMap<String,String> proteinNames = new HashMap<String,String>();
@@ -261,12 +220,7 @@ public class MergingMapsProcessor {
 			}
 		}
 
-		/*
-		 *  before: find proteins sharing the same name, save them to "P" file
-		 *  
-		 *  now: for proteins having same name add string "id1-name1-id2-name2" to vector proteinMap
-		 *  
-		 */
+		// find proteins sharing same name, save them to "P" file
 		//FileWriter fw = new FileWriter(prefix+"P.txt");
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
@@ -299,9 +253,6 @@ public class MergingMapsProcessor {
 			SpeciesDocument.Species sp = species2.get(spId);
 			if(sp!=null){
 				String spName = c2c.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), spId, Utils.getValue(sp.getName()), sp.getCompartment(), true, true, "", cd2);
-				/*
-				 * check if species alias 2 name is contained in map 1
-				 */
 				if(speciesIds.containsKey(spName)){
 					String id1 = speciesIds.get(spName); 
 					Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> vsa = speciesAliases.get(id1);
@@ -309,13 +260,12 @@ public class MergingMapsProcessor {
 						System.out.println("Vector of aliases is not found for "+id1);
 					//fw.write(vsa.get(0).getId()+"\t"+id1+"\t"+species.get(id1).getCompartment()+"\t"+spName+"\t"+cas.getId()+"\t"+spId+"\t"+sp.getCompartment()+"\t"+spName+"\n");
 					speciesMap.add(vsa.get(0).getId()+"\t"+id1+"\t"+species.get(id1).getCompartment()+"\t"+spName+"\t"+cas.getId()+"\t"+spId+"\t"+sp.getCompartment()+"\t"+spName);
-				}
-			}
+				}}
 		}
 		//fw.close();
 	}
 
-	private void rewireDiagram(SbmlDocument cd, Vector<String> subs, Vector<String> subsP){
+	public void rewireDiagram(SbmlDocument cd, Vector<String> subs, Vector<String> subsP){
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 		XmlString xs = XmlString.Factory.newInstance();
 		HashMap<String,String> aliasMap = new HashMap<String,String>();
@@ -678,7 +628,7 @@ public class MergingMapsProcessor {
 		}		
 	}
 	
-	private String getReactionString(ReactionDocument.Reaction r, SbmlDocument sbmlDoc, boolean realNames, boolean addModifiers){
+	public String getReactionString(ReactionDocument.Reaction r, SbmlDocument sbmlDoc, boolean realNames, boolean addModifiers){
 		  String reactionString = "";
 		  String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
 		  ListOfModifiersDocument.ListOfModifiers lm = r.getListOfModifiers();
@@ -755,7 +705,7 @@ public class MergingMapsProcessor {
 		  return reactionString;
 		}
 	
-	private SpeciesDocument.Species getSpecies(SbmlDocument cd, String id){
+	public SpeciesDocument.Species getSpecies(SbmlDocument cd, String id){
 		SpeciesDocument.Species sp = null;
 		for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species a = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -766,7 +716,7 @@ public class MergingMapsProcessor {
 	}
 
 	
-	private CelldesignerProteinDocument.CelldesignerProtein getProtein(SbmlDocument cd, String id){
+	public CelldesignerProteinDocument.CelldesignerProtein getProtein(SbmlDocument cd, String id){
 		CelldesignerProteinDocument.CelldesignerProtein sp = null;
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein a = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
@@ -777,7 +727,7 @@ public class MergingMapsProcessor {
 	}
 	
 
-	private CelldesignerGeneDocument.CelldesignerGene getGene(SbmlDocument cd, String id){
+	public CelldesignerGeneDocument.CelldesignerGene getGene(SbmlDocument cd, String id){
 		CelldesignerGeneDocument.CelldesignerGene sp = null;
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 			CelldesignerGeneDocument.CelldesignerGene a = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
@@ -787,7 +737,7 @@ public class MergingMapsProcessor {
 		return sp;
 	}
 	
-	private CelldesignerRNADocument.CelldesignerRNA getRNA(SbmlDocument cd, String id){
+	public CelldesignerRNADocument.CelldesignerRNA getRNA(SbmlDocument cd, String id){
 		CelldesignerRNADocument.CelldesignerRNA sp = null;
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
 			CelldesignerRNADocument.CelldesignerRNA a = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);

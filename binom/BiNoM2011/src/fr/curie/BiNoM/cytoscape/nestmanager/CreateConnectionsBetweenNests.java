@@ -26,7 +26,7 @@ import cytoscape.util.CytoscapeAction;
  */
 public class CreateConnectionsBetweenNests  extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create Connections between Modules";
+	final public static String title="Create connections between modules";
 	private CyNetwork currentNW,referenceNW;
 	private HashMap<CyNode,HashSet<CyNode>> nodesToNest;
 	private void doNodeToNests(){

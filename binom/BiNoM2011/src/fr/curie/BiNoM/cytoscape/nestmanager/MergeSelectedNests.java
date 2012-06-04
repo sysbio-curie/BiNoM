@@ -9,7 +9,7 @@ import cytoscape.util.CytoscapeAction;
  */ 
 public class MergeSelectedNests extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create Network from Union of Selected Modules";
+	final public static String title="Create network from union of selected modules";
 	public void actionPerformed(ActionEvent v) {
 		NestMerging merging=new NestMerging(Cytoscape.getCurrentNetwork(),Cytoscape.getCurrentNetworkView());
 		if(merging.perform(NestUtils.getSelectedNodes(Cytoscape.getCurrentNetwork()))) Cytoscape.getCurrentNetworkView().redrawGraph(true,true);

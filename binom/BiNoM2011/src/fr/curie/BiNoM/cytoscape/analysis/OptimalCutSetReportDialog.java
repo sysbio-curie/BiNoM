@@ -8,9 +8,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -21,7 +19,6 @@ import javax.swing.JTextArea;
 
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.OptimalCombinationAnalyzer;
-import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer.optCutSetData;
 
 
 /**
@@ -84,9 +81,6 @@ public class OptimalCutSetReportDialog extends JDialog {
 
 			getContentPane().add(jpane,BorderLayout.CENTER);    	
 			
-			/*
-			 * Ok button
-			 */
 			JPanel buttonPanel = new JPanel();
 			JButton okB = new JButton("Ok");
 
@@ -95,11 +89,9 @@ public class OptimalCutSetReportDialog extends JDialog {
 					setVisible(false);
 				}
 			});
+
 			buttonPanel.add(okB);
 	    	
-			/*
-			 * copy report to clipboard button
-			 */
 			JButton copyB = new JButton("Copy report to clipboard");
 
 			copyB.addActionListener(new ActionListener() {
@@ -110,34 +102,13 @@ public class OptimalCutSetReportDialog extends JDialog {
 					clipboard.setContents(data, data);
 				}
 			});
-			buttonPanel.add(copyB);
 
-			/*
-			 * Save report to file button
-			 */
+			buttonPanel.add(copyB);
+			
 			fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			fc.setSelectedFile(new File("Ocsana_report.txt"));
-			JButton saveReportB = new JButton("Save report to file");
-			saveReportB.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					
-					int ret = fc.showSaveDialog(OptimalCutSetReportDialog.this);
-					if (ret == fc.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
-						saveReport(file);
-					}
-				}
-			});
-			buttonPanel.add(saveReportB);
+			fc.setSelectedFile(new File("HitSetList.txt"));
 			
-			
-			/*
-			 * Save list of hit sets to file button
-			 */
-			fc = new JFileChooser();
-			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			fc.setSelectedFile(new File("hit_set_list.txt"));
 			JButton saveHitSetB = new JButton("Save hit set list to file");
 			saveHitSetB.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -150,6 +121,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 				}
 			});
 			buttonPanel.add(saveHitSetB);
+			
 			
 			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 			
@@ -168,23 +140,6 @@ public class OptimalCutSetReportDialog extends JDialog {
 	    	if (f != null)
 	    		dpc.saveOptCutSetData(f);
 	    }
-	    
-		/**
-		 * save optimal cut set report to a text file.
-		 * 
-		 * @param file
-		 */
-		private void saveReport(File file) {
-			try {
-				BufferedWriter out = new BufferedWriter(new FileWriter(file));
-				out.write(dpc.optCutSetReport.toString());
-				out.close();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
 	    
 
 }

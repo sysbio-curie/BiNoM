@@ -40,7 +40,7 @@ public class TestEB {
 		try {
 
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-short-metabolic-pathway.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
@@ -53,53 +53,11 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis2.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax2-short-metabolic-pathway.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/A_thaliana_L3.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/H_sapiens_L3.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/H_sapiens_L3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-phosphorylation-reaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-genetic-interaction.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/test.owl";
-			
-
-			/*
-			 * retrieve sequence vocabulary
-			 */
-//			BioPAX bp = new BioPAX();
-//			bp.loadBioPAX(new FileInputStream(fn));
-//			List l = biopax_DASH_level3_DOT_owlFactory.getAllSequenceModificationVocabulary(bp.model);
-//			
-//			for (int i=0;i<l.size();i++) {
-//				SequenceModificationVocabulary voc = (SequenceModificationVocabulary) l.get(i);
-//				
-//				Iterator it = voc.getTerm();
-//				String name = "";
-//				if (it.hasNext()) {
-//					name = name + ":"+(String)it.next();
-//				}
-//				//System.out.println(voc.uri()+"\t"+name);
-//				System.out.println(name);
-//			}
-			
-			
-			/*
-			 * genetic interactions
-			 */
-			BioPAX bp = new BioPAX();
-			bp.loadBioPAX(new FileInputStream(fn));
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllGene(bp.model);
-			
-			for (int i=0;i<l.size();i++) {
-				Gene  gn = (Gene) l.get(i);
-				
-				Iterator it = gn.getName();
-				String name = "";
-				if (it.hasNext()) {
-					name = name + ":"+(String)it.next();
-				}
-				//System.out.println(voc.uri()+"\t"+name);
-				System.out.println(gn.uri()+"\t"+name);
-			}
-			
 			
 //			BioPAXToSBMLConverter b2s = new BioPAXToSBMLConverter();
 //			b2s.biopax.loadBioPAX(new FileInputStream(fn));
@@ -118,9 +76,9 @@ public class TestEB {
 //			}
 			
 			
-//			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter(); 
-//			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
-//			System.out.println(gr.graphDocument.toString());
+			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter(); 
+			BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, fn, new BioPAXToCytoscapeConverter.Option());
+			System.out.println(gr.graphDocument.toString());
 			
 //			Graph graphDoc = XGMML.convertXGMMLToGraph(gr.graphDocument);
 //	    	Graph grres = BiographUtils.ShowMonoMolecularReactionsAsEdges(graphDoc);

@@ -66,6 +66,11 @@ public class OptimalCombinationAnalyzer {
 	public ArrayList<BitSet> pathMatrixColBin = new ArrayList<BitSet>();
 	
 	/**
+	 * set of nodes representing the union of all hit sets
+	 */
+	public HashSet<Integer> hitSetNodeList = new HashSet<Integer>();
+	
+	/**
 	 * List of path matrix rows, encoded as BitSet objects.
 	 */
 	public ArrayList<BitSet> pathMatrixRowBin = new ArrayList<BitSet>();
@@ -187,19 +192,10 @@ public class OptimalCombinationAnalyzer {
 	public ArrayList<SeedSet> seedSetList;
 	
 	/**
-	 * A report to log events on.
-	 */
-	public StringBuffer report;
-	
-	/**
-	 * System independent newline character
-	 */
-	public static String newline = System.getProperty("line.separator");
-	
-	/**
 	 * Constructor
 	 */
 	public OptimalCombinationAnalyzer() {
+	
 	}
 	
 	/**
@@ -234,10 +230,6 @@ public class OptimalCombinationAnalyzer {
 			System.out.println("final mcs size: "+hitSetSB.size());
 		}
 		toc = System.currentTimeMillis() - tic;
-		if (report != null) {
-			long t = toc / 1000;
-			report.append(newline+"Total timing for the search: "+t+" sec."+newline);
-		}
 		System.out.println("timing: "+toc);
 	}
 	
@@ -486,6 +478,13 @@ public class OptimalCombinationAnalyzer {
 		int setSize = 3;
 		while (setSize <= max) {
 			
+			// stop if all elementary nodes are covered
+			if (hitSetNodeList.size() == pathMatrixNbCol) {
+				setSize--;
+				System.out.println("Stop: all elementary nodes are covered. set size = "+setSize);
+				break;
+			}
+			
 			// stop if setSize value is greater than the number of nodes
 			if (setSize > pathMatrixNbCol) {
 				System.out.println("Stop: setSize is greater than the number of nodes.");
@@ -524,6 +523,7 @@ public class OptimalCombinationAnalyzer {
 						BitSet nbs = new BitSet(pathMatrixNbCol);
 						for (int i=0;i<indices.length;i++) {
 							nbs.set(indices[i]);
+							hitSetNodeList.add(indices[i]);
 						}
 						hitSetSB.add(nbs);
 						ct++;
@@ -559,6 +559,13 @@ public class OptimalCombinationAnalyzer {
 		
 		while (setSize <= maxHitSetSize) {
 			
+			// stop if all elementary nodes are covered
+			if (hitSetNodeList.size() == pathMatrixNbCol) {
+				setSize--;
+				System.out.println("Stop: all elementary nodes are covered. set size = "+setSize);
+				break;
+			}
+			
 			// stop if setSize value is greater than the number of nodes
 			if (setSize > pathMatrixNbCol) {
 				System.out.println("Stop: setSize is greater than the number of nodes.");
@@ -566,14 +573,12 @@ public class OptimalCombinationAnalyzer {
 			}
 			
 			System.out.println("\nSearch for hit set size "+ setSize);
-			report.append(newline + "Search for hit set size "+ setSize + newline);
 			
 			long nbComb =  calcCombinations(pathMatrixNbCol, setSize);
 			NumberFormat form = NumberFormat.getInstance();
 			form.setGroupingUsed(true);
 			
 			System.out.println("calculated nb of combinations: "+form.format(nbComb));
-			report.append("calculated nb of combinations: "+form.format(nbComb)+newline);
 			
 			int selectionSize;
 			/*
@@ -589,7 +594,6 @@ public class OptimalCombinationAnalyzer {
 				// select high scoring nodes
 				selectionSize = optimalSetSize(setSize, maxNbHitSet);
 				System.out.println("selection size: "+selectionSize);
-				report.append("selection size: "+selectionSize+newline);
 				
 				/*
 				 * Stop searching if the selection size is smaller than the current set size
@@ -606,8 +610,6 @@ public class OptimalCombinationAnalyzer {
 			else {
 				// no selection
 				System.out.println("no selection");
-				report.append("no selection" + newline);
-				
 				for (int i=0;i<pathMatrixNbCol;i++)
 					mapIdx.put(i, i);
 				selectionSize = pathMatrixNbCol;
@@ -617,7 +619,6 @@ public class OptimalCombinationAnalyzer {
 			int[] idx;
 			CombinationGenerator cg = new CombinationGenerator(selectionSize, setSize);
 			System.out.println("effective nb of combinations: "+form.format(cg.getTotal()));
-			report.append("effective nb of combinations: "+form.format(cg.getTotal()) + newline);
 			
 			int ct=0;
 			while(cg.hasMore()) {
@@ -660,26 +661,20 @@ public class OptimalCombinationAnalyzer {
 						BitSet nbs = new BitSet(pathMatrixNbCol);
 						for (int i=0;i<idx.length;i++) {
 							nbs.set(mapIdx.get(idx[i]));
+							hitSetNodeList.add(mapIdx.get(idx[i]));
 						}
 						hitSetSB.add(nbs);
 						ct++;
 					}
 				}
 			}
-			if (ct>0) {
+			if (ct>0)
 				System.out.println("found "+ct+ " hit sets size "+setSize);
-				report.append("found "+ct+ " hit sets size " + setSize + newline);
-			}
 			
 			setSize++;
 		}
 		
 		long toc = System.currentTimeMillis() - tic;
-		if (report != null) {
-			long t = toc / 1000;
-			report.append(newline);
-			report.append("Total timing for the search: "+t+" sec."+newline);
-		}
 		System.out.println("timing: "+toc);
 	}
 
@@ -706,6 +701,13 @@ public class OptimalCombinationAnalyzer {
 		while (setSize <= maxHitSetSize) {
 			
 			System.out.println("search for set size "+setSize);
+			
+			// stop if all elementary nodes are covered
+			if (hitSetNodeList.size() == pathMatrixNbCol) {
+				setSize--;
+				System.out.println("Stop: all elementary nodes are covered. set size = "+setSize);
+				break;
+			}
 			
 			// stop if we don't have seed sets 
 			if (seedSetList.size() == 0) {
@@ -757,10 +759,6 @@ public class OptimalCombinationAnalyzer {
 			setSize++;
 		}
 		long toc = System.currentTimeMillis() - tic;
-		if (report != null) {
-			long t = toc / 1000;
-			report.append(newline+"Total timing for the search: "+t+" sec."+newline);
-		}
 		System.out.println("timing: "+toc);
 	}
 	
@@ -807,6 +805,9 @@ public class OptimalCombinationAnalyzer {
 			if (isMinimal == true) {
 				ret = 1;
 				hitSetSB.add(candidateHitSet);
+				for (int i=candidateHitSet.nextSetBit(0); i>=0; i=candidateHitSet.nextSetBit(i+1)) {
+					hitSetNodeList.add(i);
+				}
 			}
 		}
 		else {
@@ -847,6 +848,8 @@ public class OptimalCombinationAnalyzer {
 			
 			if (tmp.cardinality() == pathMatrixNbRow) {
 				// we have a hitting set
+				hitSetNodeList.add(indices[0]);
+				hitSetNodeList.add(indices[1]);
 				hitSetSB.add(nbs);
 			}
 			else {
@@ -1138,4 +1141,51 @@ public class OptimalCombinationAnalyzer {
 		}
 	}
 
+	public void testSeedSet() {
+//		SeedSet s = new SeedSet(new BitSet(), 1);
+//		SeedSetData d = new SeedSetData(5);
+//		
+//		for (int i=10;i<=20;i++) {
+//			SeedSet ss = new SeedSet(new BitSet(), i);
+//			d.addData(ss);
+//		}
+//		
+//		for (SeedSet sss : d.list)
+//			System.out.println(sss.setScore);
+		BitSet b1 = new BitSet();
+		b1.set(1);
+		BitSet b2 = new BitSet();
+		b2.set(2);
+		BitSet b3 = new BitSet();
+		b3.set(3);
+		BitSet b4 = new BitSet();
+		b4.set(4);
+		BitSet b5 = new BitSet();
+		b5.set(5);
+		BitSet bx = new BitSet();
+		bx.set(5);
+		
+		
+		//b2.set(10);
+//		System.out.println(b.compareTo(b2));
+//		TreeSet<SeedSet> h = new TreeSet<SeedSet>();
+//		System.out.println(h.add(new SeedSet(b1, 1)));
+//		System.out.println(h.add(new SeedSet(b2, 2)));
+//		System.out.println(h.add(new SeedSet(b3, 3)));
+//		System.out.println(h.add(new SeedSet(b4, 4)));
+//		System.out.println(h.add(new SeedSet(b5, 5)));
+//		System.out.println(h.add(new SeedSet(bx, 10)));
+		
+		SeedSetData s = new SeedSetData(5);
+		BitSet b = new BitSet();
+		b.set(1);
+		
+		for (int i=0;i<10;i++) {
+			s.addData(new SeedSet(b,i));
+		}
+		
+		for (SeedSet ss: s.list)
+			System.out.println(ss.setScore+":"+ss.set);
+			
+	}
 }

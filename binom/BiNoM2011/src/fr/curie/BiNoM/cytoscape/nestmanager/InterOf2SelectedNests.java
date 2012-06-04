@@ -21,7 +21,7 @@ import giny.model.GraphPerspective;
  */
 public class InterOf2SelectedNests extends CytoscapeAction {
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create Network from Intersection of 2 Selected Modules";
+	final public static String title="Create network from intersection of 2 selected modules";
 	private CyNetwork currentNW;
 	private GraphPerspective network1;
 	private GraphPerspective network2;

@@ -199,7 +199,7 @@ public class BioPAXImportDialog extends JDialog implements ActionListener {
 	c.ipady = 5;
 	panel.add(includeInteractionsCB, c);
 
-	proteinCB = new JCheckBox("Protein-protein interactions");
+	proteinCB = new JCheckBox("Interaction map");
 	proteinCB.setFont(BOLD_FONT);
 	c = new GridBagConstraints();
 	c.gridx = 0;

@@ -69,8 +69,10 @@ public class BioPAX2SBML {
     //String prefix = "c:/datas/binomtest/il6_7pathway";
     //String prefix = "c:/datas/binomtest/biopax3-short-metabolic-pathway"; 
     //String prefix = "/Users/eric/work/binom/manual_v1.0/Apoptosis";
-      String prefix = "c:/datas/binomtest/BioPAX3/simplest";
-    	
+    //String prefix = "c:/datas/binomtest/BioPAX3/simplest";
+  	//String prefix = "C:/Datas/binomtest/BioPAX3/modif1";
+    String prefix = "C:/Datas/binomtest/BioPAX3/M-Phase2";
+	
     if(args.length>0){
       prefix = args[0];
       if(prefix.toLowerCase().endsWith(".owl"))

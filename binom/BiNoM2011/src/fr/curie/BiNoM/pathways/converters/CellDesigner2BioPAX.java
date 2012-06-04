@@ -64,8 +64,10 @@ public class CellDesigner2BioPAX {
      //String prefix = "C:/Datas/Basal/220310/CC_DNArepair_22_03_2010_DNA stage_uniform";
     //String prefix = "C:/Datas/binomtest/M-Phase2_ver41";
     	//String prefix = "C:/Datas/binomtest/BioPAX3/simplest";
-    	//String prefix = "C:/Datas/binomtest/BioPAX3/M-Phase2";
-    	String prefix = "C:/Datas/binomtest/BioPAX3/simplest";
+    	String prefix = "C:/Datas/binomtest/BioPAX3/M-Phase2";
+    	//String prefix = "C:/Datas/binomtest/BioPAX3/simplest";
+    	//String prefix = "C:/Datas/binomtest/BioPAX3/modif1";
+    	//String prefix = "C:/Datas/binomtest/BioPAX3/complex";
 
     if(args.length>0){
       prefix = args[0];
@@ -88,8 +90,8 @@ public class CellDesigner2BioPAX {
 
     // Converting to BioPAX
     cdbp.alwaysMentionCompartment = true;
-    cdbp.biopax.makeCompartments();
-    cdbp.createCellDesignerTerms();
+    //cdbp.biopax.makeCompartments();
+    //cdbp.createCellDesignerTerms();
     cdbp.compartmentHash = cdbp.getCompartmentHash(cdbp.sbml.getSbml());
     CellDesigner.entities = CellDesigner.getEntities(cdbp.sbml);
     cdbp.populateModel();

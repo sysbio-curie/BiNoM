@@ -881,6 +881,13 @@ public static String extractFolderName(String fileName){
 	return folderName;
 }
 
+/*public static String getGenericComplexName(String complexName){
+	String cnm = complexName;
+	StringTokenizer lev1 = new StringTokenizer(cnm);
+	
+	return cnm;
+}*/
+
 /**
  * Calculate the factorial of a given number
  * 
@@ -896,7 +903,5 @@ public static BigInteger factorial(int n) {
       BigInteger bigN = new BigInteger(String.valueOf(n));
       return(bigN.multiply(factorial(n - 1)));
     }
-  }
-
-
-}
+  
+}}

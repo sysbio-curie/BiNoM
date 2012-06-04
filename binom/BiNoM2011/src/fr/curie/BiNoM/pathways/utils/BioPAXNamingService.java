@@ -117,6 +117,24 @@ public class BioPAXNamingService {
 	 */
 	public void generateNames(BioPAX biopax, boolean verbose) throws Exception{
 		
+		// First, name reference entities
+		// Selected utility classes--------------------------------------------
+		List el = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllDnaReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllRnaReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllSmallMoleculeReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllEntityReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		
 		// Populate list of complex modifications
 		
 		List listOfComplexes = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
@@ -127,8 +145,6 @@ public class BioPAXNamingService {
 				PhysicalEntity pent = it.next();
 				listOfComplexComponents.put(pent.uri(), pent);
 		}}
-
-		
 		
 		/*
 		 * Populate internal maps to ModificationFeature and SequenceSite objects
@@ -136,7 +152,7 @@ public class BioPAXNamingService {
 		 * These maps will be used to create names for phosphorylation sites
 		 * 
 		 */
-		List el = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(biopax.model);
+		el = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(biopax.model);
 		for (int i=0;i<el.size();i++) {
 			ControlledVocabulary cv = ((ModificationFeature) el.get(i)).getModificationType();
 			Iterator it = cv.getTerm();
@@ -220,9 +236,6 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalEntity(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
-		// Selected utility classes--------------------------------------------
-		el = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(biopax.model);
-		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 
 		el = biopax_DASH_level3_DOT_owlFactory.getAllChemicalStructure(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
@@ -476,7 +489,8 @@ public class BioPAXNamingService {
 		}
 		else if (pe instanceof Protein) {
 			
-			if(((Protein) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+			//if(((Protein) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+			if(((Protein) pe).getEntityReference()!=null){
 				name = getShortestName(((Protein) pe).getEntityReference().getName());
 			}else{
 				name = getShortestName(pe.getName());
@@ -490,7 +504,7 @@ public class BioPAXNamingService {
 				if (str != null) {
 					name += "|" + str;
 				}
-				System.out.println("\t\tFeature:"+name);
+				//System.out.println("\t\tFeature:"+name);
 			}
 			
 			// add cellular compartment to the name, remove compartment string if already there
@@ -566,6 +580,11 @@ public class BioPAXNamingService {
 	public String createUtilityName(UtilityClass e)  throws Exception{
 		
 		String name = null;
+		if((e instanceof ProteinReference)||(e instanceof RnaReference)||(e instanceof DnaReference)||(e instanceof SmallMoleculeReference)||(e instanceof EntityReference)){
+			String s = getShortestName(((EntityReference)e).getName());
+			if(!s.equals("")) name = s;
+		}
+		
 		if(e instanceof ControlledVocabulary){
 			String s = getVocabularyTerm(((ControlledVocabulary)e).getTerm());
 			if(!s.equals("")) name = s;

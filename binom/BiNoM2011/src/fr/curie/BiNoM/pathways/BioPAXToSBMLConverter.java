@@ -361,6 +361,40 @@ public class BioPAXToSBMLConverter {
     			addIncludedParticipant(pe);
     		}
     	}
+    	// Now let us detect those who participate in reactions and exclude them from the list
+    	List<Interaction> interactions = biopax_DASH_level3_DOT_owlFactory.getAllInteraction(biopax.model);
+    	Iterator<Interaction> allint = interactions.iterator();
+    	//System.out.println(includedSpecies.size()+" included species.");
+    	//Iterator<String> it = includedSpecies.keySet().iterator();
+    	//while(it.hasNext()) System.out.println(it.next());
+    	while(allint.hasNext()){
+    		Interaction inter = allint.next();
+    		Iterator<PhysicalEntity> part = inter.getParticipant();
+    		//System.out.println("Interaction: "+inter.uri());
+    		while(part.hasNext()){
+    			PhysicalEntity pent = part.next();
+    			includedSpecies.remove(Utils.cutUri(pent.uri()));
+    			//System.out.println("Removed "+pent.uri()+" ("+includedSpecies.size()+" left)");
+    		}
+    	}
+    	List<Conversion> conversions = biopax_DASH_level3_DOT_owlFactory.getAllConversion(biopax.model);
+    	Iterator<Conversion> allconv = conversions.iterator();
+    	while(allconv.hasNext()){
+    		Conversion conv = allconv.next();
+    		//System.out.println("Conversion: "+conv.uri());
+    		Iterator<PhysicalEntity> part = conv.getLeft();
+    		while(part.hasNext()){
+    			PhysicalEntity pent = part.next();
+    			includedSpecies.remove(Utils.cutUri(pent.uri()));
+    		}
+    		part = conv.getRight();
+    		while(part.hasNext()){
+    			PhysicalEntity pent = part.next();
+    			includedSpecies.remove(Utils.cutUri(pent.uri()));
+    		}
+    	}
+    	
+    	
     	
     	
     	l = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalEntity(biopax.model);

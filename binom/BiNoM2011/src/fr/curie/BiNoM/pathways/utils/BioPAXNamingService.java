@@ -222,6 +222,7 @@ public class BioPAXNamingService {
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 
 		
+		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllRna(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		

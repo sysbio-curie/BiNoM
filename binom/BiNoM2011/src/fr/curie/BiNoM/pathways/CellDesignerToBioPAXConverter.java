@@ -251,23 +251,17 @@ public class CellDesignerToBioPAXConverter {
 				}
 			}
 			
-			// Now let us create all species and included species but not complexes, homodimers and degraded
+			// Now let us create all species and included species but not complexes and degraded
 			for(int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++){
 				SpeciesDocument.Species sp = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
 				String spcl = "";
-				if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
+				if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null)
 					spcl = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
-				boolean isHomodimer = false;
-				if(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerState()!=null)
-				if(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerState().getCelldesignerHomodimer()!=null)
-						isHomodimer = true;
-				if(!spcl.equals("COMPLEX"))if(!spcl.equals("DEGRADED"))if(!isHomodimer){
+				if(!spcl.equals("COMPLEX"))if(!spcl.equals("DEGRADED")){
 					PhysicalEntity ent = createEntityForSpecies(sp.getId(),species,complexes_list,entities,entityReferences,sbml.getSbml(),biopax,sp.getId());
 					entities.put(sp.getId(), ent);
 				}
-				}
 			}			
-			if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 			for(int j=0;j<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray().length;j++){
 				CelldesignerSpeciesDocument.CelldesignerSpecies isp = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(j);
 				PhysicalEntity ent = createEntityForSpecies(isp.getId(),species,complexes_list,entities,entityReferences,sbml.getSbml(),biopax,isp.getId());
@@ -317,31 +311,22 @@ public class CellDesignerToBioPAXConverter {
 					if(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerState()!=null){
 						String hm = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerState().getCelldesignerHomodimer());
 						if(hm!=null){
-							if(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()!=null){
-								CelldesignerProteinDocument.CelldesignerProtein pp = (CelldesignerProteinDocument.CelldesignerProtein)getProteinById(proteins,Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()));
-								System.out.println("Homodimer: "+pp.getName().getStringValue()+" ("+hm+")");
-							}
-							if(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
-								CelldesignerRNADocument.CelldesignerRNA pp = (CelldesignerRNADocument.CelldesignerRNA)getProteinById(proteins,Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()));
-								System.out.println("Homodimer: "+pp.getName()+" ("+hm+")");
-							}
+							CelldesignerProteinDocument.CelldesignerProtein pp = (CelldesignerProteinDocument.CelldesignerProtein)getProteinById(proteins,Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()));
+							System.out.println("Homodimer: "+pp.getName().getStringValue()+" ("+hm+")");
 							String csa_sp_id = sp.getId();
 							String complex_name = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,csa_sp_id,false,true);
 							String complex_id = csa_sp_id;
 							int ihm = Integer.parseInt(hm);
 							if(complexes.indexOf(complex_id)<0){
-								Complex compl = biopax_DASH_level3_DOT_owlFactory.createComplex(biopax.namespaceString+complex_name,biopax.biopaxmodel);
-								System.out.println("Created complex "+compl.uri());
+								Complex compl = biopax_DASH_level3_DOT_owlFactory.createComplex(biopax.namespaceString+complex_id,biopax.biopaxmodel);
 								compl.addName(complex_name);
 								//compl.setSHORT_DASH_NAME(complex_name);
 								complexes.add(complex_id);
 								entities.put(complex_id,compl);
-								entities.put(biopax.namespaceString+Utils.correctName(complex_name),compl);
 								Stoichiometry stoich = biopax_DASH_level3_DOT_owlFactory.createStoichiometry(biopax.namespaceString+complex_id+"_stoich", biopax.biopaxmodel);
 								stoich.setStoichiometricCoefficient((float)ihm);
-								PhysicalEntity pep = createEntityForHomodimer(sp.getId(),species,complexes_list,entities,entityReferences,sbml.getSbml(),biopax,csa_sp_id);
+								PhysicalEntity pep = createEntityForSpecies(sp.getId(),species,complexes_list,entities,entityReferences,sbml.getSbml(),biopax,csa_sp_id);
 								stoich.setPhysicalEntity(pep);
-								compl.addComponent(pep);
 								compl.addComponentStoichiometry(stoich);
 							}
 						}
@@ -701,6 +686,9 @@ public class CellDesignerToBioPAXConverter {
 		PhysicalEntity pep = null;
 		try{
 			
+			if(id.equals("s6"))
+				System.out.println();
+			
 			
 			SpeciesDocument.Species sp = species.get(id);
 			CelldesignerSpeciesDocument.CelldesignerSpecies isp = null;
@@ -757,7 +745,6 @@ public class CellDesignerToBioPAXConverter {
 						//pep = biopax_DASH_level3_DOT_owlFactory.createsequenceParticipant(biopax.namespaceString+rId+"_"+Utils.correctName(spname),biopax.biopaxmodel);
 						if(entities.get(entityUri)==null){
 							Protein protein = biopax_DASH_level3_DOT_owlFactory.createProtein(entityUri,biopax.biopaxmodel);
-							System.out.println("Created protein "+protein.uri());
 							protein.addName(spname);
 							protein.setEntityReference(entityReferences.get(Utils.getValue(si.getCelldesignerProteinReference())));
 							entities.put(entityUri, protein);
@@ -894,8 +881,47 @@ public class CellDesignerToBioPAXConverter {
 									addPublicationXrefsToEntity(pep,v);
 								}
 
-
-							addModification(sp_id, pep, si);
+							// Now we add modifications
+							if((si!=null)&&(si.getCelldesignerState()!=null)){
+								CelldesignerListOfModificationsDocument.CelldesignerListOfModifications lmodifs = si.getCelldesignerState().getCelldesignerListOfModifications();
+								if(lmodifs!=null){
+										CelldesignerModificationDocument.CelldesignerModification modifs[] = lmodifs.getCelldesignerModificationArray();
+										for(int j=0;j<modifs.length;j++){
+												CelldesignerModificationDocument.CelldesignerModification cm = (CelldesignerModificationDocument.CelldesignerModification)modifs[j];
+												//System.out.print("\t"+cm.getResidue()+"_"+cm.getState());
+												String resname = CellDesignerToCytoscapeConverter.getNameOfModificationResidue(sbml,si,cm.getResidue());
+												String stt = cm.getState().getStringValue();
+												stt = stt.substring(0,3);
+												stt = Utils.replaceString(stt," ","_");
+												String s = "";
+												if(resname==null)
+													s+="s"+(j+1)+"_"+stt;
+												else
+													s+=""+resname+"_"+stt;
+												
+												
+												ModificationFeature sf = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+sp_id+"_"+s,biopax.biopaxmodel);
+												String state = cm.getState().getStringValue();
+												if(state.equals("unknown")) state+="_modification";
+												
+												
+												SequenceModificationVocabulary modif = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+s, biopax.biopaxmodel);
+												modif.addTerm(s);
+												//System.out.println("MODIFICATION: "+s+" resname"+resname);
+												sf.setModificationType(modif);
+												
+												//sf.setModificationType((SequenceModificationVocabulary)cellDesignerTerms.get(state));
+												
+												//SequenceSite site = biopax_DASH_level3_DOT_owlFactory.createSequenceSite(biopax.namespaceString+sp_id+""+s+"_site",biopax.biopaxmodel);;
+												//sf.addFeatureLocation(site);
+												//sf.setModificationType(modificationType);
+												
+												
+												pep.addFeature(sf);
+										}
+								}
+							} // --------- adding modifications ------------
+															
 
 						} // end pep is not null
 				} // end si is not null
@@ -908,84 +934,6 @@ public class CellDesignerToBioPAXConverter {
 		if(pep==null)
 			System.out.println("ERROR: no entity for the species "+id+" is generated");
 		
-		return pep;
-	}
-	
-	public void addModification(String sp_id, PhysicalEntity pep, CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si) throws Exception{
-		// Now we add modifications
-		if((si!=null)&&(si.getCelldesignerState()!=null)){
-			CelldesignerListOfModificationsDocument.CelldesignerListOfModifications lmodifs = si.getCelldesignerState().getCelldesignerListOfModifications();
-			if(lmodifs!=null){
-					CelldesignerModificationDocument.CelldesignerModification modifs[] = lmodifs.getCelldesignerModificationArray();
-					for(int j=0;j<modifs.length;j++){
-							CelldesignerModificationDocument.CelldesignerModification cm = (CelldesignerModificationDocument.CelldesignerModification)modifs[j];
-							//System.out.print("\t"+cm.getResidue()+"_"+cm.getState());
-							String resname = CellDesignerToCytoscapeConverter.getNameOfModificationResidue(sbml,si,cm.getResidue());
-							String stt = cm.getState().getStringValue();
-							stt = stt.substring(0,3);
-							stt = Utils.replaceString(stt," ","_");
-							String s = "";
-							if(resname==null)
-								s+="s"+(j+1)+"_"+stt;
-							else
-								s+=""+resname+"_"+stt;
-							
-							
-							ModificationFeature sf = biopax_DASH_level3_DOT_owlFactory.createModificationFeature(biopax.namespaceString+sp_id+"_"+s,biopax.biopaxmodel);
-							String state = cm.getState().getStringValue();
-							if(state.equals("unknown")) state+="_modification";
-							
-							
-							SequenceModificationVocabulary modif = biopax_DASH_level3_DOT_owlFactory.createSequenceModificationVocabulary(biopax.namespaceString+s, biopax.biopaxmodel);
-							modif.addTerm(s);
-							//System.out.println("MODIFICATION: "+s+" resname"+resname);
-							sf.setModificationType(modif);
-							
-							//sf.setModificationType((SequenceModificationVocabulary)cellDesignerTerms.get(state));
-							
-							//SequenceSite site = biopax_DASH_level3_DOT_owlFactory.createSequenceSite(biopax.namespaceString+sp_id+""+s+"_site",biopax.biopaxmodel);;
-							//sf.addFeatureLocation(site);
-							//sf.setModificationType(modificationType);
-							
-							
-							pep.addFeature(sf);
-					}
-			}
-		} // --------- adding modifications ------------
-	}
-	
-	public PhysicalEntity createEntityForHomodimer(String id, HashMap<String, SpeciesDocument.Species> species, Vector complexes_list, HashMap<String, PhysicalEntity> entities, HashMap<String, EntityReference> entityReferences, SbmlDocument.Sbml sbml, BioPAX biopax, String rId){
-		PhysicalEntity pep = null;
-		try{
-		SpeciesDocument.Species sp = species.get(id);
-		EntityReference proteinRef = entityReferences.get(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()));
-		String spname = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,sp.getId(),true,true);
-		
-		StringTokenizer st = new StringTokenizer(spname,"|");
-		String lastModif = null;
-		while(st.hasMoreTokens())
-			lastModif = st.nextToken();
-		if(lastModif.startsWith("hm")){
-			spname = spname.substring(0, spname.length()-lastModif.length()-1);
-		}
-		
-		String entityUri = biopax.namespaceString+Utils.correctName(spname);
-		if(entities.get(entityUri)!=null)
-			pep = entities.get(entityUri);
-		else{
-			Protein protein = biopax_DASH_level3_DOT_owlFactory.createProtein(entityUri,biopax.biopaxmodel);
-			System.out.println("Created protein "+protein.uri());
-			protein.addName(spname);
-			protein.setEntityReference(proteinRef);
-			entities.put(entityUri, protein);
-			pep = protein;
-		}
-		
-		addModification(id, pep, sp.getAnnotation().getCelldesignerSpeciesIdentity());
-		
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 		return pep;
 	}
 

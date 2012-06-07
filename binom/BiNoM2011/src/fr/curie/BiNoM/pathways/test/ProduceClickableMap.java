@@ -81,6 +81,8 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 
 public class ProduceClickableMap
 {
+	private static final String right_hand_tag = "navicell";
+
 	private static final int maximum_number_of_posts = 20480; // might not be enough
 	
 	private static final String module_list_category_name = "module list";
@@ -657,12 +659,18 @@ public class ProduceClickableMap
 		}
 		return true;
 	}
+	
+	private String get_map_notes()
+	{
+		final Notes notes = this.cd.getSbml().getModel().getNotes();
+		return (notes == null) ? "" : Utils.getText(notes).trim();
+	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
 		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
-		String module_notes = Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
+		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
 		final AllPosts.Post module_post = create_module_post(wp, master.all_posts, module_notes, map, master.blog_name);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 
@@ -679,7 +687,7 @@ public class ProduceClickableMap
 	{
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
-		String module_notes = Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
+		final String module_notes = clMap.get_map_notes();
 
 		final File this_map_directory = mk_maps_directory(map, destination);
 
@@ -1752,7 +1760,9 @@ public class ProduceClickableMap
 
 	private static ItemCloser item_list_start(final ItemCloser indent, String id, String cls)
 	{
-		indent.indent().print("<item id=\"" + id + "\"");
+		indent.indent().print("<item");
+		if (id != null)
+			indent.getOutput().print(" id=\"" + id + "\"");
 		if (cls != null)
 			indent.getOutput().print(" class=\"" + cls + "\"");
 		return indent;
@@ -1772,7 +1782,7 @@ public class ProduceClickableMap
 		ImagesInfo scales
 	)
 	{
-		item_list_start(indent, m.getId(), "modification posttranslational");
+		item_list_start(indent, m.getId(), right_hand_tag);
 		indent.getOutput().print(" position=\"");
 		boolean first = true;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
@@ -1880,12 +1890,12 @@ public class ProduceClickableMap
 			final Modification m = q.m;
 			if (q.associated)
 			{
-				ItemCloser modif = item_list_start(entity.add(), m.getId(), "modification associated");
+				ItemCloser modif = item_list_start(entity.add(), null, m.getId() + " " + right_hand_tag);
 				output.println(">");
 				content_line_data(modif.add(), m.getName());
 				modif.close();
 			}
-			else	
+			else
 			{
 				String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
 				modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
@@ -1973,7 +1983,7 @@ public class ProduceClickableMap
 				{
 					final int post_id = k.getValue().post_id;
 					ItemCloser indent = modules.add();
-					item_list_start(indent, make_module_id(k.getKey()), "modification posttranslational");
+					item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
 					indent.getOutput().print(" position=\"");
 					indent.getOutput().print(scales.getX(position[0]));
 					indent.getOutput().print(";");
@@ -2010,7 +2020,7 @@ public class ProduceClickableMap
 		final Pair position = findCentralPlaceForReaction(r);
 		final float x = (Float)position.o1;
 		final float y = (Float)position.o2;
-		item_list_start(indent, r.getId(), "modification posttranslational");
+		item_list_start(indent, r.getId(), right_hand_tag);
 		indent.getOutput().print(" position=\"");
 		indent.getOutput().print(scales.getX(x));
 		indent.getOutput().print(";");
@@ -5792,12 +5802,11 @@ public class ProduceClickableMap
 	
 		out.println("<script src=\"" + common_directory_url + included_map_base + ".js\" type='text/javascript'></script>");
 
-		out.println("</head>");
-		
 		final String map_div_name = "map"; // see css
 		final String marker_div_name = "marker_checkboxes"; // see css
 		
-		out.print("<body onload=\"");
+		out.println("<script>");
+		out.println("$(document).ready(function(){");
 		out.print("clickmap_start(");
 		out.print("'" + blog_name + "'");
 		out.print(", '" + map_name + "'");
@@ -5820,8 +5829,14 @@ public class ProduceClickableMap
 		out.print(scales.xshift_zoom0);
 		out.print(", ");
 		out.print(scales.yshift_zoom0);
-		out.println(")\">");
+		out.println(")");
+		out.println("});");
+		out.println("</script>");
 		
+		out.println("</head>");
+		out.println("<body>");
+		
+			
 		out.println("<noscript>");
 		out.println("JavaScript must be enabled in order for you to use NaviCell.");
 		out.println("However, it seems JavaScript is either disabled or not supported by your browser.");
@@ -5838,7 +5853,7 @@ public class ProduceClickableMap
 		out.print(title);
 		out.print("</div>");
 		out.print(" <div class='header-right'>");
-		html_in_new_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='" + blog_icon + "'>");
+		html_in_named_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='" + blog_icon + "'>", "blog_" + blog_name);
 		out.print(" ");
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");
@@ -5868,12 +5883,17 @@ public class ProduceClickableMap
 		html_in_new_window(out, doc_directory + "/" + page + ".html", text);
 	}
 
-	private static void html_in_new_window(final PrintStream out, String url, String text)
+	private static void html_in_named_window(final PrintStream out, String url, String text, String target)
 	{
 		out.print("<a href=");
 		out.print(html_quote(new StringBuffer(), url));
-		out.print(" target='_blank'>");
+		out.print(" target=" + html_quote(new StringBuffer(), target) + ">");
 		out.print(text);
 		out.print("</a>");
+	}
+
+	private static void html_in_new_window(final PrintStream out, String url, String text)
+	{
+		html_in_named_window(out, url, text, "_blank");
 	}
 }

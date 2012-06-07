@@ -24,7 +24,7 @@ import giny.model.GraphPerspective;
  */
 public class ListComponents extends CytoscapeAction {
 	private static final long serialVersionUID = 1L;
-	final public static String title="List components of species in network and modules";
+	final public static String title="List Components of Species in Network and Modules";
 	static final char separator=':'; 
 	final static String end="|@";
 	final static String notUsed="()'";

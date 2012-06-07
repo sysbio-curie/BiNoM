@@ -39,6 +39,7 @@ public class MergingMapsProcessor {
 	private Vector<String> speciesMap;
 	private SbmlDocument cd1;
 	private SbmlDocument cd2;
+	private int counter = 0;
 	
 	/**
 	 * Constructor
@@ -60,14 +61,30 @@ public class MergingMapsProcessor {
 //	--------------------------------------------------------------------------------
 	
 	public void setAndLoadFileName1(String fileName) {
-		String file1Text = Utils.loadString(fileName);
-		file1Text = addPrefixToIds(file1Text,"rb_");
-		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-		countAll(cd1);
+
+		/*
+		 * old way: add prefix to first file
+		 */
+//		String file1Text = Utils.loadString(fileName);
+//		file1Text = addPrefixToIds(file1Text,"rb_");
+//		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
+//		countAll(cd1);
+		
+		this.cd1 = CellDesigner.loadCellDesigner(fileName);
 	}
 	
 	public void setAndLoadFileName2 (String fileName) {
-		this.cd2 = CellDesigner.loadCellDesigner(fileName);
+		//this.cd2 = CellDesigner.loadCellDesigner(fileName);
+		
+		/*
+		 * new way: add prefix to second file
+		 * use an internal counter to generate a new prefix each time a new file is loaded
+		 */
+		String text = Utils.loadString(fileName);
+		this.counter++;
+		String prefix = "rb" + counter + "_";
+		text = addPrefixToIds(text, prefix);
+		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
 	}
 	
 	public void setMergeLists() {

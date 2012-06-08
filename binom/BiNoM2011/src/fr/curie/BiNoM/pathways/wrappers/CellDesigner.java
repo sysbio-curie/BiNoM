@@ -187,7 +187,6 @@ public static String reactionNodeTypes[] = {
   * @param text String containing Cell Designer xml text 
   * @return sbmlDoc object
   * 
-  * @author ebonnet
   */
  public static org.sbml.x2001.ns.celldesigner.SbmlDocument loadCellDesignerFromText(String text){
 	 org.sbml.x2001.ns.celldesigner.SbmlDocument sbmlDoc = null;

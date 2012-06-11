@@ -3,6 +3,7 @@ package fr.curie.BiNoM.pathways.test;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
@@ -48,18 +49,67 @@ public class TestMergingMapsCD {
 		//		CellDesigner.saveCellDesigner(res, "/bioinfo/users/ebonnet/res.xml");
 
 
-		String fn = "/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml";
+
+
+		/*
+		 * test shift coordinates
+		 */
+		//String fn = "/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml";
+		String fn = "/bioinfo/users/ebonnet/a1_cyt.xml";
 		SbmlDocument cd = CellDesigner.loadCellDesigner(fn);
-		for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
-			SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
-			//System.out.println(sp.get);
-		}
+
+		// set new map dimensions
+		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("1000");
+		//int sizeY = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeY());
+		shiftCoordinates(cd, 200, 0);
+		
+		CellDesigner.saveCellDesigner(cd, "/bioinfo/users/ebonnet/test.xml");
 
 	}
 
+	public static void shiftCoordinates(SbmlDocument cd, float deltaX, float deltaY) {
+		
+		// species aliases
+		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias cdal = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+			float  x = Float.parseFloat(cdal.getCelldesignerBounds().getX());
+			float  y = Float.parseFloat(cdal.getCelldesignerBounds().getY());
+			x += deltaX;
+			y += deltaY;
+			cdal.getCelldesignerBounds().setX(Float.toString(x));
+			cdal.getCelldesignerBounds().setY(Float.toString(y));
+		}
+		
+		// compartments
+		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray().length;i++){
+			CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias csa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i);
+			if(csa.getCelldesignerBounds()!=null){
+				float x = Float.parseFloat(csa.getCelldesignerBounds().getX());
+				float y = Float.parseFloat(csa.getCelldesignerBounds().getY());
+				x += deltaX;
+				y += deltaY;
+				csa.getCelldesignerBounds().setX(Float.toString(x));
+				csa.getCelldesignerBounds().setY(Float.toString(y));
+			}
+		}
+		
+		// complex species aliases
+		if(cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) {
+			for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+				CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cdal = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+//				String alid = cdal.getId();
+//				String alspid = cdal.getSpecies();
+				float  x = Float.parseFloat(cdal.getCelldesignerBounds().getX());
+				float  y = Float.parseFloat(cdal.getCelldesignerBounds().getY());
+				x += deltaX;
+				y += deltaY;
+				cdal.getCelldesignerBounds().setX(Float.toString(x));
+				cdal.getCelldesignerBounds().setY(Float.toString(y));
+			}
+		}
 
-
-
+	}
+	
 	public static void modifyPositionOfSpecies(SbmlDocument cd, GraphDocument gr){
 
 		HashMap<String,Pair> coordinates = new HashMap<String,Pair>();
@@ -71,24 +121,24 @@ public class TestMergingMapsCD {
 		/*
 		 * get max x and y from graphdocument
 		 */
-		for(int i=0;i<gr.getGraph().getNodeArray().length;i++){
-			GraphicNode n = gr.getGraph().getNodeArray(i);
-			String alias = ""; 
-			for(int j=0;j<n.getAttArray().length;j++){
-				AttDocument.Att att = n.getAttArray(j);
-				if(att.getName().equals("CELLDESIGNER_ALIAS"))
-					alias = att.getValue();
-			}
-			double x = n.getGraphics().getX();
-			double y = n.getGraphics().getY();
-			if(!alias.equals("")){
-				coordinates.put(alias, new Pair(x,y));
-				if(x>maxx) maxx = x;
-				if(y>maxy) maxy = y;
-				if(x<minx) minx = x;
-				if(y<miny) miny = y;				
-			}
-		}
+		//		for(int i=0;i<gr.getGraph().getNodeArray().length;i++){
+		//			GraphicNode n = gr.getGraph().getNodeArray(i);
+		//			String alias = ""; 
+		//			for(int j=0;j<n.getAttArray().length;j++){
+		//				AttDocument.Att att = n.getAttArray(j);
+		//				if(att.getName().equals("CELLDESIGNER_ALIAS"))
+		//					alias = att.getValue();
+		//			}
+		//			double x = n.getGraphics().getX();
+		//			double y = n.getGraphics().getY();
+		//			if(!alias.equals("")){
+		//				coordinates.put(alias, new Pair(x,y));
+		//				if(x>maxx) maxx = x;
+		//				if(y>maxy) maxy = y;
+		//				if(x<minx) minx = x;
+		//				if(y<miny) miny = y;				
+		//			}
+		//		}
 
 		int width = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeX());
 		int height = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeX());
@@ -136,10 +186,15 @@ public class TestMergingMapsCD {
 				}
 			}
 
-		
-		if(maxx==minx) { minx = -(double)width/2; maxx = (double)width/2; }
-		if(maxy==miny) { miny = -(double)width/2; maxy = (double)width/2; }
-		
+		if(maxx==minx) { 
+			minx = -(double)width/2; 
+			maxx = (double)width/2; 
+		}
+		if(maxy==miny) { 
+			miny = -(double)width/2; 
+			maxy = (double)width/2; 
+		}
+
 		/*
 		 * modify coordinates for complex species aliases
 		 */
@@ -154,15 +209,17 @@ public class TestMergingMapsCD {
 				if(p!=null){
 					double x = (int)(((Double)p.o1).doubleValue());
 					double y = (int)(((Double)p.o2).doubleValue());
-					if(minx<0) x=x-minx;
-					if(miny<0) y=y-miny;
+					if(minx<0) 
+						x=x-minx;
+					if(miny<0) 
+						y=y-miny;
 					cdal.getCelldesignerBounds().setX(""+x);
 					cdal.getCelldesignerBounds().setY(""+y);
+					// modify internal components if any
 					Vector<CelldesignerSpecies> v = complexes.get(alspid);
 					if(v!=null){
 						for(int j=0;j<v.size();j++){
 							CelldesignerSpecies cs = v.get(j);
-							//System.out.println("\t"+cs.getId());
 							CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spal = aliases.get(cs.getId());
 							double xx = Double.parseDouble(spal.getCelldesignerBounds().getX());
 							double yy = Double.parseDouble(spal.getCelldesignerBounds().getY());

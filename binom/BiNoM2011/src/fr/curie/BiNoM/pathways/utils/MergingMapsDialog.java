@@ -245,6 +245,7 @@ public class MergingMapsDialog extends JDialog {
 	private void initDisplaySpecies() {
 		this.mmProc.setAndLoadFileName1(fileList.get(0).getAbsolutePath());
 		this.mmProc.setAndLoadFileName2(fileList.get(1).getAbsolutePath());
+		//this.mmProc.testShiftCoord();
 		this.mmProc.setMergeLists();
 		this.setTableData(this.mmProc.getSpeciesMap());
 	}

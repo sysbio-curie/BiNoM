@@ -119,7 +119,8 @@ public class MergingMapsProcessor {
 	}
 	
 	public void testShiftCoord() {
-		
+		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("1000");
+		this.shiftCoordinates(cd2, 200, 0);
 	}
 	
 //	private void setCandidateMergingLists() {

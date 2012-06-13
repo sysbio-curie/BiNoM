@@ -625,7 +625,7 @@ of connected network \emph{modules}. Most of the modules represent a detailed
 sequence of events that occur with a particular protein or protein complex,
 whose name can then be used to represent the whole module. This way, a
 simplified representation of a complex map can be produced, using the modules
-and their relationships as an abtracted version of the comprehensive network
+and their relationships as an abstracted version of the comprehensive network
 \cite{calzone2008comprehensive}.
 
 To facilitate the creation and management of modules, we have used in this
@@ -651,16 +651,11 @@ selected nodes and edges and also to show the clipboard content.
 
 
 \section*{Results and Discussion}
+We propose to study a reaction network focusing on the transition from G1 phase (growth phase) to S phase (DNA replication phase) of the cell cycle \cite{calzone2008comprehensive} as an example of the use of BiNoM functions. 
 
+The initial published network describes in biochemical details the regulation of the tumor suppressor gene retinoblastoma (RB or RB1). It was built using CellDesigner. The comprehensive map listed 80 proteins, 208 species, 165 interactions, 176 genes, and recapitulated more than 350 publications including information from different cellular types, thus making the map a generic map of the cell cycle regulation. It is composed of two main compartments: the cell, containing the cytoplasm, the nucleus and the nucleolus, in which the biochemical interactions such as association, dissociation, (de)phosphorylation, (de)acetylation, degradation, etc. take place; and the genes, which lists the target genes of the main transcription factors of the map, the E2F family members.A thorough description of the model and the methods used to build it and create simplified versions of it along with the first interactive map was made available at the following address (each protein (node) and each interaction (arrow) is clickable):\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/} 
 
-[[ LC : give an extended description of the biological context and explain the 
-construction of the network ( Biocham, etc.) ]]
-
-We propose to study a reaction network of the regulation of the protein RB (also
-referred to as RB1) \cite{calzone2008comprehensive} as an example of the use of
-BiNoM functions. The complete network contains about 78 proteins, 208 chemical
-species, and 165 biochemical reactions. For this study, we choose to concentrate
-on the G1 to S transition. For that, we used the intersection of the 208 species
+For this study, we choose to concentrate on the G1 to S transition. For that, we used the intersection of the 208 species
 of RB/E2F network and the 280 species listed in Reactome for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
@@ -673,16 +668,18 @@ RB-E2F network and G1/S network extracted from Reactome.}
  \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
 \end{figure}
 
+This map contains a lot of information but difficult to extract. We present two ways to get some biological insight from this map. The first one consists of transforming the reaction network into an influence network in order to analyze data on it. The second one implies a simplification of the comprehensive map by applying a method of reduction of the numerous interactions into modules without losing any content.
 
 \subsection*{Application of PIQuant on an influence network.}
-As described above, the PIQuant algorithm can be used to perform a quantitative
-analysis on an influence network. We apply PIQuant to an influence network of
-cell cycle G1/S transition, that was constructed by applying BIOCHAM
-\cite{calzone2006biocham} to the network described in the
-previous paragraph. 
+PIQuant algorithm can be used to perform a quantitative analysis on an influence network. For translating the reaction network into an influence network, we used a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that can be found at the following link: http://contraintes.inria.fr/~soliman/cd2dot.html. The translation is based on simple rules: (1) BIOCHAM deletes all linear degradations and syntheses, (2) all intermediary species with only one input and one output, are suppressed, (3) if the reactions of synthesis and degradation of a species have distinct inputs and outputs, then this reactions can be merged, and (4) if the inputs of one reaction is the same as the inputs of another reaction, then it is the case of a reversible reaction. Although this work is still in progress, a short description and an example of this conversion that include some genes of our map can be found at (ref). 
 
-In order to construct the annotation of this network, we use expression 
-data from a study of 57 bladder cancer
+%Laurence Calzone, Claudine Chaouiya, Élisabeth Remy, and Sylvain Soliman.
+%Qualitative modelling of the RB/E2F network. deliverable D3.1, ANR CALAMAR
+%(ANR-08-SYSC-003), February 2011.
+
+We apply PIQuant to the resulting influence network of the G1/S transition of the cell cycle. 
+
+In order to construct the annotation of this network, we use expression  data from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. The t-test statistic value is used as the annotation for each gene. We construct a text file listing nodes of the influence network 
@@ -762,8 +759,7 @@ different module, or subnetwork. The edges connecting the modules represent the
  \center{\includegraphics[width=0.7\textwidth]{figures/G1S_modular.png}}
 \end{figure}
 
-[[ Discuss the results: describe the modular representation. what can be concluded/done with this modular representation? ]]
-
+The modular view offers a simplified visualization of the complex network. The obtained model is more abstract but highlights some aspects that may not be evident from the reaction network. For instance, it brings into relief some feedbacks, positive, negative or feedforward, involving the major players of the cell cycle, and prepares the network for mathematical modeling. The translation of this modular network into a Boolean model is indeed straightforward. 
 
 \section*{Conclusions}
 

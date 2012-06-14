@@ -377,7 +377,9 @@ structure extracted from the human Apoptosis pathway.
 \begin{figure}[h]
  \caption{\label{mphasebiopax}  \textbf{Cell cycle network.} Zoom on the cell
 cycle network model of Novak et al. \cite{novak1998model} after the import in 
-Cytoscape of the corresponding BioPAX file with BiNoM functions.}
+Cytoscape of the corresponding BioPAX file with BiNoM functions. The grey
+squares represent complexes white white squares are proteins. Small grey diamonds
+indicate reactions. The names of each node follow BiNoM naming convention}
  \center{\includegraphics[width=0.7\textwidth]{figures/mphase_biopax.png}}
 \end{figure}
 
@@ -555,7 +557,8 @@ in the results section.
 network is composed of seven nodes and nine edges (a). The two paths (b,c)
 extracted from this network start from the source node \textbf{Ac} and end at
 the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
-\textbf{Ac} and \textbf{D} are annotated, by the values $2.0$ and $-1.0$ respectively.}
+\textbf{Ac} and \textbf{D} are annotated using experimental data, having the
+values $2.0$ and $-1.0$ respectively.}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
 
@@ -651,40 +654,78 @@ selected nodes and edges and also to show the clipboard content.
 
 
 \section*{Results and Discussion}
-We propose to study a reaction network focusing on the transition from G1 phase (growth phase) to S phase (DNA replication phase) of the cell cycle \cite{calzone2008comprehensive} as an example of the use of BiNoM functions. 
+We propose to study a reaction network focusing on the transition from G1 phase
+(growth phase) to S phase (DNA replication phase) of the cell cycle
+\cite{calzone2008comprehensive} as an example of the use of BiNoM functions. 
 
-The initial published network describes in biochemical details the regulation of the tumor suppressor gene retinoblastoma (RB or RB1). It was built using CellDesigner. The comprehensive map listed 80 proteins, 208 species, 165 interactions, 176 genes, and recapitulated more than 350 publications including information from different cellular types, thus making the map a generic map of the cell cycle regulation. It is composed of two main compartments: the cell, containing the cytoplasm, the nucleus and the nucleolus, in which the biochemical interactions such as association, dissociation, (de)phosphorylation, (de)acetylation, degradation, etc. take place; and the genes, which lists the target genes of the main transcription factors of the map, the E2F family members.A thorough description of the model and the methods used to build it and create simplified versions of it along with the first interactive map was made available at the following address (each protein (node) and each interaction (arrow) is clickable):\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/} 
+The network published in \cite{calzone2008comprehensive} describes in
+biochemical details the regulation of the well-known and charaterized tumor
+suppressor gene retinoblastoma (RB or RB1). The product of this gene operates at
+the heart of the cell cycle clock, acting as a signal transducer connecting the
+cell cycle clock with the transcriptional machinery. The pathway in which RB is
+acting is disrupted in many human tumor types \cite{weinberg1995retinoblastoma}.
+The comprehensive map of the RB/E2F network was built using CellDesigner
+\cite{funahashi2003celldesigner} and listed 80 proteins, 208 species, 165
+interactions, 176 genes, and recapitulated more than 350 publications, including
+information from different cellular types, thus making the map a generic map of
+the cell cycle regulation. It is composed of two main compartments: the cell,
+containing the cytoplasm, the nucleus and the nucleolus, in which the
+biochemical interactions such as association, dissociation, (de)phosphorylation,
+(de)acetylation, degradation, etc. take place; and the genes, which lists the
+target genes of the main transcription factors of the map, the E2F family
+members.
+A thorough description of the model and the methods used to build it and create
+simplified versions of it along with the first interactive (clickable) map is
+available on our website
+(\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/}).
 
-For this study, we choose to concentrate on the G1 to S transition. For that, we used the intersection of the 208 species
-of RB/E2F network and the 280 species listed in Reactome for the G1-S transition
+For this study, we choose to concentrate on the G1 to S transition. We
+used the intersection of the 208 species
+of RB/E2F network and the 280 species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
 reactions (Figure~\ref{g1s}).
 
 \begin{figure}[h]
  \caption{\label{g1s}  \textbf{G1/S network.}
-	Network of the G1 to S transition corresponding to the intersection of
-RB-E2F network and G1/S network extracted from Reactome.}
+	Overview of the G1 to S transition network, corresponding to the intersection of
+RB/E2F network and G1/S network extracted from Reactome.}
  \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
 \end{figure}
 
-This map contains a lot of information but difficult to extract. We present two ways to get some biological insight from this map. The first one consists of transforming the reaction network into an influence network in order to analyze data on it. The second one implies a simplification of the comprehensive map by applying a method of reduction of the numerous interactions into modules without losing any content.
+This map contains a lot of valuable informations but they are rather difficult to extract. We present two
+ways to get some biological insight from this map. The first one consists of
+transforming the reaction network into an influence network in order to analyze
+experimental data on it. The second one implies a simplification of the comprehensive map by
+applying a method of reduction of the numerous interactions into modules without
+losing any content from the original map.
 
 \subsection*{Application of PIQuant on an influence network.}
-PIQuant algorithm can be used to perform a quantitative analysis on an influence network. For translating the reaction network into an influence network, we used a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that can be found at the following link: http://contraintes.inria.fr/~soliman/cd2dot.html. The translation is based on simple rules: (1) BIOCHAM deletes all linear degradations and syntheses, (2) all intermediary species with only one input and one output, are suppressed, (3) if the reactions of synthesis and degradation of a species have distinct inputs and outputs, then this reactions can be merged, and (4) if the inputs of one reaction is the same as the inputs of another reaction, then it is the case of a reversible reaction. Although this work is still in progress, a short description and an example of this conversion that include some genes of our map can be found at (ref). 
+PIQuant algorithm can be used to perform a quantitative analysis on an influence
+network. For translating the reaction network into an influence network, we used
+a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
+available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). The
+translation is based on simple rules: (1) BIOCHAM deletes all linear
+degradations and syntheses, (2) all intermediary species with only one input and
+one output, are suppressed, (3) if the reactions of synthesis and degradation of
+a species have distinct inputs and outputs, then this reactions can be merged,
+and (4) if the inputs of one reaction is the same as the inputs of another
+reaction, then it is the case of a reversible reaction. Although this work is
+still in progress, a short description and an example of this conversion is available \cite{calzone2011calamar}. 
 
-%Laurence Calzone, Claudine Chaouiya, Élisabeth Remy, and Sylvain Soliman.
-%Qualitative modelling of the RB/E2F network. deliverable D3.1, ANR CALAMAR
-%(ANR-08-SYSC-003), February 2011.
+We apply PIQuant to the resulting influence network of the G1/S transition of
+the cell cycle. 
 
-We apply PIQuant to the resulting influence network of the G1/S transition of the cell cycle. 
-
-In order to construct the annotation of this network, we use expression  data from a study of 57 bladder cancer
+In order to construct the annotation of this network, we use expression  data
+from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
-is assessed by a t-test. The t-test statistic value is used as the annotation for each gene. We construct a text file listing nodes of the influence network 
-and their annotation. We assign annotations only to nodes that can be directly influenced by a 
-mRNA level. When a complex is annotated, it means that one of the partners has no unbound state in the network. 
+is assessed by a t-test. The t-test statistic value is used as the annotation
+for each gene. We construct a text file listing nodes of the influence network 
+and their annotation. We assign annotations only to nodes that can be directly
+influenced by a 
+mRNA level. When a complex is annotated, it means that one of the partners has
+no unbound state in the network. 
 We import this file using the Cytoscape function 
 ``Import $>$ Nodes attributes'' 
 in the cytoscape session of the influence network.
@@ -712,11 +753,16 @@ genes are over-expressed relative to the normal cells in the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
 
 \begin{figure}[h]
-  \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of PIQuant.}
-    Results of PIQuant algorithm applied to the influence network. Color
-intensities are proportional to PIQuant score (red positive, green negative).
-Each line represent a source node, each column represent a cell-cycle phase.}
-  \center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
+  \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of the PIQuant
+scores.}
+    The map shows the results of the PIQuant algorithm applied to the G1/S
+influence network. Color intensities are proportional to PIQuant score (red color indicates a positive
+value; i.e an activation, the green color indicates a negative value, i.e. an
+inhibition).
+Each line represents a source node while each column represents a cell-cycle
+phase.}
+ 
+\center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
 \end{figure}
 
 
@@ -759,7 +805,12 @@ different module, or subnetwork. The edges connecting the modules represent the
  \center{\includegraphics[width=0.7\textwidth]{figures/G1S_modular.png}}
 \end{figure}
 
-The modular view offers a simplified visualization of the complex network. The obtained model is more abstract but highlights some aspects that may not be evident from the reaction network. For instance, it brings into relief some feedbacks, positive, negative or feedforward, involving the major players of the cell cycle, and prepares the network for mathematical modeling. The translation of this modular network into a Boolean model is indeed straightforward. 
+The modular view offers a simplified visualization of the complex network. The
+obtained model is more abstract but highlights some aspects that may not be
+evident from the reaction network. For instance, it brings into relief some
+feedbacks, positive, negative or feedforward, involving the major players of the
+cell cycle, and prepares the network for mathematical modeling. The translation
+of this modular network into a Boolean model is indeed straightforward. 
 
 \section*{Conclusions}
 

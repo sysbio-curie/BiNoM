@@ -314,7 +314,7 @@ functions is in press
 \cite{binomBookChapter}.
 
 
-BiNoM is designed to handle different systems biology file formats and to
+BiNoM is designed to handle different Systems Biology file formats and to
 provide useful functions for the analysis of biological networks. The core
 functions of BiNoM can be grouped in five different topics: Input/Output,
 Analysis, BioPAX utils \& query, Module manager and Utilities.
@@ -330,15 +330,13 @@ scenarios:
 \begin{itemize}
 
 \item Interconversion of CellDesigner files to BioPAX, and from a BioPAX
-reaction network to SBML level 2 (not to the CellDesigner dialect). While the
-content of BioPAX files can be altered using BiNoM functions, it is not possible
-to create a CellDesigner file from scratch or using the graphical notations from
-a BioPAX file. 
+reaction network to SBML level 2.
 
-\item Import of a BioPAX file as a
-reaction network or a pathway structure, and creation of a subnetwork saved as a new BioPAX file. 
+\item Import of a BioPAX file as a reaction network and/or a pathway structure
+and/or a protein interactions network, followed by the creation of a subnetwork
+saved as a new BioPAX file. 
 
-\item Import of a BioPAX file, selection of a subnetwork of interest saves as a SBML file for
+\item Import of a BioPAX file, selection of a subnetwork of interest saved as a SBML file for
 the creation of a computational model using an appropriate software package.
 
 \item Import a large CellDesigner map and export only a subnetwork as a new CellDesigner file.  
@@ -361,11 +359,11 @@ BiNoM, we use the Jastor and the Jena java libraries
 automatically create java classes from the BioPAX specifications, allowing a
 convenient access to the different data types encoded in the BioPAX files. The
 guiding principle in BiNoM for the
-access to systems biology files is to provide control over the content without
+access to Systems Biology files is to provide control over the content without
 completely converting the file to the Cytoscape format. The content is therefore
 mapped to a labeled directed graph, representing the complete set of objects and
 their relationships. This graph, called the index, is highly connected and is
-not visualized explicitely. The user is interacting with selected subgraphs
+not visualized explicitely. Instead, the user is interacting with selected subgraphs
 extracted from the index. For example, BioPAX files are imported as three
 separate entities, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
@@ -380,8 +378,8 @@ structure extracted from the human Apoptosis pathway.
  \caption{\label{mphasebiopax}  \textbf{Cell cycle network.} Zoom on the cell
 cycle network model of Novak et al. \cite{novak1998model} after the import in 
 Cytoscape of the corresponding BioPAX file with BiNoM functions. The grey
-squares represent complexes white white squares are proteins. Small grey diamonds
-indicate reactions. The names of each node follow BiNoM naming convention}
+squares represent complexes while white squares are proteins. Small grey diamonds
+indicate reactions. The names of each node follow BiNoM naming convention (see the main text for details)}
  \center{\includegraphics[width=0.7\textwidth]{figures/mphase_biopax.png}}
 \end{figure}
 
@@ -397,40 +395,42 @@ triangular nodes denote steps, while grey nodes indicate reactions.}
 When importing a file, BiNoM is calling a \emph{naming service} function, in
 order to create meaningful names for the various entities. More precisely,
 entity names are combined with other features such as modifications, compartment
-and complexes components. The different features are indicated by special
+and complexe components. The different features are indicated by special
 characters, such as ``@'' for the compartments, ``$|$'' for modifications and
-``:'' to delimitate the different members of a protein complex. For example, the
-name Cdc25$|$Pho@cytoplasm represent the protein Cdc25 in a phosphorylated
+``:'' to delimitate the different members of a complex. For example, the
+name Cdc25$|$Pho@cytoplasm represents the protein Cdc25 in a phosphorylated
 state, located in the cytoplasm, while the name
-Cdc13:Cdc2$|$Thr167\_pho@cytoplasm indicate a protein complex located in the
+Cdc13:Cdc2$|$Thr167\_pho@cytoplasm indicates a protein complex located in the
 cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
 position 167 on a threonin residue.
 
 
 \subsection*{BiNoM Analysis}
-The central goal of the BiNoM software package is to provide efficient methods
+The central goal of the BiNoM plugin is to provide efficient methods
 and algorithms to reduce the inherent complexity of biological networks into
 manageable and meaningful subnetworks. This goal is achieved by a set of
-functions included as a built-in structural graph analysis library, taking into
-account for some of them the semantics contained in the graph elements. Those
-approaches include the analysis of connected and strongly connected components,
-pruning the network, decomposition in material components or in cycles, path
-analysis and network clustering.
+functions included as a built-in structural graph analysis library. Some of the functions are taking into
+account the semantics contained in the graph elements names. 
+The structural analysis functions implemented in BiNoM include the analysis of
+connected and strongly connected components, pruning the network, decomposition
+by name (material components) or by cycle, path analysis and network clustering.
 
-A trivial approach to split a network is to dissociate the unconnected subparts
-of the network. A more sophisticated one consist in decomposing the network into
+
+\subsubsection*{Decomposition by name or by cycle}
+A trivial approach to separate a network into subparts is to dissociate the unconnected subparts
+of the network. A more sophisticated one consists in decomposing the network into
 strongly connected components, using the algorithm of Tarjan
 \cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
-first all the elements associated with the \emph{input} parts of the network, a
-second with all the elements associated with the \emph{output} part and at last
-all the elements linked to the central, cyclic part. This type of approach
+the one with all the elements associated with the \emph{input} parts of the network, the
+second with all the elements associated with the \emph{output} part and the last
+part with all the elements linked to the central, cyclic part. This type of approaches
 corresponds to the bow-tie model of Broder and colleagues \cite{broder2000graph}.
 
 The decomposition in material components is using the node name semantics to
 isolate subnetworks in which each protein is involved. Major overlaps between
 the different subnetworks are to be expected, as some proteins are involved in
-several different complexes. The figure~\ref{matcdc2cdc13} is showing two examples of subnetworks
-obtained by material components decomposition applied to the cell cycle network
+different complexes. Figure~\ref{matcdc2cdc13} shows two examples of subnetworks
+obtained by material component decomposition applied to the cell cycle network
 model.
 
 \begin{figure}[h]
@@ -460,7 +460,7 @@ cycles involving CDC25 after a cycle decomposition.
 
 [[ AZ: check description of shortest path and sub-optimal path search and add a description for all non intersecting paths ]]
 
-
+\subsubsection*{Path analysis algorithms}
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
 all non-intersecting paths. The shortest path is calculated as the path having
@@ -478,6 +478,7 @@ or protein complexes. To determine the size of the clusters, the user can
 specify a percentage of intersection (ranging from 0 to 100\%) that will be used
 as a threshold to create the clusters.
 
+\subsubsection*{Pathway influence quantification algorithm}
 In this version of BiNoM, we have introduced a novel approach to quantify the
 influence of one or more annotated source nodes on a given set of valuable target nodes, 
 named PIQuant (Pathway Influence Quantification). Consider that the source nodes are 
@@ -820,7 +821,7 @@ Building a suitable model for systems and mathematical biology is a multi-step
 process, beginning with the collection of biological knowledge and progressing
 towards the formalization of a network and its translation in mathematical
 terms. BiNoM was designed to help during the intermediate steps of this process,
-by providing a convenient access to some standard systems biology
+by providing a convenient access to some standard Systems Biology
 representations such as BioPAX, also by giving the possibility to manipulate the
 network and finally to apply various algorithms (mostly based on graph theory)
 and map biological data to it. BiNoM is clearly not a tool for numerical

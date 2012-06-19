@@ -185,12 +185,12 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 \begin{abstract}
         
 Public repositories of biological pathways and networks have greatly expanded in
-recent years. Such databases facilitate the analysis of high-throughput
+recent years. Such databases contain many pathways that facilitate the analysis of high-throughput
 experimental work and the formulation of new biological hypotheses to be
  tested, a fundamental principle of the Systems Biology approach.
 However, large scale molecular maps are not always easy to mine and interpret. We
-have developped BiNoM (Biological Network Manager), a Cytoscape plugin that is
-providing several functions for the import-export of standard Systems Biology
+have developped BiNoM (Biological Network Manager), a Cytoscape plugin which provides
+ several functions for the import-export of standard Systems Biology
 file formats, and also a set of functions to analyze and reduce the complexity
 of large biological networks. Here, we provide an in-depth overview of the BiNoM
 functions, we detail novel aspects such as the support of the BioPAX level 3
@@ -240,14 +240,14 @@ relationships, occurring at the molecular level in living cells
 \cite{adriaens2008public, cary2005pathway}. Such representations represent now
 a large body of knowledge that are often organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
-\cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, BioModels
-\cite{le2006biomodels} or the Cancer Cell Map
+\cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, or the Cancer Cell Map
 (\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
-networks databases facilitate a large spectrum of analysis, improving our
+network databases facilitate a large spectrum of analyses, improving our
 understanding of cellular systems. For example, it is now a very common
 practise to cross the output of high-throughput experiments, such as mRNA or
-protein expression levels, with with a set of curated biological pathways in
-order to efficiently visualize changes and formulate new hypotheses about
+protein expression levels, with with curated biological pathways in
+order to efficiently visualize changes, analyze their impect on a network and
+formulate new hypotheses about
 biological processes \cite{saraiya2005visualizing,
 gehlenborg2010visualization}. The development of those pathway repositories has
 also fueled the creation of standard representations and formats, to facilitate
@@ -273,18 +273,21 @@ maps, even when they are focusing on a particular process, is quite large, with
 hundreds of species and interactions. The analysis and interpretation of such
 large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
-of pathways \cite{adriaens2008public}. For example, CellDesigner is a
-user-friendly software package
+of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical edition of biological pathways diagrams
 \cite{funahashi2003celldesigner}, and it is using a dialect
-of SBML to store all the information contained in the graphs. We have created
+of SBML to store all the information contained in the graphs. There is obviously
+a need for user-friendly software tools that would allow the user to easily
+import data from various standard format sources, to perform structural analyses
+and to manipulate networks, and also be able to export a network to a suitable
+format for further analysis (e.g. mathematical modeling). We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
 network vizualization and analysis tool \cite{cline2007integration}. BiNoM
-facilitate the usage and analysis of biological networks in standard Systems
+facilitates the usage and analysis of biological networks in standard Systems
 Biology formats (SBML, SBGN, BioPAX). More specifically, BiNoM implements
 several functions based on graph operations for the structural analysis of
 biological networks. Those functions can be used to reduce the complexity and
-extract meaningfull subnetworks from large scale molecular maps. Furthermore,
+extract meaningful subnetworks from large scale molecular maps. Furthermore,
 BiNoM has several built-in functions for accessing standard Systems Biology file
 formats. 
 Here, we provide a detailed view on the functions implemented in BiNoM for the
@@ -304,10 +307,10 @@ Cytoscape software, the underlying logic of all BiNoM functions is completely
 decoupled from the Cytoscape objects, allowing developers to also use BiNoM as
 an independent java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager, or alternatively the user can
-also download
-the plugin together with a manual and the source code from the BiNoM website
-\url{http://binom.curie.fr/}. We have also recently published a 
-detailed tutorial on how to use the main BiNoM functions
+also download the plugin together with a manual and the source code from the
+BiNoM website
+\url{http://binom.curie.fr/}. A detailed tutorial on how to use the main BiNoM
+functions is in press
 \cite{binomBookChapter}.
 
 

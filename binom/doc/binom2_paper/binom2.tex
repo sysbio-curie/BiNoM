@@ -448,7 +448,7 @@ the different parts of the life cycle of a given protein or complex. Care must
 be taken when applying this approach, as the number of cycles can be huge for
 large network structures. For example, it might be preferable to eliminate first
 the network hubs, which are by definition highly connected, and also group short
-cycles in meta-nodes before applying the procedure. The figure~\ref{mphasecdc25cycles} is showing two
+cycles in larger subnetworks before applying the procedure. Figure~\ref{mphasecdc25cycles} shows two
 cycles involving CDC25 after a cycle decomposition.
 
 \begin{figure}[h]
@@ -466,13 +466,13 @@ algorithms, such as finding the shortest paths, the suboptimal shortest paths or
 all non-intersecting paths. The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the sub-optimal path is constructed by removing all edges in
-all shortest paths one by one and finding the shortest path. As usual, some care
-must be taken before launching those functions, as the number of paths between nodes can be
+all shortest paths one by one and finding the shortest path. The user should
+bear in mind that the number of paths between nodes can be
 very large for big networks.
 
 Obviously, the result of some decomposition functions will result in subnetworks
 that share a large number of components, as it is for example often the case
-with the decomposition in material components. Therefore, BiNoM also include a
+with the decomposition in material components. Therefore, BiNoM also includes a
 function to \emph{cluster} networks, based on common components such as protein
 or protein complexes. To determine the size of the clusters, the user can
 specify a percentage of intersection (ranging from 0 to 100\%) that will be used

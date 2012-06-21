@@ -676,7 +676,7 @@ implemented in Cytoscape yet, but might be very useful for the analysis and
 manipulation of networks. For example, it is possible to automatically select
 the edges between two nodes, generate the network corresponding to the double
 network differences between two networks A and B, or update all the subnetworks of
-a session after some changes have been made to the initial one. The BiNoM utilities also implements
+a session after some changes have been made to the initial one. The BiNoM utilities also implement
 clipboard related functions, giving the possibility to copy, add and paste
 selected nodes and edges and also to show the clipboard content. 
 
@@ -689,7 +689,7 @@ We propose to study a reaction network focusing on the transition from G1 phase
 The network published in \cite{calzone2008comprehensive} describes in
 biochemical details the regulation of the well-known and charaterized tumor
 suppressor gene retinoblastoma (RB or RB1). The product of this gene operates at
-the heart of the cell cycle clock, acting as a signal transducer connecting the
+the heart of the cell cycle clock, acting as a signal transducer, connecting the
 cell cycle clock with the transcriptional machinery. The pathway in which RB is
 acting is disrupted in many human tumor types \cite{weinberg1995retinoblastoma}.
 The comprehensive map of the RB/E2F network was built using CellDesigner
@@ -721,7 +721,7 @@ RB/E2F network and G1/S network extracted from Reactome.}
  \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
 \end{figure}
 
-This map contains a lot of valuable informations but they are rather difficult to extract. We present two
+This map contains a lot of valuable information but they are rather difficult to extract. We present two
 ways to get some biological insight from this map. The first one consists of
 transforming the reaction network into an influence network in order to analyze
 experimental data on it. The second one implies a simplification of the comprehensive map by
@@ -736,15 +736,16 @@ available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). The
 translation is based on simple rules: (1) BIOCHAM deletes all linear
 degradations and syntheses, (2) all intermediary species with only one input and
 one output, are suppressed, (3) if the reactions of synthesis and degradation of
-a species have distinct inputs and outputs, then this reactions can be merged,
-and (4) if the inputs of one reaction is the same as the inputs of another
-reaction, then it is the case of a reversible reaction. Although this work is
-still in progress, a short description and an example of this conversion is available \cite{calzone2011calamar}. 
+the species deleted in (2) have distinct inputs and outputs, then this reactions
+can be merged, and (4) if they have the same species as input/output, then the reaction was a
+reversible reaction and is replaced by a degradation. Although this work is
+still in progress, a short description and an example of this conversion is
+available \cite{calzone2011calamar}. 
 
 We apply PIQuant to the resulting influence network of the G1/S transition of
 the cell cycle. 
 
-In order to construct the annotation of this network, we use expression  data
+In order to annotate the input nodes of this network, we use expression  data
 from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
@@ -756,16 +757,19 @@ mRNA level. When a complex is annotated, it means that one of the partners has
 no unbound state in the network. 
 We import this file using the Cytoscape function 
 ``Import $>$ Nodes attributes'' 
-in the cytoscape session of the influence network.
-Figure~\ref{InflAnnotNet} represents this influence network with the annotation.
+in the Cytoscape session of the influence network.
+Figure~\ref{InflAnnotNet} represents this influence network after its import.
  
 
 \begin{figure}[h]
   \caption{\label{InflAnnotNet} \textbf{Annotated influence network.}
-    Influence network of the cell cycle G1/S transition. Colors represent differential
+    Influence network of the cell cycle G1/S transition. Colors represent
+differential
 expression obtained from transcriptome data compared to normal tissue. Color 
-intensities are proportional to the t-statistics (red for positive, green for
-negative). The three grey nodes are markers for the different cell-cycle phases: G1, S, M.}
+intensities are proportional to the t-statistic values (red values indicate
+positive values corresponding to an activation, green values indicate negative
+values corresponding to an inhibition). The three grey nodes are markers for the
+different cell-cycle phases: G1, S, M.}
   \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
 \end{figure}
 
@@ -775,7 +779,7 @@ analysis''. We take all annotated nodes as active nodes, the grey nodes of
 Figure~\ref{InflAnnotNet} as targets, and we select optimal and sub-optimal 
 shortest path. We run a test significance and get the report table. In this
 report, the ``Node influence table'' represents the global PIQuant score from
-each annotated nodes to each cell-cycle phase markers. Those values are
+each annotated source node to each cell-cycle phase marker. Those values are
 represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
 genes are over-expressed relative to the normal cells in the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
@@ -798,7 +802,7 @@ phase.}
 \subsection*{Modularization} 
 
 The raw G1/S network is very detailed and may be hard to read at a first glance.
-To facilitate the analysis of the content, we propose to organise the reaction
+To facilitate the analysis of the content, we propose to organize the reaction
 network as a modular network. The species are clustered in groups, referred to
 as modules, in an semi-automatic manner, using BiNoM functions and biological
 knowledge. Each module represent in fact a
@@ -807,7 +811,7 @@ linked by activating or inhibiting influences according to the informations
 contained in the original diagram or derived from previous biological knowledge.
 
 Briefly, we first decomposed the global network into its different components,
-by using name semantics to isolate the sub-networks in which
+by using name semantics to isolate the subnetworks in which
 each protein is involved. The 36 networks that are created this way may share a
 lot of common species, so we went further
 by clustering the subnetworks having at least 25\% of common species. We renamed

@@ -777,12 +777,19 @@ PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
 analysis''. We take all annotated nodes as active nodes, the grey nodes of
 Figure~\ref{InflAnnotNet} as targets, and we select optimal and sub-optimal 
-shortest path. We run a test significance and get the report table. In this
+shortest path as the algorithm to extract the paths. We run a test significance
+and get the report table. In this
 report, the ``Node influence table'' represents the global PIQuant score from
-each annotated source node to each cell-cycle phase marker. Those values are
+each annotated source node to each cell-cycle phase marker (available as
+supplementary table 1). Those values are
 represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
 genes are over-expressed relative to the normal cells in the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
+Compared to Figure~\ref{InflAnnotNet}, where the coloring represents only the
+experimental data values, we can see that the PIQuant score is integrating the
+influence of the network architecture and the experimental data, thereby
+providing a better and more accurate picture of the biological response.
+
 
 \begin{figure}[h]
   \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of the PIQuant
@@ -792,7 +799,7 @@ influence network. Color intensities are proportional to PIQuant score (red colo
 value; i.e an activation, the green color indicates a negative value, i.e. an
 inhibition).
 Each line represents a source node while each column represents a cell-cycle
-phase.}
+phase. The map was produced with the R statistical package.}
  
 \center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
 \end{figure}
@@ -817,8 +824,8 @@ lot of common species, so we went further
 by clustering the subnetworks having at least 25\% of common species. We renamed
 the 7 clusters obtained with a name that illustrate the content and the main
 function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
-content of each module, making modifications if necessary. For example, the
-module E2F1\_RB is
+content of each module, making modifications if necessary by adding or deleting nodes. 
+For example, the module E2F1\_RB is
 further decomposed in three different modules containing the proteins RB, E2F1
 and E2F6. Finally, we created a final modular view, where we integrate the
 subnetworks we have previously created using a set of BiNoM functions for the
@@ -839,7 +846,7 @@ different module, or subnetwork. The edges connecting the modules represent the
 
 The modular view offers a simplified visualization of the complex network. The
 obtained model is more abstract but highlights some aspects that may not be
-evident from the reaction network. For instance, it brings into relief some
+evident from the comprehensive reaction network. For instance, it brings into relief some
 feedbacks, positive, negative or feedforward, involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
 of this modular network into a Boolean model is indeed straightforward. 
@@ -854,8 +861,8 @@ by providing a convenient access to some standard Systems Biology
 representations such as BioPAX, also by giving the possibility to manipulate the
 network and finally to apply various algorithms (mostly based on graph theory)
 and map biological data to it. BiNoM is clearly not a tool for numerical
-simulations, but it is providing functions to export networks to the SBML and
-GINsim file formats (through the GINsim Cytoscape plugin), facilitating the
+simulations, but it provides functions to export networks to the SBML and
+GINsim file formats (through the GINsim Cytoscape plugin for boolean modelling), facilitating the
 import into various numerical simulators.
 
 The future developments of BiNoM will include functions such as merging several

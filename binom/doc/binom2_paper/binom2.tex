@@ -486,9 +486,9 @@ In this version of BiNoM, we have introduced a novel approach to quantify the
 influence of one or more source nodes on one or more target nodes for a given
 network, named the PIQuant score (Pathway Influence Quantification). Note that the target
 node can be a gene or a phenotype of interest, representing a more complex
-biological function, such as cell proliferation or apopotosis. For a given network
+biological function, such as cell proliferation or apopotosis. For a given network with one source node and one target node,
 the PIQuant score value will quantify the influence of the source node on the target
-node, by taking into account available experimental data values for input nodes,
+node, by taking into account experimental data value for the input nodes,
 the path length and the sign of the path for a set of paths defined between the
 source and the target node. More generally, the goal of the PIQuant score is to
 help the user to understand the role and function of the input nodes on the
@@ -510,15 +510,17 @@ of its source node. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. Then the PIQuant score for a set of $q$ paths (from a set of 
+on the target node. This assumption may be too simplistic for some biological
+situations, but then a more sophisticated scoring scheme can be used. The
+PIQuant score for a set of $q$ paths (from a set of 
 source nodes, to a set of target nodes) is defined as:
 
 $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-For example, in the case of the network figure~\ref{piquantnetworks}a, let us
-consider Ac as the source node and Ph as target node and consider only the two
+For example, in the case of the network presented on the figure~\ref{piquantnetworks}a, let us
+consider Ac as the source node and Ph as the target node and consider only the two
 paths defined on the figures~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c. Given that the
 node Ac is annotated by the value $2.0$, and that the first path has a length
@@ -531,7 +533,7 @@ $$
 $$
 
 
-Sometimes a path has one or more intermediate nodes that are annotated nodes, 
+Sometimes a path has one or more intermediate nodes that are annotated nodes (i.e. for which we have experimental data values), 
 in addition to the source node.
 In that case, the intermediate node is \textit{consistent} if the sign of its 
 annotation is the same as the sign of the source node annotation multiplied by
@@ -546,23 +548,23 @@ The rationale behind these definitions is that the
 network structure for intermediate nodes can be consistent or inconsistent with
 experimental data values.
 
-For example, the path shown on figure~\ref{piquantnetworks}b is consistent while
-the path on the figure~\ref{piquantnetworks}c is inconsistent. In the example
-above, if only consistent paths are kept, then the PIQuant score of Ac to Ph becomes:
-
-$$
- PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
-$$
-
 According to the network, there is an influence of Ac to Ph
-that goes through D (Figuree~\ref{piquantnetworks}c). But if this path
-is functional, D annotation would have the same sign than Ac annotation, because
+that goes through D (Figure~\ref{piquantnetworks}c). But if this path
+is functional, the annotation of node D should have the same sign as for node Ac, because
 Ac activates D indirectly. In our case, the sign of D annotation is opposite to
 the sign of Ac annotation, meaning that there is another (unknown) effect on D.
 Therefore, the path from Ac to Ph that goes through D is \textit{inconsistent} and
 might not be used to compute PIQuant score. Practically, we offer the option to
 keep or not the inconsistent paths for the calculation of the PIQuant score,
-depending on how the user wants to analyze the results.
+depending on how the user wants to analyze the results. For example, the path
+shown on figure~\ref{piquantnetworks}b is consistent while
+the path on the figure~\ref{piquantnetworks}c is inconsistent. In the example
+above, if only consistent paths are kept, then the PIQuant score of Ac to Ph
+becomes:
+
+$$
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
+$$
 
 In more realistic situations, we will have multiple source nodes with different
  annotations, and also multiple target nodes representing phenotypes of

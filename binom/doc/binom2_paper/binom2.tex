@@ -458,16 +458,19 @@ cycles involving CDC25 after a cycle decomposition.
 \end{figure}
 
 
-[[ AZ: check description of shortest path and sub-optimal path search and add a description for all non intersecting paths ]]
+
 
 \subsubsection*{Path analysis algorithms}
+
+[[ AZ: check description of shortest path and sub-optimal path search and add a description for all non intersecting paths ]]
+
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
 all non-intersecting paths. The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the sub-optimal path is constructed by removing all edges in
-all shortest paths one by one and finding the shortest path. The user should
-bear in mind that the number of paths between nodes can be
+all shortest paths one by one, and finding the shortest path. The user should
+be careful when using this procedure, as the number of paths between nodes can be
 very large for big networks.
 
 Obviously, the result of some decomposition functions will result in subnetworks
@@ -480,20 +483,38 @@ as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
 In this version of BiNoM, we have introduced a novel approach to quantify the
-influence of one or more annotated source nodes on a given set of valuable target nodes, 
-named PIQuant (Pathway Influence Quantification). Consider that the source nodes are 
- \textit{annotated} by a signed real number, representing for example the expression ratio 
-of a given gene.
-For this, a set of paths from source nodes to target nodes is extracted (indexed from $1$ to $q$). 
+influence of one or more source nodes on one or more target nodes for a given network, 
+named the PIQuant score (Pathway Influence Quantification). For example,
+Figure~\ref{piquantnetworks}a shows a simple influence network composed of seven
+nodes, where the edges represent either a repression or an activation between
+nodes. The node Ac represents an input node of interest, while the node Ph is
+defined as an output node. The latter can be a gene or a phenotype of interest,
+representing a more complex biological function, such as cell proliferation or
+apopotosis. Figures~\ref{piquantnetworks}b and c show two examples of paths defined between
+the nodes Ac and Ph. In this case, the PIQuant score value will quantify the influence of the 
+source node Ac on the target node Ph, taking into account available experimental
+data values for input nodes, paths length and the sign of the paths. More generally, the goal
+of the PIQuant score is to help the user to understand the role and function of
+the input nodes on the output nodes, for a given network architecture in some defined experimental conditions.
+
+More formally, we define a source node as \textit{annotated} when a signed real number is
+assigned to the node, representing experimental data. For example, it can be the
+expression ratio of a gene between a disease and a normal state, obtained from
+transcriptomics profiling.
+We can also extract a set of paths from source nodes to target nodes (indexed
+from $1$ to $q$). 
  A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
 between a source node and a target node (without repetition of any node
-or edge). We also define the activity $\alpha_k$ of the path $k$ as the annotation
+or edge). In BiNoM, we propose three algorithms to search for paths between the
+source and target nodes (shortest paths, sub-optimal shortest paths and all
+non-intersecting paths, see previous paragraph). The activity
+$\alpha_k$ of the path $k$ is defined as the annotation
 of its source node. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. Then the PIQuant score for a set of $q$ paths (from a set of 
+on the target node. This assumption might not be true for all types of biological networks, but more complex Then the PIQuant score for a set of $q$ paths (from a set of 
 source nodes, to a set of target nodes) is defined as:
 
 $$

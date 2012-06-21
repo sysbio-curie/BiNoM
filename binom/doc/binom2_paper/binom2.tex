@@ -514,20 +514,20 @@ of its source node. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. This assumption might not be true for all types of biological networks, but more complex Then the PIQuant score for a set of $q$ paths (from a set of 
+on the target node. Then the PIQuant score for a set of $q$ paths (from a set of 
 source nodes, to a set of target nodes) is defined as:
 
 $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-For example, a very simple influence network composed of seven nodes is shown on
-figure~\ref{piquantnetworks}a. Ac is taken as source node, Ph as target node. 
-The figures ~\ref{piquantnetworks}b and
-~\ref{piquantnetworks}c show 2 paths extracted from this network. Given that the
+For example, in the case of the network figure~\ref{piquantnetworks}a, let us
+consider Ac as the source node and Ph as target node and consider only the two
+paths defined on the figures~\ref{piquantnetworks}b and
+~\ref{piquantnetworks}c. Given that the
 node Ac is annotated by the value $2.0$, and that the first path has a length
 equal to 3, the second a length equal to 5, we can calculate the PIQuant score 
-of the node AC to the node Ph as:
+of the node Ac to the node Ph as:
 
 $$
  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{5}
@@ -538,34 +538,38 @@ $$
 Sometimes a path has one or more intermediate nodes that are annotated nodes, 
 in addition to the source node.
 In that case, the intermediate node is \textit{consistent} if the sign of its 
-annotation is
-the same than the sign of the source node annotation multiplied by the sign of the 
-path from the source node
-to the intermediate node. If signs are opposite, the node is \textit{inconsistent}. 
-A path is \textit{consistent} if each annotated intermediate nodes are consistent. 
-A path is \textit{inconsistent} if at least one intermediate node is \textit{inconsistent}.
+annotation is the same as the sign of the source node annotation multiplied by
+the sign of the 
+path from the source node to the intermediate node. If signs are opposite, the
+node is \textit{inconsistent}. 
+A path is \textit{consistent} if each annotated intermediate nodes is
+consistent. A path is \textit{inconsistent} if at least one intermediate node is
+\textit{inconsistent}. 
+
+The rationale behind these definitions is that the
+network structure for intermediate nodes can be consistent or inconsistent with
+experimental data values.
+
 For example, the path shown on figure~\ref{piquantnetworks}b is consistent while
 the path on the figure~\ref{piquantnetworks}c is inconsistent. In the example
-above, if only consistent paths 
-are kept, then the PIQuant score of Ac to Ph becomes:
+above, if only consistent paths are kept, then the PIQuant score of Ac to Ph becomes:
 
 $$
  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
 $$
 
-Using this example, the biological interpretation of inconsistent paths removal
-can be detailed. According to the network, there is an influence of Ac to Ph
-that goes through D. But if this path
-is effective, D annotation would have the same sign than Ac annotation, because
+According to the network, there is an influence of Ac to Ph
+that goes through D (Figuree~\ref{piquantnetworks}c). But if this path
+is functional, D annotation would have the same sign than Ac annotation, because
 Ac activates D indirectly. In our case, the sign of D annotation is opposite to
-the sign of AC annotation, meaning that there is another (unknown) effect on D.
+the sign of Ac annotation, meaning that there is another (unknown) effect on D.
 Therefore, the path from Ac to Ph that goes through D is \textit{inconsistent} and
 might not be used to compute PIQuant score. Practically, we offer the option to
 keep or not the inconsistent paths for the calculation of the PIQuant score,
-depending on how the user wants to analyze and interpret the results.
+depending on how the user wants to analyze the results.
 
 In more realistic situations, we will have multiple source nodes with different
- annotation, and also multiple target nodes representing phenotypes of
+ annotations, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
 that allow users to select source nodes, select target nodes, and choose among
 three different options for searching paths (shortest paths, optimal and
@@ -597,16 +601,16 @@ such as the \textit{Homo sapiens} network from the reactome database
 \cite{joshi2005reactome} that has more than 6,000 reactions involving more than
 8,000 different species (proteins, RNA molecules, metabolites, etc.).
 
-BiNoM implements a set of functions precisely aiming to allow end users to
+BiNoM implements a set of functions precisely aiming at allowing end users to
 easily visualize and modify BioPAX files. To the best of our knowledge, there is
 no other software package allowing to view, query and edit BioPAX files than
 BiNoM at the moment. The functions are using
-java classes introspection techniques to build a BioPAX class tree. Then, the
-content of the file can easily be accessed. For example, the figure~\ref{biopaxtrailprop} is
-showing all the informations linked to the TRAIL protein, after a call to the
+Java class introspection techniques to build a BioPAX class tree. Then, the
+content of the file can easily be accessed. For example, figure~\ref{biopaxtrailprop} shows
+all the information linked to the TRAIL protein, after a call to the
 BioPAX property
 editor function of the BiNoM menu. Details are given in the BiNoM manual on how
-to to display valid attributes and edit them, and also how to visualize the
+to display valid attributes and edit them, and also how to visualize the
 complete BioPAX tree.
 
 
@@ -624,16 +628,16 @@ retrieving data from it. The index corresponds to a mapping of the content of
 the BioPAX file on a labeled graph (an index file is created and saved, using
 the XGMML format). Various statistics can be displayed on the content of the
 index, such as the number of proteins, complexes, reactions, publications, etc.
-To start extracting relevant informations, the user can query the index by gene
+To start extracting relevant information, the user can query the index by gene
 name (and/or by any synonym of the gene) and start building a network centered
 around this molecule of interest. The extension of the network is done by adding
-different type of entities: complexes where the molecule of interest is
+different types of entities: complexes where the molecule of interest is
 involved, chemical species, reactions (with the possibility of including all the
-sources and targets of the reactions) and related publications. The figure~\ref{smaccomplexes}
-is showing an example of a small network extracted from the human apoptosis
+sources and targets of the reactions) and related publications. Figure~\ref{smaccomplexes}
+illustrates an example of a small network extracted from the human apoptosis
 pathway downloaded from the Reactome database \cite{joshi2005reactome}, and
-centered on the SMAC protein, with all the protein complexes where
-this protein is involved that were added using the BiNoM BioPAX Query functions.
+centered on the SMAC protein, with all the protein complexes in which
+this protein is involved and that were added using the BiNoM BioPAX Query functions.
 
 
 \begin{figure}[h]
@@ -668,11 +672,11 @@ about metanodes and calculating intersection between subnetworks.
 
 \subsection*{BiNoM Utilities}
 This set of functions correspond to various small utilities that are not
-implemented yet in Cytoscape, but might be very useful for the analysis and
+implemented in Cytoscape yet, but might be very useful for the analysis and
 manipulation of networks. For example, it is possible to automatically select
 the edges between two nodes, generate the network corresponding to the double
-network differences between two networks A and B, or update all the networks of
-a session after some changes have been made. The BiNoM utilities also implements
+network differences between two networks A and B, or update all the subnetworks of
+a session after some changes have been made to the initial one. The BiNoM utilities also implements
 clipboard related functions, giving the possibility to copy, add and paste
 selected nodes and edges and also to show the clipboard content. 
 

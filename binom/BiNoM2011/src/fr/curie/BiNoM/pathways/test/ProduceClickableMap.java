@@ -5795,7 +5795,7 @@ public class ProduceClickableMap
 		*/
 		
 		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + included_map_base + ".css\"/>");
-		out.println("<script src='http://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
+		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/lib/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='/lib/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");

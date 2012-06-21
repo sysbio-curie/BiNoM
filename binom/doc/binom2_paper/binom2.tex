@@ -483,30 +483,26 @@ as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
 In this version of BiNoM, we have introduced a novel approach to quantify the
-influence of one or more source nodes on one or more target nodes for a given network, 
-named the PIQuant score (Pathway Influence Quantification). For example,
-Figure~\ref{piquantnetworks}a shows a simple influence network composed of seven
-nodes, where the edges represent either a repression or an activation between
-nodes. The node Ac represents an input node of interest, while the node Ph is
-defined as an output node. The latter can be a gene or a phenotype of interest,
-representing a more complex biological function, such as cell proliferation or
-apopotosis. Figures~\ref{piquantnetworks}b and c show two examples of paths defined between
-the nodes Ac and Ph. In this case, the PIQuant score value will quantify the influence of the 
-source node Ac on the target node Ph, taking into account available experimental
-data values for input nodes, paths length and the sign of the paths. More generally, the goal
-of the PIQuant score is to help the user to understand the role and function of
-the input nodes on the output nodes, for a given network architecture in some defined experimental conditions.
+influence of one or more source nodes on one or more target nodes for a given
+network, named the PIQuant score (Pathway Influence Quantification). Note that the target
+node can be a gene or a phenotype of interest, representing a more complex
+biological function, such as cell proliferation or apopotosis. For a given network
+the PIQuant score value will quantify the influence of the source node on the target
+node, by taking into account available experimental data values for input nodes,
+the path length and the sign of the path for a set of paths defined between the
+source and the target node. More generally, the goal of the PIQuant score is to
+help the user to understand the role and function of the input nodes on the
+output nodes, for a given network architecture and some experimental data.
 
-More formally, we define a source node as \textit{annotated} when a signed real number is
-assigned to the node, representing experimental data. For example, it can be the
-expression ratio of a gene between a disease and a normal state, obtained from
-transcriptomics profiling.
-We can also extract a set of paths from source nodes to target nodes (indexed
-from $1$ to $q$). 
+More formally, we can define a source node as \textit{annotated} when a signed real
+number is assigned to the node, representing an experimental data value. For example, it
+can be the expression ratio of a gene between a disease and a normal state,
+obtained from transcriptomics profiling. 
  A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
 between a source node and a target node (without repetition of any node
-or edge). In BiNoM, we propose three algorithms to search for paths between the
+or edge). We can extract a set of paths from source nodes to target nodes (indexed
+from $1$ to $q$), by using various algorithms. In BiNoM, we propose three solutions to search for paths between the
 source and target nodes (shortest paths, sub-optimal shortest paths and all
 non-intersecting paths, see previous paragraph). The activity
 $\alpha_k$ of the path $k$ is defined as the annotation
@@ -984,6 +980,8 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 \section*{Additional Files}
   \subsection*{Supplementary methods}
 	Detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
+  \subsection*{Supplementary table 1}
+	PIQuant score values for all the source nodes (rows) and all the target nodes (columns) of the G1/S influence network.
 
 \end{bmcformat}
 \end{document}

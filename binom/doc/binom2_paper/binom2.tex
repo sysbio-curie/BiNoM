@@ -705,7 +705,7 @@ simplified versions of it along with the first interactive (clickable) map is
 available on our website
 (\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/}).
 
-For this study, we choose to concentrate on the G1 to S transition. We
+For this study, we chose to concentrate on the G1 to S transition. We
 used the intersection of the 208 species
 of RB/E2F network and the 280 species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
@@ -733,17 +733,17 @@ a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
 available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). The
 translation is based on simple rules: (1) BIOCHAM deletes all linear
 degradations and syntheses, (2) all intermediary species with only one input and
-one output, are suppressed, (3) if the reactions of synthesis and degradation of
+one output are suppressed, (3) if the reactions of synthesis and degradation of
 the species deleted in (2) have distinct inputs and outputs, then this reactions
 can be merged, and (4) if they have the same species as input/output, then the reaction was a
 reversible reaction and is replaced by a degradation. Although this work is
 still in progress, a short description and an example of this conversion is
 available \cite{calzone2011calamar}. 
 
-We apply PIQuant to the resulting influence network of the G1/S transition of
+We applied PIQuant to the resulting influence network of the G1/S transition of
 the cell cycle. 
 
-In order to annotate the input nodes of this network, we use expression  data
+In order to annotate the input nodes of this network, we used expression  data
 from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
@@ -751,9 +751,9 @@ is assessed by a t-test. The t-test statistic value is used as the annotation
 for each gene. We construct a text file listing nodes of the influence network 
 and their annotation. We assign annotations only to nodes that can be directly
 influenced by a 
-mRNA level. When a complex is annotated, it means that one of the partners has
+mRNA level. When a complex is annotated, it means that at least one of the partners has
 no unbound state in the network. 
-We import this file using the Cytoscape function 
+We imported this file using the Cytoscape function 
 ``Import $>$ Nodes attributes'' 
 in the Cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network after its import.
@@ -773,10 +773,10 @@ different cell-cycle phases: G1, S, M.}
 
 PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
-analysis''. We take all annotated nodes as active nodes, the grey nodes of
-Figure~\ref{InflAnnotNet} as targets, and we select optimal and sub-optimal 
-shortest path as the algorithm to extract the paths. We run a test significance
-and get the report table. In this
+analysis''. We took all annotated nodes as active nodes, the grey nodes of
+Figure~\ref{InflAnnotNet} as targets, and we selected optimal and sub-optimal 
+shortest path as the algorithm to extract the paths. We ran a test significance
+and got the report table. In this
 report, the ``Node influence table'' represents the global PIQuant score from
 each annotated source node to each cell-cycle phase marker (available as
 supplementary table 1). Those values are
@@ -810,7 +810,7 @@ The raw G1/S network is very detailed and may be hard to read at a first glance.
 To facilitate the analysis of the content, we propose to organize the reaction
 network as a modular network. The species are clustered in groups, referred to
 as modules, in an semi-automatic manner, using BiNoM functions and biological
-knowledge. Each module represent in fact a
+knowledge. Each module represents in fact a
 sequence of events occuring with a particular protein. The modules are then
 linked by activating or inhibiting influences according to the informations
 contained in the original diagram or derived from previous biological knowledge.
@@ -829,8 +829,7 @@ and E2F6. Finally, we created a final modular view, where we integrate the
 subnetworks we have previously created using a set of BiNoM functions for the
 management of modules. Our final modular view is composed of 9 modules, with 22
 edges connecting them (Figure~\ref{g1smodular}). A detailed tutorial on the
-construction of
-this modular network using BiNoM is described in the supplementary methods.
+construction of this modular network using BiNoM is described in the supplementary methods.
 
 
 \begin{figure}[h]

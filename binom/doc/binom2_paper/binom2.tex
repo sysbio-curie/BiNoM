@@ -741,9 +741,11 @@ still in progress, a short description and an example of this conversion is
 available \cite{calzone2011calamar}. 
 
 We applied PIQuant to the resulting influence network of the G1/S transition of
-the cell cycle. 
+the cell cycle. We selected 19 source nodes as key, well-defined elements of the
+cell cycle G1/S transition, and three target nodes as markers of the G1, S and M
+phases of the cell cycle. 
 
-In order to annotate the input nodes of this network, we used expression  data
+In order to annotate the source nodes of this network, we used expression data
 from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
@@ -767,19 +769,19 @@ expression obtained from transcriptome data compared to normal tissue. Color
 intensities are proportional to the t-statistic values (red values indicate
 positive values corresponding to an activation, green values indicate negative
 values corresponding to an inhibition). The three grey nodes are markers for the
-different cell-cycle phases: G1, S, M.}
+different cell-cycle phases: G1 (PRB_star), S (CDK2/Cyclin E1 complex), M (CDC2/Cyclin E1 complex).}
   \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
 \end{figure}
 
 PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
-analysis''. We took all annotated nodes as active nodes, the grey nodes of
-Figure~\ref{InflAnnotNet} as targets, and we selected optimal and sub-optimal 
-shortest path as the algorithm to extract the paths. We ran a test significance
-and got the report table. In this
-report, the ``Node influence table'' represents the global PIQuant score from
-each annotated source node to each cell-cycle phase marker (available as
-supplementary table 1). Those values are
+analysis''. The PIQuant score is calculated for each association
+between a source node and a target node (the list of nodes and all the PIQuant
+score values are available as supplementary table 1). We selected optimal and
+sub-optimal shortest path as the algorithm to extract the paths. We ran a test
+significance and got the report table. In this report, the ``Node influence
+table'' represents the global PIQuant score from each annotated source node to
+each cell-cycle phase marker. Those values are
 represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
 genes are over-expressed relative to the normal cells in the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
@@ -797,7 +799,7 @@ influence network. Color intensities are proportional to PIQuant score (red colo
 value; i.e an activation, the green color indicates a negative value, i.e. an
 inhibition).
 Each line represents a source node while each column represents a cell-cycle
-phase. The map was produced with the R statistical package.}
+phase.}
  
 \center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
 \end{figure}

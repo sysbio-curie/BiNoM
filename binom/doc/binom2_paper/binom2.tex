@@ -323,9 +323,10 @@ Analysis, BioPAX utils \& query, Module manager and Utilities.
 \subsection*{BiNoM Input/Output}
 
 BiNoM functions facilitate the import and export of standard Systems Biology
-file formats, but is not designed to be a universal converter. The goal is more
-to provide robust functions for a limited number of useful conversion
-scenarios: 
+file formats, but The BiNoM plugin is not designed to be a universal converter.
+The goal is more
+to provide robust functions for a finite number of useful conversion and
+analysis scenarios, such as the examples showed below (non-exhaustive list): 
 
 \begin{itemize}
 
@@ -414,6 +415,8 @@ account the semantics contained in the graph elements names.
 The structural analysis functions implemented in BiNoM include the analysis of
 connected and strongly connected components, pruning the network, decomposition
 by name (material components) or by cycle, path analysis and network clustering.
+We also introduce in this version of BiNoM a novel function to quantify the
+influence of a source node on a target node, called PIQuant.
 
 
 \subsubsection*{Decomposition by name or by cycle}
@@ -545,7 +548,7 @@ consistent. A path is \textit{inconsistent} if at least one intermediate node is
 \textit{inconsistent}. 
 
 The rationale behind these definitions is that the
-network structure for intermediate nodes can be consistent or inconsistent with
+network structure for intermediate nodes can be either consistent or inconsistent with
 experimental data values.
 
 According to the network, there is an influence from Ac to Ph
@@ -573,8 +576,7 @@ that allow users to select source nodes, select target nodes, and choose among
 three different options for searching paths (shortest paths, optimal and
 suboptimal shortest paths, all non-intersecting paths). The software is then
 calculating PIQuant scores for every target node specified, taking into account
-every possible path found by the algorithm. We have also implemented a
-randomization test to estimate p-values for each path. We describe a detailed
+every possible path found by the algorithm. We describe a detailed
 and concrete application of the PIQuant algorithm to a real biological network
 in the results section.
 
@@ -701,11 +703,11 @@ biochemical interactions such as association, dissociation, (de)phosphorylation,
 target genes of the main transcription factors of the map, the E2F family
 members.
 A thorough description of the model and the methods used to build it and create
-simplified versions of it along with the first interactive (clickable) map is
+simplified versions of it along with an interactive (clickable) map is
 available on our website
 (\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/}).
 
-For this study, we chose to concentrate on the G1 to S transition. We
+For the study presented here, we chose to concentrate on the G1 to S transition. We
 used the intersection of the 208 species
 of RB/E2F network and the 280 species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
@@ -720,7 +722,7 @@ RB/E2F network and G1/S network extracted from Reactome.}
 \end{figure}
 
 This map contains a lot of valuable information but they are rather difficult to extract. We present two
-ways to get some biological insight from this map. The first one consists of
+ways to get some biological insight from this map, by using BiNoM functions. The first one consists of
 transforming the reaction network into an influence network in order to analyze
 experimental data on it. The second one implies a simplification of the comprehensive map by
 applying a method of reduction of the numerous interactions into modules without
@@ -769,7 +771,7 @@ expression obtained from transcriptome data compared to normal tissue. Color
 intensities are proportional to the t-statistic values (red values indicate
 positive values corresponding to an activation, green values indicate negative
 values corresponding to an inhibition). The three grey nodes are markers for the
-different cell-cycle phases: G1 (PRB_star), S (CDK2/Cyclin E1 complex), M (CDC2/Cyclin E1 complex).}
+different cell-cycle phases: G1 (PRB\_star), S (CDK2\/Cyclin E1 complex), M (CDC2\/Cyclin E1 complex).}
   \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
 \end{figure}
 

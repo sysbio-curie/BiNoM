@@ -486,16 +486,19 @@ as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
 In this version of BiNoM, we have introduced a novel approach to quantify the
-influence of one or more source nodes on one or more target nodes for a given
-network, named the PIQuant score (Pathway Influence Quantification). Note that the target
+effect of experimental data onto one or more target nodes for a given
+network, named the PIQuant score (Pathway Influence Quantification). The goal of the 
+PIQuant score is to
+help the user to understand experimental effects associated to the input nodes on the
+output nodes, for a given network architecture and some given data. 
+Note that the target
 node can be a gene or a phenotype of interest, representing a more complex
-biological function, such as cell proliferation or apopotosis. For a given network with one source node and one target node,
+biological function, such as cell proliferation or apopotosis. For a given network 
+with one source node and one target node,
 the PIQuant score value will quantify the influence of the source node on the target
 node, by taking into account experimental data value for the input nodes,
 the path length and the sign of the path for a set of paths defined between the
-source and the target node. More generally, the goal of the PIQuant score is to
-help the user to understand the role and function of the input nodes on the
-output nodes, for a given network architecture and some experimental data.
+source and the target node.
 
 More formally, we can define a source node as \textit{annotated} when a signed real
 number is assigned to the node, representing an experimental data value. For example, it
@@ -514,7 +517,8 @@ of the path $k$ as the product of the signs of every edge of the path and finall
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption may be too simplistic for some biological
-situations, but then a more sophisticated scoring scheme can be used. The
+situations; its adavantage is that there is no need for more detailed knowledge 
+than the influence network. The
 PIQuant score for a set of $q$ paths (from a set of 
 source nodes, to a set of target nodes) is defined as:
 
@@ -785,7 +789,7 @@ significance and got the report table. In this report, the ``Node influence
 table'' represents the global PIQuant score from each annotated source node to
 each cell-cycle phase marker. Those values are
 represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
-genes are over-expressed relative to the normal cells in the M and S phases (red
+genes, in cancer cells compared to normal cells, influence positively the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
 Compared to Figure~\ref{InflAnnotNet}, where the coloring represents only the
 experimental data values, we can see that the PIQuant score is integrating the

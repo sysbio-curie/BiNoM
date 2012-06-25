@@ -516,11 +516,10 @@ of its source node. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
-on the target node. This assumption may be too simplistic for some biological
-situations; its adavantage is that there is no need for more detailed knowledge 
-than the influence network. The
-PIQuant score for a set of $q$ paths (from a set of 
-source nodes, to a set of target nodes) is defined as:
+on the target node. This assumption has the advantage of being simple and does
+not require extra parameters other than the influence newtwork to be calculated.
+The PIQuant score for a set of $q$ paths (from a set of source nodes, to a set
+of target nodes) is defined as:
 
 $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
@@ -734,7 +733,7 @@ losing any content from the original map.
 
 \subsection*{Application of PIQuant on an influence network.}
 PIQuant algorithm can be used to perform a quantitative analysis on an influence
-network. For translating the reaction network into an influence network, we used
+network. In order to translate the G1/S reaction network into an influence network, we used
 a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
 available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). The
 translation is based on simple rules: (1) BIOCHAM deletes all linear
@@ -751,7 +750,7 @@ the cell cycle. We selected 19 source nodes as key, well-defined elements of the
 cell cycle G1/S transition, and three target nodes as markers of the G1, S and M
 phases of the cell cycle. 
 
-In order to annotate the source nodes of this network, we used expression data
+For the annotation of the source nodes of this network, we used expression data
 from a study of 57 bladder cancer
 tissue samples compared to normal tissue \cite{stransky2006regional}. For each 
 gene, the differential expression between tumor and normal tissue
@@ -775,7 +774,7 @@ expression obtained from transcriptome data compared to normal tissue. Color
 intensities are proportional to the t-statistic values (red values indicate
 positive values corresponding to an activation, green values indicate negative
 values corresponding to an inhibition). The three grey nodes are markers for the
-different cell-cycle phases: G1 (PRB\_star), S (CDK2\/Cyclin E1 complex), M (CDC2\/Cyclin E1 complex).}
+different cell-cycle phases: G1 (PRB\_star), S (CDK2/Cyclin E1 complex), M (CDC2/Cyclin E1 complex).}
   \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
 \end{figure}
 

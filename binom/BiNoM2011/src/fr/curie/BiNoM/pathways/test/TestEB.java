@@ -44,7 +44,7 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_arf6.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_bcatenin.owl";
@@ -53,10 +53,11 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis2.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax2-short-metabolic-pathway.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/A_thaliana_L3.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/H_sapiens_L3.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/H_sapiens_L3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-phosphorylation-reaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-genetic-interaction.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-template-reaction.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/test.owl";
 			
@@ -80,25 +81,61 @@ public class TestEB {
 //				System.out.println(name);
 //			}
 			
-			
 			/*
 			 * genetic interactions
 			 */
+//			BioPAX bp = new BioPAX();
+//			bp.loadBioPAX(new FileInputStream(fn));
+//			List l = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(bp.model);
+//			
+//			for (int i=0;i<l.size();i++) {
+//				DnaRegion  dn = (DnaRegion) l.get(i);
+//				
+//				Iterator it = dn.getName();
+//				String name = "";
+//				if (it.hasNext()) {
+//					name = name + ":"+(String)it.next();
+//				}
+//				//System.out.println(voc.uri()+"\t"+name);
+//				System.out.println(dn.uri()+"\t"+name);
+//			}
+//			
+//			l = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReaction(bp.model);
+//			
+//			for (int i=0;i<l.size();i++) {
+//				TemplateReaction  tr = (TemplateReaction) l.get(i);
+//				
+//				Iterator it = tr.getName();
+//				String name = "";
+//				if (it.hasNext()) {
+//					name = name + ":"+(String)it.next();
+//				}
+//				//System.out.println(voc.uri()+"\t"+name);
+//				System.out.println("TemplateReaction "+tr.uri()+"\t"+name);
+//			}
+
+
+			/*
+			 * small molecule reference
+			 */
 			BioPAX bp = new BioPAX();
 			bp.loadBioPAX(new FileInputStream(fn));
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllGene(bp.model);
+			List l = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(bp.model);
 			
 			for (int i=0;i<l.size();i++) {
-				Gene  gn = (Gene) l.get(i);
+				ModificationFeature  sm = (ModificationFeature) l.get(i);
 				
-				Iterator it = gn.getName();
-				String name = "";
-				if (it.hasNext()) {
-					name = name + ":"+(String)it.next();
-				}
-				//System.out.println(voc.uri()+"\t"+name);
-				System.out.println(gn.uri()+"\t"+name);
+				System.out.println(sm.uri());
+				
+				//ControlledVocabulary cv = sm.getModificationType();
+				
 			}
+			
+			BioPAXNamingService ns = new BioPAXNamingService(bp,false);
+			
+			String pname = ns.getIdByUri("http://www.reactome.org/biopax#O_phospho_L_serine_at_1921");
+			
+			System.out.println("pname = " +pname);
 			
 			
 //			BioPAXToSBMLConverter b2s = new BioPAXToSBMLConverter();

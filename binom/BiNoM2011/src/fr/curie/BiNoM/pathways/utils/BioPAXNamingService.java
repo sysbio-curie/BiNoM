@@ -39,7 +39,7 @@ import com.ibm.adtech.jastor.JastorInvalidRDFNodeException;
  * @author Andrei Zinovyev
  *
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes","unchecked"})
 public class BioPAXNamingService {
 
 	/**
@@ -236,6 +236,11 @@ public class BioPAXNamingService {
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
 
+		/*
+		 *
+		 * Now Utility BioPAX classes 
+		 * 
+		 */
 		el = biopax_DASH_level3_DOT_owlFactory.getAllChemicalStructure(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 		
@@ -269,6 +274,9 @@ public class BioPAXNamingService {
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceModificationVocabulary(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllRelationshipTypeVocabulary(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllPublicationXref(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
@@ -288,6 +296,20 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllEntityFeature(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 
+		// classes related to EntityFeature, Fragment, Modification, Binding, CovalentBinding
+		el = biopax_DASH_level3_DOT_owlFactory.getAllFragmentFeature(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllBindingFeature(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllCovalentBindingFeature(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceInterval(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 		

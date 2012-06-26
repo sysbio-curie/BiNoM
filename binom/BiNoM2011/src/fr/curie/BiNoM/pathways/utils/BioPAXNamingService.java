@@ -171,11 +171,13 @@ public class BioPAXNamingService {
 		}
 
 		
-		// Entities------------------------------------------------------------
+		/*
+		 * 
+		 *  Entities------------------------------------------------------------
+		 *  
+		 */
 		el = biopax_DASH_level3_DOT_owlFactory.getAllProtein(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
-		//System.out.println(uri2name.get("http://bioinfo.curie.fr/biopax2sbml#a75_Cdc13"));
-		//System.exit(1);
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllCatalysis(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
@@ -187,6 +189,12 @@ public class BioPAXNamingService {
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllBiochemicalReaction(biopax.model);
+		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReaction(biopax.model);
+		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReactionRegulation(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllComplexAssembly(biopax.model);
@@ -208,9 +216,14 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllInteraction(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 
+		el = biopax_DASH_level3_DOT_owlFactory.getAllGeneticInteraction(biopax.model);
+		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
+
 		el = biopax_DASH_level3_DOT_owlFactory.getAllPathway(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllGene(biopax.model);
+		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
@@ -320,6 +333,15 @@ public class BioPAXNamingService {
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
 
 		if(verbose){
+			el = biopax_DASH_level3_DOT_owlFactory.getAllGene(biopax.model);
+			for(int i=0;i<el.size();i++) printEntityName((Entity)el.get(i));
+			el = biopax_DASH_level3_DOT_owlFactory.getAllGeneticInteraction(biopax.model);
+			for(int i=0;i<el.size();i++) printEntityName((Entity)el.get(i));
+			el = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReaction(biopax.model);
+			for(int i=0;i<el.size();i++) printEntityName((Entity)el.get(i));
+			el = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReactionRegulation(biopax.model);
+			for(int i=0;i<el.size();i++) printEntityName((Entity)el.get(i));
+			
 			el = biopax_DASH_level3_DOT_owlFactory.getAllProtein(biopax.model);
 			for(int i=0;i<el.size();i++) printEntityName((Entity)el.get(i));
 			el = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);

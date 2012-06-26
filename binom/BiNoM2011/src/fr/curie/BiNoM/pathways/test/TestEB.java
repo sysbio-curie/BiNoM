@@ -44,7 +44,7 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/BIOMD0000000007-biopax3.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_arf6.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/signaling_gateway_bcatenin.owl";
@@ -57,7 +57,7 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-phosphorylation-reaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-genetic-interaction.owl";
-			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-template-reaction.owl";
+			String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-template-reaction.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/test.owl";
 			
@@ -131,11 +131,7 @@ public class TestEB {
 				
 			}
 			
-			BioPAXNamingService ns = new BioPAXNamingService(bp,false);
-			
-			String pname = ns.getIdByUri("http://www.reactome.org/biopax#O_phospho_L_serine_at_1921");
-			
-			System.out.println("pname = " +pname);
+			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
 			
 			
 //			BioPAXToSBMLConverter b2s = new BioPAXToSBMLConverter();

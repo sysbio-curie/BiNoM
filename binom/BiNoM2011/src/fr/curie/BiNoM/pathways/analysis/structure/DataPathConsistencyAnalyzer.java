@@ -264,10 +264,10 @@ public class DataPathConsistencyAnalyzer {
 			if(n!=null){
 				ind = p.graph.getNodeIndex(n.Id);
 				String conn = "-";
-				if(effect.toString().equals("activation")){
+				if(effect.toString().equalsIgnoreCase("activation")){
 					conn = "->"; p.influence*=1f;
 				}
-				if(effect.toString().equals("inhibition")){
+				if(effect.toString().equalsIgnoreCase("inhibition")){
 					conn = "-|"; p.influence*=-1f; sign = -1f;
 				}
 				if(conn.equals("-"))
@@ -297,6 +297,7 @@ public class DataPathConsistencyAnalyzer {
 			if(e.Node1.Id.equals(currentNode.Id))if(!e.Node2.Id.equals(currentNode.Id))if(visited.indexOf(e.Node2)<0){
 				n = e.Node2;
 				String ef = e.getFirstAttributeValue("EFFECT");
+				ef = ef.toLowerCase();
 				if(ef!=null){
 					if(ef.indexOf("activation")>=0)if(effect.toString().equals("")){
 						effect.append("activation"); overall+=effect.toString();
@@ -306,6 +307,7 @@ public class DataPathConsistencyAnalyzer {
 					}
 				}else{
 					ef = e.getFirstAttributeValue("interaction");
+					ef = ef.toLowerCase();
 					if(ef!=null){
 						if(ef.indexOf("activation")>=0)if(effect.toString().equals("")){
 							effect.append("activation"); overall+=effect.toString();

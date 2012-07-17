@@ -24,14 +24,15 @@ public class testBioPAXExtract {
 		    //String importString = "http://www.biopax.org/Downloads/Level2v0.92/biopax-level2.owl";
 		    //String biopaxString = "http://www.biopax.org/release/biopax-level2.owl#";			
 			
-			/*Model model = BioPAXUtilities.loadModel("c:/datas/binomtest/apoptosis.owl", BioPAX.biopaxFileString, BioPAX.importString);
-			String uri = "UniProt_Q9NR28_1_Diablo_homolog__mitochondrial_precursor__Second_mitochondria_derived_activator_of_caspase___Smac_protein___Direct_IAP_binding_protein_with_low_pI_";
+			Model model = BioPAXUtilities.loadModel("c:/datas/binomtest/biopax3/apoptosis3.owl", BioPAX.biopaxFileString, BioPAX.importString);
+			System.out.println("Loaded.");
+			String uri = "http://www.reactome.org/biopax#SMAC_mediated_dissociation_of_IAP_caspase_complexes_";
 			Vector ids = new Vector();
 			ids.add(uri);
 			Model res = BioPAXUtilities.extractURIwithAllLinks(model, ids, BioPAX.biopaxString, BioPAX.importString);
-			BioPAXUtilities.saveModel(res, "c:/datas/binomtest/smac.owl", BioPAX.biopaxString);*/
+			BioPAXUtilities.saveModel(res, "c:/datas/binomtest/biopax3/SMAC_IAP_dissociation.owl", BioPAX.biopaxString);
 
-			Model model = BioPAXUtilities.loadModel("c:/datas/biopax/ReactomeJan2011/Homo_sapiens2.owl", BioPAX.biopaxFileString, BioPAX.importString);
+			/*Model model = BioPAXUtilities.loadModel("c:/datas/biopax/ReactomeJan2011/Homo_sapiens2.owl", BioPAX.biopaxFileString, BioPAX.importString);
 			List pathways = biopax_DASH_level2_DOT_owlFactory.getAllpathway(model);
 			System.out.println(pathways.size()+" pathways found");
 			for(int i=0;i<pathways.size();i++){
@@ -51,7 +52,7 @@ public class testBioPAXExtract {
 			
 			GraphDocument grdoc = XGMML.loadFromXMGML("c:/datas/biopax/NatureNCI/temp.xgmml");
 			BioPAX res = CytoscapeToBioPAXConverter.convert(grdoc, biopax);
-		    res.saveToFile("c:/datas/biopax/NatureNCI/temp.owl", res.biopaxmodel);
+		    res.saveToFile("c:/datas/biopax/NatureNCI/temp.owl", res.biopaxmodel);*/
 			
 		    /*String namespaceString = "http://www.biopax.org/release/biopax-level2.owl#";
 		    String importString = "http://www.biopax.org/Downloads/Level2v0.92/biopax-level2.owl";

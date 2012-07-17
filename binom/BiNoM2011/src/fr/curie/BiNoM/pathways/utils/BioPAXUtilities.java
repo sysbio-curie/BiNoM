@@ -100,8 +100,9 @@ public class BioPAXUtilities {
      String defNsPrefix = getDefaultNsPrefix(modelfrom);
      if(!defNsPrefix.equals(""))
     	 namespace = defNsPrefix; 
-     com.ibm.adtech.jastor.Thing thing = biopax_DASH_level3_DOT_owlFactory.getThing(namespace+uri,modelfrom);
-     //System.out.println(thing.uri()+"\t"+numberOfStatements(thing));
+     //com.ibm.adtech.jastor.Thing thing = biopax_DASH_level3_DOT_owlFactory.getThing(namespace+uri,modelfrom);
+     com.ibm.adtech.jastor.Thing thing = biopax_DASH_level3_DOT_owlFactory.getThing(uri,modelfrom);
+     System.out.println(thing.uri()+"\t"+numberOfStatements(thing));
      //com.ibm.adtech.jastor.Thing thingto = biopax_DASH_level3_DOT_owlFactory.getThing(namespace+uri,modelto);
      //if(thingto==null){
      //System.out.println(thing.uri());

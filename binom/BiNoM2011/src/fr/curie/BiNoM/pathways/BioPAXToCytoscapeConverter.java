@@ -241,7 +241,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		for (int i=0;i<sbml.getSbml().getModel().getListOfReactions().getReactionArray().length;i++) {
 
 			ReactionDocument.Reaction r = sbml.getSbml().getModel().getListOfReactions().getReactionArray(i);
-			String rtype = "biochemicalReaction";
+			String rtype = "BiochemicalReaction";
 			Interaction react = null;
 			if (reactions!=null)if (bioPAXreactions.get(r.getId())!=null) {
 				react = (Interaction)bioPAXreactions.get(r.getId());
@@ -704,6 +704,10 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		for (int i=0;i<pl.size();i++) {
 			Protein p = (Protein)pl.get(i);
 			proteins.put(p.uri(),p);
+			
+			//if(p.uri().endsWith("Caspase_9__small_subunit___cytosol_"))
+			//	System.out.println("Caspase_9__small_subunit___cytosol_\n"+p+"\n"+p.getEntityReference());
+			
 			if (!option.distinguishCompartments){
 				String pnm = null;
 				if(p.getEntityReference()!=null){
@@ -715,6 +719,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 				if (!nodes.containsKey(pnm)) {
 					GraphicNode n = grf.addNewNode();
 					n.setId(pnm); n.setName(pnm); n.setLabel(pnm);
+					System.out.println("Adding protein reference "+pnm);
 					Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","Protein",ObjectType.STRING);
 					Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",p.uri(),ObjectType.STRING);
 					//System.out.println("Added "+pnm);
@@ -792,6 +797,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 				} 
 			}
 		}
+
 		
 		/*pl = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalEntity(biopax.model);
 		for (int i=0;i<pl.size();i++) {
@@ -824,7 +830,9 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 			if (!option.distinguishCompartments) {
 				String cnm = bpnm.getNameByUri(cmplx.uri());
 				GraphicNode n = grf.addNewNode();
-				//cnm = getGenericComplexName(cnm);
+				
+				System.out.println("Adding complex "+cnm);
+				
 				n.setId(cnm); n.setName(cnm); n.setLabel(cnm);
 				Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","Complex",ObjectType.STRING);
 				Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",cmplx.uri(),ObjectType.STRING);
@@ -835,49 +843,16 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 		}		
 
 		Iterator inn = nodes.keySet().iterator();
+		Vector nodesVector = new Vector();
 		while(inn.hasNext()) {
-			String uri = (String)inn.next();
+			nodesVector.add((String)inn.next()); 
+		}
+		for(int i=0;i<nodesVector.size();i++){
+			String uri = (String)nodesVector.get(i);
 			GraphicNode n = (GraphicNode)nodes.get(uri);
 			if (complexes.containsKey(uri)) {
 				Complex cm = (Complex)complexes.get(uri);
-				Iterator<PhysicalEntity> itc = cm.getComponent();
-				while(itc.hasNext()) {
-					PhysicalEntity pep = itc.next();
-					if(pep!=null){
-						String pepuri = pep.uri();
-						pep = (PhysicalEntity)proteins.get(pepuri);
-						if(pep==null)
-							System.out.println("ERROR: entity is not found "+pepuri);
-						else{
-							System.out.println(pepuri);
-						System.out.println(pep.getClass().getName());
-						try{
-						if(pep instanceof Protein) pepuri = ((Protein)pep).getEntityReference().uri();
-						if(pep instanceof Rna) pepuri = ((Rna)pep).getEntityReference().uri();
-						if(pep instanceof Dna) pepuri = ((Dna)pep).getEntityReference().uri();
-						if(pep instanceof SmallMolecule) pepuri = ((SmallMolecule)pep).getEntityReference().uri();
-						}catch(Exception e){
-							System.out.println("ERROR: entity reference is not found for "+pep.uri());
-						}
-						String nodeName = bpnm.getNameByUri(pepuri);
-						GraphicNode n1 = (GraphicNode)nodes.get(nodeName);
-						if (n1==null)
-							System.out.println("COMPLEX COMPONENT IS NOT INCLUDED: "+Utils.cutUri(pep.uri()));
-						else {
-							String id = n.getId()+" (CONTAINS) "+n1.getId();
-							if(edges.get(id)==null){
-								GraphicEdge ee = grf.addNewEdge();
-								ee.setId(id);
-								ee.setLabel("CONTAINS");
-								ee.setSource(n1.getId()); ee.setTarget(n.getId());
-								Utils.addAttribute(ee,"BIOPAX_EDGE_TYPE","BIOPAX_EDGE_TYPE","CONTAINS",ObjectType.STRING);
-								Utils.addAttribute(ee,"BIOPAX_EDGE_ID","BIOPAX_EDGE_ID",n.getId()+" ("+"CONTAINS"+") "+n1.getId(),ObjectType.STRING);
-								edges.put(id,ee);
-							}
-						}
-					}
-					}
-				}
+				addComplexComponentConnections(cm, proteins, complexes, nodes, edges, grf, n);
 			}
 		}
 
@@ -913,7 +888,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 					if(pi instanceof SmallMolecule) pepuri = ((SmallMolecule)pi).getEntityReference().uri();
 					String intn = bpnm.getNameByUri(pepuri);
 					n.setId(intn); n.setName(intn); n.setLabel(intn);
-					Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","physicalInteraction",ObjectType.STRING);
+					Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","PhysicalInteraction",ObjectType.STRING);
 					Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",pi.uri(),ObjectType.STRING);
 					nodes.put(intn,n);
 					nodes.put(pi.uri(),n);
@@ -924,13 +899,13 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 						if (n1==null) {
 							System.out.println("ENTITY NOT FOUND ON THE GRAPH: "+Utils.cutUri(ur));
 						} else {
-							String id = n.getId()+" (physicalInteraction) "+n1.getId();
+							String id = n.getId()+" (PhysicalInteraction) "+n1.getId();
 							if(edges.get(id)==null){
 								GraphicEdge ee = grf.addNewEdge();
 								ee.setId(id);
-								ee.setLabel("physicalInteraction");
+								ee.setLabel("PhysicalInteraction");
 								ee.setSource(n1.getId()); ee.setTarget(n.getId());
-								Utils.addAttribute(ee,"BIOPAX_EDGE_TYPE","BIOPAX_EDGE_TYPE","physycalInteraction",ObjectType.STRING);
+								Utils.addAttribute(ee,"BIOPAX_EDGE_TYPE","BIOPAX_EDGE_TYPE","PhysicalInteraction",ObjectType.STRING);
 								Utils.addAttribute(ee,"BIOPAX_EDGE_ID","BIOPAX_EDGE_ID",id,ObjectType.STRING);
 								edges.put(id,ee);
 							}
@@ -943,4 +918,84 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 
 		return gr;
 	}
+	
+	public void addComplexComponentConnections(Complex cm, HashMap<String, PhysicalEntity> proteins, HashMap<String, PhysicalEntity> complexes, HashMap nodes, HashMap edges, GraphicGraph grf, GraphicNode n) throws Exception{
+		Iterator<PhysicalEntity> itc = cm.getComponent();
+		System.out.println("\nAdding connections for the complex "+cm.uri());
+		int k=1;
+		while(itc.hasNext()) {
+			PhysicalEntity pep = itc.next();
+			System.out.println("\tcomponent "+(k++)+": "+pep.uri());
+			if(pep!=null){
+				String pepuri = pep.uri();
+				PhysicalEntity pep1 = (PhysicalEntity)proteins.get(pepuri);
+				if(pep1==null){
+					if(complexes.get(pepuri)!=null){
+						System.out.println("Component "+pepuri+" is a complex. First, we add its components:");
+						addComplexComponentConnections((Complex)complexes.get(pepuri), proteins, complexes, nodes, edges, grf, n);
+					}else
+						System.out.println("ERROR: entity is not found "+pepuri);
+					
+				}
+				
+				//System.out.println(pepuri);
+				//System.out.println(pep.getClass().getName());
+				String pepuriref = null;
+				if(pep1!=null){
+				try{
+				if(pep1 instanceof Protein) pepuriref = ((Protein)pep1).getEntityReference().uri();
+				if(pep1 instanceof Rna) pepuriref = ((Rna)pep1).getEntityReference().uri();
+				if(pep1 instanceof Dna) pepuriref = ((Dna)pep1).getEntityReference().uri();
+				if(pep1 instanceof SmallMolecule) pepuriref = ((SmallMolecule)pep1).getEntityReference().uri();
+				}catch(Exception e){
+					System.out.println("ERROR: entity reference is not found for "+pep1.uri());
+				}
+				
+				if(pepuriref==null){
+					System.out.println("No entity reference is found for the component. A species node "+bpnm.getNameByUri(pepuri)+" is created.");
+					//System.out.println(pep);
+					String cnm = bpnm.getNameByUri(pepuri);
+					GraphicNode ns = grf.addNewNode();
+					ns.setId(cnm); ns.setName(cnm); ns.setLabel(cnm);
+					Utils.addAttribute(ns,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE",getEntityType(pep1),ObjectType.STRING);
+					Utils.addAttribute(ns,"BIOPAX_URI","BIOPAX_URI",pepuri,ObjectType.STRING);
+					nodes.put(cnm,ns);
+					nodes.put(pepuri,ns);
+				}else
+					pepuri = pepuriref;
+				}
+				
+				
+				String nodeName = bpnm.getNameByUri(pepuri);
+				GraphicNode n1 = (GraphicNode)nodes.get(nodeName);
+				if (n1==null)
+					System.out.println("COMPLEX COMPONENT IS NOT INCLUDED: "+Utils.cutUri(pep.uri()));
+				else {
+					String id = n.getId()+" (CONTAINS) "+n1.getId();
+					if(edges.get(id)==null){
+						GraphicEdge ee = grf.addNewEdge();
+						ee.setId(id);
+						ee.setLabel("CONTAINS");
+						ee.setSource(n1.getId()); ee.setTarget(n.getId());
+						Utils.addAttribute(ee,"BIOPAX_EDGE_TYPE","BIOPAX_EDGE_TYPE","CONTAINS",ObjectType.STRING);
+						Utils.addAttribute(ee,"BIOPAX_EDGE_ID","BIOPAX_EDGE_ID",n.getId()+" ("+"CONTAINS"+") "+n1.getId(),ObjectType.STRING);
+						edges.put(id,ee);
+					}
+				}
+			
+			}
+		}
+	}
+	
+	public String getEntityType(PhysicalEntity p){
+		String typ = p.getClass().getName();
+		StringTokenizer st = new StringTokenizer(typ,".");
+		while(st.hasMoreTokens()) typ = st.nextToken();
+		if(typ.endsWith("Impl")) typ = typ.substring(0,typ.length()-4);
+		System.out.println(p.uri()+"="+typ);
+		return typ;
+	}
+	
+	
+	
 }

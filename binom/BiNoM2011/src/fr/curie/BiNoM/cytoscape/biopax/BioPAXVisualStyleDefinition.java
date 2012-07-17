@@ -68,7 +68,7 @@ public class BioPAXVisualStyleDefinition
 
 //  // node attribute values change ebonnet 11.2011
   public static final String NODE_INTERACTION = "Interaction";
-  public static final String NODE_PHYSICAL_INTERACTION = "physicalInteraction";
+  public static final String NODE_PHYSICAL_INTERACTION = "PhysicalInteraction";
   public static final String NODE_CONTROL = "Control";
   public static final String NODE_CATALYSIS = "Catalysis";
   public static final String NODE_MODULATION = "Modulation";

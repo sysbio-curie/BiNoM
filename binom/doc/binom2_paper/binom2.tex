@@ -56,6 +56,7 @@
 \usepackage[utf8]{inputenc} %unicode support
 \usepackage{graphicx}
 \usepackage{color}
+\usepackage{soul}
 %\usepackage[applemac]{inputenc} %applemac support if unicode package fails
 %\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
 \urlstyle{rm}
@@ -466,7 +467,7 @@ cycles involving CDC25 after a cycle decomposition.
 
 \subsubsection*{Path analysis algorithms}
 
-[[ AZ: check description of shortest path and sub-optimal path search and add a description for all non intersecting paths ]]
+\hl{[[ Andrei: check description of shortest path and sub-optimal path search and add a description for all non intersecting paths ]]}
 
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
@@ -486,27 +487,32 @@ specify a percentage of intersection (ranging from 0 to 100\%) that will be used
 as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
-\color{red}In this version of BiNoM, we have introduced a novel approach to quantify the
-effect of experimental data onto one or more target nodes for a given
-network, named the PIQuant score (Pathway Influence Quantification). 
-The target
-node can be a gene or a phenotype of interest, representing a more complex
-biological function, such as cell proliferation or apopotosis. A positive/negative
-PIQuant score is a quantitive theoretical prediction of over/underexpression of 
-the target node. For instance, consider 
-experimental data consisting of differential gene expressions 
-(between a perturbed biological state compared to normal) and the output node as
-a phenotype. In that case, positive/negative PIQuant score predicts quantitatively
-that the phenotype would be enhanced/inhibited. The PIQuant score itself is difficult 
-to interpret directly; it is easier to use it in order to compare two sets
-of data or two networks, according to the effect on the target node. \color{black}
 
-For a given network 
+In this version of BiNoM, we have introduced a novel approach to quantify the
+effect of experimental data onto one or more target nodes for a given
+network architecture, named the PIQuant score (Pathway Influence Quantification). 
+The target node can be a gene or a phenotype of interest, representing a more complex
+biological function, such as cell proliferation or apopotosis. 
+For example, in the case of a network 
 with one source node and one target node,
 the PIQuant score value will quantify the influence of the source node on the target
-node, by taking into account experimental data value for the input nodes,
+node, by taking into account experimental data values for the input nodes,
 the path length and the sign of the path for a set of paths defined between the
 source and the target node.
+A positive or negative PIQuant score value is a quantitive theoretical
+prediction of the over or underexpression of 
+the target node. For instance, let us consider that we have for a given network
+experimental data corresponding to differential gene expression values (e.g.
+disease/normal ratios).  
+In that case, a positive or a negative PIQuant score for a given phenotype
+(output node) predicts quantitatively
+that the phenotype would be respectively enhanced or inhibited. Furthermore, the
+relative difference between two PIQuant score values also is also indicative of
+a relative quantitative difference. Thus, the PIQuant score can be used to
+compare the effects of two different experimental datasets on the same phenotype
+(i.e using the same network), or to compare the effects of two different network
+architectures on the same phenotype for one experimental dataset.
+
 
 More formally, we can define a source node as \textit{annotated} when a signed real
 number is assigned to the node, representing an experimental data value. For example, it
@@ -557,38 +563,34 @@ path from the source node to the intermediate node. If signs are opposite, the
 node is \textit{inconsistent}. 
 A path is \textit{consistent} if each annotated intermediate nodes is
 consistent. A path is \textit{inconsistent} if at least one intermediate node is
-\textit{inconsistent}. \color{red} Practically, we offer the option to
-keep or not the inconsistent paths for the calculation of the PIQuant score,
-depending on how the user wants to analyze the results: by removing inconsistent path
-the user considers that no information can pass through the inconsistent paths, they
-are blocked by the annotation. In other words, it is a way to ``contextualize'' the network
-by considering that some of paths are not active, in the context defined by the annotation.
-In the contrary, by keeping inconsistent paths, the user wants to have a quantitive prediction on an output
-node in a more general context, when all possible connections are potentially active.
+\textit{inconsistent}.
+In other words, a path is inconsistent when the
+sign of the experimental data value for a node is not consistent with the sign
+of the path.
 
-(The rationale behind these definitions is that the
-network structure for intermediate nodes can be either consistent or inconsistent with
-experimental data values ?).
-
-According to the network, there is an influence from Ac to Ph
-that goes through D (Figure~\ref{piquantnetworks}c). But if this path
+For example, according to the network represented on figure~\ref{piquantnetworks}c, there is an influence from Ac to Ph
+that goes through D . But if this path
 is functional, the annotation of node D should have the same sign as the annotation for node Ac, because
-Ac activates D indirectly. In our case, the sign of D annotation is opposite to
-the sign of Ac annotation, meaning that there is another (unknown) effect on D.
-Therefore, the path from Ac to Ph that goes through D is \textit{inconsistent} and
-might not be used to compute PIQuant score.
+Ac activates D indirectly (i.e. the path from Ac to D has a positive sign). In this case, the sign of D annotation (the experimental value) is opposite to
+the sign of Ac annotation, and therefore, the path from Ac to Ph that goes through D is inconsistent.
 
+Practically, we offer the option to
+keep or not the inconsistent paths for the calculation of the PIQuant score,
+depending on how the user wants to analyze the calculations. An inconsistent
+path could indicate that the path is not complete, or could also indicate that
+the path is correct but not active under the precise conditions in which the
+experimental data was generated, corresponding to a different context.
 
-(For example, the path
-shown on figure~\ref{piquantnetworks}b is consistent while
-the path on the figure~\ref{piquantnetworks}c is inconsistent. In the example
-above, ?) if only consistent paths are kept, then the PIQuant score of Ac to Ph
-becomes:\color{black}
+In the case mentionned above on figure~\ref{piquantnetworks}c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
+becomes:
 
 $$
  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
 $$
 
+This score is higher than the value previously obtained with all the paths, and can be interpreted in this case as a higher activation of the phenotype.
+
+ 
 In more realistic situations, we will have multiple source nodes with different
  annotations, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
@@ -762,21 +764,21 @@ reversible reaction and is replaced by a degradation. Although this work is
 still in progress, a short description and an example of this conversion is
 available \cite{calzone2011calamar}.
  
-\color{red}
-We applied PIQuant to the resulting influence network of the G1/S transition of
-the cell cycle. We selected three target nodes as markers of the G1, S and M
-phases of the cell cycle. We selected 19 source nodes of this network: they are 
-the ones that can be directly influence by a mRNA level. Some of these source 
-nodes are complexes: the mRNA level that influence such a complexe is the one of 
-the partners that has no unbound state in the network.
 
-For each of these source nodes, we used expression data from a study of 57 bladder cancer
-tissue samples compared to 4 normal samples \cite{stransky2006regional}. For each 
-gene, the differential expression between tumor and normal tissue
+We applied PIQuant to the resulting influence network of the G1/S transition of
+the cell cycle (figure~\ref{InflAnnotNet}). We selected three target nodes as
+markers of the G1, S and M
+phases of the cell cycle. For the experimental data, we used expression data
+from a study of 57 bladder cancer
+tissue samples compared to 4 normal samples \cite{stransky2006regional}. For
+each gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. The t-test statistic value is used as the annotation
-for each gene. We construct a text file listing nodes of the influence network 
-and their annotation. \color{black}
-We imported this file using the Cytoscape function 
+for each gene. We selected the 19 nodes for which we had experimental data
+values as source nodes (complexes are selected if one of the members for which
+we had a experimental value had no unbound state in the network).
+
+Then, we constructed a text file listing nodes of the influence network 
+and their annotation and we imported this file using the Cytoscape function 
 ``Import $>$ Nodes attributes'' 
 in the Cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network after its import.

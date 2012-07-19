@@ -57,11 +57,18 @@ public class TestEB {
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-phosphorylation-reaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-protein-interaction.owl";
 			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-genetic-interaction.owl";
-			String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-template-reaction.owl";
+			//String fn = "/bioinfo/users/ebonnet/Binom/biopax/biopax3-template-reaction.owl";
 			
 			//String fn = "/bioinfo/users/ebonnet/test.owl";
 			
-
+			String fn = "/bioinfo/users/ebonnet/test/homo_sapiens.owl";
+			//String fn = "/bioinfo/users/ebonnet/test/arabidopsis_thaliana.owl";
+			
+			BioPAX bp = new BioPAX();
+			bp.loadBioPAX(new FileInputStream(fn));
+			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
+			System.out.println("done");
+			
 			/*
 			 * retrieve sequence vocabulary
 			 */
@@ -118,20 +125,20 @@ public class TestEB {
 			/*
 			 * small molecule reference
 			 */
-			BioPAX bp = new BioPAX();
-			bp.loadBioPAX(new FileInputStream(fn));
-			List l = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(bp.model);
-			
-			for (int i=0;i<l.size();i++) {
-				ModificationFeature  sm = (ModificationFeature) l.get(i);
-				
-				System.out.println(sm.uri());
-				
-				//ControlledVocabulary cv = sm.getModificationType();
-				
-			}
-			
-			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
+//			BioPAX bp = new BioPAX();
+//			bp.loadBioPAX(new FileInputStream(fn));
+//			List l = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(bp.model);
+//			
+//			for (int i=0;i<l.size();i++) {
+//				ModificationFeature  sm = (ModificationFeature) l.get(i);
+//				
+//				System.out.println(sm.uri());
+//				
+//				//ControlledVocabulary cv = sm.getModificationType();
+//				
+//			}
+//			
+//			BioPAXNamingService ns = new BioPAXNamingService(bp,true);
 			
 			
 //			BioPAXToSBMLConverter b2s = new BioPAXToSBMLConverter();

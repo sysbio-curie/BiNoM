@@ -420,26 +420,29 @@ public static String cutNameSpace(String uri){
  * @return
  */
 public static String correctName(String name){
-  name = Utils.replaceString(name," ","_");
-  name = Utils.replaceString(name,"*","_");
-  name = Utils.replaceString(name,"-","_");
-  name = Utils.replaceString(name,"[","_");
-  name = Utils.replaceString(name,"]","_");
-  name = Utils.replaceString(name,"__","_");
-  name = Utils.replaceString(name,"__","_");
-  //name = Utils.replaceString(name,":","_");
-  if(name.endsWith("_"))
-    name = name.substring(0,name.length()-1);
-  if(name.startsWith("_"))
-	    name = name.substring(1,name.length());
+	// cleanup non ascii characters
+	name =  name.replaceAll("[^\\p{ASCII}]", "");
 
-  byte mc[] = name.getBytes();
-  StringBuffer sb = new StringBuffer(name);
-  for(int i=0;i<mc.length;i++)
-    //System.out.println(name.charAt(i)+"\t"+mc[i]);
-    if(mc[i]<=0)
-      sb.setCharAt(i,'_');
-  return sb.toString();
+	name = Utils.replaceString(name," ","_");
+	name = Utils.replaceString(name,"*","_");
+	name = Utils.replaceString(name,"-","_");
+	name = Utils.replaceString(name,"[","_");
+	name = Utils.replaceString(name,"]","_");
+	name = Utils.replaceString(name,"__","_");
+	name = Utils.replaceString(name,"__","_");
+	//name = Utils.replaceString(name,":","_");
+	if(name.endsWith("_"))
+		name = name.substring(0,name.length()-1);
+	if(name.startsWith("_"))
+		name = name.substring(1,name.length());
+
+	byte mc[] = name.getBytes();
+	StringBuffer sb = new StringBuffer(name);
+	for(int i=0;i<mc.length;i++)
+		//System.out.println(name.charAt(i)+"\t"+mc[i]);
+		if(mc[i]<=0)
+			sb.setCharAt(i,'_');
+	return sb.toString();
 }
 /**
  * Returns first in the alphabetic order string from iterator it

@@ -155,12 +155,14 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(biopax.model);
 		for (int i=0;i<el.size();i++) {
 			ControlledVocabulary cv = ((ModificationFeature) el.get(i)).getModificationType();
-			Iterator it = cv.getTerm();
-			String term = null;
-			while(it.hasNext()) {
-				term = (String) it.next();
+			if (cv != null) {
+				Iterator it = cv.getTerm();
+				String term = null;
+				while(it.hasNext()) {
+					term = (String) it.next();
+				}
+				this.uri2ModificationFeatureName.put(((ModificationFeature) el.get(i)).uri(), term);
 			}
-			this.uri2ModificationFeatureName.put(((ModificationFeature) el.get(i)).uri(), term);
 		}
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceSite(biopax.model);
@@ -577,7 +579,7 @@ public class BioPAXNamingService {
 			}else{
 				name = getShortestName(pe.getName());
 			}
-			name = addCellularCompartmentName(name, ((Rna) pe).getCellularLocation());
+			name = addCellularCompartmentName(name, ((Dna) pe).getCellularLocation());
 		}
 		else if (pe instanceof PhysicalEntity) {
 			name = getShortestName(pe.getName());
@@ -684,6 +686,7 @@ public class BioPAXNamingService {
 		// last option, create the name from URI
 		if((name==null)||(name.equals("")))
 			name = createUtilityId(e);
+		
 		name = Utils.correctName(name);
 		return name;
 	}
@@ -832,6 +835,9 @@ public class BioPAXNamingService {
 				ret = n;
 			}
 		}
+		// cleanup non ascii characters
+		//ret =  ret.replaceAll("[^\\p{ASCII}]", "");
+		//System.out.println(">>>test<<< "+ret);
 		ret = Utils.correctName(ret);
 		return(ret);
 	}

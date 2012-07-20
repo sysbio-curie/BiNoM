@@ -419,23 +419,23 @@ by name (material components) or by cycle, path analysis and network clustering.
 We also introduce in this version of BiNoM a novel function to quantify the
 influence of a source node on a target node taking into account experimental data, called PIQuant.
 
-
 \subsubsection*{Decomposition by name or by cycle}
 A trivial approach to separate a network into subparts is to dissociate the unconnected subparts
 of the network. A more sophisticated one consists in decomposing the network into
 strongly connected components, using the algorithm of Tarjan
 \cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
-the one with all the elements associated with the \emph{input} parts of the network, the
-second with all the elements associated with the \emph{output} part and the last
+the one with all the elements associated with the \emph{input} parts of the network (nodes with outgroup edges only), the
+second with all the elements associated with the \emph{output} part (nodes with incoming edges only) and the last
 part with all the elements linked to the central, cyclic part. This type of approaches
 corresponds to the bow-tie model of Broder and colleagues \cite{broder2000graph}.
 
 The decomposition in material components is using the node name semantics to
-isolate subnetworks in which each protein is involved. Major overlaps between
-the different subnetworks are to be expected, as some proteins are involved in
+isolate subnetworks in which each protein is involved, either as a single node or as part of a complex. As a result, major overlaps between
+the different subnetworks are to be expected, as many proteins are expected to be involved in
 different complexes. Figure~\ref{matcdc2cdc13} shows two examples of subnetworks
-obtained by material component decomposition applied to the cell cycle network
-model.
+obtained by material component decomposition applied to a cell cycle network
+model of the yeast species \textit{S. pombe} \cite{novak1998model}. Very often, this approach will represent
+the different parts of the life cycle of a given protein or complex.
 
 \begin{figure}[h]
  \caption{\label{matcdc2cdc13}  \textbf{Subnetworks obtained after a decomposition in
@@ -447,12 +447,13 @@ Cdc2.}
 
 The cycle decomposition is splitting the network into relevant directed cycles
 \cite{gleiss2001relevant}, using a modifed version of the algorithm of Vismara
-and colleagues \cite{vismara1997union}. Very often, this approach will represent
-the different parts of the life cycle of a given protein or complex. Care must
+and colleagues \cite{vismara1997union}. This procedure commonly shows the
+different mechanisms in which the protein is playing a role. Care must
 be taken when applying this approach, as the number of cycles can be huge for
 large network structures. For example, it might be preferable to eliminate first
 the network hubs, which are by definition highly connected, and also group short
-cycles in larger subnetworks before applying the procedure. Figure~\ref{mphasecdc25cycles} shows two
+cycles in larger subnetworks before applying the decomposition function.
+Figure~\ref{mphasecdc25cycles} shows two
 cycles involving CDC25 after a cycle decomposition.
 
 \begin{figure}[h]
@@ -460,7 +461,6 @@ cycles involving CDC25 after a cycle decomposition.
       Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.}
  \center{\includegraphics[width=0.7\textwidth]{figures/mphase_cdc25_cycles.png}}
 \end{figure}
-
 
 \subsubsection*{Path analysis algorithms}
 
@@ -470,8 +470,8 @@ BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
 all non-intersecting paths. The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
-algorithm) while the sub-optimal path is constructed by removing all edges in
-all shortest paths one by one, and finding the shortest path. The user should
+algorithm) while the sub-optimal path is constructed by removing all edges of
+all shortest paths one by one, and finding the new shortest path. The user should
 be careful when using this procedure, as the number of paths between nodes can be
 very large for big networks.
 
@@ -489,7 +489,7 @@ In this version of BiNoM, we have introduced a novel approach to quantify the
 effect of experimental data onto one or more target nodes for a given
 network architecture, named the PIQuant score (Pathway Influence Quantification). 
 The target node can be a gene or a phenotype of interest, representing a more complex
-biological function, such as cell proliferation or apopotosis. 
+biological function, such as cell proliferation or apoptosis. 
 For example, in the case of a network 
 with one source node and one target node,
 the PIQuant score value will quantify the influence of the source node on the target
@@ -528,7 +528,7 @@ of the path $k$ as the product of the signs of every edge of the path and finall
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
-not require extra parameters other than the influence newtwork to be calculated.
+not require extra parameters other than the influence network to be calculated.
 The PIQuant score for a set of $q$ paths (from a set of source nodes, to a set
 of target nodes) is defined as:
 
@@ -536,12 +536,12 @@ $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-For example, in the case of the network presented on the figure~\ref{piquantnetworks}a, let us
-consider Ac as the source node and Ph as the target node and consider only the two
+In the case of the network presented in figure~\ref{piquantnetworks}a, let us
+consider Ac the source node and Ph the target node and consider only the two
 paths defined on the figures~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c. Given that the
-node Ac is annotated by the value $2.0$, and that the first path has a length
-equal to 3, the second a length equal to 5, we can calculate the PIQuant score 
+node Ac is annotated by the value $2.0$, that the first path has a length
+equal to 3, and that the second path has a length equal to 5, we can calculate the PIQuant score 
 of the node Ac to the node Ph as:
 
 $$
@@ -587,7 +587,7 @@ $$
 
 This score is higher than the value previously obtained with all the paths, and can be interpreted in this case as a higher activation of the phenotype.
 
-In more realistic situations, we will have multiple source nodes with different
+In more realistic situations, we would have multiple source nodes with different
  annotations, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
 that allow users to select source nodes, select target nodes, and choose among
@@ -599,14 +599,14 @@ the PIQuant score results, both globally and for every path from the source
 nodes to the output nodes. It is also possible to get a full text report
 detailing all the calculations and the results. We describe a detailed
 and concrete application of the PIQuant algorithm to a real biological network
-in the results section.
+in the Results section.
 
 \begin{figure}[h]
  \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The 
 network is composed of seven nodes and nine edges (a). The two paths (b,c)
 extracted from this network start from the source node \textbf{Ac} and end at
 the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
-\textbf{Ac} and \textbf{D} are annotated using experimental data, having the
+\textbf{Ac} and \textbf{D} are annotated using experimental data, and have the
 values $2.0$ and $-1.0$ respectively.}
  \center{\includegraphics[width=0.7\textwidth]{figures/piquant_networks.png}}
 \end{figure}
@@ -630,20 +630,20 @@ Java class introspection techniques to build a BioPAX class tree. Then, the
 content of the file can easily be accessed. For example, figure~\ref{biopaxtrailprop} shows
 all the information linked to the TRAIL protein, after a call to the
 BioPAX property
-editor function of the BiNoM menu. Details are given in the BiNoM manual on how
-to display valid attributes and edit them, and also how to visualize the
+editor function of the BiNoM menu has been made. Details are given in the BiNoM manual on how
+to display valid attributes, edit them, and how to visualize the
 complete BioPAX tree.
 
 
 \begin{figure}[h]
- \caption{\label{biopaxtrailprop}  \textbf{Extra Information linked to the TRAIL protein.}
-      The informations are automatically extracted from the BioPAX file upon
+ \caption{\label{biopaxtrailprop}  \textbf{Extra information linked to the TRAIL protein.}
+      The information is automatically extracted from the BioPAX file upon
 import with the BiNoM I/O functions.}
  \center{\includegraphics[width=0.7\textwidth]{figures/biopax_trail_prop.png}}
 \end{figure}
 
 
-The BioPAX Query functions in BiNoM allow the user to work with potentially huge
+The BioPAX Query functions in BiNoM allow the user to work with huge
 BioPAX data files and extract the relevant information, by querying an index and
 retrieving data from it. The index corresponds to a mapping of the content of
 the BioPAX file on a labeled graph (an index file is created and saved, using
@@ -664,8 +664,8 @@ this protein is involved and that were added using the BiNoM BioPAX Query functi
 \begin{figure}[h]
  \caption{\label{smaccomplexes}  \textbf{SMAC pathway subnetwork.}
       Subnetwork extracted from the human Apoptosis pathway, starting with the
-SMAC protein and expanding to all protein complexes where this
-molecule is involved using the BiNoM Query functions.}
+SMAC protein (white square) and expanding to all protein complexes where this
+molecule is involved (grey squares) using the BiNoM Query functions.}
  \center{\includegraphics[width=0.7\textwidth]{figures/smac_complexes.png}}
 \end{figure}
 

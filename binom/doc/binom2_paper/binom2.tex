@@ -191,9 +191,9 @@ recent years. Such databases contain many pathways that facilitate the analysis 
 experimental work and the formulation of new biological hypotheses to be
  tested, a fundamental principle of the Systems Biology approach.
 However, large scale molecular maps are not always easy to mine and interpret. We
-have developped BiNoM (Biological Network Manager), a Cytoscape plugin which provides
- several functions for the import-export of standard Systems Biology
-file formats, and also a set of functions to analyze and reduce the complexity
+have developed BiNoM (Biological Network Manager), a Cytoscape plugin which provides
+ functions for the import-export of standard Systems Biology
+file formats, and a set of algorithms to analyze and reduce the complexity
 of large biological networks. Here, we provide an in-depth overview of the BiNoM
 functions, we detail novel aspects such as the support of the BioPAX level 3
 format and an algorithm for the quantification of pathways for influence
@@ -237,7 +237,7 @@ study of a network representing the G1/S transition of the cell cycle.
 %%
 \section*{Background}
 
-Biological pathways and networks represent sets of interactions, or functional
+Biological pathways and networks comprise sets of interactions, or functional
 relationships, occurring at the molecular level in living cells
 \cite{adriaens2008public, cary2005pathway}. Such representations represent now
 a large body of knowledge that are often organized in publicly available
@@ -246,9 +246,9 @@ repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
 (\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
 network databases facilitate a large spectrum of analyses, improving our
 understanding of cellular systems. For example, it is now a very common
-practise to cross the output of high-throughput experiments, such as mRNA or
-protein expression levels, with with curated biological pathways in
-order to efficiently visualize changes, analyze their impect on a network and
+practice to cross the output of high-throughput experiments, such as mRNA or
+protein expression levels, with curated biological pathways in
+order to efficiently visualize changes, analyze their impact on a network and
 formulate new hypotheses about
 biological processes \cite{saraiya2005visualizing,
 gehlenborg2010visualization}. The development of those pathway repositories has
@@ -260,28 +260,28 @@ Notation (SBGN) \cite{le2009systems}. The Pathway resource list website counts
 more than 300 web-accessible biological pathway and network databases
 \cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
 formats. Ultimately, those integrated resources will facilitate computational
-models building and their experimental validation, a cycle that is the
+models building, their exchange, re-usability and their experimental validation, a cycle that is the
 cornerstone of the Systems Biology initiative \cite{karlebach2008modelling,
 kitano2002systems, ideker2001new}.
 
-As a consequence, there is a need for the precise and accurate reconstruction of
+As a consequence, there is a need for the precise and accurate construction of
 pathways and large scale molecular maps covering fundamental biological
-processes. Such maps are often constructed by manual curation of literature or
-automated curation from pathway databases \cite{bauer2009pathway}. They also
-often focus on the regulation of biological processes involved in diseases such
-as cancer \cite{oda2005comprehensive, oda2006comprehensive,
+processes. Such maps are often constructed by manual curation of the literature or
+automated curation from pathway databases \cite{bauer2009pathway}. More and more, they
+are focused on the regulation of biological processes involved in diseases such
+as cancer, Alzheimer's disease or Crohn's disease, to name a few \cite{oda2005comprehensive, oda2006comprehensive,
 calzone2008comprehensive, caron2010comprehensive}. However, the scale of such
 maps, even when they are focusing on a particular process, is quite large, with
 hundreds of species and interactions. The analysis and interpretation of such
 large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
-for the graphical edition of biological pathways diagrams
+for the graphical edition of biological pathway diagrams
 \cite{funahashi2003celldesigner}, and it is using a dialect
 of SBML to store all the information contained in the graphs. There is obviously
 a need for user-friendly software tools that would allow the user to easily
-import data from various standard format sources, to perform structural analyses
-and to manipulate networks, and also be able to export a network to a suitable
+import data from various standard format sources, to perform structural analyses on these pathways 
+and to manipulate networks, and to be able to export a network to a suitable
 format for further analysis (e.g. mathematical modeling). We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
 network vizualization and analysis tool \cite{cline2007integration}. BiNoM
@@ -291,15 +291,15 @@ several functions based on graph operations for the structural analysis of
 biological networks. Those functions can be used to reduce the complexity and
 extract meaningful subnetworks from large scale molecular maps. Furthermore,
 BiNoM has several built-in functions for accessing standard Systems Biology file
-formats. 
-Here, we provide a detailed view on the functions implemented in BiNoM for the
-analysis of large scale molecular maps. We also highlight novel functions that
-were implemented recently, such as the support of the latest BioPAX
+formats. Here, we provide a detailed view on the functions implemented in BiNoM
+that permit specific extraction of information from large scale molecular maps
+and improve their readability and usability. We also highlight novel functions
+that were implemented recently, such as the support of the latest BioPAX
 specification (BioPAX level 3) and an algorithmic approach for the
 quantification of pathways on influence networks (PIQuant). We illustrate the
-usage of the principal BiNoM functions with a detailed analysis of a molecular network
-representing the G1/S transition of the cell cycle, a central mechanism for
-tumor development and progression.
+use of the principal BiNoM functions with a detailed analysis of a molecular
+netwok of the G1/S transition of the cell cycle, a central mechanism
+for tumor development and progression.
 
 \section*{Implementation}
 The BiNoM software is implemented in the Java programming language, as a plugin
@@ -325,7 +325,7 @@ Analysis, BioPAX utils \& query, Module manager and Utilities.
 \subsection*{BiNoM Input/Output}
 
 BiNoM functions facilitate the import and export of standard Systems Biology
-file formats, but The BiNoM plugin is not designed to be a universal converter.
+file formats, but BiNoM plugin is not designed to be a universal converter.
 The goal is more
 to provide robust functions for a finite number of useful conversion and
 analysis scenarios, such as the examples showed below (non-exhaustive list): 
@@ -372,9 +372,8 @@ separate entities, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
 hierarchical arborescence of pathways, and the Protein-Protein interaction graph
 (PP). An example of a reaction network imported from a BioPAX level 3 file is
-shown on figure~\ref{mphasebiopax}, while the figure~\ref{apoptosishierarchical}
-is showing the pathway hierarchical
-structure extracted from the human Apoptosis pathway.  
+shown on figure~\ref{mphasebiopax}. Figure~\ref{apoptosishierarchical}
+shows the hierarchical structure extracted from the human Apoptosis pathway.  
 
 
 \begin{figure}[h]
@@ -395,17 +394,17 @@ triangular nodes denote steps, while grey nodes indicate reactions.}
 \end{figure}
 
 
-When importing a file, BiNoM is calling a \emph{naming service} function, in
+When importing a file, BiNoM is calling a \emph{naming service} function in
 order to create meaningful names for the various entities. More precisely,
 entity names are combined with other features such as modifications, compartment
-and complexe components. The different features are indicated by special
+and complex components. The different features are indicated by special
 characters, such as ``@'' for the compartments, ``$|$'' for modifications and
 ``:'' to delimitate the different members of a complex. For example, the
 name Cdc25$|$Pho@cytoplasm represents the protein Cdc25 in a phosphorylated
 state, located in the cytoplasm, while the name
 Cdc13:Cdc2$|$Thr167\_pho@cytoplasm indicates a protein complex located in the
 cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
-position 167 on a threonin residue.
+position 167 on a threonine residue.
 
 
 \subsection*{BiNoM Analysis}
@@ -413,12 +412,12 @@ The central goal of the BiNoM plugin is to provide efficient methods
 and algorithms to reduce the inherent complexity of biological networks into
 manageable and meaningful subnetworks. This goal is achieved by a set of
 functions included as a built-in structural graph analysis library. Some of the functions are taking into
-account the semantics contained in the graph elements names. 
+account the semantics contained in the graph element names. 
 The structural analysis functions implemented in BiNoM include the analysis of
 connected and strongly connected components, pruning the network, decomposition
 by name (material components) or by cycle, path analysis and network clustering.
 We also introduce in this version of BiNoM a novel function to quantify the
-influence of a source node on a target node, called PIQuant.
+influence of a source node on a target node taking into account experimental data, called PIQuant.
 
 
 \subsubsection*{Decomposition by name or by cycle}
@@ -461,8 +460,6 @@ cycles involving CDC25 after a cycle decomposition.
       Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.}
  \center{\includegraphics[width=0.7\textwidth]{figures/mphase_cdc25_cycles.png}}
 \end{figure}
-
-
 
 
 \subsubsection*{Path analysis algorithms}
@@ -565,7 +562,7 @@ A path is \textit{consistent} if each annotated intermediate nodes is
 consistent. A path is \textit{inconsistent} if at least one intermediate node is
 \textit{inconsistent}.
 In other words, a path is inconsistent when the
-sign of the experimental data value for a node is not consistent with the sign
+sign of the experimental data value for a node is opposite to the sign
 of the path.
 
 For example, according to the network represented on figure~\ref{piquantnetworks}c, there is an influence from Ac to Ph
@@ -590,7 +587,6 @@ $$
 
 This score is higher than the value previously obtained with all the paths, and can be interpreted in this case as a higher activation of the phenotype.
 
- 
 In more realistic situations, we will have multiple source nodes with different
  annotations, and also multiple target nodes representing phenotypes of
 particular nodes of interest. We have implemented in BiNoM a set of functions
@@ -598,7 +594,10 @@ that allow users to select source nodes, select target nodes, and choose among
 three different options for searching paths (shortest paths, optimal and
 suboptimal shortest paths, all non-intersecting paths). The software is then
 calculating PIQuant scores for every target node specified, taking into account
-every possible path found by the algorithm. We describe a detailed
+every possible path found by the algorithm. An interactive window is detailing
+the PIQuant score results, both globally and for every path from the source
+nodes to the output nodes. It is also possible to get a full text report
+detailing all the calculations and the results. We describe a detailed
 and concrete application of the PIQuant algorithm to a real biological network
 in the results section.
 
@@ -800,8 +799,8 @@ PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
 analysis''. The PIQuant score is calculated for each association
 between a source node and a target node (the list of nodes and all the PIQuant
-score values are available as supplementary table 1). We selected optimal and
-sub-optimal shortest path as the algorithm to extract the paths. We ran a test
+score values are available as supplementary table 1). We selected the option ``optimal and
+sub-optimal shortest path'' as the algorithm to extract the paths. We ran a test
 significance and got the report table. In this report, the ``Node influence
 table'' represents the global PIQuant score from each annotated source node to
 each cell-cycle phase marker. Those values are

@@ -701,7 +701,8 @@ public class Graph {
     while(it.hasNext()){
       String id = (String)it.next();
       Node n = getNode(id);
-      gr.addNode(n);
+      if(n!=null)
+    	  gr.addNode(n);
     }
     gr.addConnections(this);
     gr.name = name;

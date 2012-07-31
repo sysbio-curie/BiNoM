@@ -457,10 +457,10 @@ public class CytoscapeToCellDesignerConverter {
     			}
     		}
     	}
-    	assignColorsFromTable(sbml,colorTable);
+    	assignColorsFromTableSpecies(sbml,colorTable);
     }
     
-    public static void assignColorsFromTable(SbmlDocument sbml, HashMap colorTable){
+    public static void assignColorsFromTableSpecies(SbmlDocument sbml, HashMap colorTable){
     	for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
     		CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias alias = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
     		String species = alias.getSpecies();
@@ -486,5 +486,39 @@ public class CytoscapeToCellDesignerConverter {
     		}
     	}    	
     }
+    
+    public static void assignColorsFromTableReactions(SbmlDocument sbml, HashMap colorTable){
+        
+        /*System.out.println("The content of the colorTable:");
+        Iterator<String> it = colorTable.keySet().iterator();
+        while(it.hasNext()){
+                String key = it.next();
+                System.out.println(key+"\t-> "+colorTable.get(key));
+        }*/
+        
+                for(int i=0;i<sbml.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
+                        ReactionDocument.Reaction r = sbml.getSbml().getModel().getListOfReactions().getReactionArray(i);
+                        String id = r.getId();
+                String color = (String)colorTable.get(id);
+                //System.out.println("Reaction "+id+" Color:"+color);
+                if(color!=null){
+                        color = Utils.replaceString(color, "#", "ff");
+                        r.getAnnotation().getCelldesignerLine().setColor(color);
+                }else{
 
+                }
+                        if(r.getAnnotation().getCelldesignerListOfModification()!=null)
+                        for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
+                                CelldesignerModificationDocument.CelldesignerModification cm = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
+                                String source_target = cm.getModifiers()+"%%"+id;
+                                String color_edge = (String)colorTable.get(source_target);
+                                //System.out.println("Edge "+source_target+" Color:"+color_edge);                              
+                                if(color_edge!=null){
+                                        color_edge = Utils.replaceString(color_edge, "#", "ff");
+                                        cm.getCelldesignerLine().setColor(color_edge);
+                                }
+                        }
+                }       
+    }
+               
 }

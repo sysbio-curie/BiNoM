@@ -53,7 +53,12 @@ import java.util.HashMap;
 
 import java.io.File;
 import java.net.URL;
+
+import giny.model.Node;
+import giny.model.Edge;
 import giny.view.NodeView;
+import giny.view.EdgeView;
+
 
 import org.apache.xmlbeans.XmlString;
 import org.sbml.x2001.ns.celldesigner.*;
@@ -117,13 +122,22 @@ public class CellDesignerExportTask implements Task {
 					    reactions, degraded);
 		
 		if(options.putCytoscapeColorsOnSpecies)
-			if(isColorChanged(network))
-				assignCellDesignerColors(sbml, network);
-		
-		if(options.makeReactionsGrey)
-			assignColorToReactions(sbml, "ff999999");
-		else
-			assignColorToReactions(sbml, "ff000000");
+        if(isColorChanged(network))
+            assignCytoscapeColorsToSpecies(sbml, network);
+
+        System.out.println("options.makeReactionsGrey = "+options.makeReactionsGrey);
+        if(options.makeReactionsGrey)
+        	assignColorToAllReactions(sbml, "ff999999");
+        else
+        	assignColorToAllReactions(sbml, "ff000000");
+
+        if(options.changeFontSize){
+        	assignFontSizeToAllSpecies(sbml, options.fontSize);
+        }
+
+        if(options.putCytoscapeColorsOnReactions){
+        	assignCytoscapeColorsToReactions(sbml, network);
+        }
 
 		String path = file.getAbsolutePath();
 
@@ -281,7 +295,7 @@ public class CellDesignerExportTask implements Task {
     	return changed;
     }
     
-    public void assignCellDesignerColors(SbmlDocument sbml, CyNetwork network){
+    public void assignCytoscapeColorsToSpecies(SbmlDocument sbml, CyNetwork network){
     	HashMap colorTable = new HashMap();
     	java.util.Iterator i = network.nodesIterator();
     	cytoscape.data.CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
@@ -316,7 +330,7 @@ public class CellDesignerExportTask implements Task {
     	    
     	    
     	}
-    	CytoscapeToCellDesignerConverter.assignColorsFromTable(sbml, colorTable);
+    	CytoscapeToCellDesignerConverter.assignColorsFromTableSpecies(sbml, colorTable);
     }
     
 	public void applyCellDesignerOptions(SbmlDocument sbml, CellDesignerExportToFileDialog.CellDesignerExportToFileOptions options){
@@ -696,7 +710,7 @@ public class CellDesignerExportTask implements Task {
 			return res;
 		}	  
 	  
-		public static void assignColorToReactions(SbmlDocument cd, String color){
+		public static void assignColorToAllReactions(SbmlDocument cd, String color){
 			if(cd.getSbml().getModel().getListOfReactions()!=null)
 			for(int i=0;i<cd.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 				ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
@@ -708,6 +722,89 @@ public class CellDesignerExportTask implements Task {
 			}
 			}
 		} 
+		
+		
+        public void assignCytoscapeColorsToReactions(SbmlDocument sbml, CyNetwork network){
+        	System.out.println("In assignCytoscapeColorsToReactions...");
+            HashMap colorTable = new HashMap();
+            // First, colors of reactions as nodes
+            java.util.Iterator i = network.nodesIterator();
+            cytoscape.data.CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
+            while (i.hasNext()) {
+                CyNode node = (CyNode)i.next();
+                String id = node.getIdentifier();
+                CyNetworkView networkView = Cytoscape.getNetworkView(network.getIdentifier());
+                NodeView nv = networkView.getNodeView(node);
+                try{
+                java.awt.Color colorObject = Utils.convertPaintToColor(nv.getUnselectedPaint());
+                
+                int rc = colorObject.getRed();
+                int gc = colorObject.getGreen();
+                int bc = colorObject.getBlue();
+                String rcs = Integer.toHexString(rc); if(rcs.length()==1) rcs="0"+rcs;
+                String gcs = Integer.toHexString(gc); if(gcs.length()==1) gcs="0"+gcs;
+                String bcs = Integer.toHexString(bc); if(bcs.length()==1) bcs="0"+bcs;
+                String color = "ff"+rcs+gcs+bcs;
+                //color = "ff000000";
+                
+                    String reaction = nodeAttrs.getStringAttribute(id, "CELLDESIGNER_REACTION");
+                if (reaction!= null)if(!reaction.trim().equals("")){
+                    colorTable.put(reaction,color);
+                }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            // Second, colors of modifiers          
+            i = network.edgesIterator();
+            cytoscape.data.CyAttributes edgeAttrs = Cytoscape.getEdgeAttributes();
+            while (i.hasNext()) {
+                CyEdge edge = (CyEdge)i.next();
+                String id = edge.getIdentifier();
+                
+                Node source = edge.getSource();
+                Node target = edge.getTarget();
+                
+                CyNetworkView networkView = Cytoscape.getNetworkView(network.getIdentifier());
+                EdgeView ev = networkView.getEdgeView(edge);
+                try{
+                java.awt.Color colorObject = Utils.convertPaintToColor(ev.getUnselectedPaint());
+                
+                int rc = colorObject.getRed();
+                int gc = colorObject.getGreen();
+                int bc = colorObject.getBlue();
+                String rcs = Integer.toHexString(rc); if(rcs.length()==1) rcs="0"+rcs;
+                String gcs = Integer.toHexString(gc); if(gcs.length()==1) gcs="0"+gcs;
+                String bcs = Integer.toHexString(bc); if(bcs.length()==1) bcs="0"+bcs;
+                String color = "ff"+rcs+gcs+bcs;
+                //color = "ff000000";                   
+                
+                    //String reaction = edgeAttrs.getStringAttribute(id, "ID");
+                String mod_species = nodeAttrs.getStringAttribute(source.getIdentifier(), "CELLDESIGNER_SPECIES");
+                String source_target = mod_species+"%%"+target.getIdentifier();
+                colorTable.put(source_target,color);
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            CytoscapeToCellDesignerConverter.assignColorsFromTableReactions(sbml, colorTable);              
+        }
+        
+        public void assignFontSizeToAllSpecies(SbmlDocument sbml, float fontSize){
+            for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+                    CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+                    XmlString xs = XmlString.Factory.newInstance();
+                    xs.setStringValue(""+(new Integer((int)(fontSize))).toString());
+                    csa.getCelldesignerFont().setSize(xs);
+            }
+            for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+                    CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+                    XmlString xs = XmlString.Factory.newInstance();
+                    xs.setStringValue(""+(new Integer((int)(fontSize))).toString());
+                    csa.getCelldesignerFont().setSize(xs);
+            }               
+        }
 		
 		
 		public static void addHypotheticalInfluences(SbmlDocument cd4, boolean complexMutualInhibition, boolean inhCatalysisReactant){

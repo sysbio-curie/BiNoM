@@ -71,13 +71,13 @@ public class SubnetworkProperties {
 			
 			
 			SubnetworkProperties SP = new SubnetworkProperties();
-			SP.path = "C:/Datas/HPRD8/";
+			SP.path = "C:/Datas/HPRD9/";
 			//SP.path = "C:/Datas/SERVIER/PPIanalysis/";
 			//SP.loadNetwork(SP.path+"hprd_pc_ppi.xgmml");
 			//XGMML.saveToXGMML(SP.network, SP.path+"hprd_pc_ppi1.xgmml");
 			//SP.loadNetwork(SP.path+"hprd9.xgmml");
 			//SP.loadNetwork(SP.path+"hprd8_.xgmml");
-			SP.loadNetwork(SP.path+"hprd8.xgmml");
+			SP.loadNetwork(SP.path+"hprd9.xgmml");
 			//SP.loadNetwork(SP.path+"prolif_hits.xgmml");
 			//SP.loadNetwork(SP.path+"hprd.xgmml");
 			//SP.loadNetwork(SP.path+"test2.xgmml");
@@ -256,12 +256,14 @@ public class SubnetworkProperties {
 			//SP.modeOfSubNetworkConstruction = SP.ADD_FIRST_NEIGHBOURS;
 			//SP.modeOfSubNetworkConstruction = SP.CONNECT_BY_SHORTEST_PATHS;
 
-			SP.readComplexes(SP.path+"HPRD_PC.txt");
+			SP.readComplexes(SP.path+"HPRD_PC.txt",40);
+			//SP.complexMap.remove("COM_2971");
 			SP.addComplexesToNetworkAsClicks(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");			
 			//SP.addComplexesToNetworksAsNodes(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
 			SP.removeDoubleEdges();				System.out.println("After removing double edges: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
 			calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, true);			
-			XGMML.saveToXGMML(SP.network, SP.path+"hprd8_pc_clicks.xgmml");
+			XGMML.saveToXGMML(SP.network, SP.path+"hprd9_pc_clicks.xgmml");
+			System.exit(0);
 			
 			/*Vector<String> fulllist = Utils.loadStringListFromFile(SP.path+"pathways/"+pathways.get(0));
 			int nga[] = {100,150,155,160,165,170,175,180,185,190,195,200,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,420,440,460,480,500,520,540,560,580,600,620,640,660,680,700,1000};
@@ -1097,7 +1099,7 @@ public class SubnetworkProperties {
 			}
 			
 			if(i<10){
-				System.out.println("Sample "+i+")");
+				System.out.println("Sample "+i+", size="+subnetwork.Nodes.size()+")");
 				report.append("Sample "+i+")\n");
 			}
 			int componentSample[][] = calcDistributionOfConnectedComponentSizes(grsample);
@@ -1335,7 +1337,7 @@ public class SubnetworkProperties {
 		return components;
 	}
 	
-	public void readComplexes(String fn){
+	public void readComplexes(String fn, int complexMaximumSize){
 		VDataTable vc = VDatReadWrite.LoadFromSimpleDatFile(fn, true, "\t");
 		for(int i=0;i<vc.rowCount;i++){
 			String cn = vc.stringTable[i][vc.fieldNumByName("SOURCE_NAME")];
@@ -1351,6 +1353,21 @@ public class SubnetworkProperties {
 				proteinComplexMap.put(pn, clist);
 			}
 		}
+		Iterator<String> keys = complexMap.keySet().iterator();
+		Vector<String> keyToRemove = new Vector<String>();
+		while(keys.hasNext()){
+			String key = keys.next();
+			if(complexMap.get(key).size()>complexMaximumSize)
+				keyToRemove.add(key);
+		}
+		for(int i=0;i<keyToRemove.size();i++)
+			complexMap.remove(keyToRemove.get(i));
+		keys = complexMap.keySet().iterator();
+		while(keys.hasNext()){
+			String key = keys.next();
+			System.out.println(key+"\t"+complexMap.get(key).size());
+		}
+		
 	}
 	
 	public void addComplexesToNetworkAsClicks(){
@@ -1595,7 +1612,7 @@ public class SubnetworkProperties {
 				averageSizeOfRandomBiggestComponent.add(SP.averageSizeOfRandomBiggestComponent);
 			}
 		}
-		report+="================================================\n";
+		//report+="================================================\n";
 		System.out.println("================================================");
 		report+="NGENES\tSELECTED\tLARGESTCOMPONENT\tSIGNIFICANCE\tLARGESTRANDOMCOMPONENT\tSCORE\n";
 		System.out.println("NGENES\tSELECTED\tLARGESTCOMPONENT\tSIGNIFICANCE\tLARGESTRANDOMCOMPONENT\tSCORE");

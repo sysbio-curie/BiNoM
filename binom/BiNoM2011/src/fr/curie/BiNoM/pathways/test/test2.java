@@ -28,7 +28,7 @@ public class test2 extends SubnetworkProperties{
 			
 			SP.modeOfSubNetworkConstruction = SP.SIMPLY_CONNECT;
 
-			SP.readComplexes(SP.path+"HPRD_PC.txt");
+			SP.readComplexes(SP.path+"HPRD_PC.txt",20);
 			SP.addComplexesToNetworkAsClicks(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");			
 			//SP.addComplexesToNetworksAsNodes(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
 			SP.removeDoubleEdges();				System.out.println("After removing double edges: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");

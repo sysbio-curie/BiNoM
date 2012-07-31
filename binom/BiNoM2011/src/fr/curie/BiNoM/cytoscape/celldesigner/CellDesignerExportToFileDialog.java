@@ -76,15 +76,18 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	
 	public class CellDesignerExportToFileOptions{
 	    public boolean changeSpeciesCoordinates = false;
-	    public boolean putCytoscapeColorsOnSpecies = false;
-	    public boolean makeReactionsGrey = false;
+        public boolean putCytoscapeColorsOnSpecies = false;
+        public boolean putCytoscapeColorsOnReactions = false;           
+        public boolean makeReactionsGrey = false;
 	    public boolean mergeIfFileExists = false;
 	    public boolean removeLineBreakPoints = false;
 	    public boolean removeComplexNames = false;
 	    public boolean removeResiduesNames = false;
+        public boolean changeFontSize = false;
+        public float scaleFactor = 1f;
+        public float fontSize = 12f;
 	    public boolean insertHypotheticalInfluences_complexMutualInhibition = false;
 	    public boolean insertHypotheticalInfluences_inhCatalysisReactant = false;
-	    public float scaleFactor = 1f;
 	    public int SCALING_POSITION = 1;
 	    public int SCALING_SHAPE = 2;
 	    public int typeOfScaling = SCALING_SHAPE;
@@ -92,6 +95,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	
     private JCheckBox cbchangeSpeciesCoordinates;
     private JCheckBox cbPutCytoscapeColorsOnSpecies;
+    private JCheckBox cbPutCytoscapeColorsOnReactions;
     private JCheckBox cbMakeReactionsGrey;
     private JCheckBox cbmergeIfFileExists;
     private JCheckBox cbremoveLineBreakPoints;
@@ -103,6 +107,8 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	private JTextField tfscaleFactor;
 	private JRadioButton rbScalingPosition;
 	private JRadioButton rbScalingShape;	
+    private JTextField tfFontSize;
+    private JCheckBox  cbChangeFontSize;
 	private ButtonGroup bgtypeOfScaling;
 
 
@@ -113,7 +119,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
     
     private File cdfile = null;
 
-    private static final double COEF_X = 4, COEF_Y = 1.10;
+    private static final double COEF_X = 4, COEF_Y = 1.2;
 
     private CellDesignerExportToFileDialog() {
 	super("Export to CellDesigner file options");
@@ -199,9 +205,31 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	c.fill = GridBagConstraints.NONE;
 	panel.add(cbPutCytoscapeColorsOnSpecies,c);
 	
+    x = 0;
+    lab1 = new JLabel("Assign the reactions colors if modified");
+    c = new GridBagConstraints();
+	c.gridx = x++;
+	c.gridy = y;
+	c.ipady = 10;	
+	c.weightx = 0.0;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	panel.add(lab1,c);
+	
 
+    cbPutCytoscapeColorsOnReactions = new JCheckBox();
+    c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y++;
+	c.ipady = 10;	
+	c.weightx = 0.0;
+	c.anchor = GridBagConstraints.WEST;
+    c.fill = GridBagConstraints.NONE;
+    panel.add(cbPutCytoscapeColorsOnReactions,c);
+	
+	
 	x = 0;
-	lab1 = new JLabel("Make reactions black/grey");
+	lab1 = new JLabel("Make all reactions black/grey");
 	c = new GridBagConstraints();
 	c.gridx = x++;
 	c.gridy = y;
@@ -354,6 +382,52 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	c.fill = GridBagConstraints.NONE;
 	panel.add(tfscaleFactor,c);
 	
+	
+    x=0;
+    lab1 = new JLabel("Change font sizes");
+    c = new GridBagConstraints();
+    c.gridx = x++;
+    c.gridy = y;
+    c.ipady = 10;   
+    c.weightx = 0.0;
+    c.anchor = GridBagConstraints.WEST;
+    c.fill = GridBagConstraints.NONE;
+    panel.add(lab1,c);
+    
+    cbChangeFontSize = new JCheckBox();
+    c = new GridBagConstraints();
+    c.gridx = x;
+    c.gridy = y++;
+    c.ipady = 10;   
+    c.weightx = 0.0;
+    c.anchor = GridBagConstraints.WEST;
+    c.fill = GridBagConstraints.NONE;
+    panel.add(cbChangeFontSize,c);
+    
+    x=0;
+    lab1 = new JLabel("Font size");
+    c = new GridBagConstraints();
+    c.gridx = x++;
+    c.gridy = y;
+    c.ipady = 10;   
+    c.weightx = 0.0;
+    c.anchor = GridBagConstraints.WEST;
+    c.fill = GridBagConstraints.NONE;
+    panel.add(lab1,c);
+    
+
+    tfFontSize = new JTextField(5);
+    tfFontSize.setText("12");
+    c = new GridBagConstraints();
+    c.gridx = x;
+    c.gridy = y++;
+    c.ipady = 10;   
+    c.weightx = 0.0;
+    c.anchor = GridBagConstraints.WEST;
+    c.fill = GridBagConstraints.NONE;
+    panel.add(tfFontSize,c);
+	
+	
 	x=0;
 	lab1 = new JLabel("Add mutual inhibition in complexes");
 	c = new GridBagConstraints();
@@ -374,6 +448,8 @@ public class CellDesignerExportToFileDialog extends JFrame {
 	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
 	panel.add(cbinsertHypotheticalInfluences_complexMutualInhibition,c);
+
+	
 	
 	x=0;
 	lab1 = new JLabel("Add influence of catalyst on reactant");
@@ -406,6 +482,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
             setVisible(false);			
             CellDesignerExportToFileOptions options = new CellDesignerExportToFileOptions();
             options.putCytoscapeColorsOnSpecies = cbPutCytoscapeColorsOnSpecies.isSelected();
+            options.putCytoscapeColorsOnReactions = cbPutCytoscapeColorsOnReactions.isSelected();            
             options.makeReactionsGrey = cbMakeReactionsGrey.isSelected();
             options.changeSpeciesCoordinates = cbchangeSpeciesCoordinates.isSelected();
             options.mergeIfFileExists = cbmergeIfFileExists.isSelected();
@@ -421,6 +498,14 @@ public class CellDesignerExportToFileDialog extends JFrame {
             	options.typeOfScaling = options.SCALING_POSITION;
             if(rbScalingShape.isSelected())
             	options.typeOfScaling = options.SCALING_SHAPE;
+
+            options.changeFontSize = cbChangeFontSize.isSelected();
+            try{
+                options.fontSize = Float.parseFloat(tfFontSize.getText());
+            }catch(Exception ee){
+                options.fontSize = 12f;
+            }
+
             options.insertHypotheticalInfluences_complexMutualInhibition = cbinsertHypotheticalInfluences_complexMutualInhibition.isSelected();
             options.insertHypotheticalInfluences_inhCatalysisReactant = cbinsertHypotheticalInfluences_inhCatalysisReactant.isSelected();
             
@@ -461,7 +546,7 @@ public class CellDesignerExportToFileDialog extends JFrame {
     cdfile=_cdfile;
 
 	Dimension size = getSize();
-	setSize(new Dimension(300, 550));
+	setSize(new Dimension(400, 650));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

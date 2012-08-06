@@ -1,4 +1,5 @@
-/* Clickmap $Id$
+/* Stuart Pook (Sysra), Copyright (C) 2011, 2012 Institut Curie
+ * Clickmap $Id$
  */
 package fr.curie.BiNoM.pathways.test;
 
@@ -18,8 +19,6 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import fr.curie.BiNoM.pathways.analysis.structure.*;
-import fr.curie.BiNoM.pathways.test.ProduceClickableMap.ImagesInfo;
-import fr.curie.BiNoM.pathways.test.ProduceClickableMap.ItemCloser;
 import fr.curie.BiNoM.pathways.utils.Pair;
 import fr.curie.BiNoM.pathways.utils.SubnetworkProperties;
 import fr.curie.BiNoM.pathways.utils.Utils;
@@ -86,7 +85,7 @@ public class ProduceClickableMap
 	private static final int maximum_number_of_posts = 20480; // might not be enough
 	
 	private static final String module_list_category_name = "module list";
-	private static final String icons_directory = "/map_icons";
+	private static final String icons_directory = "../../../map_icons";
 
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = "/doc";
@@ -143,6 +142,7 @@ public class ProduceClickableMap
 	private static final String image_suffix = ".png";
 	private static final String common_directory_name = "_common";
 	private static final String common_directory_url = "../" + common_directory_name + "/";
+	private static final String jstree_directory_url = "../../../lib/jstree_pre1.0_fix_1";
 	
 	private final String blog_name;
 	private ImagesInfo scales;
@@ -739,16 +739,6 @@ public class ProduceClickableMap
 		for (final String suffix : new String[]{"js", "css"})
 			for (final String base : new String[]{ included_blog_base, included_map_base })
 				copy_file_between_directories(source, destination, base + "." + suffix);
-		/*
-		for (final String dir_name : new String[]{icons_directory, entity_icons_directory})
-		{
-			final File src = new File(source, dir_name);
-			final File dest = new File(destination, dir_name);
-			dest.mkdir();
-			for (String f : src.list())
-				copy_file_between_directories(src, dest, f);
-		}*/
-				
 	}
 
 	private static void copy_file_between_directories(final File source, File destination, final String file) throws IOException
@@ -1770,7 +1760,7 @@ public class ProduceClickableMap
 	
 	private static String make_right_hand_link_to_blog(int postid, String name)
 	{
-		StringBuffer sb = new StringBuffer("<img align='top' class='blogfromright' border='0' src='/map_icons/misc/blog.png' alt='");
+		StringBuffer sb = new StringBuffer("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
 		sb.append(postid).append("'/> ").append(name);
 		return sb.toString();
 	}
@@ -1970,7 +1960,9 @@ public class ProduceClickableMap
 		final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
 		for (Entry<String, ModuleInfo> k : modules_set.entrySet())
 		{
-			if (!positions.containsKey(k.getKey()))
+			if (master_map_name.equals(k.getKey()))
+				;
+			else if (!positions.containsKey(k.getKey()))
 				Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
 			else
 			{
@@ -1993,7 +1985,6 @@ public class ProduceClickableMap
 					indent.close();
 				}
 			}
-	//		item_line(modules.add(), "square", "modules", "Square", null).close();
 		}
 		modules.close();
 		
@@ -2574,26 +2565,6 @@ public class ProduceClickableMap
 			{
 				assert h == null_hasher;
 				show_markers_from_map(name, Arrays.asList(m.getId()), fw);
-				/*
-				final List<String> markers = new ArrayList<String>();
-				final String title = show_modifications(h, Arrays.asList(m), markers);
-				if (markers.isEmpty())
-					fw.append(folded);
-				else
-				{
-					fw.append(js_show_markers).append("[");
-					int n = 0;
-					for (final String s : markers)
-						html_quote(fw.append(n++ > 0 ? ", " : ""), s);
-					fw.append("])")
-						.append(onclick_after)
-						.append(" title=\"")
-						.append(title)
-						.append("\">")
-						.append(folded)
-						.append("</a>");
-				}
-				*/
 			}
 			else
 			{
@@ -2723,24 +2694,6 @@ public class ProduceClickableMap
 	private StringBuffer show_reaction_on_map(ReactionDocument.Reaction r, final StringBuffer fw)
 	{
 		return show_map_and_markers_from_post(fw, master_map_name, Arrays.asList(r.getId()), r.getId(), blog_name);
-		
-		/*
-		fw.append(" ")
-			.append(onclick_before)
-			.append("show_map_and_markers(\"")
-			.append(blog_name)
-			.append("\", \"")
-			.append(master_map_name)
-			.append("\", [\"")
-			.append(r.getId())
-			.append("\"])")
-			.append(onclick_after)
-			.append(" title=\"")
-			.append(r.getId())
-			.append("\">");
-		show_map_icon(fw, blog_name);
-		return fw.append("</a>");
-		*/
 	}
 
 	static private void show_map_icon(final StringBuffer fw, final String blog_name)
@@ -5797,8 +5750,8 @@ public class ProduceClickableMap
 		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + included_map_base + ".css\"/>");
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='/lib/jstree_pre1.0_fix_1/_lib/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='/lib/jstree_pre1.0_fix_1/jquery.jstree.js' type='text/javascript'></script>");
+		out.println("<script src='" + jstree_directory_url + "/_lib/jquery.js' type='text/javascript'></script>");
+		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js' type='text/javascript'></script>");
 	
 		out.println("<script src=\"" + common_directory_url + included_map_base + ".js\" type='text/javascript'></script>");
 

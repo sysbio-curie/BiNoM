@@ -1,5 +1,5 @@
 /**
-  *    Stuart Pook, Copyright (C) 2011 Institut Curie
+  *    Stuart Pook (Sysra), Copyright (C) 2011, 2012 Institut Curie
   *
   *    This program is free software: you can redistribute it and/or modify
   *    it under the terms of the GNU General Public License as published by
@@ -413,6 +413,18 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 		});
 };
 
+function open_blog_click(e)
+{
+	try
+	{
+		show_blog(e.currentTarget.alt);
+	}
+	catch (f)
+	{
+	};
+	return false;
+}
+
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
 	console.log("clickmap_start", to_open);
@@ -440,7 +452,9 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 				data.inst.close_all(children[i], false);
 		}
 		to_open = [];
+		$("img.blogfromright").click(open_blog_click);
 		console.log("to_open set", to_open, to_open.length);
+		
 	};
 	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
 	var tell_opener = function()

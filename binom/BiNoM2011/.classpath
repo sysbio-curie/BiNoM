@@ -15,6 +15,6 @@
 	<classpathentry kind="lib" path="lib/CellDesigner401Jars.jar"/>
 	<classpathentry kind="lib" path="lib/binomlibext.jar"/>
 	<classpathentry kind="lib" path="lib/imgscalr-lib-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/jwordpress/jwordpress-0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jwordpress/jwordpress-0.5.jar" sourcepath="lib/jwordpress/jwordpress-0.5-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

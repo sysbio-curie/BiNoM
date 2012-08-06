@@ -474,7 +474,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 function show_blog(postid)
 {
-	var map = window.open("/annotations/" + blog_name + "/index.php?p=" + postid, "blog_" + blog_name);
+	var map = window.open(blog_name + "/index.php?p=" + postid, "blog_" + blog_name);
 	maps[""] = map;
 	map.focus();
 }

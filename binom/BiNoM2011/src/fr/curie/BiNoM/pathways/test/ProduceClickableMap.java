@@ -137,7 +137,6 @@ public class ProduceClickableMap
 	
 	final private String module_name;
 	
-	private static final String wordpress_username = "binom";
 	private static final String celldesigner_suffix = ".xml";
 	private static final String image_suffix = ".png";
 	private static final String common_directory_name = "_common";
@@ -247,7 +246,7 @@ public class ProduceClickableMap
 		OptionParser options = new fr.curie.BiNoM.pathways.utils.OptionParser(args, null);
 		String title = null;
 		String base = null;
-		String wordpress = null;
+		File wordpress_cfg_file = null;
 		File config = null;
 		File source_directory = null;
 		File destination = null;
@@ -269,8 +268,8 @@ public class ProduceClickableMap
 				base = s;
 			else if ((s = options.stringOption("name", "project name")) != null)
 				blog_name = s;
-			else if ((s = options.stringRequiredOption("wordpress", "wordpress server")) != null)
-				wordpress = s;
+			else if ((f = options.fileRequiredOption("wordpress", "wordpress configuration file")) != null)
+				wordpress_cfg_file = f;
 			else if ((f = options.fileRequiredOption("destination", "destination directory")) != null)
 				destination = f;
 			else if ((f = options.fileRequiredOption("config", "configuration file")) != null)
@@ -292,8 +291,17 @@ public class ProduceClickableMap
 		}
 		options.done();
 		
+		final Properties wordpress_cfg = load_config(wordpress_cfg_file);
 		final Properties configuration = load_config(config);
 		
+		final String wordpress_server = wordpress_cfg.getProperty("server", "localhost");
+		final String wordpress_passwd = wordpress_cfg.getProperty("password");
+		final String wordpress_user = wordpress_cfg.getProperty("user");
+		if (wordpress_passwd == null)
+			fatal_error("no password to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
+		if (wordpress_user == null)
+			fatal_error("no user to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
+	
 		if (show_default_compartement_name == null)
 			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));
 
@@ -305,7 +313,7 @@ public class ProduceClickableMap
 			source_directory = config.getParentFile();
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
-		final Wordpress wp = open_wordpress(wordpress, blog_name);
+		final Wordpress wp = open_wordpress(wordpress_server, blog_name, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
 		final File root = mk_maps_directory(blog_name, destination);
@@ -332,7 +340,7 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(blog_name, root, base, source_directory, wp, make_tiles, modules);
+			master = process_a_map(blog_name, root, base, source_directory, wp, make_tiles, modules, wordpress_server);
 		}
 		catch (IOException e)
 		{
@@ -345,7 +353,7 @@ public class ProduceClickableMap
 		{
 			try
 			{
-				process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, modules);
+				process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, modules, wordpress_server);
 			}
 			catch (IOException e)
 			{
@@ -415,15 +423,14 @@ public class ProduceClickableMap
 		}
 		return (list);
 	}
-	private static final String blog_url_root = "annotations";
 
-	private static Wordpress open_wordpress(String wordpress, String blog_name)
+	private static Wordpress open_wordpress(String wordpress, String blog_name, String wordpress_user, String wordpress_passwd)
 	{
 		final Wordpress wp;
-		final String url = "http://" + wordpress + "/" + blog_url_root + "/" + blog_name + "/xmlrpc.php";
+		final String url = wordpress + "/" + blog_name + "/xmlrpc.php";
 		try
 		{
-			wp = new Wordpress(wordpress_username, "dsf6%sk9Idqqf", url);
+			wp = new Wordpress(wordpress_user, "dsf6%sk9Idqqf", url);
 		}
 		catch (MalformedURLException e1)
 		{
@@ -667,7 +674,7 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
+		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules, String wordpress_server) throws IOException
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
@@ -679,11 +686,11 @@ public class ProduceClickableMap
 		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		clMap.generatePages(master.all_posts, new File(this_map_directory, right_panel_list), scales, master.master_format);
-		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post);
+		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wordpress_server);
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
+		Wordpress wp, boolean make_tiles, Map<String, ModuleInfo> modules, String wordpress_server) throws IOException
 	{
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
@@ -696,7 +703,7 @@ public class ProduceClickableMap
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
 		clMap.right_panel = clMap.generatePages(wp, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
 		final AllPosts.Post module_post = create_module_post(wp, clMap.all_posts, module_notes, map, blog_name);
-		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post);
+		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wordpress_server);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 		return clMap;
 	}
@@ -2762,7 +2769,19 @@ public class ProduceClickableMap
 				Utils.eclipseErrorln("found zero comments for " + postid);
 				return postid;
 			}
-			if (wordpress_username.equals(comments.get(0).getAuthor()))
+			final Integer user_id;
+			try
+                        {
+				// FIXME this code has not been tested!
+	                        user_id = wp.getUserInfo().getUserid();
+                        }
+                        catch (XmlRpcFault e)
+                        {
+        			Utils.eclipseErrorln("failed to find my UserId for " + title);
+        			e.printStackTrace();
+        			return -2;
+                        }
+			if ((int)user_id == (int)comments.get(0).getUser_id())
 				return postid;
 		}
 		
@@ -5732,7 +5751,11 @@ public class ProduceClickableMap
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
 	
-	private static void make_index_html(final File this_map_directory, final String blog_name, final String title, final String map_name, ImagesInfo scales, AllPosts.Post module_post) throws FileNotFoundException
+	private static void make_index_html(final File this_map_directory, final String blog_name, final String title,
+		final String map_name,
+		ImagesInfo scales,
+		AllPosts.Post module_post,
+		String wordpress_server) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
@@ -5758,10 +5781,11 @@ public class ProduceClickableMap
 		final String map_div_name = "map"; // see css
 		final String marker_div_name = "marker_checkboxes"; // see css
 		
+		final StringBuffer blog_url = new StringBuffer(wordpress_server).append("/").append(blog_name);
 		out.println("<script>");
 		out.println("$(document).ready(function(){");
 		out.print("clickmap_start(");
-		out.print("'" + blog_name + "'");
+		out.print("'" + blog_url + "'");
 		out.print(", '" + map_name + "'");
 		out.print(", '#" + marker_div_name + "'");
 		out.print(", '" + map_div_name + "'");
@@ -5806,7 +5830,7 @@ public class ProduceClickableMap
 		out.print(title);
 		out.print("</div>");
 		out.print(" <div class='header-right'>");
-		html_in_named_window(out, post_link_base(module_post.getPostId(), new StringBuffer("/").append( blog_url_root).append("/").append(blog_name).append("/")).toString(), "<img alt='blog' border='0' src='" + blog_icon + "'>", "blog_" + blog_name);
+		html_in_named_window(out, post_link_base(module_post.getPostId(), blog_url.append("/")).toString(), "<img alt='blog' border='0' src='" + blog_icon + "'>", "blog_" + blog_name);
 		out.print(" ");
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");

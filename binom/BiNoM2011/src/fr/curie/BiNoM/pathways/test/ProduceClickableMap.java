@@ -311,6 +311,27 @@ public class ProduceClickableMap
 			blog_name = configuration.getProperty("name", base);
 		if (source_directory == null)
 			source_directory = config.getParentFile();
+		
+		final String r = run(base, source_directory, destination, make_tiles, blog_name, show_default_compartement_name, wordpress_server, wordpress_passwd, wordpress_user);
+		if (r != null)
+		{
+			Utils.eclipseErrorln(r);
+			System.exit(1);
+		}
+	}
+
+	static String run
+	(
+		final String base,
+		final File source_directory,
+		final File destination,
+		final boolean make_tiles,
+		final String blog_name,
+		final boolean show_default_compartement_name,
+		final String wordpress_server,
+		final String wordpress_passwd,
+		final String wordpress_user)
+	{
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
 		final Wordpress wp = open_wordpress(wordpress_server, blog_name, wordpress_user, wordpress_passwd);
@@ -319,10 +340,7 @@ public class ProduceClickableMap
 		final File root = mk_maps_directory(blog_name, destination);
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir())
-		{
-			System.err.println("failed to make " + destination_common);
-			System.exit(1);
-		}
+			return "failed to make " + destination_common;
 
 		try
 		{
@@ -330,9 +348,7 @@ public class ProduceClickableMap
 		}
 		catch (IOException e)
 		{
-			System.err.println("IO error installing static files: " + e.getMessage());
-			System.exit(1);
-			return;
+			return "IO error installing static files: " + e.getMessage();
 		}
 		
 		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
@@ -344,9 +360,7 @@ public class ProduceClickableMap
 		}
 		catch (IOException e)
 		{
-			Utils.eclipseErrorln("IO error creating map " + master_map_name + ": " + e.getMessage());
-			System.exit(3);
-			return;
+			return "IO error creating map " + master_map_name + ": " + e.getMessage();
 		}
 
 		for (final String map_name : modules.keySet())
@@ -357,15 +371,14 @@ public class ProduceClickableMap
 			}
 			catch (IOException e)
 			{
-				Utils.eclipseErrorln("IO error creating map " + map_name + ": " + e.getMessage());
-				System.exit(4);
-				return;
+				return "IO error creating map " + map_name + ": " + e.getMessage();
 			}
 		}
 		
 		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, blog_name);
 		
 		remove_old_posts(wp, master.all_posts.getUnused());
+		return null;
 	}
 	
 	private String get_map_title()
@@ -1153,10 +1166,10 @@ public class ProduceClickableMap
 			return ids;
 		}
 		private static void missing(String name)
-                {
+		{
 			Utils.eclipseErrorln("fatal error: missing category: " + name);
-	                assert false : name;
-                }
+			assert false : name;
+		}
 		private void fill(final Object o_user_id, final List<Page> recentPosts, final Wordpress wp)
 		{
 			String user_id = String.valueOf(o_user_id);
@@ -2771,16 +2784,16 @@ public class ProduceClickableMap
 			}
 			final Integer user_id;
 			try
-                        {
+			{
 				// FIXME this code has not been tested!
-	                        user_id = wp.getUserInfo().getUserid();
-                        }
-                        catch (XmlRpcFault e)
-                        {
-        			Utils.eclipseErrorln("failed to find my UserId for " + title);
-        			e.printStackTrace();
-        			return -2;
-                        }
+				user_id = wp.getUserInfo().getUserid();
+			}
+			catch (XmlRpcFault e)
+			{
+				Utils.eclipseErrorln("failed to find my UserId for " + title);
+				e.printStackTrace();
+				return -2;
+			}
 			if ((int)user_id == (int)comments.get(0).getUser_id())
 				return postid;
 		}

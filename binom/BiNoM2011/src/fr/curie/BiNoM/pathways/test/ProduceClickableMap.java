@@ -80,6 +80,27 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 
 public class ProduceClickableMap
 {
+	static class NaviCellException extends java.lang.Exception
+	{
+		private static final long serialVersionUID = 5898681220888228646L;
+		NaviCellException(String m)
+		{
+			super(m);
+			Utils.eclipseParentErrorln(m);
+		}
+		NaviCellException(String m, java.lang.Throwable cause)
+		{
+			super(m, cause);
+			Utils.eclipseParentErrorln(m + " " + cause);
+		}
+		@Override
+		public String getMessage()
+		{
+			if (this.getCause() != null)
+				return super.getMessage() + " " + this.getCause().getMessage();
+			return super.getMessage();
+		}
+	};
 	private static final String right_hand_tag = "navicell";
 
 	private static final int maximum_number_of_posts = 20480; // might not be enough
@@ -253,7 +274,7 @@ public class ProduceClickableMap
 		@SuppressWarnings("unused")
 		boolean verbose = false;
 		boolean make_tiles = true;
-		String blog_name = null;
+		String project_name = null;
 		
 		Boolean show_default_compartement_name = null;
 		
@@ -267,7 +288,7 @@ public class ProduceClickableMap
 			else if ((s = options.stringOption("base", "file name base")) != null)
 				base = s;
 			else if ((s = options.stringOption("name", "project name")) != null)
-				blog_name = s;
+				project_name = s;
 			else if ((f = options.fileRequiredOption("wordpress", "wordpress configuration file")) != null)
 				wordpress_cfg_file = f;
 			else if ((f = options.fileRequiredOption("destination", "destination directory")) != null)
@@ -294,9 +315,13 @@ public class ProduceClickableMap
 		final Properties wordpress_cfg = load_config(wordpress_cfg_file);
 		final Properties configuration = load_config(config);
 		
+		if (project_name == null)
+			project_name = configuration.getProperty("name", base);
+		
 		final String wordpress_server = wordpress_cfg.getProperty("server", "localhost");
 		final String wordpress_passwd = wordpress_cfg.getProperty("password");
 		final String wordpress_user = wordpress_cfg.getProperty("user");
+		final String wordpress_blogname = wordpress_cfg.getProperty("blog", project_name);
 		if (wordpress_passwd == null)
 			fatal_error("no password to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
 		if (wordpress_user == null)
@@ -307,40 +332,45 @@ public class ProduceClickableMap
 
 		if (base == null && (base = configuration.getProperty("base")) == null)
 			fatal_error("no base on the command line or in the configuration file");
-		if (blog_name == null)
-			blog_name = configuration.getProperty("name", base);
 		if (source_directory == null)
 			source_directory = config.getParentFile();
 		
-		final String r = run(base, source_directory, destination, make_tiles, blog_name, show_default_compartement_name, wordpress_server, wordpress_passwd, wordpress_user);
-		if (r != null)
+		try
 		{
-			Utils.eclipseErrorln(r);
+			run(base, source_directory, destination, make_tiles, project_name, show_default_compartement_name, wordpress_server,
+				wordpress_passwd, wordpress_user, wordpress_blogname);
+		}
+		catch (NaviCellException e)
+		{
+			Utils.eclipseErrorln(e.getMessage());
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
-	static String run
+	public static void run
 	(
 		final String base,
 		final File source_directory,
 		final File destination,
 		final boolean make_tiles,
-		final String blog_name,
+		final String project_name,
 		final boolean show_default_compartement_name,
 		final String wordpress_server,
 		final String wordpress_passwd,
-		final String wordpress_user)
+		final String wordpress_user,
+		final String wordpress_blogname
+	) throws NaviCellException
 	{
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
-		final Wordpress wp = open_wordpress(wordpress_server, blog_name, wordpress_user, wordpress_passwd);
+		final Wordpress wp = open_wordpress(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
-		final File root = mk_maps_directory(blog_name, destination);
+		final File root = mk_maps_directory(project_name, destination);
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir())
-			return "failed to make " + destination_common;
+			throw new NaviCellException("failed to make " + destination_common);
 
 		try
 		{
@@ -348,7 +378,7 @@ public class ProduceClickableMap
 		}
 		catch (IOException e)
 		{
-			return "IO error installing static files: " + e.getMessage();
+			throw new NaviCellException("IO error installing static files", e);
 		}
 		
 		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
@@ -356,11 +386,11 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(blog_name, root, base, source_directory, wp, make_tiles, modules, wordpress_server);
+			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, modules, wordpress_server);
 		}
 		catch (IOException e)
 		{
-			return "IO error creating map " + master_map_name + ": " + e.getMessage();
+			throw new NaviCellException("IO error creating map " + master_map_name, e);
 		}
 
 		for (final String map_name : modules.keySet())
@@ -371,14 +401,13 @@ public class ProduceClickableMap
 			}
 			catch (IOException e)
 			{
-				return "IO error creating map " + map_name + ": " + e.getMessage();
+				throw new NaviCellException("IO error creating map " + map_name, e);
 			}
 		}
 		
-		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, blog_name);
+		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, project_name);
 		
 		remove_old_posts(wp, master.all_posts.getUnused());
-		return null;
 	}
 	
 	private String get_map_title()
@@ -437,42 +466,41 @@ public class ProduceClickableMap
 		return (list);
 	}
 
-	private static Wordpress open_wordpress(String wordpress, String blog_name, String wordpress_user, String wordpress_passwd)
+	private static Wordpress open_wordpress(String wordpress, String blog_name, String wordpress_user, String wordpress_passwd) throws NaviCellException
 	{
 		final Wordpress wp;
 		final String url = wordpress + "/" + blog_name + "/xmlrpc.php";
+		
+		System.setProperty("https.proxyHost", "www-cache-in.curie.fr");
+		System.setProperty("https.proxyPort", "3128");
+		
 		try
 		{
-			wp = new Wordpress(wordpress_user, "dsf6%sk9Idqqf", url);
+			wp = new Wordpress(wordpress_user, wordpress_passwd, url);
 		}
 		catch (MalformedURLException e1)
 		{
-			System.err.println("failed to connect to Wordpress at " + url + ": " + e1.getMessage());
-			System.exit(1);
-			return null;
+			throw new NaviCellException("failed to connect to Wordpress at " + url, e1);
 		}
 		
 		try
 		{
 //			Utils.eclipsePrintln("testing blog " + blog_name + " " + wp.getUserInfo().getUrl());
 
-			assert wp.getUserInfo().getUserid() != null : wp.getUserInfo();
+			final User userInfo = wp.getUserInfo();
+			assert userInfo.getUserid() != null : userInfo;
 			if (wp.getCategories().size() < 2)
 			{
-				System.err.println("not enough categories for a usable blog " + wp.getCategories().size());
-				System.exit(1);
-				return null;
+				throw new NaviCellException("not enough categories for a usable blog " + wp.getCategories().size());
 			}
 				
 		}
 		catch (XmlRpcFault e)
 		{
-			System.err.println("failed to query Wordpress at " + url + ": " + e.getMessage());
-			System.exit(1);
-			return null;
+			throw new NaviCellException("failed to query Wordpress at " + url, e);
 		}
 		
-		Utils.eclipsePrintln("connected to blog " + blog_name);
+		Utils.eclipsePrintln("connected to blog " + url);
 		return wp;
 	}
 

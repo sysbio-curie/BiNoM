@@ -72,7 +72,7 @@ public class BioPAX2SBML {
     //String prefix = "c:/datas/binomtest/BioPAX3/simplest";
   	//String prefix = "C:/Datas/binomtest/BioPAX3/modif1";
     //String prefix = "C:/Datas/binomtest/BioPAX3/M-Phase2";
-    	String prefix = "C:/Datas/binomtest/BioPAX3/dimer";
+       String prefix = "c:/datas/binomtest/BioPAX3/6examples/biopax3-template-reaction1";
 	
     if(args.length>0){
       prefix = args[0];

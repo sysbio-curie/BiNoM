@@ -30,6 +30,8 @@ import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import jp.sbi.celldesigner.plugin.PluginMenuItem;
+
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.plugin.CytoscapePlugin;
@@ -77,6 +79,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerAssociateSource;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportToFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerImportFromFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerVisualStyleDefinition;
+import fr.curie.BiNoM.cytoscape.celldesigner.ProduceNaviCellMapFiles;
 import fr.curie.BiNoM.cytoscape.celldesigner.colorCellDesignerProteins;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory;
@@ -131,6 +134,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	JMenuItem modifyCellDesignerNotesMenuItem;
 	JMenuItem createNeighborhoodSetsMenuItem;
 	JMenuItem mergeNetworksAndFilterMenuItem;
+	JMenuItem produceNaviCellMenuItem;
 
 	private void initVisualStyles() {
 		CyNetworkView networkView = Cytoscape.getCurrentNetworkView();
@@ -243,7 +247,13 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomIOMenu.add(modifyCellDesignerNotesMenuItem);
 		modifyCellDesignerNotesMenuItem.addActionListener(new modifyCellDesignerNotes());
 
+        binomIOMenu.addSeparator();
 
+        produceNaviCellMenuItem = new JMenuItem("Produce NaviCell map files...");
+        binomIOMenu.add(produceNaviCellMenuItem);
+        produceNaviCellMenuItem.addActionListener(new ProduceNaviCellMapFiles());	
+		
+		
 		/*
 		 * Analysis functions menu
 		 */

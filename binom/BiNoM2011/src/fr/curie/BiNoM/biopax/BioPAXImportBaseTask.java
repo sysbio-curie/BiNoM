@@ -105,8 +105,8 @@ public class BioPAXImportBaseTask {
 	if (algo == BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION)
 	    return name + " PS";
 
-	if (algo == BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION)
-	    return name + " PP";
+	if (algo == BioPAXToCytoscapeConverter.INTERACTION_CONVERSION)
+	    return name + " IM";
 
 	return name + " XX";
     }

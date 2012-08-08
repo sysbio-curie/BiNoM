@@ -424,6 +424,8 @@ public static String correctName(String name){
 	name =  name.replaceAll("[^\\p{ASCII}]", "");
 
 	name = Utils.replaceString(name," ","_");
+	name = Utils.replaceString(name,"/","_");
+	name = Utils.replaceString(name,"|","_");
 	name = Utils.replaceString(name,"*","_");
 	name = Utils.replaceString(name,"-","_");
 	name = Utils.replaceString(name,"[","_");

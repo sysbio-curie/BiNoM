@@ -72,7 +72,8 @@ public class BioPAX2Cytoscape extends BioPAX2SBML {
 			//String prefix = "c:/datas/binomtest/NCI_example";
 			//String prefix = "c:/datas/binomtest/BioPAX3/complex";
 			//String prefix = "c:/datas/binomtest/BioPAX3/simplest";
-			String prefix = "c:/datas/binomtest/BioPAX3/Apoptosome";
+			//String prefix = "c:/datas/binomtest/BioPAX3/Apoptosome";
+			String prefix = "c:/datas/binomtest/BioPAX3/6examples/biopax3-template-reaction1";
 
 			if (args.length>0) {
 				prefix = args[0];
@@ -99,7 +100,7 @@ public class BioPAX2Cytoscape extends BioPAX2SBML {
 			BioPAXToCytoscapeConverter.Graph grp = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, prefix + ".owl", options);
 			XGMML.saveToXGMML(grp.graphDocument, prefix + "_pathways.xgmml");
 
-			BioPAXToCytoscapeConverter.Graph grpp = b2c.convert(BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
+			BioPAXToCytoscapeConverter.Graph grpp = b2c.convert(BioPAXToCytoscapeConverter.INTERACTION_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
 			XGMML.saveToXGMML(grpp.graphDocument, prefix + "_proteins.xgmml");
 
 

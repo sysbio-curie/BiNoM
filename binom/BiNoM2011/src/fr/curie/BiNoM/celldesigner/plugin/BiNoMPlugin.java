@@ -40,6 +40,7 @@ public class BiNoMPlugin extends CellDesignerPlugin {
     PluginMenuItem toggleBioPAXNameMenuItem;
     PluginMenuItem listAllReactionsMenuItem;
     PluginMenuItem listAllNodesMenuItem;
+    PluginMenuItem produceNaviCellMenuItem;
 
     /**
      * 
@@ -133,7 +134,7 @@ public class BiNoMPlugin extends CellDesignerPlugin {
         listAllNodesMenuItem = new PluginMenuItem("List all nodes...", action);
 	listAllNodesMenuItem.setEnable(false);
         binomIOMenu.add(listAllNodesMenuItem);
-
+                
 
 	PluginMenu structAnaMenu = new PluginMenu("BiNoM Analysis");
 	addCellDesignerPluginMenu(structAnaMenu);

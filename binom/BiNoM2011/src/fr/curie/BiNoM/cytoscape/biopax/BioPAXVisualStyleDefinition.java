@@ -69,19 +69,24 @@ public class BioPAXVisualStyleDefinition
 //  // node attribute values change ebonnet 11.2011
   public static final String NODE_INTERACTION = "Interaction";
   public static final String NODE_PHYSICAL_INTERACTION = "PhysicalInteraction";
+  public static final String NODE_GENETIC_INTERACTION = "GeneticInteraction";
   public static final String NODE_CONTROL = "Control";
   public static final String NODE_CATALYSIS = "Catalysis";
   public static final String NODE_MODULATION = "Modulation";
   public static final String NODE_CONVERSION = "Conversion";
   public static final String NODE_TRANSPORT = "Transport";
   public static final String NODE_BIOCHEMICAL_REACTION = "BiochemicalReaction";
+  public static final String NODE_TEMPLATE_REACTION = "TemplateReaction";
   public static final String NODE_TRANSPORT_WITH_BIOCHEMICAL_REACTION = "TransportWithBiochemicalReaction";
   public static final String NODE_COMPLEX_ASSEMBLY = "ComplexAssembly";
 
   public static final String NODE_PHYSICAL_ENTITY = "PhysicalEntity";
   public static final String NODE_COMPLEX = "Complex";
   public static final String NODE_DNA = "Dna";
+  public static final String NODE_DNAREGION = "DnaRegion";
+  public static final String NODE_GENE = "Gene";
   public static final String NODE_RNA = "Rna";
+  public static final String NODE_RNAREGION = "RnaRegion";
   public static final String NODE_SMALL_MOLECULE = "SmallMolecule";
   public static final String NODE_PROTEIN = "Protein";
 
@@ -110,6 +115,9 @@ public class BioPAXVisualStyleDefinition
     public static final String EDGE_CONTROL_UNKNOWN = "CONTROL_UNKNOWN";
     public static final String EDGE_CONTROL_ACTIVATION = "CONTROL_ACTIVATION";
     public static final String EDGE_CONTROL_INHIBITION = "CONTROL_INHIBITION";
+    public static final String EDGE_TEMPLATEREACTIONREGULATION_ACTIVATION = "TEMPLATEREACTIONREGULATION_ACTIVATION";
+    public static final String EDGE_TEMPLATEREACTIONREGULATION_INHIBITION = "TEMPLATEREACTIONREGULATION_INHIBITION";
+    public static final String EDGE_TEMPLATEREACTIONREGULATION_UNKNOWN = "TEMPLATEREACTIONREGULATION_UNKNOWN";
 
     public static final String EDGE_INHIBITION = "INHIBITION";
     public static final String EDGE_CONTAINS = "CONTAINS";
@@ -118,7 +126,8 @@ public class BioPAXVisualStyleDefinition
     public static final String EDGE_LEFT = "LEFT";
     public static final String EDGE_RIGHT = "RIGHT";
     public static final String EDGE_SPECIESOF = "SPECIESOF";
-    public static final String EDGE_physicalInteraction = "physicalInteraction";
+    public static final String EDGE_physicalInteraction = "PhysicalInteraction";
+    public static final String EDGE_geneticInteraction = "GeneticInteraction";
     public static final String EDGE_REFERENCE = "REFERENCE";
     public static final String EDGE_INTERSECTION = "INTERSECTION";
 
@@ -150,6 +159,9 @@ public class BioPAXVisualStyleDefinition
                              (NODE_PHYSICAL_INTERACTION,
                             		 NodeShape.DIAMOND));
         nodeShapeMapping.add(new ObjectMapping
+        					(NODE_GENETIC_INTERACTION,
+        							 NodeShape.DIAMOND));
+        nodeShapeMapping.add(new ObjectMapping
                              (NODE_CONTROL,
                             		 NodeShape.DIAMOND));
         nodeShapeMapping.add(new ObjectMapping
@@ -164,6 +176,9 @@ public class BioPAXVisualStyleDefinition
         nodeShapeMapping.add(new ObjectMapping
                              (NODE_BIOCHEMICAL_REACTION,
                             		 NodeShape.DIAMOND));
+        nodeShapeMapping.add(new ObjectMapping
+                			(NODE_TEMPLATE_REACTION,
+                					 NodeShape.DIAMOND));
         nodeShapeMapping.add(new ObjectMapping
                              (NODE_TRANSPORT,
                             		 NodeShape.DIAMOND));
@@ -187,8 +202,17 @@ public class BioPAXVisualStyleDefinition
                              (NODE_RNA,
                             		 NodeShape.PARALLELOGRAM));
         nodeShapeMapping.add(new ObjectMapping
+                (NODE_RNAREGION,
+               		 NodeShape.PARALLELOGRAM));
+        nodeShapeMapping.add(new ObjectMapping
                              (NODE_DNA,
                             		 NodeShape.RECT));
+        nodeShapeMapping.add(new ObjectMapping
+                (NODE_DNAREGION,
+               		 NodeShape.RECT));
+        nodeShapeMapping.add(new ObjectMapping
+                (NODE_GENE,
+               		 NodeShape.RECT));
         nodeShapeMapping.add(new ObjectMapping
                              (NODE_SMALL_MOLECULE,
                             		 NodeShape.ELLIPSE));
@@ -220,6 +244,8 @@ public class BioPAXVisualStyleDefinition
         nodeSizeMapping.add(new ObjectMapping
                             (NODE_PHYSICAL_INTERACTION, new Double(20)));
         nodeSizeMapping.add(new ObjectMapping
+        					(NODE_GENETIC_INTERACTION, new Double(20)));
+        nodeSizeMapping.add(new ObjectMapping
                             (NODE_CONTROL, new Double(20)));
         nodeSizeMapping.add(new ObjectMapping
                             (NODE_CATALYSIS, new Double(20)));
@@ -229,6 +255,8 @@ public class BioPAXVisualStyleDefinition
                             (NODE_CONVERSION, new Double(20)));
         nodeSizeMapping.add(new ObjectMapping
                             (NODE_BIOCHEMICAL_REACTION, new Double(20)));
+        nodeSizeMapping.add(new ObjectMapping
+        					(NODE_TEMPLATE_REACTION, new Double(20)));
         nodeSizeMapping.add(new ObjectMapping
                             (NODE_COMPLEX_ASSEMBLY, new Double(20)));
         nodeSizeMapping.add(new ObjectMapping
@@ -247,6 +275,12 @@ public class BioPAXVisualStyleDefinition
         nodeSizeMapping.add(new ObjectMapping
                             (NODE_DNA, new Double(40)));
         nodeSizeMapping.add(new ObjectMapping
+                			(NODE_RNAREGION, new Double(40)));
+        nodeSizeMapping.add(new ObjectMapping
+                			(NODE_DNAREGION, new Double(40)));
+        nodeSizeMapping.add(new ObjectMapping
+                		    (NODE_GENE, new Double(40)));
+        nodeSizeMapping.add(new ObjectMapping
                             (NODE_SMALL_MOLECULE, new Double(30)));
 
 
@@ -255,6 +289,8 @@ public class BioPAXVisualStyleDefinition
                             (NODE_INTERACTION, Color.gray));
         nodeColorMapping.add(new ObjectMapping
                             (NODE_PHYSICAL_INTERACTION, Color.gray));
+        nodeColorMapping.add(new ObjectMapping
+                		    (NODE_GENETIC_INTERACTION, Color.pink));
         nodeColorMapping.add(new ObjectMapping
                             (NODE_CONTROL, Color.gray));
         nodeColorMapping.add(new ObjectMapping
@@ -265,6 +301,8 @@ public class BioPAXVisualStyleDefinition
                             (NODE_CONVERSION, Color.gray));
         nodeColorMapping.add(new ObjectMapping
                             (NODE_BIOCHEMICAL_REACTION, Color.gray));
+        nodeColorMapping.add(new ObjectMapping
+                			(NODE_TEMPLATE_REACTION, Color.red));
         nodeColorMapping.add(new ObjectMapping
                             (NODE_COMPLEX_ASSEMBLY, Color.gray));
         nodeColorMapping.add(new ObjectMapping
@@ -281,7 +319,13 @@ public class BioPAXVisualStyleDefinition
         nodeColorMapping.add(new ObjectMapping
                              (NODE_DNA, Color.WHITE));
         nodeColorMapping.add(new ObjectMapping
+                			(NODE_DNAREGION, Color.WHITE));
+        nodeColorMapping.add(new ObjectMapping
+        					 (NODE_GENE, Color.WHITE));
+        nodeColorMapping.add(new ObjectMapping
                              (NODE_RNA, Color.WHITE));
+        nodeColorMapping.add(new ObjectMapping
+                			(NODE_RNAREGION, Color.WHITE));
         nodeColorMapping.add(new ObjectMapping
                              (NODE_SMALL_MOLECULE, Color.WHITE));
         nodeColorMapping.add(new ObjectMapping
@@ -296,7 +340,11 @@ public class BioPAXVisualStyleDefinition
 	nodeBorderLineStyleMapping.add(new ObjectMapping
 				      (NODE_BIOCHEMICAL_REACTION, LineStyle.SOLID));
 	nodeBorderLineWidthMapping.add(new ObjectMapping
-		      (NODE_BIOCHEMICAL_REACTION, 1));
+		      		  (NODE_BIOCHEMICAL_REACTION, 1));
+	nodeBorderLineStyleMapping.add(new ObjectMapping
+		      	      (NODE_TEMPLATE_REACTION, LineStyle.SOLID));
+	nodeBorderLineWidthMapping.add(new ObjectMapping
+				      (NODE_TEMPLATE_REACTION, 1));
 	
 
 	nodeBorderLineStyleMapping.add(new ObjectMapping
@@ -306,13 +354,20 @@ public class BioPAXVisualStyleDefinition
 
     	nodeBorderLineStyleMapping.add(new ObjectMapping
 			      (NODE_PATHWAY, LineStyle.SOLID));
-  nodeBorderLineWidthMapping.add(new ObjectMapping
+
+    	nodeBorderLineWidthMapping.add(new ObjectMapping
                                 (NODE_PATHWAY, 2));
+    	nodeBorderLineWidthMapping.add(new ObjectMapping
+                				(NODE_DNAREGION, 2));
+    	nodeBorderLineWidthMapping.add(new ObjectMapping
+                				(NODE_RNAREGION, 2));
 
         
 	// node border color
 	nodeBorderColorMapping.add(new ObjectMapping
 				   (NODE_BIOCHEMICAL_REACTION, Color.black));
+	nodeBorderColorMapping.add(new ObjectMapping
+			   	   (NODE_TEMPLATE_REACTION, Color.black));
 
 	nodeBorderColorMapping.add(new ObjectMapping
 				   (NODE_COMPLEX, Color.BLACK));
@@ -342,8 +397,8 @@ public class BioPAXVisualStyleDefinition
 	// edge line color
 	edgeLineColorMapping.add(new ObjectMapping
 				 (EDGE_ACTIVATION, Color.RED));
-        edgeLineColorMapping.add(new ObjectMapping
-                                 (EDGE_INHIBITION, Color.BLUE));
+    edgeLineColorMapping.add(new ObjectMapping
+                 (EDGE_INHIBITION, Color.BLUE));
 	edgeLineColorMapping.add(new ObjectMapping
 				 (EDGE_LEFT, Color.BLACK));
 	edgeLineColorMapping.add(new ObjectMapping
@@ -358,6 +413,8 @@ public class BioPAXVisualStyleDefinition
                                  (EDGE_SPECIESOF, Color.gray));
         edgeLineColorMapping.add(new ObjectMapping
                                  (EDGE_physicalInteraction, Color.gray));
+        edgeLineColorMapping.add(new ObjectMapping
+                				 (EDGE_geneticInteraction, Color.pink));
 
         edgeLineColorMapping.add(new ObjectMapping
                                  (EDGE_CATALYSIS_UNKNOWN, Color.GREEN));
@@ -384,6 +441,15 @@ public class BioPAXVisualStyleDefinition
                                  (EDGE_CONTROL_ACTIVATION, new Color(128,0,0)));
         edgeLineColorMapping.add(new ObjectMapping
                                  (EDGE_CONTROL_INHIBITION, new Color(0,0,128)));
+
+        edgeLineColorMapping.add(new ObjectMapping
+                				 (EDGE_TEMPLATEREACTIONREGULATION_UNKNOWN, Color.GREEN));
+        edgeLineColorMapping.add(new ObjectMapping
+                				 (EDGE_TEMPLATEREACTIONREGULATION_ACTIVATION, new Color(128,0,0)));
+        edgeLineColorMapping.add(new ObjectMapping
+                				 (EDGE_TEMPLATEREACTIONREGULATION_INHIBITION, new Color(0,0,128)));
+        
+        
         edgeLineColorMapping.add(new ObjectMapping
                                  (EDGE_REFERENCE, Color.gray));
         edgeLineColorMapping.add(new ObjectMapping
@@ -419,6 +485,15 @@ public class BioPAXVisualStyleDefinition
                                    (EDGE_CONTROL_ACTIVATION, new Arrow(ArrowShape.CIRCLE,new Color(128,0,0))));
         edgeTargetArrowMapping.add(new ObjectMapping
                                    (EDGE_CONTROL_INHIBITION, new Arrow(ArrowShape.T,new Color(0,0,128))));
+
+        edgeTargetArrowMapping.add(new ObjectMapping
+                				    (EDGE_TEMPLATEREACTIONREGULATION_UNKNOWN, new Arrow(ArrowShape.CIRCLE,Color.GREEN)));
+        edgeTargetArrowMapping.add(new ObjectMapping
+                				    (EDGE_TEMPLATEREACTIONREGULATION_ACTIVATION, new Arrow(ArrowShape.CIRCLE,new Color(128,0,0))));
+        edgeTargetArrowMapping.add(new ObjectMapping
+                					(EDGE_TEMPLATEREACTIONREGULATION_INHIBITION, new Arrow(ArrowShape.T,new Color(0,0,128))));
+        
+        
         edgeTargetArrowMapping.add(new ObjectMapping
                                    (EDGE_REFERENCE, Arrow.NONE));
         edgeTargetArrowMapping.add(new ObjectMapping
@@ -441,6 +516,8 @@ public class BioPAXVisualStyleDefinition
                                    (EDGE_SPECIESOF, Arrow.NONE));
         edgeTargetArrowMapping.add(new ObjectMapping
                                    (EDGE_physicalInteraction, Arrow.NONE));
+        edgeTargetArrowMapping.add(new ObjectMapping
+                				   (EDGE_geneticInteraction, Arrow.NONE));
 
 
 	// edge line type

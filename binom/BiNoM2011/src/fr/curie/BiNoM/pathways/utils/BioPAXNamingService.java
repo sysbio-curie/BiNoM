@@ -79,6 +79,7 @@ public class BioPAXNamingService {
 	
 	private HashMap<String, Entity> listOfComplexComponents = new HashMap<String, Entity>();
 
+	private BioPAX _biopax = null;
 	
 	
 	/**
@@ -116,6 +117,8 @@ public class BioPAXNamingService {
 	 * @throws Exception
 	 */
 	public void generateNames(BioPAX biopax, boolean verbose) throws Exception{
+		
+		_biopax = biopax;
 		
 		// First, name reference entities
 		// Selected utility classes--------------------------------------------
@@ -236,7 +239,6 @@ public class BioPAXNamingService {
 		el = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 
-		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllRna(biopax.model);
 		for(int i=0;i<el.size();i++) putEntity((Entity)el.get(i));
 		
@@ -262,6 +264,9 @@ public class BioPAXNamingService {
 		//Confidence (L2) replaced by Score (L3)
 		el = biopax_DASH_level3_DOT_owlFactory.getAllScore(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllEvidence(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));		
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllExperimentalForm(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
@@ -292,6 +297,14 @@ public class BioPAXNamingService {
 
 		el = biopax_DASH_level3_DOT_owlFactory.getAllRelationshipTypeVocabulary(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllInteractionVocabulary(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllEvidenceCodeVocabulary(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
+		
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllPublicationXref(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
@@ -333,6 +346,13 @@ public class BioPAXNamingService {
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceLocation(biopax.model);
 		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegionReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));
+
+		el = biopax_DASH_level3_DOT_owlFactory.getAllRnaRegionReference(biopax.model);
+		for(int i=0;i<el.size();i++) putUtilityClass((UtilityClass)el.get(i));		
+		
 
 		if(verbose){
 			el = biopax_DASH_level3_DOT_owlFactory.getAllGene(biopax.model);
@@ -429,7 +449,10 @@ public class BioPAXNamingService {
 	 * @param uri
 	 * @param name
 	 */
-	public void putName(String uri, String name){
+	public void putName(String uri, String name) throws Exception{
+		
+		Entity ent = biopax_DASH_level3_DOT_owlFactory.getEntity(uri, _biopax.model);
+		
 		String iname = (String)uri2name.get(uri);
 		if(iname==null){
 			uri2name.put(uri,name);
@@ -445,12 +468,12 @@ public class BioPAXNamingService {
 				if(!prevName.endsWith(prevAdd))
 					prevName += prevAdd;
 				name += "["+(String)uri2id.get(uri)+"]";
-				name2uri.put(prevName,iuri);
-				name2uri.put(name,uri);
-				uri2name.put(iuri,prevName);
-				uri2name.put(Utils.cutUri(iuri),prevName);
-				uri2name.put(uri,name);
-				uri2name.put(Utils.cutUri(uri),name);
+						name2uri.put(prevName,iuri);
+						name2uri.put(name,uri);
+						uri2name.put(iuri,prevName);
+						uri2name.put(Utils.cutUri(iuri),prevName);
+						uri2name.put(uri,name);
+						uri2name.put(Utils.cutUri(uri),name);
 			}
 		}
 	}
@@ -581,6 +604,22 @@ public class BioPAXNamingService {
 			}
 			name = addCellularCompartmentName(name, ((Dna) pe).getCellularLocation());
 		}
+		else if (pe instanceof DnaRegion){
+			if(((DnaRegion) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+				name = getShortestName(((DnaRegion)pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
+			name = addCellularCompartmentName(name, ((DnaRegion) pe).getCellularLocation());
+		}
+		else if (pe instanceof RnaRegion){
+			if(((RnaRegion) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
+				name = getShortestName(((RnaRegion)pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
+			name = addCellularCompartmentName(name, ((RnaRegion) pe).getCellularLocation());
+		}
 		else if (pe instanceof PhysicalEntity) {
 			name = getShortestName(pe.getName());
 			name = addCellularCompartmentName(name, ((PhysicalEntity) pe).getCellularLocation());
@@ -599,6 +638,8 @@ public class BioPAXNamingService {
 		if(pe instanceof Rna)
 			name = "r"+name;
 
+		name = ModifyIfSeveralEntitiesForTheSameReference(pe, name);
+		
 		return name;
 	}
 
@@ -625,7 +666,7 @@ public class BioPAXNamingService {
 	public String createUtilityName(UtilityClass e)  throws Exception{
 		
 		String name = null;
-		if((e instanceof ProteinReference)||(e instanceof RnaReference)||(e instanceof DnaReference)||(e instanceof SmallMoleculeReference)||(e instanceof EntityReference)){
+		if((e instanceof ProteinReference)||(e instanceof RnaReference)||(e instanceof DnaReference)||(e instanceof RnaRegionReference)||(e instanceof DnaRegionReference)||(e instanceof SmallMoleculeReference)||(e instanceof EntityReference)){
 			String s = getShortestName(((EntityReference)e).getName());
 			if(!s.equals("")) name = s;
 		}
@@ -634,6 +675,21 @@ public class BioPAXNamingService {
 			String s = getVocabularyTerm(((ControlledVocabulary)e).getTerm());
 			if(!s.equals("")) name = s;
 		}
+		
+		if(e instanceof Evidence){
+			Iterator<EvidenceCodeVocabulary> it = ((Evidence)e).getEvidenceCode();
+			String s = "";
+			while(it.hasNext()){
+				s+=getVocabularyTerm(it.next().getTerm())+"__";
+			}
+			if(s.endsWith("__")) s = s.substring(0, s.length()-2);
+			name = s;
+		}
+		
+		if(e instanceof BioSource){
+			name = getShortestName(((BioSource)e).getName());
+		}
+		
 		if(e instanceof Xref){
 			Xref px = (Xref)e;
 			if((px.getDb()!=null)&&(px.getId()!=null))
@@ -920,5 +976,17 @@ public class BioPAXNamingService {
 		
 		return name;
 	}
+	
+
+	public void createEntityReferenceMap(){
+		HashMap<EntityReference,Vector<Entity>> EntityReferenceMap = new HashMap<EntityReference,Vector<Entity>>();
+	}
+	
+	public String ModifyIfSeveralEntitiesForTheSameReference(Entity pe, String name){
+		String newname = name;
+		
+		return newname;
+	}
+
 
 }

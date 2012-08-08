@@ -56,7 +56,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 	/**
 	 * Mode of conversion: from BioPAX to Protein-protein interaction BioPAX interface
 	 */
-	public static final int PROTEIN_PROTEIN_INTERACTION_CONVERSION = 3;
+	public static final int INTERACTION_CONVERSION = 3;
 
 
 	public Vector<String> pathwaysAdded = null;
@@ -136,9 +136,9 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 					b2c.biopax);
 		}
 
-		if (algo == PROTEIN_PROTEIN_INTERACTION_CONVERSION) {
+		if (algo == INTERACTION_CONVERSION) {
 			b2c.bpnm.generateNames(b2c.biopax, false);
-			return new Graph(b2c.getXGMMLProteinGraph(name, b2c.biopax, option),
+			return new Graph(b2c.getXGMMLInteractionGraph(name, b2c.biopax, option),
 					b2c.biopax);
 		}
 
@@ -399,6 +399,9 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 					}
 				}
 		}
+		
+		// Now include new TemplateReactions
+		
 		return gr;
 	}
 
@@ -687,7 +690,7 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 	 * controls and other maps valid (they are filled by BioPAXToSBMLConverter.populateSbml()
 	 * parent method )
 	 */
-	public GraphDocument getXGMMLProteinGraph(String name, BioPAX biopax, Option option) throws Exception {
+	public GraphDocument getXGMMLInteractionGraph(String name, BioPAX biopax, Option option) throws Exception {
 		
 		GraphDocument gr = GraphDocument.Factory.newInstance();
 		GraphicGraph grf = gr.addNewGraph();
@@ -915,7 +918,66 @@ public class BioPAXToCytoscapeConverter extends BioPAXToSBMLConverter {
 				}
 			}
 		}
+		
+		// Now process genes and genetic interactions
 
+		pl = biopax_DASH_level3_DOT_owlFactory.getAllGene(biopax.model);
+		for (int i=0;i<pl.size();i++) {
+			Gene p = (Gene)pl.get(i);
+			String pnm = null;
+			pnm = bpnm.getNameByUri(p.uri());
+				if (!nodes.containsKey(pnm)) {
+					GraphicNode n = grf.addNewNode();
+					n.setId(pnm); n.setName(pnm); n.setLabel(pnm);
+					Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","Gene",ObjectType.STRING);
+					Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",p.uri(),ObjectType.STRING);
+					//System.out.println("Added "+pnm);
+					nodes.put(pnm,n);
+					nodes.put(p.uri(),n);
+				} 
+		}
+		
+		List gints = biopax_DASH_level3_DOT_owlFactory.getAllGeneticInteraction(biopax.model);
+		for (int j=0;j<gints.size();j++) {
+			GeneticInteraction pi = (GeneticInteraction)gints.get(j);
+			if (!knownInteractions.containsKey(pi.uri())) {
+				Vector v = Utils.getPropertyURIs(pi,"participant");
+				if (v.size()>0) {
+					GraphicNode n = grf.addNewNode();
+					String pepuri = pi.uri();
+					String intn = bpnm.getNameByUri(pepuri);
+					n.setId(intn); n.setName(intn); n.setLabel(intn);
+					Utils.addAttribute(n,"BIOPAX_NODE_TYPE","BIOPAX_NODE_TYPE","GeneticInteraction",ObjectType.STRING);
+					Utils.addAttribute(n,"BIOPAX_URI","BIOPAX_URI",pi.uri(),ObjectType.STRING);
+					nodes.put(intn,n);
+					nodes.put(pi.uri(),n);
+
+					for (int i=0;i<v.size();i++) {
+						String ur = (String)v.get(i);
+						GraphicNode n1 = (GraphicNode)nodes.get(ur);
+						if (n1==null) {
+							System.out.println("ENTITY NOT FOUND ON THE GRAPH: "+Utils.cutUri(ur));
+						} else {
+							String id = n.getId()+" (GeneticInteraction) "+n1.getId();
+							if(edges.get(id)==null){
+								GraphicEdge ee = grf.addNewEdge();
+								ee.setId(id);
+								ee.setLabel("GeneticInteraction");
+								ee.setSource(n1.getId()); ee.setTarget(n.getId());
+								Utils.addAttribute(ee,"BIOPAX_EDGE_TYPE","BIOPAX_EDGE_TYPE","GeneticInteraction",ObjectType.STRING);
+								Utils.addAttribute(ee,"BIOPAX_EDGE_ID","BIOPAX_EDGE_ID",id,ObjectType.STRING);
+								edges.put(id,ee);
+							}
+						}
+					}
+
+				}
+			}
+		}
+		
+		
+		// Now process template reactions
+		
 		return gr;
 	}
 	

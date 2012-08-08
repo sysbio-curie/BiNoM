@@ -307,7 +307,7 @@ public class BioPAXImportDialog extends JDialog implements ActionListener {
 	    algos[n++] = BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION;
 
 	if (proteinCB.isSelected())
-	    algos[n++] = BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION;
+	    algos[n++] = BioPAXToCytoscapeConverter.INTERACTION_CONVERSION;
 
 	return algos;
     }

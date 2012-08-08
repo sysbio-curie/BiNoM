@@ -1,5 +1,4 @@
 /*
-   BiNoM Cytoscape Plugin
    Copyright (C) 2006-2007 Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
 
    BiNoM Cytoscape Plugin is free software; you can redistribute it and/or
@@ -94,9 +93,17 @@ public class BioPAXToSBMLConverter {
 	 */
     public HashMap dnaList = new HashMap();
     /**
+ 	 * Map from cut uris (after # separator) to 'dnaRegion' entities
+ 	 */
+     public HashMap dnaRegionList = new HashMap();
+    /**
 	 * Map from cut uris (after # separator) to 'rna' entities
 	 */
     public HashMap rnaList = new HashMap();
+    /**
+	 * Map from cut uris (after # separator) to 'rnaRegion' entities
+	 */
+    public HashMap rnaRegionList = new HashMap();
     /**
 	 * Map from cut uris (after # separator) to 'smallMolecule' entities
 	 */
@@ -133,7 +140,7 @@ public class BioPAXToSBMLConverter {
     	public String id;
     	public String name;
     	/**
-    	 * Type of BioPAX object linked to the species (protein, complex, dna)
+    	 * Type of BioPAX object linked to the species (protein, complex, dna, rna, dnaRegion, rnaRegion)
     	 */
     	public String type;
     	/**
@@ -284,6 +291,18 @@ public class BioPAXToSBMLConverter {
     			addInteractionReaction(inter,lr);
     		}
     	}
+    	
+    	// Add new TemplateReactions
+    	
+    	reactionList = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReaction(biopax.model);
+    	it = reactionList.iterator();
+    	while(it.hasNext()){
+    		Interaction inter = (Interaction)it.next();
+    		if(allReactions.get(inter.uri())==null){
+    			allReactions.put(inter.uri(),inter);
+    			addInteractionReaction(inter,lr);
+    		}
+    	}
 
     	// interaction should appear but not controls
     	List<Control> ccontrolList = biopax_DASH_level3_DOT_owlFactory.getAllControl(biopax.model);
@@ -312,13 +331,19 @@ public class BioPAXToSBMLConverter {
     		addControl(ct);
     	}
     	List modlist  = biopax_DASH_level3_DOT_owlFactory.getAllModulation(biopax.model);
-    	it = modlist.iterator();
     	while(it.hasNext()){
     		Modulation ct = (Modulation)it.next();
     		allReactions.put(ct.uri(),ct);
     		addControl(ct);
     	}
-
+    	List tempreglist  = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReactionRegulation(biopax.model);
+    	it = tempreglist.iterator();
+    	while(it.hasNext()){
+    		TemplateReactionRegulation ct = (TemplateReactionRegulation)it.next();
+    		allReactions.put(ct.uri(),ct);
+    		addControl(ct);
+    	}
+    	
     	reactionList = biopax_DASH_level3_DOT_owlFactory.getAllControl(biopax.model);
     	it = reactionList.iterator();
     	while(it.hasNext()){
@@ -406,7 +431,6 @@ public class BioPAXToSBMLConverter {
     	for (int i=0;i<l.size();i++) {
     		addParticipant((PhysicalEntity)l.get(i));
     	}
-
     	l = biopax_DASH_level3_DOT_owlFactory.getAllDna(biopax.model);
     	for (int i=0;i<l.size();i++) {
     		addParticipant((PhysicalEntity)l.get(i));
@@ -416,7 +440,15 @@ public class BioPAXToSBMLConverter {
     	for (int i=0;i<l.size();i++) {
     		addParticipant((PhysicalEntity)l.get(i));
     	}
-
+    	l = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(biopax.model);
+    	for (int i=0;i<l.size();i++) {
+    		addParticipant((PhysicalEntity)l.get(i));
+    	}
+    	
+    	l = biopax_DASH_level3_DOT_owlFactory.getAllRnaRegion(biopax.model);
+    	for (int i=0;i<l.size();i++) {
+    		addParticipant((PhysicalEntity)l.get(i));
+    	}
     	l = biopax_DASH_level3_DOT_owlFactory.getAllSmallMolecule(biopax.model);
     	for (int i=0;i<l.size();i++) {
     		addParticipant((PhysicalEntity)l.get(i));
@@ -486,6 +518,12 @@ public class BioPAXToSBMLConverter {
     	allbri = allbr.iterator();
     	while(allbri.hasNext()){
     		Modulation br = (Modulation)allbri.next();
+    		findIncludedSpeciesInvolvedInReactionsPatch(br);
+    	}
+    	allbr = biopax_DASH_level3_DOT_owlFactory.getAllTemplateReactionRegulation(biopax.model);
+    	allbri = allbr.iterator();
+    	while(allbri.hasNext()){
+    		TemplateReactionRegulation br = (TemplateReactionRegulation)allbri.next();
     		findIncludedSpeciesInvolvedInReactionsPatch(br);
     	}
     	allbr = biopax_DASH_level3_DOT_owlFactory.getAllControl(biopax.model);
@@ -734,18 +772,43 @@ public class BioPAXToSBMLConverter {
     	String comm = makeComment(inter.getComment());
     	if(inter instanceof MolecularInteraction) comm+=" ; BIOPAX_REACTION_TYPE : MolecularInteraction";
     	if(inter instanceof BiochemicalReaction) comm+=" ; BIOPAX_REACTION_TYPE : interaction";
+    	if(inter instanceof TemplateReaction) comm+=" ; BIOPAX_REACTION_TYPE : TemplateReaction";
     	if(comm.length()>0){
     	    NotesDocument.Notes not = reaction.addNewNotes();
     	    Utils.setNoteHtmlBodyValue(not,comm);
     	}
     	reactions.put(inter.uri(),reaction);
-    	bioPAXreactions.put(bpnm.getNameByUri(inter.uri()),inter);
+    	bioPAXreactions.put(Utils.correctName(bpnm.getNameByUri(inter.uri())),inter);
     	bioPAXreactions.put(Utils.cutUri(inter.uri()),inter);
+    	System.out.println("Put in bioPAXreactions "+Utils.correctName(bpnm.getNameByUri(inter.uri()))+"\t"+Utils.cutUri(inter.uri()));
     	String id = GraphUtils.correctId(bpnm.getNameByUri(inter.uri()));
     	reaction.setId(id);
-    	reaction.addNewListOfReactants();
-    	reaction.addNewListOfProducts();
-    	reaction.addNewListOfModifiers();
+    	ListOfReactantsDocument.ListOfReactants lreactr = reaction.addNewListOfReactants();
+    	ListOfProductsDocument.ListOfProducts lreactp = reaction.addNewListOfProducts();
+    	ListOfModifiersDocument.ListOfModifiers lreactm = reaction.addNewListOfModifiers();
+    	// TemplateReaction is a special case
+    	if(inter instanceof TemplateReaction){
+    		TemplateReaction tr = (TemplateReaction)inter;
+    		Vector<String> products = Utils.getPropertyURIs(tr, "product");
+    		String template = Utils.getPropertyURI(tr, "template");
+    		BioPAXSpecies part = (BioPAXSpecies)independentSpecies.get(Utils.cutUri(template));
+    		if(part!=null){
+    			SpeciesReferenceDocument.SpeciesReference spr = lreactr.addNewSpeciesReference();
+    			spr.setSpecies(Utils.cutUri(part.id));
+    		}else{
+    			System.out.println("ERROR: BioPAXSpecies NOT FOUND: Template "+template+" in "+inter.uri());
+    		}
+    		for(int i=0;i<products.size();i++){
+        		String product = products.get(i);
+        		BioPAXSpecies partp = (BioPAXSpecies)independentSpecies.get(Utils.cutUri(product));
+        		if(partp!=null){
+        			SpeciesReferenceDocument.SpeciesReference spr = lreactp.addNewSpeciesReference();
+        			spr.setSpecies(Utils.cutUri(partp.id));
+        		}else{
+        			System.out.println("ERROR: BioPAXSpecies NOT FOUND: Product "+product+" in "+inter.uri());
+        		}
+    		}
+    	}
     }
 
     public void addModifierToReaction(String reaction_id, BioPAXSpecies part){
@@ -851,6 +914,8 @@ public class BioPAXToSBMLConverter {
     		if(proteinList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Protein";
     		if(dnaList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Dna";
     		if(rnaList.get(Utils.cutUri(pe.uri()))!=null) tpe = "Rna";
+    		if(dnaRegionList.get(Utils.cutUri(pe.uri()))!=null) tpe = "DnaRegion";
+    		if(rnaRegionList.get(Utils.cutUri(pe.uri()))!=null) tpe = "RnaRegion";
     		if(smallMoleculeList.get(Utils.cutUri(pe.uri()))!=null) tpe = "SmallMolecule";
 
     		/*
@@ -894,6 +959,18 @@ public class BioPAXToSBMLConverter {
     	while(it.hasNext()){
     		Rna pe = (Rna)it.next();
     		rnaList.put(Utils.cutUri(pe.uri()),pe);
+    	}
+    	lst = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(biopax.model);
+    	it = lst.iterator();
+    	while(it.hasNext()){
+    		DnaRegion pe = (DnaRegion)it.next();
+    		dnaRegionList.put(Utils.cutUri(pe.uri()),pe);
+    	}
+    	lst = biopax_DASH_level3_DOT_owlFactory.getAllRnaRegion(biopax.model);
+    	it = lst.iterator();
+    	while(it.hasNext()){
+    		RnaRegion pe = (RnaRegion)it.next();
+    		rnaRegionList.put(Utils.cutUri(pe.uri()),pe);
     	}
     	lst = biopax_DASH_level3_DOT_owlFactory.getAllSmallMolecule(biopax.model);
     	it = lst.iterator();

@@ -4,7 +4,7 @@
 %                                       %
 
 %%IMPORTANT: do not delete the first line of this template
-%%It must be present to enable the BMC Submission system to 
+%%It must be present to enable the BMC Submission system to
 %%recognise this template!!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,14 +44,14 @@
 
 
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\documentclass[10pt]{bmc_article}    
+\documentclass[10pt]{bmc_article}
 
 
 
 % Load packages
 \usepackage{cite} % Make references as [1-4], not [1,2,3,4]
-\usepackage{url}  % Formatting web addresses  
-\usepackage{ifthen}  % Conditional 
+\usepackage{url}  % Formatting web addresses
+\usepackage{ifthen}  % Conditional
 \usepackage{multicol}   %Columns
 \usepackage[utf8]{inputenc} %unicode support
 \usepackage{graphicx}
@@ -60,22 +60,22 @@
 %\usepackage[applemac]{inputenc} %applemac support if unicode package fails
 %\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
 \urlstyle{rm}
- 
- 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 %%                                             %%
 %%  If you wish to display your graphics for   %%
 %%  your own use using includegraphic or       %%
 %%  includegraphics, then comment out the      %%
-%%  following two lines of code.               %%   
+%%  following two lines of code.               %%
 %%  NB: These line *must* be included when     %%
-%%  submitting to BMC.                         %% 
+%%  submitting to BMC.                         %%
 %%  All figure files must be submitted as      %%
 %%  separate graphics through the BMC          %%
-%%  submission process, not included in the    %% 
-%%  submitted article.                         %% 
+%%  submission process, not included in the    %%
+%%  submitted article.                         %%
 %%                                             %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %\def\includegraphic{}
@@ -85,7 +85,7 @@
 
 \setlength{\topmargin}{0.0cm}
 \setlength{\textheight}{21.5cm}
-\setlength{\oddsidemargin}{0cm} 
+\setlength{\oddsidemargin}{0cm}
 \setlength{\textwidth}{16.5cm}
 \setlength{\columnsep}{0.6cm}
 
@@ -101,7 +101,7 @@
 %% returned to the Review style setting.        %%
 %%                                              %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+
 
 %Review style settings
 %\newenvironment{bmcformat}{\begin{raggedright}\baselineskip20pt\sloppy\setboolean{publ}{false}}{\end{raggedright}\baselineskip20pt\sloppy}
@@ -127,7 +127,7 @@
 
 \title{BiNoM, a Cytoscape plugin for accessing and analyzing pathways using
 standard systems biology formats}
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
 %% Enter the authors here                   %%
@@ -136,7 +136,7 @@ standard systems biology formats}
 %% the last two authors. This will be       %%
 %% replaced by a comma in the final article %%
 %%                                          %%
-%% Ensure there are no trailing spaces at   %% 
+%% Ensure there are no trailing spaces at   %%
 %% the ends of the lines                    %%     	
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,16 +144,16 @@ standard systems biology formats}
 
 % \author{Jane E Doe\correspondingauthor$^1$%
 %          \email{Jane E Doe\correspondingauthor - jane.e.doe@cambridge.co.uk}
-%        and 
+%        and
 %          John RS Smith$^2$%
 %          \email{John RS Smith - john.RS.Smith@cambridge.co.uk}%
 %       }
-%       
+%
 
 \author{Eric Bonnet$^{1,2,3}$ \and Laurence Calzone$^{1,2,3}$ \and Daniel
 Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and Andrei Zinovyev$^{1,2,3}$\correspondingauthor
 \email{andrei.zinovyev@curie.fr} }
-       
+
 
 
 
@@ -175,17 +175,17 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
 %% The Abstract begins here                 %%
-%%                                          %%  
+%%                                          %%
 %% Please refer to the Instructions for     %%
 %% authors on http://www.biomedcentral.com  %%
 %% and include the section headings         %%
-%% accordingly for your article type.       %%   
+%% accordingly for your article type.       %%
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{abstract}
-        
+
 Public repositories of biological pathways and networks have greatly expanded in
 recent years. Such databases contain many pathways that facilitate the analysis of high-throughput
 experimental work and the formulation of new biological hypotheses to be
@@ -199,7 +199,7 @@ functions, we detail novel aspects such as the support of the BioPAX level 3
 format and an algorithm for the quantification of pathways for influence
 networks. We also illustrate some of the BiNoM functions on a detailed biological case
 study of a network representing the G1/S transition of the cell cycle.
-        
+
 \end{abstract}
 
 
@@ -217,7 +217,7 @@ study of a network representing the G1/S transition of the cell cycle.
 %% authors on:                              %%
 %% http://www.biomedcentral.com/info/authors%%
 %% and include the section headings         %%
-%% accordingly for your article type.       %% 
+%% accordingly for your article type.       %%
 %%                                          %%
 %% See the Results and Discussion section   %%
 %% for details on how to create sub-sections%%
@@ -239,8 +239,8 @@ study of a network representing the G1/S transition of the cell cycle.
 
 Biological pathways and networks comprise sets of interactions, or functional
 relationships, occurring at the molecular level in living cells
-\cite{adriaens2008public, cary2005pathway}. Such representations represent now
-a large body of knowledge that are often organized in publicly available
+\cite{adriaens2008public, cary2005pathway}. 
+A large body of knowledge on cellular biochemistry is organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
 \cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, or the Cancer Cell Map
 (\url{http://cancer.cellmap.org/cellmap/}). All these pathway and biological
@@ -261,7 +261,7 @@ more than 300 web-accessible biological pathway and network databases
 \cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
 formats. Ultimately, those integrated resources will facilitate computational
 models building, their exchange, re-usability and their experimental validation, a cycle that is the
-cornerstone of the Systems Biology initiative \cite{karlebach2008modelling,
+cornerstone of the Systems Biology approach \cite{karlebach2008modelling,
 kitano2002systems, ideker2001new}.
 
 As a consequence, there is a need for the precise and accurate construction of
@@ -272,15 +272,15 @@ are focused on the regulation of biological processes involved in diseases such
 as cancer, Alzheimer's disease or Crohn's disease, to name a few \cite{oda2005comprehensive, oda2006comprehensive,
 calzone2008comprehensive, caron2010comprehensive}. However, the scale of such
 maps, even when they are focusing on a particular process, is quite large, with
-hundreds of species and interactions. The analysis and interpretation of such
+hundreds of chemical species and interactions. The analysis and interpretation of such
 large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
-for the graphical edition of biological pathway diagrams
-\cite{funahashi2003celldesigner}, and it is using a dialect
+for the graphical editing of biological pathway diagrams
+\cite{funahashi2003celldesigner}, using a proprietary extension
 of SBML to store all the information contained in the graphs. There is obviously
 a need for user-friendly software tools that would allow the user to easily
-import data from various standard format sources, to perform structural analyses on these pathways 
+import data from various standard format sources, to perform structural analyses on these pathways
 and to manipulate networks, and to be able to export a network to a suitable
 format for further analysis (e.g. mathematical modeling). We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
@@ -312,9 +312,7 @@ can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
 Plugins``, section ''Analysis''), or alternatively the user can
 also download the plugin together with a manual and the source code from the
 BiNoM website
-\url{http://binom.curie.fr/}. A detailed tutorial on how to use the main BiNoM
-functions is in press
-\cite{binomBookChapter}.
+\url{http://binom.curie.fr/}. 
 
 
 BiNoM is designed to handle different Systems Biology file formats and to
@@ -328,7 +326,7 @@ BiNoM functions facilitate the import and export of standard Systems Biology
 file formats, but BiNoM plugin is not designed to be a universal converter.
 The goal is more
 to provide robust functions for a finite number of useful conversion and
-analysis scenarios, such as the examples showed below (non-exhaustive list): 
+analysis scenarios, such as the examples showed below (non-exhaustive list):
 
 \begin{itemize}
 
@@ -337,12 +335,12 @@ reaction network to SBML level 2.
 
 \item Import of a BioPAX file as a reaction network and/or a pathway structure
 and/or a protein interactions network, followed by the creation of a subnetwork
-saved as a new BioPAX file. 
+saved as a new BioPAX file.
 
 \item Import of a BioPAX file, selection of a subnetwork of interest saved as a SBML file for
 the creation of a computational model using an appropriate software package.
 
-\item Import a large CellDesigner map and export only a subnetwork as a new CellDesigner file.  
+\item Import a large CellDesigner map and export only a subnetwork as a new CellDesigner file.
 
 \end{itemize}
 
@@ -366,31 +364,33 @@ access to Systems Biology files is to provide control over the content without
 completely converting the file to the Cytoscape format. The content is therefore
 mapped to a labeled directed graph, representing the complete set of objects and
 their relationships. This graph, called the index, is highly connected and is
-not visualized explicitely. Instead, the user is interacting with selected subgraphs
+not visualized explicitly. Instead, the user interacts with selected subgraphs
 extracted from the index. For example, BioPAX files are imported as three
-separate entities, respectively the Reaction Network (RN), representing the
+separate graphs, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
-hierarchical arborescence of pathways, and the Protein-Protein interaction graph
-(PP). An example of a reaction network imported from a BioPAX level 3 file is
-shown on figure~\ref{mphasebiopax}. Figure~\ref{apoptosishierarchical}
-shows the hierarchical structure extracted from the human Apoptosis pathway.  
+hierarchical organisation of pathways, and the Interaction Map graph
+(IM). Several examples of simple BioPAX level 3 files imported through BiNoM
+are shown in Figure~\ref{6biopax3_examples}. Figure~\ref{apoptosishierarchical}
+shows the hierarchical structure of the human Apoptosis pathway, extracted
+from Reactome database, and constructed by BiNoM.
 
 
 \begin{figure}[h]
- \caption{\label{mphasebiopax}  \textbf{Cell cycle network.} Zoom on the cell
-cycle network model of Novak et al. \cite{novak1998model} after the import in 
-Cytoscape of the corresponding BioPAX file with BiNoM functions. The grey
-squares represent complexes while white squares are proteins. Small grey diamonds
-indicate reactions. The names of each node follow BiNoM naming convention (see the main text for details)}
- \center{\includegraphics[width=0.7\textwidth]{figures/mphase_biopax.png}}
+ \caption{\label{6biopax3_examples}  \textbf{Visualization of the 6 BioPAX examples, provided in BioPAX 3.0 documentation.} 
+BioPAX 3.0 documentation available at http://biopax.org contains 6 simple examples of using BioPAX 3.0 to describe
+different aspects of functioning of biological networks. Here we show how BiNoM visualizes these examples
+in one of the standard representations (Reaction Network, Pathway Structure, Interaction Map). The graphical node and edge semantics 
+is described in more details in the BiNoM manual.}
+ \center{\includegraphics[width=0.9\textwidth]{figures/6biopax3_examples.pdf}}
 \end{figure}
 
 \begin{figure}[h]
- \caption{\label{apoptosishierarchical}  \textbf{Apoptosis pathway hierarchical
-structure.} Zoom on the BioPAX data extracted from the Reactome database
-\cite{joshi2005reactome}. The green nodes represent pathways, the pink
+ \caption{\label{apoptosishierarchical}  \textbf{Apoptosis pathway 
+structure.} Representation of BioPAX data extracted from the Reactome database
+\cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
+BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
 triangular nodes denote steps, while grey nodes indicate reactions.}
- \center{\includegraphics[width=0.7\textwidth]{figures/apoptosis_hierarchical.png}}
+ \center{\includegraphics[width=0.9\textwidth]{figures/apoptosis_hierarchical.png}}
 \end{figure}
 
 
@@ -411,31 +411,33 @@ position 167 on a threonine residue.
 The central goal of the BiNoM plugin is to provide efficient methods
 and algorithms to reduce the inherent complexity of biological networks into
 manageable and meaningful subnetworks. This goal is achieved by a set of
-functions included as a built-in structural graph analysis library. Some of the functions are taking into
-account the semantics contained in the graph element names. 
+functions included as a built-in structural graph analysis library. Some of the functions take into
+account the semantics contained in the graph element names.
 The structural analysis functions implemented in BiNoM include the analysis of
 connected and strongly connected components, pruning the network, decomposition
-by name (material components) or by cycle, path analysis and network clustering.
+by involvement of a protein (material components) or by cyclic decomposition, path analysis and network clustering.
 We also introduce in this version of BiNoM a novel function to quantify the
 influence of a source node on a target node taking into account experimental data, called PIQuant.
 
-\subsubsection*{Decomposition by name or by cycle}
+\subsubsection*{Decomposition by involvement of a protein or by cyclic decomposition}
+
+BiNoM allows many methods to dissect a complex biological network into parts.
 A trivial approach to separate a network into subparts is to dissociate the unconnected subparts
 of the network. A more sophisticated one consists in decomposing the network into
 strongly connected components, using the algorithm of Tarjan
 \cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
-the one with all the elements associated with the \emph{input} parts of the network (nodes with outgroup edges only), the
-second with all the elements associated with the \emph{output} part (nodes with incoming edges only) and the last
-part with all the elements linked to the central, cyclic part. This type of approaches
-corresponds to the bow-tie model of Broder and colleagues \cite{broder2000graph}.
+the one with all the elements associated with the \emph{input} part of the network (from which all paths lead to the central core), the
+second with all the elements associated with the \emph{output} part (from which there are no paths leading back to the central core) and the last
+part with all the elements linked to the central core, cyclic part, composed from strongly connected components, possibly connected together. 
+This type of approach corresponds to finding the bow-tie graph structure \cite{broder2000graph}.
 
 The decomposition in material components is using the node name semantics to
-isolate subnetworks in which each protein is involved, either as a single node or as part of a complex. As a result, major overlaps between
+isolate subnetworks in which each protein is involved, either as a simple chemical species or as part of a complex. As a result, major overlaps between
 the different subnetworks are to be expected, as many proteins are expected to be involved in
 different complexes. Figure~\ref{matcdc2cdc13} shows two examples of subnetworks
 obtained by material component decomposition applied to a cell cycle network
-model of the yeast species \textit{S. pombe} \cite{novak1998model}. Very often, this approach will represent
-the different parts of the life cycle of a given protein or complex.
+model of the yeast species \textit{S. pombe} \cite{novak1998model}. This approach represents
+different parts of the life cycle of a given protein.
 
 \begin{figure}[h]
  \caption{\label{matcdc2cdc13}  \textbf{Subnetworks obtained after a decomposition in
@@ -464,19 +466,19 @@ cycles involving CDC25 after a cycle decomposition.
 
 \subsubsection*{Path analysis algorithms}
 
-\hl{[[ Andrei: check description of shortest path and suboptimal path search and add a description for all non intersecting paths ]]}
-
 BiNoM analysis functions also include several classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
-all non-intersecting paths. The shortest path is calculated as the path having
+all non self-intersecting paths. The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the suboptimal path is constructed by removing all edges of
-all shortest paths one by one, and finding the new shortest path. The user should
-be careful when using this procedure, as the number of paths between nodes can be
-very large for big networks.
+all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths 
+are those paths not containing loops (self-intersections). 
+The user should be careful when using this procedure, as the number of paths between nodes can be
+very large for big networks. In order to limit the number of paths found, BiNoM
+allows to specify the maximal length of the path to be found.
 
 Obviously, the result of some decomposition functions will result in subnetworks
-that share a large number of components, as it is for example often the case
+that share some components, as it is for example often the case
 with the decomposition in material components. Therefore, BiNoM also includes a
 function to \emph{cluster} networks, based on common components such as protein
 or protein complexes. To determine the size of the clusters, the user can
@@ -487,20 +489,20 @@ as a threshold to create the clusters.
 
 In this version of BiNoM, we have introduced a novel approach to quantify the
 effect of experimental data onto one or more target nodes for a given
-network architecture, named the PIQuant score (Pathway Influence Quantification). 
+network architecture, named the PIQuant score (Pathway Influence Quantification).
 The target node can be a gene or a phenotype of interest, representing a more complex
-biological function, such as cell proliferation or apoptosis. 
-For example, in the case of a network 
+biological function, such as cell proliferation or apoptosis.
+For example, in the case of a network
 with one source node and one target node,
 the PIQuant score value will quantify the influence of the source node on the target
 node, by taking into account experimental data values for the input nodes,
 the path length and the sign of the path for a set of paths defined between the
 source and the target node.
 A positive or negative PIQuant score value is a quantitive theoretical
-prediction of the over or underexpression of 
+prediction of the over or underexpression of
 the target node. For instance, let us consider that we have for a given network
 experimental data corresponding to differential gene expression values (e.g.
-disease/normal ratios).  
+disease/normal ratios).
 In that case, a positive or a negative PIQuant score for a given phenotype
 (output node) predicts quantitatively
 that the phenotype would be respectively enhanced or inhibited. Furthermore, the
@@ -514,7 +516,7 @@ architectures on the same phenotype for one experimental dataset.
 More formally, we can define a source node as \textit{annotated} when a signed real
 number is assigned to the node, representing an experimental data value. For example, it
 can be the expression ratio of a gene between a disease and a normal state,
-obtained from transcriptomics profiling. 
+obtained from transcriptomics profiling.
  A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
 between a source node and a target node (without repetition of any node
@@ -536,12 +538,12 @@ $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-In the case of the network presented in figure~\ref{piquantnetworks}a, let us
+In the case of the network presented in Figure~\ref{piquantnetworks}a, let us
 consider Ac the source node and Ph the target node and consider only the two
-paths defined on the figures~\ref{piquantnetworks}b and
+paths defined in the Figures~\ref{piquantnetworks}b and
 ~\ref{piquantnetworks}c. Given that the
 node Ac is annotated by the value $2.0$, that the first path has a length
-equal to 3, and that the second path has a length equal to 5, we can calculate the PIQuant score 
+equal to 3, and that the second path has a length equal to 5, we can calculate the PIQuant score
 of the node Ac to the node Ph as:
 
 $$
@@ -550,14 +552,14 @@ $$
 $$
 
 
-Sometimes a path has one or more intermediate nodes that are annotated nodes 
-(i.e. for which we have experimental data values), 
+Sometimes a path has one or more intermediate nodes that are annotated nodes
+(i.e. for which we have experimental data values),
 in addition to the source node.
-In that case, the intermediate node is \textit{consistent} if the sign of its 
+In that case, the intermediate node is \textit{consistent} if the sign of its
 annotation is the same as the sign of the source node annotation multiplied by
-the sign of the 
+the sign of the
 path from the source node to the intermediate node. If signs are opposite, the
-node is \textit{inconsistent}. 
+node is \textit{inconsistent}.
 A path is \textit{consistent} if each annotated intermediate nodes is
 consistent. A path is \textit{inconsistent} if at least one intermediate node is
 \textit{inconsistent}.
@@ -565,7 +567,7 @@ In other words, a path is inconsistent when the
 sign of the experimental data value for a node is opposite to the sign
 of the path.
 
-For example, according to the network represented on figure~\ref{piquantnetworks}c, there is an influence from Ac to Ph
+For example, according to the network represented in Figure~\ref{piquantnetworks}c, there is an influence from Ac to Ph
 that goes through D . But if this path
 is functional, the annotation of node D should have the same sign as the annotation for node Ac, because
 Ac activates D indirectly (i.e. the path from Ac to D has a positive sign). In this case, the sign of D annotation (the experimental value) is opposite to
@@ -578,7 +580,7 @@ path could indicate that the path is not complete, or could also indicate that
 the path is correct but not active under the precise conditions in which the
 experimental data was generated, corresponding to a different context.
 
-In the case mentionned above on figure~\ref{piquantnetworks}c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
+In the case mentionned above in Figure~\ref{piquantnetworks}c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
 becomes:
 
 $$
@@ -602,7 +604,7 @@ and concrete application of the PIQuant algorithm to a real biological network
 in the Results section.
 
 \begin{figure}[h]
- \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The 
+ \caption{\label{piquantnetworks}  \textbf{A simple influence network.} The
 network is composed of seven nodes and nine edges (a). The two paths (b,c)
 extracted from this network start from the source node \textbf{Ac} and end at
 the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
@@ -620,14 +622,14 @@ to be edited and modified by biologists. Furthermore, due to its adoption by
 large biological knowledge repositories, some BioPAX files can be really big,
 such as the \textit{Homo sapiens} network from the reactome database
 \cite{joshi2005reactome} that has more than 6,000 reactions involving more than
-8,000 different species (proteins, RNA molecules, metabolites, etc.).
+8,000 chemical species (proteins, RNA molecules, metabolites, etc.).
 
 BiNoM implements a set of functions precisely aiming at allowing end users to
 easily visualize and modify BioPAX files. To the best of our knowledge, there is
 no other software package allowing to view, query and edit BioPAX files than
 BiNoM at the moment. The functions are using
 Java class introspection techniques to build a BioPAX class tree. Then, the
-content of the file can easily be accessed. For example, figure~\ref{biopaxtrailprop} shows
+content of the file can easily be accessed. For example, Figure~\ref{biopaxtrailprop} shows
 all the information linked to the TRAIL protein, after a call to the
 BioPAX property
 editor function of the BiNoM menu has been made. Details are given in the BiNoM manual on how
@@ -674,7 +676,7 @@ To facilitate the visualization of large molecular networks, we propose a set of
 functions that simplify them by creating modules from selected parts of the
 large network. This task, that we call \emph{modularization}, is a
 semi-automatic procedure, where biological expert knowledge is used to assure
-the coherence of the newly created modules. 
+the coherence of the newly created modules.
 
 Most of the modules represent a detailed
 sequence of events that occur with a particular protein or protein complex,
@@ -689,7 +691,7 @@ version 2.7) \cite{cline2007integration}, known as \emph{nested} networks. This
 feature allows to embed any cytoscape network in a (meta)node. It was
 introduced to allow the creation of network hierarchies and circular
 relationships. In BiNoM, we use this feature to facilitate the process of
-modularization of a large network. The BiNoM module manager integrates 
+modularization of a large network. The BiNoM module manager integrates
 functions that allow to easily create a network from a list of subnetworks,
 packing individual nodes, merging different subnetworks, displaying information
 about metanodes and calculating the intersection between subnetworks.
@@ -701,14 +703,14 @@ manipulation of networks. For example, it is possible to automatically select
 the edges between two nodes, generate the network corresponding to the double
 network differences between two networks A and B, or update all the subnetworks of
 a session after some changes have been made to the initial one. The BiNoM Utilities also implement
-clipboard related functions, giving the possibility to copy, add and paste
-selected nodes and edges and also to show the clipboard content. 
+clipboard functions, giving the possibility to copy, add and paste
+selected nodes and edges and also to show the clipboard content.
 
 
 \section*{Results and Discussion}
 We propose to study a reaction network focusing on the transition from G1 phase
 (growth phase) to S phase (DNA replication phase) of the cell cycle
-\cite{calzone2008comprehensive} as an example of the use of BiNoM functions. 
+\cite{calzone2008comprehensive} as an example of the use of BiNoM functions.
 
 The network published in \cite{calzone2008comprehensive} describes in
 biochemical details the regulation of the well-known and charaterized tumor
@@ -717,7 +719,7 @@ the heart of the cell cycle, acting as a signal transducer, connecting the
 cell cycle with the transcriptional machinery. The pathway in which RB is
 acting is disrupted in many human tumor types \cite{weinberg1995retinoblastoma}.
 The comprehensive map of the RB/E2F network was built using CellDesigner
-\cite{funahashi2003celldesigner}. It lists 80 proteins, 208 species, 165
+\cite{funahashi2003celldesigner}. It lists 80 proteins, 208 chemical species, 165
 interactions, 176 genes, and recapitulates more than 350 publications, including
 information from different cellular types, thus making the map a generic map of
 the cell cycle regulation. It is composed of two main compartments: the cell,
@@ -732,8 +734,8 @@ available on our website
 (\url{http://bioinfo-out.curie.fr/projects/rbpathway/interactive/rb_network.html/}).
 
 For the study presented here, we chose to concentrate on the G1 to S transition. We
-used the intersection of the 208 species
-of RB/E2F network and the 280 species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
+used the intersection of the 208 chemical species
+of RB/E2F network and the 280 chemical species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
 reactions (Figure~\ref{g1s}).
@@ -756,18 +758,19 @@ losing any content from the original map.
 PIQuant algorithm can be used to perform a quantitative analysis on an influence
 network. In order to translate the G1/S reaction network into an influence network, we used
 a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
-available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). The
-translation is based on simple rules: (1) BIOCHAM deletes all linear
-degradations and syntheses, (2) all intermediary species with only one input and
+available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). In order to translate a reaction network into an influence network, the first one is 
+pre-processed accordingly to simple rules: (1) BIOCHAM deletes all linear
+degradations and syntheses, (2) all intermediary chemical species with only one input and
 one output are suppressed, (3) if the reactions of synthesis and degradation of
-the species deleted in (2) have distinct inputs and outputs, then these reactions
-can be merged, and (4) if they have the same species as input/output, then the reaction is a
-reversible reaction and is replaced by a degradation. Although this work is
-still in progress, a short description and an example of this conversion is
-available \cite{calzone2011calamar}.
+the chemical species deleted in (2) have distinct inputs and outputs, then these reactions
+can be merged, and (4) if they have the same chemical species as input/output, then the reaction is a
+reversible reaction and is replaced by a degradation. The further
+translation is based on constructing Jacobian corresponding to the pre-processed reaction graph
+and analyzing the signs of its entries \cite{fages2008frontiers}. Description and an example of such a conversion is
+available in \cite{calzone2011calamar}.
 
 We applied PIQuant to the resulting influence network of the G1/S transition of
-the cell cycle (figure~\ref{InflAnnotNet}). We selected three target nodes as
+the cell cycle (Figure~\ref{InflAnnotNet}). We selected three target nodes as
 markers of the G1, S and M
 phases of the cell cycle. For the experimental data, we used expression data
 from a study of 57 bladder cancer
@@ -778,18 +781,18 @@ for each gene. We selected the 19 nodes for which we had experimental data
 values as source nodes (complexes are selected if one of the members for which
 we had a experimental value had no unbound state in the network).
 
-Then, we constructed a text file listing nodes of the influence network 
-and their annotation and we imported this file using the Cytoscape function 
-``Import $>$ Nodes attributes'' 
+Then, we constructed a text file listing nodes of the influence network
+and their annotation and we imported this file using the Cytoscape function
+``Import $>$ Nodes attributes''
 in the Cytoscape session of the influence network.
 Figure~\ref{InflAnnotNet} represents this influence network after its import.
- 
+
 
 \begin{figure}[h]
   \caption{\label{InflAnnotNet} \textbf{Annotated influence network.}
     Influence network of the cell cycle G1/S transition generated by BIOCHAM. Colors represent
 differential
-expression obtained from transcriptomic data compared to normal tissue. Color 
+expression obtained from transcriptomic data compared to normal tissue. Color
 intensities are proportional to the t-statistic values (red values indicate
 positive values corresponding to an activation, green values indicate negative
 values corresponding to an inhibition). The three grey nodes are markers for the
@@ -824,17 +827,17 @@ value; i.e an activation, the green color indicates a negative value, i.e. an
 inhibition).
 Each line represents a source node while each column represents a cell-cycle
 phase.}
- 
+
 \center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
 \end{figure}
 
 
 
-\subsection*{Modularization} 
+\subsection*{Modularization}
 
 The raw G1/S network is very detailed and may be hard to read at a first glance.
 To facilitate the analysis of the content, we propose to organize the reaction
-network as a modular network. The species are clustered in groups, referred to
+network as a modular network. The chemical species are clustered in groups, referred to
 as modules, in an semi-automatic manner, using BiNoM functions and biological
 knowledge. Each module represents in fact a
 sequence of events occuring with a particular protein. The modules are then
@@ -844,11 +847,11 @@ contained in the original diagram or derived from previous biological knowledge.
 Briefly, we first decomposed the global network into its different components,
 by using name semantics to isolate the subnetworks in which
 each protein is involved. The 36 networks that are created this way may share a
-lot of common species, so we went further
-by clustering the subnetworks having at least 25\% of common species. We renamed
+lot of common chemical species, so we went further
+by clustering the subnetworks having at least 25\% of common chemical species. We renamed
 the 7 clusters obtained with a name that illustrates the content and the main
 function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
-content of each module, making modifications if necessary by adding or deleting nodes. 
+content of each module, making modifications if necessary by adding or deleting nodes.
 For example, the module E2F1\_RB is
 further decomposed in three different modules containing the proteins RB, E2F1
 and E2F6. Finally, we generated a modular view of all the individual modules.
@@ -874,7 +877,7 @@ obtained model is more abstract but highlights some aspects that may not be
 evident from the comprehensive reaction network. For instance, it brings into relief some
 feedbacks, positive, negative or feedforward, involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
-of this modular network into a Boolean model is indeed straightforward. 
+of this modular network into a Boolean model is indeed straightforward.
 
 \section*{Conclusions}
 
@@ -890,11 +893,12 @@ simulations, but it provides functions to export final networks to the SBML and
 GINsim file formats (through the GINsim Cytoscape plugin for Boolean modeling), facilitating the
 import into various numerical simulators.
 
-The future developments of BiNoM will include functions such as merging several
-independent networks, finding minimal intervention sets to disrupt or modify the
-signaling flow from a set of source nodes to a set of target nodes, ability to
+The current development of BiNoM includes new functions such as merging several
+independent networks into one, finding minimal intervention sets to disrupt or modify the
+signaling flow from a set of source nodes to a set of target nodes (OCSANA algorithm, \cite{Vera-Licona2012OCSANA}), ability to
 generate a code for web-based representations of biological networks using the
-Google Map API.
+Google Map API, with a possibility to discuss and curate the network through a dedicated web-blog 
+(NaviCell software, http://navicell.curie.fr)
 
 
 \section*{Availability and requirements}
@@ -923,17 +927,17 @@ Google Map API.
 %\section*{Author's contributions}
 %    Text for this section \ldots
 
-    
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
   \ifthenelse{\boolean{publ}}{\small}{}
   EB, LC, DR, GS, EmB and AZ are members of the team ‘‘Computational Systems Biology of
 Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%
-%%                                                         %%              
+%%                                                         %%
 %%  Bmc_article.bst  will be used to                       %%
 %%  create a .BBL file for submission, which includes      %%
 %%  XML structured for BMC.                                %%
@@ -941,16 +945,16 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 %%  you will be prompted to submit your .BBL file.         %%
 %%                                                         %%
 %%                                                         %%
-%%  Note that the displayed Bibliography will not          %% 
+%%  Note that the displayed Bibliography will not          %%
 %%  necessarily be rendered by Latex exactly as specified  %%
-%%  in the online Instructions for Authors.                %% 
+%%  in the online Instructions for Authors.                %%
 %%                                                         %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newpage
 {\ifthenelse{\boolean{publ}}{\footnotesize}{\small}
  \bibliographystyle{bmc_article}  % Style BST file
-  \bibliography{binom2} }     % Bibliography file (usually '*.bib' ) 
+  \bibliography{binom2} }     % Bibliography file (usually '*.bib' )
 
 %%%%%%%%%%%
 
@@ -985,8 +989,8 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 %%
 %\section*{Tables}
 %  \subsection*{Table 1 - Sample table title}
-%    Here is an example of a \emph{small} table in \LaTeX\ using  
-%    \verb|\tabular{...}|. This is where the description of the table 
+%    Here is an example of a \emph{small} table in \LaTeX\ using
+%    \verb|\tabular{...}|. This is where the description of the table
 %    should go. \par \mbox{}
 %    \par
 %    \mbox{

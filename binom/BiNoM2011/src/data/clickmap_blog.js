@@ -1,21 +1,24 @@
 /**
-  *    Stuart Pook, Copyright (C) 2011 Institut Curie
-  *
-  *    This program is free software: you can redistribute it and/or modify
-  *    it under the terms of the GNU General Public License as published by
-  *    the Free Software Foundation, either version 3 of the License, or
-  *    (at your option) any later version.
-  *
-  *    This program is distributed in the hope that it will be useful,
-  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *    GNU General Public License for more details.
-  *
-  *    You should have received a copy of the GNU General Public License
-  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  *
-	This file needs to be read by each post in the blog by code in the "Header and Footer" plugin,
-	section "HTML code to be inserted in the head section of each page"
+ * Stuart Pook, Copyright (C) 2011 Institut Curie
+ *
+ * Copyright (C) 2011-2012 Curie Institute, 26 rue d'Ulm, 75005 Paris, France
+ * 
+ * BiNoM Cytoscape Plugin is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+
+ * BiNoM Cytoscape plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ *
+ * This file needs to be read by each post in the blog by code in the "Header and Footer" plugin,
+ * section "HTML code to be inserted in the head section of each page"
  *
  * $Id$
  */
@@ -44,17 +47,19 @@ var dbug = new function() {
 	  };
 	};
 	
-if(!window.console) {
-	  window.console = new function() {
-	    this.log = function(str) {};
-	    this.dir = function(str) {};
-	  };
-	}
+if (!window.console)
+{
+	window.console = new function() {
+		this.log = function(str) {};
+		this.dir = function(str) {};
+	};
+}
 
 function show_map_and_markers(map_name, ids)
 {
 	if (!maps)
 	{
+		console.log("show_map_and_markers no maps");
 		maps = Object();
 		maps[""] = window;
 	}
@@ -62,11 +67,9 @@ function show_map_and_markers(map_name, ids)
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
-		console.log("open2", map_name, map, maps);
-		
-		map = maps[map_name];
-		
-		if (!map.to_open)
+		console.log("show_map_and_markers 2 map_name=", map_name, "map=", map, "maps=", maps);
+				
+		if (typeof map.to_open == 'undefined')
 		{
 			console.log("open missing");
 			map.to_open = ids;
@@ -86,7 +89,8 @@ function show_map_and_markers(map_name, ids)
 	else
 	{
 		console.log("not open", map_name, maps);
-		map = window.open("/maps/" + blog_name + "/" + map_name);
+		var url = map_location + "/" + map_name + "/index.html";
+		map = window.open(url);
 		map.to_open = ids;
 		map.maps = maps;
 		maps[map_name] = map;

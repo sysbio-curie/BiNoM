@@ -1,21 +1,24 @@
 /**
-  *    Stuart Pook (Sysra), Copyright (C) 2011, 2012 Institut Curie
-  *
-  *    This program is free software: you can redistribute it and/or modify
-  *    it under the terms of the GNU General Public License as published by
-  *    the Free Software Foundation, either version 3 of the License, or
-  *    (at your option) any later version.
-  *
-  *    This program is distributed in the hope that it will be useful,
-  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *    GNU General Public License for more details.
-  *
-  *    You should have received a copy of the GNU General Public License
-  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  *
-  *    $Id$
-  */
+ * Stuart Pook (Sysra), Copyright (C) 2011, 2012 Institut Curie
+ *
+ * Copyright (C) 2011-2012 Curie Institute, 26 rue d'Ulm, 75005 Paris, France
+ * 
+ * BiNoM Cytoscape Plugin is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+
+ * BiNoM Cytoscape plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ *
+ * $Id$
+ */
 
 var filter = ".navicell";
 
@@ -474,7 +477,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 function show_blog(postid)
 {
-	var map = window.open(blog_name + "/index.php?p=" + postid, "blog_" + blog_name);
+	var map = window.open(blog_link(postid), "blog_" + blog_name);
 	maps[""] = map;
 	map.focus();
 }

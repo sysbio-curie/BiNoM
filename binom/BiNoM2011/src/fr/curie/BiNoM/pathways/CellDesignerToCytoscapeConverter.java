@@ -1247,20 +1247,17 @@ public class CellDesignerToCytoscapeConverter {
 	    //SpeciesDocument.Species sp = (SpeciesDocument.Species)entities.get(spid);
 	    res = "";
 	  }else
-	  if(spcl.equals("PHENOTYPE"))
+	  if(spcl.equals("UNKNOWN")||spcl.equals("PHENOTYPE")||spcl.equals("DRUG"))
 	  {
-	    SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
-	    res = sp.getName().getStringValue();
-	  }
-	  if(spcl.equals("DRUG"))
-	  {
-	    SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
-	    res = sp.getName().getStringValue();
-	  }
-	  if(spcl.equals("UNKNOWN"))
-	  {
-	    SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
-	    res = sp.getName().getStringValue();
+		Object obj = CellDesigner.entities.get(spid);
+		if(obj instanceof SpeciesDocument.Species){
+			SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
+			res = sp.getName().getStringValue();
+		}
+		if(obj instanceof CelldesignerSpeciesDocument.CelldesignerSpecies){
+			CelldesignerSpeciesDocument.CelldesignerSpecies sp = (CelldesignerSpeciesDocument.CelldesignerSpecies)CellDesigner.entities.get(spid);
+			res = sp.getName().getStringValue();
+		}
 	  }
 
 	  if(res==null)

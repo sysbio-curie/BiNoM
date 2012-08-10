@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.UnknownHostException;
 import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -164,8 +165,9 @@ public class ProduceClickableMap
 	private static final String celldesigner_suffix = ".xml";
 	private static final String image_suffix = ".png";
 	private static final String common_directory_name = "_common";
-	private static final String common_directory_url = "../" + common_directory_name + "/";
+	static final String common_directory_url = "../" + common_directory_name;
 	private static final String jstree_directory_url = "../../../lib/jstree_pre1.0_fix_1";
+	static final String jquery_js = jstree_directory_url + "/_lib/jquery.js";
 	
 	private final String blog_name;
 	private ImagesInfo scales;
@@ -382,7 +384,9 @@ public class ProduceClickableMap
 	{
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
-		final BlogCreater wp = wordpress_server == null ? new FileBlogCreater(destination) : new AllPosts(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
+		final String comment = make_tag_for_comments();
+		
+		final BlogCreater wp = wordpress_server == null ? new FileBlogCreater(destination, comment) : new AllPosts(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
 		final File destination_common = new File(maps_root, common_directory_name);
@@ -428,6 +432,27 @@ public class ProduceClickableMap
 		wp.remove_old_posts();
 	}
 	
+	private static String make_tag_for_comments()
+	{
+		final StringBuffer sb = new StringBuffer(System.getProperty("user.name"));
+		try
+		{
+			final String host = java.net.InetAddress.getLocalHost().getHostName();
+			sb.append(" on ");
+			sb.append(host);
+		}
+		catch (UnknownHostException e)
+		{
+		}
+		sb.append(" ");
+		java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+		sb.append(dateFormat.format(new Date()));
+		
+		sb.append(" $Id$");
+
+		return sb.toString();
+	}
+
 	private String get_map_title()
 	{
 		final Notes notes = cd.getSbml().getModel().getNotes();
@@ -3095,7 +3120,7 @@ public class ProduceClickableMap
 			if (r != previous)
 			{
 				final BlogCreater.Post post = wp.lookup(r.getId());
-				if (post == null)
+				if (post == null && pass2 != ReactionDisplayType.FirstPass)
 					Utils.eclipsePrintln("missing post for reaction " + r.getId());
 				show_reaction(r, h, fw.append("<li>"), pass2, post, wp).append("\n");
 			}
@@ -5258,13 +5283,13 @@ public class ProduceClickableMap
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
 		*/
 		
-		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + included_map_base + ".css\"/>");
+		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='" + jstree_directory_url + "/_lib/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js' type='text/javascript'></script>");
+		out.println("<script src='" + jquery_js + "' type='text/javascript'></script>");
+		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
 	
-		out.println("<script src=\"" + common_directory_url + included_map_base + ".js\" type='text/javascript'></script>");
+		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 
 		final String map_div_name = "map"; // see css
 		final String marker_div_name = "marker_checkboxes"; // see css

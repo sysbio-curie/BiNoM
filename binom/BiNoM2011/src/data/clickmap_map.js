@@ -1,5 +1,5 @@
 /**
- * Stuart Pook (Sysra), Copyright (C) 2011, 2012 Institut Curie
+ * Stuart Pook (Sysra), $Id$
  *
  * Copyright (C) 2011-2012 Curie Institute, 26 rue d'Ulm, 75005 Paris, France
  * 
@@ -13,11 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
- *
- * $Id$
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
 var filter = ".navicell";
@@ -28,7 +26,6 @@ var projection;
 var to_open;
 
 var maps;
-var blog_name;
 
 // http://www.contentwithstyle.co.uk/content/make-sure-that-firebug-console-debug-doesnt-break-everything/index.html
 if(!window.console)
@@ -50,10 +47,14 @@ function extend(bounds, marker)
 	var scale = 1 << map.getZoom();
 	var xoffset = marker_width / 2 / scale
 	var proj = map.getProjection();
-	var point = proj.fromLatLngToPoint(marker.getPosition());
-	var height_in_world_coords = marker_height / scale;
-	bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x - xoffset, point.y - height_in_world_coords)));
-	bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x + xoffset, point.y)));
+	console.log("extend: proj", proj);
+	if (typeof prof !== 'undefined')
+	{
+		var point = proj.fromLatLngToPoint(marker.getPosition());
+		var height_in_world_coords = marker_height / scale;
+		bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x - xoffset, point.y - height_in_world_coords)));
+		bounds.extend(proj.fromPointToLatLng(new google.maps.Point(point.x + xoffset, point.y)));
+	}
 }
 
 function show_markers_ref(markers, ref)
@@ -193,28 +194,17 @@ function get_markers_for_modification(element, projection, map)
 		var position = $(element).attr("position");
 		if (position == null)
 		{
-//			var element2 = $("li#" + id).filter(".posttranslational")[0];
-//			if (element2 == null)
-//				alert("element2 " + element2);
-//			else
-//				get_markers_for_modification(element2, projection, map);
-	//		console.log("position is null", $(element).attr("id"), element.peers.length);
-			// var selector = "li." + id;
-			//var selector = "#" + id;
-//			var nid = $(element).attr("nid");
 			var cls = $(element).attr("class");
 			var nid = /\bs\d+\b/.exec(cls);
 			var selector = "li#" + nid;
 			var idl = $(selector);
-//			alert("get_markers_for_modification here " + selector + " " + idl.length + " " + cls);
-			posttranslational.each
+			idl.each
 			(
 				function ()
 				{
 					get_markers_for_modification(this, projection, map);
 				}
 			);
-//			alert("get_markers_for_modification here " + posttranslational + " " + element.peers);
 		}
 		else
 		{
@@ -437,7 +427,6 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	}
 	maps[map_name] = window;
 
-	blog_name = blogname;
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
 	{
@@ -477,9 +466,17 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 function show_blog(postid)
 {
-	var map = window.open(blog_link(postid), "blog_" + blog_name);
-	maps[""] = map;
-	map.focus();
+	var blog = maps[""];
+	if (typeof blog !== 'undefined' && !blog.closed)
+	{
+		blog.location = blog_link(postid);
+	}
+	else
+	{
+		blog = window.open(blog_link(postid));
+		maps[""] = blog;
+	}
+	blog.focus();
 }
 
 function show_map_and_markers(map_name, ids)

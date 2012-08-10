@@ -54,10 +54,12 @@ public class FileBlogCreater extends BlogCreater
 		}
 	}
 	private final Map<String, Post> id_to_post = new java.util.HashMap<String, Post>();
-	final File root_directory; 
-	FileBlogCreater(final File destination)
+	private final File root_directory;
+	private final String comment;
+	FileBlogCreater(final File destination, String comment)
 	{
 		root_directory = destination;
+		this.comment = comment;
 	}
 	@Override
 	Post lookup(final String id)
@@ -104,15 +106,18 @@ public class FileBlogCreater extends BlogCreater
 			{
 				throw new NaviCellException("failed to create/open " + f, e);
 			}
-			java.io.BufferedWriter html = new java.io.BufferedWriter(fw);
+			final java.io.BufferedWriter html = new java.io.BufferedWriter(fw);
+			final String common = ProduceClickableMap.common_directory_url;
 			try
 			{
 				html.write("<html>\n");
+				html.write("<!--\n" + comment + "\n$Id$\n-->\n");
 				html.write("<head>\n");
 				
 				html.write("<script type='text/javascript'>var map_location='..'</script>\n");
-				html.write("<script type='text/javascript' src='../../../lib/jstree_pre1.0_fix_1/_lib/jquery.js'></script>\n");
-				html.write("<script type='text/javascript' src='clickmap_blog.js'></script>\n");
+				html.write("<script type='text/javascript' src='" + ProduceClickableMap.jquery_js + "'></script>\n");
+				html.write("<script type='text/javascript' src='" + common + "/clickmap_blog.js'></script>\n");
+				html.write("<style src='" + common + "/clickmap_blog.css'></style>\n");
 				
 				html.write("<title>\n");
 				html.write(p.title);

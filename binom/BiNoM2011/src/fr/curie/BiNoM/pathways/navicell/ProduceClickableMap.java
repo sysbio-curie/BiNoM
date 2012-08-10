@@ -386,7 +386,7 @@ public class ProduceClickableMap
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreator wp = wordpress_server == null ? new FileBlogCreater(destination, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(destination, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
 		final File destination_common = new File(maps_root, common_directory_name);

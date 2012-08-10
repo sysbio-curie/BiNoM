@@ -17,17 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA,USA.
  */
 
-//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 package fr.curie.BiNoM.pathways.navicell;
-//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 
-class FileBlogCreater extends BlogCreator
+class FileBlogCreator extends BlogCreator
 {
 	class Post implements BlogCreator.Post
 	{
@@ -58,7 +55,7 @@ class FileBlogCreater extends BlogCreator
 	private final Map<String, Post> id_to_post = new java.util.HashMap<String, Post>();
 	private final File root_directory;
 	private final String comment;
-	FileBlogCreater(final File destination, String comment)
+	FileBlogCreator(final File destination, String comment)
 	{
 		root_directory = destination;
 		this.comment = comment;

@@ -80,6 +80,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportToFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerImportFromFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerVisualStyleDefinition;
 import fr.curie.BiNoM.cytoscape.celldesigner.ProduceNaviCellMapFiles;
+import fr.curie.BiNoM.cytoscape.celldesigner.checkCellDesignerFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.colorCellDesignerProteins;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory;
@@ -132,6 +133,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	JMenuItem listAllNodesMenuItem;
 	JMenuItem colorCellDesignerProteinsMenuItem;
 	JMenuItem modifyCellDesignerNotesMenuItem;
+	JMenuItem checkCellDesignerFileMenuItem;
 	JMenuItem createNeighborhoodSetsMenuItem;
 	JMenuItem mergeNetworksAndFilterMenuItem;
 	JMenuItem produceNaviCellMenuItem;
@@ -247,6 +249,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomIOMenu.add(modifyCellDesignerNotesMenuItem);
 		modifyCellDesignerNotesMenuItem.addActionListener(new modifyCellDesignerNotes());
 
+		checkCellDesignerFileMenuItem = new JMenuItem("Check CellDesigner file...");
+		binomIOMenu.add(checkCellDesignerFileMenuItem);
+		checkCellDesignerFileMenuItem.addActionListener(new checkCellDesignerFile());
+		
         binomIOMenu.addSeparator();
 
         produceNaviCellMenuItem = new JMenuItem("Produce NaviCell map files...");

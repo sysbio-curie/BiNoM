@@ -1571,8 +1571,12 @@ public class ProduceClickableMap
 			}
 			else
 			{
-				String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
-				modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
+				if(ent!=null)if(ent.getPost()!=null){
+					String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name);
+					modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
+				}else{
+					System.out.println("ERROR: no Post for "+ent.getId());
+				}
 			}
 		}
 		
@@ -1720,8 +1724,12 @@ public class ProduceClickableMap
 		{
 			final BlogCreater.Post post = wp.lookup(r.getId());
 			
-			final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
-			reaction_line(right.add(), r, bubble, scales, post.getPostId());
+			if(post!=null){
+				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+				reaction_line(right.add(), r, bubble, scales, post.getPostId());
+			}else{
+				System.out.println("ERROR: No post for "+r.getId());
+			}
 		}
 		
 		finish_right_panel_xml(right);

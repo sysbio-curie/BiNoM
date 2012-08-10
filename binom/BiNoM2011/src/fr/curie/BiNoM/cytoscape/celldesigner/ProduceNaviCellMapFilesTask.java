@@ -39,6 +39,8 @@ import fr.curie.BiNoM.pathways.test.*;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
+import fr.curie.BiNoM.pathways.navicell.*;
+
 public class ProduceNaviCellMapFilesTask implements Task {
     private TaskMonitor taskMonitor;
     private String wordPressURL = null;
@@ -72,7 +74,7 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));    			
 				
     			try{
-    			ProduceClickableMap.run(base, source_directory, destination, make_tiles, blog_name, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name);
+    			ProduceClickableMap.run(base, source_directory, destination, make_tiles, blog_name, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, destination);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
             	    taskMonitor.setPercentCompleted(99);

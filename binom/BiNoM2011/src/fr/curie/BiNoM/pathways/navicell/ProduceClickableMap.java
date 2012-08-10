@@ -2951,7 +2951,7 @@ public class ProduceClickableMap
 					fw.append(csep);
 				final String[] t = s.split("\\" + sep, 2);
 				for (final Entity m : complex.getComponents())
-					if (m.getName().equals(t[0]))
+					if (m.getName().trim().equals(t[0].trim()))
 					{
 						show_markers_from_map(m, fw);
 //						fw.append('[').append(t[0]).append(']');
@@ -2959,9 +2959,9 @@ public class ProduceClickableMap
 							fw.append(sep).append(t[1]);
 						continue composants;
 					}
-				Utils.eclipseError("for " + name + " " + complex.getId() + " did not find " + t[0] + " in");
+				Utils.eclipseError("for " + name + " " + complex.getId() + " did not find \"" + t[0] + "\" in");
 				for (final Entity m : complex.getComponents())
-					System.err.print(" " + m.getName());
+					System.err.print(" \"" + m.getName()+"\"");
 				System.err.println();
 					
 //				assert false : name + " " + t[0];
@@ -3996,6 +3996,7 @@ public class ProduceClickableMap
 				add("STATE_TRANSITION");
 				add("TRANSPORT");
 				add("TRANSCRIPTIONAL_INHIBITION");
+				add("TRANSCRIPTION");
 				add("TRANSCRIPTIONAL_ACTIVATION");
 				add("UNKNOWN_TRANSITION");
 				add("KNOWN_TRANSITION_OMITTED");
@@ -4005,6 +4006,7 @@ public class ProduceClickableMap
 				add("NEGATIVE_INFLUENCE");
 				add("POSITIVE_INFLUENCE");
 				add("UNKNOWN_POSITIVE_INFLUENCE");
+				add("UNKNOWN_NEGATIVE_INFLUENCE");
 			}
 		}
 	);

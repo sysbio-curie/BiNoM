@@ -165,9 +165,9 @@ public static String reactionNodeTypes[] = {
    
    StringReader st1 = new StringReader(text);
    
-   LineNumberReader lr = new LineNumberReader(st1);
-   for(int i=0;i<4;i++)
-	   System.out.println(lr.readLine());
+   //LineNumberReader lr = new LineNumberReader(st1);
+   //for(int i=0;i<4;i++)
+   //   System.out.println(lr.readLine());
    
    StringReader st = new StringReader(text);   
    //System.out.print("parsing the file... ");

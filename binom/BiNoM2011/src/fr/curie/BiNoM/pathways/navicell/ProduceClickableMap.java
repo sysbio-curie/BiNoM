@@ -2952,7 +2952,7 @@ public class ProduceClickableMap
 					fw.append(csep);
 				final String[] t = s.split("\\" + sep, 2);
 				for (final Entity m : complex.getComponents())
-					if (m.getName().trim().equals(t[0].trim()))
+					if (m.getName().trim().replace("(", "").replace(")","").equals(t[0].trim().replace("(", "").replace(")","")))
 					{
 						show_markers_from_map(m, fw);
 //						fw.append('[').append(t[0]).append(']');

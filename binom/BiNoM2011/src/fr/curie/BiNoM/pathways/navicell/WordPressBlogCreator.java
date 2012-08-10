@@ -18,7 +18,6 @@
  */
 package fr.curie.BiNoM.pathways.navicell;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +36,7 @@ import redstone.xmlrpc.XmlRpcFault;
 import fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.NaviCellException;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
-public class AllPosts extends BlogCreater
+public class WordPressBlogCreator extends BlogCreater
 {
 	private static final int maximum_number_of_posts = 20480; // might not be enough
 	static class Post implements BlogCreater.Post
@@ -71,7 +70,7 @@ public class AllPosts extends BlogCreater
 			}
 			else
 			{
-				modules = new ArrayList<String>(xmlRpcArray.size() - 1);
+				modules = new java.util.ArrayList<String>(xmlRpcArray.size() - 1);
 				String c = null;
 				for (Object k : xmlRpcArray)
 				{
@@ -106,7 +105,7 @@ public class AllPosts extends BlogCreater
 	private final Wordpress wp;
 	private final String url;
 
-	public AllPosts(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd) throws NaviCellException
+	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd) throws NaviCellException
 	{
 		url = wordpress_server + "/" + wordpress_blogname;
 		wp = open_wordpress(url, wordpress_user, wordpress_passwd);
@@ -479,10 +478,10 @@ public class AllPosts extends BlogCreater
 	@Override
         void remove_old_posts() throws NaviCellException
         {
-		Map<String, fr.curie.BiNoM.pathways.navicell.AllPosts.Post> map = java.util.Collections.unmodifiableMap(posts);
-		for (final Entry<String, AllPosts.Post> entry : map.entrySet())
+		Map<String, fr.curie.BiNoM.pathways.navicell.WordPressBlogCreator.Post> map = java.util.Collections.unmodifiableMap(posts);
+		for (final Entry<String, WordPressBlogCreator.Post> entry : map.entrySet())
 		{
-			final AllPosts.Post post = entry.getValue();
+			final WordPressBlogCreator.Post post = entry.getValue();
 			final int post_id = post.getPostId();
 			try
 			{

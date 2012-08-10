@@ -56,7 +56,13 @@ public class checkCellDesignerFileTask implements Task {
     			cf.sbmlDoc = CellDesigner.loadCellDesigner(CellDesignerFileName);
     			cf.checkIfReactionConnectedToIncludedSpecies();
     			
+    			String fn = CellDesignerFileName.substring(0, CellDesignerFileName.length()-4)+"_fixed.xml";
+    			CellDesigner.saveCellDesigner(cf.sbmlDoc, fn);
+    			
         		ShowTextDialog dialog = new ShowTextDialog();
+        		
+        		if(cf.report.equals("")) cf.report = "NO PROBLEMS FOUND in "+CellDesignerFileName;
+        		
         		dialog.pop("Checking CellDesigner File", cf.report);
     			
     		}else{

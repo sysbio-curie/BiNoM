@@ -1272,7 +1272,7 @@ public class CellDesignerToCytoscapeConverter {
 	 */
 	public static void mergeCellDesignerFiles(SbmlDocument sbout, SbmlDocument sbin){ 
 	  HashMap hm = CellDesigner.getAllObjectsHash(sbout);
-	  //System.out.print("Merging ... ");
+	  //System.out.print("Merging ... ");	
 	  // Compartments
 	  //System.out.print("compartments ");
 	  if(sbin.getSbml().getModel().getListOfCompartments()!=null)

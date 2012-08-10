@@ -47,12 +47,14 @@ public class ProduceNaviCellMapFilesTask implements Task {
     private String wordPressUser = null;
     private String wordPressPassword = null;
     private String configFileName = null;
+    private boolean produceBOversion = true;
 
-    public ProduceNaviCellMapFilesTask(String _configFileName, String _wordPressURL, String _wordPressUser, String _wordPressPassword){
+    public ProduceNaviCellMapFilesTask(String _configFileName, String _wordPressURL, String _wordPressUser, String _wordPressPassword, boolean _produceBOversion){
     	configFileName = _configFileName;
     	wordPressURL = _wordPressURL;
     	wordPressUser = _wordPressUser;
     	wordPressPassword = _wordPressPassword;
+    	produceBOversion = _produceBOversion;
     }
     
     public void run() {
@@ -61,7 +63,6 @@ public class ProduceNaviCellMapFilesTask implements Task {
     		if(fc.exists()){
     			
     			File source_directory = new File(fc.getParent());
-    			File destination = new File(source_directory+"/..");
     			boolean make_tiles = true;
     			Boolean show_default_compartement_name = true;
     			String blog_name = null;
@@ -72,9 +73,15 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			base = configuration.getProperty("base");
     			blog_name = configuration.getProperty("name", base);
     			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));    			
-				
+
+    			File destination = new File(source_directory+"/../"+blog_name);
+    			if(!destination.exists()) destination.mkdir();
+    			
     			try{
-    			ProduceClickableMap.run(base, source_directory, destination, make_tiles, blog_name, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, destination);
+    			if(produceBOversion)	
+    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, show_default_compartement_name, null, null, null, blog_name, destination);
+    			else
+    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, destination);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
             	    taskMonitor.setPercentCompleted(99);

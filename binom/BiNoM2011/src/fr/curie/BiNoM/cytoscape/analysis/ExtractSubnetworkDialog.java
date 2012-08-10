@@ -73,7 +73,6 @@ public class ExtractSubnetworkDialog extends JDialog {
     private static final int MAX_ROWS = 20;
     private JComboBox netwAddCB;
     private JList netwUpdateList;
-    private static final String EMPTY_NAME = "                       ";
     private static final java.awt.Font TITLE_FONT = new java.awt.Font
 	("times", java.awt.Font.BOLD, 14);
 

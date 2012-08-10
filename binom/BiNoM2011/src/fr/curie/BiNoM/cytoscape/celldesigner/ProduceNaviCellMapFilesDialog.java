@@ -83,6 +83,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
     private JButton browseAccNum = null;
     private JTextField configFile = null;
     private JButton browseIndex = null;
+    private JCheckBox produceBrowseOnlyVersion = null;
     
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
@@ -158,6 +159,26 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
                 }
            });
 
+	y++;
+	
+	produceBrowseOnlyVersion = new JCheckBox();
+	produceBrowseOnlyVersion.setText("Make browse-only version (no WordPress blog)");
+	produceBrowseOnlyVersion.setSelected(true);
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.anchor = GridBagConstraints.WEST;
+	panel.add(produceBrowseOnlyVersion, c);
+	
+	
+	produceBrowseOnlyVersion.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			if(!produceBrowseOnlyVersion.isSelected()) { wordPressURL.setEnabled(true); wordPressUser.setEnabled(true); wordPressPassw.setEnabled(true); }
+			else { wordPressURL.setEnabled(false); wordPressUser.setEnabled(false); wordPressPassw.setEnabled(false); }
+		}
+	    });
+
+	
 	
 	y++;
 
@@ -167,7 +188,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.ipady = 20;	
 	c.gridx = x++;
 	c.gridy = y;
-	c.anchor = GridBagConstraints.CENTER;
+	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
 	c.weightx = 0;
 	panel.add(lab2,c);
@@ -178,6 +199,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.gridy = y;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
+	wordPressURL.setEnabled(false);
 	panel.add(wordPressURL,c);
 
 	y++;
@@ -188,7 +210,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.ipady = 20;	
 	c.gridx = x++;
 	c.gridy = y;
-	c.anchor = GridBagConstraints.CENTER;
+	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
 	c.weightx = 0;
 	panel.add(lab2,c);
@@ -199,6 +221,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.gridy = y;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
+	wordPressUser.setEnabled(false);
 	panel.add(wordPressUser,c);
 
 	y++;
@@ -209,7 +232,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.ipady = 20;	
 	c.gridx = x++;
 	c.gridy = y;
-	c.anchor = GridBagConstraints.CENTER;
+	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
 	c.weightx = 0;
 	panel.add(lab2,c);
@@ -220,6 +243,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	c.gridy = y;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
+	wordPressPassw.setEnabled(false);
 	panel.add(wordPressPassw,c);
 
 	
@@ -230,7 +254,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
-			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText());
+			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected());
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
            });

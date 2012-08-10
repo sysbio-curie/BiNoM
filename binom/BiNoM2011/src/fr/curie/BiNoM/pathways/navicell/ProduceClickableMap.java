@@ -213,7 +213,7 @@ public class ProduceClickableMap
 			catch (ClassCastException w)
 			{
 				// some names cannot de calculated
-				Utils.eclipseErrorln("exceptions " + m.getId());
+				Utils.eclipseErrorln("exceptions " + m.getId()+" Message: "+w.getStackTrace()[0]);
 				i++;
 			}
 		}
@@ -4007,6 +4007,7 @@ public class ProduceClickableMap
 				add("POSITIVE_INFLUENCE");
 				add("UNKNOWN_POSITIVE_INFLUENCE");
 				add("UNKNOWN_NEGATIVE_INFLUENCE");
+				add("TRUNCATION");
 			}
 		}
 	);

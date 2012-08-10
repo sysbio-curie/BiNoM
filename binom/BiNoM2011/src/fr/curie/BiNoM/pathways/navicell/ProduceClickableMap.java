@@ -801,13 +801,18 @@ public class ProduceClickableMap
 	{
 		String cccc = source + "/" + file;
 		Utils.eclipsePrintln(cccc);
-		final URL resource = getClass().getResource(cccc);
-		Utils.eclipsePrintln(resource.toString() + " for  " + cccc);
-		Utils.eclipsePrintln(resource.getFile());
+		final InputStream resource = getClass().getResourceAsStream(cccc);
 		final File destFile = new File(destination, file);
 		
-		final File sourceFile = new File(resource.getFile());
-		copy_file(sourceFile, destFile);
+//		final File sourceFile = new File(resource.getFile());
+		copy_file(resource, new FileOutputStream(destFile));
+	}
+	
+	private void copy_file(InputStream in, OutputStream out) throws IOException
+	{
+		int c;
+		while ((c = in.read()) >= 0)
+			out.write(c);
 	}
 
 	public static boolean isSymlink(File file) throws IOException {

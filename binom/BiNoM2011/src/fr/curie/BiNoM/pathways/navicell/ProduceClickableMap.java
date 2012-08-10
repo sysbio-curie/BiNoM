@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
@@ -367,7 +368,7 @@ public class ProduceClickableMap
 			System.exit(1);
 		}
 	}
-	static final File data_directory = new File("java/classes/data");
+	static final String data_directory = "/data";
 
 	public static void run
 	(
@@ -393,16 +394,9 @@ public class ProduceClickableMap
 		if (!destination_common.exists() && !destination_common.mkdir())
 			throw new NaviCellException("failed to make " + destination_common);
 
-		try
-		{
-			copy_files(data_directory, destination_common);
-		}
-		catch (IOException e)
-		{
-			throw new NaviCellException("IO error installing static files", e);
-		}
 		
 		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
+		
 
 		final ProduceClickableMap master;
 		try
@@ -412,6 +406,16 @@ public class ProduceClickableMap
 		catch (IOException e)
 		{
 			throw new NaviCellException("IO error creating map " + master_map_name, e);
+		}
+		Utils.eclipsePrintln(master.getClass().getResource("/data/map.png").toString());
+		
+		try
+		{
+			master.copy_files(data_directory, destination_common);
+		}
+		catch (IOException e)
+		{
+			throw new NaviCellException("IO error installing static files", e);
 		}
 
 		for (final String map_name : modules.keySet())
@@ -786,17 +790,23 @@ public class ProduceClickableMap
 		return this_map_directory;
 	}
 
-	private static void copy_files(final File source, final File destination) throws IOException
+	private void copy_files(final String source, final File destination) throws IOException
 	{
 		for (final String suffix : new String[]{"js", "css"})
 			for (final String base : new String[]{ included_blog_base, included_map_base })
 				copy_file_between_directories(source, destination, base + "." + suffix);
 	}
 
-	private static void copy_file_between_directories(final File source, File destination, final String file) throws IOException
+	private void copy_file_between_directories(final String source, File destination, final String file) throws IOException
 	{
+		String cccc = source + "/" + file;
+		Utils.eclipsePrintln(cccc);
+		final URL resource = getClass().getResource(cccc);
+		Utils.eclipsePrintln(resource.toString() + " for  " + cccc);
+		Utils.eclipsePrintln(resource.getFile());
 		final File destFile = new File(destination, file);
-		final File sourceFile = new File(source, file);
+		
+		final File sourceFile = new File(resource.getFile());
 		copy_file(sourceFile, destFile);
 	}
 
@@ -820,7 +830,9 @@ public class ProduceClickableMap
 		if (isSymlink(destFile))
 			Utils.eclipsePrintln("skipping symlink " + destFile);
 		else
+		{
 			copyFile(sourceFile, destFile);
+		}
 	}
 
 	static private void fatal_error(String message)

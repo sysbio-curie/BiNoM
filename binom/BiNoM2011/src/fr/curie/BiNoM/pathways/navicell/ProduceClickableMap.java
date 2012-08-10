@@ -203,7 +203,7 @@ public class ProduceClickableMap
 		/* this is really horrible but I need to have the name of the species and this can only
 		 * be done once the maps are set up. Which maps? Who knows?
 		 */
-		int i =0;
+		int i = 0;
 		for (Modification m : _speciesIDToModificationMap.values())
 		{
 			try
@@ -229,7 +229,8 @@ public class ProduceClickableMap
 					i++;
 				}
 
-		Utils.eclipseErrorln(i + " exceptions");
+		if (i != 0)
+			Utils.eclipseErrorln(i + " exceptions");
 	}
 
 	public static void main(String args[])

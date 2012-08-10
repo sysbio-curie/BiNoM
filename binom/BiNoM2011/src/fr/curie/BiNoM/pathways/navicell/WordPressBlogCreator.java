@@ -634,6 +634,6 @@ public class WordPressBlogCreator extends BlogCreator
 	@Override
 	public String getBlogLinker()
 	{
-		return "function blog_link(postid) { return '" + post_prefix + "' + postid; }";
+		return "function blog_link(postid) { return '" + url + "/" + post_prefix + "' + postid; }";
 	}
 }

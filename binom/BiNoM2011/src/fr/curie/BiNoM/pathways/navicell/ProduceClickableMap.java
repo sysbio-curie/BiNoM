@@ -324,12 +324,12 @@ public class ProduceClickableMap
 		final String wordpress_passwd;
 		final String wordpress_user;
 		final String wordpress_blogname;
-		final File maps_root;
+		final File root;
 		
 		if (wordpress_cfg_file == null)
 		{
 			wordpress_server = wordpress_passwd = wordpress_user =  wordpress_blogname = null;
-			maps_root = destination;
+			root = destination;
 		}
 		else
 		{
@@ -343,7 +343,7 @@ public class ProduceClickableMap
 				fatal_error("no password to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
 			if (wordpress_user == null)
 				fatal_error("no user to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
-			maps_root = mk_maps_directory(project_name, destination);
+			root = mk_maps_directory(project_name, destination);
 			
 		}		
 	
@@ -357,8 +357,8 @@ public class ProduceClickableMap
 		
 		try
 		{
-			run(base, source_directory, destination, make_tiles, project_name, show_default_compartement_name, wordpress_server,
-				wordpress_passwd, wordpress_user, wordpress_blogname, maps_root);
+			run(base, source_directory, make_tiles, project_name, show_default_compartement_name, wordpress_server,
+				wordpress_passwd, wordpress_user, wordpress_blogname, root);
 		}
 		catch (NaviCellException e)
 		{
@@ -372,7 +372,6 @@ public class ProduceClickableMap
 	(
 		final String base,
 		final File source_directory,
-		final File destination,
 		final boolean make_tiles,
 		final String project_name,
 		final boolean show_default_compartement_name,
@@ -380,17 +379,17 @@ public class ProduceClickableMap
 		final String wordpress_passwd,
 		final String wordpress_user,
 		final String wordpress_blogname,
-		final File maps_root
+		final File root
 	) throws NaviCellException
 	{
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(destination, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
-		final File destination_common = new File(maps_root, common_directory_name);
+		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir())
 			throw new NaviCellException("failed to make " + destination_common);
 
@@ -408,7 +407,7 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(project_name, maps_root, base, source_directory, wp, make_tiles, modules);
+			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, modules);
 		}
 		catch (IOException e)
 		{
@@ -420,7 +419,7 @@ public class ProduceClickableMap
 			if (!map_name.equals(master_map_name))
 				try
 				{
-					process_a_map(map_name, master, maps_root, base, source_directory, wp, make_tiles, modules);
+					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, modules);
 				}
 				catch (IOException e)
 				{

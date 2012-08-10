@@ -22,6 +22,7 @@ interface Linker
 {
 	StringBuffer post_link_base(int post_id, StringBuffer notes);
 	String getBlogLinker();
+	String getMapIconURL();
 }
 
 abstract public class BlogCreator implements Linker
@@ -34,6 +35,4 @@ abstract public class BlogCreator implements Linker
 	abstract Post lookup(final String id);
 	abstract Post updateBlogPostId(String id, String title, String body);
 	abstract void updateBlogPostIfRequired(Post post, String title, String body, String reactionClassName, java.util.List<String> modules);
-	abstract public StringBuffer post_link_base(int post_id, StringBuffer notes);
-	abstract public String getBlogLinker();
 }

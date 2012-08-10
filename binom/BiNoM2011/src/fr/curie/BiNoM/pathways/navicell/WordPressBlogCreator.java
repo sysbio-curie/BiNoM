@@ -18,6 +18,8 @@
  */
 package fr.curie.BiNoM.pathways.navicell;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +30,7 @@ import java.util.Map.Entry;
 
 import net.bican.wordpress.Category;
 import net.bican.wordpress.CommentCount;
+import net.bican.wordpress.MediaObject;
 import net.bican.wordpress.Page;
 import net.bican.wordpress.User;
 import net.bican.wordpress.Wordpress;
@@ -139,7 +142,7 @@ public class WordPressBlogCreator extends BlogCreator
 		fill(userid, recentPosts, wp);
 		verbose("stored " + posts.size() + " posts");
 
-
+		make_map_icon(wp, url);
 	}
 	static private String[] read_categories(final Wordpress wp, Set<String> entities, Set<String> modules) throws NaviCellException
 	{
@@ -619,8 +622,58 @@ public class WordPressBlogCreator extends BlogCreator
 		}
 		
 		Utils.eclipsePrintln("connected to blog " + url);
+
 		return wp;
 	}
+
+	private static final String map_icon_base = "map.png";
+	static private final String map_icon_url_base = "files/" + map_icon_base;
+	
+	static private void make_map_icon(final Wordpress wp, String url) throws NaviCellException
+	{
+		boolean exists = does_map_icon_exist(url);
+		if (!exists)
+		{
+			Utils.eclipsePrintln("icon does not exist " + url);
+			try
+			{
+				final MediaObject icon = wp.newMediaObject("image/png", new java.io.File(ProduceClickableMap.data_directory, map_icon_base), false);
+				Utils.eclipsePrintln(icon.toString());
+				Utils.eclipsePrintln("created " + icon.toOneLinerString());
+			}
+			catch (XmlRpcFault e)
+			{
+				throw new NaviCellException("unable to upload map icon to blog", e);
+			}
+			assert does_map_icon_exist(url);
+		}
+
+	}
+	static private boolean does_map_icon_exist(String url) throws NaviCellException
+	{
+		final java.net.URL u;
+		try
+		{
+			u = new java.net.URL(url + "/" + map_icon_url_base);
+		}
+		catch (MalformedURLException e)
+		{
+			throw new NaviCellException("failed to query Wordpress at " + url, e);
+		}
+		try
+		{
+			final java.io.InputStream is = u.openStream();
+			is.read();
+			is.close();
+		}
+		catch (IOException e)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	private static final String post_prefix = "index.php?p=";
 	private static StringBuffer post_link_base_static(int post_id, StringBuffer notes)
 	{
@@ -635,5 +688,10 @@ public class WordPressBlogCreator extends BlogCreator
 	public String getBlogLinker()
 	{
 		return "function blog_link(postid) { return '" + url + "/" + post_prefix + "' + postid; }";
+	}
+	@Override
+	public String getMapIconURL()
+	{
+		return "../" + map_icon_url_base;
 	}
 }

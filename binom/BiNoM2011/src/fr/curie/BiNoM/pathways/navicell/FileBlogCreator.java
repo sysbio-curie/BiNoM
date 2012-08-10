@@ -144,4 +144,9 @@ class FileBlogCreator extends BlogCreator
 	{
 		return "function blog_link(postid) { return '../" + blog_location + "/" + post_prefix + "' + postid + '" + post_suffix + "'; }";
 	}
+	@Override
+	public String getMapIconURL()
+	{
+		return ProduceClickableMap.icons_directory + "/map.png";
+	}
 }

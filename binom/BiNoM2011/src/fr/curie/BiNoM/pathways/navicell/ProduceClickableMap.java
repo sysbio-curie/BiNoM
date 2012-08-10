@@ -434,21 +434,21 @@ public class ProduceClickableMap
 	
 	private static String make_tag_for_comments()
 	{
-		final StringBuffer sb = new StringBuffer(System.getProperty("user.name"));
+		final StringBuffer sb = new StringBuffer();
 		try
 		{
 			final String host = java.net.InetAddress.getLocalHost().getHostName();
-			sb.append(" on ");
 			sb.append(host);
+			sb.append("\n");
 		}
 		catch (UnknownHostException e)
 		{
 		}
-		sb.append(" ");
-		java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+		java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z\n");
 		sb.append(dateFormat.format(new Date()));
 		
-		sb.append(" $Id$");
+		sb.append("$Id$\n");
+		sb.append("created by http://navicell.curie.fr/");
 
 		return sb.toString();
 	}

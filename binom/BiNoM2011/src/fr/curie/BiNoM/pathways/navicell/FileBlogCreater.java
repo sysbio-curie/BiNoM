@@ -14,20 +14,22 @@
  * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA,USA.
  */
+
+//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 package fr.curie.BiNoM.pathways.navicell;
+//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+//sdl'jkgdlagfjdslkgdfgdsssssssssssssssgf
 
-import fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.NaviCellException;
-
-public class FileBlogCreater extends BlogCreater
+class FileBlogCreater extends BlogCreator
 {
-	class Post implements BlogCreater.Post
+	class Post implements BlogCreator.Post
 	{
 		private String entity_type;
 		public Post(int post_id, String id, String title, String body)
@@ -67,7 +69,7 @@ public class FileBlogCreater extends BlogCreater
 		return id_to_post.get(id);
 	}
 	@Override
-	BlogCreater.Post updateBlogPostId(String id, String title, String body)
+	BlogCreator.Post updateBlogPostId(String id, String title, String body)
 	{
 		final Post post = new Post(id_to_post.size(), id, title, body);
 		final Post old = id_to_post.put(id, post);
@@ -75,7 +77,7 @@ public class FileBlogCreater extends BlogCreater
 		return post;
 	}
 	@Override
-	void updateBlogPostIfRequired(BlogCreater.Post bpost, String title, String body, String entity_type,
+	void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type,
 			List<String> modules)
 	{
 		final Post post = (Post)bpost;
@@ -87,7 +89,7 @@ public class FileBlogCreater extends BlogCreater
 	static private final String post_suffix = ".html";
 	static private final String blog_location = "_blog";
 	@Override
-	void remove_old_posts() throws NaviCellException
+	void remove_old_posts() throws ProduceClickableMap.NaviCellException
 	{
 		final java.io.File rd = root_directory;
 		rd.mkdir();
@@ -104,7 +106,7 @@ public class FileBlogCreater extends BlogCreater
 			}
 			catch (IOException e)
 			{
-				throw new NaviCellException("failed to create/open " + f, e);
+				throw new ProduceClickableMap.NaviCellException("failed to create/open " + f, e);
 			}
 			final java.io.BufferedWriter html = new java.io.BufferedWriter(fw);
 			final String common = ProduceClickableMap.common_directory_url;
@@ -131,7 +133,7 @@ public class FileBlogCreater extends BlogCreater
 			}
 			catch (IOException e)
 			{
-				throw new NaviCellException("failed to write " + f, e);
+				throw new ProduceClickableMap.NaviCellException("failed to write " + f, e);
 			}
 		}
 	}

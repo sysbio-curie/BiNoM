@@ -36,10 +36,10 @@ import redstone.xmlrpc.XmlRpcFault;
 import fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.NaviCellException;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
-public class WordPressBlogCreator extends BlogCreater
+public class WordPressBlogCreator extends BlogCreator
 {
 	private static final int maximum_number_of_posts = 20480; // might not be enough
-	static class Post implements BlogCreater.Post
+	static class Post implements BlogCreator.Post
 	{
 		final String hash;
 		int post_id;
@@ -515,7 +515,7 @@ public class WordPressBlogCreator extends BlogCreater
 		}
 	}
 	@Override
-        BlogCreater.Post updateBlogPostId(String id, String title, String body)
+        BlogCreator.Post updateBlogPostId(String id, String title, String body)
         {
 		final Post info = lookup(id);
 		if (body != null)
@@ -532,7 +532,7 @@ public class WordPressBlogCreator extends BlogCreater
 		return info;
 	}
 	@Override
-        void updateBlogPostIfRequired(BlogCreater.Post p, String title, String body, String entity_type,
+        void updateBlogPostIfRequired(BlogCreator.Post p, String title, String body, String entity_type,
                         List<String> modules)
         {
 		Post info = (Post)p;

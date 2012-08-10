@@ -386,7 +386,7 @@ public class ProduceClickableMap
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreater wp = wordpress_server == null ? new FileBlogCreater(destination, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreater(destination, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
 
 		final File data_directory = new File("bin/data");
 		final File destination_common = new File(maps_root, common_directory_name);
@@ -720,11 +720,11 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-		BlogCreater wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
+		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
-		final BlogCreater.Post module_post = create_module_post(wp, module_notes, map);
+		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 
 		final File this_map_directory = mk_maps_directory(map, destination);
@@ -736,7 +736,7 @@ public class ProduceClickableMap
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-		BlogCreater wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException, NaviCellException
+		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException, NaviCellException
 	{
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
@@ -748,7 +748,7 @@ public class ProduceClickableMap
 
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
 		clMap.right_panel = clMap.generatePages(wp, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
-		final BlogCreater.Post module_post = create_module_post(wp, module_notes, map);
+		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map);
 		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 		return clMap;
@@ -1522,7 +1522,7 @@ public class ProduceClickableMap
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
-		final BlogCreater wp,
+		final BlogCreator wp,
 		final SbmlDocument cd,
 		final String blog_name,
 		ImagesInfo scales
@@ -1636,7 +1636,7 @@ public class ProduceClickableMap
 	{
 		final private int post_id;
 		private final String notes;
-		ModuleInfo(String module_notes, BlogCreater.Post module_post)
+		ModuleInfo(String module_notes, BlogCreator.Post module_post)
 		{
 			post_id = module_post.getPostId();
 			notes = module_notes;
@@ -1736,7 +1736,7 @@ public class ProduceClickableMap
 	
 	private FormatProteinNotes master_format;
 	
-	private void generatePages(final BlogCreater wp, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
+	private void generatePages(final BlogCreator wp, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		final Model model = cd.getSbml().getModel();
 		
@@ -1747,7 +1747,7 @@ public class ProduceClickableMap
 
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
-			final BlogCreater.Post post = wp.lookup(r.getId());
+			final BlogCreator.Post post = wp.lookup(r.getId());
 			
 			if(post!=null){
 				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
@@ -1765,7 +1765,7 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
-	static private BlogCreater.Post create_module_post(final BlogCreater wp, final String module_notes, final String map_name)
+	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name)
 	{
 		final Hasher h = new Hasher();
 		StringBuffer fw = create_buffer_for_post_body(h);
@@ -1777,13 +1777,13 @@ public class ProduceClickableMap
 			fw.append("<br>\n").append(parts[1]);
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
-		final BlogCreater.Post post = wp.updateBlogPostId(id, map_name, body);
+		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body);
 		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList());
 		return post;
 
 	}
 
-	private ItemCloser generatePages(final BlogCreater wp, File rpanel_index, ImagesInfo scales,
+	private ItemCloser generatePages(final BlogCreator wp, File rpanel_index, ImagesInfo scales,
 		final FormatProteinNotes format,
 		Map<String, ModuleInfo> modules_set
 	)
@@ -1815,7 +1815,7 @@ public class ProduceClickableMap
 			modules.clear();
 			final String title = r.getId();
 			final String body = createReactionBody(r, format, wp);
-			final BlogCreater.Post post = wp.updateBlogPostId(r.getId(), title, body);
+			final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body);
 			
 			final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 			reaction_line(right.add(), r, bubble, scales, post.getPostId());
@@ -1832,7 +1832,7 @@ public class ProduceClickableMap
 				final String body = create_complex_body(complex, format, ReactionDisplayType.SecondPass, wp);
 				if (body != null)
 				{
-					final BlogCreater.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
+					final BlogCreator.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
 					wp.updateBlogPostIfRequired(post, complex.getName(), body, COMPLEX_CLASS_NAME, modules);
 				}
 			}
@@ -1840,7 +1840,7 @@ public class ProduceClickableMap
 			{
 //				do_entity(wp, format, xml, all_posts, ent);
 				final String body = create_entity_body(format, ent, ReactionDisplayType.SecondPass, wp, modules);
-				final BlogCreater.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
+				final BlogCreator.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
 				wp.updateBlogPostIfRequired(post, ent.getName(), body, ent.getCls(), modules);
 			}
 		}
@@ -2095,7 +2095,7 @@ public class ProduceClickableMap
 		return new StringBuffer(excerpt_marker);
 	}
 
-	private String create_complex_body(final Complex complex, final FormatProteinNotes format, final ReactionDisplayType pass2, BlogCreater wp)
+	private String create_complex_body(final Complex complex, final FormatProteinNotes format, final ReactionDisplayType pass2, BlogCreator wp)
 	{
 		if (complex.getComponents().size() < 2)
 			return null;
@@ -2387,7 +2387,7 @@ public class ProduceClickableMap
 	}
 
 	private StringBuffer show_reaction(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2,
-		BlogCreater.Post post, Linker wp)
+		BlogCreator.Post post, Linker wp)
 	{
 		formatReactants(fw, r, h, pass2, wp);
 		fw.append(" ");
@@ -2884,12 +2884,12 @@ public class ProduceClickableMap
 		return notes.append(" alt='blog'>").append("</a>");
 	}
 	
-	static String href(int post_id, String text, BlogCreater wp)
+	static String href(int post_id, String text, BlogCreator wp)
 	{
 		return add_href(new StringBuffer(), post_id, text, wp).toString();
 	}
 	
-	static StringBuffer add_href(StringBuffer fw, int post_id, String text, BlogCreater wp)
+	static StringBuffer add_href(StringBuffer fw, int post_id, String text, BlogCreator wp)
 	{
 		return post_to_post_link(post_id, fw, wp).append(text).append("</a>");
 	}
@@ -3041,7 +3041,7 @@ public class ProduceClickableMap
 //			body_buf.append(")").append(onclick_after).append(" title=\"").append(title).append("\">").append(ent.getName()).append("</a>");
 	}
 
-	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, ReactionDisplayType pass2, BlogCreater wp, List<String> modules)
+	private String create_entity_body(final FormatProteinNotes format, final EntityBase ent, ReactionDisplayType pass2, BlogCreator wp, List<String> modules)
 	{
 		final Hasher h = new Hasher();
 		final StringBuffer fw = create_buffer_for_post_body(h);
@@ -3085,7 +3085,7 @@ public class ProduceClickableMap
 		return false;
 	}
 
-	private void participates_in_reactions_split(final List<Modification> arrayList, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, BlogCreater wp)
+	private void participates_in_reactions_split(final List<Modification> arrayList, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2, BlogCreator wp)
 	{
 		final ArrayList<ReactionDocument.Reaction> catalysers = new ArrayList<ReactionDocument.Reaction>();
 		final ArrayList<ReactionDocument.Reaction> others = new ArrayList<ReactionDocument.Reaction>();
@@ -3108,7 +3108,7 @@ public class ProduceClickableMap
 		show_reactions(catalysers, "Catalyser", fw, h, pass2, wp);
 	}
 
-	private void show_reactions(ArrayList<ReactionDocument.Reaction> reactions, String as, final StringBuffer fw, final Hasher h, ReactionDisplayType pass2, BlogCreater wp)
+	private void show_reactions(ArrayList<ReactionDocument.Reaction> reactions, String as, final StringBuffer fw, final Hasher h, ReactionDisplayType pass2, BlogCreator wp)
 	{
 		Collections.sort(reactions, reaction_comparator);
 		if (as != null)
@@ -3119,7 +3119,7 @@ public class ProduceClickableMap
 		{
 			if (r != previous)
 			{
-				final BlogCreater.Post post = wp.lookup(r.getId());
+				final BlogCreator.Post post = wp.lookup(r.getId());
 				if (post == null && pass2 != ReactionDisplayType.FirstPass)
 					Utils.eclipsePrintln("missing post for reaction " + r.getId());
 				show_reaction(r, h, fw.append("<li>"), pass2, post, wp).append("\n");
@@ -3490,11 +3490,11 @@ public class ProduceClickableMap
 		{
 			return getName().compareTo(arg0.getName());
 		}
-		public void setPost(BlogCreater posts)
+		public void setPost(BlogCreator posts)
 		{
 			setPost(posts.lookup(getId()));
 		}
-		protected BlogCreater.Post post;
+		protected BlogCreator.Post post;
 		public int getPostId()
 		{
 			return post == null ? -3 : post.getPostId();
@@ -3512,8 +3512,8 @@ public class ProduceClickableMap
 		{
 			return getCls().equals(DEGRADED_CLASS_NAME);
 		}
-		public BlogCreater.Post getPost() { return post; }
-		public BlogCreater.Post setPost(BlogCreater.Post p) { return post = p; }
+		public BlogCreator.Post getPost() { return post; }
+		public BlogCreator.Post setPost(BlogCreator.Post p) { return post = p; }
 		abstract String getComment();
 		abstract String getId();
 		abstract String getCls();
@@ -3631,7 +3631,7 @@ public class ProduceClickableMap
 	
 	static class Complex extends EntityBase
 	{
-		public BlogCreater.Post setPost(BlogCreater.Post p) {
+		public BlogCreator.Post setPost(BlogCreator.Post p) {
 			return super.setPost(p); }
 		public void setGood(Complex good)
 		{
@@ -5267,8 +5267,8 @@ public class ProduceClickableMap
 	private static void make_index_html(final File this_map_directory, final String blog_name, final String title,
 		final String map_name,
 		ImagesInfo scales,
-		BlogCreater.Post module_post,
-		final BlogCreater wp) throws FileNotFoundException
+		BlogCreator.Post module_post,
+		final BlogCreator wp) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		

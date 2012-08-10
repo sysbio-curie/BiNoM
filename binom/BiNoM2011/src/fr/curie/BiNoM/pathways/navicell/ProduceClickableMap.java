@@ -367,7 +367,7 @@ public class ProduceClickableMap
 			System.exit(1);
 		}
 	}
-	static final File data_directory = new File("data");
+	static final File data_directory = new File("java/classes/data");
 
 	public static void run
 	(
@@ -800,12 +800,27 @@ public class ProduceClickableMap
 		copy_file(sourceFile, destFile);
 	}
 
+	public static boolean isSymlink(File file) throws IOException {
+		// http://stackoverflow.com/questions/813710/java-1-6-determine-symbolic-links
+		if (file == null)
+			throw new NullPointerException("File must not be null");
+		File canon;
+		if (file.getParent() == null) {
+			canon = file;
+		} else {
+			File canonDir = file.getParentFile().getCanonicalFile();
+			canon = new File(canonDir, file.getName());
+		}
+		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+	}
+
+
 	private static void copy_file(final File sourceFile, final File destFile) throws IOException
 	{
-		if (destFile.getCanonicalFile().equals(destFile.getAbsoluteFile()))
-			copyFile(sourceFile, destFile);
-		else
+		if (isSymlink(destFile))
 			Utils.eclipsePrintln("skipping symlink " + destFile);
+		else
+			copyFile(sourceFile, destFile);
 	}
 
 	static private void fatal_error(String message)

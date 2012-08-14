@@ -109,8 +109,9 @@ public static String reactionNodeTypes[] = {
      s = Utils.replaceStringCount(s,"&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">","");
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xhtml\">","");
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
-
-
+     
+     s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xh","");
+     
      fw.write(s);
      fw.close();
    }catch(Exception e){

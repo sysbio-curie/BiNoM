@@ -256,7 +256,7 @@ public class SubnetworkProperties {
 			//SP.modeOfSubNetworkConstruction = SP.ADD_FIRST_NEIGHBOURS;
 			//SP.modeOfSubNetworkConstruction = SP.CONNECT_BY_SHORTEST_PATHS;
 
-			SP.readComplexes(SP.path+"HPRD_PC.txt",40);
+			SP.readComplexes(SP.path+"HPRD_PC.txt",20);
 			//SP.complexMap.remove("COM_2971");
 			SP.addComplexesToNetworkAsClicks(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");			
 			//SP.addComplexesToNetworksAsNodes(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");

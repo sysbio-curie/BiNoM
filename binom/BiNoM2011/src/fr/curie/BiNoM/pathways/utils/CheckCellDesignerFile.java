@@ -23,7 +23,7 @@ public class CheckCellDesignerFile {
 		try{
 		CheckCellDesignerFile cf = new CheckCellDesignerFile();
 		//String nameCD = "C:/Datas/binomtest/problems";
-		String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
+		String nameCD = "C:/Datas/NaviCell/maps/mtor_src/master";
 		cf.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		cf.checkIfReactionConnectedToIncludedSpecies();
 		CellDesigner.saveCellDesigner(cf.sbmlDoc, nameCD+"_fixed.xml");
@@ -54,6 +54,7 @@ public class CheckCellDesignerFile {
 			}
 		}
 		
+		System.out.println("Number of reactions = "+sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray());
 		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 			ReactionDocument.Reaction r = sbmlDoc.getSbml().getModel().getListOfReactions().getReactionArray(i);

@@ -513,7 +513,7 @@ public class ProduceClickableMap
 		return (list);
 	}
 
-	private static Properties load_config(File config)
+	public static Properties load_config(File config)
 	{
 		final Properties configuration = new Properties();
 		final FileInputStream config_stream;
@@ -1284,6 +1284,7 @@ public class ProduceClickableMap
 		
 		final Map<String, String> includedSpeciesToSpeciesMap = new HashMap<String, String>();
 
+		if(annotation.getCelldesignerListOfIncludedSpecies()!=null)
 		for (final CelldesignerSpecies species : annotation.getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
 		{
 			final Complex e = makeClickMapComplex(complexes, species.getCelldesignerAnnotation(), entities);
@@ -1842,6 +1843,7 @@ public class ProduceClickableMap
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		final List<String> modules = new ArrayList<String>();
+		if(model.getListOfReactions()!=null)
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
 			modules.clear();
@@ -2732,6 +2734,7 @@ public class ProduceClickableMap
 			Linker wp
 		)
 		{
+			//System.out.println("Formatting note ="+note+" res = "+res.toString());
 			final String comment = build_comment(note, comments);
 			
 			hash(comment, h);
@@ -2811,6 +2814,7 @@ public class ProduceClickableMap
 			}
 			if (modules_found != null)
 				Collections.sort(modules_found);
+			//System.out.println("Formatted note ="+res.toString());
 			return res;
 		}
 		private void hash(final String comment, final Hasher h)
@@ -3752,6 +3756,7 @@ public class ProduceClickableMap
 	static private Map<String, ArrayList<CelldesignerSpecies>> makeComplexToIncludedSpeciesMap(final SbmlDocument cd)
 	{
 		final Map<String, ArrayList<CelldesignerSpecies>> map = new HashMap<String, ArrayList<CelldesignerSpecies>>();
+		if(cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for (final CelldesignerSpecies sp : cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
 		{
 			if (sp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass().equals(DEGRADED_CLASS_NAME))

@@ -263,6 +263,9 @@ public class SubnetworkProperties {
 			SP.removeDoubleEdges();				System.out.println("After removing double edges: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
 			calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, true);			
 			XGMML.saveToXGMML(SP.network, SP.path+"hprd9_pc_clicks.xgmml");
+			
+			calcPercolationThreshold(SP.network);
+			
 			System.exit(0);
 			
 			/*Vector<String> fulllist = Utils.loadStringListFromFile(SP.path+"pathways/"+pathways.get(0));
@@ -1649,6 +1652,42 @@ public class SubnetworkProperties {
 		fw.close();
 		}catch(Exception e){
 			e.printStackTrace();
+		}
+	}
+	
+	public static void calcPercolationThreshold(Graph graph){
+		int numberOfSampling = 100;
+		Random r = new Random();
+		System.out.println("Before "+graph.Nodes.size());
+		
+		/*Vector<Graph> compsGlobal = GraphAlgorithms.ConnectedComponents(graph);
+		int maxsizeGlobal = -1;
+		int imaxGlobal = -1;
+		for(int j=0;j<compsGlobal.size();j++)
+			if(maxsizeGlobal<compsGlobal.get(j).Nodes.size()){
+				maxsizeGlobal = compsGlobal.get(j).Nodes.size();
+				imaxGlobal = j;
+		}
+		graph = compsGlobal.get(imaxGlobal);*/
+		System.out.println("After "+graph.Nodes.size());
+		System.out.println("NNODES\tAV_SIZE\tPERCENTAGE_CONNECTED\tGLOBALLY_CONNECTED");
+		for(int size=100;size<=8000;size+=100){
+			int compSize = 0;
+			for(int i=0;i<numberOfSampling;i++){
+				graph.selectedIds.clear();
+				for(int j=0;j<size;j++)
+					graph.selectedIds.add(graph.Nodes.get(r.nextInt(graph.Nodes.size())).Id);
+				Graph subnetwork = graph.getSelectedNodes();
+				subnetwork.addConnections(graph);
+				Vector<Graph> comps = GraphAlgorithms.ConnectedComponents(subnetwork);
+				int maxsize = -1;
+				for(int j=0;j<comps.size();j++)
+					if(maxsize<comps.get(j).Nodes.size())
+						maxsize = comps.get(j).Nodes.size();
+				compSize+=maxsize;
+			}
+			float averageSize = (float)compSize/(float)numberOfSampling;
+			System.out.println(size+"\t"+averageSize+"\t"+averageSize/size+"\t"+averageSize/graph.Nodes.size());
 		}
 	}
 		

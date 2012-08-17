@@ -40,7 +40,10 @@ public class ComputeNaviCellMaps {
 						newargs[args.length] = "--config";
 						newargs[args.length+1] = listOfFiles[j].getAbsolutePath();
 						newargs[args.length+2] = "--destination";
-						newargs[args.length+3] = newProject.getAbsolutePath();
+						if(!wordpressfound)
+							newargs[args.length+3] = newProject.getAbsolutePath();
+						else
+							newargs[args.length+3] = currentDir.getAbsolutePath();
 						ProduceClickableMap.main(newargs);
 					}
 				}

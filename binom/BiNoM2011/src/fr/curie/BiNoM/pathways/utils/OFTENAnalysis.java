@@ -22,17 +22,18 @@ public class OFTENAnalysis {
 	public SubnetworkProperties snp = null;
 	public int numberOfPermutationsForSizeTest = 100;
 	public float thresholdSelectionConnectedComponents = 0.1f;
-	public float thresholdIntersectionOfGraphs = 0.5f;
+	public float thresholdIntersectionOfGraphs = 0.4f;
 	public String fileName = "";
 	
 	public static void main(String[] args) {
 		try{
 			
-			String prefix = "C:/Datas/EWING/ICA/";
+			//String prefix = "C:/Datas/EWING/ICA/";
+			String prefix = "C:/Datas/Kairov/DifferentialExpression4BC/lists/"; 
 			String pathToHPRD = "C:/Datas/HPRD9/hprd9_pc_clicks.xgmml";	
-			int nstart = 200;
-			int nend = 700;
-			int step = 100;
+			int nstart = 530;
+			int nend = nstart;
+			int step = 10;
 			
 			int valuesToTest[] = new int[(int)((nend-nstart)/step)+1];
 			int k = 0;

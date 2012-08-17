@@ -407,7 +407,6 @@ public class ProduceClickableMap
 		{
 			throw new NaviCellException("IO error creating map " + master_map_name, e);
 		}
-		Utils.eclipsePrintln(master.getClass().getResource("/data/map.png").toString());
 		
 		try
 		{
@@ -799,18 +798,23 @@ public class ProduceClickableMap
 
 	private void copy_file_between_directories(final String source, File destination, final String file) throws IOException
 	{
-		String cccc = source + "/" + file;
-		Utils.eclipsePrintln(cccc);
+		final String cccc = source + "/" + file;
 		final InputStream resource = getClass().getResourceAsStream(cccc);
 		final File destFile = new File(destination, file);
 		
-//		final File sourceFile = new File(resource.getFile());
-		copy_file(resource, new FileOutputStream(destFile));
+		if (isSymlink(destFile))
+			Utils.eclipsePrintln("skipping symlink " + destFile);
+		else
+		{
+			final FileOutputStream out = new FileOutputStream(destFile);
+			copy_file(resource, out);
+			out.close();
+		}
 	}
 	
-	private void copy_file(InputStream in, OutputStream out) throws IOException
+	static void copy_file(InputStream in, OutputStream out) throws IOException
 	{
-		int c;
+		int c; // FIXME
 		while ((c = in.read()) >= 0)
 			out.write(c);
 	}

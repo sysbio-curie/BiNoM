@@ -19,7 +19,9 @@
 package fr.curie.BiNoM.pathways.navicell;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -628,26 +630,73 @@ public class WordPressBlogCreator extends BlogCreator
 
 	private static final String map_icon_base = "map.png";
 	static private final String map_icon_url_base = "files/" + map_icon_base;
+
+	public static java.io.File createTempDirectory() throws IOException
+	{
+		// http://stackoverflow.com/questions/617414/create-a-temporary-directory-in-java
+		
+		final java.io.File temp = java.io.File.createTempFile("temp", Long.toString(System.nanoTime()));
+
+		if (!temp.delete())
+			throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+
+		if (!temp.mkdir())
+			throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+
+		return temp;
+	}
 	
-	static private void make_map_icon(final Wordpress wp, String url) throws NaviCellException
+	private void make_map_icon(final Wordpress wp, String url) throws NaviCellException
 	{
 		boolean exists = does_map_icon_exist(url);
 		if (!exists)
 		{
-			Utils.eclipsePrintln("icon does not exist " + url);
+			final String resource_name = ProduceClickableMap.data_directory + "/" + map_icon_base;
+			final InputStream resource = getClass().getResourceAsStream(resource_name);
+			Utils.eclipsePrintln("icon does not exist " + url + " copy from " + getClass().getResource(resource_name).toString());
+			
+			final java.io.File dir;
 			try
 			{
-				final MediaObject icon = wp.newMediaObject("image/png", new java.io.File(ProduceClickableMap.data_directory, map_icon_base), false);
-				Utils.eclipsePrintln(icon.toString());
-				Utils.eclipsePrintln("created " + icon.toOneLinerString());
+				dir = createTempDirectory();
 			}
-			catch (XmlRpcFault e)
+			catch (IOException e1)
 			{
-				throw new NaviCellException("unable to upload map icon to blog", e);
+				throw new NaviCellException("unable to make a temporary directory for map icon", e1);
 			}
-			assert does_map_icon_exist(url);
-		}
+			final java.io.File tmp = new java.io.File(dir, map_icon_base);
+			try
+			{
+				try
+				{
+					final java.io.FileOutputStream out = new java.io.FileOutputStream(tmp);
+					ProduceClickableMap.copy_file(resource, out);
+					out.close();
+				}
+				catch (IOException e1)
+				{
+					throw new NaviCellException("unable to write the temporary file for map icon", e1);
+				}
 
+				try
+				{
+					final MediaObject icon = wp.newMediaObject("image/png", tmp, false);
+					Utils.eclipsePrintln(icon.toString());
+					Utils.eclipsePrintln("created " + icon.toOneLinerString());
+				}
+				catch (XmlRpcFault e)
+				{
+					throw new NaviCellException("unable to upload map icon to blog", e);
+				}
+				assert does_map_icon_exist(url);
+			}
+			finally
+			{
+				tmp.delete();
+				if (!dir.delete())
+					throw new NaviCellException("failed to remove temporary directory " + dir);
+			}
+		}
 	}
 	static private boolean does_map_icon_exist(String url) throws NaviCellException
 	{

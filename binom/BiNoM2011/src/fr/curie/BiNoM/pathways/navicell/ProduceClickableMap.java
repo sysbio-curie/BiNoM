@@ -2738,7 +2738,6 @@ public class ProduceClickableMap
 			Linker wp
 		)
 		{
-			//System.out.println("Formatting note ="+note+" res = "+res.toString());
 			final String comment = build_comment(note, comments);
 			
 			hash(comment, h);
@@ -2816,9 +2815,9 @@ public class ProduceClickableMap
 					}
 				}
 			}
+			m.appendTail(res);
 			if (modules_found != null)
 				Collections.sort(modules_found);
-			//System.out.println("Formatted note ="+res.toString());
 			return res;
 		}
 		private void hash(final String comment, final Hasher h)

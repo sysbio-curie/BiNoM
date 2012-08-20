@@ -688,7 +688,8 @@ public class WordPressBlogCreator extends BlogCreator
 				{
 					throw new NaviCellException("unable to upload map icon to blog", e);
 				}
-				assert does_map_icon_exist(url);
+				if (!does_map_icon_exist(url))
+					throw new NaviCellException("put " + map_icon_base + " into the blog but couldn't find it");
 			}
 			finally
 			{

@@ -2419,8 +2419,13 @@ public class ProduceClickableMap
 
 	static private void show_map_icon(final StringBuffer fw, Linker wp)
 	{
+		show_map_icon(fw, wp.getMapIconURL());
+	}
+
+	private static void show_map_icon(final StringBuffer fw, final String url)
+	{
 		fw.append("<img border='0' src=");
-		html_quote(fw, wp.getMapIconURL());
+		html_quote(fw, url);
 		fw.append(" alt='map'>");
 	}
 
@@ -3476,7 +3481,7 @@ public class ProduceClickableMap
 		
 		html_quote(fw.append(" title="), title);
 		fw.append(">");
-		show_map_icon(fw, wp);
+		show_map_icon(fw, icons_directory + "/map.png");
 		return fw.append("</a>");
 	}
 

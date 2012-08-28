@@ -370,36 +370,37 @@ separate graphs, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
 hierarchical organisation of pathways, and the Interaction Map graph
 (IM). Several examples of simple BioPAX level 3 files imported through BiNoM
-are shown in Figure~\ref{6biopax3_examples}. Figure~\ref{apoptosishierarchical}
+%are shown in Figure~\ref{6biopax3_examples}. Figure~\ref{apoptosishierarchical}
+are shown in figure 1. Figure 2
 shows the hierarchical structure of the human Apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
 
-%-------------
+%------------
 %%%% figure 1
-\begin{figure}[h] \caption{\label{6biopax3_examples}  \textbf{Visualization of
-the six BioPAX example files, provided in BioPAX 3.0 documentation.} The BioPAX
-3.0 documentation available at http://biopax.org contains six simple examples
-of BioPAX 3.0 files that describe different aspects of biological network
-interactions (genetic interaction, short metabolic pathway, gene regulatory
-network, biochemical reaction, phosphorylation, protein interaction). Here we
-show how BiNoM visualizes these examples after their import. The BiNoM type of
-representation is indicated below the reaction type, in brackets (Reaction
-Network, Pathway Structure and Interaction Map). The graphical node and edge
-semantics is described in more details in the BiNoM manual.}
-\center{\includegraphics[width=0.9\textwidth]{figures/6biopax3_examples.pdf}}
-\end{figure}
+%\begin{figure}[h] \caption{\label{6biopax3_examples}  \textbf{Visualization of
+%the six BioPAX example files, provided in BioPAX 3.0 documentation.} The BioPAX
+%3.0 documentation available at http://biopax.org contains six simple examples
+%of BioPAX 3.0 files that describe different aspects of biological network
+%interactions (genetic interaction, short metabolic pathway, gene regulatory
+%network, biochemical reaction, phosphorylation, protein interaction). Here we
+%show how BiNoM visualizes these examples after their import. The BiNoM type of
+%representation is indicated below the reaction type, in brackets (Reaction
+%Network, Pathway Structure and Interaction Map). The graphical node and edge
+%semantics is described in more details in the BiNoM manual.}
+%\center{\includegraphics[width=0.9\textwidth]{figures/6biopax3_examples.pdf}}
+%\end{figure}
 
 
 %-------------
 %%%% figure 2
-\begin{figure}[h]
- \caption{\label{apoptosishierarchical}  \textbf{Apoptosis pathway 
-structure.} Representation of BioPAX data extracted from the Reactome database
-\cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
-BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
-triangular nodes denote steps, while grey nodes indicate reactions.}
- \center{\includegraphics[width=0.9\textwidth]{figures/apoptosis_hierarchical.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{apoptosishierarchical}  \textbf{Apoptosis pathway 
+%structure.} Representation of BioPAX data extracted from the Reactome database
+%\cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
+%BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
+%triangular nodes denote steps, while grey nodes indicate reactions.}
+% \center{\includegraphics[width=0.9\textwidth]{figures/apoptosis_hierarchical.png}}
+%\end{figure}
 
 
 When importing a file, BiNoM is calling a \emph{naming service} function in
@@ -442,19 +443,19 @@ This type of approach corresponds to finding the bow-tie graph structure \cite{b
 The decomposition in material components is using the node name semantics to
 isolate subnetworks in which each protein is involved, either as a simple chemical species or as part of a complex. As a result, major overlaps between
 the different subnetworks are to be expected, as many proteins are expected to be involved in
-different complexes. Figure~\ref{matcdc2cdc13} shows two examples of subnetworks
+different complexes. Figure 3 shows two examples of subnetworks
 obtained by material component decomposition applied to a cell cycle network
 model of the yeast species \textit{S. pombe} \cite{novak1998model}. This approach represents
 different parts of the life cycle of a given protein.
 
 %------------
 %%% figure 3
-\begin{figure}[h]
- \caption{\label{matcdc2cdc13}  \textbf{Subnetworks obtained after a decomposition in
-material components.} The two overlapping subnetworks correspond to the components Cdc13 and
-Cdc2.}
- \center{\includegraphics[width=0.7\textwidth]{figures/mat_cdc2_cdc13.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{matcdc2cdc13}  \textbf{Subnetworks obtained after a decomposition in
+%material components.} The two overlapping subnetworks correspond to the components Cdc13 and
+%Cdc2.}
+% \center{\includegraphics[width=0.7\textwidth]{figures/mat_cdc2_cdc13.png}}
+%\end{figure}
 
 
 The cycle decomposition is splitting the network into relevant directed cycles
@@ -465,16 +466,16 @@ be taken when applying this approach, as the number of cycles can be huge for
 large network structures. For example, it might be preferable to eliminate first
 the network hubs, which are by definition highly connected, and also group short
 cycles in larger subnetworks before applying the decomposition function.
-Figure~\ref{mphasecdc25cycles} shows two
+Figure 4 shows two
 cycles involving CDC25 after a cycle decomposition.
 
 %-----------
 %%% figure 4
-\begin{figure}[h]
- \caption{\label{mphasecdc25cycles}  \textbf{CDC25 subnetworks.}
-      Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.}
- \center{\includegraphics[width=0.7\textwidth]{figures/mphase_cdc25_cycles.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{mphasecdc25cycles}  \textbf{CDC25 subnetworks.}
+%      Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.}
+% \center{\includegraphics[width=0.7\textwidth]{figures/mphase_cdc25_cycles.png}}
+%\end{figure}
 
 \subsubsection*{Path analysis algorithms}
 
@@ -550,10 +551,10 @@ $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-In the case of the network presented in Figure~\ref{piquantnetworks}a, let us
+In the case of the network presented in figure 5a, let us
 consider Ac the source node and Ph the target node and consider only the two
-paths defined in the Figures~\ref{piquantnetworks}b and
-~\ref{piquantnetworks}c. Given that the
+paths defined in the Figures 5b and
+5c. Given that the
 node Ac is annotated by the value $2.0$, that the first path has a length
 equal to 3, and that the second path has a length equal to 5, we can calculate the PIQuant score
 of the node Ac to the node Ph as:
@@ -579,7 +580,7 @@ In other words, a path is inconsistent when the
 sign of the experimental data value for a node is opposite to the sign
 of the path.
 
-For example, according to the network represented in Figure~\ref{piquantnetworks}c, there is an influence from Ac to Ph
+For example, according to the network represented in figure 5c, there is an influence from Ac to Ph
 that goes through D . But if this path
 is functional, the annotation of node D should have the same sign as the annotation for node Ac, because
 Ac activates D indirectly (i.e. the path from Ac to D has a positive sign). In this case, the sign of D annotation (the experimental value) is opposite to
@@ -592,7 +593,7 @@ path could indicate that the path is not complete, or could also indicate that
 the path is correct but not active under the precise conditions in which the
 experimental data was generated, corresponding to a different context.
 
-In the case mentionned above in Figure~\ref{piquantnetworks}c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
+In the case mentionned above in figure 5c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
 becomes:
 
 $$
@@ -643,7 +644,7 @@ easily visualize and modify BioPAX files. To the best of our knowledge, there is
 no other software package allowing to view, query and edit BioPAX files than
 BiNoM at the moment. The functions are using
 Java class introspection techniques to build a BioPAX class tree. Then, the
-content of the file can easily be accessed. For example, Figure~\ref{biopaxtrailprop} shows
+content of the file can easily be accessed. For example, figure 6 shows
 all the information linked to the TRAIL protein, after a call to the
 BioPAX property
 editor function of the BiNoM menu has been made. Details are given in the BiNoM manual on how
@@ -652,12 +653,12 @@ complete BioPAX tree.
 
 %-----------
 %%% figure 6
-\begin{figure}[h]
- \caption{\label{biopaxtrailprop}  \textbf{Extra information linked to the TRAIL protein.}
-      The information is automatically extracted from the BioPAX file upon
-import with the BiNoM I/O functions.}
- \center{\includegraphics[width=0.7\textwidth]{figures/biopax_trail_prop.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{biopaxtrailprop}  \textbf{Extra information linked to the TRAIL protein.}
+%      The information is automatically extracted from the BioPAX file upon
+%import with the BiNoM I/O functions.}
+% \center{\includegraphics[width=0.7\textwidth]{figures/biopax_trail_prop.png}}
+%\end{figure}
 
 
 The BioPAX Query functions in BiNoM allow the user to work with huge
@@ -671,7 +672,7 @@ name (and/or by any synonym of the gene) and start building a network centered
 around this molecule of interest. The extension of the network is done by adding
 different types of entities: complexes where the molecule of interest is
 involved, chemical species, reactions (with the possibility of including all the
-sources and targets of the reactions) and related publications. Figure~\ref{smaccomplexes}
+sources and targets of the reactions) and related publications. Figure 7
 illustrates an example of a small network extracted from the human apoptosis
 pathway downloaded from the Reactome database \cite{joshi2005reactome}, and
 centered on the SMAC protein, with all the protein complexes in which
@@ -679,13 +680,13 @@ this protein is involved and that were added using the BiNoM BioPAX Query functi
 
 %-----------
 %%% figure 7
-\begin{figure}[h]
- \caption{\label{smaccomplexes}  \textbf{SMAC pathway subnetwork.}
-      Subnetwork extracted from the human Apoptosis pathway, starting with the
-SMAC protein (white square) and expanding to all protein complexes where this
-molecule is involved (grey squares) using the BiNoM Query functions.}
- \center{\includegraphics[width=0.7\textwidth]{figures/smac_complexes.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{smaccomplexes}  \textbf{SMAC pathway subnetwork.}
+%      Subnetwork extracted from the human Apoptosis pathway, starting with the
+%SMAC protein (white square) and expanding to all protein complexes where this
+%molecule is involved (grey squares) using the BiNoM Query functions.}
+% \center{\includegraphics[width=0.7\textwidth]{figures/smac_complexes.png}}
+%\end{figure}
 
 \subsection*{BiNoM Module manager}
 
@@ -755,16 +756,16 @@ used the intersection of the 208 chemical species
 of RB/E2F network and the 280 chemical species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
-reactions (Figure~\ref{g1s}).
+reactions (figure 8).
 
-%------------
+%-----------
 %%% figure 8
-\begin{figure}[h]
- \caption{\label{g1s}  \textbf{G1/S network.}
-	Overview of the G1 to S transition network, corresponding to the intersection of
-RB/E2F network and G1/S network extracted from Reactome.}
- \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{g1s}  \textbf{G1/S network.}
+%	Overview of the G1 to S transition network, corresponding to the intersection of
+%RB/E2F network and G1/S network extracted from Reactome.}
+% \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
+%\end{figure}
 
 This map contains a lot of valuable information but rather difficult to extract. We present two
 ways to get some biological insight from this map, by using BiNoM functions. The first one consists of
@@ -789,7 +790,7 @@ and analyzing the signs of its entries \cite{fages2008frontiers}. Description an
 available in \cite{calzone2011calamar}.
 
 We applied PIQuant to the resulting influence network of the G1/S transition of
-the cell cycle (Figure~\ref{InflAnnotNet}). We selected three target nodes as
+the cell cycle (figure 9). We selected three target nodes as
 markers of the G1, S and M
 phases of the cell cycle. For the experimental data, we used expression data
 from a study of 57 bladder cancer
@@ -804,21 +805,21 @@ Then, we constructed a text file listing nodes of the influence network
 and their annotation and we imported this file using the Cytoscape function
 ``Import $>$ Nodes attributes''
 in the Cytoscape session of the influence network.
-Figure~\ref{InflAnnotNet} represents this influence network after its import.
+Figure 9 represents this influence network after its import.
 
 %------------
 %%% figure 9
-\begin{figure}[h]
-  \caption{\label{InflAnnotNet} \textbf{Annotated influence network.}
-    Influence network of the cell cycle G1/S transition generated by BIOCHAM. Colors represent
-differential
-expression obtained from transcriptomic data compared to normal tissue. Color
-intensities are proportional to the t-statistic values (red values indicate
-positive values corresponding to an activation, green values indicate negative
-values corresponding to an inhibition). The three grey nodes are markers for the
-different cell cycle phases: G1 (pRB\_star), S (CDK2/Cyclin E1 complex phosphorylated), M (CDC2/Cyclin E1 complex phosphorylated).}
-  \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
-\end{figure}
+%\begin{figure}[h]
+%  \caption{\label{InflAnnotNet} \textbf{Annotated influence network.}
+%    Influence network of the cell cycle G1/S transition generated by BIOCHAM. Colors represent
+%differential
+%expression obtained from transcriptomic data compared to normal tissue. Color
+%intensities are proportional to the t-statistic values (red values indicate
+%positive values corresponding to an activation, green values indicate negative
+%values corresponding to an inhibition). The three grey nodes are markers for the
+%different cell cycle phases: G1 (pRB\_star), S (CDK2/Cyclin E1 complex phosphorylated), M (CDC2/Cyclin E1 complex phosphorylated).}
+%  \center{\includegraphics[width=0.85\textwidth]{figures/Cell_cycle_Expr.pdf}}
+%\end{figure}
 
 PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
@@ -829,30 +830,28 @@ suboptimal shortest path'' as the algorithm to extract the paths. We ran a
 significance test and got the report table. In this report, the ``Node influence
 table'' represents the global PIQuant score from each annotated source node to
 each cell-cycle phase marker. Those values are
-represented as a heat map in Figure~\ref{PIQuantHeatMap}. We can see that most
+represented as a heat map on figure 10. We can see that most
 genes, in cancer cells compared to normal cells, influence positively the M and S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
-Compared to Figure~\ref{InflAnnotNet}, where the coloring represents only the
+Compared to figure 9, where the coloring represents only the
 experimental data values, we can see that the PIQuant score is integrating the
 influence of the network architecture and the experimental data, thereby
 providing a better and more accurate picture of the biological response.
 
 %------------
 %%% figure 10
-\begin{figure}[h]
-  \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of the PIQuant
-scores.}
-    The map shows the results of the PIQuant algorithm applied to the G1/S
-influence network. Color intensities are proportional to PIQuant score (red color indicates a positive
-value; i.e an activation, the green color indicates a negative value, i.e. an
-inhibition).
-Each line represents a source node while each column represents a cell-cycle
-phase.}
+%\begin{figure}[h]
+%  \caption{\label{PIQuantHeatMap} \textbf{Heat map representation of the PIQuant
+%scores.}
+%    The map shows the results of the PIQuant algorithm applied to the G1/S
+%influence network. Color intensities are proportional to PIQuant score (red color indicates a positive
+%value; i.e an activation, the green color indicates a negative value, i.e. an
+%inhibition).
+%Each line represents a source node while each column represents a cell-cycle
+%phase.}
 
-\center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
-\end{figure}
-
-
+%\center{\includegraphics[width=0.8\textwidth]{figures/heatmapPathInfluence.pdf}}
+%\end{figure}
 
 \subsection*{Modularization}
 
@@ -879,20 +878,22 @@ and E2F6. Finally, we generated a modular view of all the individual modules.
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the user (not shown here). Our final
 modular view is composed of 9 modules, with 22
-edges connecting them (Figure~\ref{g1smodular}). A detailed tutorial on the
+edges connecting them (figure 11). A detailed tutorial on the
 construction of this modular network using BiNoM is described in the
 supplementary methods.
 
+
 %-------------
 %%% figure 11
-\begin{figure}[h]
- \caption{\label{g1smodular}  \textbf{Modular view of the G1/S network.}
-	Modular representation of the G1/S network, created by using a set of
-different BiNoM functions. Each node (pictured as a green octagon), represents a
-different module, or subnetwork. The edges connecting the modules represent the
- known influences between modules. }
- \center{\includegraphics[width=0.7\textwidth]{figures/G1S_modular.png}}
-\end{figure}
+%\begin{figure}[h]
+% \caption{\label{g1smodular}  \textbf{Modular view of the G1/S network.}
+%	Modular representation of the G1/S network, created by using a set of
+%different BiNoM functions. Each node (pictured as a green octagon), represents a
+%different module, or subnetwork. The edges connecting the modules represent the
+% known influences between modules. }
+% \center{\includegraphics[width=0.7\textwidth]{figures/G1S_modular.png}}
+%\end{figure}
+
 
 The modular view offers a simplified visualization of the complex network. The
 obtained model is more abstract but highlights some aspects that may not be
@@ -930,7 +931,7 @@ Google Map API, with a possibility to discuss and curate the network through a d
 \item Project home page: \url{http://binom.curie.fr/}
 \item Operating system(s): Platform independent
 \item Programming language: java
-\item Other requirements: java 1.5 or higher, Cytoscape 2.7 or higher
+\item Other requirements: java 1.5 or higher, Cytoscape 2.7, 2.8
 \item License: GNU LGPL
 \item Any restriction to use by non-academics: none
 \end{itemize}
@@ -999,6 +1000,72 @@ Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
 %\section*{Figures}
 %  \subsection*{Figure x - title}
 %      Description.
+\section*{Figures}
+
+  \subsection*{Figure 1 - Visualization of the six BioPAX example files, provided in BioPAX 3.0 documentation.}
+The BioPAX 3.0 documentation available at http://biopax.org contains six simple examples
+of BioPAX 3.0 files that describe different aspects of biological network
+interactions (genetic interaction, short metabolic pathway, gene regulatory
+network, biochemical reaction, phosphorylation, protein interaction). Here we
+show how BiNoM visualizes these examples after their import. The BiNoM type of
+representation is indicated below the reaction type, in brackets (Reaction
+Network, Pathway Structure and Interaction Map). The graphical node and edge
+semantic is described in more details in the BiNoM manual.
+
+  \subsection*{Figure 2 - Apoptosis pathway structure.}
+Representation of BioPAX data extracted from the Reactome database
+\cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
+BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
+triangular nodes denote steps, while grey nodes indicate reactions.
+
+  \subsection*{Figure 3 - Subnetworks obtained after a decomposition in material components.}
+The two overlapping subnetworks correspond to the components Cdc13 and
+Cdc2.
+
+  \subsection*{Figure 4 - CDC25 subnetworks.}
+Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.
+
+  \subsection*{Figure 5 - A simple influence network.}
+The network is composed of seven nodes and nine edges (a). The two paths (b,c)
+extracted from this network start from the source node \textbf{Ac} and end at
+the target node \textbf{Ph} (which denotes a phenotype of interest). The nodes
+\textbf{Ac} and \textbf{D} are annotated using experimental data, and have the
+values $2.0$ and $-1.0$ respectively.
+
+  \subsection*{Figure 6 - Extra information linked to the TRAIL protein.}
+The information is automatically extracted from the BioPAX file upon
+import with the BiNoM I/O functions.
+
+  \subsection*{Figure 7 - SMAC pathway subnetwork.}
+Subnetwork extracted from the human Apoptosis pathway, starting with the
+SMAC protein (white square) and expanding to all protein complexes where this
+molecule is involved (grey squares) using the BiNoM Query functions.
+
+  \subsection*{Figure 8 - G1/S network.}
+Overview of the G1 to S transition network, corresponding to the intersection of
+RB/E2F network and G1/S network extracted from Reactome.
+
+  \subsection*{Figure 9 - Annotated influence network.}
+Influence network of the cell cycle G1/S transition generated by BIOCHAM. Colors represent differential
+expression obtained from transcriptomic data compared to normal tissue. Color
+intensities are proportional to the t-statistic values (red values indicate
+positive values corresponding to an activation, green values indicate negative
+values corresponding to an inhibition). The three grey nodes are markers for the
+different cell cycle phases: G1 (pRB\_star), S (CDK2/Cyclin E1 complex phosphorylated), M (CDC2/Cyclin E1 complex phosphorylated).
+
+  \subsection*{Figure 10 - Heat map representation of the PIQuant scores.}
+The map shows the results of the PIQuant algorithm applied to the G1/S
+influence network. Color intensities are proportional to PIQuant score (red color indicates a positive
+value; i.e an activation, the green color indicates a negative value, i.e. an
+inhibition).
+Each line represents a source node while each column represents a cell-cycle
+phase.
+
+  \subsection*{Figure 11 - Modular view of the G1/S network.}
+Modular representation of the G1/S network, created by using a set of
+different BiNoM functions. Each node (pictured as a green octagon), represents a
+different module, or subnetwork. The edges connecting the modules represent the
+ known influences between modules.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

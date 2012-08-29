@@ -248,7 +248,7 @@ network databases facilitate a large spectrum of analyses, improving our
 understanding of cellular systems. For example, it is now a very common
 practice to cross the output of high-throughput experiments, such as mRNA or
 protein expression levels, with curated biological pathways in
-order to efficiently visualize changes, analyze their impact on a network and
+order to visualize changes, analyze their impact on a network and
 formulate new hypotheses about
 biological processes \cite{saraiya2005visualizing,
 gehlenborg2010visualization}. The development of those pathway repositories has
@@ -256,7 +256,7 @@ also fueled the creation of standard representations and formats, to facilitate
 the exchange and representation of data, such as the Biological Pathway
 Exchange standard (BioPAX) \cite{demir2010biopax}, the Systems Biology Markup
 Language (SBML) \cite{hucka2003systems} or the Systems Biology Graphical
-Notation (SBGN) \cite{le2009systems}. The Pathway resource list website counts
+Notation (SBGN) \cite{le2009systems}. The Pathguide website counts
 more than 300 web-accessible biological pathway and network databases
 \cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
 formats. Ultimately, those integrated resources will facilitate computational
@@ -284,14 +284,13 @@ import data from various standard format sources, to perform structural analyses
 and to manipulate networks, and to be able to export a network to a suitable
 format for further analysis (e.g. mathematical modeling). We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
-network vizualization and analysis tool \cite{cline2007integration}. BiNoM
-facilitates the usage and analysis of biological networks in standard Systems
-Biology formats (SBML, SBGN, BioPAX). More specifically, BiNoM implements
+network vizualization and analysis tool \cite{cline2007integration}. BiNoM has
+several built-in functions for importing and exporting standard Systems Biology
+file formats such as SBML and BioPAX. BiNoM also implements
 several functions based on graph operations for the structural analysis of
 biological networks. Those functions can be used to reduce the complexity and
-extract meaningful subnetworks from large scale molecular maps. Furthermore,
-BiNoM has several built-in functions for accessing standard Systems Biology file
-formats. Here, we provide a detailed view on the functions implemented in BiNoM
+extract meaningful subnetworks from large scale molecular maps. Here, we provide
+a detailed view on the functions implemented in BiNoM
 that permit specific extraction of information from large scale molecular maps
 and improve their readability and usability. We also highlight novel functions
 that were implemented recently, such as the support of the latest BioPAX
@@ -305,11 +304,11 @@ for tumor development and progression.
 BiNoM is implemented in the Java programming language, as a plugin
 for the network visualization and analysis software package Cytoscape
 \cite{cline2007integration}. Although the primary use of BiNoM is through the
-Cytoscape software, the underlying logic of all BiNoM functions is completely
+Cytoscape software, the underlying logic of most of the BiNoM functions is completely
 decoupled from the Cytoscape objects, allowing developers to also use BiNoM as
 an independent java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
-Plugins``, section ''Other''), or alternatively the user can
+Plugins``, section ''Other''). Alternatively, the user can
 also download the plugin together with a manual and the source code from the
 BiNoM website
 \url{http://binom.curie.fr/}. 
@@ -351,7 +350,7 @@ new specification known as BioPAX Level 3 (\url{http://www.biopax.org/}). This
 format supports metabolic pathways, signaling pathways (including states of molecules
 and generic molecules), gene regulatory networks, molecular interactions and
 genetic interactions. Due to major changes in the
-specification, the BioPAX level 3 is incompatible with the level 2 file format.
+specification, the BioPAX level 3 is not backward compatible with the level 2 file format.
 
 BioPAX is using the web ontology language specification (OWL,
 \url{http://www.w3.org/2004/OWL/}) to store data in XML-formatted files. In
@@ -369,9 +368,8 @@ extracted from the index. For example, BioPAX files are imported as three
 separate graphs, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
 hierarchical organisation of pathways, and the Interaction Map graph
-(IM). Several examples of simple BioPAX level 3 files imported through BiNoM
-%are shown in Figure~\ref{6biopax3_examples}. Figure~\ref{apoptosishierarchical}
-are shown in figure 1. Figure 2
+(IM). Several examples of simple BioPAX level 3 files imported through BiNoM,
+representing different types of interactions, are shown on figure 1. Figure 2
 shows the hierarchical structure of the human Apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
 
@@ -513,8 +511,8 @@ the path length and the sign of the path for a set of paths defined between the
 source and the target node.
 A positive or negative PIQuant score value is a quantitive theoretical
 prediction of the over or underexpression of
-the target node. For instance, let us consider that we have for a given network
-experimental data corresponding to differential gene expression values (e.g.
+the target node. For instance, let us consider that we have experimental data for a given network
+ corresponding to differential gene expression values (e.g.
 disease/normal ratios).
 In that case, a positive or a negative PIQuant score for a given phenotype
 (output node) predicts quantitatively
@@ -526,10 +524,10 @@ compare the effects of two different experimental datasets on the same phenotype
 architectures on the same phenotype for one experimental dataset.
 
 
-More formally, we can define a source node as \textit{annotated} when a signed real
-number is assigned to the node, representing an experimental data value. For example, it
-can be the expression ratio of a gene between a disease and a normal state,
-obtained from transcriptomics profiling.
+More formally, we define a source node as \textit{annotated} when a signed real
+number is assigned to the node, representing an experimental data value (e.g.
+the expression ratio of a gene between a disease and a normal state, obtained
+from transcriptomics profiling).
  A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
 between a source node and a target node (without repetition of any node
@@ -540,7 +538,7 @@ non-intersecting paths, see previous paragraph). The activity
 $\alpha_k$ of the path $k$ is defined as the annotation
 of its source node. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
-the length $\lambda_k$ of the path $k$ as the number of edges in the path. We also
+the length $\lambda_k$ of the path $k$ as the number of edges in the path. We
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
 not require extra parameters other than the influence network to be calculated.
@@ -640,9 +638,7 @@ such as the \textit{Homo sapiens} network from the reactome database
 8,000 chemical species (proteins, RNA molecules, metabolites, etc.).
 
 BiNoM implements a set of functions precisely aiming at allowing end users to
-easily visualize and modify BioPAX files. To the best of our knowledge, there is
-no other software package allowing to view, query and edit BioPAX files than
-BiNoM at the moment. The functions are using
+easily visualize and modify BioPAX files. The functions are using
 Java class introspection techniques to build a BioPAX class tree. Then, the
 content of the file can easily be accessed. For example, figure 6 shows
 all the information linked to the TRAIL protein, after a call to the
@@ -778,8 +774,8 @@ losing any content from the original map.
 PIQuant algorithm can be used to perform a quantitative analysis on an influence
 network. In order to translate the G1/S reaction network into an influence network, we used
 a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
-available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). In order to translate a reaction network into an influence network, the first one is 
-pre-processed accordingly to simple rules: (1) BIOCHAM deletes all linear
+available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). To translate a reaction network into an influence network, the first one is 
+pre-processed according to simple rules: (1) BIOCHAM deletes all linear
 degradations and syntheses, (2) all intermediary chemical species with only one input and
 one output are suppressed, (3) if the reactions of synthesis and degradation of
 the chemical species deleted in (2) have distinct inputs and outputs, then these reactions
@@ -798,10 +794,7 @@ tissue samples compared to 4 normal samples \cite{stransky2006regional}. For
 each gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. The t-test statistic value is used as the annotation
 for each gene. We selected the 19 nodes for which we had experimental data
-values as source nodes (complexes are selected if one of the members for which
-we had a experimental value had no unbound state in the network).
-
-Then, we constructed a text file listing nodes of the influence network
+values as source nodes. Then, we constructed a text file listing nodes of the influence network
 and their annotation and we imported this file using the Cytoscape function
 ``Import $>$ Nodes attributes''
 in the Cytoscape session of the influence network.
@@ -823,15 +816,20 @@ Figure 9 represents this influence network after its import.
 
 PIQuant is applied to this network and its annotation, by using the function
 ``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
-analysis''. The PIQuant score is calculated for each association
-between a source node and a target node (the list of nodes and all the PIQuant
-score values are available as supplementary table 1). We selected the option ``optimal and
-suboptimal shortest path'' as the algorithm to extract the paths. We ran a
-significance test and got the report table. In this report, the ``Node influence
-table'' represents the global PIQuant score from each annotated source node to
-each cell-cycle phase marker. Those values are
-represented as a heat map on figure 10. We can see that most
-genes, in cancer cells compared to normal cells, influence positively the M and S phases (red
+analysis''. We selected the option ``optimal and
+suboptimal shortest path'' as the algorithm to extract the paths. The PIQuant
+score is then automatically calculated for each association
+between a source node and a target node. The user can browse the results on an
+interactive window detailing the different paths and their scores, and can also
+get a complete report, detailing the global and individual PIQuant scores from
+each annotated source node to each cell-cycle phase marker (for more details on
+the interactive window and the report, see the BiNoM manual).
+The global PIQuant score from each annotated source node to each target is
+represented as a heatmap on figure 10 (the list of nodes and all the PIQuant
+score values corresponding to the heatmap figure are available as supplementary
+table 1). We can see on this figure that most
+genes, in cancer cells compared to normal cells, influence positively the M and
+S phases (red
 coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
 Compared to figure 9, where the coloring represents only the
 experimental data values, we can see that the PIQuant score is integrating the
@@ -866,17 +864,17 @@ contained in the original diagram or derived from previous biological knowledge.
 
 Briefly, we first decomposed the global network into its different components,
 by using name semantics to isolate the subnetworks in which
-each protein is involved. The 36 networks that are created this way may share a
+each protein is involved (decomposition in material components). The 36 networks that are created this way may share a
 lot of common chemical species, so we went further
 by clustering the subnetworks having at least 25\% of common chemical species. We renamed
 the 7 clusters obtained with a name that illustrates the content and the main
 function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
-content of each module, making modifications if necessary by adding or deleting nodes.
+content of each module, making modifications if necessary by adding or deleting nodes, according to specific biological knowledge.
 For example, the module E2F1\_RB is
 further decomposed in three different modules containing the proteins RB, E2F1
-and E2F6. Finally, we generated a modular view of all the individual modules.
+and E2F6. Finally, we generated a modular view of all the individual modules, using the Module Manager functions.
 BiNoM links the modules if they share components or edges. These edges are then
-interpreted as activation or inhibition by the user (not shown here). Our final
+interpreted as activation or inhibition by the user. Our final
 modular view is composed of 9 modules, with 22
 edges connecting them (figure 11). A detailed tutorial on the
 construction of this modular network using BiNoM is described in the
@@ -895,12 +893,23 @@ supplementary methods.
 %\end{figure}
 
 
-The modular view offers a simplified visualization of the complex network. The
+The modular view offers a simplified visualization of the complex network,
+without losing any information of the global map. The
 obtained model is more abstract but highlights some aspects that may not be
-evident from the comprehensive reaction network. For instance, it brings into relief some
-feedbacks, positive, negative or feedforward, involving the major players of the
+evident from the comprehensive reaction network. For instance, it brings into
+relief feedbacks (positive, negative or feedforward) involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
-of this modular network into a Boolean model is indeed straightforward.
+of this modular network into a Boolean model is indeed straightforward. Another
+application for the modular model would be to analyze experimental data such as
+transcriptome or copy number variations (CGH). The ``activity'' of each module
+is for example based on the expression levels of the genes within the module,
+wich can be visualized using a color code. It's then fairly easy to visualize
+the difference between a disease and a normal state, or even to try to
+discriminate between different disease stages. We have produce such maps for the
+RB/E2F modular network to analyze bladder tumor samples, and we could observe a
+striking difference between the non-invasive and invasive states of the disease
+\cite{calzone2008comprehensive}(the colored maps can be visualized at
+\url{http://bioinfo-out.curie.fr/projects/rbpathway/case_study.html}).
 
 \section*{Conclusions}
 
@@ -921,7 +930,7 @@ independent networks into one, finding minimal intervention sets to disrupt or m
 signaling flow from a set of source nodes to a set of target nodes (OCSANA algorithm, \cite{Vera-Licona2012OCSANA}), ability to
 generate a code for web-based representations of biological networks using the
 Google Map API, with a possibility to discuss and curate the network through a dedicated web-blog 
-(NaviCell software, http://navicell.curie.fr)
+(NaviCell software, http://navicell.curie.fr).
 
 
 \section*{Availability and requirements}
@@ -930,7 +939,7 @@ Google Map API, with a possibility to discuss and curate the network through a d
 \item Project name: BiNoM
 \item Project home page: \url{http://binom.curie.fr/}
 \item Operating system(s): Platform independent
-\item Programming language: java
+\item Programming language: Java
 \item Other requirements: java 1.5 or higher, Cytoscape 2.7, 2.8
 \item License: GNU LGPL
 \item Any restriction to use by non-academics: none
@@ -1018,8 +1027,8 @@ Representation of BioPAX data extracted from the Reactome database
 BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
 triangular nodes denote steps, while grey nodes indicate reactions.
 
-  \subsection*{Figure 3 - Subnetworks obtained after a decomposition in material components.}
-The two overlapping subnetworks correspond to the components Cdc13 and
+  \subsection*{Figure 3 - Decomposition in material components.}
+The two overlapping subnetworks found after the decomposition in material components of the cell cycle model of Novak et al. \cite{novak1998model}, corresponding to the components Cdc13 and
 Cdc2.
 
   \subsection*{Figure 4 - CDC25 subnetworks.}

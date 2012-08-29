@@ -187,18 +187,33 @@ Rovera$^{1,2,3}$ \and Gautier Stoll$^{1,2,3}$ Emmanuel Barillot$^{1,2,3}$ and An
 \begin{abstract}
 
 Public repositories of biological pathways and networks have greatly expanded in
-recent years. Such databases contain many pathways that facilitate the analysis of high-throughput
+recent years. Such databases contain many pathways that facilitate the analysis
+of high-throughput
 experimental work and the formulation of new biological hypotheses to be
  tested, a fundamental principle of the Systems Biology approach.
-However, large scale molecular maps are not always easy to mine and interpret. We
-have developed BiNoM (Biological Network Manager), a Cytoscape plugin which provides
+However, large scale molecular maps are not always easy to mine and interpret.
+We
+have developed BiNoM (Biological Network Manager), a Cytoscape plugin which
+provides
  functions for the import-export of standard Systems Biology
-file formats, and a set of algorithms to analyze and reduce the complexity
-of large biological networks. Here, we provide an in-depth overview of the BiNoM
-functions, we detail novel aspects such as the support of the BioPAX level 3
-format and an algorithm for the quantification of pathways for influence
-networks. We also illustrate some of the BiNoM functions on a detailed biological case
-study of a network representing the G1/S transition of the cell cycle.
+file formats (such as SBML and BioPAX), and a set of algorithms to analyze and
+reduce the complexity
+of large biological networks. BiNoM can be used to import and analyze files
+created with the CellDesigner software. BiNoM provides a set of functions
+allowing to import BioPAX files, but also to search and edit their
+content. As such, BiNoM is able to efficiently manage large BioPAX files such as
+whole pathway databases. BiNoM also implements a collection of powerful
+graph-based functions and algorithms such as path analysis, decomposition by
+name or cycle, subnetworks clustering and decomposition of a large network in
+modules. Here, we provide an in-depth overview of the BiNoM
+functions, and we also detail novel aspects such as the support of the BioPAX
+level 3
+format and the implementation of a new algorithm for the quantification of
+pathways for influence
+networks. At last, we illustrate some of the BiNoM functions on a detailed
+biological case
+study of a network representing the G1/S transition of the cell cycle, a crucial
+cellular process disturbed in most human tumors.
 
 \end{abstract}
 
@@ -477,9 +492,9 @@ cycles involving CDC25 after a cycle decomposition.
 
 \subsubsection*{Path analysis algorithms}
 
-BiNoM analysis functions also include several classical path analysis
+BiNoM analysis functions also include classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
-all non self-intersecting paths. The shortest path is calculated as the path having
+all non self-intersecting paths (table 1). The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the suboptimal path is constructed by removing all edges of
 all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths 
@@ -861,6 +876,8 @@ knowledge. Each module represents in fact a
 sequence of events occuring with a particular protein. The modules are then
 linked by activating or inhibiting influences according to the information
 contained in the original diagram or derived from previous biological knowledge.
+A detailed tutorial on the construction of this modular network using BiNoM is
+described in the supplementary methods.
 
 Briefly, we first decomposed the global network into its different components,
 by using name semantics to isolate the subnetworks in which
@@ -876,9 +893,7 @@ and E2F6. Finally, we generated a modular view of all the individual modules, us
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the user. Our final
 modular view is composed of 9 modules, with 22
-edges connecting them (figure 11). A detailed tutorial on the
-construction of this modular network using BiNoM is described in the
-supplementary methods.
+edges connecting them (figure 11). 
 
 
 %-------------
@@ -902,10 +917,10 @@ cell cycle, and prepares the network for mathematical modeling. The translation
 of this modular network into a Boolean model is indeed straightforward. Another
 application for the modular model would be to analyze experimental data such as
 transcriptome or copy number variations (CGH). The ``activity'' of each module
-is for example based on the expression levels of the genes within the module,
-wich can be visualized using a color code. It's then fairly easy to visualize
+is based on the expression levels of the genes within the module,
+which can be visualized using a color code on the modular map. It's then fairly easy to analyze
 the difference between a disease and a normal state, or even to try to
-discriminate between different disease stages. We have produce such maps for the
+discriminate between different disease stages. We have produced such maps for the
 RB/E2F modular network to analyze bladder tumor samples, and we could observe a
 striking difference between the non-invasive and invasive states of the disease
 \cite{calzone2008comprehensive}(the colored maps can be visualized at
@@ -937,7 +952,7 @@ Google Map API, with a possibility to discuss and curate the network through a d
 
 \begin{itemize}
 \item Project name: BiNoM
-\item Project home page: \url{http://binom.curie.fr/}
+\item Project home page: \url{http://binom.curie.fr/} and \url{http://apps.cytoscape.org/apps/binom}
 \item Operating system(s): Platform independent
 \item Programming language: Java
 \item Other requirements: java 1.5 or higher, Cytoscape 2.7, 2.8
@@ -1031,8 +1046,8 @@ triangular nodes denote steps, while grey nodes indicate reactions.
 The two overlapping subnetworks found after the decomposition in material components of the cell cycle model of Novak et al. \cite{novak1998model}, corresponding to the components Cdc13 and
 Cdc2.
 
-  \subsection*{Figure 4 - CDC25 subnetworks.}
-Two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.
+  \subsection*{Figure 4 - Decomposition in cycles.}
+The figure shows two cycles for the CDC25 protein found after the decomposition of the cell cycle network model of Novak et al. \cite{novak1998model}.
 
   \subsection*{Figure 5 - A simple influence network.}
 The network is composed of seven nodes and nine edges (a). The two paths (b,c)
@@ -1099,6 +1114,25 @@ different module, or subnetwork. The edges connecting the modules represent the
 %        A3 & ..  & .  \\ \hline
 %      \end{tabular}
 %      }
+
+
+\section*{Tables}
+  \subsection*{Table 1 - BiNoM path analysis algorithms}
+    Short description of the three different algorithms implemented in BiNoM for
+path analysis. The ``Directed paths search`` toggles the search for directed or
+undirected paths. The ''Finite radius'' option let the user restrict the search
+to a given path length, in order to avoid too large   \par \mbox{}
+    \par
+    \mbox{
+      \begin{tabular}{|c|c|c|}
+        %\hline \multicolumn{3}{|c|}{My Table}\\ \hline
+        \hline
+	\textbf{Algorithms} & \textbf{Directed paths search} &  \textbf{Finite radius} \\ \hline
+        Shortest paths (Dijkstra's algorithm & o & o \\ \hline
+        Optimal and suboptimal shortest paths & o & o  \\ \hline
+        All non-intersecting paths & o  & o  \\ \hline
+      \end{tabular}
+      }
 
 
 

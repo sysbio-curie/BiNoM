@@ -160,7 +160,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		initVisualStyles();
 
 		JMenu plugInMenu = cyMenus.getOperationsMenu();
-		JMenu binomMainMenu = new JMenu("BiNoM 2.0");
+		JMenu binomMainMenu = new JMenu("BiNoM 2.1");
 		plugInMenu.add(binomMainMenu);
 		
 		/*
@@ -339,10 +339,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem.addActionListener(new PathConsistencyAnalyzer());
 		structAnaMenu.add(menuItem);
 
-		structAnaMenu.addSeparator();
-		menuItem = new JMenuItem("OCSANA analysis...");
-		menuItem.addActionListener(new OptimalCutSetAnalyzer());
-		structAnaMenu.add(menuItem);
+//		structAnaMenu.addSeparator();
+//		menuItem = new JMenuItem("OCSANA analysis...");
+//		menuItem.addActionListener(new OptimalCutSetAnalyzer());
+//		structAnaMenu.add(menuItem);
 
 		structAnaMenu.addSeparator();
 

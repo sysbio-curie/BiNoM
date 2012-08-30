@@ -36,7 +36,7 @@ public class AboutBox implements ActionListener {
 		
 		// add content
 		addALabel("---", content);
-		addALabel("BiNoM version 2.0",content);
+		addALabel("BiNoM version 2.1",content);
 		addALabel("Copyright (c) 2006 Institut Curie",content);
 		addALabel("License: LGPL version 2.1",content);
 		addALabel("---", content);

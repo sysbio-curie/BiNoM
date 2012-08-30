@@ -1,0 +1,7 @@
+
+# change version number for all menu lines
+# use this perl one liner command in the input directory
+# adapt version numbers!
+
+# perl -pi -e 's/BiNoM 2\.0/BiNoM 2.1/g' *.tex
+ 

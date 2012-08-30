@@ -1,7 +1,7 @@
 Module manager is useful for creating modular view of large networks without loosing details of modules (using “nest”, object of Cytoscape v7 and after).
 
 \subsection{Create Network of Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network of Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network of Modules}\\
 Create a new network from a list of sub-networks (sub-networks are selected in the network list see figure~\ref{Create_network_of_modules}).\\
 Nodes=modules, no edge. Visual style created in VizMapper for module network . The got network is as \ref{M-Phase_Material_Modular} without edge and with nodes on grid.\\
 \includegraphics[width=12pt,height=12pt]{graphics/warning} Module names and node names must be different, all network names too.\\\\
@@ -15,7 +15,7 @@ select node$\Rightarrow$CRight click$\Rightarrow$CNested Network$\Rightarrow$Go 
 \end{figure}
 
 \subsection{Create Connections between Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Connections between Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Connections between Modules}\\
 Create edges linking modules from all edges of the selected network.\\
 Links are simplified, no distinction between left and right (molecule flow), no duplication if same interaction.\\
 Warning message if duplicated or absent nodes (may disturb links).
@@ -27,14 +27,14 @@ Warning message if duplicated or absent nodes (may disturb links).
 \end{figure}
 
 \subsection{Create Modules from Networks}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Modules from Networks}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Modules from Networks}\\
 Create modules in the active network from a list of sub-networks (sub-networks are selected in the network list)\\
 All edges are kept. See edge attribute PREVIOUS\_ID for their origin.\\
 The attribute BIOPAX\_NODE\_TYPE is set to “pathway” (see visual style BiNoM BioPAX).\\
 \includegraphics[width=12pt,height=12pt]{graphics/warning} All nodes of sub-networks must be found once in the active network (no intersection between sub-networks).
 
 \subsection{Agglomerate the Nearest Nodes in Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Agglomerate the Nearest Nodes in Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Agglomerate the Nearest Nodes in Modules}\\
 Create modules and a modular view by agglomerating the nearest nodes in the active network (see~algorithm~in section~\ref{Agglomeration_by_shortest_path}.\\\\
 Input 2 parameters to get not too big sub-networks containing not too far nodes:
 \begin{itemize}
@@ -57,12 +57,12 @@ Sub-networks are created and gathered in a packed network as the function "Creat
 \end{figure}
 
 \subsection{List Nodes of Modules and Network}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$List Nodes of Modules and Network}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$List Nodes of Modules and Network}\\
 List nodes of network and nodes included in modules.\\
 Result in text box can be simply copied in a spreadsheet through clipboard.
 
 \subsection{Find Common Nodes in Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Find Common Nodes in Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Find Common Nodes in Modules}\\
 Display in text box the belonging matrix of nodes (modules in columns, nodes in rows, size of modules in last row, frequency in modules in last column); result more easily usable after copying in a spreadsheet (see~\ref{Common_nodes_in_modules}.\\\\
 Create intersection edges with number of common nodes as attribute (COMMON\_NODES), green edges in figure~\ref{M-Phase_Material_Modular}.\\\\
 Create node attribute containing the node numbers of modules (NODE\_NUMBER).\\\\
@@ -79,26 +79,26 @@ Module Visual StyleCan be adapted to the wished visual aspect by hands in VizMap
 \end{figure}
 
 \subsection{Assign Module Names to Node Attribute}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Assign Module Names to Node Attribute}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Assign Module Names to Node Attribute}\\
 Create a node attribute (named as the modular network), containing module names. This attribute may be used to visualize modules in the reference network.
 
 \subsection{List Components of Species in Network and Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$List Components of Species in Network and Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$List Components of Species in Network and Modules}\\
 List components of species (their names must respect BiNoM syntax). Useful to name modules.
 
 \subsection{Create Network from Union of Selected Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network from Union of Selected Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network from Union of Selected Modules}\\
 Create a network from union of selected modules and its corresponding module in the current network (named by module names separated by \&).
 
 \subsection{Create Network from Intersection of 2 Selected Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network from Intersection of 2 Selected Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Network from Intersection of 2 Selected Modules}\\
 Create a network from intersection of 2 selected modules and its corresponding module (named by module names separated by \textbar.\\\\
 Confirm for deleting the common nodes in the selected modules.
 
 \subsection{Recreate Lost Connections inside Modules}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM Module Manager$\Rightarrow$Recreate Lost Connections Inside Modules}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Recreate Lost Connections Inside Modules}\\
 Recreate connections inside modules which may have been lost by modularizing operations.
 
 \subsection{Destroy Networks Unused as Module}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM module manager$\Rightarrow$Destroy Networks Unused as Module}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM module manager$\Rightarrow$Destroy Networks Unused as Module}\\
 Select networks to be deleted among a list of networks which are not used as modules in the current network (simplify cleaning session).

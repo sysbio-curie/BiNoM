@@ -1,6 +1,6 @@
 \subsection{Import BioPAX 3 document}
 BioPAX level 3 information is fully supported (reaction network, interaction network, pathway structure, annotations).\\\\
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM  I/O$\Rightarrow$Import BioPAX 3 Document from file}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM  I/O$\Rightarrow$Import BioPAX 3 Document from file}\\
 The model M-Phase.owl\cite{novak1998model} is uploaded. A dialog window proposes to create three different interfaces to the BioPAX file: reaction network (RN), pathway structure (PS) and protein interaction (PP).
 \begin{itemize}
 \item Reaction network: M-Phase RN is a representation of the reaction network (figure~\ref{View_BioPAX_of_Novak}).
@@ -27,11 +27,11 @@ For more details on BioPAX, its interfaces, etc, go to section \ref{Standard_Bio
 \item Include Pathways: includes green nodes (figure~\ref{Apoptosis_pathway_hierarchical_structure}) which correspond to the names of the different pathways of the network.
 \item Include interactions: shows explicitly the reactions involved in the pathway (lower grey nodes in figure~\ref{Apoptosis_pathway_hierarchical_structure}).
 \end{itemize}\
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Import BioPAX 3 Document from URL}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Import BioPAX 3 Document from URL}\\
 A BioPAX 3 document can also be imported directly from a URL. The web address must be typed in the dialog window.
 
 \subsection{Import CellDesigner document}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Import CellDesigner Document from file}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Import CellDesigner Document from file}\\
 The model can be drawn – or downloaded\cite{novak1998model} – in CellDesigner (figure~\ref{CellDesigner_view_of_yeast_cell_division}) and saved as M-Phase.xml.\\
 The “Import CellDesigner Document from file” function imports a model from CellDesigner to Cytoscape.  A dialog window opens and M-Phase.xml needs to be selected and imported (figure~\ref{Cytoscape_view_of_yeast_cell_division}).\\
 \begin{figure}
@@ -50,12 +50,12 @@ In species notes in CellDesigner “Attribute name:Value” as HUGO:E2F1 (withou
 
 \subsection{Import CSML document}
 
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Import CSML document}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Import CSML document}\\
 BiNoM imports a CSML (Cell System Markup Language, csml.org)
 
 \subsection{Import influence network from AIN file} \label{Import_AIN_file}
 
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Import AIN file}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Import AIN file}\\
 
 This option proposes to automatically import an influence network in Cytoscape
 from a simple tab-delimited text file. We call the format of the
@@ -92,8 +92,8 @@ The imported network is synchronized with BioPAX format that includes the annota
 \subsection{Export current network to BioPAX 3, Export current network to CellDesigner} \label{Export_current_network}
 The Cytoscape networks can be exported in BioPAX and CellDesigner by:
 \begin{itemize}
-\item \textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to BioPAX 3}
-\item \textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to CellDesigner}
+\item \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to BioPAX 3}
+\item \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to CellDesigner}
 \end{itemize}
 \includegraphics[width=12pt,height=12pt]{graphics/warning} provided that they are associated to existing CellDesigner or BioPAX by:
 \begin{itemize}
@@ -111,36 +111,36 @@ Here are the typical scenarios where BiNoM export operations can be useful.
 \item User imports CellDesigner file, selects a subnetwork and exports it as a BioPAX file (some SBML-specific information such as parameters values will be lost).
 \end{enumerate}
 The networks created as a result of the import operation are already associated to the corresponding BioPAX or CellDesigner files. However, if the XGMML file is saved and used in another Cytoscape session, or if a new network is created from the initial network with Cytoscape New menu then this association is lost.\\\\
-To perform export operation, the network should be Re-associated to the corresponding file (from which it is originated) through Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Associate$\ldots$ operation. For huge BioPAX files the association might take some time for the first association, but once the file is loaded into memory cache, the following associations are almost instantaneous.\\\\
+To perform export operation, the network should be Re-associated to the corresponding file (from which it is originated) through Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Associate$\ldots$ operation. For huge BioPAX files the association might take some time for the first association, but once the file is loaded into memory cache, the following associations are almost instantaneous.\\\\
 To understand better what BiNoM can do or can not, read the sections \ref{Attributed_graph_model}, \ref{BiNoM_Naming_Service} and \ref{Standard_BioPAX_Interfaces} about the BiNoM data model.
 
 \subsection{Export current network to SBML}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to SBML}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to SBML}\\
 Export the current network to pure SBML level 2.
 
 \subsection{Associate BioPAX 3 Source} \label{Associate_BioPAX_Source}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source}\\
 Associate a BioPAX 3 Source to allow exportation in BioPAX 3 as explained in section~\ref{Export_current_network}
 
 \subsection{Save whole associate BioPAX 3 as}
 When the content of the BioPAX file is modified (through BioPAX property editor, see section ~\ref{BioPAX_Property_Editor}), it can be to be saved as a whole (not only visible part) by\\
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Save whole associated BioPAX 3 as}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Save whole associated BioPAX 3 as}\\
 Otherwise, all modifications made in the different interfaces are lost. Changes are visible but only recorded permanently when the document is save.
 
 \subsection{Associate CellDesigner Source}\label{Associate_CellDesigner_Source}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source} \\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source} \\
 Associate a CellDesigner Source to allow exportation in CellDesigner as explained in section~\ref{Export_current_network}
 
 \subsection{List all reactions}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$List all reactions} \\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$List all reactions} \\
 Display list of reactions, can be copied by control+A then control+C.
 
 \subsection{List all nodes}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$List all nodes} \\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$List all nodes} \\
 Display list of nodes, can be copied by control+A then control+C.
 
 \subsection{Color CellDesigner proteins}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Color CellDesigner proteins}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Color CellDesigner proteins}\\
 Cytoscape allows coloring nodes according to values of attributes (for example expression data) by the powerful possibilities of VizMapper. The export to CellDesigner keeps the colors. This process can be used to color species in CellDesigner. The function Color CellDesigner proteins allows to color proteins in CellDesigner which describe the components of complexes.\\\\
 The gene expression file is based on Hugo names, data in columns (first line title and tabulation as column separator):\\Hugo names\textless Tab\textgreater expression level 1\textless Tab\textgreater expression level 2$\ldots$\\\\
 Open dialog box “Color CellDesigner proteins…”, input CellDesigner file name and gene expression file, click on ok. BiNoM generate a file *.conv where Hugo names are converted in protein names (links by annotation in CellDesigner, check if correct) and a CellDesigner file by column. When there are several Hugo name the highest is kept.\\\\
@@ -153,5 +153,5 @@ Figure~\ref{Colored_CellDesigner_view_by_ficticious_data} shows the aspect of co
 \end{figure}
 
 \subsection{Modify CellDesigner notes}
-\textbf{Plugins$\Rightarrow$BiNoM 2.0$\Rightarrow$BiNoM I/O$\Rightarrow$Color CellDesigner proteins}\\
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Color CellDesigner proteins}\\
 Modify in Cytoscape the notes of CellDesigner file when exporting.

@@ -297,8 +297,9 @@ public class DataPathConsistencyAnalyzer {
 			if(e.Node1.Id.equals(currentNode.Id))if(!e.Node2.Id.equals(currentNode.Id))if(visited.indexOf(e.Node2)<0){
 				n = e.Node2;
 				String ef = e.getFirstAttributeValue("EFFECT");
-				ef = ef.toLowerCase();
+				
 				if(ef!=null){
+					ef = ef.toLowerCase();
 					if(ef.indexOf("activation")>=0)if(effect.toString().equals("")){
 						effect.append("activation"); overall+=effect.toString();
 					}
@@ -307,8 +308,9 @@ public class DataPathConsistencyAnalyzer {
 					}
 				}else{
 					ef = e.getFirstAttributeValue("interaction");
-					ef = ef.toLowerCase();
+					
 					if(ef!=null){
+						ef = ef.toLowerCase();
 						if(ef.indexOf("activation")>=0)if(effect.toString().equals("")){
 							effect.append("activation"); overall+=effect.toString();
 						}

@@ -339,10 +339,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem.addActionListener(new PathConsistencyAnalyzer());
 		structAnaMenu.add(menuItem);
 
-//		structAnaMenu.addSeparator();
-//		menuItem = new JMenuItem("OCSANA analysis...");
-//		menuItem.addActionListener(new OptimalCutSetAnalyzer());
-//		structAnaMenu.add(menuItem);
+		structAnaMenu.addSeparator();
+		menuItem = new JMenuItem("OCSANA analysis...");
+		menuItem.addActionListener(new OptimalCutSetAnalyzer());
+		structAnaMenu.add(menuItem);
 
 		structAnaMenu.addSeparator();
 

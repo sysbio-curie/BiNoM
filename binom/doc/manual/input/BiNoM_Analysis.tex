@@ -180,49 +180,160 @@ This function opens a dialog where nodes to be excuded can be selected (figure~\
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Extract reaction networks}\\
 This function cleans up the diagram to only keep the reaction network. Only nodes with ‘XXXX\_REACTION’ and ‘XXXX\_SPECIES’ attributes (where XXXX stands for any word) are kept as a result of this operation. For example, it helps to clean the reaction network interface from the result of querying BioPAX index (which contains many other node types such as entities and publications.
 
-\subsection{Path consistency analysis}
-\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Path consistency analysis}\\
-This function is based on an algorithm of  Path Influence Quantification (PIQuant). Shortly, for every annotated nodes, the influence is computed by summing (optimal and sub-optimal) paths contribution (1/(length of the path)), multiplied by the nodes annotation that represent biological data. For global influence computation, influences are summed on all over the annotated nodes. The figure \ref{PIQuant_example} shows the computing in a simple example.\\\\
-\includegraphics[width=20pt,height=20pt]{graphics/warning} The edge attribute which signs influence is "EFFECT" which can take 2 values EFFECT:activation and EFFECT:inhibition. An AIN file updates this attribute (section~\ref{Import_AIN_file}) or it can be imported as an edge attribute by Cytoscape.\\\\
+\subsection{Path Influence Quantification analysis}
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Path Influence Quantification analysis}\\
+
+%This function is based on an algorithm of  Path Influence Quantification
+%(PIQuant). Shortly, for every annotated nodes, the influence is computed by
+%summing (optimal and sub-optimal) paths contribution (1/(length of the path)),
+%multiplied by the nodes annotation that represent biological data. For global
+%influence computation, influences are summed on all over the annotated nodes.
+%The figure \ref{PIQuant_example} shows the computing in a simple example.\\\\
+
+This function calculates a score to quantify the effect of experimental data
+onto one or more target nodes for a given network architecture, named the
+PIQuant score (Pathway Influence Quantification). The target node can be a gene
+or a phenotype of interest (such as cell cycle or apoptosis). We define as
+annotated nodes any node of the network for which we have experimental data
+available. The experimental data can be for instance an mRNA expression value
+(ratio disease/normal). We also assume that we have determined all the paths
+from the annotated nodes to the target nodes using an appropriate algorithm
+(such as Dijkstra's shortest paths algorithm). The PIQuant score is then defined as:
+
+
+$$
+ PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
+$$
+
+ A path $k \in \{1,\ldots , q\}$ is defined
+as a the sequence of consecutive connected nodes
+between a source node and a target node (without repetition of any node
+or edge).
+
+The annotation $\alpha_k$ of the path $k$ is defined as the annotation (real value representing the experimental data) 
+of its source node. We define the sign $\sigma_k$
+of the path $k$ as the product of the signs of every edge of the path and finally
+the length $\lambda_k$ of the path $k$ as the number of edges in the path. We
+hypothesize that the longer the path is, the lesser the global influence will be
+on the target node.
+
+\includegraphics[width=20pt,height=20pt]{graphics/warning} The Cytoscape edge attribute
+which encodes the influence corresponding to the sign (+1 or -1) of the edge is "EFFECT" which can take 2 values EFFECT:activation and
+EFFECT:inhibition.\\\\
+
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/PIQuant_example}
-\caption{Computing influence in a simple example.}
-\label{PIQuant_example}
+  \centering
+  %\includegraphics[width=0.8\textwidth]{graphics/PIQuant_example}
+  \includegraphics[width=0.8\textwidth]{graphics/piquant_networks}
+  \caption{A simple influence network. The network is composed of seven nodes
+and nine edges (a). The two paths (b,c) extracted from this network start from
+the source node \textbf{Ac} and end at the target node \textbf{Ph} (a phenotype of interest). The
+nodes \textbf{Ac} and \textbf{D} are annotated using experimental data, and have the values 2.0
+and -1.0 respectively.}
+  \label{PIQuant_example}
 \end{figure}
-For global influences, a p-value can be computed, by shuffling the annotation. Among the possible options accessible in BiNoM, the possibility of removing inconsistent path (paths that have an intermediate node with inconsistent annotation) was sometimes used.\\\\
-The dialog has 2 steps: input parameters and options, select path and display results.\\\\
+
+
+In the case of the network presented in figure~\ref{PIQuant_example}a, let us
+consider Ac the source node and Ph the target node and consider only the two
+paths defined in the figure~\ref{PIQuant_example}b and
+figure~\ref{PIQuant_example}c. Given that the
+node Ac is annotated by the value $2.0$, that the first path has a length
+equal to 3, and that the second path has a length equal to 5, we can calculate the PIQuant score
+of the node Ac to the node Ph as:
+
+$$
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{5}
+= 0.27
+$$
+
+
+Sometimes a path has one or more intermediate nodes that are annotated nodes
+(i.e. for which we have experimental data values),
+in addition to the source node.
+In that case, the intermediate node is \textit{consistent} if the sign of its
+annotation is the same as the sign of the source node annotation multiplied by
+the sign of the
+path from the source node to the intermediate node. If signs are opposite, the
+node is \textit{inconsistent}.
+A path is \textit{consistent} if each annotated intermediate nodes is
+consistent. A path is \textit{inconsistent} if at least one intermediate node is
+\textit{inconsistent}.
+In other words, a path is inconsistent when the
+sign of the experimental data value for a node is opposite to the sign
+of the path.
+
+For example, according to the network represented in figure~\ref{PIQuant_example}c, there is an influence from Ac to Ph
+that goes through D . But if this path
+is functional, the annotation of node D should have the same sign as the annotation for node Ac, because
+Ac activates D indirectly (i.e. the path from Ac to D has a positive sign). In this case, the sign of D annotation (the experimental value) is opposite to
+the sign of Ac annotation, and therefore, the path from Ac to Ph that goes through D is inconsistent.
+
+Practically, we offer the option to
+keep or not the inconsistent paths for the calculation of the PIQuant score,
+depending on how the user wants to analyze the calculations. An inconsistent
+path could indicate that the path is not complete, or could also indicate that
+the path is correct but not active under the precise conditions in which the
+experimental data was generated, corresponding to a different context.
+
+In the case mentionned above in figure~\ref{PIQuant_example}c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
+becomes:
+
+$$
+ PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
+$$
+
+This score is higher than the value previously obtained with all the paths, and can be interpreted in this case as a higher activation of the phenotype.
+
+
+In order to calculate the PIQuant score, an influence network with annotated
+nodes should be created, for example using the AIN file format (see the AIN file
+format description in the appendix).
+
+One the network is created in Cytoscape, then we can call the BiNoM function to calculate the PIQuant score.
+
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Path Influence Quantification analysis}\\
+
+%For global influences, a p-value can be computed, by shuffling the annotation.
+%Among the possible options accessible in BiNoM, the possibility of removing
+%inconsistent path (paths that have an intermediate node with inconsistent
+%annotation) was sometimes used.\\\\
+
+This function has two dialogs, one for choosing the annotated nodes, targets nodes and path search algorithm, and one to display the results of the calculation.
+
 Step 1 see figure~\ref{Path_consistency_analyser_Dialog1}:
+
 \begin{itemize}
-\item Select activity attribute name and update list, only active nodes are displayed in box.
-\item Targets are phenotypes, any node can be selected.
-\item Choose options of paths, see glossary in section \ref{GLOSSARY}.
-\item  Click OK.
+  \item Select the attribute name corresponding to the annotation and click update list, only active nodes are
+  displayed in box.
+  \item Select target nodes.
+  \item Choose one algorithm for path searching, see glossary in section \ref{GLOSSARY} for details on the different algorithms.
+  \item Click OK.
 \end{itemize}
+
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog1}
-\caption{Path consistency analysis: dialog of step 1, select attribute, sources, targets and options.}
-\label{Path_consistency_analyser_Dialog1}
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog1}
+  \caption{Path consistency analysis: dialog of step 1, select annotated nodes,
+targets and the algorithm for searching the paths.}
+  \label{Path_consistency_analyser_Dialog1}
 \end{figure}
-Step 2 see figure~\ref{Path_consistency_analyser_Dialog2}:
-\begin{itemize}
-\item Click on a target node, paths and features of path evaluated according to PIQuant are displayed.
-\item A text report about optimal cut set can be get by "path activities".
-\item Possibility to filter nodes and paths.
-\item A  significance test by  p-value allows to insure got activities are significant.
-\end{itemize}
+
+The step 2 dialog (the results of the PIQuant score calculations) is displayed on figure~\ref{Path_consistency_analyser_Dialog2}.
+
+
+
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog2}
-\caption{Path consistency analysis: dialog of step 2, display paths and activities, get all results}
-\label{Path_consistency_analyser_Dialog2}
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog2}
+  \caption{Path consistency analysis: dialog of step 2, display paths and
+activities, get all results}
+  \label{Path_consistency_analyser_Dialog2}
 \end{figure}  
 
-\subsection{OCSANA analysis}
-\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$OCSANA analysis}\\
-
-Work in progress.
+%\subsection{OCSANA analysis}
+%\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$OCSANA analysis}\\
+%Work in progress.
 
 \subsection{Create neighborhood sets file}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Create neighborhood sets file}\\

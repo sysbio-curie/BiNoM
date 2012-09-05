@@ -1,11 +1,17 @@
 \subsection{Import BioPAX 3 document}
 BioPAX level 3 information is fully supported (reaction network, interaction network, pathway structure, annotations).\\\\
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM  I/O$\Rightarrow$Import BioPAX 3 Document from file}\\
-The model M-Phase.owl\cite{novak1998model} is uploaded. A dialog window proposes to create three different interfaces to the BioPAX file: reaction network (RN), pathway structure (PS) and protein interaction (PP).
+The model M-Phase-L3.owl \cite{novak1998model} is uploaded. A dialog window
+proposes to create three different interfaces from the BioPAX file: reaction
+network (RN), pathway structure (PS) and interaction map (IM).
+
 \begin{itemize}
-\item Reaction network: M-Phase RN is a representation of the reaction network (figure~\ref{View_BioPAX_of_Novak}).
-\item Pathway structure: M-Phase PS represents the pathway hierarchical structure. For this example, we choose to show a more detailed and complete pathway, the apoptosis sub-network extracted from Reactome database (figure~\ref{Apoptosis_pathway_hierarchical_structure}).
-\item Protein interaction: M-Phase PP shows which proteins interact with each other.
+\item Reaction network: M-Phase-L3 RN is a representation of the reaction network (figure~\ref{View_BioPAX_of_Novak}).
+\item Pathway structure: M-Phase-L3 PS represents the pathway hierarchical
+structure. For this example, we choose to show a more detailed and complete
+pathway, the apoptosis sub-network extracted from Reactome database
+(figure~\ref{Apoptosis_pathway_hierarchical_structure}).
+\item Protein interaction: M-Phase-L3 IM shows which proteins interact with each other.
 \end{itemize}
 For more details on BioPAX, its interfaces, etc, go to section \ref{Standard_BioPAX_Interfaces}.
 \begin{figure}
@@ -17,7 +23,10 @@ For more details on BioPAX, its interfaces, etc, go to section \ref{Standard_Bio
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Apoptosis_pathway_hierarchical_structure}
-\caption{Apoptosis pathway hierarchical structure. Green nodes represent pathways, pink triangular nodes represent steps, and grey nodes represent reactions. From the apoptosis node (top node in red), the cell can choose through 5 different paths. The red-colored path shows one of them, the activation of apoptosis via the intrinsic pathway, leading to the cleavage of caspases 3.}
+%\caption{Apoptosis pathway hierarchical structure. Green nodes represent pathways, pink triangular nodes represent steps, and grey nodes represent reactions. From the apoptosis node (top node in red), the cell can choose through 5 different paths. The red-colored path shows one of them, the activation of apoptosis via the intrinsic pathway, leading to the cleavage of caspases 3.}
+\caption{Apoptosis pathway hierarchical structure. Green nodes represent
+pathways, pink triangular nodes represent steps, and grey nodes represent
+reactions.}
 \label{Apoptosis_pathway_hierarchical_structure}
 \end{figure}
 \\In the case of creating the pathway structure interface, several choices are offered:
@@ -72,7 +81,7 @@ family). See figure~\ref{AIN_dialog_for_families_management}.\\\\
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/AIN_dialog_for_families_management}
-\caption{Dialog window for families management when importing apoptosis influence file. BiNoM automatically detects gene families and proposes to either collapse or expand them.}
+\caption{Dialog window for families management when importing the apoptosis network influence file (AIN format). BiNoM automatically detects gene families and proposes to either collapse or expand them.}
 \label{AIN_dialog_for_families_management}
 \end{figure}
 
@@ -95,14 +104,23 @@ The Cytoscape networks can be exported in BioPAX and CellDesigner by:
 \item \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to BioPAX 3}
 \item \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Export current network to CellDesigner}
 \end{itemize}
-\includegraphics[width=12pt,height=12pt]{graphics/warning} provided that they are associated to existing CellDesigner or BioPAX by:
+\includegraphics[width=20pt,height=20pt]{graphics/warning} The network to be exported should be associated to an existing CellDesigner or BioPAX file by using the functions:
 \begin{itemize}
 \item Associate BioPAX Source, see section~\ref{Associate_BioPAX_Source}.
 \item Associate CellDesigner Source,see~\ref{Associate_CellDesigner_Source}.
 \end{itemize}
-More precisely, BiNoM is able to convert CellDesigner to BioPAX, and BioPAX reaction network interface to pure SBML. BiNoM is also able to export only a part of CellDesigner and BioPAX file, visible in the current Cytoscape network (interface). During the export operation, BiNoM is also able to merge a part of associated BioPAX file with already saved another part. BiNoM can modify the content of a BioPAX file. \\\\
-\includegraphics[width=12pt,height=12pt]{graphics/warning} BiNoM is NOT able to create CellDesigner file with all graphical notations from BioPAX or from scratch, and it is not able to modify the content of a CellDesigner file.\\\\
-Here are the typical scenarios where BiNoM export operations can be useful.
+BiNoM is able to convert CellDesigner to BioPAX, and BioPAX
+reaction network interface to pure SBML. BiNoM can also export only a
+part of a CellDesigner and BioPAX file, visible in the current Cytoscape network
+(interface). During the export operation, BiNoM can merge a part of
+associated BioPAX file with another part that has been saved already. BiNoM can modify the
+content of a BioPAX file. \\\\
+
+\includegraphics[width=20pt,height=20pt]{graphics/warning} BiNoM is NOT able to
+create a CellDesigner file with all the graphical notations from a BioPAX file or from
+scratch, and it is also not able to modify the content of a CellDesigner file.\\\\
+
+Here are a couple of typical scenarios where BiNoM export operations can be useful.
 \begin{enumerate}
 \item User imports a big BioPAX file as reaction network and using Cytoscape creates a new subnetwork from the global reaction graph. After he can export this subnetwork into a separate self-containing BioPAX file.
 \item User imports the pathway structure of a big BioPAX file and selects only a few pathway or pathwayStep nodes he is interested in. After he can export a part of the BioPAX file necessary to define these pathways.
@@ -122,10 +140,10 @@ Export the current network to pure SBML level 2.
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source}\\
 Associate a BioPAX 3 Source to allow exportation in BioPAX 3 as explained in section~\ref{Export_current_network}
 
-\subsection{Save whole associate BioPAX 3 as}
-When the content of the BioPAX file is modified (through BioPAX property editor, see section ~\ref{BioPAX_Property_Editor}), it can be to be saved as a whole (not only visible part) by\\
+\subsection{Save whole associated BioPAX 3 as}
+When the content of the BioPAX file is modified (through the BioPAX property editor, see section ~\ref{BioPAX_Property_Editor}), it can be saved as a whole (not only the visible part) by\\
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Save whole associated BioPAX 3 as}\\
-Otherwise, all modifications made in the different interfaces are lost. Changes are visible but only recorded permanently when the document is save.
+Otherwise, all modifications made in the different interfaces are lost. Changes are visible but only recorded permanently when the document is saved to a file.
 
 \subsection{Associate CellDesigner Source}\label{Associate_CellDesigner_Source}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Associate BioPAX 3 Source} \\

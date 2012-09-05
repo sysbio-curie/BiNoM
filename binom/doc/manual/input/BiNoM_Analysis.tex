@@ -45,7 +45,7 @@ This function uses node name semantics to isolate sub-networks in which each pro
 \subsection{Get Cycle Decomposition}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Get cycle decomposition}\\
 This command decomposes the network into relevant directed cycles\cite{gleiss2001relevant}, using a modification of the Vismara’s algorithm\cite{vismara1997union}. Often, this feature gives information about the life cycle of a protein or a complex, about the feedbacks of the studied network, etc(figure~\ref{Minimal_cycle_decomposition_of_the M-Phase}). Note that the union of all the cycles corresponds to the strongly connected component figure~\ref{Strongly_Connected_Component_of M-Phase_network}.\\
-\includegraphics[width=12pt,height=12pt]{graphics/warning} This operation can produce enormous number of cycles! Therefore it is rather suitable for analysis of small to moderate size networks. For a big network, one can start to understand the cyclic network structure by eliminating first the network hubs, which are contained in many network cycles. After that, the local, relatively short, cycles can be represented as meta-nodes (modules) and the analysis for cycles can be repeated.\\
+\includegraphics[width=20pt,height=20pt]{graphics/warning} This operation can produce enormous number of cycles! Therefore it is rather suitable for analysis of small to moderate size networks. For a big network, one can start to understand the cyclic network structure by eliminating first the network hubs, which are contained in many network cycles. After that, the local, relatively short, cycles can be represented as meta-nodes (modules) and the analysis for cycles can be repeated.\\
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Minimal_cycle_decomposition_of_the_M-Phase}
@@ -56,7 +56,7 @@ This command decomposes the network into relevant directed cycles\cite{gleiss200
 \subsection{Path Analysis}\label{Path_Analysis}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Path analysis}\\
 In a network, it can become handy to find out if there exists a path (or paths) from one species to another, or to verify that a protein or a protein complex is reachable from a starting molecule(figure~\ref{Path_Analysis_All_the_paths}). Provided (an) initial source and target protein(s) that are selected first on the graph then in the dialog window, the command Path analysis can find: the shortest paths, the optimal and suboptimal shortest paths, or all the non-intersecting paths (does not include inner loops), using a finite number of intermediary nodes (use finite breadth search radius), for either directed or undirected paths (figure~\ref{Path_Analysis_Pop-up_window}).\\
-\includegraphics[width=12pt,height=12pt]{graphics/warning} In big networks the number of paths can be exponential! It is recommended to find the shortest path first, take its length and increment gradually the breadth search radius starting from this value to find the second shortest, third shortest, etc., paths.\\
+\includegraphics[width=20pt,height=20pt]{graphics/warning} In big networks the number of paths can be exponential! It is recommended to find the shortest path first, take its length and increment gradually the breadth search radius starting from this value to find the second shortest, third shortest, etc., paths.\\
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Path_Analysis_Pop-up_window}
@@ -76,7 +76,7 @@ Extract a subnetwork from selected nodes of a network with various options (figu
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Extract_subnetwork_dialog}
-\caption{Dialog of extract subnetwork showing options.}
+\caption{Dialog of the ``Extract subnetwork'' function showing the different options available.}
 \label{Extract_subnetwork_dialog}
 \end{figure}
 
@@ -122,7 +122,15 @@ An alternative modular view has been obtained using the cycle decomposition inst
 
 \subsection{Mono-molecular react.to edges}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Mono-molecular react. to edges}\\
-This command transforms monomolecular (with one reactant and one product) reaction nodes into ‘influence’ edges. Thus, monomolecular (linear) reactions are represented as edges and the reaction graph is not bi-partite anymore. When the reaction nodes have the type of influence specified (through the ‘EFFECT’ attribute), the graph is transformed automatically into an influence graph (see Figure~\ref{Network_to_influence_graph}: upper panel: BioPAX network, lower panel, the equivalent influence network). Non-linear non-monomolecular reactions (such as complex assemblies) are not transformed and remain to be represented as network nodes.
+This function transforms monomolecular reaction nodes (i.e. reactions with one
+reactant and one product) into ‘influence’ edges. Thus, monomolecular (linear)
+reactions are represented as edges and the reaction graph is not bi-partite
+anymore. When the reaction nodes have the type of influence specified (through
+the Cytoscape ‘EFFECT’ attribute), the graph is transformed automatically into an
+influence graph (see Figure~\ref{Network_to_influence_graph}: upper panel:
+BioPAX network, lower panel, the equivalent influence network). Non-linear
+non-monomolecular reactions (such as complex assemblies) are not transformed and
+remain to be represented as network nodes.
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Network_to_influence_graph}
@@ -130,16 +138,33 @@ This command transforms monomolecular (with one reactant and one product) reacti
 \label{Network_to_influence_graph}
 \end{figure}
 
-\subsection{‘Linearize’ network}
+\subsection{Linearize network}
+
+%Remove reactions and reconnect edges according to a supposed influence (figure~\ref{Linearized_Network_M-Phase})\\
+%\includegraphics[width=20pt,height=20pt]{graphics/warning} The got network is not an influence network in the biological sense. But, it can be used to build an influence network.
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.8\textwidth]{graphics/Linearized_Network_M-Phase}
+%\caption{Result of applying "Linearize network" to M-Phase.}
+%\label{Linearized_Network_M-Phase}
+%\end{figure}
+The ``linearization'' replaces explicit reactions of complex formation by direct influences between constituents and complexes (in the case of an influence network imported from an AIN file).
+
+To illustrate this function, import the AIN file \textit{cell\_cycle\_AIN.txt}.
+
+\textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM I/O$\Rightarrow$Import influence network from AIN file...}\\
+Click two times 'OK' for the specification of the families. A new network is created. Then, apply the linearization functions
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$‘Linearize’ network}\\
-Remove reactions and reconnect edges according to a supposed influence (figure~\ref{Linearized_Network_M-Phase})\\
-\includegraphics[width=12pt,height=12pt]{graphics/warning} The got network is not an influence network in the biological sense. But, it can be used to build an influence network.
+
+A new 'linearized' network is created (figure ~\ref{Linearized_Network_Cell_Cycle}).
+
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{graphics/Linearized_Network_M-Phase}
-\caption{Result of applying "Linearize network" to M-Phase.}
-\label{Linearized_Network_M-Phase}
+  \centering
+  \includegraphics[width=0.8\textwidth]{graphics/linearize_cc.pdf}
+  \caption{Example of explicit reaction of complex formation (left panel) that can be replaced by direct connections (right panel) using the ``linearization`` function of BiNoM.}
+  \label{Linearized_Network_Cell_Cycle}
 \end{figure}
+
 
 \subsection{Exclude intermediate nodes}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Exclude intermediate nodes}\\
@@ -158,7 +183,7 @@ This function cleans up the diagram to only keep the reaction network. Only node
 \subsection{Path consistency analysis}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Analysis$\Rightarrow$Path consistency analysis}\\
 This function is based on an algorithm of  Path Influence Quantification (PIQuant). Shortly, for every annotated nodes, the influence is computed by summing (optimal and sub-optimal) paths contribution (1/(length of the path)), multiplied by the nodes annotation that represent biological data. For global influence computation, influences are summed on all over the annotated nodes. The figure \ref{PIQuant_example} shows the computing in a simple example.\\\\
-\includegraphics[width=12pt,height=12pt]{graphics/warning} The edge attribute which signs influence is "EFFECT" which can take 2 values EFFECT:activation and EFFECT:inhibition. An AIN file updates this attribute (section~\ref{Import_AIN_file}) or it can be imported as an edge attribute by Cytoscape.\\\\
+\includegraphics[width=20pt,height=20pt]{graphics/warning} The edge attribute which signs influence is "EFFECT" which can take 2 values EFFECT:activation and EFFECT:inhibition. An AIN file updates this attribute (section~\ref{Import_AIN_file}) or it can be imported as an edge attribute by Cytoscape.\\\\
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/PIQuant_example}

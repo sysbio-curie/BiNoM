@@ -1,0 +1,1870 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:bp="http://www.biopax.org/release/biopax-level2.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns="http://bioinfo.curie.fr/biopax2sbml#"
+    xmlns:daml="http://www.daml.org/2001/03/daml+oil#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://bioinfo.curie.fr/biopax2sbml">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level2.owl"/>
+    <owl:imports rdf:resource="http://www.biopax.org/Downloads/Level2v0.92/biopax-level2.owl"/>
+  </owl:Ontology>
+  <bp:sequenceFeature rdf:ID="s13_Thr167_pho">
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Thr167_pho</bp:NAME>
+    <bp:FEATURE-TYPE>
+      <bp:openControlledVocabulary rdf:ID="phosphorylation">
+        <bp:XREF>
+          <bp:unificationXref rdf:ID="GO_0016310">
+            <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GO</bp:DB>
+            <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >0016310</bp:ID>
+          </bp:unificationXref>
+        </bp:XREF>
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >phosphorylation</bp:TERM>
+      </bp:openControlledVocabulary>
+    </bp:FEATURE-TYPE>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Thr167_pho</bp:SHORT-NAME>
+  </bp:sequenceFeature>
+  <bp:openControlledVocabulary rdf:ID="synaptosome">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0019717">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0019717</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >synaptosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005886">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005886</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="lysosome">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005764">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005764</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >lysosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005803">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005803</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRANSCRIPTIONAL_ACTIVATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSCRIPTIONAL_ACTIVATION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:catalysis rdf:ID="re16_c_s8">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re16">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE>
+          <bp:openControlledVocabulary rdf:ID="cd3_STATE_TRANSITION">
+            <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >STATE_TRANSITION</bp:TERM>
+          </bp:openControlledVocabulary>
+        </bp:INTERACTION-TYPE>
+        <bp:LEFT>
+          <bp:sequenceParticipant rdf:ID="re16_Cdc25_pho_active">
+            <bp:PHYSICAL-ENTITY>
+              <bp:protein rdf:ID="p7">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc25</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc25</bp:SHORT-NAME>
+                <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc25</bp:SYNONYMS>
+              </bp:protein>
+            </bp:PHYSICAL-ENTITY>
+            <bp:CELLULAR-LOCATION>
+              <bp:openControlledVocabulary rdf:ID="cellular_component_unknown">
+                <bp:XREF>
+                  <bp:unificationXref rdf:ID="GO_0008372">
+                    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                    >GO</bp:DB>
+                    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                    >0008372</bp:ID>
+                  </bp:unificationXref>
+                </bp:XREF>
+                <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >cellular_component_unknown</bp:TERM>
+              </bp:openControlledVocabulary>
+            </bp:CELLULAR-LOCATION>
+            <bp:SEQUENCE-FEATURE-LIST>
+              <bp:sequenceFeature rdf:ID="s26__pho">
+                <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >_pho</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >_pho</bp:SHORT-NAME>
+              </bp:sequenceFeature>
+            </bp:SEQUENCE-FEATURE-LIST>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:LEFT>
+        <bp:RIGHT>
+          <bp:sequenceParticipant rdf:ID="re16_Cdc25">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:RIGHT>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:sequenceParticipant rdf:ID="re16_PP2A">
+        <bp:PHYSICAL-ENTITY>
+          <bp:protein rdf:ID="p8">
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >PP2A</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >PP2A</bp:SHORT-NAME>
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >PP2A</bp:SYNONYMS>
+          </bp:protein>
+        </bp:PHYSICAL-ENTITY>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:sequenceParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE>
+      <bp:openControlledVocabulary rdf:ID="cd3_CATALYSIS">
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CATALYSIS</bp:TERM>
+      </bp:openControlledVocabulary>
+    </bp:INTERACTION-TYPE>
+  </bp:catalysis>
+  <bp:openControlledVocabulary rdf:ID="late_endosome">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005770">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005770</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >late_endosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0016567">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0016567</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="midbody">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0030496">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0030496</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >midbody</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="a26_Cdc2_Tyr15_pho">
+    <bp:PHYSICAL-ENTITY>
+      <bp:protein rdf:ID="p1">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc2</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc2</bp:SHORT-NAME>
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc2</bp:SYNONYMS>
+      </bp:protein>
+    </bp:PHYSICAL-ENTITY>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:sequenceFeature rdf:ID="s11_Tyr15_pho">
+        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Tyr15_pho</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Tyr15_pho</bp:SHORT-NAME>
+      </bp:sequenceFeature>
+    </bp:SEQUENCE-FEATURE-LIST>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005813">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005813</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005783">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005783</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0000139">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0000139</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="spindle_microtubule">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005876">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005876</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >spindle_microtubule</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="mitochondrial_membrane">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0031966">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0031966</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mitochondrial_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="extracellular_matrix">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0031012">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0031012</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >extracellular_matrix</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re15_Cdc25_pho_active">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s26__pho"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:protein rdf:ID="p10">
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Plo1</bp:NAME>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Plo1</bp:SHORT-NAME>
+    <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Plo1</bp:SYNONYMS>
+  </bp:protein>
+  <bp:openControlledVocabulary rdf:ID="cd3_DISSOCIATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >DISSOCIATION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="perinuclear_region">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0048471">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0048471</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >perinuclear_region</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="actin_cytoskeleton">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0015629">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0015629</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >actin_cytoskeleton</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRANSCRIPTIONAL_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSCRIPTIONAL_INHIBITION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:physicalEntityParticipant rdf:ID="re2_Cdc13_Cdc2">
+    <bp:PHYSICAL-ENTITY>
+      <bp:complex rdf:ID="s16">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13:Cdc2</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Complex_br_(Cdc13/Cdc2)</bp:SHORT-NAME>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a25_Cdc13">
+            <bp:PHYSICAL-ENTITY>
+              <bp:protein rdf:ID="p2">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc13</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc13</bp:SHORT-NAME>
+                <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc13</bp:SYNONYMS>
+              </bp:protein>
+            </bp:PHYSICAL-ENTITY>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a25_Cdc2">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+      </bp:complex>
+    </bp:PHYSICAL-ENTITY>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:complex rdf:ID="s19">
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Cdc13:Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho</bp:NAME>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Complex_br_(Cdc13/Cdc2)</bp:SHORT-NAME>
+    <bp:COMPONENTS>
+      <bp:sequenceParticipant rdf:ID="a28_Cdc13">
+        <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+      </bp:sequenceParticipant>
+    </bp:COMPONENTS>
+    <bp:COMPONENTS>
+      <bp:sequenceParticipant rdf:ID="a28_Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+        <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:SEQUENCE-FEATURE-LIST>
+          <bp:sequenceFeature rdf:ID="s25_Thr14_pho">
+            <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr14_pho</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr14_pho</bp:SHORT-NAME>
+          </bp:sequenceFeature>
+        </bp:SEQUENCE-FEATURE-LIST>
+        <bp:SEQUENCE-FEATURE-LIST>
+          <bp:sequenceFeature rdf:ID="s25_Tyr15_pho">
+            <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Tyr15_pho</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Tyr15_pho</bp:SHORT-NAME>
+          </bp:sequenceFeature>
+        </bp:SEQUENCE-FEATURE-LIST>
+        <bp:SEQUENCE-FEATURE-LIST>
+          <bp:sequenceFeature rdf:ID="s25_Thr167_pho">
+            <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr167_pho</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Thr167_pho</bp:SHORT-NAME>
+          </bp:sequenceFeature>
+        </bp:SEQUENCE-FEATURE-LIST>
+      </bp:sequenceParticipant>
+    </bp:COMPONENTS>
+  </bp:complex>
+  <bp:unificationXref rdf:ID="GO_0000922">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0000922</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re15_Cdc25">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0032259">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0032259</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="Golgi_apparatus">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005794">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005794</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Golgi_apparatus</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="a29_Cdc2_Thr167_pho">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:sequenceFeature rdf:ID="s29_Thr167_pho">
+        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Thr167_pho</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Thr167_pho</bp:SHORT-NAME>
+      </bp:sequenceFeature>
+    </bp:SEQUENCE-FEATURE-LIST>
+  </bp:sequenceParticipant>
+  <bp:openControlledVocabulary rdf:ID="plasma_membrane">
+    <bp:XREF rdf:resource="#GO_0005886"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >plasma_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0001669">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0001669</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re11_Cdc13_ubi">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:sequenceFeature rdf:ID="s31__ubi">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >_ubi</bp:NAME>
+        <bp:FEATURE-TYPE>
+          <bp:openControlledVocabulary rdf:ID="protein_ubiquitination">
+            <bp:XREF rdf:resource="#GO_0016567"/>
+            <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >protein_ubiquitination</bp:TERM>
+          </bp:openControlledVocabulary>
+        </bp:FEATURE-TYPE>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >_ubi</bp:SHORT-NAME>
+      </bp:sequenceFeature>
+    </bp:SEQUENCE-FEATURE-LIST>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:physicalEntityParticipant rdf:ID="re17_Cdc13_Cdc2">
+    <bp:PHYSICAL-ENTITY rdf:resource="#s16"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRANSPORT">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSPORT</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:catalysis rdf:ID="re3_c_s3">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re3">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT>
+          <bp:physicalEntityParticipant rdf:ID="re3_Cdc13_Cdc2_Tyr15_pho">
+            <bp:PHYSICAL-ENTITY>
+              <bp:complex rdf:ID="s17">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc13:Cdc2_Tyr15_pho</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Complex_br_(Cdc13/Cdc2)</bp:SHORT-NAME>
+                <bp:COMPONENTS>
+                  <bp:sequenceParticipant rdf:ID="a26_Cdc13">
+                    <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+                    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype=
+                    "http://www.w3.org/2001/XMLSchema#double"
+                    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                  </bp:sequenceParticipant>
+                </bp:COMPONENTS>
+                <bp:COMPONENTS rdf:resource="#a26_Cdc2_Tyr15_pho"/>
+              </bp:complex>
+            </bp:PHYSICAL-ENTITY>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:LEFT>
+        <bp:RIGHT>
+          <bp:physicalEntityParticipant rdf:ID="re3_Cdc13_Cdc2_Thr14_pho_Tyr15_pho">
+            <bp:PHYSICAL-ENTITY>
+              <bp:complex rdf:ID="s18">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Cdc13:Cdc2_Thr14_pho_Tyr15_pho</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Complex_br_(Cdc13/Cdc2)</bp:SHORT-NAME>
+                <bp:COMPONENTS>
+                  <bp:sequenceParticipant rdf:ID="a27_Cdc13">
+                    <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+                    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype=
+                    "http://www.w3.org/2001/XMLSchema#double"
+                    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                  </bp:sequenceParticipant>
+                </bp:COMPONENTS>
+                <bp:COMPONENTS>
+                  <bp:sequenceParticipant rdf:ID="a27_Cdc2_Thr14_pho_Tyr15_pho">
+                    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+                    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype=
+                    "http://www.w3.org/2001/XMLSchema#double"
+                    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                    <bp:SEQUENCE-FEATURE-LIST>
+                      <bp:sequenceFeature rdf:ID="s21_Thr14_pho">
+                        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+                        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Thr14_pho</bp:NAME>
+                        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Thr14_pho</bp:SHORT-NAME>
+                      </bp:sequenceFeature>
+                    </bp:SEQUENCE-FEATURE-LIST>
+                    <bp:SEQUENCE-FEATURE-LIST>
+                      <bp:sequenceFeature rdf:ID="s21_Tyr15_pho">
+                        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+                        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Tyr15_pho</bp:NAME>
+                        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Tyr15_pho</bp:SHORT-NAME>
+                      </bp:sequenceFeature>
+                    </bp:SEQUENCE-FEATURE-LIST>
+                  </bp:sequenceParticipant>
+                </bp:COMPONENTS>
+              </bp:complex>
+            </bp:PHYSICAL-ENTITY>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:RIGHT>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:sequenceParticipant rdf:ID="re3_Wee1">
+        <bp:PHYSICAL-ENTITY>
+          <bp:protein rdf:ID="p3">
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Wee1</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Wee1</bp:SHORT-NAME>
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Wee1</bp:SYNONYMS>
+          </bp:protein>
+        </bp:PHYSICAL-ENTITY>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:sequenceParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:openControlledVocabulary rdf:ID="acrosome">
+    <bp:XREF rdf:resource="#GO_0001669"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >acrosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0001726">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0001726</bp:ID>
+  </bp:unificationXref>
+  <bp:catalysis rdf:ID="re15_c_s20">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re15">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT rdf:resource="#re15_Cdc25"/>
+        <bp:RIGHT rdf:resource="#re15_Cdc25_pho_active"/>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re15_Cdc13_Cdc2_Thr167_pho_active">
+        <bp:PHYSICAL-ENTITY>
+          <bp:complex rdf:ID="s20">
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cdc13:Cdc2_Thr167_pho_active</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Complex_br_(Cdc13/Cdc2)</bp:SHORT-NAME>
+            <bp:COMPONENTS>
+              <bp:sequenceParticipant rdf:ID="a29_Cdc13">
+                <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+                <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+                >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+                <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+              </bp:sequenceParticipant>
+            </bp:COMPONENTS>
+            <bp:COMPONENTS rdf:resource="#a29_Cdc2_Thr167_pho"/>
+          </bp:complex>
+        </bp:PHYSICAL-ENTITY>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:physicalEntityParticipant rdf:ID="re18_APC_Slp1_active">
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:PHYSICAL-ENTITY>
+      <bp:complex rdf:ID="s46">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >APC:Slp1_active</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Complex_br_(Slp1/APC)</bp:SHORT-NAME>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a43_Slp1">
+            <bp:PHYSICAL-ENTITY>
+              <bp:protein rdf:ID="p12">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Slp1</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Slp1</bp:SHORT-NAME>
+                <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Slp1</bp:SYNONYMS>
+              </bp:protein>
+            </bp:PHYSICAL-ENTITY>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a43_APC">
+            <bp:PHYSICAL-ENTITY>
+              <bp:protein rdf:ID="p11">
+                <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >APC</bp:NAME>
+                <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >APC</bp:SHORT-NAME>
+                <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >APC</bp:SYNONYMS>
+              </bp:protein>
+            </bp:PHYSICAL-ENTITY>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+      </bp:complex>
+    </bp:PHYSICAL-ENTITY>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:openControlledVocabulary rdf:ID="lamellipodium">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0030027">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0030027</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >lamellipodium</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:biochemicalReaction rdf:ID="re2">
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:LEFT rdf:resource="#re2_Cdc13_Cdc2"/>
+    <bp:RIGHT>
+      <bp:physicalEntityParticipant rdf:ID="re2_Cdc13_Cdc2_Tyr15_pho">
+        <bp:PHYSICAL-ENTITY rdf:resource="#s17"/>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:physicalEntityParticipant>
+    </bp:RIGHT>
+  </bp:biochemicalReaction>
+  <bp:sequenceFeature rdf:ID="s24__pho">
+    <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >_pho</bp:NAME>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >_pho</bp:SHORT-NAME>
+  </bp:sequenceFeature>
+  <bp:openControlledVocabulary rdf:ID="Golgi_lumen">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005796">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005796</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Golgi_lumen</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0016323">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0016323</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re15_Plo1">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p10"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005768">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005768</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re17_Cdc2">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005698">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005698</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="perinuclear_space">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005641">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005641</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >perinuclear_space</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005834">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005834</bp:ID>
+  </bp:unificationXref>
+  <bp:catalysis rdf:ID="re14_c_s20">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re14">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT>
+          <bp:sequenceParticipant rdf:ID="re14_Wee1">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:LEFT>
+        <bp:RIGHT>
+          <bp:sequenceParticipant rdf:ID="re14_Wee1_pho">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s24__pho"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:RIGHT>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re14_Cdc13_Cdc2_Thr167_pho_active">
+        <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:unificationXref rdf:ID="GO_0005739">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005739</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re12_Cdc13_ubi">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s31__ubi"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005758">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005758</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0032009">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0032009</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0043687">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0043687</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005769">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005769</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="adherens_junction">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005912">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005912</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >adherens_junction</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="nuclear_membrane">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0031965">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0031965</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nuclear_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="biopolymer_modification">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0043412">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0043412</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >biopolymer_modification</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cell_junction">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0030054">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0030054</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cell_junction</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="a75_Cdc2_Thr167_pho">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:sequenceFeature rdf:ID="s33_Thr167_pho">
+        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Thr167_pho</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Thr167_pho</bp:SHORT-NAME>
+      </bp:sequenceFeature>
+    </bp:SEQUENCE-FEATURE-LIST>
+  </bp:sequenceParticipant>
+  <bp:sequenceParticipant rdf:ID="re20_Rum1_pho">
+    <bp:PHYSICAL-ENTITY>
+      <bp:protein rdf:ID="p13">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Rum1</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Rum1</bp:SHORT-NAME>
+        <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Rum1</bp:SYNONYMS>
+      </bp:protein>
+    </bp:PHYSICAL-ENTITY>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST>
+      <bp:sequenceFeature rdf:ID="s34__pho">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >_pho</bp:NAME>
+        <bp:FEATURE-TYPE rdf:resource="#phosphorylation"/>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >_pho</bp:SHORT-NAME>
+      </bp:sequenceFeature>
+    </bp:SEQUENCE-FEATURE-LIST>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:openControlledVocabulary rdf:ID="microtubule_organizing_center">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005815">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005815</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >microtubule_organizing_center</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re10_Cdc2">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:sequenceParticipant rdf:ID="re24_Rum1">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005788">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005788</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="macrophage">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0030526">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0030526</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >macrophage</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0006473">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0006473</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0009897">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0009897</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005856">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005856</bp:ID>
+  </bp:unificationXref>
+  <bp:sequenceParticipant rdf:ID="re10_Cdc2_Thr167_pho">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s13_Thr167_pho"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:unificationXref rdf:ID="GO_0005881">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005881</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="ruffles">
+    <bp:XREF rdf:resource="#GO_0001726"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ruffles</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cytoskeleton">
+    <bp:XREF rdf:resource="#GO_0005856"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytoskeleton</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:biochemicalReaction rdf:ID="re18">
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+    <bp:LEFT rdf:resource="#re18_APC_Slp1_active"/>
+    <bp:RIGHT rdf:resource="#re18_APC_Slp1_active"/>
+  </bp:biochemicalReaction>
+  <bp:openControlledVocabulary rdf:ID="smooth_endoplasmic_reticulum">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005790">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005790</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >smooth_endoplasmic_reticulum</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:catalysis rdf:ID="re4_c_s5">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re4">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT>
+          <bp:physicalEntityParticipant rdf:ID="re4_Cdc13_Cdc2_Thr14_pho_Tyr15_pho">
+            <bp:PHYSICAL-ENTITY rdf:resource="#s18"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:LEFT>
+        <bp:RIGHT>
+          <bp:physicalEntityParticipant rdf:ID="re4_Cdc13_Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+            <bp:PHYSICAL-ENTITY rdf:resource="#s19"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:RIGHT>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:sequenceParticipant rdf:ID="re4_CAK">
+        <bp:PHYSICAL-ENTITY>
+          <bp:protein rdf:ID="p5">
+            <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Cyclin dependent Activating Kinase</bp:COMMENT>
+            <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CAK</bp:NAME>
+            <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CAK</bp:SHORT-NAME>
+            <bp:SYNONYMS rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CAK</bp:SYNONYMS>
+          </bp:protein>
+        </bp:PHYSICAL-ENTITY>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:sequenceParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:openControlledVocabulary rdf:ID="heterotrimeric_G_protein_complex">
+    <bp:XREF rdf:resource="#GO_0005834"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >heterotrimeric_G_protein_complex</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="nucleolus">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005730">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005730</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleolus</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re11_Cdc2_Thr167_pho">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p1"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s13_Thr167_pho"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:openControlledVocabulary rdf:ID="cd3_UNKNOWN_TRANSITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_TRANSITION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="external_side_of_plasma_membrane">
+    <bp:XREF rdf:resource="#GO_0009897"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >external_side_of_plasma_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re17_Cdc13">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:complexAssembly rdf:ID="re17">
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:HETERODIMER_ASSOCIATION</bp:COMMENT>
+    <bp:INTERACTION-TYPE>
+      <bp:openControlledVocabulary rdf:ID="cd3_HETERODIMER_ASSOCIATION">
+        <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >HETERODIMER_ASSOCIATION</bp:TERM>
+      </bp:openControlledVocabulary>
+    </bp:INTERACTION-TYPE>
+    <bp:LEFT rdf:resource="#re17_Cdc2"/>
+    <bp:LEFT rdf:resource="#re17_Cdc13"/>
+    <bp:RIGHT rdf:resource="#re17_Cdc13_Cdc2"/>
+  </bp:complexAssembly>
+  <bp:openControlledVocabulary rdf:ID="microsome">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005792">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005792</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >microsome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:physicalEntityParticipant rdf:ID="re24_Cdc13_Cdc2_Thr167_pho_Rum1">
+    <bp:PHYSICAL-ENTITY>
+      <bp:complex rdf:ID="s41">
+        <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Cdc13:Cdc2_Thr167_pho:Rum1</bp:NAME>
+        <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Complex_br_(Cdc13/Cdc2/_br_Rum1)</bp:SHORT-NAME>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a75_Cdc13">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p2"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+        <bp:COMPONENTS rdf:resource="#a75_Cdc2_Thr167_pho"/>
+        <bp:COMPONENTS>
+          <bp:sequenceParticipant rdf:ID="a75_Rum1">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+          </bp:sequenceParticipant>
+        </bp:COMPONENTS>
+      </bp:complex>
+    </bp:PHYSICAL-ENTITY>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:openControlledVocabulary rdf:ID="acetylation">
+    <bp:XREF rdf:resource="#GO_0006473"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >acetylation</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="synaptic_vesicle">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0008021">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0008021</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >synaptic_vesicle</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="spindle_midzone">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0051233">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0051233</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >spindle_midzone</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0016604">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0016604</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005829">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005829</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="nuclear_outer_membrane">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005640">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005640</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nuclear_outer_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="nuclear_body">
+    <bp:XREF rdf:resource="#GO_0016604"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nuclear_body</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="nucleus">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005634">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005634</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleus</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cell_surface">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0009986">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0009986</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cell_surface</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="nucleoplasm">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005654">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005654</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >nucleoplasm</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re23_Rum1_pho">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s34__pho"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:openControlledVocabulary rdf:ID="cd3_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >INHIBITION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0016605">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0016605</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="mitochondrial_intermembrane_space">
+    <bp:XREF rdf:resource="#GO_0005758"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mitochondrial_intermembrane_space</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:sequenceParticipant rdf:ID="re20_Rum1">
+    <bp:PHYSICAL-ENTITY rdf:resource="#p13"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:sequenceParticipant>
+  <bp:physicalEntityParticipant rdf:ID="re11_Cdc13_Cdc2_Thr167_pho_active">
+    <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:openControlledVocabulary rdf:ID="centrosome">
+    <bp:XREF rdf:resource="#GO_0005813"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >centrosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="tight_junction">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005923">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005923</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >tight_junction</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0030057">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0030057</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="organelle">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0043226">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0043226</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >organelle</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005633">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005633</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="cd3_UNKNOWN_CATALYSIS">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_CATALYSIS</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:catalysis rdf:ID="re20_c_s20">
+    <bp:CONTROLLED>
+      <bp:biochemicalReaction rdf:ID="re20">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT rdf:resource="#re20_Rum1"/>
+        <bp:RIGHT rdf:resource="#re20_Rum1_pho"/>
+      </bp:biochemicalReaction>
+    </bp:CONTROLLED>
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re20_Cdc13_Cdc2_Thr167_pho_active">
+        <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:catalysis rdf:ID="re18_c_s20">
+    <bp:CONTROLLED rdf:resource="#re18"/>
+    <bp:CONTROLLER>
+      <bp:physicalEntityParticipant rdf:ID="re18_Cdc13_Cdc2_Thr167_pho_active">
+        <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+        <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+        <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+      </bp:physicalEntityParticipant>
+    </bp:CONTROLLER>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:openControlledVocabulary rdf:ID="cytoplasmic_microtubule">
+    <bp:XREF rdf:resource="#GO_0005881"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytoplasmic_microtubule</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="spindle">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005819">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005819</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >spindle</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0042734">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0042734</bp:ID>
+  </bp:unificationXref>
+  <bp:catalysis rdf:ID="re15_c_s27">
+    <bp:CONTROLLED rdf:resource="#re15"/>
+    <bp:CONTROLLER rdf:resource="#re15_Plo1"/>
+    <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ACTIVATION</bp:CONTROL-TYPE>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDTYPE:CATALYSIS</bp:COMMENT>
+    <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+  </bp:catalysis>
+  <bp:openControlledVocabulary rdf:ID="cytosol">
+    <bp:XREF rdf:resource="#GO_0005829"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytosol</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cd3_KNOWN_TRANSITION_OMITTED">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >KNOWN_TRANSITION_OMITTED</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0018126">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0018126</bp:ID>
+  </bp:unificationXref>
+  <bp:physicalEntityParticipant rdf:ID="re5_Cdc13_Cdc2_Thr167_pho_active">
+    <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+    <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+    <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+  </bp:physicalEntityParticipant>
+  <bp:openControlledVocabulary rdf:ID="synaptonemal_complex">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0000795">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0000795</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >synaptonemal_complex</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005576">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005576</bp:ID>
+  </bp:unificationXref>
+  <bp:pathway rdf:ID="Fig_3_fission_yeast_MPF_cycle">
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re14_c_s20"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:catalysis rdf:ID="re2_c_s3">
+        <bp:CONTROLLED rdf:resource="#re2"/>
+        <bp:CONTROLLER>
+          <bp:sequenceParticipant rdf:ID="re2_Wee1">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p3"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:CONTROLLER>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+      </bp:catalysis>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Fig_3_fission_yeast_MPF_cycle</bp:NAME>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re20_c_s20"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:biochemicalReaction rdf:ID="re10">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT rdf:resource="#re10_Cdc2_Thr167_pho"/>
+        <bp:RIGHT rdf:resource="#re10_Cdc2"/>
+      </bp:biochemicalReaction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re18"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:catalysis rdf:ID="re5_c_s26">
+        <bp:CONTROLLED>
+          <bp:biochemicalReaction rdf:ID="re5">
+            <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+            <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+            <bp:LEFT>
+              <bp:physicalEntityParticipant rdf:ID="re5_Cdc13_Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+                <bp:PHYSICAL-ENTITY rdf:resource="#s19"/>
+                <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+                <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+                >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+              </bp:physicalEntityParticipant>
+            </bp:LEFT>
+            <bp:RIGHT rdf:resource="#re5_Cdc13_Cdc2_Thr167_pho_active"/>
+          </bp:biochemicalReaction>
+        </bp:CONTROLLED>
+        <bp:CONTROLLER>
+          <bp:sequenceParticipant rdf:ID="re5_Cdc25_pho_active">
+            <bp:PHYSICAL-ENTITY rdf:resource="#p7"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:SEQUENCE-FEATURE-LIST rdf:resource="#s26__pho"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:sequenceParticipant>
+        </bp:CONTROLLER>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+      </bp:catalysis>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re18_c_s20"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:catalysis rdf:ID="re11_c_s46">
+        <bp:CONTROLLED>
+          <bp:complexAssembly rdf:ID="re11">
+            <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >CDTYPE:DISSOCIATION</bp:COMMENT>
+            <bp:INTERACTION-TYPE rdf:resource="#cd3_DISSOCIATION"/>
+            <bp:LEFT rdf:resource="#re11_Cdc13_Cdc2_Thr167_pho_active"/>
+            <bp:RIGHT rdf:resource="#re11_Cdc2_Thr167_pho"/>
+            <bp:RIGHT rdf:resource="#re11_Cdc13_ubi"/>
+          </bp:complexAssembly>
+        </bp:CONTROLLED>
+        <bp:CONTROLLER>
+          <bp:physicalEntityParticipant rdf:ID="re11_APC_Slp1_active">
+            <bp:PHYSICAL-ENTITY rdf:resource="#s46"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:CONTROLLER>
+        <bp:CONTROL-TYPE rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ACTIVATION</bp:CONTROL-TYPE>
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:CATALYSIS</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_CATALYSIS"/>
+      </bp:catalysis>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:complexAssembly rdf:ID="re24">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:HETERODIMER_ASSOCIATION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_HETERODIMER_ASSOCIATION"/>
+        <bp:LEFT>
+          <bp:physicalEntityParticipant rdf:ID="re24_Cdc13_Cdc2_Thr167_pho_active">
+            <bp:PHYSICAL-ENTITY rdf:resource="#s20"/>
+            <bp:CELLULAR-LOCATION rdf:resource="#cellular_component_unknown"/>
+            <bp:STOICHIOMETRIC-COEFFICIENT rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+            >1.0</bp:STOICHIOMETRIC-COEFFICIENT>
+          </bp:physicalEntityParticipant>
+        </bp:LEFT>
+        <bp:LEFT rdf:resource="#re24_Rum1"/>
+        <bp:RIGHT rdf:resource="#re24_Cdc13_Cdc2_Thr167_pho_Rum1"/>
+      </bp:complexAssembly>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re2"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:biochemicalReaction rdf:ID="re12">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT rdf:resource="#re12_Cdc13_ubi"/>
+      </bp:biochemicalReaction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re16_c_s8"/>
+    <bp:PATHWAY-COMPONENTS>
+      <bp:biochemicalReaction rdf:ID="re23">
+        <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CDTYPE:STATE_TRANSITION</bp:COMMENT>
+        <bp:INTERACTION-TYPE rdf:resource="#cd3_STATE_TRANSITION"/>
+        <bp:LEFT rdf:resource="#re23_Rum1_pho"/>
+      </bp:biochemicalReaction>
+    </bp:PATHWAY-COMPONENTS>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15_c_s27"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re5"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re17"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re3_c_s3"/>
+    <bp:SHORT-NAME rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></bp:SHORT-NAME>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re20"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re15_c_s20"/>
+    <bp:COMMENT rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This pathway is generated automatically from the CellDesigner 3.0 XML file  using CellDesigner2BioPAX converter developed by Andrei Zinovyev at the Bioinformatics Service of Institut Curie (andrei.zinovyev@curie.fr)</bp:COMMENT>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re4"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re4_c_s5"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re11"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re16"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re14"/>
+    <bp:PATHWAY-COMPONENTS rdf:resource="#re3"/>
+  </bp:pathway>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRANSLATIONAL_ACTIVATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSLATIONAL_ACTIVATION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="post_translational_protein_modification">
+    <bp:XREF rdf:resource="#GO_0043687"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >post_translational_protein_modification</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0005741">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005741</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="mitochondrion">
+    <bp:XREF rdf:resource="#GO_0005739"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mitochondrion</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="spindle_pole">
+    <bp:XREF rdf:resource="#GO_0000922"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >spindle_pole</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0017102">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0017102</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005925">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005925</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="protein_amino_acid_hydroxylation">
+    <bp:XREF rdf:resource="#GO_0018126"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >protein_amino_acid_hydroxylation</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="vesicle">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0031982">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0031982</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >vesicle</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0045121">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0045121</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="lipid_raft">
+    <bp:XREF rdf:resource="#GO_0045121"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >lipid_raft</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="focal_adhesion">
+    <bp:XREF rdf:resource="#GO_0005925"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >focal_adhesion</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRUNCATION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRUNCATION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cytoplasm">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005737">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005737</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >cytoplasm</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="recycling_endosome">
+    <bp:XREF rdf:resource="#GO_0005764"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >recycling_endosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="stress_fiber">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0001725">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0001725</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >stress_fiber</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="desmosome">
+    <bp:XREF rdf:resource="#GO_0030057"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >desmosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="ascus_lipid_droplet">
+    <bp:XREF rdf:resource="#GO_0005633"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ascus_lipid_droplet</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="early_phagosome">
+    <bp:XREF rdf:resource="#GO_0032009"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >early_phagosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="extracellular_region">
+    <bp:XREF rdf:resource="#GO_0005576"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >extracellular_region</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0030426">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0030426</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="endoplasmic_reticulum_lumen">
+    <bp:XREF rdf:resource="#GO_0005788"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endoplasmic_reticulum_lumen</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="Golgi_membrane">
+    <bp:XREF rdf:resource="#GO_0000139"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Golgi_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="basolateral_plasma_membrane">
+    <bp:XREF rdf:resource="#GO_0016323"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >basolateral_plasma_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="PML_body">
+    <bp:XREF rdf:resource="#GO_0016605"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PML_body</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="growth_cones">
+    <bp:XREF rdf:resource="#GO_0030426"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >growth_cones</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="endosome">
+    <bp:XREF rdf:resource="#GO_0005768"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="chromosome">
+    <bp:XREF>
+      <bp:unificationXref rdf:ID="GO_0005694">
+        <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GO</bp:DB>
+        <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0005694</bp:ID>
+      </bp:unificationXref>
+    </bp:XREF>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >chromosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="methionyl_glutamyl_tRNA_synthetase_complex">
+    <bp:XREF rdf:resource="#GO_0017102"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >methionyl_glutamyl_tRNA_synthetase_complex</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="presynaptic_membrane">
+    <bp:XREF rdf:resource="#GO_0042734"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >presynaptic_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:unificationXref rdf:ID="GO_0016020">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0016020</bp:ID>
+  </bp:unificationXref>
+  <bp:unificationXref rdf:ID="GO_0005791">
+    <bp:DB rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GO</bp:DB>
+    <bp:ID rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0005791</bp:ID>
+  </bp:unificationXref>
+  <bp:openControlledVocabulary rdf:ID="cd3_UNKNOWN_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >UNKNOWN_INHIBITION</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:bioSource rdf:about="New_Protein"/>
+  <bp:openControlledVocabulary rdf:ID="membrane">
+    <bp:XREF rdf:resource="#GO_0016020"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="endoplasmic_reticulum">
+    <bp:XREF rdf:resource="#GO_0005783"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >endoplasmic_reticulum</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="secretory_vesicle">
+    <bp:XREF rdf:resource="#GO_0005803"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >secretory_vesicle</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="rough_endoplasmic_reticulum">
+    <bp:XREF rdf:resource="#GO_0005791"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >rough_endoplasmic_reticulum</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="centromere">
+    <bp:XREF rdf:resource="#GO_0005698"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >centromere</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="early_endosome">
+    <bp:XREF rdf:resource="#GO_0005769"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >early_endosome</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="methylation">
+    <bp:XREF rdf:resource="#GO_0032259"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >methylation</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="mitochondrial_outer_membrane">
+    <bp:XREF rdf:resource="#GO_0005741"/>
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mitochondrial_outer_membrane</bp:TERM>
+  </bp:openControlledVocabulary>
+  <bp:openControlledVocabulary rdf:ID="cd3_TRANSLATIONAL_INHIBITION">
+    <bp:TERM rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TRANSLATIONAL_INHIBITION</bp:TERM>
+  </bp:openControlledVocabulary>
+</rdf:RDF>

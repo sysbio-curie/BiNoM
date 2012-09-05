@@ -202,7 +202,7 @@ of large biological networks. BiNoM can be used to import and analyze files
 created with the CellDesigner software. BiNoM provides a set of functions
 allowing to import BioPAX files, but also to search and edit their
 content. As such, BiNoM is able to efficiently manage large BioPAX files such as
-whole pathway databases. BiNoM also implements a collection of powerful
+whole pathway databases (e.g. human Reactome). BiNoM also implements a collection of powerful
 graph-based functions and algorithms such as path analysis, decomposition by
 name or cycle, subnetworks clustering and decomposition of a large network in
 modules. Here, we provide an in-depth overview of the BiNoM
@@ -275,7 +275,7 @@ Notation (SBGN) \cite{le2009systems}. The Pathguide website counts
 more than 300 web-accessible biological pathway and network databases
 \cite{bader2006pathguide}, many of which are using the SBML and BioPAX standard
 formats. Ultimately, those integrated resources will facilitate computational
-models building, their exchange, re-usability and their experimental validation, a cycle that is the
+model building, their exchange, re-usability and their experimental validation, a cycle that is the
 cornerstone of the Systems Biology approach \cite{karlebach2008modelling,
 kitano2002systems, ideker2001new}.
 
@@ -293,7 +293,9 @@ tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical editing of biological pathway diagrams
 \cite{funahashi2003celldesigner}, using a proprietary extension
-of SBML to store all the information contained in the graphs. There is obviously
+of SBML to store all the information contained in the graphs. Some tools are
+available for a specific conversion of one file format into another
+\cite{mi2011biopax, buchel2012qualitative}. There is obviously
 a need for user-friendly software tools that would allow the user to easily
 import data from various standard format sources, to perform structural analyses on these pathways
 and to manipulate networks, and to be able to export a network to a suitable
@@ -323,7 +325,7 @@ Cytoscape software, the underlying logic of most of the BiNoM functions is compl
 decoupled from the Cytoscape objects, allowing developers to also use BiNoM as
 an independent Java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
-Plugins``, section ''Other''). Alternatively, the user can
+Plugins``, section ''Other'', then select the latest version of BiNoM). Alternatively, the user can
 also download the plugin together with a manual and the source code from the
 BiNoM website
 \url{http://binom.curie.fr/}. 
@@ -332,7 +334,7 @@ BiNoM website
 BiNoM is designed to handle different Systems Biology file formats and to
 provide useful functions for the analysis of biological networks. The core
 functions of BiNoM can be grouped in five different topics: Input/Output,
-Analysis, BioPAX utils \& query, Module manager and Utilities.
+Structural Analysis, BioPAX utils \& query, Module manager and Utilities.
 
 \subsection*{BiNoM Input/Output}
 
@@ -348,11 +350,14 @@ analysis scenarios, such as the examples showed below (non-exhaustive list):
 reaction network to SBML level 2.
 
 \item Import of a BioPAX file as a reaction network and/or a pathway structure
-and/or a protein interactions network, followed by the creation of a subnetwork
+and/or an interaction map, followed by the creation of a subnetwork
 saved as a new BioPAX file.
 
-\item Import of a BioPAX file, selection of a subnetwork of interest saved as a SBML file for
-the creation of a computational model using an appropriate software package.
+\item Import of a BioPAX file, selection of a subnetwork of interest saved as a
+SBML file for
+the creation of a computational model using an appropriate software package,
+such as CellDesigner \cite{funahashi2003celldesigner} or GINsim
+\cite{gonzalez2006ginsim}.
 
 \item Import a large CellDesigner map and export only a subnetwork as a new CellDesigner file.
 
@@ -429,28 +434,30 @@ cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
 position 167 on a threonine residue.
 
 
-\subsection*{BiNoM Analysis}
+\subsection*{BiNoM Structural Analysis}
 The central goal of the BiNoM plugin is to provide efficient methods
 and algorithms to reduce the inherent complexity of biological networks into
 manageable and meaningful subnetworks. This goal is achieved by a set of
 functions included as a built-in structural graph analysis library. Some of the functions take into
 account the semantics contained in the graph element names.
-The structural analysis functions implemented in BiNoM include the analysis of
-connected and strongly connected components, pruning the network, decomposition
+The structural analysis functions implemented in BiNoM include the identification of
+connected and strongly connected components, pruning of the network, decomposition
 by involvement of a protein (material components) or by cyclic decomposition, path analysis and network clustering.
 We also introduce in this version of BiNoM a novel function to quantify the
-influence of a source node on a target node taking into account experimental data, called PIQuant.
+influence of a source node on a target node taking into account experimental
+data, called PIQuant. In the following paragraphs, we will detail network
+decomposition and the PIQuant score.
 
 \subsubsection*{Decomposition by involvement of a protein or by cyclic decomposition}
 
-BiNoM allows many methods to dissect a complex biological network into parts.
+BiNoM proposes three methods to dissect a complex biological network into parts.
 A trivial approach to separate a network into subparts is to dissociate the unconnected subparts
 of the network. A more sophisticated one consists in decomposing the network into
 strongly connected components, using the algorithm of Tarjan
 \cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
 the one with all the elements associated with the \emph{input} part of the network (from which all paths lead to the central core), the
 second with all the elements associated with the \emph{output} part (from which there are no paths leading back to the central core) and the last
-part with all the elements linked to the central core, cyclic part, composed from strongly connected components, possibly connected together. 
+part with all the elements linked to the central core, the cyclic part, composed from strongly connected components, possibly connected together. 
 This type of approach corresponds to finding the bow-tie graph structure \cite{broder2000graph}.
 
 The decomposition in material components is using the node name semantics to
@@ -458,7 +465,7 @@ isolate subnetworks in which each protein is involved, either as a simple chemic
 the different subnetworks are to be expected, as many proteins are expected to be involved in
 different complexes. Figure 3 shows two examples of subnetworks
 obtained by material component decomposition applied to a cell cycle network
-model of the yeast species \textit{S. pombe} \cite{novak1998model}. This approach represents
+model of the yeast species \textit{S. pombe} \cite{novak1998model}. This approach identifies
 different parts of the life cycle of a given protein.
 
 %------------
@@ -498,7 +505,7 @@ all non self-intersecting paths (table 1). The shortest path is calculated as th
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the suboptimal path is constructed by removing all edges of
 all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths 
-are those paths not containing loops (self-intersections). 
+are those paths that do not containing loops (self-intersections). 
 The user should be careful when using this procedure, as the number of paths between nodes can be
 very large for big networks. In order to limit the number of paths found, BiNoM
 allows to specify the maximal length of the path to be found.

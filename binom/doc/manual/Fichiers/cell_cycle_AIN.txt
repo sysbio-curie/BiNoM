@@ -1,0 +1,19 @@
+ReviewRef(GS reviews)	ExperimentRef	Link	ChemType	Delay	Confidence	Tissue	Comments
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCND.):(CDK4,CDK6))	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNE.):CDK2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNA.):CDK2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	(CCNH:CDK7)->(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation is necessary for full activity of cyclin-cdk complex"
+PMID:11846025(GS:25)	.	((CCNE.):CDK2)->CDC25A	Phosphorylation	.	0.8	All
+PMID:11846025(GS:25)	.	CDC25A->((CCNE.):CDK2)	Activation	.	0.8	All
+PMID:11846025(GS:25)	.	CDC25A->((CCNA.):CDK2)	Activation	.	0.8	All
+PMID:11846025(GS:25)	.	WEE1-|((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thyr 15 that inibits the complex"
+PMID:11846025(GS:25)	.	WEE1-|(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thyr 15 that inibits the complex"
+PMID:11846025(GS:25)	.	WEE1-|((CCNA.):CDK2)	Phosphorylation	.	0.7	All	"Phosphorylation at Thyr 15 that inibits the complex, observed in vitro but not in vivo"
+PMID:11846025(GS:25)	.	WEE1-|((CCNE.):CDK2)	Phosphorylation	.	0.7	All	"Phosphorylation at Thyr 15 that inibits the complex, observed in vitro but not in vivo"
+PMID:11846025(GS:25)	.	PKMYT1-|((CCNA.):CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 14 that inibits the complex"
+PMID:11846025(GS:25)	.	PKMYT1-|(CCNB1:CDC2)	Phosphorylation	.	0.9	All	"Phosphorylation at Thr 14 that inibits the complex"
+PMID:11846025(GS:25)	.	(CDKN2.)-|((CCND.):(CDK4,CDK6))	Binding	.	0.9	All	"Other name for (CDKN2.): Ink4 familiy (p16, p15, p18, p19), prevent activation by phosphorylation and diminish the binding cyclin-cdk"
+#PMID:11846025(GS:25)	.	(CDKN1.)-|((CCND.):(CDK4,CDK6))	Binding	.	0.9	All	"Other name for (CDKN1.): Cip/Kip family, In vitro evidence"
+.	PMID:10385618(GS:32)	(CDKN1.)->((CCND.):(CDK4,CDK6))	Binding	.	0.7	All	"Other name for (CDKN1.): Cip/Kip family, in vitro and in vivo results, in contradiction with old knowledge, like in (GS:25)"
+

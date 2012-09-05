@@ -1,0 +1,1061 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+ xmlns="http://bioinfo.curie.fr/biopax2sbml#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:bp="http://www.biopax.org/release/biopax-level3.owl#"
+ xml:base="http://bioinfo.curie.fr/biopax2sbml">
+<owl:Ontology rdf:about="">
+ <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level3.owl#" />
+</owl:Ontology>
+
+<!--
+
+<bp:SequenceModificationVocabulary rdf:about="http://biopax.org/tutorial/cv1">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Thr</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:ModificationFeature rdf:about="http://biopax.org/tutorial/md1">
+<bp:modificationType rdf:resource="http://biopax.org/tutorial/cv1" />
+</bp:ModificationFeature>
+
+-->
+
+<bp:SequenceModificationVocabulary rdf:about="thr167">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Thr167_pho</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:SequenceModificationVocabulary rdf:about="ubi">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Ubi</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:SequenceModificationVocabulary rdf:about="pho">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Pho</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:SequenceModificationVocabulary rdf:about="thr14">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Thr14_pho</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:SequenceModificationVocabulary rdf:about="thr15">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Thr15_pho</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:SequenceModificationVocabulary rdf:about="tyr15">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Tyr15_pho</bp:term>
+</bp:SequenceModificationVocabulary>
+
+<bp:UnificationXref rdf:ID="GO_0005925">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005925</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005923">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005923</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ProteinReference rdf:ID="p1">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:standardName>
+</bp:ProteinReference>
+
+<bp:ProteinReference rdf:ID="p3">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Wee1</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Wee1</bp:standardName>
+</bp:ProteinReference>
+
+<bp:ProteinReference rdf:ID="p2">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:standardName>
+</bp:ProteinReference>
+
+<bp:ProteinReference rdf:ID="p5">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CAK</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CAK</bp:standardName>
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cyclin dependent Activating Kinase</bp:comment>
+</bp:ProteinReference>
+
+<!--
+<bp:Protein rdf:ID="a28_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<!--
+<bp:ModificationFeature rdf:about="http://biopax.org/tutorial/md1">
+<bp:modificationType rdf:resource="http://biopax.org/tutorial/cv1" />
+</bp:ModificationFeature>
+
+<bp:ModificationFeature rdf:ID="s11_Tyr15_pho">
+ <bp:featureLocationType rdf:resource="#phosphorylation" />
+</bp:ModificationFeature>
+-->
+
+<bp:ModificationFeature rdf:ID="s11_Tyr15_pho">
+ <bp:modificationType rdf:resource="tyr15" />
+</bp:ModificationFeature>
+
+
+<bp:Catalysis rdf:ID="re5_c_s26">
+ <bp:controlled rdf:resource="#re5" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re16_Cdc25_pho_active" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0032009">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0032009</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0016323">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016323</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:InteractionVocabulary rdf:ID="cd3_HETERODIMER_ASSOCIATION">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">HETERODIMER_ASSOCIATION</bp:term>
+</bp:InteractionVocabulary>
+
+<bp:UnificationXref rdf:ID="GO_0017102">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0017102</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005912">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005912</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="a75_Rum1">
+ <bp:entityReference rdf:resource="#p13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Rum1</bp:displayName>
+</bp:Protein>
+
+<bp:Protein rdf:ID="re11_Cdc13_ubi">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:feature rdf:resource="#s31__ubi" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+
+<bp:ModificationFeature rdf:ID="s25_Tyr15_pho">
+<bp:modificationType rdf:resource="tyr15" />
+</bp:ModificationFeature>
+
+<bp:UnificationXref rdf:ID="GO_0005791">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005791</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005790">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005790</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005792">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005792</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<!--
+<bp:Protein rdf:ID="a26_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<bp:UnificationXref rdf:ID="GO_0051233">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0051233</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005856">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005856</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0045121">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0045121</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005654">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005654</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="a26_Cdc2_Tyr15_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s11_Tyr15_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005794">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005794</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0031982">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0031982</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0030057">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030057</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005796">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005796</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re16_Cdc25">
+ <bp:entityReference rdf:resource="#p7" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc25</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0030054">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030054</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0009897">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0009897</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:SequenceRegionVocabulary rdf:ID="phosphorylation">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">phosphorylation</bp:term>
+ <bp:xref rdf:resource="#GO_0016310" />
+</bp:SequenceRegionVocabulary>
+
+<bp:ModificationFeature rdf:ID="s26__pho">
+ <bp:modificationType rdf:resource="pho" />
+</bp:ModificationFeature>
+
+<bp:Catalysis rdf:ID="re16_c_s8">
+ <bp:controlled rdf:resource="#re16" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re16_PP2A" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0030526">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030526</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0008372">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0008372</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ModificationFeature rdf:ID="s34__pho">
+ <bp:modificationType rdf:resource="pho" />
+</bp:ModificationFeature>
+
+<bp:UnificationXref rdf:ID="GO_0005741">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005741</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ModificationFeature rdf:ID="s24__pho">
+ <bp:modificationType rdf:resource="pho" />
+</bp:ModificationFeature>
+
+<!--
+<bp:ModificationFeature rdf:ID="s13_Thr167_pho">
+ <bp:featureLocationType rdf:resource="#phosphorylation" />
+</bp:ModificationFeature>
+-->
+
+<bp:ModificationFeature rdf:ID="s13_Thr167_pho">
+ <bp:modificationType rdf:resource="thr167" />
+</bp:ModificationFeature>
+
+
+<bp:BiochemicalReaction rdf:ID="re14">
+ <bp:left rdf:resource="#re2_Wee1" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:right rdf:resource="#re14_Wee1_pho" />
+</bp:BiochemicalReaction>
+
+<bp:BiochemicalReaction rdf:ID="re15">
+ <bp:left rdf:resource="#re16_Cdc25" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#re16_Cdc25_pho_active" />
+</bp:BiochemicalReaction>
+
+<bp:BiochemicalReaction rdf:ID="re16">
+ <bp:left rdf:resource="#re16_Cdc25_pho_active" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#re16_Cdc25" />
+</bp:BiochemicalReaction>
+
+<bp:ComplexAssembly rdf:ID="re17">
+ <bp:left rdf:resource="#re17_Cdc2" />
+ <bp:left rdf:resource="#re17_Cdc13" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:HETERODIMER_ASSOCIATION</bp:comment>
+ <bp:right rdf:resource="#s16" />
+</bp:ComplexAssembly>
+
+<bp:BiochemicalReaction rdf:ID="re18">
+ <bp:left rdf:resource="#s46" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#s46" />
+</bp:BiochemicalReaction>
+
+<bp:ModificationFeature rdf:ID="s29_Thr167_pho">
+ <bp:modificationType rdf:resource="thr167" />
+</bp:ModificationFeature>
+
+<bp:InteractionVocabulary rdf:ID="cd3_STATE_TRANSITION">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">STATE_TRANSITION</bp:term>
+</bp:InteractionVocabulary>
+
+<bp:UnificationXref rdf:ID="GO_0001669">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0001669</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0030027">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030027</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0001725">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0001725</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0019717">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0019717</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0001726">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0001726</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ModificationFeature rdf:ID="s21_Tyr15_pho">
+ <bp:modificationType rdf:resource="tyr15" />
+</bp:ModificationFeature>
+
+<bp:UnificationXref rdf:ID="GO_0005641">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005641</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ComplexAssembly rdf:ID="re11">
+ <bp:left rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:DISSOCIATION</bp:comment>
+ <bp:right rdf:resource="#re10_Cdc2_Thr167_pho" />
+ <bp:right rdf:resource="#re11_Cdc13_ubi" />
+</bp:ComplexAssembly>
+
+<bp:UnificationXref rdf:ID="GO_0005640">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005640</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:BiochemicalReaction rdf:ID="re10">
+ <bp:left rdf:resource="#re10_Cdc2_Thr167_pho" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#re17_Cdc2" />
+</bp:BiochemicalReaction>
+
+<bp:Protein rdf:ID="a27_Cdc2_Thr14_pho_Tyr15_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s21_Thr14_pho" />
+ <bp:feature rdf:resource="#s21_Tyr15_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:BiochemicalReaction rdf:ID="re12">
+ <bp:left rdf:resource="#re11_Cdc13_ubi" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+</bp:BiochemicalReaction>
+
+
+<!--
+<bp:Protein rdf:ID="a29_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<bp:ModificationFeature rdf:ID="s25_Thr14_pho">
+ <bp:modificationType rdf:resource="thr14" />
+</bp:ModificationFeature>
+
+<bp:UnificationXref rdf:ID="GO_0042734">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0042734</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:CellularLocationVocabulary rdf:ID="cellular_component_unknown">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">cellular_component_unknown</bp:term>
+ <bp:xref rdf:resource="#GO_0008372" />
+</bp:CellularLocationVocabulary>
+
+<bp:UnificationXref rdf:ID="GO_0030496">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030496</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005730">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005730</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0000139">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0000139</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="a43_APC">
+ <bp:entityReference rdf:resource="#p11" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">APC</bp:displayName>
+</bp:Protein>
+
+<bp:Protein rdf:ID="re4_CAK">
+ <bp:entityReference rdf:resource="#p5" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CAK</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0048471">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0048471</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="a28_Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s25_Thr14_pho" />
+ <bp:feature rdf:resource="#s25_Tyr15_pho" />
+ <bp:feature rdf:resource="#s25_Thr167_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0016605">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016605</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0016604">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016604</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005739">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005739</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005834">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005834</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005737">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005737</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0043226">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0043226</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:BiochemicalReaction rdf:ID="re20">
+ <bp:left rdf:resource="#re24_Rum1" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#re23_Rum1_pho" />
+</bp:BiochemicalReaction>
+
+<bp:UnificationXref rdf:ID="GO_0005634">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005634</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ModificationFeature rdf:ID="s31__ubi">
+  <bp:modificationType rdf:resource="ubi" />
+</bp:ModificationFeature>
+
+<bp:UnificationXref rdf:ID="GO_0005633">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005633</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ComplexAssembly rdf:ID="re24">
+ <bp:left rdf:resource="#re24_Rum1" />
+ <bp:left rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:HETERODIMER_ASSOCIATION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_HETERODIMER_ASSOCIATION" />
+ <bp:right rdf:resource="#s41" />
+</bp:ComplexAssembly>
+
+<bp:BiochemicalReaction rdf:ID="re23">
+ <bp:left rdf:resource="#re23_Rum1_pho" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+</bp:BiochemicalReaction>
+
+<bp:UnificationXref rdf:ID="GO_0015629">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0015629</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0031965">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0031965</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0031966">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0031966</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0043412">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0043412</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0031012">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0031012</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ProteinReference rdf:ID="p8">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">PP2A</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">PP2A</bp:standardName>
+</bp:ProteinReference>
+
+<bp:ProteinReference rdf:ID="p7">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc25</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc25</bp:standardName>
+</bp:ProteinReference>
+
+<bp:UnificationXref rdf:ID="GO_0018126">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0018126</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0043687">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0043687</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:SequenceRegionVocabulary rdf:ID="protein_ubiquitination">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">protein_ubiquitination</bp:term>
+ <bp:xref rdf:resource="#GO_0016567" />
+</bp:SequenceRegionVocabulary>
+
+<bp:ModificationFeature rdf:ID="s21_Thr14_pho">
+ <bp:modificationType rdf:resource="thr14" />
+</bp:ModificationFeature>
+
+<bp:Protein rdf:ID="a29_Cdc2_Thr167_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s29_Thr167_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005769">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005769</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Pathway rdf:ID="Fig_3_fission_yeast_MPF_cycle">
+ <bp:pathwayComponent rdf:resource="#re4" />
+ <bp:pathwayComponent rdf:resource="#re15_c_s20" />
+ <bp:pathwayComponent rdf:resource="#re2_c_s3" />
+ <bp:pathwayComponent rdf:resource="#re2" />
+ <bp:pathwayComponent rdf:resource="#re15_c_s27" />
+ <bp:pathwayComponent rdf:resource="#re5_c_s26" />
+ <bp:pathwayComponent rdf:resource="#re23" />
+ <bp:pathwayComponent rdf:resource="#re5" />
+ <bp:pathwayComponent rdf:resource="#re18" />
+ <bp:pathwayComponent rdf:resource="#re24" />
+ <bp:pathwayComponent rdf:resource="#re14" />
+ <bp:pathwayComponent rdf:resource="#re11" />
+ <bp:pathwayComponent rdf:resource="#re15" />
+ <bp:pathwayComponent rdf:resource="#re20" />
+ <bp:pathwayComponent rdf:resource="#re14_c_s20" />
+ <bp:pathwayComponent rdf:resource="#re18_c_s20" />
+ <bp:pathwayComponent rdf:resource="#re12" />
+ <bp:pathwayComponent rdf:resource="#re17" />
+ <bp:pathwayComponent rdf:resource="#re16" />
+ <bp:pathwayComponent rdf:resource="#re20_c_s20" />
+ <bp:pathwayComponent rdf:resource="#re4_c_s5" />
+ <bp:pathwayComponent rdf:resource="#re11_c_s46" />
+ <bp:pathwayComponent rdf:resource="#re3" />
+ <bp:pathwayComponent rdf:resource="#re3_c_s3" />
+ <bp:pathwayComponent rdf:resource="#re16_c_s8" />
+ <bp:pathwayComponent rdf:resource="#re10" />
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Fig_3_fission_yeast_MPF_cycle</bp:standardName>
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">This pathway is generated automatically from the CellDesigner 3.0 XML file using CellDesigner2BioPAX converter developed by Andrei Zinovyev at the Bioinformatics Service of Institut Curie (andrei.zinovyev@curie.fr)</bp:comment>
+</bp:Pathway>
+
+<bp:UnificationXref rdf:ID="GO_0005768">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005768</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<!--
+<bp:Protein rdf:ID="a75_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<bp:UnificationXref rdf:ID="GO_0016567">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016567</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005764">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005764</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Complex rdf:ID="s16">
+ <bp:component rdf:resource="#a25_Cdc2" />
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2</bp:standardName>
+</bp:Complex>
+
+<bp:InteractionVocabulary rdf:ID="cd3_CATALYSIS">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CATALYSIS</bp:term>
+</bp:InteractionVocabulary>
+
+<bp:Complex rdf:ID="s17">
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:component rdf:resource="#a26_Cdc2_Tyr15_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2_Tyr15_pho</bp:standardName>
+</bp:Complex>
+
+<bp:Catalysis rdf:ID="re20_c_s20">
+ <bp:controlled rdf:resource="#re20" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:Protein rdf:ID="re16_Cdc25_pho_active">
+ <bp:entityReference rdf:resource="#p7" />
+ <bp:feature rdf:resource="#s26__pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc25</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005819">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005819</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005813">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005813</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005815">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005815</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<!--
+<bp:Protein rdf:ID="a25_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<bp:Protein rdf:ID="re2_Wee1">
+ <bp:entityReference rdf:resource="#p3" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Wee1</bp:displayName>
+</bp:Protein>
+
+<!--
+<bp:Protein rdf:ID="a75_Cdc2_Thr167_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s33_Thr167_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+-->
+
+
+<bp:UnificationXref rdf:ID="GO_0009986">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0009986</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005758">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005758</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Catalysis rdf:ID="re3_c_s3">
+ <bp:controlled rdf:resource="#re3" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re2_Wee1" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0005698">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005698</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Complex rdf:ID="s19">
+ <bp:component rdf:resource="#a28_Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho" />
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2_Thr14_pho_Tyr15_pho_Thr167_pho</bp:standardName>
+</bp:Complex>
+
+<bp:Complex rdf:ID="s18">
+ <bp:component rdf:resource="#a27_Cdc2_Thr14_pho_Tyr15_pho" />
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2_Thr14_pho_Tyr15_pho</bp:standardName>
+</bp:Complex>
+
+<bp:Catalysis rdf:ID="re18_c_s20">
+ <bp:controlled rdf:resource="#re18" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0006473">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0006473</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005694">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005694</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re23_Rum1_pho">
+ <bp:entityReference rdf:resource="#p13" />
+ <bp:feature rdf:resource="#s34__pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Rum1</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005829">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005829</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Complex rdf:ID="s20">
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:component rdf:resource="#a29_Cdc2_Thr167_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2_Thr167_pho_active</bp:standardName>
+</bp:Complex>
+
+<bp:UnificationXref rdf:ID="GO_0030426">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0030426</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="a25_Cdc2">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005886">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005886</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re14_Wee1_pho">
+ <bp:entityReference rdf:resource="#p3" />
+ <bp:feature rdf:resource="#s24__pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Wee1</bp:displayName>
+</bp:Protein>
+
+<bp:Catalysis rdf:ID="re4_c_s5">
+ <bp:controlled rdf:resource="#re4" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re4_CAK" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0005783">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005783</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re10_Cdc2_Thr167_pho">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:feature rdf:resource="#s13_Thr167_pho" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<bp:Catalysis rdf:ID="re2_c_s3">
+ <bp:controlled rdf:resource="#re2" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re2_Wee1" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0005788">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005788</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Catalysis rdf:ID="re11_c_s46">
+ <bp:controlled rdf:resource="#re11" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#s46" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:BiochemicalReaction rdf:ID="re5">
+ <bp:left rdf:resource="#s19" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#s20" />
+</bp:BiochemicalReaction>
+
+<bp:Protein rdf:ID="re17_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+
+<bp:ModificationFeature rdf:ID="s25_Thr167_pho">
+ <bp:modificationType rdf:resource="thr167" />
+</bp:ModificationFeature>
+
+<bp:Protein rdf:ID="a43_Slp1">
+ <bp:entityReference rdf:resource="#p12" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Slp1</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0008021">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0008021</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:InteractionVocabulary rdf:ID="cd3_DISSOCIATION">
+ <bp:term rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">DISSOCIATION</bp:term>
+</bp:InteractionVocabulary>
+
+<bp:UnificationXref rdf:ID="GO_0032259">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0032259</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:BioSource rdf:about="New_Protein">
+</bp:BioSource>
+
+<bp:Catalysis rdf:ID="re14_c_s20">
+ <bp:controlled rdf:resource="#re14" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:Protein rdf:ID="re24_Rum1">
+ <bp:entityReference rdf:resource="#p13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Rum1</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0005881">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005881</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:BiochemicalReaction rdf:ID="re2">
+ <bp:left rdf:resource="#s16" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#s17" />
+</bp:BiochemicalReaction>
+
+<bp:BiochemicalReaction rdf:ID="re3">
+ <bp:left rdf:resource="#s17" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#s18" />
+</bp:BiochemicalReaction>
+
+<bp:BiochemicalReaction rdf:ID="re4">
+ <bp:left rdf:resource="#s18" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:STATE_TRANSITION</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_STATE_TRANSITION" />
+ <bp:right rdf:resource="#s19" />
+</bp:BiochemicalReaction>
+
+<bp:ProteinReference rdf:ID="p13">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Rum1</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Rum1</bp:standardName>
+</bp:ProteinReference>
+
+<bp:Catalysis rdf:ID="re15_c_s27">
+ <bp:controlled rdf:resource="#re15" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#re15_Plo1" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0005576">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005576</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005876">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005876</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re16_PP2A">
+ <bp:entityReference rdf:resource="#p8" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">PP2A</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0016310">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016310</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Catalysis rdf:ID="re15_c_s20">
+ <bp:controlled rdf:resource="#re15" />
+ <bp:controlType rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ACTIVATION</bp:controlType>
+ <bp:controller rdf:resource="#s20" />
+ <bp:comment rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">CDTYPE:CATALYSIS</bp:comment>
+ <bp:interactionType rdf:resource="#cd3_CATALYSIS" />
+</bp:Catalysis>
+
+<bp:UnificationXref rdf:ID="GO_0016020">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0016020</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re17_Cdc2">
+ <bp:entityReference rdf:resource="#p1" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc2</bp:displayName>
+</bp:Protein>
+
+<!--
+<bp:Protein rdf:ID="a27_Cdc13">
+ <bp:entityReference rdf:resource="#p2" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13</bp:displayName>
+</bp:Protein>
+-->
+
+<bp:ProteinReference rdf:ID="p10">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Plo1</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Plo1</bp:standardName>
+</bp:ProteinReference>
+
+<bp:ProteinReference rdf:ID="p11">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">APC</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">APC</bp:standardName>
+</bp:ProteinReference>
+
+<bp:UnificationXref rdf:ID="GO_0000922">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0000922</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:ProteinReference rdf:ID="p12">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Slp1</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Slp1</bp:standardName>
+</bp:ProteinReference>
+
+<bp:Complex rdf:ID="s46">
+ <bp:component rdf:resource="#a43_APC" />
+ <bp:component rdf:resource="#a43_Slp1" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Slp1/APC)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">APC:Slp1_active</bp:standardName>
+</bp:Complex>
+
+<bp:UnificationXref rdf:ID="GO_0005770">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005770</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Protein rdf:ID="re15_Plo1">
+ <bp:entityReference rdf:resource="#p10" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Plo1</bp:displayName>
+</bp:Protein>
+
+<bp:UnificationXref rdf:ID="GO_0000795">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0000795</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:UnificationXref rdf:ID="GO_0005803">
+ <bp:id rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">0005803</bp:id>
+ <bp:db rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">GO</bp:db>
+</bp:UnificationXref>
+
+<bp:Complex rdf:ID="s41">
+ <bp:component rdf:resource="#a75_Rum1" />
+ <bp:component rdf:resource="#a29_Cdc2_Thr167_pho" />
+ <bp:component rdf:resource="#re17_Cdc13" />
+ <bp:cellularLocation rdf:resource="#cellular_component_unknown" />
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Complex_br_(Cdc13/Cdc2/_br_Rum1)</bp:displayName>
+ <bp:standardName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">Cdc13:Cdc2_Thr167_pho:Rum1</bp:standardName>
+</bp:Complex>
+
+<bp:ModificationFeature rdf:ID="s33_Thr167_pho">
+ <bp:modificationType rdf:resource="thr167" />
+</bp:ModificationFeature>
+</rdf:RDF>

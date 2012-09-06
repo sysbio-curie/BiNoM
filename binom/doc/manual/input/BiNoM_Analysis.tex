@@ -207,11 +207,11 @@ $$
 
  A path $k \in \{1,\ldots , q\}$ is defined
 as a the sequence of consecutive connected nodes
-between a source node and a target node (without repetition of any node
+between an annotated node and a target node (without repetition of any node
 or edge).
 
 The annotation $\alpha_k$ of the path $k$ is defined as the annotation (real value representing the experimental data) 
-of its source node. We define the sign $\sigma_k$
+of the first node in the path. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and finally
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. We
 hypothesize that the longer the path is, the lesser the global influence will be
@@ -235,7 +235,7 @@ and -1.0 respectively.}
 
 
 In the case of the network presented in figure~\ref{PIQuant_example}a, let us
-consider Ac the source node and Ph the target node and consider only the two
+consider Ac the annotated node and Ph the target node and consider only the two
 paths defined in the figure~\ref{PIQuant_example}b and
 figure~\ref{PIQuant_example}c. Given that the
 node Ac is annotated by the value $2.0$, that the first path has a length
@@ -252,9 +252,9 @@ Sometimes a path has one or more intermediate nodes that are annotated nodes
 (i.e. for which we have experimental data values),
 in addition to the source node.
 In that case, the intermediate node is \textit{consistent} if the sign of its
-annotation is the same as the sign of the source node annotation multiplied by
+annotation is the same as the sign of the first node in the path multiplied by
 the sign of the
-path from the source node to the intermediate node. If signs are opposite, the
+path from the annotated node to the intermediate node. If signs are opposite, the
 node is \textit{inconsistent}.
 A path is \textit{consistent} if each annotated intermediate nodes is
 consistent. A path is \textit{inconsistent} if at least one intermediate node is
@@ -321,13 +321,27 @@ targets and the algorithm for searching the paths.}
 
 The step 2 dialog (the results of the PIQuant score calculations) is displayed on figure~\ref{Path_consistency_analyser_Dialog2}.
 
+All the paths and the corresponding PIQuant scores are displayed in three
+interactive lists on the upper part of the window. The user can select the
+target nodes, annotated nodes and the paths. Individua PIQuant score are
+displayed for each path, while a sum of the individual PIQuant scores is
+diplayed below the lists.
 
+Different options are available, such as using sign algebra, selecting all
+paths, filter out inconsistent nodes, filter out inconsistent paths, filter
+inactive paths and get Paths activities.
+
+It is also possible to test the significance of a global PIQuant score, by
+reshuffling the annotations between the nodes and estimating a p-value from the
+distribution.
+
+At last, the user can get a text report, detailing the global and individual
+PIQuant scores.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{graphics/Path_consistency_analyser_Dialog2}
-  \caption{Path consistency analysis: dialog of step 2, display paths and
-activities, get all results}
+  \caption{Path influence quantification analysis: dialog of step 2, showing all the results and available options.}
   \label{Path_consistency_analyser_Dialog2}
 \end{figure}  
 
@@ -341,6 +355,6 @@ This function creates a file *.gmt (a text file where nodes are separated by \te
 \begin{figure}
 \centering
 \includegraphics[width=7 cm]{graphics/Create_Neigborhood_File_Dialog}
-\caption{Diialog for options of creating a neighborhood sets file.}
+\caption{Dialog for setting the different options of creating a neighborhood sets file.}
 \label{Create_Neigborhood_File_Dialog}
 \end{figure}  

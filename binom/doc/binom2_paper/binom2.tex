@@ -554,21 +554,21 @@ number is assigned to the node, representing an experimental data value (e.g.
 the expression ratio of a gene between a disease and a normal state, obtained
 from transcriptomics profiling).
  A path $k \in \{1,\ldots , q\}$ is defined
-as a the sequence of consecutive connected nodes
+as the sequence of consecutive connected nodes
 between an annotated node and a target node (without repetition of any node
 or edge). We can extract a set of paths from annotated nodes to target nodes (indexed
 from $1$ to $q$), by using various algorithms. In BiNoM, we propose three solutions to search for paths between the
 annotated and target nodes (shortest paths, suboptimal shortest paths and all
-non self-intersecting paths, see previous paragraph). The activity
+non self-intersecting paths, see previous paragraph). The annotation
 $\alpha_k$ of the path $k$ is defined as the annotation
-of the node. We define the sign $\sigma_k$
-of the path $k$ as the product of the signs of every edge of the path and finally
-the length $\lambda_k$ of the path $k$ as the number of edges in the path. We
+of the first node of the path. We define the sign $\sigma_k$
+of the path $k$ as the product of the signs of every edge of the path and 
+the length $\lambda_k$ of the path $k$ as the number of edges in the path. A summary of the input data types is shown in table 2. We
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
-not require extra parameters other than the influence network to be calculated.
+not require the estimation or calculation of extra parameters.
 Considering a set of $q$ paths that have been extracted from the network
-of interest, between a selection of annotated and target nodes defined by the user. A summary of the input data types is shown in table 2.
+of interest, between a selection of annotated and target nodes defined by the user. 
 The PIQuant score is then defined as:
 
 $$
@@ -659,7 +659,7 @@ consequence, this format was designed first to be machine-readable, but was not
 intended
 to be edited and modified by biologists. Furthermore, due to its adoption by
 large biological knowledge repositories, some BioPAX files can be really big,
-such as the \textit{Homo sapiens} network from the reactome database
+such as the \textit{Homo sapiens} network from the Reactome database
 \cite{joshi2005reactome} that has more than 6,000 reactions involving more than
 8,000 chemical species (proteins, RNA molecules, metabolites, etc.).
 
@@ -669,9 +669,7 @@ Java class introspection techniques to build a BioPAX class tree. Then, the
 content of the file can easily be accessed. For example, figure 6 shows
 all the information linked to the TRAIL protein, after a call to the
 BioPAX property
-editor function of the BiNoM menu has been made. Details are given in the BiNoM manual on how
-to display valid attributes, edit them, and how to visualize the
-complete BioPAX tree.
+editor function of the BiNoM menu has been made (for more details see the BiNoM manual available at \url{http://binom.curie.fr}).
 
 %-----------
 %%% figure 6
@@ -979,7 +977,7 @@ software, http://navicell.curie.fr).
 
 \begin{itemize}
 \item Project name: BiNoM
-\item Project home page: \url{http://binom.curie.fr/} and \url{http://apps.cytoscape.org/apps/binom}
+\item Project home page: \url{http://binom.curie.fr/}
 \item Operating system(s): Platform independent
 \item Programming language: Java
 \item Other requirements: Java 1.5 or higher, Cytoscape 2.7, 2.8

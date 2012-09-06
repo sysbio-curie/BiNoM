@@ -552,7 +552,7 @@ architectures on the same phenotype for one experimental dataset.
 More formally, we define a node as \textit{annotated} when a signed real
 number is assigned to the node, representing an experimental data value (e.g.
 the expression ratio of a gene between a disease and a normal state, obtained
-from transcriptomics profiling).
+from transcriptomic profiling).
  A path $k \in \{1,\ldots , q\}$ is defined
 as the sequence of consecutive connected nodes
 between an annotated node and a target node (without repetition of any node
@@ -568,8 +568,7 @@ hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
 not require the estimation or calculation of extra parameters.
 Considering a set of $q$ paths that have been extracted from the network
-of interest, between a selection of annotated and target nodes defined by the user. 
-The PIQuant score is then defined as:
+of interest, between a selection of annotated and target nodes defined by the user, the PIQuant score is then defined as:
 
 $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}

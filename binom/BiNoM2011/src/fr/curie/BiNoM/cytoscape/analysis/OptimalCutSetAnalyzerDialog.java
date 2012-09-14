@@ -370,7 +370,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		y++;
 
 		allPathRB = new JRadioButton();
-		allPathRB.setText("All non-intersecting paths");
+		allPathRB.setText("All non-self-intersecting paths");
 		allPathRB.setSelected((new StructureAnalysisUtils.Option()).pathFindMode==StructureAnalysisUtils.Option.ALL_PATHS);	
 		c = new GridBagConstraints();
 		c.gridx = x;
@@ -445,6 +445,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		//c.gridwidth = 3;
 		c.anchor = GridBagConstraints.WEST;
 		panel.add(logisticRB, c);
+		logisticRB.setVisible(false);
 		
 		ButtonGroup Equationgroup = new ButtonGroup();
 		Equationgroup.add(inverseRB);
@@ -468,7 +469,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		
 		y++;
 		bergeRB = new JRadioButton();
-		bergeRB.setText("Full search (Berge's algorithm)");
+		bergeRB.setText("Exact solution (Berge's algorithm)");
 		bergeRB.setSelected(true);
 		bergeRB.setActionCommand("berge");
 		bergeRB.addActionListener(this);
@@ -481,7 +482,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		
 		y++;
 		partialRB = new JRadioButton();
-		partialRB.setText("Partial enumeration");
+		partialRB.setText("Approximation solution");
 		partialRB.setActionCommand("enum");
 		partialRB.addActionListener(this);
 		c = new GridBagConstraints();

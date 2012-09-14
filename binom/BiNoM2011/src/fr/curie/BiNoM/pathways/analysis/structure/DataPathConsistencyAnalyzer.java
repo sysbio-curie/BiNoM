@@ -1251,7 +1251,7 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			this.optCutSetReport.append("Search option: full search (Berge's algorithm)"+newline);
+			this.optCutSetReport.append("Search option: exact solution (Berge's algorithm)"+newline);
 			
 			oca.mainBerge(true);
 			
@@ -1270,7 +1270,7 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: partial enumeration"+newline);
+			this.optCutSetReport.append("Search option: approximation solution"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff

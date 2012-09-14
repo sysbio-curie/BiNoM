@@ -9,8 +9,9 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.text.NumberFormat;
 
-import com.ibm.icu.text.NumberFormat;
+//import com.ibm.icu.text.NumberFormat;
 
 import fr.curie.BiNoM.pathways.utils.CombinationGenerator;
 import fr.curie.BiNoM.pathways.utils.Utils;

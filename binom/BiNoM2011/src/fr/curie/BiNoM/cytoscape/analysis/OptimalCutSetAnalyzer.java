@@ -10,7 +10,7 @@ import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 /**
- * Root class  for the optimal cut set analysis.
+ * Root class  for the optimal intervention set analysis.
  * 
  * Called by the BiNoM menu directly.
  * 

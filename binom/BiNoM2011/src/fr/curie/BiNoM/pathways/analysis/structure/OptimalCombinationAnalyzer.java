@@ -82,7 +82,7 @@ public class OptimalCombinationAnalyzer {
 	public ArrayList<String> orderedNodesByScore;
 	
 	/**
-	 * Maximum hit set size for partial search. 
+	 * Maximum intervention set size for partial search. 
 	 */
 	public long maxHitSetSize;
 	
@@ -493,7 +493,7 @@ public class OptimalCombinationAnalyzer {
 				break;
 			}
 			
-			System.out.println("Search for hit set size "+ setSize);
+			System.out.println("Search for intervention set size "+ setSize);
 			
 			// generate all combinations and test them
 			int[] indices;
@@ -532,13 +532,13 @@ public class OptimalCombinationAnalyzer {
 				}
 			}
 			if (ct>0)
-				System.out.println("found "+ct+ " hit sets size "+setSize);
+				System.out.println("found "+ct+ " intervention sets size "+setSize);
 			setSize++;
 		}
 	}
 
 	/**
-	 * Search for minimal hit sets by partial enumeration.
+	 * Search for minimal intervention sets by partial enumeration.
 	 */
 	public void searchHitSetPartial() {
 		
@@ -548,7 +548,7 @@ public class OptimalCombinationAnalyzer {
 		long tic = System.currentTimeMillis();
 		
 		/*
-		 * First enumerate and test hit sets of size 2
+		 * First enumerate and test sets of size 2
 		 */
 		searchHitSetSizeTwo();
 		
@@ -566,8 +566,8 @@ public class OptimalCombinationAnalyzer {
 				break;
 			}
 			
-			System.out.println("\nSearch for hit set size "+ setSize);
-			report.append(newline + "Search for hit set size "+ setSize + newline);
+			System.out.println("\nSearch for set size "+ setSize);
+			report.append(newline + "Search for set size "+ setSize + newline);
 			
 			long nbComb =  calcCombinations(pathMatrixNbCol, setSize);
 			NumberFormat form = NumberFormat.getInstance();
@@ -668,8 +668,8 @@ public class OptimalCombinationAnalyzer {
 				}
 			}
 			if (ct>0) {
-				System.out.println("found "+ct+ " hit sets size "+setSize);
-				report.append("found "+ct+ " hit sets size " + setSize + newline);
+				System.out.println("found "+ct+ " sets size "+setSize);
+				report.append("found "+ct+ " sets size " + setSize + newline);
 			}
 			
 			setSize++;
@@ -726,7 +726,7 @@ public class OptimalCombinationAnalyzer {
 			SeedSetData newSeedList = new SeedSetData(maxSeedSetNumber);
 			
 			/*
-			 * Build the new hit set candidates list from previous seed list
+			 * Build the new set candidates list from previous seed list
 			 * and check them on the fly.
 			 */
 			
@@ -825,7 +825,7 @@ public class OptimalCombinationAnalyzer {
 	 */
 	public void searchHitSetSizeTwo() {
 		
-		System.out.println("Search for hit sets size 2");
+		System.out.println("Search for intervention sets size 2");
 		seedSetList = new ArrayList<SeedSet>();
 		
 		int[] indices;
@@ -893,7 +893,7 @@ public class OptimalCombinationAnalyzer {
 	 */
 	public void searchHitSetSizeOne() {
 		
-		System.out.println("Search for hit set size 1");
+		System.out.println("Search for intervention set size 1");
 		
 		HashSet<Integer> skipCol = new HashSet<Integer>();
 		

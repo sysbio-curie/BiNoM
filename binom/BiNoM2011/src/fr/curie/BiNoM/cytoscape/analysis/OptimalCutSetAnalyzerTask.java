@@ -14,7 +14,7 @@ public class OptimalCutSetAnalyzerTask implements Task {
 	}
 
 	public String getTitle() {
-		return "Finding optimal cut sets...";
+		return "Finding optimal intervention sets...";
 	}
 
 	public void halt() {

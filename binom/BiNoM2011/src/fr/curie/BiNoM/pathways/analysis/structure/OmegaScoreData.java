@@ -2,7 +2,7 @@ package fr.curie.BiNoM.pathways.analysis.structure;
 
 
 /**
- * Simple class to store Omega score data for optimal cut sets
+ * Simple class to store Omega score data for optimal intervention sets
  * elementary nodes.
  * 
  * @author ebonnet

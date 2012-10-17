@@ -11,7 +11,7 @@ import java.util.*;
 
 
 /**
- * Report dialog box for optimal cut set results. 
+ * Report dialog box for optimal intervention set results. 
  * 
  * 
  * @author ebonnet
@@ -49,7 +49,7 @@ public class PathConsistencyAnalyzerReportDialog extends JDialog {
     public void pop() {
     	build();
     	
-    	this.setTitle("Optimal cut set report");
+    	this.setTitle("Optimal intervention set report");
     	setLocation((screenSize.width - getSize().width) / 2,
     			(screenSize.height - getSize().height) / 2);
     	setVisible(true);

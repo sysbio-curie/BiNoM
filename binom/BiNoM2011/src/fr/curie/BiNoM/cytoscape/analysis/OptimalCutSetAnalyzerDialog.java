@@ -42,7 +42,7 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 
 
 /**
- * Graphical interface for the input parameters of the Optimal Cut Set algorithm.
+ * Graphical interface for the input parameters of the Optimal Intervention Set algorithm.
  * 
  * @author eric
  *
@@ -68,8 +68,6 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 	private JRadioButton bergeRB;
 	private JRadioButton partialRB;
 	private JRadioButton seedRB;
-	private JRadioButton inverseRB;
-	private JRadioButton logisticRB;
 
 	private JCheckBox limitationRadius;
 	private JTextField searchRadius;
@@ -138,7 +136,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		attNames.insertItemAt("None", 0);
 		attNames.setSelectedIndex(0);
 
-		setSize(770, 720);
+		setSize(770, 740);
 
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
@@ -415,51 +413,11 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		y++;
 		
 		/*
-		 * Equation for calculating the score
+		 * Opt intervention set specific parameters 
 		 */
 		
 		y++;
-		JLabel labScore = new JLabel("Choose equation for the score");
-		c = new GridBagConstraints();
-		c.gridx = x;
-		c.gridy = y;
-		c.gridwidth = 3;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(labScore, c);
-		
-		y++;
-		inverseRB = new JRadioButton("Inverse");
-		inverseRB.setSelected(true);
-		c = new GridBagConstraints();
-		c.gridx = x;
-		c.gridy = y;
-		//c.gridwidth = 3;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(inverseRB, c);
-		
-		logisticRB = new JRadioButton("Logistic");
-		logisticRB.setSelected(false);
-		c = new GridBagConstraints();
-		c.gridx = x+2;
-		c.gridy = y;
-		//c.gridwidth = 3;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(logisticRB, c);
-		logisticRB.setVisible(false);
-		
-		ButtonGroup Equationgroup = new ButtonGroup();
-		Equationgroup.add(inverseRB);
-		Equationgroup.add(logisticRB);
-
-		y++;
-		y = GraphicUtils.addHSepPanel(panel, 1, y, 5, 2);
-		
-		/*
-		 * Opt cut set specific parameters 
-		 */
-		
-		y++;
-		JLabel algoL = new JLabel("Minimal hitting sets search algorithm:");
+		JLabel algoL = new JLabel("Minimal intervention sets search algorithm:");
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
@@ -525,7 +483,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		y++;
 		
 		JPanel p3 = new JPanel(new FlowLayout());
-		JLabel l2 = new JLabel("Max. Nb of (million) hit sets");
+		JLabel l2 = new JLabel("Max. Nb of (million) intervention sets");
 		p3.add(l2);
 		maxSetNb = new JTextField(4);
 		maxSetNb.setEnabled(false);
@@ -549,7 +507,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		okB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				// get the data and launch the optimal cut set analysis
+				// get the data and launch the optimal intervention set analysis
 				
 				Object source_idxs[] = sourceList.getSelectedValues();
 				Object target_idxs[] = targetList.getSelectedValues();
@@ -583,13 +541,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 					if(allPathRB.isSelected()) 
 						analyzer.searchPathMode = analyzer.ALL_PATHS;
 					
-					// equation for calculating the score
-					if (inverseRB.isSelected())
-						analyzer.useInverseFunction = true;
-					else 
-						analyzer.useInverseFunction = false;
-					
-					// minimal cut set options
+					// minimal intervention set options
 					if (bergeRB.isSelected())
 						analyzer.ocsSearch = analyzer.OCS_BERGE;
 					if(partialRB.isSelected())

@@ -25,7 +25,7 @@ import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer.op
 
 
 /**
- * A simple dialog window to show the optimal cut set search report.
+ * A simple dialog window to show the optimal intervention set search report.
  * 
  * @author ebo
  *
@@ -62,7 +62,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 	    public void pop() {
 	    	build();
 	    	
-	    	this.setTitle("Optimal cut set report");
+	    	this.setTitle("Optimal intervention set report");
 	    	setLocation((screenSize.width - getSize().width) / 2,
 	    			(screenSize.height - getSize().height) / 2);
 	    	setVisible(true);
@@ -133,12 +133,12 @@ public class OptimalCutSetReportDialog extends JDialog {
 			
 			
 			/*
-			 * Save list of hit sets to file button
+			 * Save list of intervention sets to file button
 			 */
 			fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			fc.setSelectedFile(new File("hit_set_list.txt"));
-			JButton saveHitSetB = new JButton("Save hit set list to file");
+			JButton saveHitSetB = new JButton("Save intervention set list to file");
 			saveHitSetB.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					
@@ -160,7 +160,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 	    }
 
 	    /**
-	     * Save optimal cut set list to a tab-delimited text file.
+	     * Save optimal intervention set list to a tab-delimited text file.
 	     * 
 	     * @param f
 	     */
@@ -170,7 +170,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 	    }
 	    
 		/**
-		 * save optimal cut set report to a text file.
+		 * save optimal intervention set report to a text file.
 		 * 
 		 * @param file
 		 */

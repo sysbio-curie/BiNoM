@@ -78,13 +78,8 @@ public class DataPathConsistencyAnalyzer {
 	public HashMap<Node,Integer> nodeInconsistencies = new HashMap<Node,Integer>(); 
 	
 	/*
-	 *  Optimal cut set search data structures
+	 *  Optimal intervention set search data structures
 	 */
-	
-	/**
-	 * Type of function for the score
-	 */
-	public boolean useInverseFunction;
 	
 	/**
 	 * System independent newline character
@@ -144,7 +139,7 @@ public class DataPathConsistencyAnalyzer {
 	public ArrayList<OmegaScoreData> omegaScores = new ArrayList<OmegaScoreData>();
 	
 	/**
-	 * Report for the optimal cut set search
+	 * Report for the optimal intervention set search
 	 */
 	public StringBuffer optCutSetReport = new StringBuffer();
 	
@@ -184,12 +179,12 @@ public class DataPathConsistencyAnalyzer {
 	public int pathMatrixNbRow, pathMatrixNbCol;
 	
 	/**
-	 * List of optimal cut sets with their scores
+	 * List of optimal intervention sets with their scores
 	 */
 	private ArrayList<optCutSetData> optCutSetList;
 	
 	/**
-	 * Simple data structure to store optimal cut sets data
+	 * Simple data structure to store optimal intervention sets data
 	 */
 	public class optCutSetData implements Comparable {
 		
@@ -873,7 +868,7 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public void ocsanaScore() {
 		
-		this.optCutSetReport.append("--- Optimal cut set search report ---"+newline+newline);
+		this.optCutSetReport.append("--- Optimal intervention set search report ---"+newline+newline);
 		
 		String line = "";
 		for (Node n : this.sourceNodes)
@@ -962,11 +957,38 @@ public class DataPathConsistencyAnalyzer {
 						if (nodeSequence.contains(p.label) == false) {
 							nodeSequence.add(p.label);
 							allPaths.add(p);
-							//System.out.println(p.label);
+							//System.out.println(">>>"+p.label);
 						}
 					}
 				}
 			}
+		}
+		
+		// check if every source node is reaching a target node in the paths
+		ArrayList<String> missing = new ArrayList<String>();
+		HashMap<Node,HashSet<Node>> check = new HashMap<Node,HashSet<Node>>();
+		for (Node n : sourceNodes)
+			check.put(n, new HashSet<Node>());
+		
+		for (Path p : allPaths) {
+			Node source = p.nodeSequence.get(0);
+			Node target = p.nodeSequence.get(p.nodeSequence.size()-1);
+			check.get(source).add(target);
+		}
+		
+		for (Node s : sourceNodes) {
+			for (Node t : outputNodes) {
+				if (!check.get(s).contains(t)) {
+					missing.add(s.Id + " --/--> " + t.Id);
+				}
+			}
+		}
+		
+		if (missing.size() > 0) {
+			this.optCutSetReport.append(newline+"Warning: No pathways were found for the specified parameters between:"+newline);
+			for (String str : missing)
+				this.optCutSetReport.append(str+newline);
+			this.optCutSetReport.append(newline);
 		}
 		
 		//split all paths
@@ -1090,14 +1112,7 @@ public class DataPathConsistencyAnalyzer {
 			Node source = p.nodeSequence.get(p.source);
 			int idx = scoreMap.get(target).get(source);
 			double sco = 0.0;
-			/*
-			 * use either the inverse or the logistic function for calculating the score
-			 */
-			if (this.useInverseFunction == true)
-				sco = p.influence / p.length;
-			else
-				sco = p.influence * (1 / (1 + Math.exp(-1 * p.length)));
-			
+			sco = p.influence / p.length;
 			scoreVal[idx] += sco;
 			targetScoreVal[idx] += sco;
 			//System.out.println("score: "+source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
@@ -1125,14 +1140,9 @@ public class DataPathConsistencyAnalyzer {
 							/*
 							 * Do not take into account the sign for the penalty score
 							 * so take the absolute value.
-							 * Use inverse or logistic function for calculating the score.
 							 */
 							double sco = 0.0;
-							if (this.useInverseFunction == true) 
-								sco = Math.abs(ps.influence / ps.length);
-							else
-								sco = Math.abs(ps.influence * (1 / (1 + Math.exp(-1 * ps.length))));
-							
+							sco = Math.abs(ps.influence / ps.length);
 							scoreVal[idx] -= sco;
 							sideEffectScoreVal[idx] += sco;
 //							System.out.println(source.Id+":"+target.Id+" "+ps.label+" infl="+ps.influence+" len="+ps.length+" score="+sco+" val="+scoreVal[idx]);
@@ -1211,7 +1221,7 @@ public class DataPathConsistencyAnalyzer {
 	}
 	
 	/**
-	 * Performs optimal cut set search.
+	 * Performs optimal intervention set search.
 	 * Ocsana scores should have been called before.
 	 * 
 	 * @author ebo
@@ -1251,12 +1261,12 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			this.optCutSetReport.append("Search option: exact solution (Berge's algorithm)"+newline);
+			this.optCutSetReport.append("Search option: Exact solution (Berge's algorithm)"+newline);
 			
 			oca.mainBerge(true);
 			
 			if (this.useMaxSetSize == true) {
-				this.optCutSetReport.append("Selecting hit sets having a size <= "+this.maxSetSize+newline);
+				this.optCutSetReport.append("Selecting intervention sets having a size <= "+this.maxSetSize+newline);
 				/*
 				 * take into account exception nodes for the max set size cutoff
 				 */
@@ -1270,13 +1280,13 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: approximation solution"+newline);
+			this.optCutSetReport.append("Search option: Approximation solution"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
 			 */
 			if (oca.exceptionNode.size()>0) {
-				System.out.println("Correcting max. hit set size for exception nodes ("+oca.exceptionNode.size()+").");
+				System.out.println("Correcting max. intervention set size for exception nodes ("+oca.exceptionNode.size()+").");
 				this.maxSetSize = this.maxSetSize - oca.exceptionNode.size();
 			}
 		
@@ -1288,13 +1298,13 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Seed based enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: seed based enumeration"+newline);
+			this.optCutSetReport.append("Search option: Seed based enumeration"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
 			 */
 			if (oca.exceptionNode.size()>0) {
-				System.out.println("Correcting max. hit set size for exception nodes("+oca.exceptionNode.size()+").");
+				System.out.println("Correcting max. intervention set size for exception nodes("+oca.exceptionNode.size()+").");
 				this.maxSetSize = this.maxSetSize - oca.exceptionNode.size();
 			}
 			
@@ -1325,9 +1335,9 @@ public class DataPathConsistencyAnalyzer {
 		
 		Collections.sort(optCutSetList);
 
-		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal cut sets."+newline+newline);
+		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal intervention sets."+newline+newline);
 		
-		this.optCutSetReport.append("Cut set\tSize\tScore\tTarget-Score\tSide-Effect-Score"+newline+newline);
+		this.optCutSetReport.append("Intervention set\tSize\tScore\tTarget-Score\tSide-Effect-Score"+newline+newline);
 		DecimalFormat df = new DecimalFormat("#.###");
 		for (optCutSetData d : optCutSetList) {
 			String str = "[";
@@ -1344,7 +1354,7 @@ public class DataPathConsistencyAnalyzer {
 	}
 	
 	/**
-	 * save optimal cut set list to a text file.
+	 * save optimal intervention set list to a text file.
 	 * 
 	 * @param file
 	 */

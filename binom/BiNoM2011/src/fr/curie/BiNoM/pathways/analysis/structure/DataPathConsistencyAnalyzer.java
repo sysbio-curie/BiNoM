@@ -80,7 +80,22 @@ public class DataPathConsistencyAnalyzer {
 	/*
 	 *  Optimal intervention set search data structures
 	 */
+
+	/**
+	 * Overall score, the value of this score will be set to 0 if the score is becoming negative
+	 */
+	private double [] scoreVal;
+
+	/**
+	 *  Score values are stored in an array, with a map [target x nodes] pointing to the indexes.
+	 */
+	private HashMap<Node, HashMap<Node, Integer>> scoreMap = new HashMap<Node, HashMap<Node, Integer>>();
 	
+	/**
+	 * Ocsana score matrix
+	 */
+	private double [] targetScoreVal;
+
 	/**
 	 * System independent newline character
 	 */
@@ -131,7 +146,6 @@ public class DataPathConsistencyAnalyzer {
 	 * Ocsana omega score, taking into account side-effect nodes only.
 	 */
 	public HashMap<String, Double> omegaSideEffectScoreMap = new HashMap<String, Double>();
-
 	
 	/**
 	 * Ocsana Omega scores
@@ -909,7 +923,6 @@ public class DataPathConsistencyAnalyzer {
 		for (Node n : sideNodes)
 			outputNodes.add(n);
 		
-		
 		// simple data structure to select unique paths
 		HashSet<String> nodeSequence = new HashSet<String>();
 
@@ -1027,9 +1040,6 @@ public class DataPathConsistencyAnalyzer {
 		 *  select paths and nodes associated to target nodes
 		 */
 
-		// elementary paths, set of paths sinking to target nodes
-		//ArrayList<Path> elemPaths = new ArrayList<Path>();
-
 		// same but split in individual components
 		ArrayList<Path> elemSplitPaths = new ArrayList<Path>();
 
@@ -1075,19 +1085,18 @@ public class DataPathConsistencyAnalyzer {
 		}
 		this.optCutSetReport.append(newline);
 
-		/*
-		 *  Score values are stored in an array, with a map [target x nodes] pointing to the indexes.
-		 */
 		int ct = 0;
-		HashMap<Node, HashMap<Node, Integer>> scoreMap = new HashMap<Node, HashMap<Node, Integer>>();
+		
 		/*
 		 * Overall score, the value of this score will be set to 0 if the score is becoming negative
 		 */
-		double [] scoreVal = new double[targetNodes.size() * allNodes.size()];
+		scoreVal = new double[targetNodes.size() * allNodes.size()];
+		
 		/*
 		 * Score taking into account the targets only
 		 */
-		double [] targetScoreVal = new double[targetNodes.size() * allNodes.size()];
+		targetScoreVal = new double[targetNodes.size() * allNodes.size()];
+		
 		/*
 		 * Score for side effect nodes
 		 */
@@ -1350,7 +1359,25 @@ public class DataPathConsistencyAnalyzer {
 			str += "]";
 			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\t"+df.format(d.targetScore)+"\t"+df.format(d.sideEffectScore)+newline);
 		}
-	
+		
+		/*
+		 * print out score matrix
+		 */
+		this.optCutSetReport.append(newline + "Score matrix (elementary nodes x target nodes):" + newline);
+		String str = "";
+		for (Node t : targetNodes)
+			str += t.Id + " ";
+		this.optCutSetReport.append(str + newline);
+		
+		for (Node s : elemNodes) {
+			str = s.Id + " ";
+			for (Node t : targetNodes) {
+				int idx = scoreMap.get(t).get(s);
+				str += df.format(scoreVal[idx]) + " ";
+			}
+			str = str.substring(0, str.length()-1);
+			this.optCutSetReport.append(str + newline);
+		}
 	}
 	
 	/**

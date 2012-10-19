@@ -2,6 +2,7 @@ package fr.curie.BiNoM.cytoscape.analysis;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -11,17 +12,30 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import cytoscape.CyNetwork;
+import cytoscape.Cytoscape;
+import cytoscape.view.CyNetworkView;
+
+import edu.rpi.cs.xgmml.GraphDocument;
+import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
+import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
+import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.analysis.structure.OptimalCombinationAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer.optCutSetData;
+import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 
 /**
@@ -151,6 +165,18 @@ public class OptimalCutSetReportDialog extends JDialog {
 			});
 			buttonPanel.add(saveHitSetB);
 			
+			/*
+			 * Extraction and visualization of the network
+			 */
+			JButton visuB = new JButton("Visualize results");
+			visuB.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					createCytoscapeNetworks();
+				
+				}
+			});
+			buttonPanel.add(visuB);
+			
 			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 			
 			pack();
@@ -184,7 +210,58 @@ public class OptimalCutSetReportDialog extends JDialog {
 				e.printStackTrace();
 			}
 		}
+		
+		/**
+		 * Create Cytoscape networks corresponding to Ocsana optimal intervention sets
+		 */
+		private void createCytoscapeNetworks() {
+			// code here
+//			CyNetworkView view = Cytoscape.getCurrentNetworkView();
+//			String msg = "empty";
+//			if (view != null)
+//				msg = "got it";
+//			JOptionPane.showMessageDialog(new Frame(), msg);
+//			GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
+//			Graph gr = XGMML.convertXGMMLToGraph(grDoc);
+//			String msg = Integer.toString(gr.Nodes.size());
+//			JOptionPane.showMessageDialog(new Frame(), msg);
 
-	    
+			mapInterventionSetsToNodes();
+			
+			for (String graphName : dpc.sourceGraphs.keySet()) {
+				GraphDocument grDoc = XGMML.convertGraphToXGMML(dpc.sourceGraphs.get(graphName));
+				try {
+					CyNetwork cyNetwork = NetworkFactory.createNetwork
+					("g_"+graphName,
+							grDoc,
+							Cytoscape.getCurrentNetworkView().getVisualStyle(),
+							false,//true, // applyLayout
+							null);
+				}
+				catch (Exception ex) {
+					// do nothing
+				}
+			}
+		}
+		
+		/**
+		 * Map intervention sets to nodes as attributes
+		 */
+		private void mapInterventionSetsToNodes() {
+			for (String gname : dpc.sourceGraphs.keySet()) {
+				for (Node n : dpc.sourceGraphs.get(gname).Nodes) {
+					for (ArrayList<Node> iSet : dpc.optIntSets) {
+						if (iSet.contains(n)) {
+							String attr_name = "[";
+							for (Node no : iSet)
+								attr_name += no.Id+",";
+							attr_name = attr_name.substring(0, attr_name.length()-1);
+							attr_name += "]";
+							n.setAttributeValueUnique(attr_name, "1", Attribute.ATTRIBUTE_TYPE_STRING);
+						}
+					}
+				}
+			}
+		}
 
 }

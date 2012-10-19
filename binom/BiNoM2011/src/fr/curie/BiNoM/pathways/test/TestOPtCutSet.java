@@ -35,8 +35,8 @@ public class TestOPtCutSet {
 			
 			DataPathConsistencyAnalyzer dpc = new DataPathConsistencyAnalyzer();
 
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
@@ -165,7 +165,6 @@ public class TestOPtCutSet {
 			//oca.mainBerge(false);
 			//long toc = System.currentTimeMillis() - tic;
 			//System.out.println("global timing: "+toc);
-			
 		}
 		catch (Exception e) {
 			e.printStackTrace();

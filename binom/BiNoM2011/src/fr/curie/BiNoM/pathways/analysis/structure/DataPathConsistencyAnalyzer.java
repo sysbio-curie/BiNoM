@@ -82,6 +82,21 @@ public class DataPathConsistencyAnalyzer {
 	 */
 
 	/**
+	 * List of optimal intervention sets as node objects.
+	 */
+	public ArrayList<ArrayList<Node>> optIntSets = new ArrayList<ArrayList<Node>>();
+	
+	/**
+	 * Ocsana list of "source" graphs
+	 */
+	public HashMap<String, Graph> sourceGraphs = new HashMap<String, Graph>();
+	
+	/**
+	 * List of all paths from source nodes to target nodes
+	 */
+	private ArrayList<Path> allPaths = new ArrayList<Path>();
+	
+	/**
 	 * Overall score, the value of this score will be set to 0 if the score is becoming negative
 	 */
 	private double [] scoreVal;
@@ -130,7 +145,6 @@ public class DataPathConsistencyAnalyzer {
 	 *  all individual nodes from elementary paths (target nodes excepted)
 	 */
 	public HashSet<Node> allNodes = new HashSet<Node>();
-
 
 	/**
 	 * Ocsana Omega scores map
@@ -926,14 +940,8 @@ public class DataPathConsistencyAnalyzer {
 		// simple data structure to select unique paths
 		HashSet<String> nodeSequence = new HashSet<String>();
 
-		// store all unique paths to output nodes
-		ArrayList<Path> allPaths = new ArrayList<Path>();
-
 		// all paths split in individual components e.g. A->B->C: A->B->C + B->C 
 		ArrayList<Path> splitPaths = new ArrayList<Path>();
-
-		// all individual nodes from elementary paths (target nodes excepted)
-		//HashSet<Node> allNodes = new HashSet<Node>();
 
 		// search paths between source and output nodes
 		for (Node so : sourceNodes) {
@@ -1171,6 +1179,8 @@ public class DataPathConsistencyAnalyzer {
 //					targetScoreVal[idx] = 0;
 //			}
 
+		// create "source graphs" to be used to create Cytoscape networks 
+		createCytoscapeNet();
 		
 		System.out.println("\nScores:");
 		DecimalFormat df = new DecimalFormat("#.###");
@@ -1358,6 +1368,16 @@ public class DataPathConsistencyAnalyzer {
 			str = str.substring(0, str.length()-3);
 			str += "]";
 			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\t"+df.format(d.targetScore)+"\t"+df.format(d.sideEffectScore)+newline);
+		}
+		
+		/*
+		 * set a list of optimal intervention sets as node objects
+		 */
+		for (optCutSetData d : optCutSetList) {
+			ArrayList<Node> l = new ArrayList<Node>();
+			for (String id : d.optCutSet)
+				l.add(this.graph.getNode(id));
+			this.optIntSets.add(l);
 		}
 		
 		/*
@@ -1611,6 +1631,37 @@ public class DataPathConsistencyAnalyzer {
 					pathMatrix[i][j] = 0;
 			}
 		}
+	}
+	
+	/**
+	 * Create Cytoscape networks from Ocsana elementary paths, one network per source node.
+	 */
+	private void createCytoscapeNet() {
+		
+		HashMap<Node, HashSet<Node>> sourcePaths = new HashMap<Node, HashSet<Node>>();
+		for (Node s: this.sourceNodes)
+			sourcePaths.put(s, new HashSet<Node>());
+		for (Path p : allPaths) {
+			Node so = p.nodeSequence.get(0);
+			for (int i=1;i<p.nodeSequence.size();i++)
+				sourcePaths.get(so).add(p.nodeSequence.get(i));
+		}
+
+		for (Node s : sourcePaths.keySet()) {
+			Graph g = new Graph();
+			g.addNode(s);
+			Iterator<Node> it = sourcePaths.get(s).iterator();
+			while(it.hasNext()) {
+				Node n = (Node)it.next();
+				g.addNode(n);
+			}
+			// add side effect nodes
+			for (Node n : this.sideNodes)
+				g.addNode(n);
+			g.addConnections(this.graph);
+			sourceGraphs.put(s.Id,g);
+		}
+	
 	}
 	
 }

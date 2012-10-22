@@ -1381,21 +1381,24 @@ public class DataPathConsistencyAnalyzer {
 		}
 		
 		/*
-		 * print out score matrix
+		 * print out score matrix on the report
 		 */
 		this.optCutSetReport.append(newline + "Score matrix (elementary nodes x target nodes):" + newline);
 		String str = "";
 		for (Node t : targetNodes)
 			str += t.Id + " ";
-		this.optCutSetReport.append(str + newline);
+		this.optCutSetReport.append(str+"row_sum"+newline);
 		
 		for (Node s : elemNodes) {
 			str = s.Id + " ";
+			double rowSum = 0.0;
 			for (Node t : targetNodes) {
 				int idx = scoreMap.get(t).get(s);
+				rowSum += scoreVal[idx];
 				str += df.format(scoreVal[idx]) + " ";
 			}
 			str = str.substring(0, str.length()-1);
+			str += " " + df.format(rowSum);
 			this.optCutSetReport.append(str + newline);
 		}
 	}

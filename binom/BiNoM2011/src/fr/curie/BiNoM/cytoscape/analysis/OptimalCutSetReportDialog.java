@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -172,7 +173,6 @@ public class OptimalCutSetReportDialog extends JDialog {
 			visuB.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					createCytoscapeNetworks();
-				
 				}
 			});
 			buttonPanel.add(visuB);
@@ -215,18 +215,16 @@ public class OptimalCutSetReportDialog extends JDialog {
 		 * Create Cytoscape networks corresponding to Ocsana optimal intervention sets
 		 */
 		private void createCytoscapeNetworks() {
-			// code here
-//			CyNetworkView view = Cytoscape.getCurrentNetworkView();
-//			String msg = "empty";
-//			if (view != null)
-//				msg = "got it";
-//			JOptionPane.showMessageDialog(new Frame(), msg);
-//			GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
-//			Graph gr = XGMML.convertXGMMLToGraph(grDoc);
-//			String msg = Integer.toString(gr.Nodes.size());
-//			JOptionPane.showMessageDialog(new Frame(), msg);
 
-			mapInterventionSetsToNodes();
+			OptimalCutSetVisuDialog dialog = new OptimalCutSetVisuDialog(new JFrame(), "Intervention sets visualization options", true);
+			dialog.setVisible(true);
+			
+			System.out.println("Create set attributes: "+dialog.createSetAttributes);
+			System.out.println("Nb top sets selected: "+dialog.nbTopSets);
+			
+			if (dialog.createSetAttributes) {
+			  mapInterventionSetsToNodes(dialog.nbTopSets);
+			}
 			
 			for (String graphName : dpc.sourceGraphs.keySet()) {
 				GraphDocument grDoc = XGMML.convertGraphToXGMML(dpc.sourceGraphs.get(graphName));
@@ -239,7 +237,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 							null);
 				}
 				catch (Exception ex) {
-					// do nothing
+					// do absolutely nothing.
 				}
 			}
 		}
@@ -247,18 +245,25 @@ public class OptimalCutSetReportDialog extends JDialog {
 		/**
 		 * Map intervention sets to nodes as attributes
 		 */
-		private void mapInterventionSetsToNodes() {
+		private void mapInterventionSetsToNodes(int nbTopSets) {
 			for (String gname : dpc.sourceGraphs.keySet()) {
 				for (Node n : dpc.sourceGraphs.get(gname).Nodes) {
+					int ct = 0;
 					for (ArrayList<Node> iSet : dpc.optIntSets) {
-						if (iSet.contains(n)) {
-							String attr_name = "[";
-							for (Node no : iSet)
-								attr_name += no.Id+",";
-							attr_name = attr_name.substring(0, attr_name.length()-1);
-							attr_name += "]";
-							n.setAttributeValueUnique(attr_name, "1", Attribute.ATTRIBUTE_TYPE_STRING);
+						if (ct<nbTopSets) {
+							if (iSet.contains(n)) {
+								String attr_name = "[";
+								for (Node no : iSet)
+									attr_name += no.Id+",";
+								attr_name = attr_name.substring(0, attr_name.length()-1);
+								attr_name += "]";
+								n.setAttributeValueUnique(attr_name, "1", Attribute.ATTRIBUTE_TYPE_STRING);
+							}
 						}
+						else {
+							break;
+						}
+						ct++;
 					}
 				}
 			}

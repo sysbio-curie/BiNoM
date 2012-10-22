@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 
 import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetGenesDialog;
+import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetVisuDialog;
 import fr.curie.BiNoM.cytoscape.analysis.PathConsistencyAnalyzerReportDialog;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
 
-public class TestOptCutSetDeux {
+public class TestDialog {
 
 	/**
 	 * @param args
@@ -18,16 +19,14 @@ public class TestOptCutSetDeux {
 
 		try {
 
-			/*
-			 * 
-			 * Graphical interface test
-			 */
 			//OptimalCutSetGenesDialog dialog = new OptimalCutSetGenesDialog(new JFrame(), "Title", true);
 			//dialog.setVisible(true);
 			
+//			PathConsistencyAnalyzerReportDialog dialog = new PathConsistencyAnalyzerReportDialog("test bla bla bla bla........////->");
+//			dialog.pop();
 			
-			PathConsistencyAnalyzerReportDialog dialog = new PathConsistencyAnalyzerReportDialog("test bla bla bla bla........////->");
-			dialog.pop();
+			OptimalCutSetVisuDialog dialog = new OptimalCutSetVisuDialog(new JFrame(), "test", true);
+			dialog.setVisible(true);
 			
 		}
 		catch (Exception e) {

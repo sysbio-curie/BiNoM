@@ -71,7 +71,7 @@ public class SubnetworkProperties {
 			
 			
 			SubnetworkProperties SP = new SubnetworkProperties();
-			SP.path = "C:/Datas/HPRD9/";
+			SP.path = "c:/datas/HPRD9/";
 			//SP.path = "C:/Datas/SERVIER/PPIanalysis/";
 			//SP.loadNetwork(SP.path+"hprd_pc_ppi.xgmml");
 			//XGMML.saveToXGMML(SP.network, SP.path+"hprd_pc_ppi1.xgmml");
@@ -256,7 +256,7 @@ public class SubnetworkProperties {
 			//SP.modeOfSubNetworkConstruction = SP.ADD_FIRST_NEIGHBOURS;
 			//SP.modeOfSubNetworkConstruction = SP.CONNECT_BY_SHORTEST_PATHS;
 
-			SP.readComplexes(SP.path+"HPRD_PC.txt",20);
+			SP.readComplexes(SP.path+"HPRD_PC.txt",40);
 			//SP.complexMap.remove("COM_2971");
 			SP.addComplexesToNetworkAsClicks(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");			
 			//SP.addComplexesToNetworksAsNodes(); System.out.println("After adding complexes: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
@@ -264,7 +264,7 @@ public class SubnetworkProperties {
 			calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, true);			
 			XGMML.saveToXGMML(SP.network, SP.path+"hprd9_pc_clicks.xgmml");
 			
-			calcPercolationThreshold(SP.network);
+			//calcPercolationThreshold(SP.network);
 			
 			System.exit(0);
 			
@@ -1671,17 +1671,22 @@ public class SubnetworkProperties {
 		graph = compsGlobal.get(imaxGlobal);*/
 		System.out.println("After "+graph.Nodes.size());
 		System.out.println("NNODES\tAV_SIZE\tPERCENTAGE_CONNECTED\tGLOBALLY_CONNECTED");
-		for(int size=100;size<=8000;size+=100){
+		for(int size=100;size<=graph.Nodes.size();size+=300){
 			int compSize = 0;
 			for(int i=0;i<numberOfSampling;i++){
 				graph.selectedIds.clear();
-				for(int j=0;j<size;j++)
-					graph.selectedIds.add(graph.Nodes.get(r.nextInt(graph.Nodes.size())).Id);
-				Graph subnetwork = graph.getSelectedNodes();
+				int j=0;
+				while(j<size){
+					String randomId = graph.Nodes.get(r.nextInt(graph.Nodes.size())).Id;
+					if(!graph.selectedIds.contains(randomId)){
+						graph.selectedIds.add(randomId);
+						j++;
+					}
+				}Graph subnetwork = graph.getSelectedNodes();
 				subnetwork.addConnections(graph);
 				Vector<Graph> comps = GraphAlgorithms.ConnectedComponents(subnetwork);
 				int maxsize = -1;
-				for(int j=0;j<comps.size();j++)
+				for(j=0;j<comps.size();j++)
 					if(maxsize<comps.get(j).Nodes.size())
 						maxsize = comps.get(j).Nodes.size();
 				compSize+=maxsize;

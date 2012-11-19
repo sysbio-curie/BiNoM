@@ -107,10 +107,14 @@ public class DataPathConsistencyAnalyzer {
 	private HashMap<Node, HashMap<Node, Integer>> scoreMap = new HashMap<Node, HashMap<Node, Integer>>();
 	
 	/**
-	 * Ocsana score matrix
+	 * Score matrices for PIQUANT score.
 	 */
 	private double [] targetScoreVal;
+	private double [] targetScoreValPos;
+	private double [] targetScoreValNeg;
 
+	private double [] ocsanaScore;
+	
 	/**
 	 * System independent newline character
 	 */
@@ -1104,11 +1108,18 @@ public class DataPathConsistencyAnalyzer {
 		 * Score taking into account the targets only
 		 */
 		targetScoreVal = new double[targetNodes.size() * allNodes.size()];
+		targetScoreValPos = new double[targetNodes.size() * allNodes.size()];
+		targetScoreValNeg = new double[targetNodes.size() * allNodes.size()];
 		
 		/*
 		 * Score for side effect nodes
 		 */
 		double [] sideEffectScoreVal = new double[targetNodes.size() * allNodes.size()];
+		
+		/*
+		 * OCSANA score (omega)
+		 */
+		ocsanaScore = new double[targetNodes.size() * allNodes.size()];
 		
 		for (Node t : targetNodes)
 			scoreMap.put(t, new HashMap<Node, Integer>());
@@ -1119,7 +1130,10 @@ public class DataPathConsistencyAnalyzer {
 				scoreMap.get(t).put(s, ct);
 				scoreVal[ct] = 0.0;
 				targetScoreVal[ct] = 0.0;
+				targetScoreValPos[ct] = 0.0;
+				targetScoreValNeg[ct] = 0.0;
 				sideEffectScoreVal[ct] = 0.0;
+				ocsanaScore[ct] = 0.0;
 				ct++;
 			}
 		
@@ -1132,6 +1146,11 @@ public class DataPathConsistencyAnalyzer {
 			sco = p.influence / p.length;
 			scoreVal[idx] += sco;
 			targetScoreVal[idx] += sco;
+			if (sco > 0)
+				targetScoreValPos[idx] += sco;
+			else 
+				targetScoreValNeg[idx] += sco;
+			
 			//System.out.println("score: "+source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
 		}
 
@@ -1224,6 +1243,7 @@ public class DataPathConsistencyAnalyzer {
 						factor++;
 				}
 				double tmp = factor * scoreVal[scoreMap.get(target).get(source)];
+				ocsanaScore[scoreMap.get(target).get(source)] = tmp;
 				omegaScore += tmp;
 				omegaTargetScore += factor * targetScoreVal[scoreMap.get(target).get(source)];
 				omegaSideEffectScore += factor * sideEffectScoreVal[scoreMap.get(target).get(source)];
@@ -1357,7 +1377,7 @@ public class DataPathConsistencyAnalyzer {
 
 		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal intervention sets."+newline+newline);
 		
-		this.optCutSetReport.append("Intervention set\tSize\tScore\tTarget-Score\tSide-Effect-Score"+newline+newline);
+		this.optCutSetReport.append("Intervention set\tSize\tOCSANA score\tOCSANA score (targets only)\tOCSANA score (side effect nodes only)"+newline+newline);
 		DecimalFormat df = new DecimalFormat("#.###");
 		for (optCutSetData d : optCutSetList) {
 			String str = "[";
@@ -1382,9 +1402,9 @@ public class DataPathConsistencyAnalyzer {
 		}
 		
 		/*
-		 * print out score matrix on the report
+		 * print out OCSANA score matrix on the report
 		 */
-		this.optCutSetReport.append(newline + "Score matrix (elementary nodes x target nodes):" + newline);
+		this.optCutSetReport.append(newline + "OCSANA Score matrix (elementary nodes x target nodes):" + newline);
 		String str = "";
 		for (Node t : targetNodes)
 			str += t.Id + " ";
@@ -1396,11 +1416,33 @@ public class DataPathConsistencyAnalyzer {
 			double rowSum = 0.0;
 			for (Node t : targetNodes) {
 				int idx = scoreMap.get(t).get(s);
-				rowSum += scoreVal[idx];
-				str += df.format(scoreVal[idx]) + " ";
+				rowSum += ocsanaScore[idx];
+				str += df.format(ocsanaScore[idx]) + " ";
 			}
 			str = str.substring(0, str.length()-1);
 			//str += " " + df.format(rowSum);
+			this.optCutSetReport.append(str + newline);
+		}
+		
+		/*
+		 * print out PIQUANT score matrix on the report
+		 */
+		this.optCutSetReport.append(newline + "PIQUANT Score matrix (elementary nodes x target nodes):" + newline);
+		str = "";
+		for (Node t : targetNodes)
+			str += t.Id + "+ "+ t.Id+"- "+t.Id+"_tot ";
+		this.optCutSetReport.append(str+newline);
+		
+		for (Node s : elemNodes) {
+			str = s.Id + " ";
+			double rowSum = 0.0;
+			for (Node t : targetNodes) {
+				int idx = scoreMap.get(t).get(s);
+				str += df.format(targetScoreValPos[idx]) + " ";
+				str += df.format(targetScoreValNeg[idx]) + " ";
+				str += df.format(targetScoreVal[idx]) + " ";
+			}
+			str = str.substring(0, str.length()-1);
 			this.optCutSetReport.append(str + newline);
 		}
 	}

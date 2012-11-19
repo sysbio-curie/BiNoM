@@ -1160,7 +1160,8 @@ public class DataPathConsistencyAnalyzer {
 							 */
 							double sco = 0.0;
 							sco = Math.abs(ps.influence / ps.length);
-							scoreVal[idx] -= sco;
+							//scoreVal[idx] -= sco;
+							scoreVal[idx] = Math.abs(scoreVal[idx]) - sco;
 							sideEffectScoreVal[idx] += sco;
 //							System.out.println(source.Id+":"+target.Id+" "+ps.label+" infl="+ps.influence+" len="+ps.length+" score="+sco+" val="+scoreVal[idx]);
 						}
@@ -1387,7 +1388,8 @@ public class DataPathConsistencyAnalyzer {
 		String str = "";
 		for (Node t : targetNodes)
 			str += t.Id + " ";
-		this.optCutSetReport.append(str+"row_sum"+newline);
+		//this.optCutSetReport.append(str+"row_sum"+newline);
+		this.optCutSetReport.append(str+newline);
 		
 		for (Node s : elemNodes) {
 			str = s.Id + " ";
@@ -1398,7 +1400,7 @@ public class DataPathConsistencyAnalyzer {
 				str += df.format(scoreVal[idx]) + " ";
 			}
 			str = str.substring(0, str.length()-1);
-			str += " " + df.format(rowSum);
+			//str += " " + df.format(rowSum);
 			this.optCutSetReport.append(str + newline);
 		}
 	}

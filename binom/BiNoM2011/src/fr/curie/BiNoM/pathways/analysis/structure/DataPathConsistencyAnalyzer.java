@@ -996,7 +996,7 @@ public class DataPathConsistencyAnalyzer {
 						if (nodeSequence.contains(p.label) == false) {
 							nodeSequence.add(p.label);
 							allPaths.add(p);
-							//System.out.println(">>>"+p.label);
+							//System.out.println(">>> all paths "+p.label);
 						}
 					}
 				}
@@ -1178,7 +1178,7 @@ public class DataPathConsistencyAnalyzer {
 				}
 			}
 		}
-
+	
 		// Absolute value of the PIQUANT score
 		for (Node t : targetNodes) {
 			for (Node s : elemNodes) {

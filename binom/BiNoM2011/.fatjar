@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Thu Aug 30 16:13:31 CEST 2012
+#Tue Nov 20 11:02:42 CET 2012
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
@@ -10,5 +10,5 @@ manifest.mainclass=
 manifest.file=manifest.txt
 jarname.isextern=false
 onejar.expand=
-excludes=<po|BiNoM2011>~fr/~curie/~BiNoM/~celldesigner/;<po|BiNoM2011>~data/~clickmap_blog.js;<po|BiNoM2011>~data/~clickmap_map.css;<po|BiNoM2011>~data/~clickmap_blog.css;<po|BiNoM2011>~data/~clickmap_map.js;<jar|VDAOEngine.jar>;<jar|cytoscape270.jar>;<jar|giny.jar>;<jar|celldesigner.jar>;<jar|CellDesigner401Jars.jar>;<jar|imgscalr-lib-3.1.jar>
+excludes=<po|BiNoM2011>~fr/~curie/~BiNoM/~celldesigner/;<po|BiNoM2011>~data/~clickmap_blog.css;<po|BiNoM2011>~data/~clickmap_blog.js;<po|BiNoM2011>~data/~clickmap_map.js;<po|BiNoM2011>~data/~clickmap_map.css;<jar|VDAOEngine.jar>;<jar|cytoscape270.jar>;<jar|giny.jar>;<jar|celldesigner.jar>;<jar|CellDesigner401Jars.jar>;<jar|imgscalr-lib-3.1.jar>
 includes=

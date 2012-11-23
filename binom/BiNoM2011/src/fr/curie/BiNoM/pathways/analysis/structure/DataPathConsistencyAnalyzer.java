@@ -97,22 +97,21 @@ public class DataPathConsistencyAnalyzer {
 	private ArrayList<Path> allPaths = new ArrayList<Path>();
 	
 	/**
-	 * Overall score, the value of this score will be set to 0 if the score is becoming negative
-	 */
-	private double [] scoreVal;
-
-	/**
 	 *  Score values are stored in an array, with a map [target x nodes] pointing to the indexes.
 	 */
 	private HashMap<Node, HashMap<Node, Integer>> scoreMap = new HashMap<Node, HashMap<Node, Integer>>();
 	
 	/**
-	 * Score matrices for PIQUANT score.
+	 * Score matrices for PIQUANT and OCSANA various scores.
 	 */
-	private double [] targetScoreVal;
-	private double [] targetScoreValPos;
-	private double [] targetScoreValNeg;
-
+	private double [] piquantScore;
+	private double [] piquantScorePos;
+	private double [] piquantScoreNeg;
+	private double [] piquantAbsScore;
+	private double [] piquantAbsSetScore;
+	private double [] piquantSetScore;
+	private double [] sideScore;
+	private double [] overallScore;
 	private double [] ocsanaScore;
 	
 	/**
@@ -151,19 +150,11 @@ public class DataPathConsistencyAnalyzer {
 	public HashSet<Node> allNodes = new HashSet<Node>();
 
 	/**
-	 * Ocsana Omega scores map
+	 * Ocsana Omega scores maps
 	 */
 	public HashMap<String, Double> omegaScoreMap = new HashMap<String, Double>();
-	
-	/**
-	 * Ocsana omega score, taking into account targets only. 
-	 */
-	public HashMap<String, Double> omegaTargetScoreMap = new HashMap<String, Double>();
-	
-	/**
-	 * Ocsana omega score, taking into account side-effect nodes only.
-	 */
-	public HashMap<String, Double> omegaSideEffectScoreMap = new HashMap<String, Double>();
+	public HashMap<String, Double> piquantAbsSetScoreMap = new HashMap<String, Double>();
+	public HashMap<String, Double> sideScoreMap = new HashMap<String, Double>();
 	
 	/**
 	 * Ocsana Omega scores
@@ -222,8 +213,8 @@ public class DataPathConsistencyAnalyzer {
 		
 		public HashSet<String> optCutSet;
 		public double score;
-		public double targetScore;
-		public double sideEffectScore;
+		public double sumPiquantAbsSetScore;
+		public double sumSideScore;
 		public int optCutSetSize;
 		
 		public optCutSetData(HashSet<String> optCutSet, double score) {
@@ -232,12 +223,12 @@ public class DataPathConsistencyAnalyzer {
 			this.optCutSetSize = optCutSet.size();
 		}
 		
-		public optCutSetData(HashSet<String> optCutSet, double score, double targetScore, double sideEffectScore) {
+		public optCutSetData(HashSet<String> optCutSet, double score, double sumPiquantAbsSetScore, double sumSideScore) {
 			this.optCutSet = optCutSet; 
 			this.score = score;
 			this.optCutSetSize = optCutSet.size();
-			this.targetScore = targetScore;
-			this.sideEffectScore = sideEffectScore;
+			this.sumPiquantAbsSetScore = sumPiquantAbsSetScore;
+			this.sumSideScore = sumSideScore;
 		}
 		
 		/*
@@ -900,7 +891,8 @@ public class DataPathConsistencyAnalyzer {
 	 */
 	public void ocsanaScore() {
 		
-		this.optCutSetReport.append("--- Optimal intervention set search report ---"+newline+newline);
+		this.optCutSetReport.append("--- Optimal Combinations of Interventions Report ---"+newline+newline);
+		this.optCutSetReport.append("OPTIONS"+newline+newline);
 		
 		String line = "";
 		for (Node n : this.sourceNodes)
@@ -927,9 +919,31 @@ public class DataPathConsistencyAnalyzer {
 				line += n.Id + "(" + nodeID2attribute.get(n.Id) + ")" + " ";
 		this.optCutSetReport.append("Side effect nodes: "+line+newline+newline);
 		
+		if (this.searchPathMode == 0)
+			line = "Shortest paths";
+		else if (this.searchPathMode == 1)
+			line = "Optimal and suboptimal shortest paths";
+		else if (this.searchPathMode == 2)
+			line = "All non-intersecting paths";
+		
+		this.optCutSetReport.append("Path search algorithm: "+line+newline);
+		String radStr = "inf";
+		if (this.searchRadius < 1e300)
+			radStr = Double.toString(this.searchRadius);
+		this.optCutSetReport.append("Finite search radius for All non-intersecting paths: "+radStr+newline+newline);
+		
+		if (ocsSearch == OCS_BERGE)
+			this.optCutSetReport.append("CI algorithm selected: Exact solution (Berge's algorithm)"+newline+newline);
+		else { 
+			this.optCutSetReport.append("CI algorithm selected: Approximation solution"+newline);
+			long maxNb = this.maxSetNb / 1000000;
+			this.optCutSetReport.append("Max. Nb of million of combinations to test: "+ maxNb + newline+newline);
+		}
+		this.optCutSetReport.append("RESULTS"+ newline+newline);
+		
 		// convert every "neutral" edge to activation
 		int nbConversions = this.checkEdgeInfluence();
-		this.optCutSetReport.append(nbConversions+" edges were converted to activation out of "+this.graph.Edges.size()+"\n\n");
+		this.optCutSetReport.append("Modifications to the network: "+nbConversions+" undefined effect edges were converted to activation effect edges out of "+this.graph.Edges.size()+"\n\n");
 		System.out.println(nbConversions+" edges were converted to activation out of "+this.graph.Edges.size()+"\n\n");
 		
 		ArrayList<Node> outputNodes = new ArrayList<Node>();
@@ -1055,9 +1069,6 @@ public class DataPathConsistencyAnalyzer {
 		// same but split in individual components
 		ArrayList<Path> elemSplitPaths = new ArrayList<Path>();
 
-		// set of unique nodes from elementary paths
-		//HashSet<Node> elemNodes = new HashSet<Node>();
-
 		for (Node n : targetNodes) {
 			for (Path p : allPaths) {
 				if (p.nodeSequence.get(p.target) == n) {
@@ -1069,10 +1080,6 @@ public class DataPathConsistencyAnalyzer {
 			}
 		}
 
-//		System.out.println(">>>test<<<");
-//		printPaths(elemPaths);
-//		System.exit(1);
-		
 		fillPathMatrix(elemPaths);
 		
 		this.optCutSetReport.append("Found "+elemPaths.size()+" elementary paths and "+elemNodes.size()+" elementary nodes"+newline+newline);
@@ -1100,21 +1107,17 @@ public class DataPathConsistencyAnalyzer {
 		int ct = 0;
 		
 		/*
-		 * Overall score, the value of this score will be set to 0 if the score is becoming negative
+		 * Initialize various score matrices
 		 */
-		scoreVal = new double[targetNodes.size() * allNodes.size()];
-		
-		/*
-		 * Score taking into account the targets only
-		 */
-		targetScoreVal = new double[targetNodes.size() * allNodes.size()];
-		targetScoreValPos = new double[targetNodes.size() * allNodes.size()];
-		targetScoreValNeg = new double[targetNodes.size() * allNodes.size()];
-		
-		/*
-		 * Score for side effect nodes
-		 */
-		double [] sideEffectScoreVal = new double[targetNodes.size() * allNodes.size()];
+		piquantScore = new double[targetNodes.size() * allNodes.size()];
+		piquantScorePos = new double[targetNodes.size() * allNodes.size()];
+		piquantScoreNeg = new double[targetNodes.size() * allNodes.size()];
+		piquantAbsScore = new double[targetNodes.size() * allNodes.size()];
+		piquantAbsSetScore = new double[targetNodes.size() * allNodes.size()];
+		piquantSetScore = new double[targetNodes.size() * allNodes.size()];
+		sideScore = new double[targetNodes.size() * allNodes.size()];
+		overallScore = new double[targetNodes.size() * allNodes.size()];
+		ocsanaScore = new double[targetNodes.size() * allNodes.size()];
 		
 		/*
 		 * OCSANA score (omega)
@@ -1128,43 +1131,33 @@ public class DataPathConsistencyAnalyzer {
 			for (Node s : elemNodes) {
 				//System.out.println(t.Id+"--"+s.Id);
 				scoreMap.get(t).put(s, ct);
-				scoreVal[ct] = 0.0;
-				targetScoreVal[ct] = 0.0;
-				targetScoreValPos[ct] = 0.0;
-				targetScoreValNeg[ct] = 0.0;
-				sideEffectScoreVal[ct] = 0.0;
+				piquantScore[ct] = 0.0;
+				piquantScorePos[ct] = 0.0;
+				piquantScoreNeg[ct] = 0.0;
+				piquantAbsScore[ct] = 0.0;
+				piquantAbsSetScore[ct] = 0.0;
+				piquantSetScore[ct] = 0.0;
+				sideScore[ct] = 0.0;
+				overallScore[ct] = 0.0;
 				ocsanaScore[ct] = 0.0;
 				ct++;
 			}
-		
-//		System.out.println("\nScores");
+
+		// PIQUANT score
 		for (Path p : elemSplitPaths) {
 			Node target = p.nodeSequence.get(p.target);
 			Node source = p.nodeSequence.get(p.source);
 			int idx = scoreMap.get(target).get(source);
 			double sco = 0.0;
 			sco = p.influence / p.length;
-			scoreVal[idx] += sco;
-			targetScoreVal[idx] += sco;
+			piquantScore[idx] += sco;
 			if (sco > 0)
-				targetScoreValPos[idx] += sco;
+				piquantScorePos[idx] += sco;
 			else 
-				targetScoreValNeg[idx] += sco;
-			
-			//System.out.println("score: "+source.Id+":"+target.Id+" "+p.label+" infl="+p.influence+" len="+p.length+" score="+sco+" val="+ scoreVal[idx]);
+				piquantScoreNeg[idx] += sco;
 		}
 
-		// negative scores are set to 0
-//		for (Node t : targetNodes)
-//			for (Node s : elemNodes) {
-//				int idx = scoreMap.get(t).get(s);
-//				if (scoreVal[idx] < 0)
-//					scoreVal[idx] = 0;
-//				if (targetScoreVal[idx] < 0)
-//					targetScoreVal[idx] = 0;
-//			}
-
-//		System.out.println("\nPenalty scores");
+		// side-effect score
 		for (Node source : elemNodes) {
 			for (Node target : targetNodes) {
 				for (Node side : sideNodes) {
@@ -1179,45 +1172,39 @@ public class DataPathConsistencyAnalyzer {
 							 */
 							double sco = 0.0;
 							sco = Math.abs(ps.influence / ps.length);
-							//scoreVal[idx] -= sco;
-							scoreVal[idx] = Math.abs(scoreVal[idx]) - sco;
-							sideEffectScoreVal[idx] += sco;
-//							System.out.println(source.Id+":"+target.Id+" "+ps.label+" infl="+ps.influence+" len="+ps.length+" score="+sco+" val="+scoreVal[idx]);
+							sideScore[idx] += sco;
 						}
 					}
 				}
 			}
 		}
 
-		// negative scores are set to 0
-//		for (Node t : targetNodes)
-//			for (Node s : elemNodes) {
-//				int idx = scoreMap.get(t).get(s);
-//				if (scoreVal[idx] < 0)
-//					scoreVal[idx] = 0;
-//				if (targetScoreVal[idx] < 0)
-//					targetScoreVal[idx] = 0;
-//			}
-
+		// Absolute value of the PIQUANT score
+		for (Node t : targetNodes) {
+			for (Node s : elemNodes) {
+				int idx = scoreMap.get(t).get(s);
+				piquantAbsScore[idx] = Math.abs(piquantScore[idx]);
+				overallScore[idx] = piquantAbsScore[idx] - sideScore[idx];
+			}
+		}
+		
 		// create "source graphs" to be used to create Cytoscape networks 
 		createCytoscapeNet();
 		
-		System.out.println("\nScores:");
+		System.out.println("\nPIQUANT Scores:");
 		DecimalFormat df = new DecimalFormat("#.###");
 		for (Node t : targetNodes)
 			for (Node s : elemNodes) {
 				int idx = scoreMap.get(t).get(s);
 				if (nodeID2attribute == null)
-					//System.out.println(t.Id+"-"+s.Id+" = "+df.format(scoreVal[idx]) + " " + df.format(targetScoreVal[idx]) + " " + df.format(sideEffectScoreVal[idx]));
-					System.out.println(t.Id+"-"+s.Id+" = "+df.format(scoreVal[idx]) );
+					System.out.println(t.Id+"-"+s.Id+" = "+df.format(piquantScore[idx]) );
 				else
-					//System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+df.format(scoreVal[idx])+ " " + df.format(targetScoreVal[idx]) + " " + df.format(sideEffectScoreVal[idx]));
-					System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+df.format(scoreVal[idx]));
+					System.out.println(t.Id+"("+nodeID2attribute.get(t.Id)+")"+"-"+s.Id+"("+nodeID2attribute.get(s.Id)+")"+" = "+df.format(piquantScore[idx]));
 			}
 	
 		
 		/*
-		 * Calculate Omega scores for all elementary nodes
+		 * Calculate Omega scores for all elementary nodes (=OCSANA score)
 		 */
 		HashMap<Node,ArrayList<HashSet<String>>> elemPathsByTarget = new HashMap<Node, ArrayList<HashSet<String>>>();
 		for (Node t : targetNodes)
@@ -1232,26 +1219,27 @@ public class DataPathConsistencyAnalyzer {
 		}
 		
 		for (Node source : elemNodes) {
-			double omegaScore = 0;
-			double omegaTargetScore = 0;
-			double omegaSideEffectScore = 0;
+			double sumOmegaScore = 0;
+			double sumPiquantAbsSetScore = 0;
+			double sumSideScore = 0;
 			for (Node target : targetNodes) {
 				int factor = 0;
 				for (int i=0;i<elemPathsByTarget.get(target).size();i++) {
-					//System.out.println(elemPathsByTarget.get(target).get(i));
 					if (elemPathsByTarget.get(target).get(i).contains(source.Id))
 						factor++;
 				}
-				double tmp = factor * scoreVal[scoreMap.get(target).get(source)];
-				ocsanaScore[scoreMap.get(target).get(source)] = tmp;
-				omegaScore += tmp;
-				omegaTargetScore += factor * targetScoreVal[scoreMap.get(target).get(source)];
-				omegaSideEffectScore += factor * sideEffectScoreVal[scoreMap.get(target).get(source)];
-				//System.out.println("source="+source.Id+" target="+target.Id+" factor="+factor+" om="+omegaScore + " score="+ scoreVal[scoreMap.get(target).get(source)]);
+				int idx = scoreMap.get(target).get(source);
+				double sco = factor * overallScore[idx];
+				ocsanaScore[idx] = sco;
+				sumOmegaScore += sco;
+				piquantAbsSetScore[idx] = piquantAbsScore[idx] * factor;
+				sumPiquantAbsSetScore += piquantAbsSetScore[idx]; 
+				piquantSetScore[idx] = piquantScore[idx] * factor;
+				sumSideScore += sideScore[idx];
 			}
-			omegaScoreMap.put(source.Id, omegaScore);
-			omegaTargetScoreMap.put(source.Id, omegaTargetScore);
-			omegaSideEffectScoreMap.put(source.Id, omegaSideEffectScore);
+			omegaScoreMap.put(source.Id, sumOmegaScore);
+			piquantAbsSetScoreMap.put(source.Id, sumPiquantAbsSetScore);
+			sideScoreMap.put(source.Id, sumSideScore);
 		}
 		
 		for (String id : omegaScoreMap.keySet()) {
@@ -1301,8 +1289,6 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			this.optCutSetReport.append("Search option: Exact solution (Berge's algorithm)"+newline);
-			
 			oca.mainBerge(true);
 			
 			if (this.useMaxSetSize == true) {
@@ -1320,7 +1306,6 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: Approximation solution"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
@@ -1338,7 +1323,6 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Seed based enumeration approach
 			 */
-			this.optCutSetReport.append("Search option: Seed based enumeration"+newline);
 			
 			/*
 			 * take into account exception nodes for the max set size cutoff
@@ -1361,23 +1345,22 @@ public class DataPathConsistencyAnalyzer {
 		optCutSetList = new ArrayList<optCutSetData>();
 		
 		for (HashSet<String> set : hitSet) {
-			double score = 0.0;
-			double targetScore = 0.0;
-			double sideEffectScore = 0.0;
+			double sumOmegaScore = 0.0;
+			double sumPiquantAbsSetScore = 0.0;
+			double sumSideScore = 0.0;
 			for (String nodeID : set) {
-				score += omegaScoreMap.get(nodeID);
-				targetScore += this.omegaTargetScoreMap.get(nodeID);
-				sideEffectScore += this.omegaSideEffectScoreMap.get(nodeID);
+				sumOmegaScore += omegaScoreMap.get(nodeID);
+				sumPiquantAbsSetScore += piquantAbsSetScoreMap.get(nodeID);
+				sumSideScore += sideScoreMap.get(nodeID);
 			}
-			//optCutSetList.add(new optCutSetData(set, score));
-			optCutSetList.add(new optCutSetData(set, score, targetScore, sideEffectScore));
+			optCutSetList.add(new optCutSetData(set, sumOmegaScore, sumPiquantAbsSetScore, sumSideScore));
 		}
 		
 		Collections.sort(optCutSetList);
 
-		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal intervention sets."+newline+newline);
+		this.optCutSetReport.append("Found " + optCutSetList.size() + " optimal CIs."+newline+newline);
 		
-		this.optCutSetReport.append("Intervention set\tSize\tOCSANA score\tOCSANA score (targets only)\tOCSANA score (side effect nodes only)"+newline+newline);
+		this.optCutSetReport.append("Optimal CI\tSize\tOCSANA score\t|PIQUANT score|*Set score\tSideEffects score"+newline+newline);
 		DecimalFormat df = new DecimalFormat("#.###");
 		for (optCutSetData d : optCutSetList) {
 			String str = "[";
@@ -1388,7 +1371,7 @@ public class DataPathConsistencyAnalyzer {
 					str += id + "(" + nodeID2attribute.get(id) + ")" + " , ";
 			str = str.substring(0, str.length()-3);
 			str += "]";
-			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\t"+df.format(d.targetScore)+"\t"+df.format(d.sideEffectScore)+newline);
+			this.optCutSetReport.append(str+"\t"+ d.optCutSetSize+"\t"+df.format(d.score)+"\t"+df.format(d.sumPiquantAbsSetScore)+"\t"+df.format(d.sumSideScore)+newline);
 		}
 		
 		/*
@@ -1404,47 +1387,41 @@ public class DataPathConsistencyAnalyzer {
 		/*
 		 * print out OCSANA score matrix on the report
 		 */
-		this.optCutSetReport.append(newline + "OCSANA Score matrix (elementary nodes x target nodes):" + newline);
-		String str = "";
+		this.optCutSetReport.append(newline + "OCSANA Score matrix (elementary nodes x target nodes):" + newline+newline);
+		String str = "Elementary node / Target node\t";
 		for (Node t : targetNodes)
-			str += t.Id + " ";
-		//this.optCutSetReport.append(str+"row_sum"+newline);
+			str += t.Id + "\t";
 		this.optCutSetReport.append(str+newline);
 		
 		for (Node s : elemNodes) {
-			str = s.Id + " ";
-			double rowSum = 0.0;
+			str = s.Id + "\t";
 			for (Node t : targetNodes) {
 				int idx = scoreMap.get(t).get(s);
-				rowSum += ocsanaScore[idx];
-				str += df.format(ocsanaScore[idx]) + " ";
+				str += df.format(ocsanaScore[idx]) + "\t";
 			}
 			str = str.substring(0, str.length()-1);
-			//str += " " + df.format(rowSum);
 			this.optCutSetReport.append(str + newline);
 		}
 		
 		/*
-		 * print out PIQUANT score matrix on the report
+		 * print out PIQUANT*SET score matrix on the report
 		 */
-		this.optCutSetReport.append(newline + "PIQUANT Score matrix (elementary nodes x target nodes):" + newline);
-		str = "";
+		this.optCutSetReport.append(newline + "PIQUANT*SET Score matrix (elementary nodes x target nodes):" + newline+newline);
+		str = "Elementary node / Target node\t";
 		for (Node t : targetNodes)
-			str += t.Id + "+ "+ t.Id+"- "+t.Id+"_tot ";
+			str += t.Id + "\t";
 		this.optCutSetReport.append(str+newline);
 		
 		for (Node s : elemNodes) {
-			str = s.Id + " ";
-			double rowSum = 0.0;
+			str = s.Id + "\t";
 			for (Node t : targetNodes) {
 				int idx = scoreMap.get(t).get(s);
-				str += df.format(targetScoreValPos[idx]) + " ";
-				str += df.format(targetScoreValNeg[idx]) + " ";
-				str += df.format(targetScoreVal[idx]) + " ";
+				str += df.format(piquantSetScore[idx]) + "\t";
 			}
 			str = str.substring(0, str.length()-1);
 			this.optCutSetReport.append(str + newline);
 		}
+
 	}
 	
 	/**
@@ -1467,9 +1444,9 @@ public class DataPathConsistencyAnalyzer {
 				str += d.optCutSetSize + "\t";
 				str += d.score;
 				str += "\t";
-				str += d.targetScore;
+				str += d.sumPiquantAbsSetScore;
 				str += "\t";
-				str += d.sideEffectScore;
+				str += d.sumSideScore;
 				out.write(str+newline);
 			}
 			out.close();

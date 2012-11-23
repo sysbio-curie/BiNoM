@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 //import com.ibm.icu.text.NumberFormat;
@@ -229,15 +230,15 @@ public class OptimalCombinationAnalyzer {
 			}
 			hitSetSB = checkMinimalityBerge(hitSetSB);
 		}
-		long toc=0;
 		if (printLog) {
 			System.out.println("max set size: "+maxSetSize);
 			System.out.println("final mcs size: "+hitSetSB.size());
 		}
-		toc = System.currentTimeMillis() - tic;
+		long toc = System.currentTimeMillis() - tic;
 		if (report != null) {
-			long t = toc / 1000;
-			report.append(newline+"Total timing for the search: "+t+" sec."+newline);
+			double t = (double) toc / 1000;
+			DecimalFormat df = new DecimalFormat("#.###");
+			report.append(newline+"Total timing for the search: "+df.format(t)+" sec."+newline);
 		}
 		System.out.println("timing: "+toc);
 	}
@@ -567,14 +568,14 @@ public class OptimalCombinationAnalyzer {
 			}
 			
 			System.out.println("\nSearch for set size "+ setSize);
-			report.append(newline + "Search for set size "+ setSize + newline);
+			report.append(newline + "Search for CI size "+ setSize + newline);
 			
 			long nbComb =  calcCombinations(pathMatrixNbCol, setSize);
 			NumberFormat form = NumberFormat.getInstance();
 			form.setGroupingUsed(true);
 			
 			System.out.println("calculated nb of combinations: "+form.format(nbComb));
-			report.append("calculated nb of combinations: "+form.format(nbComb)+newline);
+			report.append("Total nb of possible combinations: "+form.format(nbComb)+newline);
 			
 			int selectionSize;
 			/*
@@ -607,7 +608,6 @@ public class OptimalCombinationAnalyzer {
 			else {
 				// no selection
 				System.out.println("no selection");
-				report.append("no selection" + newline);
 				
 				for (int i=0;i<pathMatrixNbCol;i++)
 					mapIdx.put(i, i);
@@ -618,7 +618,7 @@ public class OptimalCombinationAnalyzer {
 			int[] idx;
 			CombinationGenerator cg = new CombinationGenerator(selectionSize, setSize);
 			System.out.println("effective nb of combinations: "+form.format(cg.getTotal()));
-			report.append("effective nb of combinations: "+form.format(cg.getTotal()) + newline);
+			report.append("Tested nb of combinations: "+form.format(cg.getTotal()) + newline);
 			
 			int ct=0;
 			while(cg.hasMore()) {
@@ -677,9 +677,10 @@ public class OptimalCombinationAnalyzer {
 		
 		long toc = System.currentTimeMillis() - tic;
 		if (report != null) {
-			long t = toc / 1000;
+			double t = toc / 1000;
+			DecimalFormat df = new DecimalFormat("#.###");
 			report.append(newline);
-			report.append("Total timing for the search: "+t+" sec."+newline);
+			report.append("Total timing for the search: "+df.format(t)+" sec."+newline);
 		}
 		System.out.println("timing: "+toc);
 	}

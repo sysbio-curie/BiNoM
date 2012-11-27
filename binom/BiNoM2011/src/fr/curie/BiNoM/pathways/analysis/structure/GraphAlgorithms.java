@@ -476,11 +476,15 @@ public class GraphAlgorithms {
 	    // reverse all paths (from source to end)
 	    for(int i=0;i<path.size();i++){
 	      pth = path.get(i);
-	      Graph pthr = new Graph();	      
+	      Graph pthr = new Graph();	    
+	      //System.out.print("Adding path: ");
 	      for(int j=pth.size()-1;j>=0;j--){
 	        pthr.addNode((Node)graph.Nodes.get(pth.get(j).intValue()));
+		    //System.out.print(graph.Nodes.get(pth.get(j).intValue()).Id+"-");
 	      }
-	      pthr.addConnections(graph);
+	      //pthr.addConnections(graph);
+	      pthr.addConnectionsAlongSequence(graph);
+	      //System.out.println(" , "+pthr.Edges.size()+"edges");
 	      pathf.add(pthr);
 	    }
 		return pathf;

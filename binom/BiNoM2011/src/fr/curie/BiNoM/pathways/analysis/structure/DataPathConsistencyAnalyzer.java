@@ -408,12 +408,13 @@ public class DataPathConsistencyAnalyzer {
 					for(int j=0;j<pts.size();j++){
 						Graph pth = pts.get(j);
 						Path ppath = new Path(pth,n.Id);
-						for(int k=0;k<pth.Nodes.size();k++)
-							System.out.print(pth.Nodes.get(k).Id+"-");
-						System.out.println();
 						ppath.target = pth.getNodeIndex(pathwayNode.Id);
 						calcPathProperties(ppath);
 						vpaths.add(ppath);
+						System.out.print("\t"+(j+1)+")");
+						//for(int k=0;k<pth.Nodes.size();k++)
+						//	System.out.print(pth.Nodes.get(k).Id+"-");
+						System.out.println(ppath.label);
 					}
 				}
 				System.out.println(n.Id+"\t"+vpaths.size()+" paths found.");

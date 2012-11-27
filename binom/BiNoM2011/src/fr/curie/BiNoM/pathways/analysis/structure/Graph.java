@@ -495,6 +495,20 @@ public class Graph {
     }
   }
   
+  public void addConnectionsAlongSequence(Graph gr){
+	    for(int k=0;k<gr.Edges.size();k++){
+	        Edge e = (Edge)gr.Edges.elementAt(k);
+	        Node n1 = this.getNode(e.Node1.Id);
+	        Node n2 = this.getNode(e.Node2.Id);
+	        if(n1!=null)if(n2!=null)
+	        for(int i=0;i<this.Nodes.size()-1;i++){
+	        	if(this.Nodes.get(i).Id.equals(n1.Id))
+		        	if(this.Nodes.get(i+1).Id.equals(n2.Id))
+		        		addEdge(e);
+	        }
+	      }	  
+  }
+  
   public void addMetanodeConnections(Graph gr, boolean nodeIntersectionView, boolean showIntersections){
 	    for(int i=0;i<Nodes.size();i++){
 	        Node n1 = (Node)Nodes.elementAt(i);

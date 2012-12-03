@@ -88,6 +88,14 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
     
     public int result = -1;
 
+    private class NodeComparator implements Comparator {
+    	public int compare (Object o1, Object o2) {
+    		Node n1 = (Node) o1;
+    		Node n2 = (Node) o2;
+    		return n1.Id.compareTo(n2.Id);
+    	}
+    }
+    
     public PathConsistencyAnalyzerDialog(JFrame frame, String mess, boolean modal){
     	super(frame, mess, modal);
     	createElements();
@@ -113,10 +121,10 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 	    targetNodes.add(n);
 	}
 	
-	//Collections.sort(dataTarget);
+	Collections.sort(dataTarget);
+	Collections.sort(targetNodes, new NodeComparator());
 	
 	fillActiveNodesList();
-    
 
 	analyzer.getPathwayNodes();
     
@@ -436,6 +444,8 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
     	int indicesActive[] = new int[dataActive.size()];
     	for(int i=0;i<indicesActive.length;i++)
     	    indicesActive[i] = i;
+        
+    	Collections.sort(dataActive);
         
     	sourceList.setListData(dataActive);
     	int len = dataActive.size();

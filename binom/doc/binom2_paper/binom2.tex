@@ -712,12 +712,12 @@ this protein is involved and that were added using the BiNoM BioPAX Query functi
 To facilitate the visualization of large molecular networks, we propose a set of
 functions that simplify them by creating modules from selected parts of the
 large network. This task, that we call \emph{modularization}, is a
-semi-automatic procedure, where biological expert knowledge is used to assure
+semi-automatic procedure, where biological expert knowledge is used to insure
 the coherence of the newly created modules.
 
 Most of the modules represent a detailed
 sequence of events that occur with a particular protein or protein complex,
-whose name can then be used to represent the whole module. This way, a
+whose name can then be used to represent the whole module (although any name can be used). This way, a
 simplified representation of a complex map can be produced, using the modules
 and their relationships as an abstracted version of the comprehensive network
 \cite{calzone2008comprehensive}.
@@ -749,9 +749,9 @@ selected nodes and edges and also to show the clipboard content.
 
 
 \section*{Results and Discussion}
-We propose to study a reaction network focusing on the transition from G1 phase
+As an example of the use of BiNoM functions, we propose to study a reaction network focusing on the transition from G1 phase
 (growth phase) to S phase (DNA replication phase) of the cell cycle
-\cite{calzone2008comprehensive} as an example of the use of BiNoM functions.
+\cite{calzone2008comprehensive}.
 
 The network published in \cite{calzone2008comprehensive} describes in
 biochemical details the regulation of the well-known and charaterized tumor
@@ -793,7 +793,7 @@ reactions (figure 8).
 This map contains a lot of valuable information but rather difficult to extract. We present two
 ways to get some biological insight from this map, by using BiNoM functions. The first one consists of
 transforming the reaction network into an influence network in order to analyze
-experimental data on it. The second one implies a simplification of the comprehensive map by
+experimental data on it. The second one presents a simplification of the comprehensive map by
 applying a method of reduction of the numerous interactions into modules without
 losing any content from the original map.
 
@@ -802,7 +802,7 @@ PIQuant algorithm can be used to perform a quantitative analysis on an influence
 network. In order to translate the G1/S reaction network into an influence network, we used
 a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
 available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). To
-translate a reaction network into an influence network, the first one is 
+translate a reaction network into an influence network, the former is 
 pre-processed according to simple rules: (1) BIOCHAM deletes all non-regulated
 degradation and syntheses reactions, (2) all intermediary chemical species with
 only one input and
@@ -824,7 +824,7 @@ from a study of 57 bladder cancer
 tissue samples compared to 4 normal samples \cite{stransky2006regional}. For
 each gene, the differential expression between tumor and normal tissue
 is assessed by a t-test. The t-test statistic value is used as the annotation
-for each gene. We selected the 19 nodes for which we had experimental data
+for each node. We selected the 19 nodes for which we had experimental data
 values as annotated nodes. Then, we constructed a text file listing nodes of the influence network
 and their annotation and we imported this file using the Cytoscape function
 ``Import $>$ Nodes attributes''
@@ -846,7 +846,7 @@ Figure 9 represents this influence network after its import.
 %\end{figure}
 
 PIQuant is applied to this network and its annotation, by using the function
-``Plugins $>$ BiNoM 2.0 $>$ BiNoM Analysis $>$ Path Influence Quantification
+``Plugins $>$ BiNoM 2.1 $>$ BiNoM Analysis $>$ Path Influence Quantification
 analysis''. We selected the option ``optimal and
 suboptimal shortest path'' as the algorithm to extract the paths. The PIQuant
 score is then automatically calculated for each association
@@ -859,8 +859,8 @@ The global PIQuant score from each annotated source node to each target is
 represented as a heatmap on figure 10 (the list of nodes and all the PIQuant
 score values corresponding to the heatmap figure are available as supplementary
 table 1). We can see on this figure that most
-genes, in cancer cells compared to normal cells, influence positively the M and
-S phases (red coloring on the heatmap), indicating an enhanced proliferation for tumor cells.
+genes have positive scores (red coloring on the heatmap), in cancer cells compared to normal cells, indicating that they influence positively the M and
+S phases, corresponding to an enhanced proliferation for tumor cells.
 A clear difference can be observed when comparing the heapmap to figure 9, where
 the color values represent only experimental data values. The heatmap represents
 this time the integration of both experimental data and the network
@@ -883,7 +883,7 @@ architecture through the PIQuant score.
 
 \subsection*{Modularization of the G1/S molecular map}
 
-The raw G1/S network is very detailed and may be hard to grasp at a first glance.
+The initial G1/S network is very detailed and may be hard to grasp at a first glance.
 To facilitate the analysis of the content, we propose to organize the reaction
 network as a modular network. The chemical species are clustered in groups, referred to
 as modules, in an semi-automatic manner, using BiNoM functions and biological
@@ -895,7 +895,7 @@ A detailed tutorial on the construction of this modular network using BiNoM is
 described in the supplementary methods.
 
 Briefly, we first decomposed the global network into its different components,
-by using name semantics to isolate the subnetworks in which
+by using name semantics, to isolate the subnetworks in which
 each protein is involved (decomposition in material components). The 36 networks that are created this way may share a
 lot of common chemical species, so we went further
 by clustering the subnetworks having at least 25\% of common chemical species. We renamed
@@ -906,7 +906,7 @@ For example, the module E2F1\_RB is
 further decomposed in three different modules containing the proteins RB, E2F1
 and E2F6. Finally, we generated a modular view of all the individual modules, using the Module Manager functions.
 BiNoM links the modules if they share components or edges. These edges are then
-interpreted as activation or inhibition by the user. Our final
+interpreted as activation or inhibition by the modeler. Our final
 modular view is composed of 9 modules, with 22
 edges connecting them (figure 11). 
 
@@ -929,7 +929,7 @@ obtained model is more abstract but highlights some aspects that may not be
 evident from the comprehensive reaction network. For instance, it brings into
 relief feedbacks (positive, negative or feedforward) involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
-of this modular network into a Boolean model is indeed straightforward. Another
+of this modular network into a Boolean model, for instance, is indeed straightforward. Another
 application for the modular model would be to analyze experimental data such as
 transcriptome or copy number variations (CGH). The ``activity'' of each module
 is based on the expression levels of the genes within the module,
@@ -938,7 +938,7 @@ the difference between a disease and a normal state, or even to try to
 discriminate between different disease stages. We have produced such maps for the
 RB/E2F modular network to analyze bladder tumor samples, and we could observe a
 striking difference between the non-invasive and invasive states of the disease
-\cite{calzone2008comprehensive}(the colored maps can be visualized at
+\cite{calzone2008comprehensive}(the map and the details about the procedure can be seen at
 \url{http://bioinfo-out.curie.fr/projects/rbpathway/case_study.html}).
 
 \section*{Conclusions}
@@ -1097,12 +1097,12 @@ RB/E2F network and G1/S network extracted from Reactome.
   \subsection*{Figure 9 - Annotated influence network.}
 Influence network of the cell cycle G1/S transition generated by BIOCHAM. Colors represent differential
 expression obtained from transcriptomic data compared to normal tissue. Color
-intensities are proportional to the t-statistic values (red values indicate
+intensities are proportional to the t-test statistic values (red values indicate
 positive values corresponding to an activation, green values indicate negative
 values corresponding to an inhibition). The three grey nodes are markers for the
 different cell cycle phases: G1 (pRB\_star), S (CDK2/Cyclin E1 complex phosphorylated), M (CDC2/Cyclin E1 complex phosphorylated).
 
-  \subsection*{Figure 10 - Heat map representation of the PIQuant scores.}
+  \subsection*{Figure 10 - Heatmap representation of the PIQuant scores.}
 The map shows the results of the PIQuant algorithm applied to the G1/S
 influence network. Color intensities are proportional to PIQuant score (red color indicates a positive
 value; i.e an activation, the green color indicates a negative value, i.e. an
@@ -1111,7 +1111,7 @@ Each line represents an annotated node while each column represents a cell-cycle
 phase phenotype: G1 (pRB\_star), S (CDK2/Cyclin E1 complex phosphorylated), M (CDC2/Cyclin E1 complex phosphorylated).
 
   \subsection*{Figure 11 - Modular view of the G1/S network.}
-Modular representation of the G1/S network, created by using a set of
+Modular representation of the G1/S network, created using a set of
 different BiNoM functions. Each node (pictured as a green octagon), represents a
 different module, or subnetwork. The edges connecting the modules represent the
  known influences between modules.
@@ -1145,7 +1145,7 @@ different module, or subnetwork. The edges connecting the modules represent the
   \subsection*{Table 1 - BiNoM path analysis algorithms.}
     Listing of the different algorithms implemented in BiNoM for
 path analysis. The ``Directed paths search`` toggles the search for directed or
-undirected paths. The ''Finite radius'' option let the user restrict the search
+undirected paths. The ''Finite radius'' option lets the user restrict the search
 to a given path length, in order to limit the size of the results and computation time.   \par \mbox{}
     \par
     \mbox{
@@ -1167,7 +1167,7 @@ to a given path length, in order to limit the size of the results and computatio
         \hline
 	\textbf{Data type} & \textbf{Description} \\ \hline
         Influence network (set of paths) & \parbox{10cm}{\null An influence network of
-interest composed of different species (proteins, complexes, Rna, small
+interest composed of different species (proteins, complexes, RNA, small
 molecules), connected by edges representing activation or inhibition. A
 collection of paths will be extracted from the network, defined between annotated
 and target nodes of biological interest.\null} \\ \hline

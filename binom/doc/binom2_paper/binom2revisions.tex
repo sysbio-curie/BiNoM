@@ -195,8 +195,8 @@ However, large scale molecular maps are not always easy to mine and interpret.
 We
 have developed BiNoM (Biological Network Manager), a Cytoscape plugin which
 provides
- functions for the import-export of standard Systems Biology
-file formats (such as SBML and BioPAX), and a set of algorithms to analyze and
+ functions for the import-export of some standard Systems Biology
+file formats (import from CellDesigner, BioPAX level 3 and CSML; export to SBML, CellDesigner and BioPAX level 3), and a set of algorithms to analyze and
 reduce the complexity
 of large biological networks. BiNoM can be used to import and analyze files
 created with the CellDesigner software. BiNoM provides a set of functions
@@ -292,19 +292,28 @@ large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical editing of biological pathway diagrams
-\cite{funahashi2003celldesigner}, using a proprietary extension
-of SBML to store all the information contained in the graphs. Some tools are
+\cite{funahashi2003celldesigner}. The CellDesigner file format correspond to the SBML specification, except that the official SBML layout extension is replaced by a layout specific to the software. Some tools are
 available for a specific conversion of one file format into another
 \cite{mi2011biopax, buchel2012qualitative}. There is obviously
 a need for user-friendly software tools that would allow the user to easily
 import data from various standard format sources, to perform structural analyses on these pathways
 and to manipulate networks, and to be able to export a network to a suitable
-format for further analysis (e.g. mathematical modeling). We have created
+format for further analysis. We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
-network vizualization and analysis tool \cite{cline2007integration}. BiNoM has
-several built-in functions for importing and exporting standard Systems Biology
-file formats such as SBML and BioPAX. BiNoM also implements
-several functions based on graph operations for the structural analysis of
+network vizualization and analysis tool \cite{cline2007integration} precisely to fulfill this purpose.
+BiNoM is designed to be useful in a finite set of pragmatic, user-oriented and
+useful scenarios for biological networks analysis. For instance, a user may want
+to import a molecular map from a CellDesigner file, analyze it using graph-based
+algorithms, and finally export a subnetwork of interest to the SBML format for
+mathematical modeling using a dedicated software. Obviously, it is rather
+complicated to provide robust support for all the standard Systems Biology
+formats that are now available. We have therefore implemented functions in BiNoM
+for importing and exporting from and to a selection of file formats
+(CellDesigner, BioPAX level 3, CSML, SBML, see table 3 for a detailed
+information on the exact import/export possibilities of BiNoM). For this
+version, the support of SBML is limited to the export capability, but we are
+planning to provide robust SBML import functions for the next software release. 
+BiNoM also implements several functions based on graph operations for the structural analysis of
 biological networks. Those functions can be used to reduce the complexity and
 extract meaningful subnetworks from large scale molecular maps. Here, we provide
 a detailed view on the functions implemented in BiNoM
@@ -338,11 +347,12 @@ Structural Analysis, BioPAX utils \& query, Module manager and Utilities.
 
 \subsection*{BiNoM Input/Output}
 
-BiNoM functions facilitate the import and export of standard Systems Biology
-file formats, but BiNoM plugin is not designed to be a universal converter.
-The goal is more
-to provide robust functions for a finite number of useful conversion and
-analysis scenarios, such as the examples showed below (non-exhaustive list):
+BiNoM functions facilitate the import and export of some of the standard Systems
+Biology file formats, but BiNoM plugin is not designed to be a universal
+converter (for a complete list of the different import/export possibilities in
+BiNoM, see table 3).
+For instance, BiNoM will be useful in the examples of conversion and analysis
+scenarios detailed below (non-exhaustive list):
 
 \begin{itemize}
 
@@ -363,8 +373,7 @@ such as CellDesigner \cite{funahashi2003celldesigner} or GINsim
 
 \end{itemize}
 
-BiNoM allows the user to import and export SBML level 2 files, as well as
-CellDesigner 3.x and 4.x file formats \cite{zinovyev2008binom}. The BioPAX
+The BioPAX
 community has recently made a major update of the BioPAX standard, producing a
 new specification known as BioPAX Level 3 (\url{http://www.biopax.org/}). This
 format supports metabolic pathways, signaling pathways (including states of molecules
@@ -392,34 +401,6 @@ hierarchical organisation of pathways, and the Interaction Map graph
 representing different types of interactions, are shown on figure 1. Figure 2
 shows the hierarchical structure of the human Apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
-
-%------------
-%%%% figure 1
-%\begin{figure}[h] \caption{\label{6biopax3_examples}  \textbf{Visualization of
-%the six BioPAX example files, provided in BioPAX 3.0 documentation.} The BioPAX
-%3.0 documentation available at http://biopax.org contains six simple examples
-%of BioPAX 3.0 files that describe different aspects of biological network
-%interactions (genetic interaction, short metabolic pathway, gene regulatory
-%network, biochemical reaction, phosphorylation, protein interaction). Here we
-%show how BiNoM visualizes these examples after their import. The BiNoM type of
-%representation is indicated below the reaction type, in brackets (Reaction
-%Network, Pathway Structure and Interaction Map). The graphical node and edge
-%semantics is described in more details in the BiNoM manual.}
-%\center{\includegraphics[width=0.9\textwidth]{figures/6biopax3_examples.pdf}}
-%\end{figure}
-
-
-%-------------
-%%%% figure 2
-%\begin{figure}[h]
-% \caption{\label{apoptosishierarchical}  \textbf{Apoptosis pathway 
-%structure.} Representation of BioPAX data extracted from the Reactome database
-%\cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
-%BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
-%triangular nodes denote steps, while grey nodes indicate reactions.}
-% \center{\includegraphics[width=0.9\textwidth]{figures/apoptosis_hierarchical.png}}
-%\end{figure}
-
 
 When importing a file, BiNoM is calling a \emph{naming service} function in
 order to create meaningful names for the various entities. More precisely,
@@ -1177,6 +1158,29 @@ experimental data values (consisting of a real number), such as an expression
 ratio or a t-test statistic value.\null}  \\ \hline
       \end{tabular}
       }
+
+  \subsection*{Table 3 - Detailed import/export BiNoM capabilities for standard Systems Biology file formats.}
+    
+   The table is indicating the different standard Systems Biology file formats and versions that can be imported/exported in BiNoM, as well as what type of conversions are possible.    \par \mbox{}
+    \par
+    \mbox{
+      \begin{tabular}{|l|}
+        %\hline \multicolumn{3}{|c|}{My Table}\\ \hline
+        \hline
+	\textbf{Import from} \\ \hline
+        CellDesigner v3.x, 4.1, 4.2 \\ \hline
+        BioPAX level 3  \\ \hline
+        CSML v3.0  \\ \hline\hline
+        \textbf{Export (from / to)} \\ \hline
+        BioPAX level 3 / BioPAX level 3 \\ \hline
+        BioPAX level 3 / SBML level 2 \\ \hline
+        CellDesigner v3.x, 4.1, 4.2 / CellDesigner v4.1 \\ \hline
+        CellDesigner v3.x, 4.1, 4.2 / BioPAX level 3 \\ \hline
+        CellDesigner v3.x, 4.1, 4.2 / SBML level 2 \\ \hline
+        CSML v3.0 / SBML level 2 \\ \hline
+      \end{tabular}
+      }
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

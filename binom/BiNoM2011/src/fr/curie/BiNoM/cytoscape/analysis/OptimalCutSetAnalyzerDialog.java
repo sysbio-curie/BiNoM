@@ -471,7 +471,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		JPanel p2 = new JPanel(new FlowLayout());
 		maxSetSize = new JTextField(4);
 		maxSetSize.setText("inf");
-		JLabel l1 = new JLabel("Max. set size");
+		JLabel l1 = new JLabel("Max. size of CI");
 		p2.add(l1);
 		p2.add(maxSetSize);
 		c = new GridBagConstraints();
@@ -483,7 +483,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		y++;
 		
 		JPanel p3 = new JPanel(new FlowLayout());
-		JLabel l2 = new JLabel("Max. Nb of (million) intervention sets");
+		JLabel l2 = new JLabel("Max. Nb of (millions) candidate CIs");
 		p3.add(l2);
 		maxSetNb = new JTextField(4);
 		maxSetNb.setEnabled(false);

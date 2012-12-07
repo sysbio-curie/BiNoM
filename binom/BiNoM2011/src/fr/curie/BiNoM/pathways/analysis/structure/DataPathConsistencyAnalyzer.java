@@ -1186,6 +1186,8 @@ public class DataPathConsistencyAnalyzer {
 				int idx = scoreMap.get(t).get(s);
 				piquantAbsScore[idx] = Math.abs(piquantScore[idx]);
 				overallScore[idx] = piquantAbsScore[idx] - sideScore[idx];
+				if (overallScore[idx] < 0)
+					overallScore[idx] = 0;
 			}
 		}
 		
@@ -1229,6 +1231,7 @@ public class DataPathConsistencyAnalyzer {
 					if (elemPathsByTarget.get(target).get(i).contains(source.Id))
 						factor++;
 				}
+				//System.out.println("elem node: "+source.Id+" factor: "+factor);
 				int idx = scoreMap.get(target).get(source);
 				double sco = factor * overallScore[idx];
 				ocsanaScore[idx] = sco;
@@ -1407,7 +1410,7 @@ public class DataPathConsistencyAnalyzer {
 		/*
 		 * print out PIQUANT*SET score matrix on the report
 		 */
-		this.optCutSetReport.append(newline + "PIQUANT*SET Score matrix (elementary nodes x target nodes):" + newline+newline);
+		this.optCutSetReport.append(newline + "PIQUANT x SET Score matrix (elementary nodes x target nodes):" + newline+newline);
 		str = "Elementary node / Target node\t";
 		for (Node t : targetNodes)
 			str += t.Id + "\t";

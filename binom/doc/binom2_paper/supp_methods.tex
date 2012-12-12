@@ -3,19 +3,52 @@
 \usepackage{hyperref}
 
 %opening
-\title{Supplementary methods: tutorial for the modularization of the G1/S network using BiNoM functions}
+\title{Supplementary methods for the manuscript "BiNoM, a Cytoscape plugin for accessing and analyzing pathways using
+standard systems biology formats"}
 \author{}
 
 \begin{document}
 
 \maketitle
 
-\begin{abstract}
-In this tutorial, we describe the step-by-step procedure to extract a compact modular network from a large network representing the cell cycle G1/S transition. The input file can be downloaded from our website \url{http://binom.curie.fr/}.
-\end{abstract}
+%\begin{abstract}
+%In this tutorial, we describe the step-by-step procedure to extract a compact modular network from a large network representing the cell cycle G1/S transition. The input file can be downloaded from our website \url{http://binom.curie.fr/}.
+%\end{abstract}
 
-%\section{}
 
+\section*{Changelog}
+We provide here a list of the main changes that were introduced for the version of BiNoM described in this manuscript, as compared to the original version by Zinovyev et al. \cite{zinovyev2008binom}.
+
+\begin{itemize}
+ \item Support for the export and import of BioPAX level 3 files. Please note
+that versions 2.x of BiNoM accepts only BioPAX level 3 files. The previous
+version of BiNoM (version 1.0) is available from our website
+(\url{http://binom.curie.fr}) for users that would like to process BioPAX level
+2 files.
+
+ \item Module manager: a complete set of functions that simplify the
+visualization and modularization of large molecular networks. The functions rely
+on a new feature introduced with Cytoscape 2.7 and higher and knwon as
+\textit{nested} networks.
+
+ \item Path Influence Quantification algorithm (PIQuant): this algorithm was
+available in beta version in the previous version of BiNoM, but we provide now a
+stable version with detailed explanations on the algorithm and a case study in
+the manuscript.
+
+  \item A complete case study illustrating the principal functions of BiNoM applied to the analysis of a network representing the G1/S transition of the cell cycle.
+
+  \item Numerous bugs in the code have been fixed since the version 1.0 of BiNoM.
+
+\end{itemize}
+
+
+
+\section*{Tutorial for the modularization of the G1/S network using BiNoM functions}
+In this tutorial, we describe the step-by-step procedure to extract a compact
+modular network from a large network representing the cell cycle G1/S
+transition. The input file can be downloaded from our website
+\url{http://binom.curie.fr/}.
 \begin{enumerate}
 \item Import network. \\
 \textbf{Plugins $\rightarrow$ BiNoM 2.1 $\rightarrow$ BiNoM I/O $\rightarrow$ Import CellDesigner document
@@ -84,5 +117,6 @@ edgesInitial network: 209 nodes and 266 edges.
 \end{itemize}
 
 \end{enumerate}
-
+ \bibliographystyle{bmc_article}
+\bibliography{binom2}
 \end{document}

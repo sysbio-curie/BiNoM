@@ -17,8 +17,8 @@
 %%                                     %%
 %% Uses:                               %%
 %% cite.sty, url.sty, bmc_article.cls  %%
-%% ifthen.sty. multicol.sty		   %%
-%%				      	   %%
+%% ifthen.sty. multicol.sty	       %%
+%%				       %%
 %%                                     %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -292,7 +292,9 @@ large scale maps is therefore not a straightforward task. Several computational
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical editing of biological pathway diagrams
-\cite{funahashi2003celldesigner}. The CellDesigner file format correspond to the SBML specification, except that the official SBML layout extension is replaced by a layout specific to the software. Some tools are
+\cite{funahashi2003celldesigner}. The CellDesigner file format correspond to the
+SBML specification, except that the official SBML layout extension is replaced
+by a layout specific to the software. Some tools are
 available for a specific conversion of one file format into another
 \cite{mi2011biopax, buchel2012qualitative}. There is obviously
 a need for user-friendly software tools that would allow the user to easily
@@ -327,7 +329,7 @@ netwok of the G1/S transition of the cell cycle, a central mechanism
 for tumor development and progression.
 
 \section*{Implementation}
-BiNoM is implemented in the Java programming language, as a plugin
+BiNoM is implemented in the Java\texttrademark programming language, as a plugin
 for the network visualization and analysis software package Cytoscape
 \cite{cline2007integration}. Although the primary use of BiNoM is through the
 Cytoscape software, the underlying logic of most of the BiNoM functions is completely
@@ -336,13 +338,30 @@ an independent Java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
 Plugins``, section ''Other'', then select the latest version of BiNoM). Alternatively, the user can
 also download the plugin together with a manual and the source code from the
-BiNoM website
-\url{http://binom.curie.fr/}. 
+BiNoM website \url{http://binom.curie.fr/}. 
 
+BiNoM manipulates the information contained in the standard Systems Biology
+files by mapping it onto a labeled graph, called index. The index does not try
+to map the totality of all details but rather serves as a connection map for the
+objects contained in other ontologies. The index contains the minimum
+information needed to graphically represent objects and connections between
+them. BiNoM index is a light-weight construction which can be easily
+regenerated, does not duplicate the information in existing files and serves
+only to facilitate the visualization and to access existing Systems Biology
+files. Currently, BiNoM index is mostly developed to map BioPAX ontology files
+and CellDesigner object schema. More specifically, we use XmlBeans
+(\url{http://xmlbeans.apache.org/}) to create Java classes from the xml definition file in
+order to access all the elements contained in the CellDesigner, SBML and CSML files.
+BioPAX uses the web ontology language specification (OWL,
+\url{http://www.w3.org/2004/OWL/}) to store data in XML-formatted files. In
+BiNoM, we use the Jastor and the Jena Java libraries
+(\url{http://jastor.sourceforge.net/}, \url{http://jena.sourceforge.net/}) to
+automatically create Java classes from the BioPAX specifications, allowing a
+convenient access to the different data types encoded in the BioPAX files. More
+detailed informations about the index and mapiign are available in the BiNoM
+manual (\url{http://binom.curie.fr}).
 
-BiNoM is designed to handle different Systems Biology file formats and to
-provide useful functions for the analysis of biological networks. The core
-functions of BiNoM can be grouped in five different topics: Input/Output,
+The core functions of BiNoM can be grouped in five different topics: Input/Output,
 Structural Analysis, BioPAX utils \& query, Module manager and Utilities.
 
 \subsection*{BiNoM Input/Output}
@@ -381,23 +400,13 @@ and generic molecules), gene regulatory networks, molecular interactions and
 genetic interactions. Due to major changes in the
 specification, the BioPAX level 3 is not backward compatible with the level 2 file format.
 
-BioPAX is using the web ontology language specification (OWL,
-\url{http://www.w3.org/2004/OWL/}) to store data in XML-formatted files. In
-BiNoM, we use the Jastor and the Jena Java libraries
-(\url{http://jastor.sourceforge.net/}, \url{http://jena.sourceforge.net/}) to
-automatically create Java classes from the BioPAX specifications, allowing a
-convenient access to the different data types encoded in the BioPAX files. The
-guiding principle in BiNoM for the
-access to Systems Biology files is to provide control over the content without
-completely converting the file to the Cytoscape format. The content is therefore
-mapped to a labeled directed graph, representing the complete set of objects and
-their relationships. This graph, called the index, is highly connected and is
-not visualized explicitly. Instead, the user interacts with selected subgraphs
-extracted from the index. For example, BioPAX files are imported as three
+BioPAX level 3 files are imported as three
 separate graphs, respectively the Reaction Network (RN), representing the
 biochemical reaction network, the Pathway Structure (PS), showing the
 hierarchical organisation of pathways, and the Interaction Map graph
-(IM). Several examples of simple BioPAX level 3 files imported through BiNoM,
+(IM). At the moment, the MIRIAM annotations are not imported in BiNoM, but we
+plan to provide access to this type information soon. Several examples of simple
+BioPAX level 3 files imported through BiNoM,
 representing different types of interactions, are shown on figure 1. Figure 2
 shows the hierarchical structure of the human Apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
@@ -734,14 +743,12 @@ As an example of the use of BiNoM functions, we propose to study a reaction netw
 (growth phase) to S phase (DNA replication phase) of the cell cycle
 \cite{calzone2008comprehensive}.
 
-The network published in \cite{calzone2008comprehensive} describes in
-biochemical details the regulation of the well-known and charaterized tumor
-suppressor gene retinoblastoma (RB or RB1). The product of this gene operates at
+In a previous work, we have published a comprehensive map of the regulation of the well-known and charaterized tumor
+suppressor gene retinoblastoma (RB or RB1) \cite{calzone2008comprehensive}. The product of this gene operates at
 the heart of the cell cycle, acting as a signal transducer, connecting the
 cell cycle with the transcriptional machinery. The pathway in which RB is
 acting is disrupted in many human tumor types \cite{weinberg1995retinoblastoma}.
-The comprehensive map of the RB/E2F network was built using CellDesigner
-\cite{funahashi2003celldesigner}. It lists 80 proteins, 208 chemical species, 165
+We used the Celldesigner software to create the map \cite{funahashi2003celldesigner}. It lists 80 proteins, 208 chemical species, 165
 interactions, 176 genes, and recapitulates more than 350 publications, including
 information from different cellular types, thus making the map a generic map of
 the cell cycle regulation. It is composed of two main compartments: the cell,
@@ -927,31 +934,14 @@ striking difference between the non-invasive and invasive states of the disease
 Building a suitable model for systems and mathematical biology is a multi-step
 process, beginning with the collection of biological knowledge and progressing
 towards the formalization of a network and its translation in mathematical
-terms. BiNoM was designed to help during the intermediate steps of this process,
-by providing a convenient access to some standard Systems Biology
-representations such as BioPAX and SBML, by giving the possibility to manipulate the
+terms. BiNoM is designed to help during the intermediate steps of this process,
+by providing a convenient access a selection of standard Systems Biology
+formats, by giving the possibility to manipulate the
 network with various algorithms (mostly based on graph theory)
 and map biological data to it. BiNoM is clearly not a tool for numerical
 simulations, but it provides functions to export final networks to the SBML and
 GINsim file formats (through the GINsim Cytoscape plugin for Boolean modeling), facilitating the
 import into various numerical simulators.
-
-The current development of BiNoM includes novel functions covering various
-areas. A utility is under development that will allow the user to merge several
-independent CellDesigner maps into one by taking into account shared components.
-We are developing a new algorithm to find automatically minimal
-intervention sets to disrupt or modify the
-signaling flow for a given influence network (OCSANA algorithm,
-\cite{Vera-Licona2012OCSANA}). More precisely, an ensemble of paths can be
-defined for an influence network, between a set of annotated nodes and a set of
-target nodes. The algorithm is then finding what are the sets of nodes that will
-cut all the paths if they are removed from the network, a combinatorial problem
-known as the minimal cut set or minimal intervention set. Finally, we are
-also working on an extension of BiNoM that will convert a CellDesigner molecular
-map to a web-based representation of the biological network
-using the Google Map API, with a possibility to easily navigate and zoom within
-the molecular map and curate the network through a dedicated web-blog system (NaviCell
-software, http://navicell.curie.fr).
 
 \section*{Availability and requirements}
 
@@ -964,8 +954,6 @@ software, http://navicell.curie.fr).
 \item License: GNU LGPL
 \item Any restriction to use by non-academics: none
 \end{itemize}
-
-
 
 
 % \section*{Section title}
@@ -1191,7 +1179,7 @@ ratio or a t-test statistic value.\null}  \\ \hline
 
 \section*{Additional Files}
   \subsection*{Supplementary methods}
-	Detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
+	Changelog for BiNoM version 2.0 compared to version 1.0 and detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
   \subsection*{Supplementary table 1}
 	PIQuant score values for all the annotated nodes (rows) and all the target nodes (columns) of the G1/S influence network.
 

@@ -311,7 +311,7 @@ mathematical modeling using a dedicated software. Obviously, it is rather
 complicated to provide robust support for all the standard systems biology
 formats that are now available. We have therefore implemented functions in BiNoM
 for importing and exporting from and to a selection of file formats
-(CellDesigner, BioPAX Level 3, CSML, SBML, see table 3 for a detailed
+(CellDesigner, BioPAX Level 3, CSML, SBML, see Table 3 for a detailed
 information on the exact import/export possibilities of BiNoM). For this
 version, the support of SBML is limited to the export capability, but we are
 planning to provide robust SBML import functions for the next software release. 
@@ -369,7 +369,7 @@ Structural Analysis, BioPAX utils \& query, Module manager and Utilities.
 BiNoM functions facilitate the import and export of some of the standard systems
 biology file formats, but BiNoM plugin is not designed to be a universal
 converter (for a complete list of the different import/export possibilities in
-BiNoM, see table 3).
+BiNoM, see Table 3).
 For instance, BiNoM will be useful in the examples of conversion and analysis
 scenarios detailed below (non-exhaustive list):
 
@@ -407,7 +407,7 @@ hierarchical organisation of pathways, and the Interaction Map graph
 (IM). At the moment, the MIRIAM annotations are not imported in BiNoM, but we
 plan to provide access to this type information soon. Several examples of simple
 BioPAX Level 3 files imported through BiNoM,
-representing different types of interactions, are shown on figure 1. Figure 2
+representing different types of interactions, are shown on Figure 1. Figure 2
 shows the hierarchical structure of the human Apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
 
@@ -491,7 +491,7 @@ cycles involving CDC25 after a cycle decomposition.
 
 BiNoM analysis functions also include classical path analysis
 algorithms, such as finding the shortest paths, the suboptimal shortest paths or
-all non self-intersecting paths (table 1). The shortest path is calculated as the path having
+all non self-intersecting paths (Table 1). The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the suboptimal path is constructed by removing all edges of
 all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths 
@@ -553,7 +553,7 @@ non self-intersecting paths, see previous paragraph). The annotation
 $\alpha_k$ of the path $k$ is defined as the annotation
 of the first node of the path. We define the sign $\sigma_k$
 of the path $k$ as the product of the signs of every edge of the path and 
-the length $\lambda_k$ of the path $k$ as the number of edges in the path. A summary of the input data types is shown in table 2. We
+the length $\lambda_k$ of the path $k$ as the number of edges in the path. A summary of the input data types is shown in Table 2. We
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
 not require the estimation or calculation of extra parameters.
@@ -564,7 +564,7 @@ $$
  PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
-In the case of the network presented in figure 5a, let us
+In the case of the network presented in Figure 5a, let us
 consider Ac the annotated node and Ph the target node and consider only the two
 paths defined in the Figures 5b and
 5c. Given that the
@@ -655,7 +655,7 @@ such as the \textit{Homo sapiens} network from the Reactome database
 BiNoM implements a set of functions precisely aiming at allowing end users to
 easily visualize and modify BioPAX files. The functions are using
 Java class introspection techniques to build a BioPAX class tree. Then, the
-content of the file can easily be accessed. For example, figure 6 shows
+content of the file can easily be accessed. For example, Figure 6 shows
 all the information linked to the TRAIL protein, after a call to the
 BioPAX property
 editor function of the BiNoM menu has been made (for more details see the BiNoM manual available at \url{http://binom.curie.fr}).
@@ -767,7 +767,7 @@ used the intersection of the 208 chemical species
 of RB/E2F network and the 280 chemical species listed in Reactome \cite{joshi2005reactome} for the G1-S transition
 (referred to as \emph{Mitotic G1 G1/S phases} in Reactome). The resulting
 subnetwork contains 38 proteins, 98 chemical species, and 100 biochemical
-reactions (figure 8).
+reactions (Figure 8).
 
 %-----------
 %%% figure 8
@@ -805,7 +805,7 @@ conversion is
 available in \cite{calzone2011calamar}.
 
 We applied PIQuant to the resulting influence network of the G1/S transition of
-the cell cycle (figure 9). We selected three target nodes as
+the cell cycle (Figure 9). We selected three target nodes as
 markers of the G1, S and M
 phases of the cell cycle. For the experimental data, we used expression data
 from a study of 57 bladder cancer
@@ -844,12 +844,12 @@ get a complete report, detailing the global and individual PIQuant scores from
 each annotated node to each cell-cycle phase marker (for more details on
 the interactive window and the report, see the BiNoM manual).
 The global PIQuant score from each annotated source node to each target is
-represented as a heatmap on figure 10 (the list of nodes and all the PIQuant
-score values corresponding to the heatmap figure are available as supplementary
-table 1). We can see on this figure that most
+represented as a heatmap on Figure 10 (the list of nodes and all the PIQuant
+score values corresponding to the heatmap Figure are available as supplementary
+Table 1). We can see on this Figure that most
 genes have positive scores (red coloring on the heatmap), in cancer cells compared to normal cells, indicating that they influence positively the M and
 S phases, corresponding to an enhanced proliferation for tumor cells.
-A clear difference can be observed when comparing the heapmap to figure 9, where
+A clear difference can be observed when comparing the heapmap to Figure 9, where
 the color values represent only experimental data values. The heatmap represents
 this time the integration of both experimental data and the network
 architecture through the PIQuant score.
@@ -896,7 +896,7 @@ and E2F6. Finally, we generated a modular view of all the individual modules, us
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the modeler. Our final
 modular view is composed of 9 modules, with 22
-edges connecting them (figure 11). 
+edges connecting them (Figure 11). 
 
 
 %-------------
@@ -1180,7 +1180,7 @@ ratio or a t-test statistic value.\null}  \\ \hline
 \section*{Additional Files}
   \subsection*{Supplementary methods}
 	Changelog for BiNoM version 2.0 compared to version 1.0 and detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
-  \subsection*{Supplementary table 1}
+  \subsection*{Supplementary Table 1}
 	PIQuant score values for all the annotated nodes (rows) and all the target nodes (columns) of the G1/S influence network.
 
 \end{bmcformat}

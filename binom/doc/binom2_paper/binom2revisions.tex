@@ -312,9 +312,10 @@ complicated to provide robust support for all the standard systems biology
 formats that are now available. We have therefore implemented functions in BiNoM
 for importing and exporting from and to a selection of file formats
 (CellDesigner, BioPAX Level 3, CSML, SBML, see Table 3 for a detailed
-information on the exact import/export possibilities of BiNoM). For this
-version, the support of SBML is limited to the export capability, but we are
-planning to provide robust SBML import functions for the next software release. 
+information on the exact import/export possibilities of BiNoM). BiNoM uses its
+own ontology for the graphical representation of the different entities and
+their relationships. The graphical conventions in BiNoM are inspired by the ones defined for the SBGN standard
+(see the BiNoM manual chapter 8 for a more complete description).
 BiNoM also implements several functions based on graph operations for the structural analysis of
 biological networks. Those functions can be used to reduce the complexity and
 extract meaningful subnetworks from large-scale molecular maps. Here, we provide
@@ -323,7 +324,7 @@ that permit specific extraction of information from molecular maps
 and improve their readability and usability. We also highlight novel functions
 that were implemented recently, such as the support of the latest BioPAX
 specification (BioPAX Level 3) and an algorithmic approach for the
-quantification of pathways on influence networks (PIQuant). We illustrate the
+quantification of pathways on influence networks (PIQuant, Pathway Influence Quantification algorithm). We illustrate the
 use of the principal BiNoM functions with a detailed analysis of a molecular
 netwok of the G1/S transition of the cell cycle, a central mechanism
 for tumor development and progression.
@@ -336,7 +337,7 @@ Cytoscape software, the underlying logic of most of the BiNoM functions is compl
 decoupled from the Cytoscape objects, allowing developers to also use BiNoM as
 an independent Java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
-Plugins", section ``Other", then select the latest version of BiNoM). Alternatively, the user can
+Plugins", Section ``Other", then select the latest version of BiNoM). Alternatively, the user can
 also download the plugin together with a manual and the source code from the
 BiNoM website \url{http://binom.curie.fr/}. 
 
@@ -364,7 +365,7 @@ manual (\url{http://binom.curie.fr}).
 The core functions of BiNoM can be grouped in five different topics: Input/Output,
 Structural Analysis, BioPAX utils \& query, Module manager and Utilities.
 
-\subsection*{BiNoM Input/Output}
+\subsection*{BiNoM input / output}
 
 BiNoM functions facilitate the import and export of some of the standard systems
 biology file formats, but BiNoM plugin is not designed to be a universal
@@ -408,7 +409,7 @@ hierarchical organisation of pathways, and the Interaction Map graph
 plan to provide access to this type information soon. Several examples of simple
 BioPAX Level 3 files imported through BiNoM,
 representing different types of interactions, are shown on Figure 1. Figure 2
-shows the hierarchical structure of the human Apoptosis pathway, extracted
+shows the hierarchical structure of the human apoptosis pathway, extracted
 from Reactome database, and constructed by BiNoM.
 
 When importing a file, BiNoM is calling a \emph{naming service} function in
@@ -424,7 +425,7 @@ cytosplasm, composed of the protein Cdc13 and the protein Cdc2 phosphorylated at
 position 167 on a threonine residue.
 
 
-\subsection*{BiNoM Structural Analysis}
+\subsection*{BiNoM structural analysis}
 The central goal of the BiNoM plugin is to provide efficient methods
 and algorithms to reduce the inherent complexity of biological networks into
 manageable and meaningful subnetworks. This goal is achieved by a set of
@@ -510,8 +511,7 @@ as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
 
-In this version of BiNoM, we have introduced a novel approach called PIQuant
-(Pathway Influence Quantification). It consists of associating a score to a
+In this version of BiNoM, we have introduced a novel approach called PIQuant. It consists of associating a score to a
 target node of interest for a given network, that will quantify the effect of
 experimental data.
 A target node can be a gene, or a phenotype of interest, that represents a more complex
@@ -647,7 +647,7 @@ exchange of data between various database systems \cite{demir2010biopax}. As a
 consequence, this format was designed first to be machine-readable, but was not
 intended
 to be edited and modified by biologists. Furthermore, due to its adoption by
-large biological knowledge repositories, some BioPAX files can be really big,
+large biological knowledge repositories, some BioPAX files can be really large,
 such as the \textit{Homo sapiens} network from the Reactome database
 \cite{joshi2005reactome} that has more than 6,000 reactions involving more than
 8,000 chemical species (proteins, RNA molecules, metabolites, etc.).
@@ -670,7 +670,7 @@ editor function of the BiNoM menu has been made (for more details see the BiNoM 
 %\end{figure}
 
 
-The BioPAX Query functions in BiNoM allow the user to work with huge
+The BioPAX query functions in BiNoM allow the user to work with huge
 BioPAX data files and extract the relevant information, by querying an index and
 retrieving data from it. The index corresponds to a mapping of the content of
 the BioPAX file on a labeled graph (an index file is created and saved, using
@@ -685,7 +685,7 @@ sources and targets of the reactions) and related publications. Figure 7
 illustrates an example of a small network extracted from the human apoptosis
 pathway downloaded from the Reactome database \cite{joshi2005reactome}, and
 centered on the SMAC protein, with all the protein complexes in which
-this protein is involved and that were added using the BiNoM BioPAX Query functions.
+this protein is involved and that were added using the BiNoM BioPAX query functions.
 
 %-----------
 %%% figure 7
@@ -697,7 +697,7 @@ this protein is involved and that were added using the BiNoM BioPAX Query functi
 % \center{\includegraphics[width=0.7\textwidth]{figures/smac_complexes.png}}
 %\end{figure}
 
-\subsection*{BiNoM Module manager}
+\subsection*{BiNoM module manager}
 
 To facilitate the visualization of large molecular networks, we propose a set of
 functions that simplify them by creating modules from selected parts of the
@@ -715,15 +715,15 @@ and their relationships as an abstracted version of the comprehensive network
 To facilitate the creation and management of modules, we have used in this
 version of BiNoM a new feature introduced in recent versions of Cytoscape (as of
 version 2.7) \cite{cline2007integration}, known as \emph{nested} networks. This
-feature allows to embed any cytoscape network in a (meta)node. It was
-introduced to allow the creation of network hierarchies and circular
+feature allows the user to embed any cytoscape network in a (meta)node. It was
+introduced for the creation of network hierarchies and circular
 relationships. In BiNoM, we use this feature to facilitate the process of
 modularization of a large network. The BiNoM module manager integrates
-functions that allow to easily create a network from a list of subnetworks,
+functions that allow users to easily create a network from a list of subnetworks,
 packing individual nodes, merging different subnetworks, displaying information
 about metanodes and calculating the intersection between subnetworks.
 
-\subsection*{BiNoM Utilities}
+\subsection*{BiNoM utilities}
 This set of functions corresponds to various small utilities that are not
 implemented in Cytoscape yet, but might be very useful for the analysis and
 manipulation of networks. For example, it is possible to automatically select
@@ -738,7 +738,7 @@ clipboard functions, giving the possibility to copy, add and paste
 selected nodes and edges and also to show the clipboard content.
 
 
-\section*{Results and Discussion}
+\section*{Results and discussion}
 As an example of the use of BiNoM functions, we propose to study a reaction network focusing on the transition from G1 phase
 (growth phase) to S phase (DNA replication phase) of the cell cycle
 \cite{calzone2008comprehensive}.
@@ -838,7 +838,7 @@ PIQuant is applied to this network and its annotation, by using the function
 analysis''. We selected the option ``optimal and
 suboptimal shortest path'' as the algorithm to extract the paths. The PIQuant
 score is then automatically calculated for each association
-between aa annotated node and a target node. The user can browse the results on an
+between an annotated node and a target node. The user can browse the results on an
 interactive window detailing the different paths and their scores, and can also
 get a complete report, detailing the global and individual PIQuant scores from
 each annotated node to each cell-cycle phase marker (for more details on
@@ -891,7 +891,7 @@ the 7 clusters obtained with a name that illustrates the content and the main
 function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
 content of each module, making modifications if necessary by adding or deleting nodes, according to specific biological knowledge.
 For example, the module E2F1\_RB is
-further decomposed in three different modules containing the proteins RB, E2F1
+further decomposed in three different modules containing the proteins RB, E2F1,
 and E2F6. Finally, we generated a modular view of all the individual modules, using the Module Manager functions.
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the modeler. Our final
@@ -915,7 +915,7 @@ The modular view offers a simplified visualization of the complex network,
 without losing any information of the global map. The
 obtained model is more abstract but highlights some aspects that may not be
 evident from the comprehensive reaction network. For instance, it brings into
-relief feedbacks (positive, negative or feedforward) involving the major players of the
+relief feedbacks (positive, negative, or feedforward) involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
 of this modular network into a Boolean model, for instance, is indeed straightforward. Another
 application for the modular model would be to analyze experimental data such as
@@ -1055,9 +1055,9 @@ The information is automatically extracted from the BioPAX file upon
 import with the BiNoM I/O functions.
 
   \subsection*{Figure 7 - SMAC pathway subnetwork.}
-Subnetwork extracted from the human Apoptosis pathway, starting with the
+Subnetwork extracted from the human apoptosis pathway, starting with the
 SMAC protein (white square) and expanding to all protein complexes where this
-molecule is involved (grey squares) using the BiNoM Query functions.
+molecule is involved (grey squares) using the BiNoM query functions.
 
   \subsection*{Figure 8 - G1/S network.}
 Overview of the G1 to S transition network, corresponding to the intersection of
@@ -1179,7 +1179,7 @@ ratio or a t-test statistic value.\null}  \\ \hline
 
 \section*{Additional Files}
   \subsection*{Supplementary methods}
-	Changelog for BiNoM version 2.0 compared to version 1.0 and detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
+	Installation procedure for BiNoM, changelog for BiNoM version 2.0 compared to version 1.0 and detailed tutorial for the creation of a modular view of the G1/S network using BiNoM functions.
   \subsection*{Supplementary Table 1}
 	PIQuant score values for all the annotated nodes (rows) and all the target nodes (columns) of the G1/S influence network.
 

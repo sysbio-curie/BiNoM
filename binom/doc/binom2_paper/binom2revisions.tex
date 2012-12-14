@@ -294,15 +294,22 @@ of pathways \cite{adriaens2008public}. For example, CellDesigner is a software p
 for the graphical editing of biological pathway diagrams
 \cite{funahashi2003celldesigner}. The CellDesigner file format correspond to the
 SBML specification, except that the official SBML layout extension is replaced
-by a layout specific to the software. Some tools are
-available for a specific conversion of one file format into another
-\cite{mi2011biopax, buchel2012qualitative}. There is obviously
+by a layout specific to the software.  There is obviously
 a need for user-friendly software tools that would allow the user to easily
 import data from various standard format sources, to perform structural analyses on these pathways
 and to manipulate networks, and to be able to export a network to a suitable
 format for further analysis. We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
 network vizualization and analysis tool \cite{cline2007integration} precisely to fulfill this purpose.
+There are several tools available for the import, visualisation and export of standard systems biology file formats, as well as their their conversion 
+\cite{funahashi2003celldesigner, mi2011biopax, buchel2012qualitative, ruebenacker2009integrating, konig2012cysbml}. There is also a significant number of tools for network analysis 
+\cite{su2010glay, bader2003automated, szalay2012moduland,
+morris2011clustermaker, rivera2010nemo}. However, we think that the stength of
+BiNoM is to provide at the same time a strong support for a choice of systems
+biology file formats, a set of robust and powerful network analysis tools, and
+also some very speficic functions that are not available in any other tool at
+the moment (see Table 4 for a detailed comparison of BiNoM's function with other
+tools).
 BiNoM is designed to be useful in a finite set of pragmatic, user-oriented and
 useful scenarios for biological networks analysis. For instance, a user may want
 to import a molecular map from a CellDesigner file, analyze it using graph-based
@@ -1170,7 +1177,65 @@ ratio or a t-test statistic value.\null}  \\ \hline
       \end{tabular}
       }
 
+  \subsection*{Table 4 - Comparison of BiNoM functionalities with other software tools.}
+    
+   The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}, 
+biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012cysbml}), ShortestPath (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay (\cite{su2010glay}), MCode (\cite{bader2003automated}), ModuLand (\cite{szalay2012moduland}),
+ clusterMaker (\cite{morris2011clustermaker}), NeMo (\cite{rivera2010nemo}).
 
+
+
+   \par \mbox{}
+\begin{center}
+    \par
+    \mbox{
+%\tiny
+      \scalebox{0.55}{
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+
+        \hline
+	\textbf{Function}      & \textbf{BiNoM} & \textbf{CellDesigner} & \textbf{BioPAX2SBML} & \textbf{SyBiL} & \textbf{SBFC} & \textbf{biographer} & \textbf{cySBML} & \textbf{ShortestPath} & \textbf{Glay} & \textbf{MCode} & \textbf{Moduland} & \textbf{clusterMaker} & \textbf{NeMo}\\ \hline
+        Standalone application & $\circ$        & $\bullet$ & $\bullet$ & $\bullet$      & $\bullet$     & $\bullet$           & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$          & $\circ$               &  $\circ$      \\ \hline
+        Cytoscape plugin       & $\bullet$      &$\circ$&$\circ$& $\circ$        & $\circ$       & $\circ$             & $\bullet$     & $\bullet$             &  $\bullet$    &  $\bullet$     &  $\bullet$         & $\bullet$            &  $\bullet$      \\ \hline
+        BioPAX import          & $\bullet$      & $\bullet$ & $\bullet$ & $\bullet$      & $\bullet$     & $\circ$             & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        BioPAX visualization   & $\bullet$      & $\bullet$ & $\circ$ & $\bullet$      & $\circ$       & $\circ$             & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        BioPAX properties editor & $\bullet$   & $\circ$ & $\circ$ & $\circ$      & $\circ$       & $\circ$             & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        BioPAX queries          & $\bullet$    & $\circ$ & $\circ$& $\circ$      & $\circ$       & $\circ$             & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        BioPAX export          & $\bullet$      & $\circ$ & $\circ$& $\bullet$      & $\bullet$     & $\circ$             & $\circ$       & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        SBML import            & $\bullet$      & $\bullet$ & $\circ$& $\bullet$      & $\bullet$     & $\bullet$           & $\bullet$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        SBML visualization     & $\bullet$      & $\bullet$ & $\circ$& $\bullet$      & $\circ$       & $\bullet$           & $\bullet$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        SBML validation        & $\circ$      & $\circ$ & $\circ$& $\circ$      & $\bullet$     & $\circ$           & $\bullet$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        SBML layout and & & & & & & & & & & & & &
+         \\qualitative support & $\circ$     & $\circ$ & $\bullet$ & $\circ$      & $\circ$       & $\circ$           & $\bullet$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        CellDesigner import, & & & & & & & & & & & & &
+         \\visualization and export & $\bullet$      &$\bullet$&$\circ$& $\circ$      & $\circ$       & $\circ$     & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        CSML import            & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        CSML visualization     & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Cytoscape extra & & & & & & & & & & &
+                   \\utilities & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Get connected  & & & & & & & & & & & & & 
+            \\network components & $\bullet$ &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\bullet$       &  $\circ$           & $\bullet$            &  $\bullet$      \\ \hline
+        Semantic clustering  & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Community structure  & & & & & & & & & & & & &
+                \\clustering  & $\circ$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\bullet$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Hierarchical modules  & & & & & & & & & & & & &
+                \\clustering  & $\circ$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\bullet$           & $\circ$            &  $\circ$      \\ \hline
+        Multiple standard  & & & & & & & & & & & & &
+                \\clustering methods & $\circ$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\bullet$            &  $\circ$      \\ \hline
+
+        Network decomposition & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Get shortest paths    & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\bullet$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Get optimal and suboptimal & & & & & & & & & & & & &
+          \\shortest paths    & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Get all  & & & & & & & & & & & & &
+          \\non-intersecting paths    & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Path influence quantification & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        Module manager       & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
+        
+\hline
+      \end{tabular}
+      }}
+\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%

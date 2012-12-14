@@ -487,6 +487,14 @@ cycles in larger subnetworks before applying the decomposition function.
 Figure 4 shows two
 cycles involving CDC25 after a cycle decomposition.
 
+Obviously, the result of some decomposition functions will result in subnetworks
+that share some components, as it is for example often the case
+with the decomposition in material components. Therefore, BiNoM also includes a
+function to \emph{cluster} networks, based on common components such as protein
+or protein complexes. To determine the size of the clusters, the user can
+specify a percentage of intersection (ranging from 0 to 100\%) that will be used
+as a threshold to create the clusters.
+
 %-----------
 %%% figure 4
 %\begin{figure}[h]
@@ -508,13 +516,6 @@ The user should be careful when using this procedure, as the number of paths bet
 very large for big networks. In order to limit the number of paths found, BiNoM
 allows to specify the maximal length of the path to be found.
 
-Obviously, the result of some decomposition functions will result in subnetworks
-that share some components, as it is for example often the case
-with the decomposition in material components. Therefore, BiNoM also includes a
-function to \emph{cluster} networks, based on common components such as protein
-or protein complexes. To determine the size of the clusters, the user can
-specify a percentage of intersection (ranging from 0 to 100\%) that will be used
-as a threshold to create the clusters.
 
 \subsubsection*{Pathway influence quantification algorithm}
 
@@ -785,7 +786,7 @@ reactions (Figure 8).
 % \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
 %\end{figure}
 
-This map contains a lot of valuable information but rather difficult to extract. We present two
+This map contains a lot of valuable information but this one is rather difficult to extract. We present two
 ways to get some biological insight from this map, by using BiNoM functions. The first one consists of
 transforming the reaction network into an influence network in order to analyze
 experimental data on it. The second one presents a simplification of the comprehensive map by
@@ -1038,7 +1039,7 @@ Network, Pathway Structure and Interaction Map). The graphical node and edge
 semantic is described in more details in the BiNoM manual.
 
   \subsection*{Figure 2 - Apoptosis pathway structure.}
-Representation of BioPAX data extracted from the Reactome database
+Zoom on a portion of the representation of BioPAX data extracted from the Reactome database
 \cite{joshi2005reactome}, corresponding to the Apoptosis pathway and imported through
 BiNoM, using Pathway Structure BioPAX representation. The green nodes represent pathways, the pink
 triangular nodes denote steps, while grey nodes indicate reactions.

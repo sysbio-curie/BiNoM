@@ -48,7 +48,7 @@ function extend(bounds, marker)
 	var xoffset = marker_width / 2 / scale
 	var proj = map.getProjection();
 	console.log("extend: proj", proj);
-	if (typeof prof !== 'undefined')
+	if (typeof proj !== 'undefined')
 	{
 		var point = proj.fromLatLngToPoint(marker.getPosition());
 		var height_in_world_coords = marker_height / scale;

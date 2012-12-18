@@ -892,10 +892,10 @@ described in the supplementary methods.
 
 Briefly, we first decomposed the global network into its different components,
 by using name semantics, to isolate the subnetworks in which
-each protein is involved (decomposition in material components). The 36 networks that are created this way may share a
+each protein is involved (decomposition in material components). The 29 networks that are created this way may share a
 lot of common chemical species, so we went further
 by clustering the subnetworks having at least 25\% of common chemical species. We renamed
-the 7 clusters obtained with a name that illustrates the content and the main
+the 9 clusters obtained with a name that illustrates the content and the main
 function of the clusters (such as E2F1\_RB, Wee1, etc.). Then, we checked the
 content of each module, making modifications if necessary by adding or deleting nodes, according to specific biological knowledge.
 For example, the module E2F1\_RB is
@@ -903,7 +903,7 @@ further decomposed in three different modules containing the proteins RB, E2F1,
 and E2F6. Finally, we generated a modular view of all the individual modules, using the Module Manager functions.
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the modeler. Our final
-modular view is composed of 9 modules, with 22
+modular view is composed of 11 modules, with 27
 edges connecting them (Figure 11). 
 
 
@@ -921,7 +921,7 @@ edges connecting them (Figure 11).
 
 The modular view offers a simplified visualization of the complex network,
 without losing any information of the global map. The
-obtained model is more abstract but highlights some aspects that may not be
+ model obtained is more abstract but highlights some aspects that may not be
 evident from the comprehensive reaction network. For instance, it brings into
 relief feedbacks (positive, negative, or feedforward) involving the major players of the
 cell cycle, and prepares the network for mathematical modeling. The translation
@@ -972,10 +972,15 @@ import into various numerical simulators.
 \bigskip
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section*{Author's contributions}
+\section*{Competing interests}
 %    Text for this section \ldots
+The authors declare that they have no conflict of interest.
 
-
+\section*{Author's contributions}
+EB, AZ and LC designed the study. EB, AZ and DR wrote the code. EB, AZ, LC, DR
+and GS generated the data, performed the analyses and interpreted the results.
+EB, AZ and LC wrote the manuscript. AZ and EmB supervised the study. All authors
+edited and approved the final version of the manuscript.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}

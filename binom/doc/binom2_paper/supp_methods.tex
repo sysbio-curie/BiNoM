@@ -67,9 +67,9 @@ transition. The input file can be downloaded from our website
 \url{http://binom.curie.fr/}.
 \begin{enumerate}
 \item Import network. \\
-\textbf{Plugins $\rightarrow$ BiNoM 2.1 $\rightarrow$ BiNoM I/O $\rightarrow$ Import CellDesigner document
-from file}.  \\
-Choose G1S.xml
+\textbf{File $\rightarrow$ Import $\rightarrow$ Network (Multiple File Types)...}\\
+Choose the file g1s\_209\_266.xgmml.
+The network ``G1S" is created in Cytoscape.
 
 % fournir le fichier xml correspondant
 
@@ -78,14 +78,14 @@ We choose to decompose the network according to the different components present
 in the map rather than decomposing according to the cycles of the network. 
 \textbf{Plugins $\rightarrow$ BiNoM 2.1 $\rightarrow$ BiNoM Analysis $\rightarrow$ Get Material
 Components…}.\\
-36 subnetworks are created.
+29 subnetworks are created.
 
 \item	Clustering. \\
 The resulting subnetworks may share a lot of species. To reduce the number of
 subnetworks, we cluster them with an overlap of 25\%. \\
 \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM Analysis $\rightarrow$ Cluster networks}. \\
 A pop-up window appears. Among the proposed networks, select all networks except
-G1S.xml and choose 25\% overlap. 7 networks are created.
+G1S.xml and choose 25\% overlap. 9 networks are created.
 
 \item	Rename the newly-created clusters.
 It is important to rename right away the clusters with a name that illustrates
@@ -94,43 +94,31 @@ Choosing the appropriate name might be facilitated by listing the name of the
 components of the cluster: \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM module manager
 $\rightarrow$ List components of species in network and modules} \\
 To rename them, right-click on the Network panel.
-We propose to use the following names for these 7 clusters: \textbf{E2F1\_RB},
-\textbf{CycD1}, \textbf{CycE\_A}, \textbf{Wee1}, \textbf{p21}, \textbf{CycH} and
-\textbf{CycB1}.
-
+We propose to use the following names for these 9 clusters: \textbf{E2F1\_RB},
+\textbf{CycD1}, \textbf{CycE\_A}, \textbf{Wee1}, \textbf{p21}, \textbf{CycH}, \textbf{CycB1}, \textbf{CDC25} and \textbf{CDC20}.
 
 \item	Inside the clusters, check the content of the modules (manual curation
 of the modularization).
 
 \begin{itemize}
 \item	For cluster E2F1\_RB, separate RB from E2F1 and from E2F6 and create
-three different modules. \textbf{Select $\rightarrow$ Nodes $\rightarrow$ By Name}. Write E2F6. The
+three different modules. \textbf{Select $\rightarrow$ Nodes $\rightarrow$ By Name}. Write ``*E2F6*". The
 nodes with E2F6 are highlighted.Select the reactions between the nodes.
 \textbf{Select $\rightarrow$ Nodes $\rightarrow$ First neighbours of selected nodes}. \textbf{File $\rightarrow$ New
  $\rightarrow$ Network $\rightarrow$ From selected nodes all edges}. Rename E2F1\_RB child and delete the
 nodes from E2F1\_RB network.
 \item	Do the same for pRB.
 \item	Rename the remaining network of E2F1\_RB, E2F1.
-\item	For cluster, CycB1, select CDC25 and create a new module with components
-including CDC25.
-\item	The resulting list of modules is: CDC25, CycB1, Wee1, CycH, p21, CycD1,
-CycE\_A, E2F1, RB and E2F6.
+%\item	For cluster, CycB1, select CDC25 and create a new module with components
+%including CDC25.
+\item	The resulting list of modules is: CDC25, CDC20, CycB1, Wee1, CycH, p21, CycD1,
+CycE\_A, E2F1, RB, E2F6.
 \end{itemize}
 
 \item	Select modules to prepare the modular view. In the pop-up window, choose
-the 10 modules. \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM modules $\rightarrow$ Create nested network}.
-\item	Connect modules. \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM modules $\rightarrow$ Update connections between
-nests.}
-\item   Verify the resulting modular view
+the 11 modules. \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM Module Manager$\rightarrow$ Create Network of Modules}.
+\item	Connect modules. \textbf{Plugins $\rightarrow$  BiNoM 2.1 $\rightarrow$ BiNoM Module Manager $\rightarrow$ Create Connections between Modules.}
 
-\begin{itemize}
-\item	Merge networks (modules). \textbf{Plugins - Advanced network merge}.
-Choose union and the 10 modules. Resulting network: 209 nodes and 476
-edgesInitial network: 209 nodes and 266 edges.
-
-\item	Update connections from other network.
-\item	Network difference.
-\end{itemize}
 
 \end{enumerate}
  \bibliographystyle{bmc_article}

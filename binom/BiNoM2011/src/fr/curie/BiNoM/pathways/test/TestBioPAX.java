@@ -55,7 +55,7 @@ public class TestBioPAX {
      createBiopaxIndividual(individualName,individualClass,biopaxmodel);
      }
 
-      // Create an individual in the class “unificationXref” for every protein
+      // Create an individual in the class unificationXref for every protein
       for (int i = 0; i < proteinName.length; i++) {
       // Create the name of the individual
       individualName = "Xref" + i;
@@ -63,7 +63,7 @@ public class TestBioPAX {
       createBiopaxIndividual(individualName,individualClass,biopaxmodel);
       }
 
-       // Add the property “NAME” to every protein
+       // Add the property NAME to every protein
        propertyName = "NAME";
        for(int i = 0; i < proteinName.length; i++) {
        // Create the name of the individual

@@ -10,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.*;
  * <p>(URI: http://www.biopax.org/release/biopax-level3.owl#EntityReferenceTypeVocabulary)</p>
  * <br>
  * RDF Schema Standard Properties <br>
- * 	comment : Definiiton: A reference to a term from an entity reference group ontology. As of the writing of this documentation, there is no standard ontology of these terms, though a common type is ‘homology’.^^http://www.w3.org/2001/XMLSchema#string <br>
+ * 	comment : Definiiton: A reference to a term from an entity reference group ontology. As of the writing of this documentation, there is no standard ontology of these terms, though a common type is homology.^^http://www.w3.org/2001/XMLSchema#string <br>
  * <br>
  * <br>
  */

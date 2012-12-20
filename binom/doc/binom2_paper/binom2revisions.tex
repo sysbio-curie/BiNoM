@@ -254,7 +254,7 @@ cellular process disturbed in most human tumors.
 
 Biological pathways and networks comprise sets of interactions, or functional
 relationships, occurring at the molecular Level in living cells
-\cite{adriaens2008public, cary2005pathway}. 
+\cite{adriaens2008public, cary2005pathway}.
 A large body of knowledge on cellular biochemistry is organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
 \cite{joshi2005reactome}, MINT \cite{zanzoni2002mint}, or the Cancer Cell Map
@@ -301,17 +301,17 @@ and to manipulate networks, and to be able to export a network to a suitable
 format for further analysis. We have created
 BiNoM \cite{zinovyev2008binom}, a software plugin for the popular Cytoscape
 network vizualization and analysis tool \cite{cline2007integration} precisely to fulfill this purpose.
-There are several tools available for the import, visualisation and export of standard systems biology file formats, as well as their their conversion 
-\cite{funahashi2003celldesigner, mi2011biopax, buchel2012qualitative, ruebenacker2009integrating, konig2012cysbml}. There is also a significant number of tools for network analysis 
+There are several tools available for the import, visualisation and export of standard systems biology file formats, as well as their their conversion
+\cite{funahashi2003celldesigner, mi2011biopax, buchel2012qualitative, ruebenacker2009integrating, konig2012cysbml}. There is also a significant number of tools for network analysis
 \cite{su2010glay, bader2003automated, szalay2012moduland,
-morris2011clustermaker, rivera2010nemo}. However, we think that the stength of
+morris2011clustermaker, rivera2010nemo}. However, we think that the strength of
 BiNoM is to provide at the same time a strong support for a choice of systems
 biology file formats, a set of robust and powerful network analysis tools, and
 also some very speficic functions that are not available in any other tool at
 the moment (see Table 4 for a detailed comparison of BiNoM's function with other
 tools).
 BiNoM is designed to be useful in a finite set of pragmatic, user-oriented and
-useful scenarios for biological networks analysis. For instance, a user may want
+proved to be needed scenarios for biological networks analysis. For instance, a user may want
 to import a molecular map from a CellDesigner file, analyze it using graph-based
 algorithms, and finally export a subnetwork of interest to the SBML format for
 mathematical modeling using a dedicated software. Obviously, it is rather
@@ -346,7 +346,7 @@ an independent Java library \cite{zinovyev2008binom}. The installation of BiNoM
 can be done through the Cytoscape plugin manager (menu ``Plugins $>$ Manage
 Plugins", Section ``Other", then select the latest version of BiNoM). Alternatively, the user can
 also download the plugin together with a manual and the source code from the
-BiNoM website \url{http://binom.curie.fr/}. 
+BiNoM website \url{http://binom.curie.fr/}.
 
 BiNoM manipulates the information contained in the standard systems biology
 files by mapping it onto a labeled graph, called index. The index does not try
@@ -366,7 +366,7 @@ BiNoM, we use the Jastor and the Jena Java libraries
 (\url{http://jastor.sourceforge.net/}, \url{http://jena.sourceforge.net/}) to
 automatically create Java classes from the BioPAX specifications, allowing a
 convenient access to the different data types encoded in the BioPAX files. More
-detailed informations about the index and mapiign are available in the BiNoM
+detailed informations about the index and the mapping are available in the BiNoM
 manual (\url{http://binom.curie.fr}).
 
 The core functions of BiNoM can be grouped in five different topics: Input/Output,
@@ -455,7 +455,7 @@ strongly connected components, using the algorithm of Tarjan
 \cite{tarjan1972depth}. It is also possible to prune the network into three different parts:
 the one with all the elements associated with the \emph{input} part of the network (from which all paths lead to the central core), the
 second with all the elements associated with the \emph{output} part (from which there are no paths leading back to the central core) and the last
-part with all the elements linked to the central core, the cyclic part, composed from strongly connected components, possibly connected together. 
+part with all the elements linked to the central core, the cyclic part, composed from strongly connected components, possibly connected together.
 This type of approach corresponds to finding the bow-tie graph structure \cite{broder2000graph}.
 
 The decomposition in material components is using the node name semantics to
@@ -510,9 +510,10 @@ algorithms, such as finding the shortest paths, the suboptimal shortest paths or
 all non self-intersecting paths (Table 1). The shortest path is calculated as the path having
 the minimal sum of weights of the edges composing the path (Dijkstra's
 algorithm) while the suboptimal path is constructed by removing all edges of
-all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths 
-are those paths that do not containing loops (self-intersections). 
-The user should be careful when using this procedure, as the number of paths between nodes can be
+all shortest paths one by one, and finding the new shortest path. All non self-intersecting paths
+are those paths that do not contain loops (self-intersections). They are found using a variant
+of breadth-first search algorithm. The user should be careful when using this procedure, as the 
+number of paths between nodes can be
 very large for big networks. In order to limit the number of paths found, BiNoM
 allows to specify the maximal length of the path to be found.
 
@@ -537,10 +538,10 @@ the target node. For instance, let us consider that we have experimental data fo
 disease/normal ratios).
 In that case, a positive or a negative PIQuant score for a given phenotype
 (target node) predicts quantitatively
-that the phenotype would be respectively enhanced or inhibited. 
+that the phenotype would be respectively enhanced or inhibited.
 %Furthermore, the
 %relative difference between two PIQuant score values also is also indicative of
-%a relative quantitative difference. 
+%a relative quantitative difference.
 Thus, the PIQuant score can be used to
 compare the effects of two different experimental datasets on the same phenotype
 (i.e. using the same network), or to compare the effects of two different network
@@ -560,7 +561,7 @@ annotated and target nodes (shortest paths, suboptimal shortest paths and all
 non self-intersecting paths, see previous paragraph). The annotation
 $\alpha_k$ of the path $k$ is defined as the annotation
 of the first node of the path. We define the sign $\sigma_k$
-of the path $k$ as the product of the signs of every edge of the path and 
+of the path $k$ as the product of the signs of every edge of the path and
 the length $\lambda_k$ of the path $k$ as the number of edges in the path. A summary of the input data types is shown in Table 2. We
 hypothesize that the longer the path is, the lesser the global influence will be
 on the target node. This assumption has the advantage of being simple and does
@@ -600,27 +601,27 @@ $$
 % In other words, a path is inconsistent when the
 % sign of the experimental data value for a node is opposite to the sign
 % of the path.
-% 
+%
 % For example, according to the network represented in figure 5c, there is an influence from Ac to Ph
 % that goes through D . But if this path
 % is functional, the annotation of node D should have the same sign as the annotation for node Ac, because
 % Ac activates D indirectly (i.e. the path from Ac to D has a positive sign). In this case, the sign of D annotation (the experimental value) is opposite to
 % the sign of Ac annotation, and therefore, the path from Ac to Ph that goes through D is inconsistent.
-% 
+%
 % Practically, we offer the option to
 % keep or not the inconsistent paths for the calculation of the PIQuant score,
 % depending on how the user wants to analyze the calculations. An inconsistent
 % path could indicate that the path is not complete, or could also indicate that
 % the path is correct but not active under the precise conditions in which the
 % experimental data was generated, corresponding to a different context.
-% 
+%
 % In the case mentionned above in figure 5c, if only consistent paths are kept, then the PIQuant score of Ac to Ph
 % becomes:
-% 
+%
 % $$
 %  PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} = 0.67
 % $$
-% 
+%
 % This score is higher than the value previously obtained with all the paths, and can be interpreted in this case as a higher activation of the phenotype.
 
 In more realistic situations, we would have multiple annotated nodes with different
@@ -798,7 +799,7 @@ PIQuant algorithm can be used to perform a quantitative analysis on an influence
 network. In order to translate the G1/S reaction network into an influence network, we used
 a tool developed by the team of BIOCHAM \cite{calzone2006biocham} that is
 available online (\url{http://contraintes.inria.fr/~soliman/cd2dot.html}). To
-translate a reaction network into an influence network, the former is 
+translate a reaction network into an influence network, the former is
 pre-processed according to simple rules: (1) BIOCHAM deletes all non-regulated
 degradation and syntheses reactions, (2) all intermediary chemical species with
 only one input and
@@ -857,7 +858,7 @@ score values corresponding to the heatmap Figure are available as supplementary
 Table 1). We can see on this Figure that most
 genes have positive scores (red coloring on the heatmap), in cancer cells compared to normal cells, indicating that they influence positively the M and
 S phases, corresponding to an enhanced proliferation for tumor cells.
-A clear difference can be observed when comparing the heapmap to Figure 9, where
+A clear difference can be observed when comparing the heatmap to Figure 9, where
 the color values represent only experimental data values. The heatmap represents
 this time the integration of both experimental data and the network
 architecture through the PIQuant score.
@@ -904,7 +905,7 @@ and E2F6. Finally, we generated a modular view of all the individual modules, us
 BiNoM links the modules if they share components or edges. These edges are then
 interpreted as activation or inhibition by the modeler. Our final
 modular view is composed of 11 modules, with 27
-edges connecting them (Figure 11). 
+edges connecting them (Figure 11).
 
 
 %-------------
@@ -985,9 +986,11 @@ edited and approved the final version of the manuscript.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
   \ifthenelse{\boolean{publ}}{\small}{}
-  This work is supported by the APO-SYS EU FP7 project. EB, LC, DR, GS, EmB and
-AZ are members of the team ‘‘Computational Systems Biology of
-Cancer,’’ Equipe labellisée par la Ligue Nationale Contre le Cancer.
+  This work is supported by the APO-SYS EU FP7 project. 
+The work is supported by EU FP7 ASSET project and by the grant "Projet Incitatif et Collaboratif Computational Systems Biology Approach for Cancer " from Institut Curie.  
+EB, LC, DR, GS, EmB and AZ are members of the team ``Computational Systems Biology of
+Cancer", Equipe labellise par la Ligue Nationale Contre le Cancer.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%
@@ -1161,7 +1164,7 @@ ratio or a \textit{t}-test statistic value.\null}  \\ \hline
       }
 
   \subsection*{Table 3 - Detailed import/export BiNoM capabilities for standard systems biology file formats.}
-    
+
    The table is indicating the different standard systems biology file formats and versions that can be imported/exported in BiNoM, as well as what type of conversions are possible.    \par \mbox{}
     \par
     \mbox{
@@ -1184,8 +1187,8 @@ ratio or a \textit{t}-test statistic value.\null}  \\ \hline
       }
 
   \subsection*{Table 4 - Comparison of BiNoM functionalities with other software tools.}
-    
-   The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}, 
+
+   The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html},
 biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012cysbml}), ShortestPath (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay (\cite{su2010glay}), MCode (\cite{bader2003automated}), ModuLand (\cite{szalay2012moduland}),
  clusterMaker (\cite{morris2011clustermaker}), NeMo (\cite{rivera2010nemo}).
 
@@ -1219,7 +1222,7 @@ biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012
         CSML visualization     & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         Cytoscape extra & & & & & & & & & & &
                    \\utilities & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
-        Get connected  & & & & & & & & & & & & & 
+        Get connected  & & & & & & & & & & & & &
             \\network components & $\bullet$ &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\bullet$       &  $\circ$           & $\bullet$            &  $\bullet$      \\ \hline
         Semantic clustering  & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         Community structure  & & & & & & & & & & & & &
@@ -1237,7 +1240,7 @@ biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012
           \\non-intersecting paths    & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         Path influence quantification & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         Module manager       & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
-        
+
 \hline
       \end{tabular}
       }}

@@ -1658,12 +1658,13 @@ public class ProduceClickableMap
 		right_close(output);
 	}
 	
-	static private String make_module_bubble(String notes, int post_id)
+	static private String make_module_bubble(String module_name, String notes, int post_id)
 	{
 		String[] parts = notes.split("\n", 2);
 		StringBuffer fw = new StringBuffer();
 		fw.append("<b>").append(parts[0]).append("</b>");
 		bubble_to_post_link_with_anchor(post_id, fw);
+		open_map_from_bubble(fw.append(" "), module_name);
 		if (parts.length > 1)
 			fw.append("<br>\n").append(parts[1]);
 		return fw.toString();
@@ -1731,7 +1732,7 @@ public class ProduceClickableMap
 					indent.getOutput().print(";");
 					indent.getOutput().print(scales.getY(position[1]));
 					indent.getOutput().println("\">");
-					content_line(indent.add(), make_right_hand_link_to_blog(post_id, k.getKey()), make_module_bubble(k.getValue().notes, post_id));
+					content_line(indent.add(), make_right_hand_link_to_blog(post_id, k.getKey()), make_module_bubble(k.getKey(), k.getValue().notes, post_id));
 					indent.close();
 				}
 			}
@@ -3470,19 +3471,32 @@ public class ProduceClickableMap
 		
 		if (markers.isEmpty())
 			return fw;
+		return open_map_from_bubble_maybe_with_markers(fw, markers, map_name, title);
+	}
 
+	static private StringBuffer open_map_from_bubble_maybe_with_markers(StringBuffer fw, List<String> markers, final String map_name, final String title)
+	{
 		fw.append(onclick_before).append( "show_map_and_markers(");
 		html_quote(fw, map_name);
 		fw.append(", [");
-		int n = 0;
-		for (String e : markers)
-			html_quote(fw.append(n++ == 0 ? "" : ", "), e);
+		if (markers != null)
+		{
+			int n = 0;
+			for (String e : markers)
+				html_quote(fw.append(n++ == 0 ? "" : ", "), e);
+		}
 		fw.append("]);").append(onclick_after);
 		
-		html_quote(fw.append(" title="), title);
+		if (title != null)
+			html_quote(fw.append(" title="), title);
 		fw.append(">");
 		show_map_icon(fw, icons_directory + "/map.png");
 		return fw.append("</a>");
+	}
+	
+	static private StringBuffer open_map_from_bubble(StringBuffer fw, final String map_name)
+	{
+		return open_map_from_bubble_maybe_with_markers(fw, null, map_name, map_name);
 	}
 
 	static private StringBuffer show_shapes_on_map_from_post(final Hasher h, StringBuffer fw, List<String> sps,

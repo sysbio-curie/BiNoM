@@ -20,13 +20,13 @@
   <att type="real" name="GRAPH_VIEW_CENTER_Y" value="1671.5430297851562"/>
   <att type="boolean" name="NODE_SIZE_LOCKED" value="true"/>
   <att type="string" name="__layoutAlgorithm" value="grid" cy:hidden="true"/>
-  <node label="CDK2|Tyr14_pho|Tyr15_pho:cyclin E1*" id="-158">
+  <node label="CDK2|Tyr14_pho|Tyr15_pho:cyclinE1*" id="-158">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a796"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s741"/>
     <att type="string" name="HUGO" value="CDK2@@CCNE1"/>
-    <att type="string" name="canonicalName" value="CDK2|Tyr14_pho|Tyr15_pho:cyclin E1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3638.0" y="1749.3828125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Tyr14_pho|Tyr15_pho:cyclin E1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Tyr14_pho|Tyr15_pho:cyclinE1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3638.0" y="1749.3828125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Tyr14_pho|Tyr15_pho:cyclinE1*" cy:borderLineType="solid"/>
   </node>
   <node label="re220" id="-295">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="TRANSPORT"/>
@@ -82,13 +82,13 @@
     <att type="string" name="canonicalName" value="re310"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3098.87890625" y="1432.3983154296875" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re310" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default" id="-138">
+  <node label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default" id="-138">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a803"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s769"/>
     <att type="string" name="HUGO" value="CDK1@@CCNB1"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3582.25" y="2658.87255859375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3582.25" y="2658.87255859375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default" cy:borderLineType="solid"/>
   </node>
   <node label="re196" id="-342">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -200,13 +200,13 @@
     <att type="string" name="canonicalName" value="CDK2"/>
     <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3619.7421875" y="1508.75" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin B1*" id="-127">
+  <node label="cyclinB1*" id="-127">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a871"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s541"/>
     <att type="string" name="HUGO" value="CCNB1"/>
-    <att type="string" name="canonicalName" value="cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3020.5" y="2035.818359375" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3020.5" y="2035.818359375" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="re306" id="-330">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -222,13 +222,13 @@
     <att type="string" name="canonicalName" value="CDC2|Thr161_pho"/>
     <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2947.5" y="1918.984375" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr161_pho" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Thr14_pho:cyclin B1*@default" id="-137">
+  <node label="CDC2|Thr14_pho:cyclinB1*@default" id="-137">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a832"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s768"/>
     <att type="string" name="HUGO" value="CDK1@@CCNB1"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1*@default"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3749.5" y="2974.748779296875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr14_pho:cyclin B1*@default" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1*@default"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3749.5" y="2974.748779296875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr14_pho:cyclinB1*@default" cy:borderLineType="solid"/>
   </node>
   <node label="p21Cip*|T145_pho" id="-205">
     <att type="string" name="CELLDESIGNER_ALIAS" value="sa543"/>
@@ -260,13 +260,13 @@
     <att type="string" name="canonicalName" value="re329"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3438.87890625" y="1631.78271484375" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re329" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Tyr15_pho:cyclin B1*@default" id="-139">
+  <node label="CDC2|Tyr15_pho:cyclinB1*@default" id="-139">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a837"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s770"/>
     <att type="string" name="HUGO" value="CCNB1@@CDK1"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1*@default"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3112.0" y="2655.118408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho:cyclin B1*@default" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1*@default"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3112.0" y="2655.118408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho:cyclinB1*@default" cy:borderLineType="solid"/>
   </node>
   <node label="re275" id="-226">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -274,13 +274,13 @@
     <att type="string" name="canonicalName" value="re275"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3952.080810546875" y="674.439453125" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re275" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Tyr15_pho:cyclin B1*" id="-132">
+  <node label="CDC2|Tyr15_pho:cyclinB1*" id="-132">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a836"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s745"/>
     <att type="string" name="HUGO" value="CCNB1@@CDK1"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3118.5" y="2323.75146484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho:cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3118.5" y="2323.75146484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho:cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="re269" id="-329">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -334,13 +334,13 @@
     <att type="string" name="canonicalName" value="re271"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="4047.247314453125" y="678.4166870117188" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re271" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK7|Thr170_pho:MNAT1:cyclin H*" id="-135">
+  <node label="CDK7|Thr170_pho:MNAT1:cyclinH*" id="-135">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a845"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s749"/>
     <att type="string" name="HUGO" value="CDK7@@CCNH@@MNAT1"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2727.0" y="1717.962646484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK7|Thr170_pho:MNAT1:cyclin H*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2727.0" y="1717.962646484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK7|Thr170_pho:MNAT1:cyclinH*" cy:borderLineType="solid"/>
   </node>
   <node label="re254" id="-335">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -354,13 +354,13 @@
     <att type="string" name="canonicalName" value="re324"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="1753.5" y="2095.472900390625" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re324" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin A2*:p21Cip*" id="-172">
+  <node label="CDK2|Thr160_pho:cyclinA2*:p21Cip*" id="-172">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa93"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s788"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2@@CDKN1A"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin A2*:p21Cip*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1157.5" y="1682.5660400390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin A2*:p21Cip*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinA2*:p21Cip*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1157.5" y="1682.5660400390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinA2*:p21Cip*" cy:borderLineType="solid"/>
   </node>
   <node label="DP1*|pho" id="-7">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a345"/>
@@ -382,13 +382,13 @@
     <att type="string" name="canonicalName" value="re265"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="2648.25" y="2151.25" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re265" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin E1*|Thr380_pho" id="-149">
+  <node label="cyclinE1*|Thr380_pho" id="-149">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a852"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s529"/>
     <att type="string" name="HUGO" value="CCNE1"/>
-    <att type="string" name="canonicalName" value="cyclin E1*|Thr380_pho"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3865.25" y="1649.6649169921875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin E1*|Thr380_pho" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinE1*|Thr380_pho"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3865.25" y="1649.6649169921875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinE1*|Thr380_pho" cy:borderLineType="solid"/>
   </node>
   <node label="re325" id="-288">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -404,13 +404,13 @@
     <att type="string" name="canonicalName" value="APC:CDC20|pho"/>
     <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="4077.48779296875" y="1958.5" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="APC:CDC20|pho" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin E1*:p107*" id="-212">
+  <node label="CDK2|Thr160_pho:cyclinE1*:p107*" id="-212">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa100"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s1487"/>
     <att type="string" name="HUGO" value="CCNE1@@CDK2@@RBL1"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*:p107*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1907.75" y="1156.037353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin E1*:p107*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*:p107*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1907.75" y="1156.037353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinE1*:p107*" cy:borderLineType="solid"/>
   </node>
   <node label="re171" id="-322">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -430,13 +430,13 @@
     <att type="string" name="canonicalName" value="re604"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="1231.25" y="2228.5" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re604" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Thr161_pho:cyclin B1*" id="-134">
+  <node label="CDC2|Thr161_pho:cyclinB1*" id="-134">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a791"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s748"/>
     <att type="string" name="HUGO" value="CCNB1@@CDK1"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2566.0" y="1963.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr161_pho:cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2566.0" y="1963.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr161_pho:cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="CDK2|Thr160_pho" id="-147">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a851"/>
@@ -488,29 +488,29 @@
     <att type="string" name="canonicalName" value="DP1*:p14ARF*@nucleole"/>
     <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="4551.5" y="764.5" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="DP1*:p14ARF*@nucleole" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin A2*" id="-143">
+  <node label="cyclinA2*" id="-143">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a38"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s30"/>
     <att type="string" name="HUGO" value="CCNA2"/>
-    <att type="string" name="canonicalName" value="cyclin A2*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3844.0" y="1455.0" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin A2*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinA2*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3844.0" y="1455.0" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinA2*" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin B1*@default" id="-120">
+  <node label="cyclinB1*@default" id="-120">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a36"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s28"/>
     <att type="string" name="HUGO" value="CCNB1"/>
-    <att type="string" name="canonicalName" value="cyclin B1*@default"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2919.7578125" y="3139.65185546875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin B1*@default" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinB1*@default"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2919.7578125" y="3139.65185546875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinB1*@default" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin A2*" id="-26">
+  <node label="CDK2|Thr160_pho:cyclinA2*" id="-26">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa89"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s718"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin A2*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3319.0" y="1407.57470703125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin A2*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinA2*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3319.0" y="1407.57470703125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinA2*" cy:borderLineType="solid"/>
   </node>
   <node label="re233" id="-305">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -524,13 +524,13 @@
     <att type="string" name="canonicalName" value="re217"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3688.75" y="2233.184814453125" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re217" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK7:MNAT1:cyclin H*" id="-167">
+  <node label="CDK7:MNAT1:cyclinH*" id="-167">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a642"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s752"/>
     <att type="string" name="HUGO" value="CDK7@@CCNH@@MNAT1"/>
-    <att type="string" name="canonicalName" value="CDK7:MNAT1:cyclin H*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2760.5" y="2283.543701171875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK7:MNAT1:cyclin H*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK7:MNAT1:cyclinH*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2760.5" y="2283.543701171875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK7:MNAT1:cyclinH*" cy:borderLineType="solid"/>
   </node>
   <node label="re60" id="-216">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -588,13 +588,13 @@
     <att type="string" name="canonicalName" value="re298"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="2378.787109375" y="1051.6666259765625" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re298" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin E1*:p21Cip*" id="-171">
+  <node label="CDK2|Thr160_pho:cyclinE1*:p21Cip*" id="-171">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa92"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s787"/>
     <att type="string" name="HUGO" value="CCNE1@@CDK2@@CDKN1A"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*:p21Cip*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="947.5" y="1742.5660400390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin E1*:p21Cip*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*:p21Cip*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="947.5" y="1742.5660400390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinE1*:p21Cip*" cy:borderLineType="solid"/>
   </node>
   <node label="re284" id="-260">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -632,21 +632,21 @@
     <att type="string" name="canonicalName" value="DP1*:E2F1:HDAC1:SWI/SNF:pRB*|pho"/>
     <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2463.8984375" y="1098.75" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="DP1*:E2F1:HDAC1:SWI/SNF:pRB*|pho" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin E1*" id="-148">
+  <node label="cyclinE1*" id="-148">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a37"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s29"/>
     <att type="string" name="HUGO" value="CCNE1"/>
-    <att type="string" name="canonicalName" value="cyclin E1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3488.7578125" y="1618.65185546875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin E1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinE1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3488.7578125" y="1618.65185546875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinE1*" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2:cyclin B1*" id="-133">
+  <node label="CDC2:cyclinB1*" id="-133">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a818"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s746"/>
     <att type="string" name="HUGO" value="CDK1@@CCNB1"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2896.5" y="2106.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2:cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2896.5" y="2106.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2:cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="re250" id="-324">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="DISSOCIATION"/>
@@ -770,13 +770,13 @@
     <att type="string" name="canonicalName" value="DP1*:p14ARF*"/>
     <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="4258.5" y="764.0" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="DP1*:p14ARF*" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Thr161_pho:cyclin B1*:p21Cip*" id="-173">
+  <node label="CDC2|Thr161_pho:cyclinB1*:p21Cip*" id="-173">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa94"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s798"/>
     <att type="string" name="HUGO" value="CCNB1@@CDK1@@CDKN1A"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1*:p21Cip*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="985.5" y="2097.566162109375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr161_pho:cyclin B1*:p21Cip*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1*:p21Cip*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="985.5" y="2097.566162109375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr161_pho:cyclinB1*:p21Cip*" cy:borderLineType="solid"/>
   </node>
   <node label="re235" id="-307">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="TRANSPORT"/>
@@ -784,21 +784,21 @@
     <att type="string" name="canonicalName" value="re235"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3115.25" y="2489.434814453125" fill="#808080" width="1" outline="#00ff00" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re235" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin E1*|Thr380_pho" id="-155">
+  <node label="CDK2|Thr160_pho:cyclinE1*|Thr380_pho" id="-155">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a849"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s722"/>
     <att type="string" name="HUGO" value="CDK2@@CCNE1"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*|Thr380_pho"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3356.5" y="1676.751953125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin E1*|Thr380_pho" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*|Thr380_pho"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3356.5" y="1676.751953125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinE1*|Thr380_pho" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin A2*" id="-54">
+  <node label="CDK2:cyclinA2*" id="-54">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a33"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s719"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2878.7578125" y="1457.2218017578125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin A2*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2878.7578125" y="1457.2218017578125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinA2*" cy:borderLineType="solid"/>
   </node>
   <node label="DP1*:E2F1:HDAC1:SUV39H1:SWI/SNF:pRB*" id="-67">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a462"/>
@@ -884,13 +884,13 @@
     <att type="string" name="canonicalName" value="re264"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="2721.0625" y="2365.273193359375" fill="#808080" width="1" outline="#00ff00" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re264" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2:cyclin B1*@default" id="-136">
+  <node label="CDC2:cyclinB1*@default" id="-136">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a809"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s767"/>
     <att type="string" name="HUGO" value="CDK1@@CCNB1"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1*@default"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2937.75" y="2975.37255859375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2:cyclin B1*@default" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1*@default"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2937.75" y="2975.37255859375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2:cyclinB1*@default" cy:borderLineType="solid"/>
   </node>
   <node label="re236" id="-308">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -970,13 +970,13 @@
     <att type="string" name="canonicalName" value="CDC20"/>
     <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="3845.0" y="2072.0" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC20" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin E1*" id="-55">
+  <node label="CDK2|Thr160_pho:cyclinE1*" id="-55">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a632"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s723"/>
     <att type="string" name="HUGO" value="CCNE1@@CDK2"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2612.25" y="1520.2469482421875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin E1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2612.25" y="1520.2469482421875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinE1*" cy:borderLineType="solid"/>
   </node>
   <node label="re1276" id="-379">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -1002,21 +1002,21 @@
     <att type="string" name="canonicalName" value="re225"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3665.875" y="2816.810546875" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re225" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin E1*" id="-154">
+  <node label="CDK2:cyclinE1*" id="-154">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a34"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s721"/>
     <att type="string" name="HUGO" value="CDK2@@CCNE1"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin E1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3239.7578125" y="1514.1827392578125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin E1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinE1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3239.7578125" y="1514.1827392578125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinE1*" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin A2*:p107*" id="-209">
+  <node label="CDK2:cyclinA2*:p107*" id="-209">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa97"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s1476"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2@@RBL1"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2*:p107*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2985.0" y="1355.537353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin A2*:p107*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2*:p107*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2985.0" y="1355.537353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinA2*:p107*" cy:borderLineType="solid"/>
   </node>
   <node label="re2" id="-214">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="TRANSPORT"/>
@@ -1190,13 +1190,13 @@
     <att type="string" name="canonicalName" value="re234"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3115.25" y="2489.434814453125" fill="#808080" width="1" outline="#00ff00" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re234" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2|Thr160_pho:cyclin E1*:p130*|pho" id="-211">
+  <node label="CDK2|Thr160_pho:cyclinE1*:p130*|pho" id="-211">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa99"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s1486"/>
     <att type="string" name="HUGO" value="CCNE1@@CDK2@@RBL2"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*:p130*|pho"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1910.5" y="1027.07470703125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclin E1*:p130*|pho" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*:p130*|pho"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1910.5" y="1027.07470703125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2|Thr160_pho:cyclinE1*:p130*|pho" cy:borderLineType="solid"/>
   </node>
   <node label="re180" id="-273">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -1272,13 +1272,13 @@
     <att type="string" name="canonicalName" value="re219"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3344.0" y="2115.684814453125" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re219" cy:borderLineType="solid"/>
   </node>
-  <node label="cyclin H*" id="-165">
+  <node label="cyclinH*" id="-165">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a633"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="PROTEIN"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s401"/>
     <att type="string" name="HUGO" value="CCNH"/>
-    <att type="string" name="canonicalName" value="cyclin H*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2363.0" y="2217.0" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclin H*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="cyclinH*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2363.0" y="2217.0" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="cyclinH*" cy:borderLineType="solid"/>
   </node>
   <node label="re170" id="-321">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -1322,13 +1322,13 @@
     <att type="string" name="canonicalName" value="re330"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="2564.38037109375" y="2283.993408203125" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re330" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin E1*:p27Kip1*" id="-159">
+  <node label="CDK2:cyclinE1*:p27Kip1*" id="-159">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a711"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s742"/>
     <att type="string" name="HUGO" value="CDK2@@CCNE1@@CDKN1B"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin E1*:p27Kip1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2898.75" y="1726.1519775390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin E1*:p27Kip1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinE1*:p27Kip1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2898.75" y="1726.1519775390625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinE1*:p27Kip1*" cy:borderLineType="solid"/>
   </node>
   <node label="re147" id="-318">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -1348,21 +1348,21 @@
     <att type="string" name="canonicalName" value="re224"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3665.875" y="2816.810546875" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re224" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin A2*:p27Kip1*" id="-157">
+  <node label="CDK2:cyclinA2*:p27Kip1*" id="-157">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a713"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s740"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2@@CDKN1B"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2*:p27Kip1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3264.75" y="1860.642333984375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin A2*:p27Kip1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2*:p27Kip1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3264.75" y="1860.642333984375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinA2*:p27Kip1*" cy:borderLineType="solid"/>
   </node>
-  <node label="CDK2:cyclin A2*:p130*|pho" id="-210">
+  <node label="CDK2:cyclinA2*:p130*|pho" id="-210">
     <att type="string" name="CELLDESIGNER_ALIAS" value="csa98"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s1481"/>
     <att type="string" name="HUGO" value="CDK2@@CCNA2@@RBL2"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2*:p130*|pho"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2695.0" y="1335.537353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclin A2*:p130*|pho" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2*:p130*|pho"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="2695.0" y="1335.537353515625" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK2:cyclinA2*:p130*|pho" cy:borderLineType="solid"/>
   </node>
   <node label="re148" id="-338">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="HETERODIMER_ASSOCIATION"/>
@@ -1398,13 +1398,13 @@
     <att type="string" name="canonicalName" value="re317"/>
     <graphics type="DIAMOND" h="20.0" w="20.0" x="3255.37109375" y="582.0316772460938" fill="#808080" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="re317" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*" id="-131">
+  <node label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*" id="-131">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a812"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s744"/>
     <att type="string" name="HUGO" value="CDK1@@CCNB1"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3586.0" y="2341.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3586.0" y="2341.618408203125" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="re86" id="-218">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -1442,13 +1442,13 @@
     <att type="string" name="canonicalName" value="CDC25C"/>
     <graphics type="ROUNDED_RECTANGLE" h="30.0" w="30.0" x="2563.260498046875" y="2387.987060546875" fill="#ffffff" width="1" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC25C" cy:borderLineType="solid"/>
   </node>
-  <node label="CDC2|Thr14_pho:cyclin B1*" id="-130">
+  <node label="CDC2|Thr14_pho:cyclinB1*" id="-130">
     <att type="string" name="CELLDESIGNER_ALIAS" value="a825"/>
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="COMPLEX"/>
     <att type="string" name="CELLDESIGNER_SPECIES" value="s743"/>
     <att type="string" name="HUGO" value="CCNB1@@CDK1"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1*"/>
-    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3791.5" y="2124.75146484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr14_pho:cyclin B1*" cy:borderLineType="solid"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1*"/>
+    <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="3791.5" y="2124.75146484375" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDC2|Thr14_pho:cyclinB1*" cy:borderLineType="solid"/>
   </node>
   <node label="re64" id="-217">
     <att type="string" name="CELLDESIGNER_NODE_TYPE" value="STATE_TRANSITION"/>
@@ -1480,9 +1480,9 @@
     <att type="string" name="canonicalName" value="CDK4:cyclin D1*:p27Kip1*"/>
     <graphics type="ROUNDED_RECTANGLE" h="40.0" w="40.0" x="1956.5" y="1841.0936279296875" fill="#c0c0c0" width="2" outline="#000000" cy:nodeTransparency="1.0" cy:nodeLabelFont="Default-0-12" cy:nodeLabel="CDK4:cyclin D1*:p27Kip1*" cy:borderLineType="solid"/>
   </node>
-  <edge label="re220 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default" source="-295" target="-138">
+  <edge label="re220 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default" source="-295" target="-138">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re220 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re220 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1504,33 +1504,33 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re241 (pp) CDC2|Tyr15_pho:cyclin B1*" source="-312" target="-132">
+  <edge label="re241 (pp) CDC2|Tyr15_pho:cyclinB1*" source="-312" target="-132">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re241 (pp) CDC2|Tyr15_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re241 (pp) CDC2|Tyr15_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re310 (pp) CDK2|Thr160_pho:cyclin A2*" source="-332" target="-26">
+  <edge label="re310 (pp) CDK2|Thr160_pho:cyclinA2*" source="-332" target="-26">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re310 (pp) CDK2|Thr160_pho:cyclin A2*"/>
+    <att type="string" name="canonicalName" value="re310 (pp) CDK2|Thr160_pho:cyclinA2*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re239" source="-138" target="-311">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re239" source="-138" target="-311">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re239"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re239"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re225" source="-138" target="-298">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re225" source="-138" target="-298">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re225"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re225"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re212" source="-138" target="-290">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re212" source="-138" target="-290">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default (pp) re212"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default (pp) re212"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1540,9 +1540,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re218 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*" source="-293" target="-131">
+  <edge label="re218 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*" source="-293" target="-131">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re218 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re218 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1552,9 +1552,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re307 (pp) CDK2:cyclin A2*" source="-331" target="-54">
+  <edge label="re307 (pp) CDK2:cyclinA2*" source="-331" target="-54">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re307 (pp) CDK2:cyclin A2*"/>
+    <att type="string" name="canonicalName" value="re307 (pp) CDK2:cyclinA2*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1582,9 +1582,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re326 (pp) CDK2|Thr160_pho:cyclin A2*:p21Cip*" source="-345" target="-172">
+  <edge label="re326 (pp) CDK2|Thr160_pho:cyclinA2*:p21Cip*" source="-345" target="-172">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re326 (pp) CDK2|Thr160_pho:cyclin A2*:p21Cip*"/>
+    <att type="string" name="canonicalName" value="re326 (pp) CDK2|Thr160_pho:cyclinA2*:p21Cip*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1624,9 +1624,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re229 (pp) CDC2|Thr14_pho:cyclin B1*@default" source="-302" target="-137">
+  <edge label="re229 (pp) CDC2|Thr14_pho:cyclinB1*@default" source="-302" target="-137">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re229 (pp) CDC2|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re229 (pp) CDC2|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1642,15 +1642,15 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin B1* (pp) re260" source="-127" target="-314">
+  <edge label="cyclinB1* (pp) re260" source="-127" target="-314">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin B1* (pp) re260"/>
+    <att type="string" name="canonicalName" value="cyclinB1* (pp) re260"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re306 (pp) CDK2:cyclin E1*" source="-330" target="-154">
+  <edge label="re306 (pp) CDK2:cyclinE1*" source="-330" target="-154">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re306 (pp) CDK2:cyclin E1*"/>
+    <att type="string" name="canonicalName" value="re306 (pp) CDK2:cyclinE1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1660,21 +1660,21 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1*@default (pp) re228" source="-137" target="-301">
+  <edge label="CDC2|Thr14_pho:cyclinB1*@default (pp) re228" source="-137" target="-301">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1*@default (pp) re228"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1*@default (pp) re228"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1*@default (pp) re227" source="-137" target="-300">
+  <edge label="CDC2|Thr14_pho:cyclinB1*@default (pp) re227" source="-137" target="-300">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1*@default (pp) re227"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1*@default (pp) re227"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1*@default (pp) re224" source="-137" target="-297">
+  <edge label="CDC2|Thr14_pho:cyclinB1*@default (pp) re224" source="-137" target="-297">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1*@default (pp) re224"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1*@default (pp) re224"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1714,27 +1714,27 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re329 (pp) CDK2|Tyr14_pho|Tyr15_pho:cyclin E1*" source="-333" target="-158">
+  <edge label="re329 (pp) CDK2|Tyr14_pho|Tyr15_pho:cyclinE1*" source="-333" target="-158">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re329 (pp) CDK2|Tyr14_pho|Tyr15_pho:cyclin E1*"/>
+    <att type="string" name="canonicalName" value="re329 (pp) CDK2|Tyr14_pho|Tyr15_pho:cyclinE1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho:cyclin B1*@default (pp) re237" source="-139" target="-309">
+  <edge label="CDC2|Tyr15_pho:cyclinB1*@default (pp) re237" source="-139" target="-309">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1*@default (pp) re237"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1*@default (pp) re237"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho:cyclin B1*@default (pp) re236" source="-139" target="-308">
+  <edge label="CDC2|Tyr15_pho:cyclinB1*@default (pp) re236" source="-139" target="-308">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1*@default (pp) re236"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1*@default (pp) re236"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho:cyclin B1*@default (pp) re234" source="-139" target="-306">
+  <edge label="CDC2|Tyr15_pho:cyclinB1*@default (pp) re234" source="-139" target="-306">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1*@default (pp) re234"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1*@default (pp) re234"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1744,15 +1744,15 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho:cyclin B1* (pp) re235" source="-132" target="-307">
+  <edge label="CDC2|Tyr15_pho:cyclinB1* (pp) re235" source="-132" target="-307">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1* (pp) re235"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1* (pp) re235"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho:cyclin B1* (pp) re233" source="-132" target="-305">
+  <edge label="CDC2|Tyr15_pho:cyclinB1* (pp) re233" source="-132" target="-305">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclin B1* (pp) re233"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho:cyclinB1* (pp) re233"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1798,33 +1798,33 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re175" source="-135" target="-340">
+  <edge label="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re175" source="-135" target="-340">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re175"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re175"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re174" source="-135" target="-339">
+  <edge label="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re174" source="-135" target="-339">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re174"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re174"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re310" source="-135" target="-332">
+  <edge label="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re310" source="-135" target="-332">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re310"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re310"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re147" source="-135" target="-318">
+  <edge label="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re147" source="-135" target="-318">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re147"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re147"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re216" source="-135" target="-291">
+  <edge label="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re216" source="-135" target="-291">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclin H* (pp) re216"/>
+    <att type="string" name="canonicalName" value="CDK7|Thr170_pho:MNAT1:cyclinH* (pp) re216"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1846,9 +1846,9 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re212 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*" source="-290" target="-131">
+  <edge label="re212 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*" source="-290" target="-131">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re212 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re212 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1858,9 +1858,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin E1*|Thr380_pho (pp) re252" source="-149" target="-326">
+  <edge label="cyclinE1*|Thr380_pho (pp) re252" source="-149" target="-326">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin E1*|Thr380_pho (pp) re252"/>
+    <att type="string" name="canonicalName" value="cyclinE1*|Thr380_pho (pp) re252"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1882,9 +1882,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re171 (pp) CDK2:cyclin A2*:p27Kip1*" source="-322" target="-157">
+  <edge label="re171 (pp) CDK2:cyclinA2*:p27Kip1*" source="-322" target="-157">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re171 (pp) CDK2:cyclin A2*:p27Kip1*"/>
+    <att type="string" name="canonicalName" value="re171 (pp) CDK2:cyclinA2*:p27Kip1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1900,39 +1900,39 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re195" source="-134" target="-370">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re195" source="-134" target="-370">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re195"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re195"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re328" source="-134" target="-347">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re328" source="-134" target="-347">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re328"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re328"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re258" source="-134" target="-328">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re258" source="-134" target="-328">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re258"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re258"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re330" source="-134" target="-317">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re330" source="-134" target="-317">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re330"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re330"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re320" source="-134" target="-315">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re320" source="-134" target="-315">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re320"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re320"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr161_pho:cyclin B1* (pp) re255" source="-134" target="-313">
+  <edge label="CDC2|Thr161_pho:cyclinB1* (pp) re255" source="-134" target="-313">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclin B1* (pp) re255"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr161_pho:cyclinB1* (pp) re255"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1972,9 +1972,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re230 (pp) CDC2:cyclin B1*" source="-303" target="-133">
+  <edge label="re230 (pp) CDC2:cyclinB1*" source="-303" target="-133">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re230 (pp) CDC2:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re230 (pp) CDC2:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -1990,51 +1990,51 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin A2* (pp) re307" source="-143" target="-331">
+  <edge label="cyclinA2* (pp) re307" source="-143" target="-331">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin A2* (pp) re307"/>
+    <att type="string" name="canonicalName" value="cyclinA2* (pp) re307"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin A2* (pp) re257" source="-143" target="-327">
+  <edge label="cyclinA2* (pp) re257" source="-143" target="-327">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin A2* (pp) re257"/>
+    <att type="string" name="canonicalName" value="cyclinA2* (pp) re257"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin B1*@default (pp) re221" source="-120" target="-296">
+  <edge label="cyclinB1*@default (pp) re221" source="-120" target="-296">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin B1*@default (pp) re221"/>
+    <att type="string" name="canonicalName" value="cyclinB1*@default (pp) re221"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin A2* (pp) re258" source="-26" target="-328">
+  <edge label="CDK2|Thr160_pho:cyclinA2* (pp) re258" source="-26" target="-328">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin A2* (pp) re258"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinA2* (pp) re258"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin A2* (pp) re86" source="-26" target="-218">
+  <edge label="CDK2|Thr160_pho:cyclinA2* (pp) re86" source="-26" target="-218">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin A2* (pp) re86"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinA2* (pp) re86"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re233 (pp) CDC2:cyclin B1*" source="-305" target="-133">
+  <edge label="re233 (pp) CDC2:cyclinB1*" source="-305" target="-133">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re233 (pp) CDC2:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re233 (pp) CDC2:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re217 (pp) CDC2|Thr14_pho:cyclin B1*" source="-292" target="-130">
+  <edge label="re217 (pp) CDC2|Thr14_pho:cyclinB1*" source="-292" target="-130">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re217 (pp) CDC2|Thr14_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re217 (pp) CDC2|Thr14_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK7:MNAT1:cyclin H* (pp) re245" source="-167" target="-341">
+  <edge label="CDK7:MNAT1:cyclinH* (pp) re245" source="-167" target="-341">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK7:MNAT1:cyclin H* (pp) re245"/>
+    <att type="string" name="canonicalName" value="CDK7:MNAT1:cyclinH* (pp) re245"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2164,21 +2164,21 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin E1* (pp) re306" source="-148" target="-330">
+  <edge label="cyclinE1* (pp) re306" source="-148" target="-330">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin E1* (pp) re306"/>
+    <att type="string" name="canonicalName" value="cyclinE1* (pp) re306"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2:cyclin B1* (pp) re232" source="-133" target="-304">
+  <edge label="CDC2:cyclinB1* (pp) re232" source="-133" target="-304">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1* (pp) re232"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1* (pp) re232"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2:cyclin B1* (pp) re216" source="-133" target="-291">
+  <edge label="CDC2:cyclinB1* (pp) re216" source="-133" target="-291">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1* (pp) re216"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1* (pp) re216"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2188,15 +2188,15 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re250 (pp) cyclin E1*|Thr380_pho" source="-324" target="-149">
+  <edge label="re250 (pp) cyclinE1*|Thr380_pho" source="-324" target="-149">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re250 (pp) cyclin E1*|Thr380_pho"/>
+    <att type="string" name="canonicalName" value="re250 (pp) cyclinE1*|Thr380_pho"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re221 (pp) CDC2:cyclin B1*@default" source="-296" target="-136">
+  <edge label="re221 (pp) CDC2:cyclinB1*@default" source="-296" target="-136">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re221 (pp) CDC2:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re221 (pp) CDC2:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2218,9 +2218,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re320 (pp) cyclin B1*" source="-315" target="-127">
+  <edge label="re320 (pp) cyclinB1*" source="-315" target="-127">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re320 (pp) cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re320 (pp) cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2230,9 +2230,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re328 (pp) CDC2|Thr161_pho:cyclin B1*:p21Cip*" source="-347" target="-173">
+  <edge label="re328 (pp) CDC2|Thr161_pho:cyclinB1*:p21Cip*" source="-347" target="-173">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re328 (pp) CDC2|Thr161_pho:cyclin B1*:p21Cip*"/>
+    <att type="string" name="canonicalName" value="re328 (pp) CDC2|Thr161_pho:cyclinB1*:p21Cip*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2242,27 +2242,27 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re248 (pp) CDK2|Thr160_pho:cyclin E1*|Thr380_pho" source="-323" target="-155">
+  <edge label="re248 (pp) CDK2|Thr160_pho:cyclinE1*|Thr380_pho" source="-323" target="-155">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re248 (pp) CDK2|Thr160_pho:cyclin E1*|Thr380_pho"/>
+    <att type="string" name="canonicalName" value="re248 (pp) CDK2|Thr160_pho:cyclinE1*|Thr380_pho"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re327 (pp) CDK2|Thr160_pho:cyclin E1*:p21Cip*" source="-346" target="-171">
+  <edge label="re327 (pp) CDK2|Thr160_pho:cyclinE1*:p21Cip*" source="-346" target="-171">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re327 (pp) CDK2|Thr160_pho:cyclin E1*:p21Cip*"/>
+    <att type="string" name="canonicalName" value="re327 (pp) CDK2|Thr160_pho:cyclinE1*:p21Cip*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re237 (pp) CDC2:cyclin B1*@default" source="-309" target="-136">
+  <edge label="re237 (pp) CDC2:cyclinB1*@default" source="-309" target="-136">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re237 (pp) CDC2:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re237 (pp) CDC2:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re1273 (pp) CDK2:cyclin A2*:p107*" source="-376" target="-209">
+  <edge label="re1273 (pp) CDK2:cyclinA2*:p107*" source="-376" target="-209">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re1273 (pp) CDK2:cyclin A2*:p107*"/>
+    <att type="string" name="canonicalName" value="re1273 (pp) CDK2:cyclinA2*:p107*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2272,9 +2272,9 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re226 (pp) CDC2|Thr14_pho:cyclin B1*@default" source="-299" target="-137">
+  <edge label="re226 (pp) CDC2|Thr14_pho:cyclinB1*@default" source="-299" target="-137">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re226 (pp) CDC2|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re226 (pp) CDC2|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2290,51 +2290,51 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re235 (pp) CDC2|Tyr15_pho:cyclin B1*@default" source="-307" target="-139">
+  <edge label="re235 (pp) CDC2|Tyr15_pho:cyclinB1*@default" source="-307" target="-139">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re235 (pp) CDC2|Tyr15_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re235 (pp) CDC2|Tyr15_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1*|Thr380_pho (pp) re250" source="-155" target="-324">
+  <edge label="CDK2|Thr160_pho:cyclinE1*|Thr380_pho (pp) re250" source="-155" target="-324">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1*|Thr380_pho (pp) re250"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1*|Thr380_pho (pp) re250"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re1274" source="-54" target="-377">
+  <edge label="CDK2:cyclinA2* (pp) re1274" source="-54" target="-377">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re1274"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re1274"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re1273" source="-54" target="-376">
+  <edge label="CDK2:cyclinA2* (pp) re1273" source="-54" target="-376">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re1273"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re1273"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re1272" source="-54" target="-375">
+  <edge label="CDK2:cyclinA2* (pp) re1272" source="-54" target="-375">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re1272"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re1272"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re326" source="-54" target="-345">
+  <edge label="CDK2:cyclinA2* (pp) re326" source="-54" target="-345">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re326"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re326"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re310" source="-54" target="-332">
+  <edge label="CDK2:cyclinA2* (pp) re310" source="-54" target="-332">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re310"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re310"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin A2* (pp) re171" source="-54" target="-322">
+  <edge label="CDK2:cyclinA2* (pp) re171" source="-54" target="-322">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin A2* (pp) re171"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinA2* (pp) re171"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2368,9 +2368,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re238 (pp) CDC2|Tyr15_pho:cyclin B1*@default" source="-310" target="-139">
+  <edge label="re238 (pp) CDC2|Tyr15_pho:cyclinB1*@default" source="-310" target="-139">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re238 (pp) CDC2|Tyr15_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re238 (pp) CDC2|Tyr15_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2416,27 +2416,27 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2:cyclin B1*@default (pp) re238" source="-136" target="-310">
+  <edge label="CDC2:cyclinB1*@default (pp) re238" source="-136" target="-310">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1*@default (pp) re238"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1*@default (pp) re238"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2:cyclin B1*@default (pp) re230" source="-136" target="-303">
+  <edge label="CDC2:cyclinB1*@default (pp) re230" source="-136" target="-303">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1*@default (pp) re230"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1*@default (pp) re230"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2:cyclin B1*@default (pp) re226" source="-136" target="-299">
+  <edge label="CDC2:cyclinB1*@default (pp) re226" source="-136" target="-299">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2:cyclin B1*@default (pp) re226"/>
+    <att type="string" name="canonicalName" value="CDC2:cyclinB1*@default (pp) re226"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re236 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default" source="-308" target="-138">
+  <edge label="re236 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default" source="-308" target="-138">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re236 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re236 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2542,9 +2542,9 @@
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re245 (pp) CDK7|Thr170_pho:MNAT1:cyclin H*" source="-341" target="-135">
+  <edge label="re245 (pp) CDK7|Thr170_pho:MNAT1:cyclinH*" source="-341" target="-135">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re245 (pp) CDK7|Thr170_pho:MNAT1:cyclin H*"/>
+    <att type="string" name="canonicalName" value="re245 (pp) CDK7|Thr170_pho:MNAT1:cyclinH*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2554,51 +2554,51 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re1276" source="-55" target="-379">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re1276" source="-55" target="-379">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re1276"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re1276"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re1275" source="-55" target="-378">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re1275" source="-55" target="-378">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re1275"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re1275"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re327" source="-55" target="-346">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re327" source="-55" target="-346">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re327"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re327"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re248" source="-55" target="-323">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re248" source="-55" target="-323">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re248"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re248"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re169" source="-55" target="-320">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re169" source="-55" target="-320">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re169"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re169"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re323" source="-55" target="-252">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re323" source="-55" target="-252">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re323"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re323"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2|Thr160_pho:cyclin E1* (pp) re289" source="-55" target="-244">
+  <edge label="CDK2|Thr160_pho:cyclinE1* (pp) re289" source="-55" target="-244">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="CATALYSIS"/>
-    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclin E1* (pp) re289"/>
+    <att type="string" name="canonicalName" value="CDK2|Thr160_pho:cyclinE1* (pp) re289"/>
     <att type="string" name="interaction" value="CATALYSIS" cy:editable="false"/>
     <graphics width="1" fill="#ff0000" cy:sourceArrow="0" cy:targetArrow="12" cy:sourceArrowColor="#000000" cy:targetArrowColor="#ff0000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re1276 (pp) CDK2|Thr160_pho:cyclin E1*:p130*|pho" source="-379" target="-211">
+  <edge label="re1276 (pp) CDK2|Thr160_pho:cyclinE1*:p130*|pho" source="-379" target="-211">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re1276 (pp) CDK2|Thr160_pho:cyclin E1*:p130*|pho"/>
+    <att type="string" name="canonicalName" value="re1276 (pp) CDK2|Thr160_pho:cyclinE1*:p130*|pho"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2614,27 +2614,27 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re225 (pp) CDC2|Thr14_pho:cyclin B1*@default" source="-298" target="-137">
+  <edge label="re225 (pp) CDC2|Thr14_pho:cyclinB1*@default" source="-298" target="-137">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re225 (pp) CDC2|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re225 (pp) CDC2|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin E1* (pp) re329" source="-154" target="-333">
+  <edge label="CDK2:cyclinE1* (pp) re329" source="-154" target="-333">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin E1* (pp) re329"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinE1* (pp) re329"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin E1* (pp) re170" source="-154" target="-321">
+  <edge label="CDK2:cyclinE1* (pp) re170" source="-154" target="-321">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin E1* (pp) re170"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinE1* (pp) re170"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDK2:cyclin E1* (pp) re147" source="-154" target="-318">
+  <edge label="CDK2:cyclinE1* (pp) re147" source="-154" target="-318">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDK2:cyclin E1* (pp) re147"/>
+    <att type="string" name="canonicalName" value="CDK2:cyclinE1* (pp) re147"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2674,15 +2674,15 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re228 (pp) CDC2|Thr14_pho:cyclin B1*" source="-301" target="-130">
+  <edge label="re228 (pp) CDC2|Thr14_pho:cyclinB1*" source="-301" target="-130">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re228 (pp) CDC2|Thr14_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re228 (pp) CDC2|Thr14_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re239 (pp) CDC2|Tyr15_pho:cyclin B1*@default" source="-311" target="-139">
+  <edge label="re239 (pp) CDC2|Tyr15_pho:cyclinB1*@default" source="-311" target="-139">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re239 (pp) CDC2|Tyr15_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re239 (pp) CDC2|Tyr15_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2794,9 +2794,9 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re1275 (pp) CDK2|Thr160_pho:cyclin E1*:p107*" source="-378" target="-212">
+  <edge label="re1275 (pp) CDK2|Thr160_pho:cyclinE1*:p107*" source="-378" target="-212">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re1275 (pp) CDK2|Thr160_pho:cyclin E1*:p107*"/>
+    <att type="string" name="canonicalName" value="re1275 (pp) CDK2|Thr160_pho:cyclinE1*:p107*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2806,9 +2806,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re1274 (pp) CDK2:cyclin A2*:p130*|pho" source="-377" target="-210">
+  <edge label="re1274 (pp) CDK2:cyclinA2*:p130*|pho" source="-377" target="-210">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re1274 (pp) CDK2:cyclin A2*:p130*|pho"/>
+    <att type="string" name="canonicalName" value="re1274 (pp) CDK2:cyclinA2*:p130*|pho"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2818,9 +2818,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re234 (pp) CDC2|Tyr15_pho:cyclin B1*" source="-306" target="-132">
+  <edge label="re234 (pp) CDC2|Tyr15_pho:cyclinB1*" source="-306" target="-132">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re234 (pp) CDC2|Tyr15_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re234 (pp) CDC2|Tyr15_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2836,9 +2836,9 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re216 (pp) CDC2|Thr161_pho:cyclin B1*" source="-291" target="-134">
+  <edge label="re216 (pp) CDC2|Thr161_pho:cyclinB1*" source="-291" target="-134">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re216 (pp) CDC2|Thr161_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re216 (pp) CDC2|Thr161_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2872,27 +2872,27 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re232 (pp) CDC2|Tyr15_pho:cyclin B1*" source="-304" target="-132">
+  <edge label="re232 (pp) CDC2|Tyr15_pho:cyclinB1*" source="-304" target="-132">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re232 (pp) CDC2|Tyr15_pho:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re232 (pp) CDC2|Tyr15_pho:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re219 (pp) CDC2:cyclin B1*" source="-294" target="-133">
+  <edge label="re219 (pp) CDC2:cyclinB1*" source="-294" target="-133">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re219 (pp) CDC2:cyclin B1*"/>
+    <att type="string" name="canonicalName" value="re219 (pp) CDC2:cyclinB1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="cyclin H* (pp) re148" source="-165" target="-338">
+  <edge label="cyclinH* (pp) re148" source="-165" target="-338">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="cyclin H* (pp) re148"/>
+    <att type="string" name="canonicalName" value="cyclinH* (pp) re148"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re170 (pp) CDK2:cyclin E1*:p27Kip1*" source="-321" target="-159">
+  <edge label="re170 (pp) CDK2:cyclinE1*:p27Kip1*" source="-321" target="-159">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re170 (pp) CDK2:cyclin E1*:p27Kip1*"/>
+    <att type="string" name="canonicalName" value="re170 (pp) CDK2:cyclinE1*:p27Kip1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2920,27 +2920,27 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re147 (pp) CDK2|Thr160_pho:cyclin E1*" source="-318" target="-55">
+  <edge label="re147 (pp) CDK2|Thr160_pho:cyclinE1*" source="-318" target="-55">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re147 (pp) CDK2|Thr160_pho:cyclin E1*"/>
+    <att type="string" name="canonicalName" value="re147 (pp) CDK2|Thr160_pho:cyclinE1*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re227 (pp) CDC2:cyclin B1*@default" source="-300" target="-136">
+  <edge label="re227 (pp) CDC2:cyclinB1*@default" source="-300" target="-136">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re227 (pp) CDC2:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re227 (pp) CDC2:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re224 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default" source="-297" target="-138">
+  <edge label="re224 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default" source="-297" target="-138">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re224 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclin B1*@default"/>
+    <att type="string" name="canonicalName" value="re224 (pp) CDC2|Tyr15_pho|Thr14_pho:cyclinB1*@default"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="re148 (pp) CDK7:MNAT1:cyclin H*" source="-338" target="-167">
+  <edge label="re148 (pp) CDK7:MNAT1:cyclinH*" source="-338" target="-167">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="RIGHT"/>
-    <att type="string" name="canonicalName" value="re148 (pp) CDK7:MNAT1:cyclin H*"/>
+    <att type="string" name="canonicalName" value="re148 (pp) CDK7:MNAT1:cyclinH*"/>
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -2974,21 +2974,21 @@
     <att type="string" name="interaction" value="RIGHT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re241" source="-131" target="-312">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re241" source="-131" target="-312">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re241"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re241"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re220" source="-131" target="-295">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re220" source="-131" target="-295">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re220"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re220"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re217" source="-131" target="-292">
+  <edge label="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re217" source="-131" target="-292">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclin B1* (pp) re217"/>
+    <att type="string" name="canonicalName" value="CDC2|Tyr15_pho|Thr14_pho:cyclinB1* (pp) re217"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
@@ -3034,21 +3034,21 @@
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1* (pp) re229" source="-130" target="-302">
+  <edge label="CDC2|Thr14_pho:cyclinB1* (pp) re229" source="-130" target="-302">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1* (pp) re229"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1* (pp) re229"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1* (pp) re219" source="-130" target="-294">
+  <edge label="CDC2|Thr14_pho:cyclinB1* (pp) re219" source="-130" target="-294">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1* (pp) re219"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1* (pp) re219"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>
-  <edge label="CDC2|Thr14_pho:cyclin B1* (pp) re218" source="-130" target="-293">
+  <edge label="CDC2|Thr14_pho:cyclinB1* (pp) re218" source="-130" target="-293">
     <att type="string" name="CELLDESIGNER_EDGE_TYPE" value="LEFT"/>
-    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclin B1* (pp) re218"/>
+    <att type="string" name="canonicalName" value="CDC2|Thr14_pho:cyclinB1* (pp) re218"/>
     <att type="string" name="interaction" value="LEFT" cy:editable="false"/>
     <graphics width="1" fill="#000000" cy:sourceArrow="0" cy:targetArrow="6" cy:sourceArrowColor="#000000" cy:targetArrowColor="#000000" cy:edgeLabelFont="SanSerif-0-10" cy:edgeLabel="" cy:edgeLineType="SOLID" cy:curved="STRAIGHT_LINES"/>
   </edge>

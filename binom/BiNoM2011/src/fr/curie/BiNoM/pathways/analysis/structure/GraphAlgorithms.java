@@ -547,7 +547,8 @@ public class GraphAlgorithms {
 	      for(int j=pth.size()-1;j>=0;j--){
 	        pthr.addNode((Node)graph.Nodes.get(pth.get(j).intValue()));
 	      }
-	      pthr.addConnections(graph);
+	      //pthr.addConnections(graph);
+	      pthr.addConnectionsAlongSequence(graph);
 	      pathf.add(pthr);
 	    }
 		return pathf;

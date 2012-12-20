@@ -111,6 +111,7 @@ public class CellDesignerToCytoscapeConverter {
 	c2c.sbml = CellDesigner.loadCellDesigner(file);
 	System.out.println("Loaded.");
 
+
 	CellDesigner.entities = CellDesigner.getEntities(c2c.sbml);
 	//BipartiteGraph bgr = c2c.celldesigner.getBipartiteGraph(c2c.sbml.getSbml());
 	//BiographUtils.mapClassesToNodeProps(bgr);
@@ -900,6 +901,12 @@ public class CellDesignerToCytoscapeConverter {
 	 public static String getSpeciesName(CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity spi, String sp_id, String sp_name, String compartment, boolean addModifications, boolean addCompartmentName, String defcomp_id, SbmlDocument.Sbml sbml, String alias){
 	   String s = "";
 	   String cl = null;
+	   
+	   if(spi == null){
+		   SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(sp_id);
+		   s = Utils.getValue(sp.getName());
+		   return s;
+	   }
 
 	   //if(an!=null)
 	     cl = Utils.getText(spi.getCelldesignerClass());
@@ -1171,9 +1178,10 @@ public class CellDesignerToCytoscapeConverter {
 	public static String getEntityName(String spid, CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity ident, SbmlDocument.Sbml sbml){
 	  String res = null;
 	  if(ident==null){
-		  System.out.println("ident = null for "+spid);
-		  System.exit(0);
-	  }
+		  //System.out.println("ident = null for "+spid);
+		  SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
+		  res = Utils.getValue(sp.getName());
+	  }else{
 	  String spcl = Utils.getText(ident.getCelldesignerClass());
 	  if(spcl.equals("PROTEIN")){
 	    String id = Utils.getText(ident.getCelldesignerProteinReference());
@@ -1262,6 +1270,7 @@ public class CellDesignerToCytoscapeConverter {
 
 	  if(res==null)
 	    System.out.println("UNKNOWN ENTITY TYPE "+spcl+" !!! "+spid);
+	  }
 	  return res;
 	}
 

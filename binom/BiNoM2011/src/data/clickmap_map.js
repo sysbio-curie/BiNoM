@@ -418,6 +418,18 @@ function open_blog_click(e)
 	return false;
 }
 
+function open_module_map_click(e)
+{
+	try
+	{
+		show_map_and_markers(e.currentTarget.alt, []);
+	}
+	catch (f)
+	{
+	};
+	return false;
+}
+
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
 	console.log("clickmap_start", to_open);
@@ -445,6 +457,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		}
 		to_open = [];
 		$("img.blogfromright").click(open_blog_click);
+		$("img.mapmodulefromright").click(open_module_map_click);
 		console.log("to_open set", to_open, to_open.length);
 		
 	};

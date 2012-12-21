@@ -113,6 +113,9 @@ public class ProduceClickableMap
 	private static final String base_directory = "../../..";
 	static final String icons_directory = base_directory + "/map_icons";
 
+
+	private static final String map_icon = icons_directory + "/map.png";
+
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = base_directory + "/doc";
 	private static final String entity_icons_directory = icons_directory + "/entity";
@@ -1504,11 +1507,18 @@ public class ProduceClickableMap
 		return indent;
 	}
 	
-	private static String make_right_hand_link_to_blog(int postid, String name)
+	private static StringBuffer make_right_hand_link_to_blog(StringBuffer sb, int postid)
 	{
-		StringBuffer sb = new StringBuffer("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
-		sb.append(postid).append("'/> ").append(name);
-		return sb.toString();
+		if (sb == null)
+			sb = new StringBuffer();
+		sb.append("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
+		sb.append(postid).append("'/>");
+		return sb;
+	}
+	
+	private static StringBuffer make_right_hand_link_to_blog_with_name(StringBuffer sb, int postid, String name)
+	{
+		return make_right_hand_link_to_blog(sb, postid).append(" ").append(name);
 	}
 	
 	private static void modification_line(final ItemCloser indent, Modification m,
@@ -1596,7 +1606,7 @@ public class ProduceClickableMap
 			final FormatProteinNotes format, final SbmlDocument cd, final String blog_name, ImagesInfo scales, final PrintWriter output,
 			final ItemCloser cls, final EntityBase ent, Linker wp)
 	{
-		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, make_right_hand_link_to_blog(ent.getPostId(), ent.getName()), null);
+		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, make_right_hand_link_to_blog_with_name(null, ent.getPostId(), ent.getName()).toString(), null);
 		
 		class Modif
 		{
@@ -1681,6 +1691,16 @@ public class ProduceClickableMap
 		}
 	}
 	
+	static private String make_right_hand_module_entry(int post_id, String name)
+	{
+		final StringBuffer sb = make_right_hand_link_to_blog(null, post_id);
+		sb.append(" ");
+		sb.append("<img align='top' class='mapmodulefromright' border='0' src='" + map_icon + "' alt='");
+		sb.append(name).append("'/>");
+		sb.append(" ").append(name);
+		return sb.toString();
+	}
+	
 	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set, Model model, ImagesInfo scales, String blog_name)
 	{
 		final PrintWriter output = right_close_entities(right);
@@ -1732,7 +1752,12 @@ public class ProduceClickableMap
 					indent.getOutput().print(";");
 					indent.getOutput().print(scales.getY(position[1]));
 					indent.getOutput().println("\">");
-					content_line(indent.add(), make_right_hand_link_to_blog(post_id, k.getKey()), make_module_bubble(k.getKey(), k.getValue().notes, post_id));
+					content_line
+					(
+						indent.add(),
+						make_right_hand_module_entry(post_id, k.getKey()),
+						make_module_bubble(k.getKey(), k.getValue().notes, post_id)
+					);
 					indent.close();
 				}
 			}
@@ -1768,7 +1793,7 @@ public class ProduceClickableMap
 		indent.getOutput().print(";");
 		indent.getOutput().print(scales.getY(y));
 		indent.getOutput().println("\">");
-		content_line(indent.add(), make_right_hand_link_to_blog(post_id, r.getId()), bubble);
+		content_line(indent.add(), make_right_hand_link_to_blog_with_name(null, post_id, r.getId()).toString(), bubble);
 		indent.close();
 	}
 	
@@ -2427,7 +2452,7 @@ public class ProduceClickableMap
 	{
 		fw.append("<img border='0' src=");
 		html_quote(fw, url);
-		fw.append(" alt='map'>");
+		fw.append(" alt='map' />"); // don't remove the space as WordPress appears to put it back
 	}
 
 	private StringBuffer show_reaction(ReactionDocument.Reaction r, final Hasher h, final StringBuffer fw, ReactionDisplayType pass2,
@@ -3490,7 +3515,7 @@ public class ProduceClickableMap
 		if (title != null)
 			html_quote(fw.append(" title="), title);
 		fw.append(">");
-		show_map_icon(fw, icons_directory + "/map.png");
+		show_map_icon(fw, map_icon);
 		return fw.append("</a>");
 	}
 	

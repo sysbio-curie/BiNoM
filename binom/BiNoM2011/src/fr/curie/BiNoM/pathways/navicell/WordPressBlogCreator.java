@@ -536,15 +536,16 @@ public class WordPressBlogCreator extends BlogCreator
 		return info;
 	}
 	@Override
-        void updateBlogPostIfRequired(BlogCreator.Post p, String title, String body, String entity_type,
+        void updateBlogPostIfRequired(BlogCreator.Post p, String title, final String in_body, String entity_type,
                         List<String> modules)
         {
 		Post info = (Post)p;
 		final String cls = entity_type.toLowerCase();
-		if (body == null)
+		if (in_body == null)
 			return;
 //		assert !body.endsWith("\n") : "bodies must not end with a \\n: " + body;
-		body = body.trim();
+		final String body = in_body.trim();
+		assert body.isEmpty() || body.charAt(body.length() - 1) != '\n';
 		title = title.trim();
 		final boolean body_eq = body.equals(info.getBody());
 		if (body_eq && !body_eq)
@@ -553,8 +554,9 @@ public class WordPressBlogCreator extends BlogCreator
 			for (; i < body.length() && i < info.getBody().length(); i++)
 				if (body.charAt(i) != info.getBody().charAt(i))
 					break;
-			Utils.eclipsePrintln(info.getBody().substring(i));
-			Utils.eclipsePrintln(body.substring(i));
+			i = Math.min(Math.min(info.getBody().length(), body.length()), i + 20);
+			Utils.eclipsePrintln("old: " + info.getBody().substring(0, i));
+			Utils.eclipsePrintln("new: " + body.substring(0, i));
 		}
 		final String r;
 		if (!body_eq)
@@ -570,7 +572,7 @@ public class WordPressBlogCreator extends BlogCreator
 		if (r != null)
 		{
 			updateBlogPost(wp, info.getPostId(), title, body, cls, modules);
-			verbose("updated post for " + info.getPostId() + " as " + r + " changed: " +  title);
+			verbose("updated post for " + info.getPostId() + " as " + r + " changed: " +  title + "(" + cls + ")");
 		}
 	}
 	

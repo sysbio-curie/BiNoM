@@ -125,7 +125,7 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{BiNoM, a Cytoscape plugin for accessing and analyzing pathways using
+\title{BiNoM 2.0, a Cytoscape plugin for accessing and analyzing pathways using
 standard systems biology formats}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -292,9 +292,9 @@ hundreds of chemical species and interactions. The analysis and interpretation o
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical editing of biological pathway diagrams
-\cite{funahashi2003celldesigner}. The CellDesigner file format correspond to the
-SBML specification, except that the official SBML layout extension is replaced
-by a layout specific to the software.  There is obviously
+\cite{funahashi2003celldesigner}. The CellDesigner file format uses an extension of the 
+SBML specification, describing 
+biological types of chemical species and the layout of the reaction graph.  There is obviously
 a need for user-friendly software tools that would allow the user to easily
 import data from various standard format sources, to perform structural analyses on these pathways
 and to manipulate networks, and to be able to export a network to a suitable
@@ -348,7 +348,7 @@ Plugins", Section ``Other", then select the latest version of BiNoM). Alternativ
 also download the plugin together with a manual and the source code from the
 BiNoM website \url{http://binom.curie.fr/}.
 
-BiNoM manipulates the information contained in the standard systems biology
+BiNoM manipulates the information contained in standard systems biology
 files by mapping it onto a labeled graph, called index. The index does not try
 to map the totality of all details but rather serves as a connection map for the
 objects contained in other ontologies. The index contains the minimum
@@ -787,7 +787,7 @@ reactions (Figure 8).
 % \center{\includegraphics[width=0.85\textwidth]{figures/G1S.png}}
 %\end{figure}
 
-This map contains a lot of valuable information but this one is rather difficult to extract. We present two
+This map contains a lot of valuable information but it can be rather difficult to extract. We present two
 ways to get some biological insight from this map, by using BiNoM functions. The first one consists of
 transforming the reaction network into an influence network in order to analyze
 experimental data on it. The second one presents a simplification of the comprehensive map by
@@ -989,7 +989,7 @@ edited and approved the final version of the manuscript.
   This work is supported by the APO-SYS EU FP7 project. 
 The work is supported by EU FP7 ASSET project and by the grant "Projet Incitatif et Collaboratif Computational Systems Biology Approach for Cancer " from Institut Curie.  
 EB, LC, DR, GS, EmB and AZ are members of the team ``Computational Systems Biology of
-Cancer", Equipe labellise par la Ligue Nationale Contre le Cancer.
+Cancer", Equipe labellisée par la Ligue Nationale Contre le Cancer.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1220,7 +1220,7 @@ biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012
          \\visualization and export & $\bullet$      &$\bullet$&$\circ$& $\circ$      & $\circ$       & $\circ$     & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         CSML import            & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         CSML visualization     & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
-        Cytoscape extra & & & & & & & & & & &
+        Cytoscape extra & & & & & & & & & & & & &
                    \\utilities & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\ \hline
         Get connected  & & & & & & & & & & & & &
             \\network components & $\bullet$ &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\bullet$       &  $\circ$           & $\bullet$            &  $\bullet$      \\ \hline

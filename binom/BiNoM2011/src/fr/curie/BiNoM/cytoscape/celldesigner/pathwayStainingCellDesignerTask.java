@@ -57,6 +57,8 @@ public class pathwayStainingCellDesignerTask implements Task {
 	public final class stainingOptions{
 		public float influenceRadius = 0.01f;
 		public boolean normalizeToZValues = true;
+		public boolean useModuleDefinitionsFromCellDesignerFile = false;
+		public boolean useProteinNameIfHUGOisntFound = true;
 		public float thresholdForComputingGradient = 2f;
 		public float gridSizeX = 20f;
 		public float gridSizeY = 20f;
@@ -83,6 +85,8 @@ public class pathwayStainingCellDesignerTask implements Task {
     			cps.gridStepY = options.gridSizeY;
     			cps.normalizeColumnValues = options.normalizeToZValues;
     			cps.thresholdGradient = options.thresholdForComputingGradient;
+    			cps.useModuleDefinitionsFromCellDesignerFile = options.useModuleDefinitionsFromCellDesignerFile;
+    			cps.useProteinNameIfHUGOisntFound = options.useProteinNameIfHUGOisntFound;
     			
     			cps.run(CellDesignerFileName, PngFileName, DataTableFileName, ProteinGroupFileName);    			
     		}else{

@@ -87,6 +87,8 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
     private JButton browseProteinGroup = null;
     
     private JCheckBox normalizeToZValues = null;
+    private JCheckBox useModuleDefinitionsFromCellDesignerFile = null;
+    private JCheckBox useProteinNameIfHUGOisntFound = null;
     private JTextField influenceRadius = null;
     private JTextField thresholdForComputingGradient = null;
     private JTextField gridSizeX = null;
@@ -393,8 +395,33 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
 	panel.add(normalizeToZValues,c);
 	normalizeToZValues.setSelected(options.normalizeToZValues);
 
+	useModuleDefinitionsFromCellDesignerFile = new JCheckBox("Use module definitions from XML file");
+	x = 1;
+	c = new GridBagConstraints();
+	c.ipady = 20;	
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.CENTER;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(useModuleDefinitionsFromCellDesignerFile,c);
+	useModuleDefinitionsFromCellDesignerFile.setSelected(options.useModuleDefinitionsFromCellDesignerFile);
+	
 	
 	y++;
+	
+	useProteinNameIfHUGOisntFound = new JCheckBox("Use name (if there is no HUGO tag)");
+	x = 1;
+	c = new GridBagConstraints();
+	c.ipady = 20;	
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.CENTER;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(useProteinNameIfHUGOisntFound,c);
+	useProteinNameIfHUGOisntFound.setSelected(options.useProteinNameIfHUGOisntFound);
+	
 
 	lab2 = new JLabel("Color spot radius  ");
 	x = 0;
@@ -505,10 +532,12 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
 
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            setVisible(false);	
+            //setVisible(false);	
             try{
             options.influenceRadius = Float.parseFloat(influenceRadius.getText());
             options.normalizeToZValues = normalizeToZValues.isSelected();
+            options.useModuleDefinitionsFromCellDesignerFile = useModuleDefinitionsFromCellDesignerFile.isSelected();
+            options.useProteinNameIfHUGOisntFound = useProteinNameIfHUGOisntFound.isSelected();
             options.thresholdForComputingGradient = Float.parseFloat(thresholdForComputingGradient.getText());
             options.gridSizeX = Float.parseFloat(gridSizeX.getText());
             options.gridSizeY = Float.parseFloat(gridSizeY.getText());

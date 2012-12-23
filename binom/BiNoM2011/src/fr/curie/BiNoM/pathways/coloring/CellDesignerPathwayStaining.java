@@ -42,6 +42,8 @@ public class CellDesignerPathwayStaining {
 	public float infradius = 0.01f;
 	public float thresholdGradient = 2f;
 	public boolean normalizeColumnValues = true; 
+	public boolean useModuleDefinitionsFromCellDesignerFile = true;
+	public boolean useProteinNameIfHUGOisntFound = true;
 	
 	public SimpleTable table = null;
 	
@@ -77,9 +79,10 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", null, prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", null, prefix+"expression.txt", null);
 			//cm.run(prefix+"rbe2f.xml", null, null, null);
-			cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
+			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			//cm.run(prefix+"rbe2f.xml", null, null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, prefix+"modules_proteins_c2_lc.gmt");
+			cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
 			System.exit(0);
 			
 			
@@ -120,6 +123,20 @@ public class CellDesignerPathwayStaining {
 	public void run(String CellDesignerFileName, String PngFileName, String DataTableFileName, String ProteinGroupFileName){
 
 		loadMap(CellDesignerFileName);
+		
+		if(ProteinGroupFileName==null){
+			if(useModuleDefinitionsFromCellDesignerFile){
+				String fn = CellDesignerFileName.substring(0,CellDesignerFileName.length()-4);
+				if((new File(fn+".gmt").exists()))
+					fn = fn+"_new.gmt";
+				else
+					fn = fn+".gmt";
+				HashMap<String, Vector<String>> groups = extractGMTFromCellDesigner(fn);
+				if(groups.size()!=0)
+					ProteinGroupFileName = fn;
+			}
+		}
+		
 		if(ProteinGroupFileName==null){
 			createPoints();
 			loadGroupsOfProteins(ProteinGroupFileName);
@@ -307,12 +324,15 @@ public class CellDesignerPathwayStaining {
 		Vector<String> hugos = new Vector<String>();
 		String spclass = Utils.getValue(csi.getCelldesignerClass());
 		String annotation = null;
+		String name = null;
 		if(spclass.equals("PROTEIN")){
 			CelldesignerProteinDocument.CelldesignerProtein p = (CelldesignerProteinDocument.CelldesignerProtein)CellDesigner.entities.get(Utils.getValue(csi.getCelldesignerProteinReference()));
 			//System.out.println(p.getId());
 			//System.out.println(p.getCelldesignerNotes());
 			if(p.getCelldesignerNotes()!=null)
 				annotation = Utils.getText(p.getCelldesignerNotes());
+			name = ""+Utils.getValue(p.getName());
+			if(name==null) System.out.println("Name = null for protein "+p.getId());			
 			//System.out.println(annotation);
 		}
 		if(spclass.equals("GENE")){
@@ -320,17 +340,25 @@ public class CellDesignerPathwayStaining {
 			//System.out.println(p.getId());
 			if(p.getCelldesignerNotes()!=null)
 				annotation = Utils.getText(p.getCelldesignerNotes());
+			name = ""+p.getName();			
+			if(name==null) System.out.println("Name = null for gene "+p.getId());			
 			//System.out.println(p.getId()); System.out.println(annotation);
 		}
 		if(spclass.equals("RNA")){
 			CelldesignerRNADocument.CelldesignerRNA p = (CelldesignerRNADocument.CelldesignerRNA)CellDesigner.entities.get(Utils.getValue(csi.getCelldesignerRnaReference()));
 			if(p.getCelldesignerNotes()!=null)
 				annotation = Utils.getText(p.getCelldesignerNotes());
+			name = ""+p.getName();
+			if(name==null) System.out.println("Name = null for rna "+p.getId());
 			//System.out.println(p.getId()); System.out.println(annotation);			
 		}
 		if(annotation!=null){
 			hugos = getTagValues(annotation,"HUGO");
 		}
+		if(hugos.size()==0)
+			if(this.useProteinNameIfHUGOisntFound)
+				if(name!=null)
+					hugos.add(name);
 		return hugos;
 	}
 	
@@ -583,22 +611,28 @@ public class CellDesignerPathwayStaining {
 		  }
 	  }
 	  
-	  public void extractGMTFromCellDesigner(String fn){
+	  public HashMap<String, Vector<String>>  extractGMTFromCellDesigner(String fn){
 		  HashMap<String, Vector<String>> groups = new HashMap<String, Vector<String>>();
 		  for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			  CelldesignerProtein protein = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);  
-			  String notes = Utils.getText(protein.getCelldesignerNotes());
-			  processAnnotation(notes, groups);
+			  if(protein.getCelldesignerNotes()!=null){
+				  String notes = Utils.getText(protein.getCelldesignerNotes());
+				  processAnnotation(Utils.getValue(protein.getName()), notes, groups);
+			  }
 		  }
 		  for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 			  CelldesignerGene gene = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);  
-			  String notes = Utils.getText(gene.getCelldesignerNotes());
-			  processAnnotation(notes, groups);
+			  if(gene.getCelldesignerNotes()!=null){
+				  String notes = Utils.getText(gene.getCelldesignerNotes());
+				  processAnnotation(gene.getName(), notes, groups);
+			  }
 		  }
 		  for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
 			  CelldesignerRNA rna = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);  
-			  String notes = Utils.getText(rna.getCelldesignerNotes());
-			  processAnnotation(notes, groups);
+			  if(rna.getCelldesignerNotes()!=null){
+				  String notes = Utils.getText(rna.getCelldesignerNotes());
+				  processAnnotation(rna.getName(), notes, groups);
+			  }
 		  }
 		  Iterator<String> it = groups.keySet().iterator();
 		  try{
@@ -615,19 +649,27 @@ public class CellDesignerPathwayStaining {
 		  }catch(Exception e){
 			  e.printStackTrace();
 		  }
+		  return groups;
 	  }
 	
-	  public void processAnnotation(String notes, HashMap<String, Vector<String>> groups){
+	  public void processAnnotation(String name, String notes, HashMap<String, Vector<String>> groups){
 		  Vector<String> hugos = getTagValues(notes, "HUGO");
 		  Vector<String> cc_phase = getTagValues(notes, "CC_PHASE");		  
 		  Vector<String> layer = getTagValues(notes, "LAYER");		  
 		  Vector<String> pathway = getTagValues(notes, "PATHWAY");		  		  
 		  Vector<String> checkpoints = getTagValues(notes,"CHECKPOINT");
+		  Vector<String> modules = getTagValues(notes,"MODULE");
 		  Vector<String> module_names = new Vector<String>();
 		  module_names.addAll(cc_phase);
 		  module_names.addAll(pathway);
 		  module_names.addAll(layer);
 		  module_names.addAll(checkpoints);
+		  module_names.addAll(modules);		
+		  if(useProteinNameIfHUGOisntFound){
+			  if(hugos.size()==0)
+				  if(name!=null)
+					  hugos.add(name);
+		  }
 		  for(int i=0;i<module_names.size();i++){
 			  String module = module_names.get(i);
 			  Vector<String> names = groups.get(module);

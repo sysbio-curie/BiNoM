@@ -209,6 +209,14 @@ public class WordPressBlogCreator extends BlogCreator
 		}
 		verbose(deleted + " posts deleted");
 	}
+	private static void debugMessage(String m)
+	{
+		Utils.eclipseParentPrintln(m);
+	}
+	private static void errorMessage(String m)
+	{
+		Utils.eclipseParentErrorln(m);
+	}
 	private void updatePageId(final String id, final int post_id)
 	{
 		assert posts.get(id) == null : id;
@@ -216,11 +224,11 @@ public class WordPressBlogCreator extends BlogCreator
 		assert ip != null : id + " " + post_id;
 		if (ip != null)
 		{
-			ProduceClickableMap.debugMessage("hash change on " + id + " " + ip.post_id + " -> " + post_id);
+			debugMessage("hash change on " + id + " " + ip.post_id + " -> " + post_id);
 			ip.post_id = post_id;
 		}
 		else
-			ProduceClickableMap.debugMessage("hash change on " + id + " " + post_id);
+			debugMessage("hash change on " + id + " " + post_id);
 	}
 	private Post addPage(String id, int page_id)
 	{
@@ -262,7 +270,7 @@ public class WordPressBlogCreator extends BlogCreator
 			catch (XmlRpcFault e)
 			{
 				e.printStackTrace();
-				ProduceClickableMap.errorMessage("failed to create catagory " + category + " with parent " + parent);
+				errorMessage("failed to create catagory " + category + " with parent " + parent);
 			}
 		}
 		return category;
@@ -315,12 +323,12 @@ public class WordPressBlogCreator extends BlogCreator
 			if (r)
 				assert postid == page.getPostid() : postid + " " + page.getPostid();
 			else
-				ProduceClickableMap.errorMessage("failed to update post for " + postid + " " +  page.getTitle());
+				errorMessage("failed to update post for " + postid + " " +  page.getTitle());
 		}
 		catch (XmlRpcFault e)
 		{
 			e.printStackTrace();
-			ProduceClickableMap.errorMessage("exception when updating " + postid + " " +  page.getTitle());
+			errorMessage("exception when updating " + postid + " " +  page.getTitle());
 			return;
 		}
 	}

@@ -419,7 +419,7 @@ public class ProduceClickableMap
 				}
 		}
 		
-		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, project_name);
+		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
 		
 		wp.remove_old_posts();
 	}
@@ -1589,7 +1589,7 @@ public class ProduceClickableMap
 		right_close(output);
 	}
 	
-	static private String make_module_bubble(String module_name, String notes, int post_id)
+	static  String make_module_bubble(String module_name, String notes, int post_id, Linker wp, FormatProteinNotes notes_formatter)
 	{
 		String[] parts = notes.split("\n", 2);
 		StringBuffer fw = new StringBuffer();
@@ -1597,7 +1597,11 @@ public class ProduceClickableMap
 		bubble_to_post_link_with_anchor(post_id, fw);
 		open_map_from_bubble(fw.append(" "), module_name);
 		if (parts.length > 1)
-			fw.append("<br>\n").append(parts[1]);
+		{
+			fw.append("<br>\n");
+			notes_formatter.module_bubble(fw, parts[1], wp);
+			// java.util.Collections.<Modification>emptyList(), null
+		}
 		return fw.toString();
 	}
 	
@@ -1622,7 +1626,10 @@ public class ProduceClickableMap
 		return sb.toString();
 	}
 	
-	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set, Model model, ImagesInfo scales, String blog_name)
+	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set,
+		Model model, ImagesInfo scales, String blog_name,
+		Linker wp, FormatProteinNotes notes_formatter
+	)
 	{
 		final PrintWriter output = right_close_entities(right);
 		
@@ -1677,7 +1684,7 @@ public class ProduceClickableMap
 					(
 						indent.add(),
 						make_right_hand_module_entry(post_id, k.getKey()),
-						make_module_bubble(k.getKey(), k.getValue().notes, post_id)
+						make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
 					);
 					indent.close();
 				}
@@ -2925,7 +2932,7 @@ public class ProduceClickableMap
 		return fw.append("</a>");
 	}
 	
-	static private StringBuffer open_map_from_bubble(StringBuffer fw, final String map_name)
+	static StringBuffer open_map_from_bubble(StringBuffer fw, final String map_name)
 	{
 		return open_map_from_bubble_maybe_with_markers(fw, null, map_name, map_name);
 	}

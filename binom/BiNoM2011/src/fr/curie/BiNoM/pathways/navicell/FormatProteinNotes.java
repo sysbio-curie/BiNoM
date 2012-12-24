@@ -145,6 +145,14 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 			return ProduceClickableMap.show_shapes_on_map_from_bubble(h, fw, sps, map_name, blog_name, wp);
 		}
 	};
+	static final ShowShapesOnMap show_map_module_from_bubble = new ShowShapesOnMap()
+	{
+		@Override
+		public StringBuffer show_shapes_on_map(Hasher h, StringBuffer fw, List<String> sps, String map_name, String blog_name, Linker wp)
+		{
+			return ProduceClickableMap.open_map_from_bubble(fw, map_name);
+		}
+	};
 	StringBuffer pmid_post(ReactionDocument.Reaction r, StringBuffer fw, Hasher h, SbmlDocument cd, Linker wp)
 	{
 		final Notes notes = r.getNotes();
@@ -154,6 +162,10 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		final Notes notes = r.getNotes();
 		return notes == null ? fw : format(Utils.getValue(notes), fw, ProduceClickableMap.null_hasher, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_bubble, null, wp);
+	}
+	StringBuffer module_bubble(StringBuffer result, String comment, Linker wp)
+	{
+		return format(comment, result, ProduceClickableMap.null_hasher, java.util.Collections.<String>emptyList(), pat_bubble, null, null, show_map_module_from_bubble, null, wp);
 	}
 	StringBuffer bubble(final StringBuffer res, String comment, List<Modification> modifs, SbmlDocument cd, Linker wp)
 	{
@@ -170,7 +182,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	private StringBuffer format(String note, final StringBuffer res, Hasher h,
 		List<String> all,
 		Pattern pat,
-		SbmlDocument cd,
+		SbmlDocument cd_, // not used
 		List<Modification> comments,
 		ShowShapesOnMap show_shapes_on_map,
 		List<String> modules_found,
@@ -271,5 +283,4 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 			}
 		}
 	}
-
 }

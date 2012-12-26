@@ -509,7 +509,7 @@ function show_map_and_markers(map_name, ids)
 	else
 	{
 		console.log("not open is map", map, maps);
-		map = window.open("../" + map_name);
+		map = window.open("../" + map_name + "/index.html");
 		map.to_open = ids;
 		map.maps = maps;
 		maps[map_name] = map;

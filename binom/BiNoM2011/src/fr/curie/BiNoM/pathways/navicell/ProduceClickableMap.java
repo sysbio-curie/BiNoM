@@ -716,7 +716,7 @@ public class ProduceClickableMap
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
-		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map);
+		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 
 		final File this_map_directory = mk_maps_directory(map, destination);
@@ -728,7 +728,9 @@ public class ProduceClickableMap
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException, NaviCellException
+		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules
+	)
+		throws IOException, NaviCellException
 	{
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
@@ -740,7 +742,7 @@ public class ProduceClickableMap
 
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
 		clMap.right_panel = clMap.generatePages(wp, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
-		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map);
+		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
 		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 		return clMap;
@@ -1600,7 +1602,6 @@ public class ProduceClickableMap
 		{
 			fw.append("<br>\n");
 			notes_formatter.module_bubble(fw, parts[1], wp);
-			// java.util.Collections.<Modification>emptyList(), null
 		}
 		return fw.toString();
 	}
@@ -1756,7 +1757,8 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
-	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name)
+	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name,
+		final FormatProteinNotes notes_formatter)
 	{
 		final Hasher h = new Hasher();
 		StringBuffer fw = create_buffer_for_post_body(h);
@@ -1765,7 +1767,7 @@ public class ProduceClickableMap
 		show_map_and_markers_from_post(fw, map_name, Collections.<String>emptyList(), map_name, wp);
 		
 		if (parts.length > 1)
-			fw.append("<br>\n").append(parts[1]);
+			notes_formatter.module_post(fw.append("<br>\n"), parts[1], wp);
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
 		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body);
@@ -2902,6 +2904,7 @@ public class ProduceClickableMap
 	static StringBuffer show_shapes_on_map_from_bubble(final Hasher h,
 		StringBuffer fw, List<String> markers, final String map_name, final String blog_name, Linker wp)
 	{
+		assert h == null_hasher;
 //		final boolean first = show_modifications(h, fw, sps, title,
 //			" " + onclick_before + "show_map_and_markers(\"" + blog_name + "\", \"" + map_name + "\", ");
 		
@@ -2935,6 +2938,12 @@ public class ProduceClickableMap
 	static StringBuffer open_map_from_bubble(StringBuffer fw, final String map_name)
 	{
 		return open_map_from_bubble_maybe_with_markers(fw, null, map_name, map_name);
+	}
+
+	static StringBuffer show_map_from_post(final Hasher h, StringBuffer fw,
+		final String map_name, final String blog_name, Linker wp)
+	{
+		return show_map_and_markers_from_post(fw, map_name, Collections.<String>emptyList(), map_name, wp);
 	}
 
 	static StringBuffer show_shapes_on_map_from_post(final Hasher h, StringBuffer fw, List<String> sps,
@@ -3000,7 +3009,6 @@ public class ProduceClickableMap
 		}
 		public List<Modification> getAssociated()
 		{
-			// TODO Auto-generated method stub
 			return Collections.<Modification>emptyList();
 		}
 		public boolean isBad()

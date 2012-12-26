@@ -134,7 +134,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		@Override
 		public StringBuffer show_shapes_on_map(Hasher h, StringBuffer fw, List<String> sps, String map_name, String blog_name, Linker wp)
 		{
-			return ProduceClickableMap.show_shapes_on_map_from_post(h, fw, sps, map_name, blog_name, wp);
+			return ProduceClickableMap.show_map_from_post(h, fw, map_name, blog_name, wp);
 		}
 	};
 	static final ShowShapesOnMap show_shapes_on_map_from_bubble = new ShowShapesOnMap()
@@ -162,6 +162,10 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		final Notes notes = r.getNotes();
 		return notes == null ? fw : format(Utils.getValue(notes), fw, ProduceClickableMap.null_hasher, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_bubble, null, wp);
+	}
+	StringBuffer module_post(StringBuffer result, String comment, Linker wp)
+	{
+		return format(comment, result, ProduceClickableMap.null_hasher, java.util.Collections.<String>emptyList(), pat_bubble, null, null, show_shapes_on_map_from_post, null, wp);
 	}
 	StringBuffer module_bubble(StringBuffer result, String comment, Linker wp)
 	{

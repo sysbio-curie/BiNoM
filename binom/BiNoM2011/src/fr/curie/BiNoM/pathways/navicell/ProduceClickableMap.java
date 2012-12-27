@@ -3992,6 +3992,19 @@ public class ProduceClickableMap
 			map.put(s[0], s.length == 2 ? s[1] : s[2]);
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
 	}
+
+	private static PrintStream create_reset_button(final PrintStream out)
+	{
+		out.print(onclick_before);
+		out.print("uncheck_all_entities(");
+		out.print(");");
+		out.print(onclick_after);
+		out.print(" title='uncheck all entities'>");
+		out.print("reset");
+		out.print("</a>");
+		out.println();
+		return out;
+	}
 	
 	private static void make_index_html(final File this_map_directory, final String blog_name, final String title,
 		final String map_name,
@@ -4055,7 +4068,6 @@ public class ProduceClickableMap
 		out.println("</head>");
 		out.println("<body>");
 		
-			
 		out.println("<noscript>");
 		out.println("JavaScript must be enabled in order for you to use NaviCell.");
 		out.println("However, it seems JavaScript is either disabled or not supported by your browser.");
@@ -4074,7 +4086,7 @@ public class ProduceClickableMap
 		out.println("<div class='header-right'>");
 		
 		out.println(bubble_to_post_link_with_anchor(module_post.getPostId(), new StringBuffer()).toString());
-		
+		create_reset_button(out);
 		doc_in_new_window(out, "map_symbols", "map symbols");
 		out.print(" ");
 		doc_in_new_window(out, "map_help", "help");

@@ -8,8 +8,8 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
 
- * BiNoM Cytoscape plugin is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * BiNoM Cytoscape plugin is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  * 
@@ -47,7 +47,6 @@ function extend(bounds, marker)
 	var scale = 1 << map.getZoom();
 	var xoffset = marker_width / 2 / scale
 	var proj = map.getProjection();
-	console.log("extend: proj", proj);
 	if (typeof proj !== 'undefined')
 	{
 		var point = proj.fromLatLngToPoint(marker.getPosition());
@@ -514,4 +513,19 @@ function show_map_and_markers(map_name, ids)
 		map.maps = maps;
 		maps[map_name] = map;
 	}
+}
+
+function uncheck_all_entities()
+{
+//	jQuery.jstree._reference(jtree).uncheck_all();
+	// Query.jstree._reference(jtree).uncheck_all() does not call the uncheck_node callback
+	
+	var ref = jQuery.jstree._reference(jtree);
+	ref.get_checked().each
+	(
+		function (index, element)
+		{
+			ref.uncheck_node(element);
+		}
+	);
 }

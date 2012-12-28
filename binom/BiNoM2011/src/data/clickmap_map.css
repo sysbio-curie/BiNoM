@@ -24,6 +24,7 @@ html, body {
 		padding: 0;
 		border: none;
 		font-size: 100%; /* http://www.w3schools.com/css/css_font.asp */
+	overflow: hidden;	/* Remove scroll bars on browser window */
 }
 
 /* http://www.w3.org/TR/CSS2/text.html */
@@ -43,8 +44,16 @@ html, body {
 .header-centre {
 	font-size:1.4em;
 }
+#MySplitter {
+	height: 99.9%;
+	width: 99.9%;
+	border: 0px solid #aaa;
+}
 
-
+.vsplitbar {
+	width: 5px;
+	background: #aaa;
+}
 #header {
 	position: relative;
 	padding-left: 1em;
@@ -55,7 +64,7 @@ html, body {
 	color: #ff8400;
 	background-color: white;
 	
-	width: 84%;
+	width: 99%;
 	line-height: 40px;
 	height: 40px;
 }
@@ -66,7 +75,7 @@ html, body {
 		margin-top: 1px;			
 		left: 0;
 		padding: 0;
-		width: 85%;
+		width: 100%;
 		bottom: 0px; /* http://stackoverflow.com/questions/1192783/css-how-to-set-div-height-100-minus-npx */
 		border: none;
 		border-bottom: solid;
@@ -74,16 +83,15 @@ html, body {
 		border-color: gray;		
 }
 
-#side_bar {
+#marker_checkboxes {
 		
 		top: 0%;
-		overflow: auto;
 		background-color: white;
 		position: absolute;
 		right: 0;
 		padding: 0;
-		width: 15%;
-		height: 99.9%;
+		width: 100%;
+		height: 100%;
 		border-bottom: solid;
 		border-left: solid;
 		border-width: 1px;

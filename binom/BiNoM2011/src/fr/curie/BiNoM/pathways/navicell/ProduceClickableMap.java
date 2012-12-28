@@ -4006,6 +4006,64 @@ public class ProduceClickableMap
 		return out;
 	}
 	
+	private static class Div
+	{
+		private boolean open;
+		final PrintStream out;
+		final Div parent;
+		private Div child;
+		Div(PrintStream out, String text)
+		{
+			this.out = out;
+			this.parent = null;
+			print(text);
+		}
+		private void print(String text)
+		{
+			out.print("<div");
+			if (text != null)
+			{
+				assert !text.endsWith(">") : text;
+				out.print(" ");
+				out.print(text);
+			}
+			out.println(">");
+			this.child = null;
+			this.open = true;
+		}
+		
+		Div(Div parent)
+		{
+			this(parent, null);
+		}
+			
+		Div(Div parent, String text)
+		{
+			assert parent != null;
+			assert parent.open;
+			assert parent.child == null;
+			assert parent.out != null;
+			
+			this.out = parent.out;
+			this.parent = parent;
+			parent.child = this;
+			
+			print(text);
+		}
+		void close()
+		{
+			assert open;
+			open = false;
+			out.println("</div>");
+			if (parent != null)
+			{
+				assert parent.open;
+				assert parent.child == this;
+				parent.child = null;
+			}
+		}
+	}
+	
 	private static void make_index_html(final File this_map_directory, final String blog_name, final String title,
 		final String map_name,
 		ImagesInfo scales,
@@ -4030,6 +4088,8 @@ public class ProduceClickableMap
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='" + jquery_js + "' type='text/javascript'></script>");
 		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
+		
+		out.println("<script src='../../../lib/splitter-1.5.1.js' type='text/javascript'></script>");
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 
@@ -4038,6 +4098,17 @@ public class ProduceClickableMap
 		
 		out.println("<script type='text/javascript'>");
 		out.println("$(document).ready(function(){");
+		
+		{
+			// http://methvin.com/splitter/index.html
+			out.println("$('#MySplitter').splitter({");
+			out.println("outline: true,");
+			out.println("resizeTo: window,");
+			out.println("sizeRight: 200,");
+			out.println("splitVertical: true");
+			out.println("});");		
+		}
+		
 		out.print("clickmap_start(");
 		out.print(html_quote(blog_name));
 		out.print(html_quote(new StringBuffer(","), map_name).toString());
@@ -4060,11 +4131,11 @@ public class ProduceClickableMap
 		out.print(scales.xshift_zoom0);
 		out.print(", ");
 		out.print(scales.yshift_zoom0);
-		out.println(")");
+		out.print(");");
 		out.println("});");
 		out.println(wp.getBlogLinker());
-		out.println("</script>");
 		
+		out.println("</script>");
 		out.println("</head>");
 		out.println("<body>");
 		
@@ -4074,16 +4145,21 @@ public class ProduceClickableMap
 		out.println("To view the maps, enable JavaScript by changing your browser options and then try again.");
 		out.println("</noscript>");
 		
-		out.print("<div id='header'>");
-		out.print(" <div class='header-left'>");
+		final Div my_splitter = new Div(out, "id='MySplitter'");
+		
+		final Div left_content = new Div(my_splitter); // Left content goes here
+		
+		final Div header = new Div(left_content, "id='header'");
+		final Div header_left = new Div(header, "class='header-left'");
 		out.print("<a href='/' target='_blank'><img border='0' src=");
 		out.print(html_quote(new StringBuffer(), icons_directory + "/misc/map_top_panel_logo.png"));
 		out.print("/></a>");
-		out.println("</div>");
-		out.println("<div class='header-centre'>");
+		header_left.close();
+		final Div header_centre = new Div(header, "class='header-centre'");
 		out.println(title);
-		out.println("</div>");
-		out.println("<div class='header-right'>");
+		header_centre.close();
+		
+		final Div header_right = new Div(header, "class='header-right'");
 		
 		out.println(bubble_to_post_link_with_anchor(module_post.getPostId(), new StringBuffer()).toString());
 		create_reset_button(out);
@@ -4092,17 +4168,19 @@ public class ProduceClickableMap
 		doc_in_new_window(out, "map_help", "help");
 		
 		out.println("<input type='text' size='14' id='query_text'/>");
-//		out.print("<input type='button' class='button' value='Search' id='search' style='' />");
-		out.println("</div>");
-		out.println("</div>");
+		header_right.close();
+		header.close();
 
-		out.print("<div id='" + map_div_name);
-		out.println("'>The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.</div>");
-		out.println("<div id='side_bar'>");
+		final Div map_div = new Div(left_content, "id='" + map_div_name + "'");
+		out.println("The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.");
+		map_div.close();
 		
-		out.println("<div id='" + marker_div_name + "'></div>");
+		left_content.close();
 		
-		out.println("</div>");
+		(new Div(my_splitter, "id='" + marker_div_name + "'")).close();
+		
+		my_splitter.close();
+		
 		out.println("</body>");
 		out.println("</html>");
 		out.flush();

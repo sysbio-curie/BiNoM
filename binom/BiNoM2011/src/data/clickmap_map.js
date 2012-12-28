@@ -431,7 +431,7 @@ function open_module_map_click(e)
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
-	console.log("clickmap_start", to_open);
+	console.log("clickmap_start ... ", to_open);
 	if (!maps)
 	{
 		maps = Object();

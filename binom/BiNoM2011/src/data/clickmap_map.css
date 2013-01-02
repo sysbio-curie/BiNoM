@@ -96,7 +96,7 @@ html, body {
 		border-left: solid;
 		border-width: 1px;
 		border-color: gray;
-		
+	overflow: auto;	
 }
 
 .jstree-default .jstree-search

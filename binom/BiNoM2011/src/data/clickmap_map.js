@@ -27,6 +27,47 @@ var to_open;
 
 var maps;
 
+var normal_marker_icon;
+var new_marker_icon;
+var icon_shadow;
+var new_markers;
+
+function setup_icons()
+{
+	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
+	icon = function(colour)
+	{
+		return new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + colour,
+			new google.maps.Size(21, 34),
+			new google.maps.Point(0,0),
+			new google.maps.Point(10, 34)
+		);	
+	}
+	
+	normal_marker_icon = icon("FE7569");	
+	new_marker_icon = icon("5555FF");	
+	icon_shadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+	        new google.maps.Size(40, 37),
+	        new google.maps.Point(0, 0),
+	        new google.maps.Point(12, 35));	
+}
+
+function make_marker_visible(marker)
+{
+	marker.setIcon(new_marker_icon);
+	marker.setAnimation(google.maps.Animation.DROP);
+	marker.setVisible(true);
+	new_markers.push(marker);
+}
+
+function make_new_markers_old()
+{
+	while (new_markers.length != 0)
+	{
+		new_markers.pop().setIcon(normal_marker_icon);
+	}
+}
+
 // http://www.contentwithstyle.co.uk/content/make-sure-that-firebug-console-debug-doesnt-break-everything/index.html
 if(!window.console)
 {
@@ -58,6 +99,7 @@ function extend(bounds, marker)
 
 function show_markers_ref(markers, ref)
 {
+	make_new_markers_old();
 	var bounds = new google.maps.LatLngBounds();
 	$.each
 	(
@@ -81,14 +123,7 @@ function show_markers_ref(markers, ref)
 							extend(bounds, i);
 						}
 					);
-					this.markers.forEach
-					(
-						function(i)
-						{
-							i.setVisible(true);
-							i.setAnimation(google.maps.Animation.DROP);
-						}
-					);
+					this.markers.forEach(make_marker_visible);
 					ref.check_node(this);
 					this.peers.each
 					(
@@ -223,7 +258,9 @@ function get_markers_for_modification(element, projection, map)
 							position: projection.fromPointToLatLng(p),
 							map: map,
 							title: name + " (" + id + ")",
-							visible: false
+							visible: false,
+							icon : new_marker_icon,
+							shadow: icon_shadow
 						}
 				);
 				google.maps.event.addListener
@@ -284,7 +321,9 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 		return false;
 	return false;
 	
-}; 
+};
+
+var check_node_inhibit = false;
 
 function start_right_hand_panel(selector, source, map, projection, whenloaded)
 {
@@ -368,6 +407,10 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			"check_node.jstree",
 			function(event, data)
 			{
+				if (check_node_inhibit)
+					return;
+				check_node_inhibit = true;
+				make_new_markers_old();
 				var bounds = new google.maps.LatLngBounds();
 				var f = function(index, element)
 				{
@@ -379,8 +422,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 							if (!i.getVisible())
 							{
 								extend(bounds, i);
-								i.setVisible(true);
-								i.setAnimation(google.maps.Animation.DROP);
+								make_marker_visible(i);
 							}
 						}
 					);
@@ -399,6 +441,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 //				$(data.args[0].parentNode.parentNode).each(f);
 				if (!bounds.isEmpty())
 					map.panToBounds(bounds);
+				check_node_inhibit = false;
 			}
 		).bind("search.jstree", function (e, data) {
 //			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");
@@ -437,6 +480,8 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		maps = Object();
 	}
 	maps[map_name] = window;
+	
+	new_markers = Array();
 
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
 	var whenready = function(e, data)
@@ -473,6 +518,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 			console.log("tell_opener no", maps);
 	};
 	tell_opener();
+	setup_icons();
 	setInterval(tell_opener, 1000);
 }
 

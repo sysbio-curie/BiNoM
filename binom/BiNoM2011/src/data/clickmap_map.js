@@ -27,34 +27,73 @@ var to_open;
 
 var maps;
 
-var normal_marker_icon;
-var new_marker_icon;
-var icon_shadow;
 var new_markers;
+
+var medium_icon;
+var small_icon;
+var big_icon;
 
 function setup_icons()
 {
-	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
-	icon = function(colour)
+	var normal_marker_colour = "FE7569";	
+	var new_marker_colour = "5555FF";
+	
+	var simple_icon = function(colour, scale, w, h, anchor_x, anchor_y)
 	{
-		return new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + colour,
-			new google.maps.Size(21, 34),
-			new google.maps.Point(0,0),
-			new google.maps.Point(10, 34)
-		);	
+		var url = "http://chart.apis.google.com/chart?chst=d_map_spin&chld="
+			+ scale // scale_factor
+			+ "|0" // rotation_deg
+			+ "|" + colour // fill_color
+			+ "|20" // font_size
+			+ "|_" // font_style Either '_' for normal text or 'b' for boldface text
+			+ "|%E2%80%A2" // One or more lines of text, delimited by | characters
+			;
+		
+		return new google.maps.MarkerImage(url);
+		
+		var url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|";
+		
+		// http://stackoverflow.com/questions/7842730/change-marker-size-in-google-maps-v3
+		return n = new google.maps.MarkerImage(url + colour,
+				null,
+				null,
+				null,
+				new google.maps.Size(w, h)
+			);
+		
+		return n = new google.maps.MarkerImage(url + colour,
+			new google.maps.Size(w, h),
+			new google.maps.Point(0, 0),
+			new google.maps.Point(anchor_x, anchor_y)
+		);
+	}	
+	
+	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
+	var icon = function(w, h, anchor_x, anchor_y)
+	{
+		var normal_icon1 = simple_icon("FE7569", w, h, anchor_x, anchor_y);
+		var new_icon1 = simple_icon("5555FF", w, h, anchor_x, anchor_y);
+		normal_icon1.new_icon = new_icon1;
+		normal_icon1.normal_icon = normal_icon1;
+		new_icon1.new_icon = new_icon1;
+		new_icon1.normal_icon = normal_icon1;
+		return normal_icon1;
 	}
 	
-	normal_marker_icon = icon("FE7569");	
-	new_marker_icon = icon("5555FF");	
+	medium_icon = icon(0.5, 34, 10, 34);
+	small_icon = icon(0.4, 17, 5, 17);	
+	big_icon = icon(0.75, 68, 20, 68);	
+	
+	/*
 	icon_shadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
 	        new google.maps.Size(40, 37),
 	        new google.maps.Point(0, 0),
-	        new google.maps.Point(12, 35));	
+	        new google.maps.Point(12, 35));	*/
 }
 
 function make_marker_visible(marker)
 {
-	marker.setIcon(new_marker_icon);
+	marker.setIcon(marker.getIcon().new_icon);
 	marker.setAnimation(google.maps.Animation.DROP);
 	marker.setVisible(true);
 	new_markers.push(marker);
@@ -64,7 +103,8 @@ function make_new_markers_old()
 {
 	while (new_markers.length != 0)
 	{
-		new_markers.pop().setIcon(normal_marker_icon);
+		var i = new_markers.pop();
+		i.setIcon(i.getIcon().normal_icon);
 	}
 }
 
@@ -243,6 +283,13 @@ function get_markers_for_modification(element, projection, map)
 		else
 		{
 			var id = $(element).attr("id");
+			var cls = $(element).parent().parent().attr("id");
+			var icon = medium_icon;
+			if (cls == "REACTION")
+				icon = small_icon;
+			else if (cls == "modules")
+				icon = big_icon;
+				
 //			alert("get_markers_for_modification create " + id);
 			element.markers = Array();
 			var positions = position.split(" ");
@@ -259,8 +306,7 @@ function get_markers_for_modification(element, projection, map)
 							map: map,
 							title: name + " (" + id + ")",
 							visible: false,
-							icon : new_marker_icon,
-							shadow: icon_shadow
+							icon : icon
 						}
 				);
 				google.maps.event.addListener
@@ -567,11 +613,18 @@ function uncheck_all_entities()
 	// Query.jstree._reference(jtree).uncheck_all() does not call the uncheck_node callback
 	
 	var ref = jQuery.jstree._reference(jtree);
-	ref.get_checked().each
+	var f = function(index, element)
+	{
+		$.each(element.markers, function(key, i) { i.setVisible(false); });
+	}
+		
+	$.each
 	(
-		function (index, element)
+		ref.get_checked(), 
+		function()
 		{
-			ref.uncheck_node(element);
+			ref.uncheck_node(this);
+			$(this).filter(filter).each(f); // needed for reactions
 		}
 	);
 }

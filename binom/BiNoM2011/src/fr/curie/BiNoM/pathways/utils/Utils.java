@@ -1006,5 +1006,103 @@ public static class Transparency {
 	}
 
 
+public static String cutFirstLastNonVisibleSymbols(String s){
+	StringBuffer res = new StringBuffer(s);
+	if(res!=null)if(res.length()>0){
+	res = new StringBuffer(cutFirstNonVisibleSymbols(res.toString()));
+	res = res.reverse();
+	res = new StringBuffer(cutFirstNonVisibleSymbols(res.toString()));	
+	res = res.reverse();
+	}
+	return res.toString();
+}
+
+public static String cutFirstNonVisibleSymbols(String s){
+	StringBuffer res = new StringBuffer(s);
+	int k = 0;
+	boolean isNonVisible = true;
+	while((res.length()>0)&&isNonVisible){
+		char c = res.charAt(k);
+		if((c=='\t')||(c=='\n')||(c==' ')||(c=='\r')){
+			isNonVisible = true;
+			res.deleteCharAt(k);
+		}else{
+			isNonVisible = false;
+		}
+			
+	}
+	return res.toString();
+}
+
+
+public static Vector<String> guessProteinIdentifiers(String name) throws Exception{
+	
+	System.out.println("Accessing genenames.org.... for "+name);
+	
+	Vector<String> ids = new Vector<String>();
+	String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"\\&submit=Submit";
+	String html1 = downloadURL(query1);
+	LineNumberReader lr = new LineNumberReader(new StringReader(html1));
+	String s = null;
+	String HUGO = "";
+	String HGNC = "";
+	while((s=lr.readLine())!=null){
+		s = s.trim();
+		String key = "<a href=\"/data/hgnc_data.php?hgnc_id=";
+		if(s.startsWith(key)){
+			s = s.substring(key.length(),s.length());
+			StringTokenizer st = new StringTokenizer(s,"\"></");
+			HGNC = st.nextToken();
+			HUGO = st.nextToken();
+			break;
+		}
+	}
+	
+	String query2 = "http://www.genenames.org/data/hgnc_data.php?hgnc_id="+HGNC;
+	String html2 = downloadURL(query2);
+	
+	lr = new LineNumberReader(new StringReader(html2));
+	while((s=lr.readLine())!=null){
+		s = s.trim();
+		String key1 = "<th class=\"symbol_data-header-";
+		if(s.startsWith(key1)){
+			s = s.substring(key1.length(),s.length());
+			StringTokenizer st = new StringTokenizer(s,"\">");
+			String type = st.nextToken();
+			String nextLine = lr.readLine();
+			nextLine = nextLine.trim();
+			String key2 = "<td class=\"symbol_data-data-"+type+"\"><strong>";			
+			nextLine = nextLine.substring(key2.length(), nextLine.length());
+			st = new StringTokenizer(nextLine,"<");
+			String value = st.nextToken();
+			if(!type.equals("hgnc_id"))
+				ids.add(type+":"+value);
+			//System.out.println(type+":"+value);
+		}
+		String key3 = "Entrez Gene:";
+		if(s.indexOf(key3)>=0){
+			s = s.substring(s.indexOf(key3)+key3.length(), s.length());
+			StringTokenizer st = new StringTokenizer(s,"<");
+			String type = "ENTREZ";
+			String value = st.nextToken();
+			ids.add(type+":"+value);
+		}
+		key3 = "UniProtKB:";
+		if(s.indexOf(key3)>=0){
+			s = s.substring(s.indexOf(key3)+key3.length(), s.length());
+			StringTokenizer st = new StringTokenizer(s,"<");
+			String type = "UNIPROT";
+			String value = st.nextToken();
+			ids.add(type+":"+value);
+		}
+		
+	}
+	
+	
+	ids.add("HUGO:"+HUGO);
+	ids.add("GENECARDS:"+HGNC);	
+	ids.add("HGNC:"+HGNC);
+	return ids;
+}
 
 }

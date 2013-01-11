@@ -38,21 +38,28 @@ import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
-public class modifyCellDesignerNotesTask implements Task {
+public class extractCellDesignerNotesTask implements Task {
     private TaskMonitor taskMonitor;
-    private String FeatureTableFileName = null;
     private String CellDesignerFileName = null;
+    private extractingNotesOptions options = null;
 
-    public modifyCellDesignerNotesTask(String cellDesignerFileName, String featureTableFileName){
-    	FeatureTableFileName = featureTableFileName;
+    public extractCellDesignerNotesTask(String cellDesignerFileName, extractingNotesOptions _options){
     	CellDesignerFileName = cellDesignerFileName;
+    	options = _options;
+    }
+    
+    public class extractingNotesOptions{
+    	public boolean formatAnnotation	= true;
+    	public boolean allannotations = false;
+    	public boolean guessIdentifiers = false;
+    	public boolean removeEmptySections = true;
+    	public boolean removeInvalidTags = true;
     }
     
     public void run() {
     	try {
     		File fc = new File(CellDesignerFileName);
-    		File ft = new File(FeatureTableFileName);
-    		if(fc.exists()&&ft.exists()){
+    		if(fc.exists()){
     			
     			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
     			
@@ -62,9 +69,16 @@ public class modifyCellDesignerNotesTask implements Task {
     			}
     			
     			mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
-    			mn.comments = Utils.loadString(FeatureTableFileName);
-    			mn.ModifyCellDesignerNotes();
-    			CellDesigner.saveCellDesigner(mn.sbmlDoc, nameCD+"_notes.xml");
+    			mn.formatAnnotation = options.formatAnnotation;
+    			mn.allannotations = options.allannotations;
+    			mn.guessIdentifiers = options.guessIdentifiers;
+    			mn.removeEmptySections = options.removeEmptySections;
+    			mn.removeInvalidTags = options.removeInvalidTags;
+    			mn.comments = mn.exportCellDesignerNotes();
+    			//mn.comments = Utils.loadString(nameCD+"_notes.txt");
+    			//mn.ModifyCellDesignerNotes();
+    			
+    			Utils.saveStringToFile(mn.comments, nameCD+"_notes.txt");
     			
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
@@ -74,12 +88,12 @@ public class modifyCellDesignerNotesTask implements Task {
     	}catch(Exception e){
     		e.printStackTrace();
     	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error modifying CellDesigner notes:" + e);
+    	    taskMonitor.setStatus("Error extracting CellDesigner notes:" + e);
     	}
     }
 
     public String getTitle() {
-    	return "BiNoM: Modify CellDesigner notes...";
+    	return "BiNoM: Extract CellDesigner notes...";
     }
 
     public void halt() {

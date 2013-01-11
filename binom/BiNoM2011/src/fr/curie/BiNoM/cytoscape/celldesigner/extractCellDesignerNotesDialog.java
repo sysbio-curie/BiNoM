@@ -69,23 +69,29 @@ import cytoscape.CyEdge;
 import cytoscape.util.CyFileFilter;
 import cytoscape.util.FileUtil;
 
-public class modifyCellDesignerNotesDialog extends JFrame {
+public class extractCellDesignerNotesDialog extends JFrame {
 
     private JButton okB, cancelB;
     private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
     private static final java.awt.Font BOLD_FONT = new java.awt.Font
 	("times", java.awt.Font.BOLD, 12);
     
-    private JTextField accNumField = null;
-    private JButton browseAccNum = null;
+    //private JTextField accNumField = null;
+    //private JButton browseAccNum = null;
     private JTextField indexField = null;
     private JButton browseIndex = null;
+    
+    private JCheckBox formatAnnotations = null;
+    private JCheckBox allAnnotations = null;    
+    private JCheckBox guessIdentifiers = null;    
+    private JCheckBox removeEmptySections = null;  
+    private JCheckBox removeInvalidTags = null;
     
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
 
-    private modifyCellDesignerNotesDialog() {
-	super("Modify CellDesigner notes");
+    private extractCellDesignerNotesDialog() {
+	super("Extract CellDesigner notes");
 	final JPanel panel = new JPanel(new GridBagLayout());
 	GridBagConstraints c;
 	int y = 0;
@@ -172,84 +178,87 @@ public class modifyCellDesignerNotesDialog extends JFrame {
 
 	
 	y++;
-
-	JLabel lab2 = new JLabel("  CellDesigner notes file  ");
-	x = 0;
-	c = new GridBagConstraints();
-	c.ipady = 20;	
-	c.gridx = x++;
-	c.gridy = y;
-	c.anchor = GridBagConstraints.CENTER;
-	c.fill = GridBagConstraints.NONE;
-	c.weightx = 0;
-	panel.add(lab2,c);
-
-	/*lab2 = new JLabel("(optional) ");
+	
+    formatAnnotations = new JCheckBox("Analyze annotations");
 	c = new GridBagConstraints();
 	c.gridx = 1;
-	c.gridy = 5;
-	c.anchor = GridBagConstraints.CENTER;
-	panel.add(lab2,c);*/
-	
-	accNumField = new JTextField(30);
-	c = new GridBagConstraints();
-	c.gridx = x++;
-	c.gridy = y;
+	c.gridy = y++;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
-	panel.add(accNumField,c);
+	panel.add(formatAnnotations, c);
 
-	x++;
-	browseAccNum = new JButton("Browse...");
-	c = new GridBagConstraints();
-	c.gridx = x++;
-	c.gridy = y;
-	c.anchor = GridBagConstraints.EAST;
-	c.fill = GridBagConstraints.NONE;
-	c.weightx = 0;
-	panel.add(browseAccNum,c);
-
-	padPanel = new JPanel();
-	c = new GridBagConstraints();
-	c.ipadx = 5;
-	c.gridx = x++;
-	c.gridy = y;
-	c.fill = GridBagConstraints.NONE;
-	c.weightx = 0;
-	panel.add(padPanel, c);
-
-	browseAccNum.addActionListener(new ActionListener() {
+	formatAnnotations.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    File file = FileUtil.getFile
-			("Load Feature Table File", FileUtil.LOAD);
-
-		    toFront();
-		    if (file != null) {
-			String fn = file.getAbsolutePath();
-			accNumField.setText(fn);
-		    }
-
-		    /*
-		    final JFileChooser fc = new JFileChooser();
-		    fc.setName(accNumField.getText());
-		    int returnVal = fc.showOpenDialog(panel);
-		    if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = fc.getSelectedFile();
-			String fn = file.getAbsolutePath();
-			accNumField.setText(fn);
-		    }			        
-		    */
-                }
+        
+			if(formatAnnotations.isSelected()){
+				allAnnotations.setEnabled(true);
+				guessIdentifiers.setEnabled(true);
+				removeEmptySections.setEnabled(true);
+				removeInvalidTags.setEnabled(true);
+			}else{
+				allAnnotations.setEnabled(false);
+				guessIdentifiers.setEnabled(false);
+				removeEmptySections.setEnabled(false);
+				removeInvalidTags.setEnabled(false);
+			}
+		
+		}
            });
 	
+	
+    allAnnotations = new JCheckBox("Process empty annotations");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(allAnnotations, c);
+
+    guessIdentifiers = new JCheckBox("Use Internet to fill Identifiers");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(guessIdentifiers, c);
+
+    removeEmptySections = new JCheckBox("Remove empty sections");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(removeEmptySections, c);
+
+	removeInvalidTags = new JCheckBox("Remove unfilled tags");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(removeInvalidTags, c);
+	
+	extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(null,null);
+	final extractCellDesignerNotesTask.extractingNotesOptions options = task.new extractingNotesOptions();
+	
+	formatAnnotations.setSelected(options.formatAnnotation);
+	allAnnotations.setSelected(options.allannotations);
+	guessIdentifiers.setSelected(options.guessIdentifiers);
+	removeEmptySections.setSelected(options.removeEmptySections);
+	removeInvalidTags.setSelected(options.removeInvalidTags);
 	JPanel buttonPanel = new JPanel();
 
 	okB = new JButton("OK");
 
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            setVisible(false);			
-			modifyCellDesignerNotesTask task = new modifyCellDesignerNotesTask(indexField.getText(),accNumField.getText());
+            //setVisible(false);			
+            options.formatAnnotation = formatAnnotations.isSelected();
+            options.allannotations = allAnnotations.isSelected();
+            options.guessIdentifiers = guessIdentifiers.isSelected();
+            options.removeEmptySections = removeEmptySections.isSelected();
+            options.removeInvalidTags = removeInvalidTags.isSelected();
+			extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(indexField.getText(),options);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
            });
@@ -273,18 +282,18 @@ public class modifyCellDesignerNotesDialog extends JFrame {
 	pack();
     }
 
-    public static modifyCellDesignerNotesDialog instance;
+    public static extractCellDesignerNotesDialog instance;
 
-    public static modifyCellDesignerNotesDialog getInstance() {
+    public static extractCellDesignerNotesDialog getInstance() {
 	if (instance == null)
-	    instance = new modifyCellDesignerNotesDialog();
+	    instance = new extractCellDesignerNotesDialog();
 	return instance;
     }
 
     public void raise() {
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 200));
+	setSize(new Dimension(550, 260));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

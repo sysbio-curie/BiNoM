@@ -112,6 +112,9 @@ public static String reactionNodeTypes[] = {
      
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xh","");
      
+     s = Utils.replaceStringCount(s, "<celldesigner:notes xsi:nil=\"true\"/>", "");
+     s = Utils.replaceStringCount(s, "<notes xsi:nil=\"true\"/>", "");
+     
      fw.write(s);
      fw.close();
    }catch(Exception e){

@@ -77,7 +77,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 	    public void pop() {
 	    	build();
 	    	
-	    	this.setTitle("Optimal intervention set report");
+	    	this.setTitle("Optimal Combination of Intervention set (CIs) report");
 	    	setLocation((screenSize.width - getSize().width) / 2,
 	    			(screenSize.height - getSize().height) / 2);
 	    	setVisible(true);
@@ -153,7 +153,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 			fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			fc.setSelectedFile(new File("hit_set_list.txt"));
-			JButton saveHitSetB = new JButton("Save intervention set list to file");
+			JButton saveHitSetB = new JButton("Save CIs list to file");
 			saveHitSetB.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					

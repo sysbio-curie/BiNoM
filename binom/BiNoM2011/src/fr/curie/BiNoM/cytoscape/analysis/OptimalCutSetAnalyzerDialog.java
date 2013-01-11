@@ -471,7 +471,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		JPanel p2 = new JPanel(new FlowLayout());
 		maxSetSize = new JTextField(4);
 		maxSetSize.setText("inf");
-		JLabel l1 = new JLabel("Max. size of CI");
+		JLabel l1 = new JLabel("Max. CIs size");
 		p2.add(l1);
 		p2.add(maxSetSize);
 		c = new GridBagConstraints();
@@ -562,13 +562,13 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						try {
 							analyzer.maxSetSize = Integer.parseInt(maxSetSize.getText());
 							if (analyzer.maxSetSize <= 0) {
-								JOptionPane.showMessageDialog(new Frame(), "Max. set size should be 'inf' or a positive integer > 0.");
+								JOptionPane.showMessageDialog(new Frame(), "Max. CIs size should be 'inf' or a positive integer > 0.");
 								resetAnalyzer();
 								return;
 							}
 						}
 						catch (NumberFormatException  nfe) {
-							JOptionPane.showMessageDialog(new Frame(), "Max. set size should be 'inf' or a positive integer > 0.");
+							JOptionPane.showMessageDialog(new Frame(), "Max. CIs size should be 'inf' or a positive integer > 0.");
 							resetAnalyzer();
 							return;
 						}
@@ -578,13 +578,13 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						try {
 							analyzer.maxSetNb = Long.parseLong(maxSetNb.getText()) * (long) 1e+6;
 							if (analyzer.maxSetNb <= 0) {
-								JOptionPane.showMessageDialog(new Frame(), "Max. Nb of sets should be a positive integer > 0.");
+								JOptionPane.showMessageDialog(new Frame(), "Max. Nb of candidate CIs should be a positive integer > 0.");
 								resetAnalyzer();
 								return;
 							}
 						}
 						catch (NumberFormatException nfe) {
-							JOptionPane.showMessageDialog(new Frame(), "Max. Nb of sets should be a positive integer > 0.");
+							JOptionPane.showMessageDialog(new Frame(), "Max. Nb of candidate CIs should be a positive integer > 0.");
 							resetAnalyzer();
 							return;
 						}

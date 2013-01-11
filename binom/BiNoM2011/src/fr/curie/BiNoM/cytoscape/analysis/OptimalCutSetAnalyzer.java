@@ -22,7 +22,7 @@ public class OptimalCutSetAnalyzer implements ActionListener {
 	   public void actionPerformed(ActionEvent e){
 	    	if(Cytoscape.getCurrentNetwork()!=null){
 	    		
-	    		OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(Cytoscape.getDesktop(),"Optimal Combinations of Intervention Strategies for Network Analysis",true);
+	    		OptimalCutSetAnalyzerDialog dialog = new OptimalCutSetAnalyzerDialog(Cytoscape.getDesktop(),"Optimal Combinations of Intervention (CI) Strategies for Network Analysis",true);
 	    		
 	    		GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Cytoscape.getCurrentNetwork());
 	    		

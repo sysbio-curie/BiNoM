@@ -217,22 +217,24 @@ public class OptimalCombinationAnalyzer {
 		
 		// Minimal cut set
 		hitSetSB = initFirstRowBerge();
-		hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(1));
 		long tic = System.currentTimeMillis();
-		int maxSetSize=0;
-		for (int i=1;i<pathMatrixNbRow;i++) {
-			hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
-			if (printLog) {
-				int pn = i+1;
-				System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow);
-				if (hitSetSB.size() > maxSetSize)
-					maxSetSize = hitSetSB.size();
+		if (pathMatrixRowBin.size()>1) {
+			hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(1));
+			int maxSetSize=0;
+			for (int i=1;i<pathMatrixNbRow;i++) {
+				hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
+				if (printLog) {
+					int pn = i+1;
+					System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow);
+					if (hitSetSB.size() > maxSetSize)
+						maxSetSize = hitSetSB.size();
+				}
+				hitSetSB = checkMinimalityBerge(hitSetSB);
 			}
-			hitSetSB = checkMinimalityBerge(hitSetSB);
-		}
-		if (printLog) {
-			System.out.println("max set size: "+maxSetSize);
-			System.out.println("final mcs size: "+hitSetSB.size());
+			if (printLog) {
+				System.out.println("max set size: "+maxSetSize);
+				System.out.println("final CI size: "+hitSetSB.size());
+			}
 		}
 		long toc = System.currentTimeMillis() - tic;
 		if (report != null) {

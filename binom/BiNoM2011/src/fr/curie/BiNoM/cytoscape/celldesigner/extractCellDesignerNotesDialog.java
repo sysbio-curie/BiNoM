@@ -86,6 +86,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
     private JCheckBox guessIdentifiers = null;    
     private JCheckBox removeEmptySections = null;  
     private JCheckBox removeInvalidTags = null;
+    private JCheckBox moveNonannotatedTextToReferenceSection = null;
     
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
@@ -230,13 +231,22 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	c.weightx = 1.0;
 	panel.add(removeEmptySections, c);
 
-	removeInvalidTags = new JCheckBox("Remove unfilled tags");    
+	removeInvalidTags = new JCheckBox("Remove empty tags");    
 	c = new GridBagConstraints();
 	c.gridx = 1;
 	c.gridy = y++;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
 	panel.add(removeInvalidTags, c);
+
+	moveNonannotatedTextToReferenceSection = new JCheckBox("Move non-annotated text to References");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(moveNonannotatedTextToReferenceSection, c);
+	
 	
 	extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(null,null);
 	final extractCellDesignerNotesTask.extractingNotesOptions options = task.new extractingNotesOptions();
@@ -246,6 +256,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	guessIdentifiers.setSelected(options.guessIdentifiers);
 	removeEmptySections.setSelected(options.removeEmptySections);
 	removeInvalidTags.setSelected(options.removeInvalidTags);
+	moveNonannotatedTextToReferenceSection.setSelected(options.moveNonannotatedTextToReferenceSection);
 	JPanel buttonPanel = new JPanel();
 
 	okB = new JButton("OK");
@@ -258,6 +269,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
             options.guessIdentifiers = guessIdentifiers.isSelected();
             options.removeEmptySections = removeEmptySections.isSelected();
             options.removeInvalidTags = removeInvalidTags.isSelected();
+            options.moveNonannotatedTextToReferenceSection = moveNonannotatedTextToReferenceSection.isSelected();
 			extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(indexField.getText(),options);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
@@ -293,7 +305,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
     public void raise() {
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 260));
+	setSize(new Dimension(550, 280));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

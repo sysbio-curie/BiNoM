@@ -24,6 +24,8 @@ public class ModifyCellDesignerNotes {
 	public boolean guessIdentifiers = true;
 	public boolean removeEmptySections = true;
 	public boolean removeInvalidTags = true;
+	public boolean moveNonannotatedTextToReferenceSection = true;
+	
 	
 	public String tags[] = {"HUGO","HGNC","PUBMED","ENTREZ","UNIPROT","GENECARDS","PMID","PATHWAY","MODULE","LAYER","NAME","ALT_NAME"};
 
@@ -68,9 +70,9 @@ public class ModifyCellDesignerNotes {
 		//System.exit(0);
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
-		//String nameCD = "C:/Datas/NaviCell/maps/mphase_src/M-Phase2";
+		String nameCD = "C:/Datas/NaviCell/maps/mphase_src/M-Phase2";
 		//String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
-		String nameCD = "C:/Datas/NaviCell/maps/dnarepair_src/master";
+	    //String nameCD = "C:/Datas/NaviCell/maps/dnarepair_src/master";
 		//String nameCD = "c:/datas/binomtest/test_master";
 		String nameNotes = "c:/datas/basal/comm_temp.txt";
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
@@ -315,7 +317,12 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+spName+"\n");
 				String reqsections[] = {"Identifiers","Modules","References"};
 				System.out.println("Processing "+sp.getId()+"/"+spName);
-				if(formatAnnotation)
+				boolean degraded = false;
+				System.out.println(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
+				if(sp.getAnnotation()!=null)
+					if(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("DEGRADED"))
+						degraded = true;
+				if(formatAnnotation)if(!degraded)
 					annot = processAnnotations(annot,null, reqsections, false);				
 				annotations.append(annot+"\n\n");
 			}
@@ -363,6 +370,7 @@ public class ModifyCellDesignerNotes {
 		nonannotated = Utils.replaceString(nonannotated, "PUBMED:", "PMID:");
 		nonannotated = Utils.replaceString(nonannotated, "PATHWAY:", "MODULE:");		
 		String newnonannotated = new String(nonannotated);
+		if(!moveNonannotatedTextToReferenceSection){
 		int k=0;
 		StringTokenizer st = new StringTokenizer(nonannotated,"\t\n ,;.");
 		Vector<String> alltags = new Vector<String>();
@@ -404,13 +412,17 @@ public class ModifyCellDesignerNotes {
 				AnnotationSection sec = getSectionByName(secs,"Identifiers");
 				sec.content+=s+" ";
 			}
+		}}else{
+			newnonannotated = "";
+			AnnotationSection sec = getSectionByName(secs,"References");
+			sec.content+=nonannotated;
 		}
 		//Process existing sections and eliminate undefined tags
 		if(removeInvalidTags)
 		for(int i=1;i<secs.size();i++){
 			AnnotationSection sec = secs.get(i);
 			String text = sec.content;
-			st = new StringTokenizer(text,"\t\n ,;.");
+			StringTokenizer st = new StringTokenizer(text,"\t\n ,;.");
 			while(st.hasMoreTokens()){
 				String s = st.nextToken();
 				for(int j=0;j<tags.length;j++)
@@ -438,7 +450,7 @@ public class ModifyCellDesignerNotes {
 			fillIdentifiers(getSectionByName(secs,"Identifiers"),entityName);
 			// if HUGO tag is not defined, mark with @@@ mark
 			String text = this.getSectionByName(secs, "Identifiers").content;
-			st = new StringTokenizer(text,"\t\n .,;");
+			StringTokenizer st = new StringTokenizer(text,"\t\n .,;");
 			boolean hugofound = false;
 			while(st.hasMoreTokens()){
 				String s = st.nextToken();

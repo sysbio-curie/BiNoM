@@ -1042,6 +1042,11 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	Vector<String> ids = new Vector<String>();
 	String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"\\&submit=Submit";
 	String html1 = downloadURL(query1);
+	
+	if(html1.contains("refused"))
+		System.out.println(html1);
+	//System.out.println(html1);
+	
 	LineNumberReader lr = new LineNumberReader(new StringReader(html1));
 	String s = null;
 	String HUGO = "";
@@ -1102,6 +1107,10 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	ids.add("HUGO:"+HUGO);
 	ids.add("GENECARDS:"+HGNC);	
 	ids.add("HGNC:"+HGNC);
+	
+	//for(int i=0;i<ids.size();i++)
+	//	System.out.println("\t"+ids.get(i));
+	
 	return ids;
 }
 

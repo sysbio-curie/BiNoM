@@ -54,6 +54,7 @@ public class extractCellDesignerNotesTask implements Task {
     	public boolean guessIdentifiers = false;
     	public boolean removeEmptySections = true;
     	public boolean removeInvalidTags = true;
+    	public boolean moveNonannotatedTextToReferenceSection = true;
     }
     
     public void run() {
@@ -74,6 +75,7 @@ public class extractCellDesignerNotesTask implements Task {
     			mn.guessIdentifiers = options.guessIdentifiers;
     			mn.removeEmptySections = options.removeEmptySections;
     			mn.removeInvalidTags = options.removeInvalidTags;
+    			mn.moveNonannotatedTextToReferenceSection = options.moveNonannotatedTextToReferenceSection;
     			mn.comments = mn.exportCellDesignerNotes();
     			//mn.comments = Utils.loadString(nameCD+"_notes.txt");
     			//mn.ModifyCellDesignerNotes();

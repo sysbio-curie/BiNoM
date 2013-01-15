@@ -232,7 +232,7 @@ public class OptimalCombinationAnalyzer {
 				hitSetSB = checkMinimalityBerge(hitSetSB);
 			}
 			if (printLog) {
-				System.out.println("max set size: "+maxSetSize);
+				System.out.println("max CI size: "+maxSetSize);
 				System.out.println("final CI size: "+hitSetSB.size());
 			}
 		}
@@ -553,7 +553,10 @@ public class OptimalCombinationAnalyzer {
 		/*
 		 * First enumerate and test sets of size 2
 		 */
-		searchHitSetSizeTwo();
+		if (pathMatrixNbCol>0)
+			searchHitSetSizeTwo();
+		else
+			return;
 		
 		HashMap<String, Integer> mapNodes = new HashMap<String, Integer>();
 		for (int i=0;i<pathMatrixNodeList.size();i++)
@@ -569,7 +572,7 @@ public class OptimalCombinationAnalyzer {
 				break;
 			}
 			
-			System.out.println("\nSearch for set size "+ setSize);
+			System.out.println("\nSearch for CI size "+ setSize);
 			report.append(newline + "Search for CI size "+ setSize + newline);
 			
 			long nbComb =  calcCombinations(pathMatrixNbCol, setSize);

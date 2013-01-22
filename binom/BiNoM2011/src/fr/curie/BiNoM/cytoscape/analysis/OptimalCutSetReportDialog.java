@@ -216,7 +216,7 @@ public class OptimalCutSetReportDialog extends JDialog {
 		 */
 		private void createCytoscapeNetworks() {
 
-			OptimalCutSetVisuDialog dialog = new OptimalCutSetVisuDialog(new JFrame(), "Intervention sets visualization options", true);
+			OptimalCutSetVisuDialog dialog = new OptimalCutSetVisuDialog(new JFrame(), "CIs visualization options", true);
 			dialog.setVisible(true);
 			
 			System.out.println("Create set attributes: "+dialog.createSetAttributes);

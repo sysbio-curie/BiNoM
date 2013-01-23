@@ -29,7 +29,6 @@ public class TestOPtCutSet {
 		//oca.testSeedSet();
 	}
 	
-
 	public static void graphTest() {
 		try {
 			
@@ -46,7 +45,8 @@ public class TestOPtCutSet {
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_30p.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal4.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal5.xgmml");
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_example1.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_example1.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_eric_test.xgmml");
 			
 			/*
 			 * Graphical interface test

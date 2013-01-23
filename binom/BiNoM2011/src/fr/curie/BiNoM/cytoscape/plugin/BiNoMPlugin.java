@@ -17,20 +17,12 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-/*
-  BiNoM authors:
-	Andrei Zinovyev : http://www.ihes.fr/~zinovyev
-	Eric Viara : http://www.sysra.com/viara
-	Laurence Calzone :	http://leibniz.biol.vt.edu/people/laurence/laurence.html
- */
 package fr.curie.BiNoM.cytoscape.plugin;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-
-import jp.sbi.celldesigner.plugin.PluginMenuItem;
 
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;

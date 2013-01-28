@@ -72,7 +72,7 @@ public class CellDesignerPathwayStaining {
 		try{
 			
 			String prefix = "c:/datas/colormaps/";
-			
+				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
 			
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
@@ -82,7 +82,8 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			//cm.run(prefix+"rbe2f.xml", null, null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, prefix+"modules_proteins_c2_lc.gmt");
-			cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
+			//cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
+			cm.run(prefix+"dnarepair.xml", null, null, null);
 			System.exit(0);
 			
 			
@@ -92,8 +93,8 @@ public class CellDesignerPathwayStaining {
 			//System.exit(0);
 			//cm.loadMap(prefix+"test1.xml");
 			//cm.loadGroupsOfProteins(prefix+"modules_proteins_c2_lc.gmt");
-			//cm.loadGroupsOfProteins(prefix+"dnarepair_modules.gmt");
-			cm.loadGroupsOfProteins(prefix+"dnarepair_proteins.gmt");			
+			cm.loadGroupsOfProteins(prefix+"dnarepair_modules.gmt");
+			//cm.loadGroupsOfProteins(prefix+"dnarepair_proteins.gmt");			
 			//cm.loadGroupsOfProteins(prefix+"proteins.gmt");
 			cm.createPoints();
 			cm.makeRegularPoints();

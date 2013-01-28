@@ -1095,6 +1095,17 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
   }
   
   
+  public Graph convertReactionNetworkIntoEntityNetwork(Graph reactionNetwork){
+	  Graph entityNetwork = new Graph();
+	  Vector<String> allProteinNames = extractProteinNamesFromNodeNames(reactionNetwork.Nodes);
+	  for(int i=0;i<allProteinNames.size();i++){
+		  Node n = new Node();
+		  n.Id = allProteinNames.get(i);
+		  n.NodeLabel = allProteinNames.get(i);
+		  entityNetwork.addNode(n);
+	  }
+	  return entityNetwork;
+  }
 
 
 

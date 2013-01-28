@@ -48,7 +48,7 @@ public class SubnetworkProperties {
 			int numberOfSamples = 100;
 			
 			
-			//String path = "c:/datas/hprd/";
+			//String path = "c:/datas/hprd9/";
 			/*VDataTable vt2 = VDatReadWrite.LoadFromSimpleDatFile(path+"BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt", true, "\t");
 			for(int i=0;i<vt2.rowCount;i++){
 				if(vt2.stringTable[i][vt2.fieldNumByName("SOURCE_NAME")].equals("-"))
@@ -66,7 +66,7 @@ public class SubnetworkProperties {
 				if(vt2.stringTable[i][vt2.fieldNumByName("TARGET_NAME")].equals("-"))
 					vt2.stringTable[i][vt2.fieldNumByName("TARGET_NAME")] = vt2.stringTable[i][vt2.fieldNumByName("TARGET_NP")];
 			}
-			VDatReadWrite.saveToSimpleDatFile(vt2, path+"HPRD_PC.txt");			
+			VDatReadWrite.saveToSimpleDatFile(vt2, path+"HPRD_PC.txt");
 			System.exit(0);*/
 			
 			

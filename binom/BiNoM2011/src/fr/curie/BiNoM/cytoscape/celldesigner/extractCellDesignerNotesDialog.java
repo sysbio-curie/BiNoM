@@ -305,7 +305,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
     public void raise() {
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 280));
+	setSize(new Dimension(550, 300));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

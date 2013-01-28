@@ -15,8 +15,11 @@ public class KEGGAccess {
 		// TODO Auto-generated method stub
 		try{
 			
-			String prefix = "C:/Datas/KEGG/Yeast/";
-			String file = "pathway_list";
+			//String prefix = "C:/Datas/KEGG/Yeast/";
+			//String file = "pathway_list";
+			String prefix = "C:/Datas/KEGG/Human/";
+			String file = "dnarepair";
+
 			Vector<String> pathwayList = Utils.loadStringListFromFile(prefix+file);
 			String gmt = loadKEGGasGMTString(pathwayList);
 			FileWriter fw = new FileWriter(prefix+file+"_KEGG");
@@ -50,10 +53,13 @@ public class KEGGAccess {
 	
 	public static Vector<String> getGenesFromKEGGPathway(String organism, String pathway) throws Exception{
 		Vector<String> genes = new Vector<String>();
+		//System.out.println(KEGGgenesPrefix+organism+pathway);
 		String page = Utils.downloadURL(KEGGgenesPrefix+organism+pathway);
+		//System.out.println(page);
 		LineNumberReader lr = new LineNumberReader(new StringReader(page));
 		String s = null;
 		while((s=lr.readLine())!=null){
+			/*// This worked for yeast 
 			StringTokenizer st = new StringTokenizer(s,"<>");
 			while(st.hasMoreTokens()){
 				String token = st.nextToken();
@@ -61,6 +67,14 @@ public class KEGGAccess {
 					String gene = token.substring(organism.length()+1,token.length());
 					genes.add(gene);
 				}
+			}*/
+			// This is for human (HUGO)
+			if(s.contains("</a>"))if(s.contains("/dbget-bin/")){
+				s = s.substring(s.indexOf("</a>")+4,s.length());
+				//System.out.println(s);
+				StringTokenizer st = new StringTokenizer(s,"\t ,;");
+				String hugo = st.nextToken();
+				genes.add(hugo);
 			}
 		}
 		return genes;

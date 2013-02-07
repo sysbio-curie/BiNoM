@@ -11,7 +11,6 @@ public class testMergingMapsDialog {
 
 	public static void main(String[] args) {
 		
-		
 		/*
 		 * second step: merge the maps from the list of files.
 		 */

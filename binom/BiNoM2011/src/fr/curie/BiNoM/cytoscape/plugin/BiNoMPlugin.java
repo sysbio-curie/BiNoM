@@ -36,10 +36,12 @@ import fr.curie.BiNoM.cytoscape.ain.ImportFromSimpleTextInfluenceFile;
 import fr.curie.BiNoM.cytoscape.analysis.CalcCentrality;
 import fr.curie.BiNoM.cytoscape.analysis.ClusterNetworks;
 import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponents;
+import fr.curie.BiNoM.cytoscape.analysis.ConvertReactionNetworkToEntityNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.CycleDecomposition;
 import fr.curie.BiNoM.cytoscape.analysis.EdgesFromOtherNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.ExcludeIntermediateNodes;
 import fr.curie.BiNoM.cytoscape.analysis.ExtractReactionNetwork;
+import fr.curie.BiNoM.cytoscape.analysis.ConvertReactionNetworkToEntityNetworkTask;
 import fr.curie.BiNoM.cytoscape.analysis.ExtractSubnetwork;
 import fr.curie.BiNoM.cytoscape.analysis.LinearizeNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.MaterialComponents;
@@ -130,6 +132,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	JMenuItem colorCellDesignerProteinsMenuItem;
 	JMenuItem pathwayStainingCellDesignerMenuItem;
 	JMenuItem extractCellDesignerNotesMenuItem;
+	JMenuItem convertReactionNetworkToEntityNetworkTask;
 	JMenuItem modifyCellDesignerNotesMenuItem;	
 	JMenuItem checkCellDesignerFileMenuItem;
 	JMenuItem createNeighborhoodSetsMenuItem;
@@ -346,6 +349,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 
 		menuItem = new JMenuItem("Extract Reaction Network...");
 		menuItem.addActionListener(new ExtractReactionNetwork());
+		structAnaMenu.add(menuItem);
+
+		menuItem = new JMenuItem("Convert Reaction 2 Entity Network...");
+		menuItem.addActionListener(new ConvertReactionNetworkToEntityNetwork());
 		structAnaMenu.add(menuItem);
 
 		structAnaMenu.addSeparator();

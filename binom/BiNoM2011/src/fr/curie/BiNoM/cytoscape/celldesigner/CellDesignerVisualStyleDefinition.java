@@ -97,6 +97,9 @@ public class CellDesignerVisualStyleDefinition
     public static final String EDGE_MODULATION = "MODULATION";
     public static final String EDGE_POSITIVE_INFLUENCE = "POSITIVE_INFLUENCE";
     public static final String EDGE_NEGATIVE_INFLUENCE = "NEGATIVE_INFLUENCE";
+    public static final String EDGE_UNKNOWN_POSITIVE_INFLUENCE = "UNKNOWN_POSITIVE_INFLUENCE";
+    public static final String EDGE_UNKNOWN_NEGATIVE_INFLUENCE = "UNKNOWN_NEGATIVE_INFLUENCE";
+    public static final String EDGE_UNKNOWN_TRANSITION = "UNKNOWN_TRANSITION";
 
     
 
@@ -418,11 +421,15 @@ public class CellDesignerVisualStyleDefinition
     edgeTargetArrowMapping.add(new ObjectMapping
     			(EDGE_TRANSCRIPTIONAL_INHIBITION, new Arrow(ArrowShape.T,Color.GREEN)));
     edgeTargetArrowMapping.add(new ObjectMapping
-                (EDGE_INTERSECTION, new Arrow(ArrowShape.DIAMOND,Color.CYAN)));
+                (EDGE_INTERSECTION, new Arrow(ArrowShape.NONE,Color.CYAN)));
     edgeTargetArrowMapping.add(new ObjectMapping
 			(EDGE_NEGATIVE_INFLUENCE, new Arrow(ArrowShape.T,Color.GREEN)));
 	edgeTargetArrowMapping.add(new ObjectMapping
 			(EDGE_POSITIVE_INFLUENCE, new Arrow(ArrowShape.ARROW,Color.RED)));
+    edgeTargetArrowMapping.add(new ObjectMapping
+			(EDGE_UNKNOWN_NEGATIVE_INFLUENCE, new Arrow(ArrowShape.T,Color.GREEN)));
+	edgeTargetArrowMapping.add(new ObjectMapping
+			(EDGE_UNKNOWN_POSITIVE_INFLUENCE, new Arrow(ArrowShape.ARROW,Color.RED)));
 
     
     edgeTargetArrowMapping.add(new ObjectMapping
@@ -456,6 +463,8 @@ public class CellDesignerVisualStyleDefinition
                                  (EDGE_MODIFIES, LineStyle.LONG_DASH));
     	edgeLineTypeMapping.add(new ObjectMapping
    			 (EDGE_CATALYSIS_UNKNOWN, LineStyle.LONG_DASH));
+    	edgeLineTypeMapping.add(new ObjectMapping
+      			 (EDGE_UNKNOWN_TRANSITION, LineStyle.LONG_DASH));
         
 
 	// edge line color
@@ -479,6 +488,10 @@ public class CellDesignerVisualStyleDefinition
 			 (EDGE_POSITIVE_INFLUENCE, Color.RED));
 	edgeLineColorMapping.add(new ObjectMapping
 			 (EDGE_NEGATIVE_INFLUENCE, Color.GREEN));
+	edgeLineColorMapping.add(new ObjectMapping
+			 (EDGE_UNKNOWN_POSITIVE_INFLUENCE, Color.RED));
+	edgeLineColorMapping.add(new ObjectMapping
+			 (EDGE_UNKNOWN_NEGATIVE_INFLUENCE, Color.GREEN));
 
         
         edgeLineColorMapping.add(new ObjectMapping

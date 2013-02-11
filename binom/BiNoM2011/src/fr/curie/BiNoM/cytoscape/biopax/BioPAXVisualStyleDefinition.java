@@ -497,7 +497,7 @@ public class BioPAXVisualStyleDefinition
         edgeTargetArrowMapping.add(new ObjectMapping
                                    (EDGE_REFERENCE, Arrow.NONE));
         edgeTargetArrowMapping.add(new ObjectMapping
-                (EDGE_INTERSECTION, new Arrow(ArrowShape.DIAMOND,Color.CYAN)));
+                (EDGE_INTERSECTION, new Arrow(ArrowShape.NONE,Color.CYAN)));
 
         edgeTargetArrowMapping.add(new ObjectMapping
                 (EDGE_RIGHT, new Arrow(ArrowShape.ARROW,Color.BLACK)));

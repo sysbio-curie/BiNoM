@@ -59,7 +59,7 @@
 
       <a NAME="introduction"></a>
       <h2>Introduction</h2>
-      <p><b>BiNoM</b> ( Biological Network Manager ) is <a href="http://cytoscape.org">Cytoscape</a> plugin developed by
+      <p><b>BiNoM</b> ( Biological Network Manager ) is a <a href="http://cytoscape.org">Cytoscape</a> plugin developed by the 
 	 <a href="http://bioinfo-out.curie.fr/sysbio">Computational Systems Biology of Cancer</a> group in
 	 <a href="http://bioinfo-out.curie.fr">Bioinformatics Laboratory of Institut Curie (Paris)</a>.
 
@@ -70,7 +70,7 @@ studies on the network structure. BiNoM provides the user with a
 complete interface for the analysis of biological networks in
 Cytoscape environment.
 
-      <p> The first version of the BiNoM software supports the following functions:
+      <p> BiNoM software supports the following functions:
 <ul>
 <li>Import of BioPAX, SBML and CellDesigner formats
 <li>Export to BioPAX, SBML and CellDesigner formats after user manipulations 
@@ -84,12 +84,15 @@ concept of BioPAX index and network interfaces
 <li>Some general purpose utilities not yet implemented in Cytoscape (clipboard operations, network updating, etc.)
 </ul>
 
+<!--
 <p><font color=red>Latest news:</font> BiNoM is compatible the latest version of Cytoscape (2.8.0).
 Due to continuous changes in Cytoscape API, only the latest version of Cytoscape will be supported in the future.
+-->
 
+<!--
 <p><font color=red>Latest news:</font> In the downloads section, there is a beta version of BiNoM capable 
 of working with BioPAX version 3.
-
+-->
 
 <p>More information in
 <ul>
@@ -103,21 +106,37 @@ of working with BioPAX version 3.
       <a NAME="downloads"></a>
       <hr>
       <h2>Downloads</h2>
-	<p>BiNoM can be installed and used in several ways: 
-	<p><b>Easy)</b> As Cytoscape plug-in with all libraries included<br><a href="BiNoM_all.jar">Download, 22M</a>
-	<p>Installation steps:
-           <ol>
-             <li>Copy BiNoM_all.jar into the 'plugin/' folder of Cytoscape
-           </ol>
-	   <p><font color=red>Important note:</font> This version can be used only with the latest version of Cytoscape (2.8.*). 
-		If you use Cytoscape version 2.4.* or below, you have to 1) download the <a href="BiNoM_all_2.4.jar">old version of BiNoM</a>; 2) remove (or, better, rename and keep)
+	<p>BiNoM can be installed in several ways: 
+	<!--<p><b>Easy)</b> As Cytoscape plug-in with all libraries included<br><a href="BiNoM_all.jar">Download, 22M</a> -->
+	<p><b>* Easy</b> <p>As a Cytoscape plug-in file with all libraries included (stable release)<a href="BiNoM_all_v2.2.jar"> Download, 25M</a>
+	<p>Current experimental <a href="BiNoM_all.jar">BiNoM release</a><p>
+  
+	<p>Installation procedure: just copy BiNoM_all.jar into the 'plugin/' folder of Cytoscape (you should also remove all previous BiNoM versions from this folder).
+
+	   <p><font color=red>Important note:</font> This version can be used only with versions 2.7.x and 2.8.x of Cytoscape. 
+		If you use Cytoscape version 2.4.* or below, you have to follow these steps:
+    <ol>
+      <li>Download the <a href="BiNoM_for_Cytoscape2.4.jar">old version of BiNoM</a>. 
+      <li>Remove (or, better, rename and keep)
 		xercesImpl.jar from 'lib/' folder of Cytoscape (since it is not compatible with the version of the same 
-		jar used by Jena in BiNoM)
+		jar used by Jena in BiNoM).
+    </ol>
 	   <p><font color=red>Important note:</font> Some browsers automatically rename the BiNoM_all.jar to BiNoM_all.zip
 		after the download. Do not unpack the .zip file but rather rename it back to BiNoM_all.jar and copy into the  plugin/ Cytoscape folder.
+    </ol>
 
-	<p>Beta version of BiNoM plugin for working with <b>BioPAX 3</b> files is available <a href="BiNoM_all_biopax3_beta.jar">here</a>.
+    <p><b>* Using Cytoscape plugin manager</b></p>
+    <ol>
+      <li>Launch the Cytoscape plugin manager (menu "Plugins -> Manage Plugins").
+      <li>Go to the category "Other".
+      <li>Select the latest version of BiNoM (currently 2.2).
+      <li>Click "Install".
+      <li>Restart Cytoscape.
+    </ol>
 
+	<!--<p>Beta version of BiNoM plugin for working with <b>BioPAX 3</b> files is available <a href="BiNoM_all_biopax3_beta.jar">here</a>.-->
+
+<!--
 	<p><b>Pro)</b> As Cytoscape plug-in without Jastor, XmlBeans, Jena libraries (smaller file)
 	<br><a href="BiNoM.jar">Download, 9M</a>
 	<p>Installation steps:
@@ -132,19 +151,27 @@ of working with BioPAX version 3.
              <li><a href="http://xmlbeans.apache.org/">XmlBeans</a> library (BiNoM uses xbean.jar:commons-logging.jar:sax.jar)
 	     <li><a href="http://jena.sourceforge.net/">Jena</a> library (BiNoM uses antlr.jar:concurrent.jar:icu4j_3_4.jar:iri.jar:jakarta-oro-2.0.5.jar:jena.jar:jenatest.jar:junit.jar:rdf-api-2001-01-19.jar:xercesImpl.jar (dated 07/02/07):xml-apis.jar)
            </ol>
+-->
 
-	<p><b>Library)</b> As stand-alone jar for file conversions, structural analysis, etc. (Jena, Jastor and XmlBeans are included)
-            <br><a  href="BiNoM_all.jar">Download, 22M</a>  <br>(<a href="docs/BiNoM_examples.zip">examples of use</a>)	
-      <a NAME="documentation"></a>
+	<p><b>* Library</b> <p>As stand-alone jar for file conversions, structural analysis, etc. (Jena, Jastor and XmlBeans are included) <a  href="BiNoM_all_v2.2.jar">Download, 25M</a>  
+  <br>(<a href="docs/BiNoM_examples.zip">examples of use</a>)	
+
+
+<a NAME="documentation"></a>
       <hr>
       <h2>Documentation and source code</h2>
         <ul>
            <li><a href="docs/BiNoM_refcard.pdf">BiNoM reference card</a>
-           <li><a href="docs/Binom_Manual_v1.0.pdf">BiNoM manual</a> and the <a href="docs/manual_files/manual_files.zip">files</a> mentioned in it
+           <!--<li><a href="docs/Binom_Manual_v1.0.pdf">BiNoM manual</a> and the <a href="docs/manual_files/manual_files.zip">files</a> mentioned in it -->
+           <li><a href="docs/BiNoM_Manual_v2.pdf">BiNoM manual</a> and the <a href="manual_files.zip">files</a> mentioned in it 
 	   <li><a href="http://bioinfo-out.curie.fr/training/CGH-PATHWAYworkshop/">BiNoM tutorial</a>
 	   <li><a href="book_chapter_input_files.zip">Materials for "Practical use of BiNoM, a Biological Network Manager software" book chapter by Bonnet E. et al (2012)</a>
-           <li>BiNoM JavaDoc API (<a href="docs/BiNoM_javadoc.zip">As Zip-archive</a>) (<a href="docs/javadoc/index.html">online</a>) 
-	   <li><a href="docs/BiNoM_src.zip">BiNoM source code</a>
+     <!-- <li>BiNoM JavaDoc API (<a href="docs/BiNoM_javadoc.zip">As Zip-archive</a>) (<a href="docs/javadoc/index.html">online</a>) --> 
+	   <!--<li><a href="docs/BiNoM_src.zip">BiNoM source code</a> -->
+	   <li><a href="docs/BiNoM_v2.1_src.tgz">BiNoM source code</a>
+	   <li><a href="docs/BiNoM_v2_JavaDoc.zip">BiNoM JavaDoc</a>
+	   <li><a href="g1s_209_266.xgmml">Supplementary material (G1S network file) for the manuscript "BiNoM, a Cytoscape plugin for accessing and analyzing
+     pathways using standard systems biology formats" by Bonnet E. et al. (2012)</a>
         </ul>
       <a NAME="screenshots"></a>
       <hr>
@@ -160,25 +187,29 @@ of working with BioPAX version 3.
       <h2>BiNoM working group</h2>
         <ul>
 	<li><a href="http://www.ihes.fr/~zinovyev">Andrei Zinovyev</a>
-	<li>Eric Viara
-	<li>Emmanuel Barillot
+  <li>Eric Bonnet
 	<li>Laurence Calzone
+  <li>Daniel Rovera
+  <li>Gautier Stoll
+	<li>Eric Viara
 	<li>Philippe La Rosa
+	<li>Emmanuel Barillot
 	</ul>
       <hr>
       <h2>Contacts</h2>
 	 <ul>
 	 <li><a href="http://www.ihes.fr/~zinovyev">Andrei Zinovyev</a>
-	 <li><a mailto="emmanuel.barillot@curie.fr">Emmanuel Barillot</a>
 	 <li><a mailto="laurence.calzone@curie.fr">Laurence Calzone</a>
+	 <li><a mailto="eric.bonnet@curie.fr">Eric Bonnet</a>
+	 <li><a mailto="emmanuel.barillot@curie.fr">Emmanuel Barillot</a>
 	 </ul>
       <hr>
       <h2>Acknowledgements</h2>
       <p>This project was partly funded by the EC contract <a href="http://pybios.molgen.mpg.de/ESBIC-D">ESBIC-D</a>
 (LSHG-CT-2005-518192), the PIC Bioinformatique et Biostatistiques
-from Institut Curie, and the Research Networks Program in
+from Institut Curie, the Research Networks Program in
 Bioinformatics from the High Council for Scientific and
-Technological Cooperation between France and Israel.
+Technological Cooperation between France and Israel, and the <a href="http://www.apo-sys.eu/">APO-SYS</a> FP7 European program.
 
 
       </td>

@@ -99,7 +99,7 @@ public class Element {
 	   * @param substring
 	   * @return
 	   */
-	  public Vector getAttributesWithSubstringInName(String substring){
+	  public Vector<Attribute> getAttributesWithSubstringInName(String substring){
 		  Vector res = new Vector();
 		  for(int i=0;i<this.Attributes.size();i++){
 			  Attribute at = (Attribute)this.Attributes.get(i);
@@ -107,6 +107,15 @@ public class Element {
 				  res.add(at);
 		  }
 		  return res;
-	  }	
+	  }
+	  
+	  public String getFirstAttributeValueWithSubstringInName(String substring){
+		  String res = null;
+		  Vector<Attribute> atts = getAttributesWithSubstringInName(substring);
+		  if(atts.size()>0)
+			  res = atts.get(0).value;
+		  return res;
+	  }
+	  
 
 }

@@ -32,6 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.*;
 
+import fr.curie.BiNoM.pathways.wrappers.XGMML;
+
 
 /**
  * Set of functions using specific graph node semantics of BiNoM 
@@ -46,6 +48,17 @@ public class BiographUtils extends Graph {
   
   public static void main(String[] args) {
     BiographUtils biographUtils1 = new BiographUtils();
+    
+    try{
+    	//String prefix = "c:/datas/binomtest/M-phase2";
+    	String prefix = "C:/Datas/BinomTest/Reaction2EntityNetwork/mapk";
+    	Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+".xgmml"));
+    	graph = convertReactionNetworkIntoEntityNetwork(graph);
+    	XGMML.saveToXGMML(graph, prefix+"_entity.xgmml");
+    }catch(Exception e){
+    	e.printStackTrace();
+    }
+    
   }
 
   /**
@@ -1027,8 +1040,15 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  st = new StringTokenizer(nameWithoutCompartment,":");
 	  while(st.hasMoreTokens()){
 		  String part = st.nextToken();
-		  StringTokenizer st1 = new StringTokenizer(part,"|");
+		  StringTokenizer st1 = new StringTokenizer(part,"(|)'");
 		  String proteinName = st1.nextToken();
+		  if((proteinName.startsWith("g"))||(proteinName.startsWith("r"))){
+			  System.out.println(proteinName);
+			  if(proteinName.substring(1, 2).equals(proteinName.substring(1, 2).toUpperCase())){
+			  	proteinName = proteinName.substring(1, proteinName.length());
+			  }
+			  System.out.println(proteinName);
+		  }
 		  if(!names.contains(proteinName))
 			  names.add(proteinName);
 	  }
@@ -1095,8 +1115,9 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
   }
   
   
-  public Graph convertReactionNetworkIntoEntityNetwork(Graph reactionNetwork){
+  public static Graph convertReactionNetworkIntoEntityNetwork(Graph reactionNetwork){
 	  Graph entityNetwork = new Graph();
+	  reactionNetwork.calcNodesInOut();
 	  Vector<String> allProteinNames = extractProteinNamesFromNodeNames(reactionNetwork.Nodes);
 	  for(int i=0;i<allProteinNames.size();i++){
 		  Node n = new Node();
@@ -1104,9 +1125,164 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  n.NodeLabel = allProteinNames.get(i);
 		  entityNetwork.addNode(n);
 	  }
+	  // First, create intersection relations
+	  for(int i=0;i<reactionNetwork.Nodes.size();i++){
+		  Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i).Id);
+		  for(int j=0;j<names.size();j++)for(int k=j+1;k<names.size();k++){
+			  String id = "";
+			  if(names.get(j).compareTo(names.get(k))<0)
+				  id = names.get(j)+" (interesects) "+names.get(k);
+			  else
+				  id = names.get(k)+" (interesects) "+names.get(j);
+			  Edge e = entityNetwork.getCreateEdge(id);
+			  int inter_size = 1;
+			  String inter_string = reactionNetwork.Nodes.get(i).Id;
+			  if(e.getFirstAttributeValue("INTERSECTION_SIZE")!=null){
+				  inter_size = Integer.parseInt(e.getFirstAttributeValue("INTERSECTION_SIZE"))+1;
+				  inter_string = e.getFirstAttributeValue("INTERSECTION")+"@@"+inter_string;
+			  }
+			  e.Node1 = entityNetwork.getNode(names.get(j));
+			  e.Node2 = entityNetwork.getNode(names.get(k));
+			  e.setAttributeValueUnique("INTERSECTION", ""+inter_string, Attribute.ATTRIBUTE_TYPE_STRING);			  
+			  e.setAttributeValueUnique("INTERSECTION_SIZE", ""+inter_size, Attribute.ATTRIBUTE_TYPE_STRING);
+			  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "INTERSECTION", Attribute.ATTRIBUTE_TYPE_STRING);
+			  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", "INTERSECTION", Attribute.ATTRIBUTE_TYPE_STRING);
+			  entityNetwork.addEdge(e);
+		  }
+	  }
+	  // Second, all regulation relations
+	  for(int i=0;i<reactionNetwork.Nodes.size();i++)if(reactionNetwork.Nodes.get(i).getAttributesWithSubstringInName("REACTION")!=null)if(reactionNetwork.Nodes.get(i).getAttributesWithSubstringInName("REACTION").size()!=0){
+		  Vector<Edge> incoming = reactionNetwork.Nodes.get(i).incomingEdges;
+		  Node reactionNode = reactionNetwork.Nodes.get(i);
+		  String type = "";
+		  if(reactionNode.getFirstAttributeValueWithSubstringInName("NODE_TYPE")!=null)
+			  	type = reactionNode.getFirstAttributeValueWithSubstringInName("NODE_TYPE");
+		  //System.out.println(reactionNode.Id);
+		  
+		  Vector<String> reactants = new Vector<String>();
+		  Vector<String> products = new Vector<String>();
+		  for(int k=0;k<reactionNode.incomingEdges.size();k++)if(reactionNode.incomingEdges.get(k).getFirstAttributeValue("interaction").equals("LEFT")){
+			  Vector<String> reactants1 = extractProteinNamesFromNodeName(reactionNode.incomingEdges.get(k).Node1.Id);	
+			  for(int l=0;l<reactants1.size();l++) reactants.add(reactants1.get(l));
+		  }
+		  for(int k=0;k<reactionNode.outcomingEdges.size();k++)if(reactionNode.outcomingEdges.get(k).getFirstAttributeValue("interaction").equals("RIGHT")){
+			  Vector<String> products1 = extractProteinNamesFromNodeName(reactionNode.outcomingEdges.get(k).Node2.Id);		  			  
+			  for(int l=0;l<products1.size();l++) products.add(products1.get(l));
+		  }
+		  
+		  for(int j=0;j<incoming.size();j++)if(!incoming.get(j).getFirstAttributeValue("interaction").equals("LEFT"))if(!incoming.get(j).getFirstAttributeValue("interaction").equals("RIGHT")){
+			  Node n = incoming.get(j).Node1;
+			  Vector<String> namesReg = extractProteinNamesFromNodeName(n.Id);
+			  // now whe should construct a list of everything that regulated (reactants and products)
+			  Vector<String> names = new Vector<String>();
+			  for(int s=0;s<reactants.size();s++) 
+				  if(!names.contains(reactants.get(s)))
+					  names.add(reactants.get(s));
+			  for(int s=0;s<products.size();s++) 
+				  if(!names.contains(products.get(s)))
+					  names.add(products.get(s));
+
+			  System.out.print("Regulators for "+reactionNetwork.Nodes.get(i).Id+" :");
+			  for(int k=0;k<namesReg.size();k++) System.out.print(namesReg.get(k)+"\t"); System.out.println();
+			  System.out.print("Regulated entities for "+reactionNetwork.Nodes.get(i).Id+" :");
+			  for(int k=0;k<names.size();k++) System.out.print(names.get(k)+"\t"); System.out.println();
+
+			  
+			  for(int k=0;k<names.size();k++)for(int l=0;l<namesReg.size();l++){
+				  String id = namesReg.get(l)+" (regulates) "+names.get(k);
+				  if(entityNetwork.getNode(namesReg.get(l))!=null)
+					  if(entityNetwork.getNode(names.get(k))!=null){					  
+						  Edge e = entityNetwork.getCreateEdge(id);			
+				  		  e.Node1 = entityNetwork.getNode(namesReg.get(l));
+				  		  e.Node2 = entityNetwork.getNode(names.get(k));
+				  		  e.Attributes = incoming.get(j).Attributes;
+					  }
+			  }
+		  }
+		  
+			  // Next, if there is a conversion of one entity into another one
+		      if(!type.contains("INFLUENCE"))
+		  	  for(int k=0;k<products.size();k++)if(!reactants.contains(products.get(k))){
+				  for(int l=0;l<reactants.size();l++){
+					  String id = reactants.get(l)+" ("+type+") "+products.get(k);
+					  if(entityNetwork.getNode(reactants.get(l))!=null)
+						  if(entityNetwork.getNode(products.get(k))!=null){					  
+							  Edge e = entityNetwork.getCreateEdge(id);			
+					  		  e.Node1 = entityNetwork.getNode(reactants.get(l));
+					  		  e.Node2 = entityNetwork.getNode(products.get(k));
+							  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+							  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+						  }					  
+				  }
+			  }
+		      
+		      // Finally, if the reaction itself represents an influence
+			  if(type.contains("INFLUENCE")){
+				  for(int k=0;k<products.size();k++){
+					  for(int l=0;l<reactants.size();l++){
+						  String id = reactants.get(l)+" (regulates) "+products.get(k);
+						  if(entityNetwork.getNode(reactants.get(l))!=null)
+							  if(entityNetwork.getNode(products.get(k))!=null){					  
+								  Edge e = entityNetwork.getCreateEdge(id);			
+						  		  e.Node1 = entityNetwork.getNode(reactants.get(l));
+						  		  e.Node2 = entityNetwork.getNode(products.get(k));
+						  		  if(type.contains("POSITIVE"))
+						  			  e.setAttributeValueUnique("interaction", "activates", Attribute.ATTRIBUTE_TYPE_STRING);
+						  		  if(type.contains("NEGATIVE"))
+						  			  e.setAttributeValueUnique("interaction", "inhibits", Attribute.ATTRIBUTE_TYPE_STRING);
+								  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+								  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+							  }					  
+					  }
+				  }
+			  }
+
+	  }
+	  
 	  return entityNetwork;
   }
-
+  
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[]){
+	  Vector<Node> res = new Vector<Node>();
+	  reactionNetwork.calcNodesInOut();
+	  Node reactionNode = reactionNetwork.getNode(reid);
+	  
+	  if(reactionNode!=null){
+		  System.out.print(reid+":\t");
+		  for(int i=0;i<reactionNode.incomingEdges.size();i++){
+			  Edge e = reactionNode.incomingEdges.get(i);
+			  Vector<String> interactionTypes = e.getAttributeValues("interaction");
+			  boolean typeFound = false;
+			  for(int j=0;j<interactionTypes.size();j++){
+				  for(int k=0;k<typesOfRegulations.length;k++){
+					  if(typesOfRegulations[k].equals(interactionTypes.get(j)))
+						  typeFound = true;
+				  }
+			  }
+			  if(typeFound){
+				  if(!res.contains(e.Node1)){
+					  res.add(e.Node1);
+					  System.out.print(e.Node1.Id+"\t");
+				  }
+			  }
+		  }
+		  System.out.println();
+	  }
+	  return res;
+  }
+  
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[]){
+	  Vector<Node> res = new Vector<Node>();
+	  Iterator<String> it = reactionIds.iterator();
+	  while(it.hasNext()){
+		  Vector<Node> regs = findReactionRegulators(reactionNetwork,it.next(),typesOfRegulations);
+		  for(int j=0;j<regs.size();j++)
+			  if(!res.contains(regs.get(j)))
+				  res.add(regs.get(j));
+	  }
+	  return res;
+  }
+  
 
 
 }

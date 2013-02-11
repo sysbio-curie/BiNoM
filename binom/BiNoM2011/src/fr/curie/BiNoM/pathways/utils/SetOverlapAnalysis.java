@@ -3,6 +3,13 @@ package fr.curie.BiNoM.pathways.utils;
 import java.io.*;
 import java.util.*;
 
+import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
+import fr.curie.BiNoM.pathways.analysis.structure.OmegaScoreData;
+import fr.curie.BiNoM.pathways.analysis.structure.OptimalCombinationAnalyzer;
+import fr.curie.BiNoM.pathways.wrappers.XGMML;
+
 import vdaoengine.utils.Utils;
 
 public class SetOverlapAnalysis {
@@ -11,6 +18,7 @@ public class SetOverlapAnalysis {
 	public Vector<Vector<String>> lists = new Vector<Vector<String>>();
 	public Vector<HashSet<String>> sets = null;
 	public Vector<String> setnames = null;
+	public Vector<String> allproteins = null;
 	
 	/**
 	 * @param args
@@ -23,11 +31,26 @@ public class SetOverlapAnalysis {
 			//String prefix = "C:/Datas/Kairov/DifferentialExpression4BC/lists/";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_KEGG";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_map_PARP12BRCA12";
-			String prefix = "C:/Datas/KEGG/Test/test";
-			so.LoadSetsFromGMT(prefix+".gmt");
-			so.printSetSizes();
-			so.printSetIntersections();
+			//String prefix = "C:/Datas/KEGG/Test/test";
+			//String prefix = "C:/Datas/KEGG/Test/ocsana_report_cellfate";
+			//String prefix = "C:/Datas/KEGG/Human/dnarepair_map_onlyRepair";
+			//String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path";
+			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_REPAIRtoire_onlyBER";
 			
+			so.LoadSetsFromGMT(prefix+".gmt");
+			
+			//String typesOfRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
+			//Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/DNARepairAnalysis/dnarepair.xml.xgmml"));
+			//so.makeGMTOfReactionRegulators(prefix+"_reg", graph, typesOfRegulations);
+			
+			//so.printSetSizes();
+			//so.printSetIntersections();
+
+			so.findMinimalHittingSet(4, prefix);
+			//so.listSetsIncludingSet(prefix+".minhitsets",new String[]{"BRCA1"});
+			
+			//so.createGMTFromOCSANAOutput("C:/Datas/DNARepairAnalysis/dnarepair_OCSANA_report");
+						
 			System.exit(-1);
 			
 			so.LoadNewOrderedList(prefix+"1ic1");
@@ -72,7 +95,7 @@ public class SetOverlapAnalysis {
 		setnames = new Vector<String>();
 		LineNumberReader lr = new LineNumberReader(new FileReader(fn));
 		String s = null;
-		Vector<String> allproteins = new Vector<String>();
+		allproteins = new Vector<String>();
 		while((s=lr.readLine())!=null){
 			StringTokenizer st = new StringTokenizer(s,"\t");
 			String groupName = st.nextToken();
@@ -216,8 +239,300 @@ public class SetOverlapAnalysis {
 		}
 	}
 	
-	public void findMinimalHittingSet(){
+	public void findMinimalHittingSet(int maxSetSize, String fileNamePreifix) throws Exception{
+		OptimalCombinationAnalyzer oca = new OptimalCombinationAnalyzer();
+		ArrayList<BitSet> pathMatrixRowBin = new ArrayList<BitSet>();
+		oca.pathMatrixNbRow = sets.size();
+		oca.pathMatrixNbCol = allproteins.size();
+		int pathMatrix[][] = new int[oca.pathMatrixNbRow][oca.pathMatrixNbCol];
+		Iterator<HashSet<String>> it = sets.iterator();
+		int k=0;
+		while(it.hasNext()){
+			HashSet<String> set = it.next();
+			BitSet b = new BitSet(allproteins.size());
+			Iterator<String> proteins = set.iterator();
+			while(proteins.hasNext()){
+				String name = proteins.next();
+				if(allproteins.indexOf(name)!=-1){
+					b.set(allproteins.indexOf(name));
+					pathMatrix[k][allproteins.indexOf(name)] = 1;
+				}
+				else
+					System.out.println(name+" is not found");
+			}
+			k++;
+			pathMatrixRowBin.add(b);
+		}
 		
+		//oca.pathMatrixRowBin = pathMatrixRowBin;
+		oca.pathMatrix = pathMatrix;
+		oca.pathMatrixNodeList = new ArrayList<String>();
+		oca.omegaScoreList = new ArrayList<OmegaScoreData>();
+		oca.orderedNodesByScore = new ArrayList<String>();
+		for(int i=0;i<allproteins.size();i++){
+			oca.pathMatrixNodeList.add(allproteins.get(i));
+			oca.omegaScoreList.add(new OmegaScoreData(allproteins.get(i),i));
+			oca.orderedNodesByScore.add(allproteins.get(i));
+		}
+		oca.initOrderedNodesList();
+		oca.searchHitSetSizeOne();
+		oca.convertPathMatrixColToBinary();
+		oca.convertPathMatrixRowToBinary();
+		
+		oca.report = new StringBuffer();
+		
+		//oca.initOrderedNodesList();
+		
+		//oca.checkRows();
+		//oca.searchHitSetSizeOne();
+
+		oca.maxNbHitSet = (long)50e6;
+		oca.maxHitSetSize = maxSetSize;
+
+		if(maxSetSize!=-1){
+			//oca.searchHitSetFull(maxSetSize);
+			oca.searchHitSetPartial();
+		}
+		else
+			oca.mainBerge(true);
+		
+		
+		// Printing the results
+
+		Iterator<BitSet> itb = oca.hitSetSB.iterator();
+		int maxFoundSize = 0;
+		while(itb.hasNext()){
+			int size = 0; BitSet bs = itb.next();
+			for(int i=0;i<bs.size();i++) if(bs.get(i)) size++;
+			if(size>maxFoundSize) maxFoundSize = size;
+		}
+		
+		
+		FileWriter fw = new FileWriter(fileNamePreifix+".minhitsets");
+
+		System.out.print("SIZE\t"); fw.write("SIZE\t");
+		for(int sz=1;sz<=maxFoundSize;sz++) { System.out.print("N"+sz+"\t"); fw.write("N"+sz+"\t"); } 
+		for(int sz=1;sz<=maxFoundSize;sz++) { System.out.print("SETS"+sz+"\t"); fw.write("SETS"+sz+"\t"); } 		
+		System.out.println(); fw.write("\n");
+		
+		
+		Iterator<String> it1 = oca.hitSetSizeOne.iterator();
+		while(it1.hasNext()){
+			String node = it1.next();
+			System.out.println("1\t"+node);
+			fw.write("1\t"+node+"\n");
+		}
+
+		
+		Vector<Vector<OmegaScoreData>> frequencies = new Vector<Vector<OmegaScoreData>>();
+		
+		for(int sz=2;sz<=maxFoundSize;sz++){
+		
+		Vector<Vector<String>> hitSetString = new Vector<Vector<String>>();
+		itb = oca.hitSetSB.iterator();
+		while(itb.hasNext()){
+			BitSet bs = itb.next();
+			int size = 0;
+			Vector<String> set = new Vector<String>();
+			for(int i=0;i<bs.size();i++)
+				if(bs.get(i)){
+					size++;
+					set.add(oca.pathMatrixNodeList.get(i));
+				}
+			Collections.sort(set);
+			if(sz==size){
+				System.out.print(size+"\t");
+				fw.write(size+"\t");
+				for(int i=0;i<set.size();i++){
+					System.out.print(set.get(i)+"\t");
+					fw.write(set.get(i)+"\t");
+				}
+			for(int i=set.size();i<=maxFoundSize;i++){
+				System.out.print("\t");
+				fw.write("\t");
+			}
+			for(int i=0;i<set.size();i++){
+				String node = set.get(i);
+				Vector<String> names = getListOfSets(node);
+				String s = "(";
+				for(int j=0;j<names.size();j++) if(j==names.size()-1) s+=names.get(j); else s+=names.get(j)+";";
+				s+=")";
+				System.out.print(s+"\t");
+				fw.write(s+"\t");
+			}
+			System.out.println();
+			fw.write("\n");
+			hitSetString.add(set);
+			}
+		}
+		frequencies.add(analyzeHitFrequency(hitSetString));		
+		}
+		
+		FileWriter fw1 = new FileWriter(fileNamePreifix+".freqmhs");		
+		System.out.println();
+		System.out.print("NODE\tSETS\t"); fw1.write("NODE\tSETS\t");
+		for(int sz=2;sz<=maxFoundSize;sz++) { System.out.print("SZ"+sz+"\t"); fw1.write("SZ"+sz+"\t"); } System.out.println(); fw1.write("\n");
+		for(int i=0;i<allproteins.size();i++){
+			Vector<String> names = getListOfSets(allproteins.get(i));
+			String s = "(";
+			for(int j=0;j<names.size();j++) if(j==names.size()-1) s+=names.get(j); else s+=names.get(j)+";";
+			s+=")";
+			System.out.print(allproteins.get(i)+"\t"+s+"\t");
+			fw1.write(allproteins.get(i)+"\t"+s+"\t");
+			for(int j=2;j<=maxFoundSize;j++){
+				System.out.print(frequencies.get(j-2).get(i).score+"\t");
+				fw1.write(frequencies.get(j-2).get(i).score+"\t");
+			}
+			System.out.println(); fw1.write("\n");
+		}
+		fw1.close();
+		
+		
+		fw.close();
 	}
+	
+	public Vector<String> getListOfSets(String node){
+		Vector<String> res = new Vector<String>();
+		for(int i=0;i<sets.size();i++){
+			HashSet set = sets.get(i);
+			if(set.contains(node))
+				res.add(setnames.get(i));
+		}
+		return res;
+	}
+	
+	public Vector<OmegaScoreData> analyzeHitFrequency(Vector<Vector<String>> hitSet){
+		Vector<OmegaScoreData> frequencies = new Vector<OmegaScoreData>();
+		for(int i=0;i<allproteins.size();i++)
+			frequencies.add(new OmegaScoreData(allproteins.get(i),0));
+		for(int i=0;i<hitSet.size();i++){
+			Vector<String> bs = hitSet.get(i);
+			for(int j=0;j<bs.size();j++)
+				frequencies.get(allproteins.indexOf(bs.get(j))).score+=1;
+		}
+		//Collections.sort(frequencies);
+		return frequencies;
+	}
+	
+	public void createGMTFromOCSANAOutput(String fn) throws Exception{
+		LineNumberReader lr = new LineNumberReader(new FileReader(fn));
+		FileWriter fw = new FileWriter(fn+".gmt");
+		String s = null;
+		while((s=lr.readLine())!=null){
+			if(s.startsWith("Found ")){
+				StringTokenizer st = new StringTokenizer(s," \t");
+				st.nextToken();
+				int npaths = Integer.parseInt(st.nextToken());
+				lr.readLine();
+				for(int i=0;i<npaths;i++){
+					s = lr.readLine();
+					st = new StringTokenizer(s,"->|");
+					fw.write("path"+(i+1)+"\t"+s+"\t");
+					while(st.hasMoreTokens()){
+						String node = st.nextToken();
+						if(!node.contains(":"))
+							fw.write(node+"\t");
+					}
+					fw.write("\n");
+				}
+				break;
+			}
+		}
+		fw.close();
+	}
+	
+	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfRegulations[]) throws Exception{
+		FileWriter fw = new FileWriter(prefix+".gmt");
+		for(int i=0;i<setnames.size();i++){
+			fw.write(setnames.get(i)+"\tna\t");
+			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfRegulations);
+			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
+			for(int j=0;j<regnames.size();j++){
+				fw.write(regnames.get(j)+"\t");
+			}
+			fw.write("\n");
+		}
+		fw.close();
+	}
+	
+	public void listSetsIncludingSet(String fileName, String subset[]){
+		HashSet<String> _subset = new HashSet<String>();
+		for(int i=0;i<subset.length;i++)
+			_subset.add(subset[i]);
+		listSetsIncludingSet(fileName,_subset);
+	}
+	
+	public void listSetsIncludingSet(String fileName, HashSet<String> subset){
+		loadSetsFromTable(fileName);
+		listSetsIncludingSet(subset);
+	}
+	
+	public int listSetsIncludingSet(HashSet<String> subset){
+		int numberOfResults = 0;
+		int maxsetsize = getMaximumSetSize();
+		
+		Vector<String> vsubset = convertSetToVector(subset);
+		
+		System.out.print("NAME\t");
+		for(int i=0;i<maxsetsize;i++) System.out.print("N"+(i+1)+"\t"); System.out.println();
+		
+		for(int i=0;i<sets.size();i++){
+			HashSet<String> set = sets.get(i);
+			Vector<String> vset = convertSetToVector(set);
+			String name = setnames.get(i);
+			Vector<String> inters = calcIntersectionOfSets(set, subset);
+			if(inters.size()==subset.size()){
+				numberOfResults++;
+				System.out.print(name+"\t");
+				for(int j=0;j<vsubset.size();j++) System.out.print(vsubset.get(j)+"\t"); 
+				for(int j=0;j<vset.size();j++) if(!subset.contains(vset.get(j))) System.out.print(vset.get(j)+"\t"); 
+				System.out.println();
+			}
+		}
+		return numberOfResults;
+	}
+	
+	public int getMaximumSetSize(){
+		int maxsetsize = 0;
+		for(int i=0;i<sets.size();i++){
+			HashSet<String> set = sets.get(i);
+			if(set.size()>maxsetsize) maxsetsize = set.size();
+		}
+		return maxsetsize;
+	}
+	
+	public Vector<String> convertSetToVector(HashSet<String> set){
+		Vector<String> res = new Vector<String>();
+		Iterator<String> it = set.iterator();
+		while(it.hasNext()){
+			res.add(it.next());
+		}
+		Collections.sort(res);
+		return res;
+	}
+	
+	
+	public void loadSetsFromTable(String fileName){
+		sets = new Vector<HashSet<String>>();
+		setnames = new Vector<String>();
+		SimpleTable tab = new SimpleTable();
+		tab.LoadFromSimpleDatFile(fileName, true, "\t");
+		for(int i=0;i<tab.rowCount;i++){
+			HashSet<String> set = new HashSet<String>();
+			int size = Integer.parseInt(tab.stringTable[i][tab.fieldNumByName("SIZE")]);
+			for(int j=1;j<=size;j++){
+				String fn = "N"+j;
+				String s = tab.stringTable[i][tab.fieldNumByName(fn)];
+				set.add(s);
+			}
+			sets.add(set);
+			if(tab.fieldNumByName("NAME")!=-1){
+				setnames.add(tab.stringTable[i][tab.fieldNumByName("NAME")]);
+			}else{
+				setnames.add("set"+i);
+			}
+		}
+	}
+	
 
 }

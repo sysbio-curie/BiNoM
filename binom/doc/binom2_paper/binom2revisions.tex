@@ -292,8 +292,7 @@ hundreds of chemical species and interactions. The analysis and interpretation o
 tools have been developed to facilitate the visualization, curation and analysis
 of pathways \cite{adriaens2008public}. For example, CellDesigner is a software package
 for the graphical editing of biological pathway diagrams
-\cite{funahashi2003celldesigner}. The CellDesigner file format uses an extension of the 
-SBML specification, describing 
+\cite{funahashi2003celldesigner}. CellDesigner files are using the SBML format specification, with specific extensions describing 
 biological types of chemical species and the layout of the reaction graph.  There is obviously
 a need for user-friendly software tools that would allow the user to easily
 import data from various standard format sources, to perform structural analyses on these pathways
@@ -337,7 +336,7 @@ netwok of the G1/S transition of the cell cycle, a central mechanism
 for tumor development and progression.
 
 \section*{Implementation}
-BiNoM is implemented in the Java\texttrademark programming language, as a plugin
+BiNoM is implemented in the Java\texttrademark{} programming language, as a plugin
 for the network visualization and analysis software package Cytoscape
 \cite{cline2007integration}. Although the primary use of BiNoM is through the
 Cytoscape software, the underlying logic of most of the BiNoM functions is completely
@@ -570,7 +569,7 @@ Considering a set of $q$ paths that have been extracted from the network
 of interest, between a selection of annotated and target nodes defined by the user, the PIQuant score is then defined as:
 
 $$
- PIQuant_{Score} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
+ PIQuant_{\textnormal{Score}} = \sum_{k=1}^{q} \alpha_{k} \sigma_{k} \frac{1}{\lambda_{k}}
 $$
 
 In the case of the network presented in Figure 5a, let us
@@ -582,7 +581,7 @@ equal to 3, and that the second path has a length equal to 5, we can calculate t
 of the node Ac to the node Ph as:
 
 $$
- PIQuant_{Score} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{5}
+ PIQuant_{\textnormal{Score}} = 2 \cdot 1 \cdot \frac{1}{3} + 2 \cdot (-1) \cdot \frac{1}{5}
 = 0.27
 $$
 
@@ -987,9 +986,9 @@ edited and approved the final version of the manuscript.
 \section*{Acknowledgements}
   \ifthenelse{\boolean{publ}}{\small}{}
   This work is supported by the APO-SYS EU FP7 project. 
-The work is supported by EU FP7 ASSET project and by the grant "Projet Incitatif et Collaboratif Computational Systems Biology Approach for Cancer " from Institut Curie.  
+The work is supported by EU FP7 ASSET project and by the grant ``Projet Incitatif et Collaboratif Computational Systems Biology Approach for Cancer" from Institut Curie.  
 EB, LC, DR, GS, EmB and AZ are members of the team ``Computational Systems Biology of
-Cancer", Equipe labellisée par la Ligue Nationale Contre le Cancer.
+Cancer", Equipe labellisée par la Ligue Nationale Contre le Cancer. The authors would like to thank the anonymous reviewers for their valuable comments and suggestions. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1165,7 +1164,7 @@ ratio or a \textit{t}-test statistic value.\null}  \\ \hline
 
   \subsection*{Table 3 - Detailed import/export BiNoM capabilities for standard systems biology file formats.}
 
-   The table is indicating the different standard systems biology file formats and versions that can be imported/exported in BiNoM, as well as what type of conversions are possible.    \par \mbox{}
+   The table is indicating the different standard systems biology file formats and versions that can be currently imported/exported in BiNoM, as well as what type of conversions are possible.    \par \mbox{}
     \par
     \mbox{
       \begin{tabular}{|l|}
@@ -1188,9 +1187,9 @@ ratio or a \textit{t}-test statistic value.\null}  \\ \hline
 
   \subsection*{Table 4 - Comparison of BiNoM functionalities with other software tools.}
 
-   The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html},
-biographer (\url{http://code.google.com/p/biographer/}), cySBML (\cite{konig2012cysbml}), ShortestPath (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay (\cite{su2010glay}), MCode (\cite{bader2003automated}), ModuLand (\cite{szalay2012moduland}),
- clusterMaker (\cite{morris2011clustermaker}), NeMo (\cite{rivera2010nemo}).
+   The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}),
+biographer (\url{http://code.google.com/p/biographer/}), cySBML \cite{konig2012cysbml}, ShortestPath (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay \cite{su2010glay}, MCode \cite{bader2003automated}, ModuLand \cite{szalay2012moduland},
+ clusterMaker \cite{morris2011clustermaker}, NeMo \cite{rivera2010nemo}.
 
 
 

@@ -38,7 +38,7 @@ public class TestOPtCutSet {
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/toynet2.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_with_exception.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_node0.xgmml");
-			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
+			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/egfr_linearized.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/test_laurence/24112011.xgmml");
 
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/merged_net_0pc.xgmml");
@@ -46,7 +46,7 @@ public class TestOPtCutSet {
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal4.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal5.xgmml");
 			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_example1.xgmml");
-			dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_eric_test.xgmml");
+			//dpc.loadGraph("/bioinfo/users/ebonnet/Binom/signal_eric_test.xgmml");
 			
 			/*
 			 * Graphical interface test

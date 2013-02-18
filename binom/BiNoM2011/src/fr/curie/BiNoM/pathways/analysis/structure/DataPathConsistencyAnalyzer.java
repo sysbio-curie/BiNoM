@@ -107,12 +107,7 @@ public class DataPathConsistencyAnalyzer {
 	private double [] piquantScore;
 	private double [] piquantScorePos;
 	private double [] piquantScoreNeg;
-//	private double [] piquantAbsScore;
-//	private double [] piquantAbsSetScore;
 	private double [] piquantSetScore;
-//	private double [] sideScore;
-//	private double [] overallScore;
-//	private double [] ocsanaScore;
 	private HashMap<Node,Double> overallScore;
 	
 	/**
@@ -182,6 +177,11 @@ public class DataPathConsistencyAnalyzer {
 	 * Flag for using maximum set size
 	 */
 	public boolean useMaxSetSize;
+	
+	/**
+	 * Flag for restricting Berge's algorithm search
+	 */
+	public boolean restrictBerge;
 	
 	/**
 	 * Node Id to attribute value map
@@ -1393,18 +1393,31 @@ public class DataPathConsistencyAnalyzer {
 			/*
 			 * Full search with Berge's algorithm
 			 */
-			oca.mainBerge(true);
-			
-			if (this.useMaxSetSize == true) {
+			if (this.restrictBerge == true) {
 				this.optCutSetReport.append("Selecting intervention sets having a size <= "+this.maxSetSize+newline);
 				/*
 				 * take into account exception nodes for the max set size cutoff
 				 */
-				if (oca.exceptionNode.size()>0)
-					oca.selectHitSetSize(this.maxSetSize - oca.exceptionNode.size());
-				else 
-					oca.selectHitSetSize(this.maxSetSize);
+				if (oca.exceptionNode.size()>0) {
+					System.out.println("Correcting max. intervention set size for exception nodes ("+oca.exceptionNode.size()+").");
+					this.maxSetSize = this.maxSetSize - oca.exceptionNode.size();
+				}
+				oca.restrictBerge = true;
+				oca.maxHitSetSize = this.maxSetSize;
 			}
+			oca.mainBerge(true);
+			
+			
+//			if (this.useMaxSetSize == true) {
+//				this.optCutSetReport.append("Selecting intervention sets having a size <= "+this.maxSetSize+newline);
+//				/*
+//				 * take into account exception nodes for the max set size cutoff
+//				 */
+//				if (oca.exceptionNode.size()>0)
+//					oca.selectHitSetSize(this.maxSetSize - oca.exceptionNode.size());
+//				else 
+//					oca.selectHitSetSize(this.maxSetSize);
+//			}
 		}
 		else if (ocsSearch == OCS_PARTIAL) {
 			/*

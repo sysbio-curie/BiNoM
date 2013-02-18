@@ -73,7 +73,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 	private JTextField searchRadius;
 	private JTextField maxSetNb;
 	private JTextField maxSetSize;
-
+	private JTextField maxSetSizeBerge;
+	
 	private JPanel panel; 
 
 	private Vector nodeList;
@@ -437,7 +438,20 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		c.gridwidth = 3;
 		c.anchor = GridBagConstraints.WEST;
 		panel.add(bergeRB, c);
-		
+
+		y++;
+		JPanel p21 = new JPanel(new FlowLayout());
+		maxSetSizeBerge = new JTextField(4);
+		maxSetSizeBerge.setText("inf");
+		JLabel l11 = new JLabel("Max. CIs size");
+		p21.add(l11);
+		p21.add(maxSetSizeBerge);
+		c = new GridBagConstraints();
+		c.gridx = x;
+		c.gridy = y;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(p21, c);
+
 		y++;
 		partialRB = new JRadioButton();
 		partialRB.setText("Approximation solution");
@@ -546,14 +560,30 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						analyzer.ocsSearch = analyzer.OCS_BERGE;
 					if(partialRB.isSelected())
 						analyzer.ocsSearch = analyzer.OCS_PARTIAL;
-//					if(seedRB.isSelected())
-//						analyzer.ocsSearch = analyzer.OCS_SEED;
-					
 					
 					if(limitationRadius.isSelected())
 						analyzer.searchRadius = Double.parseDouble(searchRadius.getText());
 					else
 						analyzer.searchRadius = Double.MAX_VALUE;
+
+					if (maxSetSizeBerge.getText().equalsIgnoreCase("inf"))
+						analyzer.restrictBerge = false;
+					else {
+						analyzer.restrictBerge = true;
+						try {
+							analyzer.maxSetSize = Integer.parseInt(maxSetSizeBerge.getText());
+							if (analyzer.maxSetSize <= 0) {
+								JOptionPane.showMessageDialog(new Frame(), "Max. CIs size should be 'inf' or a positive integer > 0.");
+								resetAnalyzer();
+								return;
+							}
+						}
+						catch (NumberFormatException  nfe) {
+							JOptionPane.showMessageDialog(new Frame(), "Max. CIs size should be 'inf' or a positive integer > 0.");
+							resetAnalyzer();
+							return;
+						}
+					}
 					
 					if (maxSetSize.getText().equalsIgnoreCase("inf"))
 						analyzer.useMaxSetSize = false;

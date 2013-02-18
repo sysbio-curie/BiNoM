@@ -199,9 +199,15 @@ public class OptimalCombinationAnalyzer {
 	public static String newline = System.getProperty("line.separator");
 	
 	/**
+	 * flag to indicate if Berge's search is restricted, default is false  
+	 */
+	public boolean restrictBerge = false;
+	
+	/**
 	 * Constructor
 	 */
 	public OptimalCombinationAnalyzer() {
+	
 	}
 	
 	/**
@@ -214,6 +220,8 @@ public class OptimalCombinationAnalyzer {
 	public void mainBerge(boolean printLog) {
 		
 		System.out.println("Start Berge's algorithm search...");
+		//System.out.println("restrictBerge= "+this.restrictBerge);
+		//System.out.println("maxHitSetSize= "+this.maxHitSetSize);
 		
 		// Minimal cut set
 		hitSetSB = initFirstRowBerge();
@@ -222,7 +230,12 @@ public class OptimalCombinationAnalyzer {
 			hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(1));
 			int maxSetSize=0;
 			for (int i=1;i<pathMatrixNbRow;i++) {
-				hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
+				if (this.restrictBerge == false) {
+					hitSetSB = createCandidateSetBerge(hitSetSB, pathMatrixRowBin.get(i));
+				}
+				else {
+					hitSetSB = createCandidateSetBergeRestrict(hitSetSB, pathMatrixRowBin.get(i));
+				}
 				if (printLog) {
 					int pn = i+1;
 					System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow);
@@ -243,6 +256,7 @@ public class OptimalCombinationAnalyzer {
 			report.append(newline+"Total timing for the search: "+df.format(t)+" sec."+newline);
 		}
 		System.out.println("timing: "+toc);
+		this.saveHitSetSB("/bioinfo/users/ebonnet/hit_set.txt");
 	}
 	
 	/**
@@ -321,6 +335,48 @@ public class OptimalCombinationAnalyzer {
 		}
 		return(cand);
 	}
+
+	
+	/**
+	 * Create new candidate set by adding nodes from new row of the path matrix, while
+	 * checking for a given max set size.
+	 * 
+	 * @param mcs minimal cut set
+	 * @param row new row as BitSet object
+	 * @return new set
+	 * 
+	 * @author ebo
+	 */
+	public HashSet<BitSet> createCandidateSetBergeRestrict(HashSet<BitSet> mcs, BitSet row) {
+		HashSet<BitSet> cand = new HashSet<BitSet>();
+		for (BitSet cs : mcs) {
+			/*
+			 * we only want hit sets <= maxHitSetSize 
+			 */
+			if (cs.cardinality() <= this.maxHitSetSize) {
+				/*
+				 * First test if the hit set and the row are disjoint, if yes generate new hit set 
+				 * by adding each node of the row to the hit set, otherwise just keep the hit set as it is,
+				 * because adding nodes would just create supersets. 
+				 */
+				BitSet testJoint = (BitSet) cs.clone();
+				testJoint.and(row);
+				if (testJoint.cardinality() == 0) {
+					// add each node of the row to previous hit set
+					for(int i=row.nextSetBit(0); i>=0; i=row.nextSetBit(i+1)) { // loop over bits set to 1 in BitSet object
+						BitSet newOne = (BitSet) cs.clone();
+						newOne.set(i);
+						cand.add(newOne);
+					}
+				}
+				else {
+					cand.add(cs);
+				}
+			}
+		}
+		return(cand);
+	}
+
 	
 	/**
 	 * Initialization of Berge's algorithm with the first row of the path matrix.
@@ -1127,7 +1183,7 @@ public class OptimalCombinationAnalyzer {
 
 	
 	public void saveHitSetSB(String filename) {
-		
+		System.out.println("Saving hit sets to file "+filename+"...");
 		try {
 			BufferedWriter bf = new BufferedWriter(new FileWriter(filename));
 			for (BitSet b : hitSetSB) {

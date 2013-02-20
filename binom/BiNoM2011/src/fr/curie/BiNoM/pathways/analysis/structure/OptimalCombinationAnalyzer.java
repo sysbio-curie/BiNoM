@@ -256,7 +256,7 @@ public class OptimalCombinationAnalyzer {
 			report.append(newline+"Total timing for the search: "+df.format(t)+" sec."+newline);
 		}
 		System.out.println("timing: "+toc);
-		this.saveHitSetSB("/bioinfo/users/ebonnet/hit_set.txt");
+		//this.saveHitSetSB("/bioinfo/users/ebonnet/hit_set.txt");
 	}
 	
 	/**

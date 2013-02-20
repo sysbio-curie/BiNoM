@@ -120,8 +120,8 @@ public class MergingMapsProcessor {
 	}
 
 	public void testShiftCoord() {
-		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("1000");
-		this.shiftCoordinates(cd2, 300, 0);
+		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("2000");
+		this.shiftCoordinates(cd2, 600, 0);
 	}
 
 	//	private void setCandidateMergingLists() {
@@ -728,31 +728,31 @@ public class MergingMapsProcessor {
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 		XmlString xs = XmlString.Factory.newInstance();
 
-		HashMap<String,String> aliasMap = new HashMap<String,String>();
-		HashMap<String,String> speciesMap = new HashMap<String,String>();
-		Vector<String> subsAliases = new Vector<String>();
-		Vector<String> subsSpecies = new Vector<String>();
-
-		for(int i=0;i<speciesMapStr.size();i++){
-			String s = speciesMapStr.get(i); 
-			StringTokenizer st = new StringTokenizer(s,"\t");
-			// "alias_ID1 species_ID1 compartment1 species_name1 alias_ID2 species_ID2 compartment2 species_name2"
-			String ato = st.nextToken(); //alias_ID1 
-			String sto = st.nextToken(); // species_ID1
-			st.nextToken(); 
-			st.nextToken();
-			String afrom = st.nextToken(); // alias_ID2
-			String sfrom = st.nextToken(); // species_ID2
-			st.nextToken(); 
-			st.nextToken();
-			aliasMap.put(afrom,ato); // alias_ID2 => alias_ID1
-			speciesMap.put(sfrom, sto); // species_ID2 => species_ID1
-			subsAliases.add(afrom); // alias_ID2
-			subsSpecies.add(sfrom); // species_ID2
-		}
+//		HashMap<String,String> aliasMap = new HashMap<String,String>();
+//		HashMap<String,String> speciesMap = new HashMap<String,String>();
+//		Vector<String> subsAliases = new Vector<String>();
+//		Vector<String> subsSpecies = new Vector<String>();
+//
+//		for(int i=0;i<speciesMapStr.size();i++){
+//			String s = speciesMapStr.get(i); 
+//			StringTokenizer st = new StringTokenizer(s,"\t");
+//			// "alias_ID1 species_ID1 compartment1 species_name1 alias_ID2 species_ID2 compartment2 species_name2"
+//			String ato = st.nextToken(); //alias_ID1 
+//			String sto = st.nextToken(); // species_ID1
+//			st.nextToken(); 
+//			st.nextToken();
+//			String afrom = st.nextToken(); // alias_ID2
+//			String sfrom = st.nextToken(); // species_ID2
+//			st.nextToken(); 
+//			st.nextToken();
+//			aliasMap.put(afrom,ato); // alias_ID2 => alias_ID1
+//			speciesMap.put(sfrom, sto); // species_ID2 => species_ID1
+//			subsAliases.add(afrom); // alias_ID2
+//			subsSpecies.add(sfrom); // species_ID2
+//		}
 
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd.getSbml());
-
+		
 		int i;
 		HashMap<String,String> idMap = new HashMap<String,String>();
 		Vector<String> subsIds = new Vector<String>();
@@ -767,17 +767,20 @@ public class MergingMapsProcessor {
 			subsIds.add(afrom); // list of protein_id2
 		}
 
-		// Deal with redundant proteins, genes and rnas
-		System.out.println();
+		/*
+		 *  Deal with redundant proteins, genes and rnas
+		 */
+		
+		/*
+		 * Process included species
+		 */
 		if(cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null) {
 			for(i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
 				CelldesignerSpeciesDocument.CelldesignerSpecies csp = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
 				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()!=null){
 					String pr = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
-					//System.out.println(pr);
 					if(idMap.get(pr)!=null){
 						xs.setStringValue(idMap.get(pr));
-						//System.out.println(pr+"->"+idMap.get(pr));
 						CellDesigner.entities = CellDesigner.getEntities(cd);
 						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference().set(xs);
@@ -819,6 +822,9 @@ public class MergingMapsProcessor {
 			}
 		}
 
+		/*
+		 * process proteins
+		 */
 		for(i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species csp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
 			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()!=null){
@@ -836,6 +842,11 @@ public class MergingMapsProcessor {
 			}			
 		}
 
+		/*
+		 * Process er..., what exactly?
+		 * 
+		 * ... seems to be the annotations.
+		 */
 		i=0; 
 		int numberOfProteins = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();
 		while(i<numberOfProteins){
@@ -865,6 +876,9 @@ public class MergingMapsProcessor {
 				i++;
 		}
 
+		/*
+		 * 
+		 */
 		i=0; 
 		int numberOfGenes = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();
 		while(i<numberOfGenes){

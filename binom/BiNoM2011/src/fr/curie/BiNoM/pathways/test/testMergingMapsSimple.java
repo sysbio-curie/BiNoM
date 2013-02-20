@@ -12,10 +12,16 @@ public class testMergingMapsSimple {
 
 	public static void main(String[] args) {
 		
+		//String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml";
+		//String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/a2.xml";
+		
+		String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-1.xml";
+		String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-2.xml";
+		
 		// build a list of maps to merge
 		ArrayList<File> fl = new ArrayList<File>();
-		fl.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml"));
-		fl.add(new File("/bioinfo/users/ebonnet/Binom/mergeMaps/a2.xml"));
+		fl.add(new File(file1));
+		fl.add(new File(file2));
 	
 		int nbFiles = fl.size();
 		
@@ -27,6 +33,7 @@ public class testMergingMapsSimple {
 		
 		// create common species maps
 		mp.setMergeLists();
+		//mp.printSpeciesMap();
 		
 		// merge 2 maps
 		mp.mergeTwoMaps();

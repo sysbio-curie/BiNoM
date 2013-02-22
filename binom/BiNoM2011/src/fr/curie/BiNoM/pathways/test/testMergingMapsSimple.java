@@ -47,6 +47,8 @@ public class testMergingMapsSimple {
 			mp.mergeTwoMaps();
 		}
 		
+		System.out.println("saving file...");
 		mp.saveCd1File("/bioinfo/users/ebonnet/merged_maps.xml");
+		System.out.println("done.");
 	}
 }

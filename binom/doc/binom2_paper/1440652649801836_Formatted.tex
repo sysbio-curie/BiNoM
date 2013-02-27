@@ -193,36 +193,46 @@ standard systems biology formats}
 
 \begin{abstract}\justifying
 
-Public repositories of biological pathways and networks have greatly expanded in
-recent years. Such databases contain many pathways that facilitate the analysis
-of high-throughput
-experimental work and the formulation of new biological hypotheses to be
- tested, a fundamental principle of the systems biology approach.
-However, large-scale molecular maps are not always easy to mine and interpret.
-We
-have developed BiNoM (Biological Network Manager), a Cytoscape plugin, which
-provides
- functions for the import-export of some standard systems biology
-file formats (import from CellDesigner, BioPAX Level 3 and CSML; export to SBML, CellDesigner and BioPAX Level 3), and a set of algorithms to analyze and
-reduce the complexity
-of biological networks. BiNoM can be used to import and analyze files
-created with the CellDesigner software. BiNoM provides a set of functions
-allowing to import BioPAX files, but also to search and edit their
-content. As such, BiNoM is able to efficiently manage large BioPAX files such as
-whole pathway databases (e.g. human Reactome). BiNoM also implements a collection of powerful
-graph-based functions and algorithms such as path analysis, decomposition by
-name or cycle, subnetworks clustering and decomposition of a large network in
-modules. Here, we provide an in-depth overview of the BiNoM
-functions, and we also detail novel aspects such as the support of the BioPAX
-Level 3
-format and the implementation of a new algorithm for the quantification of
-pathways for influence
-networks. At last, we illustrate some of the BiNoM functions on a detailed
-biological case
-study of a network representing the G1/S transition of the cell cycle, a crucial
-cellular process disturbed in most human tumors.
+Background
+
+Public repositories of biological pathways and networks have greatly expanded
+in recent years. Such databases contain many pathways that facilitate the
+analysis of high-throughput experimental work and the formulation of new
+biological hypotheses to be tested, a fundamental principle of the systems
+biology approach.  However, large-scale molecular maps are not always easy to
+mine and interpret.
+
+
+Results
+
+We have developed BiNoM (Biological Network Manager), a Cytoscape plugin, which
+provides functions for the import-export of some standard systems biology file
+formats (import from CellDesigner, BioPAX Level 3 and CSML; export to SBML,
+CellDesigner and BioPAX Level 3), and a set of algorithms to analyze and reduce
+the complexity of biological networks. BiNoM can be used to import and analyze
+files created with the CellDesigner software. BiNoM provides a set of functions
+allowing to import BioPAX files, but also to search and edit their content. As
+such, BiNoM is able to efficiently manage large BioPAX files such as whole
+pathway databases (e.g. human Reactome). BiNoM also implements a collection of
+powerful graph-based functions and algorithms such as path analysis,
+decomposition by name or cycle, subnetworks clustering and decomposition of a
+large network in modules. 
+
+Conclusions
+
+Here, we provide an in-depth overview of the BiNoM functions, and we also
+detail novel aspects such as the support of the BioPAX Level 3 format and the
+implementation of a new algorithm for the quantification of pathways for
+influence networks. At last, we illustrate some of the BiNoM functions on a
+detailed biological case study of a network representing the G1/S transition of
+the cell cycle, a crucial cellular process disturbed in most human tumors.
 
 \end{abstract}
+
+
+\section*{Keywords}
+Systems Biology, Cytoscape, Software, SBML, BioPAX, CellDesigner, Conversion, SBGN, Reactome, 
+Network analysis, Path analysis, Molecular maps, Pathways.
 
 
 \ifthenelse{\boolean{publ}}{\begin{multicols}{2}}{}
@@ -257,7 +267,7 @@ cellular process disturbed in most human tumors.
 \section*{Background}
 
 Biological pathways and networks comprise sets of interactions, or functional
-relationships, occurring at the molecular Level in living cells
+relationships, occurring at the molecular level in living cells
 \cite{adriaens2008public, cary2005pathway}.
 A large body of knowledge on cellular biochemistry is organized in publicly available
 repositories such as the KEGG database \cite{ogata1999kegg}, Reactome
@@ -386,9 +396,20 @@ for tumor development and progression.
         Module manager       & $\bullet$      &$\circ$&$\circ$& $\circ$      & $\circ$       & $\circ$           & $\circ$     & $\circ$               &  $\circ$      &  $\circ$       &  $\circ$           & $\circ$            &  $\circ$      \\
         \hline
       \end{tabular}\\
- The table is comparing the main functions in BiNoM with other visualization and network analysis tools. The references for the software tools are: CellDesigner \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC (Systems Biology File Converter \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}),
-biographer (\url{http://code.google.com/p/biographer/}), cySBML \cite{konig2012cysbml}, ShortestPath (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay \cite{su2010glay}, MCode \cite{bader2003automated}, ModuLand \cite{szalay2012moduland},
- clusterMaker \cite{morris2011clustermaker}, NeMo \cite{rivera2010nemo}.
+ The table is comparing the main functions in BiNoM with other visualization
+ and network analysis tools. The symbol \bullet indicates that the function is
+ available within the tool, while \circ indicates that the function is not
+ available. The references for the software tools are: CellDesigner
+ \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML
+ \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC
+ (Systems Biology File Converter
+ \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}),
+ biographer (\url{http://code.google.com/p/biographer/}), cySBML
+ \cite{konig2012cysbml}, ShortestPath
+ (\url{http://csresources.sourceforge.net/ShortestPath/}), Glay
+ \cite{su2010glay}, MCode \cite{bader2003automated}, ModuLand
+ \cite{szalay2012moduland}, clusterMaker \cite{morris2011clustermaker}, NeMo
+ \cite{rivera2010nemo}.
 
 \end{sidewaystable}
 

@@ -142,7 +142,7 @@ public class MergingMapsProcessor {
 		CellDesigner.saveCellDesigner(cd1, fileName);
 	}
 
-	public Vector<String> getSpeciesMapStr() {
+	public Vector<String> getSpeciesMap() {
 		return this.speciesMapStr;
 	}
 

@@ -28,6 +28,8 @@ package fr.curie.BiNoM.pathways.analysis.structure;
 
 import java.util.*;
 import java.io.*;
+
+import vdaoengine.utils.Algorithms;
 import edu.rpi.cs.xgmml.*;
 
 /*
@@ -263,6 +265,34 @@ public class StructureAnalysisUtils {
 		}
 	}
 	return selected;
+  }
+  
+  public static Graph removeReciprocalEdges(Graph graph){
+	  Graph gr = graph;
+	  float connectivity[] = new float[graph.Nodes.size()];
+	  gr.calcNodesInOut();
+	  for(int i=0;i<graph.Nodes.size();i++){
+		  connectivity[i] = 0f+graph.Nodes.get(i).incomingEdges.size()+graph.Nodes.get(i).outcomingEdges.size();
+	  }
+	  int ind[] = Algorithms.SortMass(connectivity);
+	  for(int i=0;i<ind.length;i++){
+		  Node n = graph.Nodes.get(ind[i]);
+		  gr.calcNodesInOut();
+		  for(int j=0;j<n.incomingEdges.size();j++)for(int k=0;k<n.outcomingEdges.size();k++){
+			  Edge ej = n.incomingEdges.get(j);
+			  Edge ek = n.outcomingEdges.get(k);	
+			  if(ej.Node1==ek.Node2)if(ej.Node2==ek.Node1)
+					 gr.removeEdge(ek.Id);
+		  }
+		  gr.calcNodesInOut();
+		  for(int j=0;j<n.incomingEdges.size();j++)for(int k=j+1;k<n.incomingEdges.size();k++){
+			  Edge ej = n.incomingEdges.get(j);
+			  Edge ek = n.incomingEdges.get(k);	
+			  if(ej.Node1==ek.Node1)if(ej.Node2==ek.Node2)
+					 gr.removeEdge(ek.Id);
+		  }
+	  }
+	  return gr;
   }
 
 }

@@ -36,6 +36,7 @@ import fr.curie.BiNoM.cytoscape.ain.ImportFromSimpleTextInfluenceFile;
 import fr.curie.BiNoM.cytoscape.analysis.CalcCentrality;
 import fr.curie.BiNoM.cytoscape.analysis.ClusterNetworks;
 import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponents;
+import fr.curie.BiNoM.cytoscape.analysis.ConvertToUndirectedGraph;
 import fr.curie.BiNoM.cytoscape.analysis.ConvertReactionNetworkToEntityNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.CycleDecomposition;
 import fr.curie.BiNoM.cytoscape.analysis.EdgesFromOtherNetwork;
@@ -539,6 +540,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 
 		menuItem = new JMenuItem("Update connections from other network");
 		menuItem.addActionListener(new EdgesFromOtherNetwork());
+		binomUtilsMenu.add(menuItem);
+		
+		menuItem = new JMenuItem("Remove multiple edges");
+		menuItem.addActionListener(new ConvertToUndirectedGraph());
 		binomUtilsMenu.add(menuItem);
 
 		mergeNetworksAndFilterMenuItem  = new JMenuItem("Merge Networks and Filter by Frequency");

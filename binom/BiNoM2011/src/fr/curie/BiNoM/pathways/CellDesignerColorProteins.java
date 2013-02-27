@@ -91,7 +91,7 @@ public class CellDesignerColorProteins {
     SimpleTable tabl = cl.loadAttribTable(args[1]);
     CellDesigner celld3 = new CellDesigner();
     SbmlDocument sbmlp = celld3.loadCellDesigner(args[0]);
-    createAttributeTable(tabl,sbmlp,path+"temp.txt");
+    createAttributeTable(tabl,sbmlp,path+"temp.txt",path+"temp.gmt");
     
     tabl = cl.loadAttribTable(path+"temp.txt");
     
@@ -144,7 +144,7 @@ public class CellDesignerColorProteins {
 	        
 	        //String path = Utils.extractFolderName(featureTableName);
 	        
-	        createAttributeTable(tabl,sbmlp,featureTableName+".conv");
+	        createAttributeTable(tabl,sbmlp,featureTableName+".conv",featureTableName+".gmt");
 	        tabl = cl.loadAttribTable(featureTableName+".conv");
 
 	        for(int i=1;i<tabl.fnames.length;i++){
@@ -559,9 +559,10 @@ public class CellDesignerColorProteins {
    return s1;
   }
   
-  public static void createAttributeTable(SimpleTable tabl,SbmlDocument sbmlp,String path){
+  public static void createAttributeTable(SimpleTable tabl,SbmlDocument sbmlp,String path, String pathhugos){
 	  try{
 		  FileWriter fw = new FileWriter(path);
+		  FileWriter fwhugos = new FileWriter(pathhugos);
 		  HashMap<String,Integer> proteins = new HashMap<String,Integer>();
 		  for(int i=0;i<tabl.rowCount;i++){
 			  String name = tabl.tab[i][0];
@@ -627,6 +628,11 @@ public class CellDesignerColorProteins {
 			  for(int l=0;l<pnames.size();l++) System.out.print(pnames.get(l)+"\t");
 			  System.out.println();
 			  
+			  fwhugos.write(pname+"\tna\t");
+			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
+			  for(int j=1;j<pnames.size();j++) fwhugos.write(pnames.get(j)+"\t");
+			  fwhugos.write("\n");
+			  
 			  boolean fd = false;
 			  for(int k=0;k<pnames.size();k++){
 					Integer ind = proteins.get(pnames.get(k));
@@ -686,6 +692,12 @@ public class CellDesignerColorProteins {
 			  }
 			  if(fd){
 			  fw.write(pname+"\t");
+
+			  fwhugos.write(pname+"\tna\t");
+			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
+			  for(int j=1;j<pnames.size();j++) fwhugos.write(pnames.get(j)+"\t");
+			  fwhugos.write("\n");
+			  
 			  for(int j=1;j<tabl.fnames.length;j++){
 				  float value = 0f;
 				  boolean found = false;
@@ -709,6 +721,7 @@ public class CellDesignerColorProteins {
 		  }		  
 		  
 		  fw.close();
+		  fwhugos.close();
 	  }catch(Exception e){
 		  e.printStackTrace();
 	  }

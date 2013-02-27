@@ -3,7 +3,9 @@ package fr.curie.BiNoM.pathways.utils;
 import java.io.*;
 import java.util.*;
 
+import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
+import fr.curie.BiNoM.pathways.analysis.structure.Edge;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.analysis.structure.OmegaScoreData;
@@ -26,7 +28,22 @@ public class SetOverlapAnalysis {
 	public static void main(String[] args) {
 		try{
 
+			//makeSLNetworkFromYeastScreen();
+			//System.exit(0);
+			
 			SetOverlapAnalysis so = new SetOverlapAnalysis();
+
+			/*Vector<String> current = new Vector<String>();
+			Vector<Vector<String>> setofsets = new Vector<Vector<String>>();
+			Vector<String> setnames = new Vector<String>();
+			Vector<HashSet<String>> sets = new Vector<HashSet<String>>();			
+			Vector<String> set1 = new Vector<String>(); set1.add("PARP1"); //set1.add("PARP2"); 
+			Vector<String> set2 = new Vector<String>(); set2.add("RFC1"); set2.add("RFC2"); set2.add("RFC3");  
+			Vector<String> set3 = new Vector<String>();	set3.add("RR1"); set3.add("RR2");
+			setofsets.add(set1); setofsets.add(set2); setofsets.add(set3);
+			so.generateAllCombinations(current, setofsets, setnames, sets, "set",0);
+			System.exit(0);
+			*/
 			
 			//String prefix = "C:/Datas/Kairov/DifferentialExpression4BC/lists/";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_KEGG";
@@ -35,9 +52,36 @@ public class SetOverlapAnalysis {
 			//String prefix = "C:/Datas/KEGG/Test/ocsana_report_cellfate";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_map_onlyRepair";
 			//String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path";
-			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_REPAIRtoire_onlyBER";
+			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path_reg_ber";
+			
+			//so.convertTableSetToGMT(prefix+".minhitsets",prefix+".minhitsets.gmt",3);
+			//so.expandSetsOfLists_SplitSets(prefix+".minhitsets.gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+".minhitsets_hugo.gmt");			
+			//so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
+			//so.LoadSetsFromGMT(prefix+".minhitsets_hugo.gmt"); for(int i=0;i<so.allproteins.size();i++) System.out.println(so.allproteins.get(i));
+			//so.convertXGMMLtoGMT("C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.xgmml","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", false);
+
+			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 10);
+			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
+			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", 10000000, 0);
+			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", 10000000, 0);	
+			int inters = so.intersect2ListsOfSets("C:/Datas/BioGrid/human_mouse_genetic.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
+			System.out.println("Total "+inters+" complete overlaps");
+
+			//generateAllPairwiseGMT(prefix+"_hugo_noWRN.gmt", prefix+"_hugo_noWRN_allpairs.gmt");
+			
+			for(int i=0;i<0;i++){
+			//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt",1000000);
+				//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt",10000000);
+				//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt",prefix+"_hugo_noWRN_allpairs.gmt",0000000);
+				Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt","c:/datas/biogrid/human_mouse_genetic.gmt",0000000);
+			//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/DNARepairAnalysis/dnarepair_path_reg_ber.minhitsets_hugo.gmt",1000000);
+			XGMML.saveToXGMML(connectionGraph, "C:/Datas/DNARepairAnalysis/temp.xgmml");
+			System.out.println("Connection graph coverage score = "+getConnectionGraphCoverageScore(connectionGraph));
+			}
+			System.exit(0);
 			
 			so.LoadSetsFromGMT(prefix+".gmt");
+			so.findMinimalHittingSet(4, prefix);
 			
 			//String typesOfRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
 			//Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/DNARepairAnalysis/dnarepair.xml.xgmml"));
@@ -46,7 +90,6 @@ public class SetOverlapAnalysis {
 			//so.printSetSizes();
 			//so.printSetIntersections();
 
-			so.findMinimalHittingSet(4, prefix);
 			//so.listSetsIncludingSet(prefix+".minhitsets",new String[]{"BRCA1"});
 			
 			//so.createGMTFromOCSANAOutput("C:/Datas/DNARepairAnalysis/dnarepair_OCSANA_report");
@@ -98,20 +141,21 @@ public class SetOverlapAnalysis {
 		allproteins = new Vector<String>();
 		while((s=lr.readLine())!=null){
 			StringTokenizer st = new StringTokenizer(s,"\t");
-			String groupName = st.nextToken();
+			String groupName = st.nextToken().trim();
 			setnames.add(groupName);
 			String description = st.nextToken();
 			HashSet<String> proteins = new HashSet<String>();
 			while((st.hasMoreTokens())){
 				String protein = st.nextToken();
-				proteins.add(protein);
+				if(!protein.trim().equals(""))
+					proteins.add(protein);
 				if(!protein.contains(":")) // this is for DNA repair map!!!
 				if(!allproteins.contains(protein))
 					allproteins.add(protein);	
 			}
-			sets.add(proteins);
+			sets.add(proteins); //System.out.print(groupName+":"+proteins.size()+"\t");
 		}
-		System.out.println("Totally "+allproteins.size()+" genes are found");
+		System.out.println(fn+": totally "+allproteins.size()+" genes are found");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -534,5 +578,362 @@ public class SetOverlapAnalysis {
 		}
 	}
 	
+	public void convertTableSetToGMT(String fnSetTable, String fnSetGMT, int maxSize) throws Exception{
+		loadSetsFromTable(fnSetTable);
+		saveSetsAsGMT(fnSetGMT,maxSize);
+	}
+	
+	public void saveSetsAsGMT(String fnSetGMT, int maxSize) throws Exception{
+		FileWriter fw = new FileWriter(fnSetGMT);
+		for(int i=0;i<setnames.size();i++)if((maxSize==-1)||(sets.get(i).size()<=maxSize)){
+			fw.write(setnames.get(i)+"\tna\t");
+				HashSet<String> hs = sets.get(i);
+				Iterator<String> its = hs.iterator();
+				while(its.hasNext()){
+					fw.write(its.next()+"\t");
+				}
+				fw.write("\n");
+		}
+		fw.close();
+	}
+	
+	
+	public void expandSetsOfLists_ExpandSets(String setGMT, String expansionSetGMT, String fn) throws Exception{
+		LoadSetsFromGMT(setGMT);
+		SetOverlapAnalysis expansionSets = new SetOverlapAnalysis();
+		expansionSets.LoadSetsFromGMT(expansionSetGMT);
+		
+		Vector<String> newsetnames = new Vector<String>();
+		Vector<HashSet<String>> newsets = new Vector<HashSet<String>>();
+		
+		for(int i=0;i<setnames.size();i++){
+			HashSet<String> set = sets.get(i);
+			Iterator<String> its = set.iterator();
+			Vector<String> items = new Vector<String>();
+			while(its.hasNext())
+				items.add(its.next());
+			Vector<Vector<String>> tempItemsExpanded = new Vector<Vector<String>>();
+			for(int j=0;j<items.size();j++){
+				String item = items.get(j);
+				int k = expansionSets.setnames.indexOf(item);
+				if(k!=-1){
+					HashSet eset = expansionSets.sets.get(k);
+					Iterator<String> ite = eset.iterator();
+					set.remove(item);
+					while(ite.hasNext())
+						set.add(ite.next());
+				}
+			}
+		}
+		saveSetsAsGMT(fn,-1);
+	}
+	
+	public void expandSetsOfLists_SplitSets(String setGMT, String expansionSetGMT, String fn) throws Exception{
+		LoadSetsFromGMT(setGMT);
+		SetOverlapAnalysis expansionSets = new SetOverlapAnalysis();
+		expansionSets.LoadSetsFromGMT(expansionSetGMT);
+		
+		Vector<String> newsetnames = new Vector<String>();
+		Vector<HashSet<String>> newsets = new Vector<HashSet<String>>();
+		
+		for(int i=0;i<setnames.size();i++){
+			HashSet<String> set = sets.get(i);
+			Iterator<String> its = set.iterator();
+			Vector<String> items = new Vector<String>();
+			while(its.hasNext())
+				items.add(its.next());
+			Vector<Vector<String>> tempItemsExpanded = new Vector<Vector<String>>();
+			for(int j=0;j<items.size();j++){
+				String item = items.get(j);
+				int k = expansionSets.setnames.indexOf(item);
+				Vector<String> temp = new Vector<String>();
+				if(k!=-1){
+					Iterator<String> itt = expansionSets.sets.get(k).iterator();
+					while(itt.hasNext()){ 
+						String s = itt.next(); 
+						if(!s.trim().equals("")) 
+							if(!temp.contains(s)) 
+								temp.add(s); 
+					}
+					System.out.print("Expansion set("+temp.size()+"): "); for(int kk=0;kk<temp.size();kk++) System.out.print(temp.get(kk)+"\t"); System.out.println();
+				}else{
+				    temp.add(item);
+				}
+				tempItemsExpanded.add(temp);
+			}
+			Vector<String> currentSet = new Vector<String>();
+			generateAllCombinations(currentSet, tempItemsExpanded, newsetnames, newsets, setnames.get(i), newsets.size());
+		}
+		
+		this.setnames = newsetnames;
+		this.sets = newsets;	
+		saveSetsAsGMT(fn,-1);
+	}
+	
+	public void generateAllCombinations(Vector<String> currentSet, Vector<Vector<String>> setofsets, Vector<String> names, Vector<HashSet<String>> sets, String name, int number){
+		if(setofsets.size()==1){
+		for(int i=0;i<setofsets.get(0).size();i++){
+			HashSet<String> set = new HashSet<String>();
+			names.add(name+"_"+(sets.size()-number)); System.out.print(name+"_"+(sets.size()-number)+":\t");
+			for(int j=0;j<currentSet.size();j++){
+				set.add(currentSet.get(j)); System.out.print(currentSet.get(j)+"\t");
+			}
+			set.add(setofsets.get(0).get(i)); System.out.println(setofsets.get(0).get(i));
+			sets.add(set);
+			
+		}   //currentSet.clear();
+			//String s = null; if(currentSet.size()>0) s = currentSet.get(0); currentSet.clear(); if(s!=null) currentSet.add(s);
+		}else{
+			for(int i=0;i<setofsets.get(0).size();i++){			
+				Vector<Vector<String>> stemp = new Vector<Vector<String>>();
+				for(int j=1;j<setofsets.size();j++)
+					stemp.add(setofsets.get(j));
+				currentSet.add(setofsets.get(0).get(i)); //System.out.println("Generating from "+setofsets.get(0).get(i));
+				generateAllCombinations(currentSet, stemp, names, sets, name, number);
+				//currentSet.clear();
+				if(currentSet.size()>0) 
+					currentSet.remove(currentSet.size()-1);
+			}
+		}
+	}
+	
+	public static void convertXGMMLtoGMT(String xgmmlFileName, String gmtFileName, boolean splitIntoPairs) throws Exception{
+		Graph  graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(xgmmlFileName));
+		SetOverlapAnalysis so = new SetOverlapAnalysis();
+		so.setnames = new Vector<String>();
+		so.sets = new Vector<HashSet<String>>();
+		for(int i=0;i<graph.Edges.size();i++)if(!graph.Edges.get(i).Node1.Id.equals(graph.Edges.get(i).Node2.Id)){
+			String id1 = graph.Edges.get(i).Node1.Id;
+			String id2 = graph.Edges.get(i).Node2.Id;			
+			StringTokenizer st1 = new StringTokenizer(id1," ,");
+			StringTokenizer st2 = new StringTokenizer(id2," ,");
+			/*HashSet<String> set = new HashSet<String>();
+			set.add(id1);
+			set.add(id2);
+			sets.add(set);*/
+
+			int k=0;
+			if(splitIntoPairs){
+			while(st1.hasMoreTokens()){
+				String st1s = st1.nextToken();
+				while(st2.hasMoreTokens()){
+					String st2s = st2.nextToken();
+					HashSet<String> set = new HashSet<String>();
+					if(!st1s.equals(st2s)){
+						so.setnames.add(graph.Edges.get(i).Id+"_"+k);
+						set.add(st1s);
+						set.add(st2s);
+						so.sets.add(set);
+						k++;
+					}
+				}
+			}
+			}else{
+				HashSet<String> set = new HashSet<String>();
+				while(st1.hasMoreTokens()){
+					String st1s = st1.nextToken();
+					while(st2.hasMoreTokens()){
+						String st2s = st2.nextToken();
+						set.add(st1s);
+						set.add(st2s);
+					}
+				}
+				if(set.size()>1){
+					so.setnames.add(graph.Edges.get(i).Id);
+					so.sets.add(set);
+				}
+			}
+		}
+		so.saveSetsAsGMT(gmtFileName, -1);
+	}
+	
+	public int intersect2ListsOfSets(String gmt1, String gmt2){
+		return intersect2ListsOfSets(gmt1, gmt2, 0, 0);
+	}
+	
+	public int intersect2ListsOfSets(String gmt1, String gmt2, int numberOfReshuffles, int numbeOfPermutationsForPValue){
+		int count = 0;
+		SetOverlapAnalysis so1 = new SetOverlapAnalysis();
+		SetOverlapAnalysis so2 = new SetOverlapAnalysis();	
+		so1.LoadSetsFromGMT(gmt1);
+		so2.LoadSetsFromGMT(gmt2);
+		count = intersect2ListsOfSets(so1, so2);
+		int pcount = 0;
+		for(int i=0;i<numbeOfPermutationsForPValue;i++){
+			System.out.println("Permutation "+(i+1)+":");
+			so1.reshuffleSets(numberOfReshuffles,true);
+			int lcount = intersect2ListsOfSets(so1, so2);
+			System.out.println(lcount+" overlaps in random case.");
+			if(lcount>=count) pcount++;
+		}
+		System.out.println("Estimated p-value = "+1.0f*pcount/numbeOfPermutationsForPValue);
+		return count;
+	}
+	
+	public int intersect2ListsOfSets(SetOverlapAnalysis so1, SetOverlapAnalysis so2){
+		int count = 0;
+		for(int i=0;i<so1.setnames.size();i++){
+			HashSet<String> set1 = so1.sets.get(i);
+			int countCompleteOverlap = 0;
+			for(int j=0;j<so2.setnames.size();j++){
+				HashSet<String> set2 = so2.sets.get(j);
+				Vector<String> overlap = calcIntersectionOfSets(set1, set2);
+				if((overlap.size()==set2.size())||(overlap.size()==set1.size()))
+					countCompleteOverlap++;
+			}
+			if(countCompleteOverlap>0){
+			System.out.print(so1.setnames.get(i)+"\t");
+			Iterator<String> it1 = set1.iterator();
+			while(it1.hasNext()){
+				System.out.print(it1.next());
+				if(it1.hasNext()) System.out.print(",");
+			}
+			System.out.println("\t"+countCompleteOverlap);
+			//count+=countCompleteOverlap;
+			count++;
+			}
+		}
+		return count;
+	}
+	
+	public void reshuffleSets(int numberOfPermutations, boolean conserveSizes){
+		Random r = new Random();
+		int efp =0;
+		for(int i=0;i<numberOfPermutations;i++){
+			int i1 = r.nextInt(sets.size());
+			int i2 = r.nextInt(sets.size());
+			int j1 = r.nextInt(sets.get(i1).size());
+			int j2 = r.nextInt(sets.get(i2).size());
+			//System.out.println(i1+"("+j1+")"+"\t"+i2+"("+j2+")");
+			HashSet set1 = sets.get(i1);
+			HashSet set2 = sets.get(i2);
+			//if(set1.size()==1)
+			//	System.out.println(setnames.get(i1)+":\t"+set1.size()+"\t"+set2.size());
+			String el1 = ""; Iterator<String> it1 = set1.iterator(); for(int k=0;k<=j1;k++) el1 = it1.next();
+			String el2 = ""; Iterator<String> it2 = set2.iterator(); for(int k=0;k<=j2;k++) el2 = it2.next();
+			//if((!el1.equals(""))&&(!el2.equals("")))
+			if((!set1.contains(el2))&&(!set2.contains(el1))||(!conserveSizes)){
+				set1.remove(el1);
+				set2.remove(el2);
+				set1.add(el2);
+				set2.add(el1);
+				efp++;
+			}
+		}
+		System.out.println(efp+" effective permutations were made");
+	}
+	
+	public Graph getBiPartiteSetConnectionGraph(String gmtSets, String gmtConnectors, int numberOfPermutations) throws Exception{
+		SetOverlapAnalysis sets = new SetOverlapAnalysis();
+		SetOverlapAnalysis connectors = new SetOverlapAnalysis();		
+		sets.LoadSetsFromGMT(gmtSets);
+		connectors.LoadSetsFromGMT(gmtConnectors);		
+
+		connectors.reshuffleSets(numberOfPermutations, true);
+		
+		//sets.reshuffleSets(numberOfPermutations, false);
+
+		//sets.saveSetsAsGMT("C:/Datas/DNARepairAnalysis/temp.gmt", -1);		
+		
+		Graph connectionGraph = new Graph();
+		for(int i=0;i<sets.setnames.size();i++){
+			Node n = connectionGraph.getCreateNode(sets.setnames.get(i));
+			n.setAttributeValueUnique("NODE_TYPE", "SET", Attribute.ATTRIBUTE_TYPE_STRING);
+		}
+		for(int i=0;i<connectors.setnames.size();i++){
+			HashSet<String> set = connectors.sets.get(i);
+			String connectorLabel = "";
+			Iterator<String> its = set.iterator();
+			Vector<Vector<String>> connected = new Vector<Vector<String>>();
+			while(its.hasNext()){
+				String item = its.next();
+				if(item.equals(""))
+					System.out.println(connectors.setnames.get(i)+"("+set.size()+")");
+				connectorLabel+=item+"_";
+				Vector<String> found = sets.getListOfSets(item);
+				connected.add(found);
+			}
+			
+			// Variant 1 - connector nodes should belong to at least one set (allconnectedsets)
+			Vector<String> allconnectedsets = new Vector<String>();
+			for(int s=0;s<connected.size();s++){
+				Vector<String> found = connected.get(s);
+				if(found.size()==0){
+					allconnectedsets.clear(); break;
+				}
+				for(int j=0;j<found.size();j++)
+					if(!allconnectedsets.contains(found.get(j)))
+						allconnectedsets.add(found.get(j));
+			}
+			
+			if(connectorLabel.length()>0) connectorLabel = connectorLabel.substring(0, connectorLabel.length()-1);
+			/*Vector<String> uniquelyConnected = new Vector<String>();
+			for(int j=0;j<allconnectedsets.size();j++){
+				String setname = allconnectedsets.get(j);
+				int count = 0;
+				for(int k=0;k<connected.size();k++)
+					if(connected.get(k).contains(setname))
+						count++;
+				if(count==1)
+					uniquelyConnected.add(setname);
+			}*/
+			Collections.sort(allconnectedsets);
+			String label = ""; 
+			for(int k=0;k<allconnectedsets.size();k++) label+=allconnectedsets.get(k)+"|"; 
+			if(label.length()>0) label = label.substring(0, label.length()-1);
+			label = "C:"+label;
+			Node connector = connectionGraph.getCreateNode(label);
+			connector.setAttributeValueUnique("NODE_TYPE", "CONNECTORS", Attribute.ATTRIBUTE_TYPE_STRING);			
+			if(connector.getFirstAttributeValue("NUMBER_OF_CONNECTORS")==null){
+				connector.setAttributeValueUnique("NUMBER_OF_CONNECTORS", "1", Attribute.ATTRIBUTE_TYPE_REAL);	
+				connector.setAttributeValueUnique("NUMBER_OF_CONNECTED_SETS", ""+allconnectedsets.size(), Attribute.ATTRIBUTE_TYPE_REAL);					
+				connector.setAttributeValueUnique("CONNECTED_SETS", label, Attribute.ATTRIBUTE_TYPE_STRING);	
+				connector.setAttributeValueUnique("CONNECTOR",connectorLabel,Attribute.ATTRIBUTE_TYPE_STRING);
+				for(int k=0;k<allconnectedsets.size();k++){
+					Edge e = new Edge();
+					e.Node1 = connector;
+					e.Node2 = connectionGraph.getNode(allconnectedsets.get(k));
+					e.Id = e.Node1+"_"+e.Node2;
+					connectionGraph.addEdge(e);
+				}
+			}else{
+				int num = Integer.parseInt(connector.getFirstAttributeValue("NUMBER_OF_CONNECTORS"));
+				connector.setAttributeValueUnique("NUMBER_OF_CONNECTORS", ""+(num+1), Attribute.ATTRIBUTE_TYPE_REAL);
+				String cat = connector.getFirstAttributeValue("CONNECTOR");
+				connector.setAttributeValueUnique("CONNECTOR",cat+";"+connectorLabel,Attribute.ATTRIBUTE_TYPE_STRING);				
+			}
+		}
+		connectionGraph.assignEdgeIds();
+		return connectionGraph;
+	}
+	
+	public static float getConnectionGraphCoverageScore(Graph graph){
+		float score = 0f;
+		for(int i=0;i<graph.Nodes.size();i++){
+			Node n =  graph.Nodes.get(i);
+			if(n.getFirstAttributeValue("NODE_TYPE").equals("CONNECTORS")){
+				int num_connected_sets = Integer.parseInt(n.getFirstAttributeValue("NUMBER_OF_CONNECTED_SETS"));
+				int num_connectors = Integer.parseInt(n.getFirstAttributeValue("NUMBER_OF_CONNECTORS"));
+				score+=num_connected_sets*num_connectors;
+			}
+		}
+		return score;
+	}
+	
+	public static void generateAllPairwiseGMT(String gmtFile, String newFile) throws Exception{
+		SetOverlapAnalysis so = new SetOverlapAnalysis();
+		SetOverlapAnalysis sonew = new SetOverlapAnalysis();		
+		so.LoadSetsFromGMT(gmtFile);
+		sonew.setnames = new Vector<String>();
+		sonew.sets = new Vector<HashSet<String>>();
+		for(int i=0;i<so.allproteins.size();i++)for(int j=i+1;j<so.allproteins.size();j++){
+			sonew.setnames.add(so.allproteins.get(i)+"_"+so.allproteins.get(j));
+			HashSet<String> pair = new HashSet<String>();
+			pair.add(so.allproteins.get(i));
+			pair.add(so.allproteins.get(j));
+			sonew.sets.add(pair);
+		}
+		sonew.saveSetsAsGMT(newFile, -1);
+	}
 
 }

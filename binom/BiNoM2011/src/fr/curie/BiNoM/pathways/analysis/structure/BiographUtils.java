@@ -50,10 +50,11 @@ public class BiographUtils extends Graph {
     BiographUtils biographUtils1 = new BiographUtils();
     
     try{
-    	//String prefix = "c:/datas/binomtest/M-phase2";
-    	String prefix = "C:/Datas/BinomTest/Reaction2EntityNetwork/mapk";
+    	String prefix = "c:/datas/binomtest/M-phase2";
+    	//String prefix = "C:/Datas/BinomTest/Reaction2EntityNetwork/mapk";
     	Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+".xgmml"));
     	graph = convertReactionNetworkIntoEntityNetwork(graph);
+    	graph = StructureAnalysisUtils.removeReciprocalEdges(graph);
     	XGMML.saveToXGMML(graph, prefix+"_entity.xgmml");
     }catch(Exception e){
     	e.printStackTrace();
@@ -1128,12 +1129,12 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  // First, create intersection relations
 	  for(int i=0;i<reactionNetwork.Nodes.size();i++){
 		  Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i).Id);
-		  for(int j=0;j<names.size();j++)for(int k=j+1;k<names.size();k++){
+		  for(int j=0;j<names.size();j++)for(int k=0;k<names.size();k++)if(j!=k){
 			  String id = "";
-			  if(names.get(j).compareTo(names.get(k))<0)
+			  //if(names.get(j).compareTo(names.get(k))<0)
 				  id = names.get(j)+" (interesects) "+names.get(k);
-			  else
-				  id = names.get(k)+" (interesects) "+names.get(j);
+			  //else
+			  //	  id = names.get(k)+" (interesects) "+names.get(j);
 			  Edge e = entityNetwork.getCreateEdge(id);
 			  int inter_size = 1;
 			  String inter_string = reactionNetwork.Nodes.get(i).Id;
@@ -1282,6 +1283,8 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  }
 	  return res;
   }
+  
+  
   
 
 

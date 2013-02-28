@@ -193,7 +193,7 @@ standard systems biology formats}
 
 \begin{abstract}\justifying
 
-Background
+\paragraph{Background}
 
 Public repositories of biological pathways and networks have greatly expanded
 in recent years. Such databases contain many pathways that facilitate the
@@ -203,7 +203,7 @@ biology approach.  However, large-scale molecular maps are not always easy to
 mine and interpret.
 
 
-Results
+\paragraph{Results}
 
 We have developed BiNoM (Biological Network Manager), a Cytoscape plugin, which
 provides functions for the import-export of some standard systems biology file
@@ -216,9 +216,9 @@ such, BiNoM is able to efficiently manage large BioPAX files such as whole
 pathway databases (e.g. human Reactome). BiNoM also implements a collection of
 powerful graph-based functions and algorithms such as path analysis,
 decomposition by name or cycle, subnetworks clustering and decomposition of a
-large network in modules. 
+large network in modules.
 
-Conclusions
+\paragraph{Conclusions}
 
 Here, we provide an in-depth overview of the BiNoM functions, and we also
 detail novel aspects such as the support of the BioPAX Level 3 format and the
@@ -231,7 +231,7 @@ the cell cycle, a crucial cellular process disturbed in most human tumors.
 
 
 \section*{Keywords}
-Systems Biology, Cytoscape, Software, SBML, BioPAX, CellDesigner, Conversion, SBGN, Reactome, 
+Systems Biology, Cytoscape, Software, SBML, BioPAX, CellDesigner, Conversion, SBGN, Reactome,
 Network analysis, Path analysis, Molecular maps, Pathways.
 
 
@@ -397,8 +397,8 @@ for tumor development and progression.
         \hline
       \end{tabular}\\
  The table is comparing the main functions in BiNoM with other visualization
- and network analysis tools. The symbol \bullet indicates that the function is
- available within the tool, while \circ indicates that the function is not
+ and network analysis tools. The symbol $\bullet$ indicates that the function is
+ available within the tool, while $\circ$ indicates that the function is not
  available. The references for the software tools are: CellDesigner
  \cite{funahashi2003celldesigner, mi2011biopax}, BioPAX2SBML
  \cite{buchel2012qualitative}, SyBiL  \cite{ruebenacker2009integrating}, SBFC
@@ -418,36 +418,27 @@ for tumor development and progression.
 \begin{table}[!h]
   \textbf{Table 2 Detailed import/export BiNoM capabilities for standard systems biology file formats}
 
-      \begin{tabular*}{\textwidth}{@{\extracolsep\fill}l}
+      \begin{tabular*}{\textwidth}{@{\extracolsep\fill}ll}
         %\hline \multicolumn{3}{|c|}{My Table}\\ \hline
         \hline
-    \textbf{Import from} \\
+    \textbf{Import from} & \textbf{Export (from / to)}\\
     \hline
-        CellDesigner v3.x, 4.1, 4.2 \\
+        CellDesigner v3.x, 4.1, 4.2  & BioPAX Level 3 / BioPAX Level 3 \\
         \hline
-        BioPAX Level 3  \\
+        BioPAX Level 3 & BioPAX Level 3 / SBML Level 2 \\
         \hline
-        SBML Level 2 \\
+        SBML Level 2 & CellDesigner v3.x, 4.1, 4.2 / CellDesigner v4.1 \\
         \hline
-        CSML v3.0  \\
+        CSML v3.0  & CellDesigner v3.x, 4.1, 4.2 / BioPAX Level 3 \\
         \hline
-        \textbf{Export (from / to)} \\
+           & CellDesigner v3.x, 4.1, 4.2 / SBML Level 2 \\
         \hline
-        BioPAX Level 3 / BioPAX Level 3 \\
-        \hline
-        BioPAX Level 3 / SBML Level 2 \\
-        \hline
-        CellDesigner v3.x, 4.1, 4.2 / CellDesigner v4.1 \\
-        \hline
-        CellDesigner v3.x, 4.1, 4.2 / BioPAX Level 3 \\
-        \hline
-        CellDesigner v3.x, 4.1, 4.2 / SBML Level 2 \\
-        \hline
-        CSML v3.0 / SBML Level 2 \\
+           & CSML v3.0 / SBML Level 2 \\
         \hline
       \end{tabular*}\\
  The table is indicating the different standard systems biology file formats and versions that can be currently imported/exported in BiNoM, as well as what type of conversions are possible.
 \end{table}
+
 
 \section*{Implementation}
 BiNoM is implemented in the Java\texttrademark{} programming language, as a plugin
@@ -1072,7 +1063,7 @@ then the reaction is a
 reversible reaction and is replaced by a degradation \cite{fages2008frontiers}.
 A thorough description of the procedure together with an example of such a
 conversion is
-available in \cite{calzone2011calamar}.{\pagebreak} 
+available in \cite{calzone2011calamar}.
 
 We applied PIQuant to the resulting influence network of the G1/S transition of
 the cell cycle (Figure~9). We selected three target nodes as
@@ -1137,7 +1128,7 @@ S phases, corresponding to an enhanced proliferation for tumor cells.
 A clear difference can be observed when comparing the heatmap to Figure 9, where
 the color values represent only experimental data values. The heatmap represents
 this time the integration of both experimental data and the network
-architecture through the PIQuant score.
+architecture through the PIQuant score.{\pagebreak} 
 
 %==Figure 10==
 \hrulefill\
@@ -1539,28 +1530,30 @@ Ideker T, Galitski T, Hood L: \textbf{A new approach to decoding life: systems
 \bibitem{bauer2009pathway}
 Bauer-Mehren A, Furlong L, Sanz F: \textbf{Pathway databases and tools for
   their exploitation: benefits, current limitations and challenges.}
-  \emph{Mol Syst Biol} 2009, \textbf{5:}
+  \emph{Mol Syst Biol} 2009, \textbf{5:}{290}.
 
 \bibitem{oda2005comprehensive}
 Oda K, Matsuoka Y, Funahashi A, Kitano H: \textbf{A comprehensive pathway map
-  of epidermal growth factor receptor signaling.} \emph{Mol Syst Biol} 2005, \textbf{1:}
+  of epidermal growth factor receptor signaling.} \emph{Mol Syst Biol} 2005, \textbf{1}(1):2005.0010.
 
 \bibitem{oda2006comprehensive}
 Oda K, Kitano H: \textbf{A comprehensive map of the toll-like receptor
-  signaling network.} \emph{Mol Syst Biol} 2006, \textbf{2:}
+  signaling network.} \emph{Mol Syst Biol} 2006, \textbf{2}(1):2006.0015.
 
 \bibitem{calzone2008comprehensive}
 Calzone L, Gelay A, Zinovyev A, Radvanyl F, Barillot E: \textbf{A comprehensive
-  modular map of molecular interactions in RB/E2F pathway.} \emph{Mol Syst Biol} 2008, \textbf{4:}
+  modular map of molecular interactions in RB/E2F pathway.} \emph{Mol Syst Biol} 2008, \textbf{4}(1):174.
+
 
 \bibitem{caron2010comprehensive}
 Caron E, Ghosh S, Matsuoka Y, Ashton-Beaucage D, Therrien M, Lemieux S,
   Perreault C, Roux P, Kitano H: \textbf{A comprehensive map of the mTOR
-  signaling network.} \emph{Mol Syst Biol} 2010, \textbf{6:}
+  signaling network.} \emph{Mol Syst Biol} 2010, \textbf{6}(1):453.
+ 
 
 \bibitem{funahashi2003celldesigner}
 Funahashi A, Tanimura N, Morohashi M, Kitano H: \textbf{CellDesigner: a process
-  diagram editor for gene-regulatory and biochemical networks} 2003.
+  diagram editor for gene-regulatory and biochemical networks.} {\it BIOSILICO} 2003, \textbf{1:}{159--162}.
 
 \bibitem{zinovyev2008binom}
 Zinovyev A, Viara E, Calzone L, Barillot E: \textbf{BiNoM: a Cytoscape plugin
@@ -1623,9 +1616,7 @@ Gonzalez A, Naldi A, Sanchez L, Thieffry D, Chaouiya C: \textbf{GINsim: A
   regulatory networks.} \emph{Biosystems} 2006, \textbf{84}(2):91--100.
 
 \bibitem{tarjan1972depth}
-Tarjan R: \textbf{Depth-first search and linear graph algorithms.} In
-  \emph{Switching and Automata Theory, 1971., 12th Annual Symposium on}. IEEE;
-  1972:114--121.
+Tarjan R: {\bf Depth-first search and linear graph algorithms.} \textit{SIAM J Comput}  1972, \textbf{1}(2):{146--160}.
 
 \bibitem{broder2000graph}
 Broder A, Kumar R, Maghoul F, Raghavan P, Rajagopalan S, Stata R, Tomkins A,
@@ -1658,7 +1649,8 @@ Calzone L, Fages F, Soliman S: \textbf{BIOCHAM: an environment for modeling
 \bibitem{fages2008frontiers}
 Fage F, Soliman S: \textbf{From reaction models to influence graphs and back: a
   theorem.} \emph{Formal Methods Syst Biol FMSB'08, Lect Notes
-  Comput Sci} 2008, \textbf{5054:}
+  Comput Sci} 2008, \textbf{5054:}90--102.
+
 
 \bibitem{calzone2011calamar}
 Calzone L, Chaouiya C, Remy E, Soliman S: \textbf{Qualitative modelling of the

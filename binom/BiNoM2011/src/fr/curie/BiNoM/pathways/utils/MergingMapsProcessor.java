@@ -75,7 +75,7 @@ public class MergingMapsProcessor {
 	/**
 	 * List of asRNA ID2
 	 */
-	private ArrayList<String> asRnaList;
+	private ArrayList<String> asRnaIdList;
 
 	
 	/**
@@ -333,7 +333,7 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 		  CelldesignerGeneDocument.CelldesignerGene g = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
 		  if (geneNames.containsKey(g.getName())) {
-			  System.out.println(">>>duplicated gene name: "+g.getName() + " id: " + g.getId());
+			  //System.out.println(">>>duplicated gene name: "+g.getName() + " id: " + g.getId());
 			  this.geneMap.put(g.getId(), geneNames.get(g.getName()));
 			  this.geneIdList.add(g.getId());
 		  }
@@ -350,7 +350,7 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
 			CelldesignerRNADocument.CelldesignerRNA rna = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
 			if (rnaNames.containsKey(rna.getName())) {
-				System.out.println(">>>duplicated RNA gene name: "+rna.getName() + " id: " + rna.getId());
+				//System.out.println(">>>duplicated RNA gene name: "+rna.getName() + " id: " + rna.getId());
 				this.rnaMap.put(rna.getId(), rnaNames.get(rna.getName()));
 				this.rnaIdList.add(rna.getId());
 			}
@@ -364,13 +364,13 @@ public class MergingMapsProcessor {
 			//System.out.println("asRNA file 1: "+asRna.getName() + " id: "+ asRna.getId());
 		}
 		this.asRnaMap = new HashMap<String, String>();
-		this.asRnaList = new ArrayList<String>();
+		this.asRnaIdList = new ArrayList<String>();
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asRna = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			if (asRnaNames.containsKey(asRna.getName())) {
-				System.out.println(">>>duplicated asRNA name: "+asRna.getName() + " id: " + asRna.getId());
-				this.rnaMap.put(asRna.getId(), asRnaNames.get(asRna.getName()));
-				this.asRnaList.add(asRna.getId());
+				//System.out.println(">>>duplicated asRNA name: "+asRna.getName() + " id: " + asRna.getId());
+				this.asRnaMap.put(asRna.getId(), asRnaNames.get(asRna.getName()));
+				this.asRnaIdList.add(asRna.getId());
 			}
 		}
 
@@ -473,6 +473,14 @@ public class MergingMapsProcessor {
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		XmlString xs = XmlString.Factory.newInstance();
 
+		System.out.println("Rna Map");
+		for (String s : rnaMap.keySet())
+			System.out.println(s+":"+rnaMap.get(s));
+		System.out.println("As Rna Map");
+		for (String s : asRnaMap.keySet())
+			System.out.println(s+":"+asRnaMap.get(s));
+		System.out.println("###");
+		
 //		HashMap<String,String> aliasMap = new HashMap<String,String>();
 //		HashMap<String,String> speciesMap = new HashMap<String,String>();
 //		Vector<String> subsAliases = new Vector<String>();
@@ -571,7 +579,7 @@ public class MergingMapsProcessor {
 		}
 
 		/*
-		 * Change reference to proteins in species
+		 * Change reference to proteins, genes, RNA, antisenseRNA, in species
 		 */
 		for(int i=0;i<cd1.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species csp = cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -589,17 +597,45 @@ public class MergingMapsProcessor {
 				}
 			}
 			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()!=null){
-				String pr = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
-				System.out.println(">>> pr= "+pr+" species "+csp.getName());
-				if(geneMap.get(pr)!=null){
-					xs.setStringValue(geneMap.get(pr));
+				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
+				//System.out.println(">>> pr= "+str+" species "+csp.getName());
+				if(geneMap.get(str)!=null){
+					xs.setStringValue(geneMap.get(str));
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
 					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
 					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().set(xs);
-					System.out.println("Changed gene reference in "+csp.getId()+" from "+pr+" ("+getGene(cd1,pr).getName()+") to "+geneMap.get(pr)+" ("+getGene(cd1,geneMap.get(pr)).getName()+")");
+					System.out.println("Changed gene reference in "+csp.getId()+" from "+str+" ("+getGene(cd1,str).getName()+") to "+geneMap.get(str)+" ("+getGene(cd1,geneMap.get(str)).getName()+")");
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
 					System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
 					System.out.println();
+				}
+			}
+			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
+				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
+				System.out.println(">>> rna species= "+str+" species "+csp.getName());
+				if(rnaMap.get(str)!=null){
+					xs.setStringValue(rnaMap.get(str));
+					CellDesigner.entities = CellDesigner.getEntities(cd1);
+					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
+					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference().set(xs);
+					System.out.println("Changed RNA reference in "+csp.getId()+" from "+str+" ("+getRNA(cd1,str).getName()+") to "+rnaMap.get(str)+" ("+getRNA(cd1,rnaMap.get(str)).getName()+")");
+					CellDesigner.entities = CellDesigner.getEntities(cd1);
+					System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
+					System.out.println("#---#");
+				}
+			}
+			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference()!=null){
+				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
+				System.out.println(">>> antisense rna species= "+str+" species "+Utils.getValue(csp.getName()));
+				if(asRnaMap.get(str)!=null){
+					xs.setStringValue(asRnaMap.get(str));
+					CellDesigner.entities = CellDesigner.getEntities(cd1);
+					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
+					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference().set(xs);
+					System.out.println("Changed Antisense RNA reference in "+csp.getId()+" from "+str+" ("+getAsRNA(cd1,str).getName()+") to "+asRnaMap.get(str)+" ("+getAsRNA(cd1,asRnaMap.get(str)).getName()+")");
+					CellDesigner.entities = CellDesigner.getEntities(cd1);
+					System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
+					System.out.println("[EOF]");
 				}
 			}
 		}
@@ -646,11 +682,11 @@ public class MergingMapsProcessor {
 		int numberOfGenes = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();
 		while(i<numberOfGenes){
 			CelldesignerGeneDocument.CelldesignerGene gene = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
-			if(proteinIdList.indexOf(gene.getId())>=0){
-				String pto = proteinMap.get(gene.getId());
-				CelldesignerGeneDocument.CelldesignerGene geneto = getGene(cd1,pto);
+			if(geneIdList.indexOf(gene.getId())>=0){
+				String gto = geneMap.get(gene.getId());
+				CelldesignerGeneDocument.CelldesignerGene geneto = getGene(cd1,gto);
 				if(geneto==null)
-					System.out.println("Substitution not found for "+gene.getId()+" ("+pto+")");
+					System.out.println("Substitution not found for "+gene.getId()+" ("+gto+")");
 				if(gene.getCelldesignerNotes()!=null){
 					String comment = Utils.getValue(gene.getCelldesignerNotes()).trim();
 					if(geneto.getCelldesignerNotes()==null)
@@ -669,8 +705,8 @@ public class MergingMapsProcessor {
 		int numberOfRNAs = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();
 		while(i<numberOfRNAs){
 			CelldesignerRNADocument.CelldesignerRNA rna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
-			if(proteinIdList.indexOf(rna.getId())>=0){
-				String pto = proteinMap.get(rna.getId());
+			if(rnaIdList.indexOf(rna.getId())>=0){
+				String pto = rnaMap.get(rna.getId());
 				CelldesignerRNADocument.CelldesignerRNA rnato = getRNA(cd1,pto);
 				if(rna.getCelldesignerNotes()!=null){
 					String comment = Utils.getValue(rna.getCelldesignerNotes()).trim();
@@ -686,7 +722,30 @@ public class MergingMapsProcessor {
 			}
 			else 
 				i++;
-		}		
+		}
+		
+		i=0; 
+		int numberOfAsRNAs = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();
+		while(i<numberOfAsRNAs){
+			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA rna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+			if(asRnaIdList.indexOf(rna.getId())>=0){
+				String asRna = asRnaMap.get(rna.getId());
+				CelldesignerRNADocument.CelldesignerRNA rnato = getRNA(cd1,asRna);
+				if(rna.getCelldesignerNotes()!=null){
+					String comment = Utils.getValue(rna.getCelldesignerNotes()).trim();
+					if(rnato.getCelldesignerNotes()==null)
+						rnato.addNewCelldesignerNotes();
+					String commentto = Utils.getValue(rnato.getCelldesignerNotes()).trim();
+					xs.setStringValue("<&html><&body>"+commentto+"\n"+comment+"<&/body><&/html>");
+					rnato.getCelldesignerNotes().set(xs);
+				}
+				System.out.println("RNA "+rna.getId()+" ("+rna.getName()+") removed.");				
+				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().removeCelldesignerAntisenseRNA(i);
+				numberOfAsRNAs--;
+			}
+			else 
+				i++;
+		}
 	} 
 
 //	private void rewireDiagram(SbmlDocument cd, Vector<String> subs, Vector<String> subsP){
@@ -1172,6 +1231,17 @@ public class MergingMapsProcessor {
 		return sp;
 	}
 
+	private CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA getAsRNA(SbmlDocument cd, String id){
+		CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA sp = null;
+		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
+			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA a = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+			if(a.getId().equals(id))
+				sp = a;
+		}
+		return sp;
+	}
+
+	
 	/**
 	 * shift coordinates in a celldesigner file.
 	 * 

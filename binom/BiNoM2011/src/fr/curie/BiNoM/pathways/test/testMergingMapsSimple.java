@@ -15,11 +15,11 @@ public class testMergingMapsSimple {
 		//String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/a1.xml";
 		//String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/a2.xml";
 		
-		String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-1.xml";
-		String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-2.xml";
+		//String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-1.xml";
+		//String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-2.xml";
 
-		//String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml";
-		//String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml";
+		String file1 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml";
+		String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml";
 		
 		// build a list of maps to merge
 		ArrayList<File> fl = new ArrayList<File>();

@@ -454,7 +454,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 
 		y++;
 		partialRB = new JRadioButton();
-		partialRB.setText("Approximation solution");
+		partialRB.setText("Selective enumeration");
 		partialRB.setActionCommand("enum");
 		partialRB.addActionListener(this);
 		c = new GridBagConstraints();

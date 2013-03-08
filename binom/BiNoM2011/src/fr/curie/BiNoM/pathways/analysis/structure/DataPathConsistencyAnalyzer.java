@@ -938,7 +938,7 @@ public class DataPathConsistencyAnalyzer {
 		if (ocsSearch == OCS_BERGE)
 			this.optCutSetReport.append("CI algorithm selected: Exact solution (Berge's algorithm)"+newline+newline);
 		else { 
-			this.optCutSetReport.append("CI algorithm selected: Approximation solution"+newline);
+			this.optCutSetReport.append("CI algorithm selected: Selective enumeration"+newline);
 			long maxNb = this.maxSetNb / 1000000;
 			this.optCutSetReport.append("Max. Nb of million of combinations to test: "+ maxNb + newline+newline);
 		}

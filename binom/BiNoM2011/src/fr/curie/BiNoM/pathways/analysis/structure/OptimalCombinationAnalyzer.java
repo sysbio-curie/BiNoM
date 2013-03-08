@@ -238,7 +238,7 @@ public class OptimalCombinationAnalyzer {
 				}
 				if (printLog) {
 					int pn = i+1;
-					System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow);
+					System.out.println("Analyzing path number "+pn+" / "+pathMatrixNbRow + " (" + hitSetSB.size() + ")");
 					if (hitSetSB.size() > maxSetSize)
 						maxSetSize = hitSetSB.size();
 				}

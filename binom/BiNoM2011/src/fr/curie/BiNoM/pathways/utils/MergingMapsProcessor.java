@@ -529,7 +529,10 @@ public class MergingMapsProcessor {
 		 */
 		if(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null) {
 			for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
+				
 				CelldesignerSpeciesDocument.CelldesignerSpecies csp = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+				
+				// proteins
 				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()!=null){
 					String pr = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
 					if(proteinMap.get(pr)!=null){
@@ -545,36 +548,40 @@ public class MergingMapsProcessor {
 						System.out.println();
 					}
 				}
-//				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()!=null){
-//					String pr = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
-//					if(proteinMap.get(pr)!=null){
-//						xs.setStringValue(proteinMap.get(pr));
-//						CellDesigner.entities = CellDesigner.getEntities(cd1);
-//						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
-//						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().set(xs);
-//						xs.setStringValue(getGene(cd1,proteinMap.get(pr)).getName()); 
-//						csp.setName(xs);
-//						System.out.println("Changed gene reference in "+csp.getId()+" from "+pr+" ("+getGene(cd1,pr).getName()+") to "+proteinMap.get(pr)+" ("+getGene(cd1,proteinMap.get(pr)).getName()+")");
-//						CellDesigner.entities = CellDesigner.getEntities(cd1);
-//						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
-//						System.out.println();
-//					}
-//				}
-//				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
-//					String pr = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
-//					if(proteinMap.get(pr)!=null){
-//						xs.setStringValue(proteinMap.get(pr));
-//						CellDesigner.entities = CellDesigner.getEntities(cd1);
-//						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
-//						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference().set(xs);
-//						xs.setStringValue(getRNA(cd1,proteinMap.get(pr)).getName()); 
-//						csp.setName(xs);
-//						System.out.println("Changed rna reference in "+csp.getId()+" from "+pr+" ("+getRNA(cd1,pr).getName()+") to "+proteinMap.get(pr)+" ("+getRNA(cd1,proteinMap.get(pr)).getName()+")");
-//						CellDesigner.entities = CellDesigner.getEntities(cd1);
-//						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
-//						System.out.println();
-//					}
-//				}			
+				
+				// genes
+				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()!=null){
+					String ge = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
+					if(geneMap.get(ge)!=null){
+						xs.setStringValue(geneMap.get(ge));
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
+						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().set(xs);
+						xs.setStringValue(getGene(cd1,geneMap.get(ge)).getName()); 
+						csp.setName(xs);
+						System.out.println("Changed gene reference in "+csp.getId()+" from "+ge+" ("+getGene(cd1,ge).getName()+") to "+geneMap.get(ge)+" ("+getGene(cd1,proteinMap.get(ge)).getName()+")");
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
+						System.out.println();
+					}
+				}
+				
+				// RNAs
+				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
+					String rna = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
+					if(rnaMap.get(rna)!=null){
+						xs.setStringValue(proteinMap.get(rna));
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
+						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference().set(xs);
+						xs.setStringValue(getRNA(cd1,rnaMap.get(rna)).getName()); 
+						csp.setName(xs);
+						System.out.println("Changed rna reference in "+csp.getId()+" from "+rna+" ("+getRNA(cd1,rna).getName()+") to "+rnaMap.get(rna)+" ("+getRNA(cd1,rnaMap.get(rna)).getName()+")");
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
+						System.out.println();
+					}
+				}			
 			}
 		}
 

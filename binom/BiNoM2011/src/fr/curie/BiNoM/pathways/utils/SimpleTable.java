@@ -42,8 +42,10 @@ public class SimpleTable {
   public String stringTable[][] = null;
   public String filename = null;
   
-  public HashMap<String,Vector<Integer>> index = new HashMap<String,Vector<Integer>>();
+  public boolean makeUpperCaseInIndex = false;
   
+  public HashMap<String,Vector<Integer>> index = new HashMap<String,Vector<Integer>>();
+  public HashMap<String,Vector<Integer>> secondaryIndex = new HashMap<String,Vector<Integer>>();  
   
   public SimpleTable() {
   }
@@ -57,10 +59,36 @@ public class SimpleTable {
 	  	if(ifield!=-1){
 	  		for(int i=0;i<stringTable.length;i++){
 	  			Vector<Integer> rows = null;
-	  			rows = index.get(stringTable[i][ifield]);
+	  			if(!makeUpperCaseInIndex)
+	  				rows = index.get(stringTable[i][ifield]);
+	  			else
+	  				rows = index.get(stringTable[i][ifield].toUpperCase());
 	  			if(rows==null) rows = new Vector<Integer>();
 	  			rows.add(new Integer(i));
-	  			index.put(stringTable[i][ifield], rows);
+	  			if(!makeUpperCaseInIndex)	  			
+	  				index.put(stringTable[i][ifield], rows);
+	  			else
+	  				index.put(stringTable[i][ifield].toUpperCase(), rows);
+	  		}
+	  	}
+	  }
+
+  public void createSecondaryIndex(String field){
+	  	secondaryIndex.clear();
+	  	int ifield = fieldNumByName(field);
+	  	if(ifield!=-1){
+	  		for(int i=0;i<stringTable.length;i++){
+	  			Vector<Integer> rows = null;
+	  			if(!makeUpperCaseInIndex)
+	  				rows = secondaryIndex.get(stringTable[i][ifield]);
+	  			else
+	  				rows = secondaryIndex.get(stringTable[i][ifield].toUpperCase());
+	  			if(rows==null) rows = new Vector<Integer>();
+	  			rows.add(new Integer(i));
+	  			if(!makeUpperCaseInIndex)	  			
+	  				secondaryIndex.put(stringTable[i][ifield], rows);
+	  			else
+	  				secondaryIndex.put(stringTable[i][ifield].toUpperCase(), rows);
 	  		}
 	  	}
 	  }

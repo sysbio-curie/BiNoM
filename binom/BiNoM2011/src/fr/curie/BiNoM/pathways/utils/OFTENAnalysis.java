@@ -33,7 +33,7 @@ public class OFTENAnalysis {
 			String pathToHPRD = "C:/Datas/HPRD9/hprd9_pc_clicks.xgmml";	
 			int nstart = 530;
 			int nend = nstart;
-			int step = 10;
+			int step = 10;	
 			
 			int valuesToTest[] = new int[(int)((nend-nstart)/step)+1];
 			int k = 0;

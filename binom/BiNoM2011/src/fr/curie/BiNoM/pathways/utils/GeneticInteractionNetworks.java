@@ -1,6 +1,8 @@
 package fr.curie.BiNoM.pathways.utils;
 
 import java.io.FileWriter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -20,8 +22,10 @@ public class GeneticInteractionNetworks {
 	public static void main(String[] args) {
 		try{
 			
+			//makeYeastORFNameTable();
+			makeHumanizedBioGrid();
 			//makeSLNetworkFromYeastScreen();
-			extractBioGridMammalianNetwork();
+			//extractBioGridMammalianNetwork();
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -71,7 +75,7 @@ public class GeneticInteractionNetworks {
 			}
 		}
 		so_human_yeast.saveSetsAsGMT("C:/Datas/SyntheticInteractions/human_yeast_orthologs.gmt", -1);
-		// Create graph of "humanized" interactions
+		// Create graph of "humanized" interactions for Costanzo 2010
 		Graph graph = new Graph();
 		for(int i=0;i<network.rowCount;i++){
 			String source = network.stringTable[i][network.fieldNumByName("ORFQUERY")];
@@ -223,6 +227,123 @@ public class GeneticInteractionNetworks {
 		//	System.out.println(s);
 		//}
 
+	}
+	
+	
+	public static void makeHumanizedBioGrid() throws Exception{
+		SimpleTable yeastData = new SimpleTable();
+		yeastData.LoadFromSimpleDatFile("C:/Datas/BioGrid/yeast_genetic_header.txt", true, "\t");
+		SetOverlapAnalysis so = new SetOverlapAnalysis();
+		so.LoadSetsFromGMT("C:/Datas/SyntheticInteractions/yeast_human_orthologs.gmt");
+		SimpleTable yeastORFNames = new SimpleTable();
+		yeastORFNames.LoadFromSimpleDatFile("C:/Datas/SyntheticInteractions/ORF_Name_Yeast.txt", true, "\t");
+
+		yeastORFNames.makeUpperCaseInIndex = true;
+		yeastORFNames.createIndex("NAME");
+		yeastORFNames.createSecondaryIndex("ORF");		
+		
+		HashMap<String,String> pmids = new HashMap<String,String>();
+		HashMap<String,String> systems = new HashMap<String,String>();		
+		
+		for(int i=0;i<yeastData.rowCount;i++){
+			String geneA = yeastData.stringTable[i][yeastData.fieldNumByName("GENEA")].toUpperCase();
+			String geneB = yeastData.stringTable[i][yeastData.fieldNumByName("GENEB")].toUpperCase();
+			String pubmed = yeastData.stringTable[i][yeastData.fieldNumByName("PMID")];
+			String system = yeastData.stringTable[i][yeastData.fieldNumByName("SYSTEM")];			
+			if(geneA.compareTo(geneB)>0){
+				String temp = geneA; geneA = geneB; geneB = temp;
+			}
+			String id = geneA+"_"+geneB;
+			if(pmids.get(id)==null){ pmids.put(id, pubmed); systems.put(id, system); }else{
+				String pms = pmids.get(id); pms+=";"+pubmed; pmids.put(id, pms);
+				String sms = systems.get(id); sms+=";"+system; systems.put(id, sms);				
+			}
+		}
+		
+		FileWriter fw = new FileWriter("C:/Datas/BioGrid/yeast_genetic_header_compr.txt");
+		FileWriter fw_orf = new FileWriter("C:/Datas/BioGrid/yeast_genetic_header_compr_ORF.gmt");
+		FileWriter fw_orf_negative = new FileWriter("C:/Datas/BioGrid/yeast_genetic_header_compr_ORF_negative.gmt");		
+		FileWriter fwh = new FileWriter("C:/Datas/BioGrid/yeast_genetic_humanized.txt");		
+		FileWriter fwhg = new FileWriter("C:/Datas/BioGrid/yeast_genetic_humanized.gmt");				
+		FileWriter fwhg_negative = new FileWriter("C:/Datas/BioGrid/yeast_genetic_humanized_negative.gmt");						
+		fw.write("ID\tGENEA\tGENEB\tPMID\tSYSTEM\tEVIDENCES\n");
+		fwh.write("ID\tHUMANGENEA\tHUMANGENEB\tSYSTEM\tEVIDENCES\n");		
+		for(String s: pmids.keySet()){
+			StringTokenizer st = new StringTokenizer(s,"_");
+			String ps = systems.get(s);
+			int count_evidences = 0;
+			StringTokenizer st1 = new StringTokenizer(ps,";");
+			Vector<String> sms = new Vector<String>();
+			while(st1.hasMoreTokens()) { count_evidences++; String ss = st1.nextToken(); if(!sms.contains(ss)) sms.add(ss); }
+			String systemLabel = "";
+			Collections.sort(sms); for(int i=0;i<sms.size();i++) systemLabel+=sms.get(i)+";"; if(systemLabel.length()>0) systemLabel = systemLabel.substring(0, systemLabel.length()-1); 
+			String geneA = st.nextToken().toUpperCase();
+			String geneB = st.nextToken().toUpperCase();
+			fw.write(s+"\t"+geneA+"\t"+geneB+"\t"+pmids.get(s)+"\t"+systems.get(s)+"\t"+count_evidences+"\n");
+			
+			String orfA = null;
+			String humangeneA = "";
+			String orfB = null;
+			String humangeneB = "";
+			
+			if((yeastORFNames.index.get(geneA)==null)&&(yeastORFNames.secondaryIndex.get(geneA)==null)){
+				System.out.println(geneA+"\tORF not found!");
+			}else{
+				int k = -1;
+				if(yeastORFNames.index.get(geneA)!=null) k = yeastORFNames.index.get(geneA).get(0); else
+				if(yeastORFNames.secondaryIndex.get(geneA)!=null) k = yeastORFNames.secondaryIndex.get(geneA).get(0);				
+				orfA = yeastORFNames.stringTable[k][yeastORFNames.fieldNumByName("ORF")];
+				if(so.setnames.indexOf(orfA)==-1){
+					System.out.println(orfA+"\tcan not be humanized!");
+				}else{
+					HashSet<String> set = so.sets.get(so.setnames.indexOf(orfA));
+					for(String ss: set) humangeneA+=ss+" "; if(humangeneA.length()>0) humangeneA = humangeneA.substring(0, humangeneA.length()-1);
+				}
+			}
+
+			if((yeastORFNames.index.get(geneB)==null)&&(yeastORFNames.secondaryIndex.get(geneB)==null)){
+				System.out.println(geneB+"\tORF not found!");
+			}else{
+				int k = -1;
+				if(yeastORFNames.index.get(geneB)!=null) k = yeastORFNames.index.get(geneB).get(0); else
+				if(yeastORFNames.secondaryIndex.get(geneB)!=null) k = yeastORFNames.secondaryIndex.get(geneB).get(0);				
+				orfB = yeastORFNames.stringTable[k][yeastORFNames.fieldNumByName("ORF")];
+				if(so.setnames.indexOf(orfB)==-1){
+					System.out.println(orfB+"\tcan not be humanized!");
+				}else{
+					HashSet<String> set = so.sets.get(so.setnames.indexOf(orfB));
+					for(String ss: set) humangeneB+=ss+" "; if(humangeneB.length()>0) humangeneB = humangeneB.substring(0, humangeneB.length()-1);
+				}
+			}
+			
+			boolean negative = false;
+			if(systemLabel.contains("Negative")||systemLabel.contains("Synthetic Lethality")||systemLabel.contains("Synthetic Growth")||systemLabel.contains("Phenotypic Enhancement")||systemLabel.contains("Dosage Lethality")||systemLabel.contains("Dosage Growth Defect")||systemLabel.contains("Synthetic Haploinsufficiency"))
+				negative = true;
+
+			if((orfA!=null)&&(orfB!=null)){
+				fw_orf.write(s+"\t"+systemLabel+"\t"+orfA+"\t"+orfB+"\n");
+			}
+			if(negative)
+			if((orfA!=null)&&(orfB!=null)){
+				fw_orf_negative.write(s+"\t"+systemLabel+"\t"+orfA+"\t"+orfB+"\n");
+			}
+			
+			
+			if((!humangeneA.equals(""))&&(!humangeneB.equals(""))){
+				fwh.write(s+"\t"+humangeneA+"\t"+humangeneB+"\t"+systemLabel+"\t"+count_evidences+"\n");
+				fwhg.write(s+"\t"+systemLabel+";"+count_evidences+"\t");
+				if(negative)
+					fwhg_negative.write(s+"\t"+systemLabel+";"+count_evidences+"\t");
+				HashSet<String> set = new HashSet<String>();
+				st = new StringTokenizer(humangeneA," "); while(st.hasMoreTokens()) set.add(st.nextToken());
+				st = new StringTokenizer(humangeneB," "); while(st.hasMoreTokens()) set.add(st.nextToken());
+				for(String ss: set) fwhg.write(ss+"\t"); fwhg.write("\n");
+				if(negative){				
+					for(String ss: set) fwhg_negative.write(ss+"\t"); fwhg_negative.write("\n");
+				}
+			}
+		}
+		fw.close(); fwh.close(); fwhg.close(); fwhg_negative.close(); fw_orf.close(); fw_orf_negative.close();
 	}
 	
 

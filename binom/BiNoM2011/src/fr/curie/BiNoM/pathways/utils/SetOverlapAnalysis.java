@@ -52,20 +52,27 @@ public class SetOverlapAnalysis {
 			//String prefix = "C:/Datas/KEGG/Test/ocsana_report_cellfate";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_map_onlyRepair";
 			//String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path";
-			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path_reg_ber";
+			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path_reg_re";
+			
+			
+
 			
 			//so.convertTableSetToGMT(prefix+".minhitsets",prefix+".minhitsets.gmt",3);
 			//so.expandSetsOfLists_SplitSets(prefix+".minhitsets.gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+".minhitsets_hugo.gmt");			
 			//so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
+			so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
 			//so.LoadSetsFromGMT(prefix+".minhitsets_hugo.gmt"); for(int i=0;i<so.allproteins.size();i++) System.out.println(so.allproteins.get(i));
 			//so.convertXGMMLtoGMT("C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.xgmml","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", false);
+			//so.expandSetsOfLists_SplitSets("c:/datas/biogrid/yeast_genetic_header_compr_ORF_negative.gmt", "C:/Datas/SyntheticInteractions/yeast_human_orthologs.gmt", "c:/datas/biogrid/yeast_genetic_humanized_negative_pairs.gmt");
 
 			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 10);
 			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
 			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", 10000000, 0);
 			//int inters = so.intersect2ListsOfSets("C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", 10000000, 0);	
-			int inters = so.intersect2ListsOfSets("C:/Datas/BioGrid/human_mouse_genetic.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
-			System.out.println("Total "+inters+" complete overlaps");
+			//int inters = so.intersect2ListsOfSets("C:/Datas/BioGrid/human_mouse_genetic.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
+			//int inters = so.intersect2ListsOfSets("C:/Datas/BioGrid/yeast_genetic_humanized_negative.gmt",prefix+".minhitsets_hugo.gmt", 10000000, 0);
+			//int inters = so.intersect2ListsOfSets("C:/Datas/BioGrid/yeast_genetic_humanized_negative_pairs.gmt",prefix+".minhitsets_hugo_noWRN.gmt", 10000000, 0);
+			//System.out.println("Total "+inters+" complete overlaps");
 
 			//generateAllPairwiseGMT(prefix+"_hugo_noWRN.gmt", prefix+"_hugo_noWRN_allpairs.gmt");
 			
@@ -73,24 +80,28 @@ public class SetOverlapAnalysis {
 			//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt",1000000);
 				//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/SyntheticInteractions/Constanzo2010/stringent_humanized_negative_pairs.gmt",10000000);
 				//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt",prefix+"_hugo_noWRN_allpairs.gmt",0000000);
-				Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt","c:/datas/biogrid/human_mouse_genetic.gmt",0000000);
-			//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/DNARepairAnalysis/dnarepair_path_reg_ber.minhitsets_hugo.gmt",1000000);
+				//Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt","c:/datas/biogrid/human_mouse_genetic.gmt",0000000);
+				Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo_noWRN.gmt","c:/datas/biogrid/yeast_genetic_humanized_negative_pairs.gmt",0000000);
+			    //Graph connectionGraph = so.getBiPartiteSetConnectionGraph(prefix+"_hugo.gmt","C:/Datas/DNARepairAnalysis/dnarepair_path_reg_ber.minhitsets_hugo.gmt",1000000);
 			XGMML.saveToXGMML(connectionGraph, "C:/Datas/DNARepairAnalysis/temp.xgmml");
 			System.out.println("Connection graph coverage score = "+getConnectionGraphCoverageScore(connectionGraph));
 			}
-			System.exit(0);
+			//System.exit(0);
 			
-			so.LoadSetsFromGMT(prefix+".gmt");
-			so.findMinimalHittingSet(4, prefix);
+			//so.LoadSetsFromGMT(prefix+".gmt");
+			//so.findMinimalHittingSet(3, prefix);
 			
 			//String typesOfRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
-			//Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/DNARepairAnalysis/dnarepair.xml.xgmml"));
+			///Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/DNARepairAnalysis/dnarepair.xml.xgmml"));
 			//so.makeGMTOfReactionRegulators(prefix+"_reg", graph, typesOfRegulations);
 			
 			//so.printSetSizes();
 			//so.printSetIntersections();
 
 			//so.listSetsIncludingSet(prefix+".minhitsets",new String[]{"BRCA1"});
+			
+			//Vector<String> gmts = new Vector<String>(); gmts.add(prefix+".gmt"); gmts.add(prefix+"_re.gmt");
+			//convertSetofGMTsToTable(gmts);
 			
 			//so.createGMTFromOCSANAOutput("C:/Datas/DNARepairAnalysis/dnarepair_OCSANA_report");
 						
@@ -414,15 +425,15 @@ public class SetOverlapAnalysis {
 		
 		FileWriter fw1 = new FileWriter(fileNamePreifix+".freqmhs");		
 		System.out.println();
-		System.out.print("NODE\tSETS\t"); fw1.write("NODE\tSETS\t");
+		System.out.print("NODE\tSETS\tNSETS\t"); fw1.write("NODE\tSETS\tNSETS\t");
 		for(int sz=2;sz<=maxFoundSize;sz++) { System.out.print("SZ"+sz+"\t"); fw1.write("SZ"+sz+"\t"); } System.out.println(); fw1.write("\n");
 		for(int i=0;i<allproteins.size();i++){
 			Vector<String> names = getListOfSets(allproteins.get(i));
 			String s = "(";
 			for(int j=0;j<names.size();j++) if(j==names.size()-1) s+=names.get(j); else s+=names.get(j)+";";
 			s+=")";
-			System.out.print(allproteins.get(i)+"\t"+s+"\t");
-			fw1.write(allproteins.get(i)+"\t"+s+"\t");
+			System.out.print(allproteins.get(i)+"\t"+s+"\t"+names.size()+"\t");
+			fw1.write(allproteins.get(i)+"\t"+s+"\t"+names.size()+"\t");
 			for(int j=2;j<=maxFoundSize;j++){
 				System.out.print(frequencies.get(j-2).get(i).score+"\t");
 				fw1.write(frequencies.get(j-2).get(i).score+"\t");
@@ -487,14 +498,38 @@ public class SetOverlapAnalysis {
 	
 	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfRegulations[]) throws Exception{
 		FileWriter fw = new FileWriter(prefix+".gmt");
+		Vector<String> reactions = new Vector<String>();
 		for(int i=0;i<setnames.size();i++){
 			fw.write(setnames.get(i)+"\tna\t");
 			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfRegulations);
+			for(String s:sets.get(i)){
+				if(!reactions.contains(s))
+					reactions.add(s);
+			}
 			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
 			for(int j=0;j<regnames.size();j++){
 				fw.write(regnames.get(j)+"\t");
 			}
 			fw.write("\n");
+		}
+		fw.close();
+		Collections.sort(reactions);
+		// Make also gmt of reaction regulators per set
+		fw = new FileWriter(prefix+"_re.gmt");
+		for(String re: reactions){
+			HashSet<String> set = new HashSet<String>();
+			set.add(re);
+			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, set, typesOfRegulations);
+			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
+			regnames.remove("G1 cell cycle phase");
+			regnames.remove("S cell cycle phase");
+			if(regnames.size()>0){
+			fw.write(re+"\tna\t");						
+			for(int j=0;j<regnames.size();j++){
+				fw.write(regnames.get(j)+"\t");
+			}
+			fw.write("\n");		
+			}
 		}
 		fw.close();
 	}
@@ -595,6 +630,43 @@ public class SetOverlapAnalysis {
 				fw.write("\n");
 		}
 		fw.close();
+	}
+	
+	public static void convertSetofGMTsToTable(Vector<String> gmts){
+		Vector<SetOverlapAnalysis> sos = new Vector<SetOverlapAnalysis>();
+		Vector<String> allproteins = new Vector<String>();
+		for(int i=0;i<gmts.size();i++){
+			SetOverlapAnalysis so = new SetOverlapAnalysis();
+			so.LoadSetsFromGMT(gmts.get(i));
+			sos.add(so);
+			for(int j=0;j<so.allproteins.size();j++)
+				if(!allproteins.contains(so.allproteins.get(j)))
+					allproteins.add(so.allproteins.get(j));
+		}
+		Collections.sort(allproteins);
+		System.out.print("GENE\t"); 
+		for(int i=0;i<gmts.size();i++){
+			String fn = (new File(gmts.get(i))).getName();
+			System.out.print(fn.substring(0,fn.length()-4)+"\t");
+		}
+		for(int i=0;i<gmts.size();i++){
+			SetOverlapAnalysis so = sos.get(i);
+			for(int j=0;j<so.setnames.size();j++) System.out.print(so.setnames.get(j)+"\t");
+		}
+		System.out.println();
+		for(int i=0;i<allproteins.size();i++){
+			String pn = allproteins.get(i);
+			System.out.print(pn+"\t");
+			for(int j=0;j<gmts.size();j++) System.out.print(sos.get(j).getListOfSets(pn).size()+"\t");
+			for(int j=0;j<gmts.size();j++){
+				for(int k=0;k<sos.get(j).setnames.size();k++)
+					if(sos.get(j).sets.get(k).contains(pn))
+						System.out.print("1\t");
+					else
+						System.out.print("0\t");
+			}
+		System.out.println();					
+		}
 	}
 	
 	
@@ -840,7 +912,12 @@ public class SetOverlapAnalysis {
 			Node n = connectionGraph.getCreateNode(sets.setnames.get(i));
 			n.setAttributeValueUnique("NODE_TYPE", "SET", Attribute.ATTRIBUTE_TYPE_STRING);
 		}
+		Date d = new Date();
 		for(int i=0;i<connectors.setnames.size();i++){
+			if(i==(int)(0.0001f*i)*10000){
+				System.out.println(i+"\tMem="+Utils.getUsedMemoryMb()+"\tTime="+((new Date()).getTime()-d.getTime())/1000);
+				d = new Date();
+			}
 			HashSet<String> set = connectors.sets.get(i);
 			String connectorLabel = "";
 			Iterator<String> its = set.iterator();

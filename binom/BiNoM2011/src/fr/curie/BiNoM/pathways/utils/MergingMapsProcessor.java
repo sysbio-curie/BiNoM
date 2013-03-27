@@ -136,8 +136,6 @@ public class MergingMapsProcessor {
 
 	public void mergeTwoMaps() {
 		mergeDiagrams();
-		//rewireDiagram(cd1, speciesMap,proteinMap);
-		//mergeElements(cd1, speciesMap,proteinMap);
 		mergeElements();
 	}
 
@@ -290,20 +288,25 @@ public class MergingMapsProcessor {
 
 	private static String addPrefixToIds(String text, String prefix){
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
-		for(int i=0;i<ids.size();i++)
-			if(!ids.get(i).equals("default")){
-				//System.out.println("id= "+ids.get(i));
+		for(int i=0;i<ids.size();i++) {
+			if(ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
+				//System.out.println(">>> id= "+ids.get(i));
 				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
 				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
 				text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
 			}
+		}
 		
+		/*
+		 * id replacement in tag "units" is giving a bug in CellDesigner
+		 * so here we find all occurences of "units" and set them back 
+		 * to an accepted value. 
+		 */
 		Pattern p = Pattern.compile("units=\"(\\S+)\"");
 		Matcher m = p.matcher(text);
 		HashSet<String> w = new HashSet<String>();
 		while(m.find()) {
-			System.out.println(m.group(0) + ">>>" + m.group(1));
 			if (!m.group(1).equalsIgnoreCase("volume"))
 				w.add(m.group(1));
 		}
@@ -313,31 +316,7 @@ public class MergingMapsProcessor {
 			while(m.find())
 				text = m.replaceAll("units=\"volume\"");
 		}
-		//System.out.println(text);
 		return text;
-		
-//		HashSet<String> ids = new HashSet<String>();
-//		Pattern p = Pattern.compile("id=\"(\\S+)\"");
-//		Matcher m = p.matcher(text);
-//		while(m.find()) {
-//			if (m.group(1).equals("default") == false)
-//				ids.add(m.group(1));
-//		}
-//		
-//		for (String id : ids)
-//			System.out.println("id= "+id);
-//		
-//		for (String id : ids) {
-//			p = Pattern.compile("id=\"" + id + "\"");
-//			m = p.matcher(text);
-//			while(m.find())
-//				text = m.replaceAll("id=\"" + prefix + id + "\"");
-//			p = Pattern.compile(">" + id + "<");
-//			m = p.matcher(text);
-//			while(m.find())
-//				text = m.replaceAll(">" + prefix + id + "<");
-//		}
-//		return text;
 	}
 
 	/**
@@ -351,6 +330,7 @@ public class MergingMapsProcessor {
 				cd1.getSbml().getModel().getListOfCompartments().addNewCompartment().set(cd2.getSbml().getModel().getListOfCompartments().getCompartmentArray(i));
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().sizeOfCelldesignerCompartmentAliasArray();i++)
 			cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().addNewCelldesignerCompartmentAlias().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i));
+		
 		// Proteins, Genes, RNA
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++)
 			cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().addNewCelldesignerProtein().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i));
@@ -367,6 +347,7 @@ public class MergingMapsProcessor {
 		if(cd2.getSbml().getModel().getListOfReactions()!=null)
 			for(int i=0;i<cd2.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++)
 				cd1.getSbml().getModel().getListOfReactions().addNewReaction().set(cd2.getSbml().getModel().getListOfReactions().getReactionArray(i));
+		
 		// Included, simple and complex Aliases
 		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 			for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++)
@@ -1340,6 +1321,20 @@ public class MergingMapsProcessor {
 		return sp;
 	}
 
-	
+	/**
+	 * Crude method to test if a string is an integer value
+	 * 
+	 * @param str
+	 * @return boolean
+	 */
+	private static boolean isNumeric(String str) {
+		try {
+			Integer.parseInt(str);
+		}
+		catch (NumberFormatException nfe) {
+			 return false;
+		}
+		return true;
+	}
 
 }

@@ -14,11 +14,11 @@ public class testRemoveEditPoints {
 	public static void main(String[] args) {
 		try{
 			
-			//String file = "c:/datas/binomtest/testEditPoints1";
+			String file = "c:/datas/binomtest/test_boolean";
 			//String file = "c:/datas/binomtest/M-Phase2";
 			//String file = "c:/datas/binomtest/mergedDraft_rew_mrn";
 			//String file = "C:/Datas/Basal/DNArepair_CCmap_layout work_15122010/Map Layots work versions/CellCycle_DNArepair_New_15_12_2010_1";
-			String file = "C:/Datas/Basal/DNArepair_CCmap_layout work_15122010/Map Layots work versions/BER_NER_MMR_MASTER";
+			//String file = "C:/Datas/Basal/DNArepair_CCmap_layout work_15122010/Map Layots work versions/BER_NER_MMR_MASTER";
 			
 			SbmlDocument cd1 = CellDesigner.loadCellDesigner(file+".xml");
 			removeEditPoints(cd1);
@@ -63,13 +63,9 @@ public class testRemoveEditPoints {
 					CelldesignerModificationDocument.CelldesignerModification cmd = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
 					String type = cmd.getType();
 					System.out.println(type);
-					/*if(cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_OR)||
-					   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_AND)||
-					   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_NOT)||
-					   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_UNKNOWN)
-					){
-						Utils.setValue(cmd.getEditPoints(),"0.5,0.5");
-					}else*/
+					if(type.contains("BOOLEAN_LOGIC")){
+						Utils.setValue(cmd.getEditPoints(),"100,100");
+					}else
 					if(cmd.getCelldesignerLinkTarget()!=null){
 						cmd.getCelldesignerLinkTarget().setCelldesignerLinkAnchor(null);
 						cmd.getCelldesignerLinkTarget().getCelldesignerLinkAnchor().getPosition().toString();
@@ -173,6 +169,7 @@ public class testRemoveEditPoints {
 						}
 						Pair center = calcAveragePair(modifiers);
 						Utils.setValue(cmd.getEditPoints(),""+((Float)center.o1).toString()+","+((Float)center.o2).toString()+"");
+						//Utils.setValue(cmd.getEditPoints(),"100,100");
 					}
 				}
 			}

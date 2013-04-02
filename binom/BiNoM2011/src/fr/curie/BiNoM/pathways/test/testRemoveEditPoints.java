@@ -14,7 +14,7 @@ public class testRemoveEditPoints {
 	public static void main(String[] args) {
 		try{
 			
-			String file = "c:/datas/binomtest/test_boolean";
+			String file = "c:/datas/binomtest/testAND1";
 			//String file = "c:/datas/binomtest/M-Phase2";
 			//String file = "c:/datas/binomtest/mergedDraft_rew_mrn";
 			//String file = "C:/Datas/Basal/DNArepair_CCmap_layout work_15122010/Map Layots work versions/CellCycle_DNArepair_New_15_12_2010_1";
@@ -172,6 +172,45 @@ public class testRemoveEditPoints {
 						//Utils.setValue(cmd.getEditPoints(),"100,100");
 					}
 				}
+				
+				if(r.getAnnotation().getCelldesignerListOfGateMember()!=null)
+				for(int j=0;j<r.getAnnotation().getCelldesignerListOfGateMember().sizeOfCelldesignerGateMemberArray();j++){
+					CelldesignerGateMemberDocument.CelldesignerGateMember cmd = r.getAnnotation().getCelldesignerListOfGateMember().getCelldesignerGateMemberArray(j);
+					String type = cmd.getType();
+					System.out.println(type);
+					//if(cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_OR)||
+					//   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_AND)||
+					//   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_NOT)||
+					//   cmd.getType().equals(CelldesignerModificationDocument.CelldesignerModification.Type.BOOLEAN_LOGIC_GATE_UNKNOWN)
+					//){
+					//	Utils.setValue(cmd.getEditPoints(),"0.5,0.5");
+					//}else
+					if(!type.contains("BOOLEAN_LOGIC")){
+						if(cmd.getCelldesignerLinkTarget()!=null){
+							cmd.getCelldesignerLinkTarget().setCelldesignerLinkAnchor(null);
+							//cmd.getCelldesignerLinkTarget().getCelldesignerLinkAnchor().getPosition().toString();
+							cmd.getCelldesignerLinkTarget().getCelldesignerLinkAnchor().setPosition(null);
+						}
+						if(cmd.getEditPoints()!=null){
+							cmd.setEditPoints(null);
+							//Utils.setValue(cmd.getEditPoints(),"0.5,0.5");
+						}
+					}else{
+						Pair reactionCenter = getReactionCenter(r,aliasPositions);
+						Vector<Pair> modifiers = new Vector<Pair>(); 
+						modifiers.add(reactionCenter);
+						String aliases = cmd.getAliases();
+						StringTokenizer st = new StringTokenizer(aliases,",");
+						while(st.hasMoreTokens()){
+							String al = st.nextToken();
+							modifiers.add(aliasPositions.get(al));
+						}
+						Pair center = calcAveragePair(modifiers);
+						//Utils.setValue(cmd.getEditPoints(),""+((Float)center.o1).toString()+","+((Float)center.o2).toString()+"");
+						Utils.setValue(cmd.getEditPoints(),"100,100");
+					}
+				}				
+				
 			}
 			
 		}catch(Exception e){

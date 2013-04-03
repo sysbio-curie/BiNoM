@@ -218,6 +218,27 @@ public class MergingMapsProcessor {
 		 */
 		for(int i=0;i<cd2.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 			ReactionDocument.Reaction r = cd2.getSbml().getModel().getListOfReactions().getReactionArray(i);
+			
+			// cd version 4.1
+			if(r.getAnnotation().getCelldesignerListOfModification()!=null) {
+				for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
+					CelldesignerModificationDocument.CelldesignerModification cmd = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
+					String type = cmd.getType();
+					if (type.contains("BOOLEAN_LOGIC")) {
+						String str = Utils.getValue(cmd.getEditPoints());
+						String[] coord = str.split(",");
+						float x = Float.parseFloat(coord[0]);
+						float y = Float.parseFloat(coord[1]);
+						x += deltaX;
+						y += deltaY;
+						str = x+","+y;
+						Utils.setValue(cmd.getEditPoints(),str);
+						//System.out.println(">>>"+ cmd.getEditPoints());
+					}
+				}
+			}
+			
+			// cd files version 4.2
 			if(r.getAnnotation().getCelldesignerListOfGateMember()!=null) {
 				for(int j=0;j<r.getAnnotation().getCelldesignerListOfGateMember().sizeOfCelldesignerGateMemberArray();j++){
 					CelldesignerGateMemberDocument.CelldesignerGateMember cmd = r.getAnnotation().getCelldesignerListOfGateMember().getCelldesignerGateMemberArray(j);

@@ -16,6 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
+
 package fr.curie.BiNoM.pathways.navicell;
 
 import java.awt.geom.AffineTransform;
@@ -356,6 +357,7 @@ public class ProduceClickableMap
 			e.printStackTrace();
 			System.exit(1);
 		}
+		System.out.println("Done");
 	}
 	static final String data_directory = "/data";
 
@@ -4089,7 +4091,7 @@ public class ProduceClickableMap
 		out.println("<script src='" + jquery_js + "' type='text/javascript'></script>");
 		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
 		
-		out.println("<script src='../../../lib/splitter-1.5.1.js' type='text/javascript'></script>");
+		out.println("<script src='../../../lib/splitter-1.5.1-patched.js' type='text/javascript'></script>");
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 
@@ -4103,7 +4105,8 @@ public class ProduceClickableMap
 			// http://methvin.com/splitter/index.html
 			out.println("$('#MySplitter').splitter({");
 			out.println("outline: true,");
-			out.println("resizeTo: window,");
+			/*out.println("resizeTo: window,");*/
+			out.println("resizeToWidth: true,");
 			out.println("sizeRight: 200,");
 			out.println("splitVertical: true");
 			out.println("});");		

@@ -17,6 +17,8 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerBaseProductDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerBaseReactantDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerEditPointsDocument.CelldesignerEditPoints;
+import org.sbml.x2001.ns.celldesigner.CelldesignerGateMemberDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
@@ -210,82 +212,40 @@ public class MergingMapsProcessor {
 				cdal.getCelldesignerBounds().setY(Float.toString(y));
 			}
 		}
+		
+		/*
+		 * Special case: shift coordinates for boolean logic gates
+		 */
+		for(int i=0;i<cd2.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
+			ReactionDocument.Reaction r = cd2.getSbml().getModel().getListOfReactions().getReactionArray(i);
+			if(r.getAnnotation().getCelldesignerListOfGateMember()!=null) {
+				for(int j=0;j<r.getAnnotation().getCelldesignerListOfGateMember().sizeOfCelldesignerGateMemberArray();j++){
+					CelldesignerGateMemberDocument.CelldesignerGateMember cmd = r.getAnnotation().getCelldesignerListOfGateMember().getCelldesignerGateMemberArray(j);
+					String type = cmd.getType();
+					if (type.contains("BOOLEAN_LOGIC")) {
+						String str = Utils.getValue(cmd.getEditPoints());
+						String[] coord = str.split(",");
+						float x = Float.parseFloat(coord[0]);
+						float y = Float.parseFloat(coord[1]);
+						x += deltaX;
+						y += deltaY;
+						str = x+","+y;
+						Utils.setValue(cmd.getEditPoints(),str);
+						//System.out.println(cmd.getEditPoints());
+					}
+				}
+			}
+		}
 
 	}
 
-	
-	
-	//	private void setCandidateMergingLists() {
-	//		// load file1 in a string
-	//		String file1Text = Utils.loadString(fileName1);
-	//		
-	//		// add a prefix to all IDs
-	//		file1Text = addPrefixToIds(file1Text,"rb_");
-	//		
-	//		// load file1_id in SbmlDocument object
-	//		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-	//		System.out.println("Loaded.");
-	//		
-	//		countAll(cd1);
-	//		
-	//		// load file 2 as SbmlDocument object
-	//		cd2 = CellDesigner.loadCellDesigner(fileName2);
-	//		
-	//		// define and write maps of common things
-	//		produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
-	//	}
-
-
-//	private static void countAll(SbmlDocument cd){
-//
-//		HashMap<String,Integer> rt = new HashMap<String,Integer>();
-//
-//		for(int i=0;i<cd.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
-//			ReactionDocument.Reaction reaction = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
-//			Integer num = rt.get(Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType()).trim());
-//			if(num==null) 
-//				num = new Integer(0);
-//			num = new Integer(num+1);
-//			rt.put(Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType()).trim(), num);
-//		}
-//
-//		Set keys = rt.keySet(); 
-//		Iterator<String> it = keys.iterator();
-//		Vector<String> types = new Vector<String>();
-//		while(it.hasNext()) {
-//			types.add(it.next()); 
-//			Collections.sort(types);
-//		}
-//
-//		for(int i=0;i<types.size();i++)
-//			System.out.println(types.get(i)+"\t"+rt.get(types.get(i)));
-//
-//		rt = new HashMap<String,Integer>();
-//
-//		for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
-//			SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
-//			Integer num = rt.get("SPECIES_"+Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
-//			if(num==null) num = new Integer(0);
-//			num = new Integer(num+1);
-//			rt.put("SPECIES_"+Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()), num);
-//		}
-//
-//		keys = rt.keySet(); 
-//		it = keys.iterator(); 
-//		types = new Vector<String>(); 
-//		while(it.hasNext()) { 
-//			types.add(it.next()); 
-//			Collections.sort(types);
-//		}
-//
-//		for(int i=0;i<types.size();i++)
-//			System.out.println(types.get(i)+"\t"+rt.get(types.get(i)));
-//
-//		System.out.println("PROTEIN\t"+cd.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray());
-//		System.out.println("GENE\t"+cd.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray());
-//		System.out.println("RNA\t"+cd.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray());
-//	}
-
+	/**
+	 * Just add a given prefix to all IDs on a given CellDesigner map.
+	 * 
+	 * @param text the whole map as a string
+	 * @param prefix a string representing the prefix to add
+	 * @return string the whole modified map as a string
+	 */
 	private static String addPrefixToIds(String text, String prefix){
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++) {
@@ -546,14 +506,6 @@ public class MergingMapsProcessor {
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		XmlString xs = XmlString.Factory.newInstance();
 
-		System.out.println("Rna Map");
-		for (String s : rnaMap.keySet())
-			System.out.println(s+":"+rnaMap.get(s));
-		System.out.println("As Rna Map");
-		for (String s : asRnaMap.keySet())
-			System.out.println(s+":"+asRnaMap.get(s));
-		System.out.println("###");
-		
 //		HashMap<String,String> aliasMap = new HashMap<String,String>();
 //		HashMap<String,String> speciesMap = new HashMap<String,String>();
 //		Vector<String> subsAliases = new Vector<String>();
@@ -692,7 +644,6 @@ public class MergingMapsProcessor {
 			}
 			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
-				System.out.println(">>> rna species= "+str+" species "+csp.getName());
 				if(rnaMap.get(str)!=null){
 					xs.setStringValue(rnaMap.get(str));
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
@@ -701,12 +652,10 @@ public class MergingMapsProcessor {
 					System.out.println("Changed RNA reference in "+csp.getId()+" from "+str+" ("+getRNA(cd1,str).getName()+") to "+rnaMap.get(str)+" ("+getRNA(cd1,rnaMap.get(str)).getName()+")");
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
 					System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
-					System.out.println("#---#");
 				}
 			}
 			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference()!=null){
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
-				System.out.println(">>> antisense rna species= "+str+" species "+Utils.getValue(csp.getName()));
 				if(asRnaMap.get(str)!=null){
 					xs.setStringValue(asRnaMap.get(str));
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
@@ -715,7 +664,6 @@ public class MergingMapsProcessor {
 					System.out.println("Changed Antisense RNA reference in "+csp.getId()+" from "+str+" ("+getAsRNA(cd1,str).getName()+") to "+asRnaMap.get(str)+" ("+getAsRNA(cd1,asRnaMap.get(str)).getName()+")");
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
 					System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
-					System.out.println("[EOF]");
 				}
 			}
 		}

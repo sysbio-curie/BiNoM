@@ -120,7 +120,6 @@ public class testRemoveEditPoints {
 					r.getAnnotation().getCelldesignerEditPoints().setNum0("0");
 					r.getAnnotation().getCelldesignerEditPoints().setNum1("0");
 					r.getAnnotation().getCelldesignerEditPoints().setNum2("0");
-					
 				}else
 				if(r.getAnnotation().getCelldesignerEditPoints()!=null)
 					r.getAnnotation().unsetCelldesignerEditPoints();

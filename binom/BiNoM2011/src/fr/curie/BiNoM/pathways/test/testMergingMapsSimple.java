@@ -25,6 +25,9 @@ public class testMergingMapsSimple {
 		//String file2 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml";
 		//String file3 = "/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml";
 		
+		//String file1 = "/bioinfo/users/ebonnet/testAND.xml";
+		//String file2 = "/bioinfo/users/ebonnet/testAND.xml";
+		
 		/*
 		 * sizeX = 2500 sizeY = 2500
 		 */
@@ -47,6 +50,8 @@ public class testMergingMapsSimple {
 		//mp.shiftCoordinatesCd2(600, 0);
 		mp.setCd1MapSizeX("6000");
 		mp.shiftCoordinatesCd2(2600, 0);
+		//mp.setCd1MapSizeX("1500");
+		//mp.shiftCoordinatesCd2(700, 0);
 		
 		// create common species maps
 		mp.setMergeLists();

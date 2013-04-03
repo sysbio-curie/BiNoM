@@ -418,7 +418,7 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		 */
 		
 		y++;
-		JLabel algoL = new JLabel("Minimal intervention sets search algorithm:");
+		JLabel algoL = new JLabel("CI sets search algorithm:");
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;

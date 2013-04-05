@@ -167,18 +167,30 @@ public class MergingMapsProcessor {
 	public void setCd1MapSizeX(String val) {
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(val);
 	}
+
+	public void setCd1MapSizeY(String val) {
+		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(val);
+	}
+
+	public void shiftCoordinatesCD1(float deltaX, float deltaY) {
+		shiftCoordinates(cd1,deltaX, deltaY);
+	}
+	public void shiftCoordinatesCD2(float deltaX, float deltaY) {
+		shiftCoordinates(cd2,deltaX, deltaY);
+	}
 	
 	/**
-	 * shift coordinates for CellDesigner file cd2.
+	 * shift coordinates for elements of a CellDesigner file 
 	 * 
+	 * @param cd CellDesigner file
 	 * @param deltaX float delta x value
 	 * @param deltaY float delta y value
 	 */
-	public void shiftCoordinatesCd2( float deltaX, float deltaY) {
+	private void shiftCoordinates(SbmlDocument cd,float deltaX, float deltaY) {
 
 		// species aliases
-		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
-			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias cdal = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias cdal = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 			float  x = Float.parseFloat(cdal.getCelldesignerBounds().getX());
 			float  y = Float.parseFloat(cdal.getCelldesignerBounds().getY());
 			x += deltaX;
@@ -188,8 +200,8 @@ public class MergingMapsProcessor {
 		}
 
 		// compartments
-		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray().length;i++){
-			CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias csa = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i);
+		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray().length;i++){
+			CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias csa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i);
 			if(csa.getCelldesignerBounds()!=null){
 				float x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 				float y = Float.parseFloat(csa.getCelldesignerBounds().getY());
@@ -201,9 +213,9 @@ public class MergingMapsProcessor {
 		}
 
 		// complex species aliases
-		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) {
-			for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
-				CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cdal = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+		if(cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) {
+			for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+				CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cdal = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 				float  x = Float.parseFloat(cdal.getCelldesignerBounds().getX());
 				float  y = Float.parseFloat(cdal.getCelldesignerBounds().getY());
 				x += deltaX;
@@ -216,8 +228,8 @@ public class MergingMapsProcessor {
 		/*
 		 * Special case: shift coordinates for boolean logic gates
 		 */
-		for(int i=0;i<cd2.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
-			ReactionDocument.Reaction r = cd2.getSbml().getModel().getListOfReactions().getReactionArray(i);
+		for(int i=0;i<cd.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
+			ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
 			
 			// cd version 4.1
 			if(r.getAnnotation().getCelldesignerListOfModification()!=null) {
@@ -257,9 +269,8 @@ public class MergingMapsProcessor {
 				}
 			}
 		}
-
 	}
-
+	
 	/**
 	 * Just add a given prefix to all IDs on a given CellDesigner map.
 	 * 
@@ -588,9 +599,9 @@ public class MergingMapsProcessor {
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference().set(xs);
 						xs.setStringValue(Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())); 
 						csp.setName(xs);
-						System.out.println("IS Changed protein reference in "+csp.getId()+" from "+pr+" ("+Utils.getValue(getProtein(cd1,pr).getName())+") to "+proteinMap.get(pr)+" ("+Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())+")");
+						System.out.println("Changed protein reference in "+csp.getId()+" from "+pr+" ("+Utils.getValue(getProtein(cd1,pr).getName())+") to "+proteinMap.get(pr)+" ("+Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())+")");
 						CellDesigner.entities = CellDesigner.getEntities(cd1);
-						System.out.println("IS Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
+						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
 						System.out.println();
 					}
 				}
@@ -605,7 +616,7 @@ public class MergingMapsProcessor {
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().set(xs);
 						xs.setStringValue(getGene(cd1,geneMap.get(ge)).getName()); 
 						csp.setName(xs);
-						System.out.println("Changed gene reference in "+csp.getId()+" from "+ge+" ("+getGene(cd1,ge).getName()+") to "+geneMap.get(ge)+" ("+getGene(cd1,proteinMap.get(ge)).getName()+")");
+						System.out.print("Changed gene reference in "+csp.getId()+" from "+ge+" ("+getGene(cd1,ge).getName()+") to "+geneMap.get(ge)+" ("+getGene(cd1,geneMap.get(ge)).getName()+")");
 						CellDesigner.entities = CellDesigner.getEntities(cd1);
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
 						System.out.println();
@@ -616,7 +627,7 @@ public class MergingMapsProcessor {
 				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference()!=null){
 					String rna = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
 					if(rnaMap.get(rna)!=null){
-						xs.setStringValue(proteinMap.get(rna));
+						xs.setStringValue(rnaMap.get(rna));
 						CellDesigner.entities = CellDesigner.getEntities(cd1);
 						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference().set(xs);
@@ -627,7 +638,7 @@ public class MergingMapsProcessor {
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
 						System.out.println();
 					}
-				}			
+				}
 			}
 		}
 
@@ -651,7 +662,6 @@ public class MergingMapsProcessor {
 			}
 			if(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()!=null){
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
-				//System.out.println(">>> pr= "+str+" species "+csp.getName());
 				if(geneMap.get(str)!=null){
 					xs.setStringValue(geneMap.get(str));
 					CellDesigner.entities = CellDesigner.getEntities(cd1);
@@ -776,26 +786,27 @@ public class MergingMapsProcessor {
 		i=0; 
 		int numberOfAsRNAs = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();
 		while(i<numberOfAsRNAs){
-			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA rna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
-			if(asRnaIdList.indexOf(rna.getId())>=0){
-				String asRna = asRnaMap.get(rna.getId());
-				CelldesignerRNADocument.CelldesignerRNA rnato = getRNA(cd1,asRna);
-				if(rna.getCelldesignerNotes()!=null){
-					String comment = Utils.getValue(rna.getCelldesignerNotes()).trim();
-					if(rnato.getCelldesignerNotes()==null)
-						rnato.addNewCelldesignerNotes();
-					String commentto = Utils.getValue(rnato.getCelldesignerNotes()).trim();
+			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asrna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+			if(asRnaIdList.indexOf(asrna.getId())>=0){
+				String asRnaStr = asRnaMap.get(asrna.getId());
+				
+				CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asrnato = getAsRNA(cd1,asRnaStr);
+				if(asrna.getCelldesignerNotes()!=null){
+					String comment = Utils.getValue(asrna.getCelldesignerNotes()).trim();
+					if(asrnato.getCelldesignerNotes()==null)
+						asrnato.addNewCelldesignerNotes();
+					String commentto = Utils.getValue(asrnato.getCelldesignerNotes()).trim();
 					xs.setStringValue("<&html><&body>"+commentto+"\n"+comment+"<&/body><&/html>");
-					rnato.getCelldesignerNotes().set(xs);
+					asrnato.getCelldesignerNotes().set(xs);
 				}
-				System.out.println("RNA "+rna.getId()+" ("+rna.getName()+") removed.");				
+				System.out.println("RNA "+asrna.getId()+" ("+asrna.getName()+") removed.");				
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().removeCelldesignerAntisenseRNA(i);
 				numberOfAsRNAs--;
 			}
 			else 
 				i++;
 		}
-	} 
+	}
 
 //	private void rewireDiagram(SbmlDocument cd, Vector<String> subs, Vector<String> subsP){
 //		CellDesigner.entities = CellDesigner.getEntities(cd);

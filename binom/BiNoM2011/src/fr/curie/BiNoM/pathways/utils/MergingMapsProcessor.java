@@ -1,23 +1,16 @@
 package fr.curie.BiNoM.pathways.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlString;
 import org.sbml.x2001.ns.celldesigner.CelldesignerAntisenseRNADocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerBaseProductDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerBaseReactantDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerEditPointsDocument.CelldesignerEditPoints;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGateMemberDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
@@ -25,8 +18,6 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
-import org.sbml.x2001.ns.celldesigner.ListOfModifiersDocument;
-import org.sbml.x2001.ns.celldesigner.ModifierSpeciesReferenceDocument;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
@@ -36,14 +27,33 @@ import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 
 /**
- * Cell designer merging maps procedures.
+ * Cell Designer merging maps procedures.
  */
 public class MergingMapsProcessor {
 
-	//private Vector<String> proteinMap;
+	/**
+	 * Not really used at the moment
+	 */
 	private Vector<String> speciesMapStr = new Vector<String>();
+	
+	/**
+	 * Cell Designer file 1
+	 * 
+	 * All files will be merged into this file during the process.
+	 */
 	private SbmlDocument cd1;
+	
+	/**
+	 * Cell Designer file 2
+	 * 
+	 * Files from the list are loaded as cd2, and then merged into cd1.
+	 * 
+	 */
 	private SbmlDocument cd2;
+	
+	/** 
+	 * Simple counter to create specific prefix for cd2 files.
+	 */
 	private int counter = 0;
 	
 	/**
@@ -82,7 +92,28 @@ public class MergingMapsProcessor {
 	 */
 	private ArrayList<String> asRnaIdList;
 
+
+	/**
+	 * Simple class to store file name and coordinates for the maps to be merged.
+	 */
+	private class MapData {
+		public String fileName;
+		public int deltaX;
+		public int deltaY;
+		
+		// constructor
+		MapData(String fn, int dx, int dy) {
+			fileName = fn;
+			deltaX = dx;
+			deltaY = dy;
+		}
+	}
 	
+	/**
+	 * List of files to be merged + coordinates
+	 */
+	private ArrayList<MapData> mapList = new ArrayList<MapData>();
+
 	/**
 	 * Constructor
 	 */
@@ -90,7 +121,49 @@ public class MergingMapsProcessor {
 		// there is no life in the void.
 	}
 
-	//  ------ full process to merge two maps ---------------------------------------------	
+	public void addMap(String fileName, int deltaX, int deltaY) {
+		mapList.add(new MapData(fileName,deltaX,deltaY));
+	}
+	
+	/**
+	 * Merge all maps into one.
+	 * 
+	 * @param sizeX
+	 * @param sizeY
+	 */
+	public void mergeAll(String sizeX, String sizeY) {
+		int nbFiles = mapList.size();
+		
+		this.cd1 = CellDesigner.loadCellDesigner(mapList.get(0).fileName);
+		
+		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(sizeX);
+		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(sizeY);
+		shiftCoordinates(cd1,mapList.get(0).deltaX, mapList.get(0).deltaY);
+		
+		setAndLoadFileName2(mapList.get(1).fileName);
+		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
+		produceCandidateMergeLists();
+		mergeDiagrams();
+		mergeElements();
+		
+		for (int i=2;i<nbFiles;i++) {
+			// set new file 2 name
+			setAndLoadFileName2(mapList.get(i).fileName);
+			shiftCoordinates(cd2, mapList.get(i).deltaX, mapList.get(i).deltaY);
+			// create new common species names
+			produceCandidateMergeLists();
+			// merge maps
+			mergeDiagrams();
+			mergeElements();
+		}
+		
+		System.out.println("saving file...");
+		CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/merged_maps.xml");
+		System.out.println("done.");
+
+	}
+
+	//  ------ full process to merge two maps (original AZ procedure) ------------------	
 	//	String file1Text = Utils.loadString(fileName1);
 	//	file1Text = addPrefixToIds(file1Text,"rb_");
 	//	cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
@@ -102,81 +175,21 @@ public class MergingMapsProcessor {
 	//	CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/rew.xml");
 	//	--------------------------------------------------------------------------------
 
-
-	public void setAndLoadFileName1(String fileName) {
-
-		/*
-		 * old way: add prefix to first file
-		 */
-		//		String file1Text = Utils.loadString(fileName);
-		//		file1Text = addPrefixToIds(file1Text,"rb_");
-		//		cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-		//		countAll(cd1);
-
-		this.cd1 = CellDesigner.loadCellDesigner(fileName);
-	}
-
-	public void setAndLoadFileName2 (String fileName) {
-		//this.cd2 = CellDesigner.loadCellDesigner(fileName);
-
+	/**
+	 * Load CD file 2. Add a prefix to all element IDs.
+	 * 
+	 * @param fileName
+	 */
+	private void setAndLoadFileName2 (String fileName) {
 		/*
 		 * new way: add prefix to second file
 		 * use an internal counter to generate a new prefix each time a new file is loaded
 		 */
 		String text = Utils.loadString(fileName);
 		this.counter++;
-		String prefix = "rb" + counter + "_";
+		String prefix = "cd" + counter + "_";
 		text = addPrefixToIds(text, prefix);
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
-	}
-
-	public void setMergeLists() {
-		//proteinMap = new Vector<String>();
-		speciesMapStr = new Vector<String>();
-		produceCandidateMergeLists();
-	}
-
-	public void mergeTwoMaps() {
-		mergeDiagrams();
-		mergeElements();
-	}
-
-	public void saveCd1File(String fileName) {
-		CellDesigner.saveCellDesigner(cd1, fileName);
-	}
-
-	public Vector<String> getSpeciesMap() {
-		return this.speciesMapStr;
-	}
-
-	public void setSpeciesMap(Vector<String> data) {
-		this.speciesMapStr = data;
-	}
-
-	public void printSpeciesMap() {
-		System.out.println("#----- species map---------");
-		for (String s : this.speciesMapStr)
-			System.out.println(s);
-	}
-
-//	public void testShiftCoord() {
-//		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("2000");
-//		this.shiftCoordinates(cd2, 600, 0);
-//	}
-
-	public void setCd1MapSizeX(String val) {
-		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(val);
-	}
-
-	public void setCd1MapSizeY(String val) {
-		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(val);
-	}
-
-	public void shiftCoordinatesCD1(float deltaX, float deltaY) {
-		shiftCoordinates(cd1,deltaX, deltaY);
-	}
-	public void shiftCoordinatesCD2(float deltaX, float deltaY) {
-		shiftCoordinates(cd2,deltaX, deltaY);
 	}
 	
 	/**
@@ -278,7 +291,7 @@ public class MergingMapsProcessor {
 	 * @param prefix a string representing the prefix to add
 	 * @return string the whole modified map as a string
 	 */
-	private static String addPrefixToIds(String text, String prefix){
+	private String addPrefixToIds(String text, String prefix){
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++) {
 			if(ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
@@ -312,7 +325,7 @@ public class MergingMapsProcessor {
 	}
 
 	/**
-	 * Merge "mechanically" CellDesigner components of file cd2 into file cd1.
+	 * Merge "mechanically" all the CellDesigner components of file cd2 into file cd1.
 	 */
 	private void mergeDiagrams() {
 		

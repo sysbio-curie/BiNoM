@@ -113,6 +113,16 @@ public class MergingMapsProcessor {
 	 * List of files to be merged + coordinates
 	 */
 	private ArrayList<MapData> mapList = new ArrayList<MapData>();
+	
+	/**
+	 * Size X for merged map
+	 */
+	private String sizeX;
+	
+	/**
+	 * Size Y for merged map
+	 */
+	private String sizeY;
 
 	/**
 	 * Constructor
@@ -121,8 +131,26 @@ public class MergingMapsProcessor {
 		// there is no life in the void.
 	}
 
+	/**
+	 * Add map data (filename, deltaX, deltaY) to the internal list of maps to be merged.
+	 * 
+	 * @param fileName
+	 * @param deltaX
+	 * @param deltaY
+	 */
 	public void addMap(String fileName, int deltaX, int deltaY) {
 		mapList.add(new MapData(fileName,deltaX,deltaY));
+	}
+	
+	/**
+	 * Set size values for new map
+	 * 
+	 * @param X
+	 * @param Y
+	 */
+	public void setMapSize(int X, int Y) {
+		sizeX = Integer.toString(X);
+		sizeY = Integer.toString(Y);
 	}
 	
 	/**
@@ -131,7 +159,7 @@ public class MergingMapsProcessor {
 	 * @param sizeX
 	 * @param sizeY
 	 */
-	public void mergeAll(String sizeX, String sizeY) {
+	public void mergeAll() {
 		int nbFiles = mapList.size();
 		
 		this.cd1 = CellDesigner.loadCellDesigner(mapList.get(0).fileName);
@@ -157,10 +185,17 @@ public class MergingMapsProcessor {
 			mergeElements();
 		}
 		
-		System.out.println("saving file...");
-		CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/merged_maps.xml");
-		System.out.println("done.");
-
+		
+	}
+	
+	/**
+	 * save merged map
+	 * @param fileName
+	 */
+	public void saveMap(String fileName) {
+		System.out.println("saving file " +fileName);
+		CellDesigner.saveCellDesigner(cd1, fileName);
+		System.out.println("Done.");
 	}
 
 	//  ------ full process to merge two maps (original AZ procedure) ------------------	

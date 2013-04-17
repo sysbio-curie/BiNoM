@@ -1494,12 +1494,17 @@ public class ProduceClickableMap
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
-		final BlogCreator wp,
-		final SbmlDocument cd,
-		final String blog_name,
+		/*final*/ BlogCreator wp,
+		/*final*/ SbmlDocument cd,
+		/*final*/ String blog_name,
 		ImagesInfo scales
 	) throws UnsupportedEncodingException, FileNotFoundException
 	{
+		// unused variables: cd, blog_name and wp
+		cd = null; // EV 2013-04-17
+		blog_name = null; // EV 2013-04-17
+		wp = null; // EV 2013-04-17
+		
 		final String encoding = "UTF-8";
 		final PrintWriter output = new PrintWriter(output_file, encoding);
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");

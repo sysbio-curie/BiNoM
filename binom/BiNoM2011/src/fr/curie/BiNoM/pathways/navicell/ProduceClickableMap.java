@@ -1,4 +1,5 @@
-/* Stuart Pook (Sysra) $Id$
+/* Stuart Pook & Eric Viara (Sysra) $Id$
+ *
  *
  * Copyright (C) 2011-2012 Curie Institute, 26 rue d'Ulm, 75005 Paris, France
  * 
@@ -689,6 +690,7 @@ public class ProduceClickableMap
 	}
 	
 	private static final String right_panel_list = "right_panel.xml";
+	private static final String json_map_list = "map.json";
 	
 	private static boolean empty_tiles(final File tiles_directory)
 	{
@@ -725,7 +727,7 @@ public class ProduceClickableMap
 
 		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
-		clMap.generatePages(wp, new File(this_map_directory, right_panel_list), scales, master.master_format);
+		clMap.generatePages(wp, new File(this_map_directory, json_map_list), new File(this_map_directory, right_panel_list), scales, master.master_format);
 		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
 	}
 
@@ -1490,6 +1492,138 @@ public class ProduceClickableMap
 	}
 	*/
 	
+	private static void generate_json_entity_modification(final PrintStream outjson, Modification m,	Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, ImagesInfo scales
+	)
+	{
+		outjson.print("        \"positions\" : [");
+		boolean first = true;
+		for (final String shape_id : m.getShapeIds(speciesAliases))
+		{
+			final Vector<Place> places = placeMap.get(shape_id);
+			assert places.size() == 1 : shape_id + " " + places.size();
+			final Place place = places.get(0);
+			if (first) {
+				first = false;
+			} else {
+				outjson.print(",");
+			}
+			
+			outjson.print("{");
+			outjson.print("\"x\" : " + scales.getX(place.x) + ", ");
+			outjson.print("\"y\" : " + scales.getY(place.y));
+			outjson.print("}");
+		}
+		outjson.println("]");
+	}
+	
+	private static class Modif
+	{
+		final Modification m;
+		final boolean associated;
+		Modif(Modification m, boolean associated)
+		{
+			this.m = m;
+			this.associated = associated;
+		}
+	}
+
+	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
+	{
+		outjson.println("    \"id\" : \"" + ent.getId() + "\",");
+		outjson.println("    \"name\" : \"" + ent.getName() + "\",");
+		outjson.println("    \"hugo\" : \"" + ent.getHugoName() + "\",");
+		outjson.println("    \"postid\" : \"" + ent.getPostId() + "\",");
+		if (ent.getComment() != null) {
+			//			outjson.println("    \"comment\" : \"" + ent.getComment().replaceAll("\\", "\\\\").replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
+			outjson.println("    \"comment\" : \"" + ent.getComment().replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
+		}
+
+		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
+
+		for (final Modification m : ent.getPostTranslational()) {
+			modifs.add(new Modif(m, false));
+		}
+
+		for (final Modification m : ent.getAssociated()) {
+			modifs.add(new Modif(m, true));
+		}
+
+		boolean first = true;
+		outjson.println("    \"modifs\" : [");
+		for (final Modif q : modifs)
+		{
+			final Modification m = q.m;
+			if (first) {
+				first = false;
+			} else {
+				outjson.println(",");
+			}
+			outjson.println("      {");
+			outjson.println("        \"name\" : \"" + m.getName() + "\",");
+			outjson.println("        \"id\" : \"" + m.getId() + "\",");
+			if (q.associated)
+			{
+				outjson.println("        \"associated\" : true");
+			}
+			else
+			{
+				generate_json_entity_modification(outjson, m, speciesAliases, placeMap, scales);
+			}
+			outjson.print("      }");
+		}
+		outjson.println("\n    ]");
+	}
+
+	static private void generate_json_map(final File outjson_file, final Map<String, EntityBase> entityIDToEntityMap,
+		final Map<String, Vector<String>> speciesAliases,
+		final Map<String, Vector<Place>> placeMap,
+		final FormatProteinNotes format,
+		ImagesInfo scales) throws UnsupportedEncodingException, FileNotFoundException {
+		final String encoding = "UTF-8";
+		final PrintStream outjson = new PrintStream(outjson_file);
+		outjson.println("{");
+		final List<EntityBase> entities = new ArrayList<EntityBase>();
+		boolean first = true;
+		for (final String[] s : class_name_to_human_name)
+		{
+			String clsname = s[0];
+			if (clsname.equals(REACTION_CLASS_NAME)) {
+				break;
+			}
+
+			for (final EntityBase ent : entityIDToEntityMap.values()) {
+				if (clsname.equals(ent.getCls()) && !ent.isBad()) {
+					entities.add(ent);
+				}
+			}
+
+			if (first) {
+				first = false;
+			} else {
+				outjson.println(",");
+			}
+
+			outjson.println("  \"class\" : \"" + clsname + "\",");
+			outjson.println("  \"entity_size\" : \"" + entities.size() + "\",");
+
+			outjson.println("  \"entities\" : [");
+			boolean first2 = true;
+			for (final EntityBase ent : entities) {
+				if (first2) {
+					first2 = false;
+				} else {
+					outjson.println(",");
+				}
+				outjson.println("    {");
+				generate_json_entity(speciesAliases, placeMap, format, scales, outjson, ent);
+				outjson.print("    }");
+			}
+			outjson.println("\n  ]");
+		}
+		outjson.println("}");
+		outjson.close();
+	}
+
 	static private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
@@ -1538,16 +1672,6 @@ public class ProduceClickableMap
 	{
 		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, make_right_hand_link_to_blog_with_name(null, ent.getPostId(), ent.getName()).toString(), null);
 		
-		class Modif
-		{
-			final Modification m;
-			final boolean associated;
-			Modif(Modification m, boolean associated)
-			{
-				this.m = m;
-				this.associated = associated;
-			}
-		}
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
 		for (final Modification m : ent.getPostTranslational())
 			modifs.add(new Modif(m, false));
@@ -1735,7 +1859,7 @@ public class ProduceClickableMap
 	
 	private FormatProteinNotes master_format;
 	
-	private void generatePages(final BlogCreator wp, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
+	private void generatePages(final BlogCreator wp, File json_map_file, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		final Model model = cd.getSbml().getModel();
 		
@@ -1743,6 +1867,7 @@ public class ProduceClickableMap
 			ent.setPost(wp);
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
+		generate_json_map(json_map_file, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
@@ -3032,6 +3157,7 @@ public class ProduceClickableMap
 		abstract String getId();
 		abstract String getCls();
 		abstract String getName();
+		abstract String getHugoName();
 		private final ArrayList<Modification> modifications = new ArrayList<Modification>();
 		public ArrayList<Modification> getModifications()
 		{
@@ -3075,7 +3201,7 @@ public class ProduceClickableMap
 	static class Entity extends EntityBase {
 		String id;
 		String label;
-		String standardName_;
+		String hugoName;
 		String cls;
 		String comment = "";
 		private final ArrayList<Modification> associated = new ArrayList<Modification>();
@@ -3083,6 +3209,7 @@ public class ProduceClickableMap
 		public String getComment() { return comment; }
 		public String getName() { return label; }
 		public String getCls() { return cls; }
+		public String getHugoName() {return hugoName;}
 		@Override
 		public ArrayList<Modification> getAssociated()
 		{
@@ -3106,9 +3233,11 @@ public class ProduceClickableMap
 			this.cls = cls;
 			
 			String res = notes == null ? "" : notes.trim();
-			standardName_ = getStandardName(res);
-			if (standardName_.equals(""))
-				standardName_ = label;
+			hugoName = findHugoName(res);
+			/*
+			if (hugoName.equals(""))
+				hugoName = label;
+			*/
 			comment = res;
 		}
 		Entity(String id, String label, String cls, final Notes notes)
@@ -3214,6 +3343,11 @@ public class ProduceClickableMap
 			if (label == null)
 				label = make_complex_name(components);
 			return label;
+		}
+		@Override
+		public String getHugoName()
+		{
+			return "";
 		}
 		public boolean isBad()
 		{
@@ -3321,7 +3455,7 @@ public class ProduceClickableMap
 		  return reactionString;
 		}
 	
-	private static String getStandardName(String comment){
+	private static String findHugoName(String comment){
 		String res = "";
 		try{
 

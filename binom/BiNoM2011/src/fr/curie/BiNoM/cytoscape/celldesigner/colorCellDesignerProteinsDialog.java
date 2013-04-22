@@ -249,8 +249,12 @@ public class colorCellDesignerProteinsDialog extends JFrame {
 
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            setVisible(false);			
-			colorCellDesignerProteinsTask task = new colorCellDesignerProteinsTask(indexField.getText(),accNumField.getText());
+            setVisible(false);
+            colorCellDesignerProteinsTask task = null;
+            if(!accNumField.getText().equals(""))
+            	task = new colorCellDesignerProteinsTask(indexField.getText(),accNumField.getText());
+            else
+            	task = new colorCellDesignerProteinsTask(indexField.getText(),null);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
            });

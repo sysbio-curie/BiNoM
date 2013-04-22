@@ -3,6 +3,10 @@ package fr.curie.BiNoM.pathways.utils;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JFileChooser;
+
+import cytoscape.Cytoscape;
+
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.Edge;
@@ -52,7 +56,8 @@ public class SetOverlapAnalysis {
 			//String prefix = "C:/Datas/KEGG/Test/ocsana_report_cellfate";
 			//String prefix = "C:/Datas/KEGG/Human/dnarepair_map_onlyRepair";
 			//String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path";
-			String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path_reg_re";
+			//String prefix = "C:/Datas/DNARepairAnalysis/dnarepair_path_reg_re";
+			String prefix = "C:/Datas/DNARepairAnalysis/dna_repair_genes";
 			
 			
 
@@ -60,7 +65,7 @@ public class SetOverlapAnalysis {
 			//so.convertTableSetToGMT(prefix+".minhitsets",prefix+".minhitsets.gmt",3);
 			//so.expandSetsOfLists_SplitSets(prefix+".minhitsets.gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+".minhitsets_hugo.gmt");			
 			//so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
-			so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
+			//so.expandSetsOfLists_ExpandSets(prefix+".gmt", "C:/Datas/DNARepairAnalysis/dna_repair_genes.gmt", prefix+"_hugo.gmt");
 			//so.LoadSetsFromGMT(prefix+".minhitsets_hugo.gmt"); for(int i=0;i<so.allproteins.size();i++) System.out.println(so.allproteins.get(i));
 			//so.convertXGMMLtoGMT("C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.xgmml","C:/Datas/SyntheticInteractions/Caso2009/SL_human.sif.gmt", false);
 			//so.expandSetsOfLists_SplitSets("c:/datas/biogrid/yeast_genetic_header_compr_ORF_negative.gmt", "C:/Datas/SyntheticInteractions/yeast_human_orthologs.gmt", "c:/datas/biogrid/yeast_genetic_humanized_negative_pairs.gmt");
@@ -88,7 +93,7 @@ public class SetOverlapAnalysis {
 			}
 			//System.exit(0);
 			
-			//so.LoadSetsFromGMT(prefix+".gmt");
+			so.LoadSetsFromGMT(prefix+".gmt");
 			//so.findMinimalHittingSet(3, prefix);
 			
 			//String typesOfRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
@@ -97,6 +102,16 @@ public class SetOverlapAnalysis {
 			
 			//so.printSetSizes();
 			//so.printSetIntersections();
+			
+			JFileChooser j = new JFileChooser();
+			j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			Integer opt = j.showOpenDialog(Cytoscape.getDesktop());
+			if(opt!=-1){
+				//printSetIntersectionsInFolder("C:/Datas/acsn/naming/");
+				printSetIntersectionsInFolder(j.getSelectedFile().getAbsolutePath());
+			}
+			System.exit(0);
+			
 
 			//so.listSetsIncludingSet(prefix+".minhitsets",new String[]{"BRCA1"});
 			
@@ -274,24 +289,59 @@ public class SetOverlapAnalysis {
 		}
 	}
 	
-	public void printSetIntersections(){
-		System.out.println("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION");		
+	public void printSetIntersections(String filename) throws Exception{
+		FileWriter fw = null;
+		if(filename!=null)
+			fw = new FileWriter(filename);
+		System.out.println("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION");
+		if(fw!=null)
+			fw.write("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION\n");
 		for(int i=0;i<sets.size();i++){
 			for(int j=i+1;j<sets.size();j++){
 				HashSet<String> seti = sets.get(i);
 				HashSet<String> setj = sets.get(j);		
 				Vector<String> names = calcIntersectionOfSets(seti, setj);
 				Collections.sort(names);
-				if(names.size()>0)
+				if(names.size()>0){
 					System.out.print(setnames.get(i)+"\t"+setnames.get(j)+"\tintersects\t"+names.size()+"\t");
+					if(fw!=null)
+						fw.write(setnames.get(i)+"\t"+setnames.get(j)+"\tintersects\t"+names.size()+"\t");
+				}
 				for(int k=0;k<names.size();k++)
-					if(k==names.size()-1)
+					if(k==names.size()-1){
 						System.out.print(names.get(k)+"\n");
-					else
-						System.out.print(names.get(k)+",");					
+						if(fw!=null)
+							fw.write(names.get(k)+"\n");
+					}
+					else{
+						System.out.print(names.get(k)+",");
+						if(fw!=null)
+							fw.write(names.get(k)+",");
+					}
 				
 			}
 		}
+		if(fw!=null)
+			fw.close();
+	}
+	
+	public static void printSetIntersectionsInFolder(String folder) throws Exception{
+		File f = new File(folder);
+		File files[] = f.listFiles();
+		SetOverlapAnalysis so = new SetOverlapAnalysis();
+		so.setnames = new Vector<String>();
+		so.sets = new Vector<HashSet<String>>();
+		for(int i=0;i<files.length;i++)if(files[i].getName().endsWith("gmt")){
+			SetOverlapAnalysis si = new SetOverlapAnalysis();
+			si.LoadSetsFromGMT(files[i].getAbsolutePath());
+			for(int j=0;j<si.setnames.size();j++){
+				String name = si.setnames.get(j);
+				name = name+"_"+files[i].getName().substring(0, 2);
+				so.setnames.add(name);
+				so.sets.add(si.sets.get(j));
+			}
+		}
+		so.printSetIntersections(folder+"\\_intersection.txt");
 	}
 	
 	public void findMinimalHittingSet(int maxSetSize, String fileNamePreifix) throws Exception{

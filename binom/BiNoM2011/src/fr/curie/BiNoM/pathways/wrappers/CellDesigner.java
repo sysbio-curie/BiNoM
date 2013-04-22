@@ -115,6 +115,8 @@ public static String reactionNodeTypes[] = {
      s = Utils.replaceStringCount(s, "<celldesigner:notes xsi:nil=\"true\"/>", "");
      s = Utils.replaceStringCount(s, "<notes xsi:nil=\"true\"/>", "");
      
+     s = Utils.replaceStringCount(s,"<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");     
+     
      fw.write(s);
      fw.close();
    }catch(Exception e){

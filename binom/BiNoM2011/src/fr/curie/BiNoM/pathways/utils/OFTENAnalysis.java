@@ -28,6 +28,7 @@ public class OFTENAnalysis {
 	public static void main(String[] args) {
 		try{
 			
+				
 			//String prefix = "C:/Datas/EWING/ICA/";
 			String prefix = "C:/Datas/Kairov/DifferentialExpression4BC/lists/"; 
 			String pathToHPRD = "C:/Datas/HPRD9/hprd9_pc_clicks.xgmml";	

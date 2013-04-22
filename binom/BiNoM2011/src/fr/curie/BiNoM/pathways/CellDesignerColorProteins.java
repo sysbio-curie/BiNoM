@@ -58,11 +58,11 @@ public class CellDesignerColorProteins {
     args = new String[2];
     
     //String path = "c:/datas/basal/220210/";
-    String path = "c:/datas/CALAMAR/SpecificMap/";
+    String path = "c:/datas/temp3/";
     
     //args[0] = path+"test.xml";
     //args[0] = path+"CC_DNArepair_22_02_2010_corrected_1.xml";
-    args[0] = path+"rb260907.xml";
+    args[0] = path+"dnarepair.xml";
     args[1] = path+"bc3log_addcol.txt";
 
     //CellDesigner celld = new CellDesigner();
@@ -88,10 +88,13 @@ public class CellDesignerColorProteins {
 
 
     CellDesignerColorProteins cl = new CellDesignerColorProteins();
-    SimpleTable tabl = cl.loadAttribTable(args[1]);
+    //SimpleTable tabl = cl.loadAttribTable(args[1]);
+    SimpleTable tabl = null;
     CellDesigner celld3 = new CellDesigner();
     SbmlDocument sbmlp = celld3.loadCellDesigner(args[0]);
-    createAttributeTable(tabl,sbmlp,path+"temp.txt",path+"temp.gmt");
+    //createAttributeTable(tabl,sbmlp,path+"temp.txt",path+"temp.gmt");
+    createAttributeTable(tabl,sbmlp,null,path+"temp.gmt");
+    System.exit(0);
     
     tabl = cl.loadAttribTable(path+"temp.txt");
     
@@ -144,6 +147,10 @@ public class CellDesignerColorProteins {
 	        
 	        //String path = Utils.extractFolderName(featureTableName);
 	        
+	        System.out.println("featureTableName = "+featureTableName);
+	        
+	        if((featureTableName!=null)&&((new File(featureTableName)).exists())){
+	        
 	        createAttributeTable(tabl,sbmlp,featureTableName+".conv",featureTableName+".gmt");
 	        tabl = cl.loadAttribTable(featureTableName+".conv");
 
@@ -177,6 +184,8 @@ public class CellDesignerColorProteins {
 	          //FileWriter out = new FileWriter(fn+"_"+tabl.fnames[i]+".xml");
 	          //document.write(out);
 	          //out.close();
+	        }}else{
+		        createAttributeTable(null,sbmlp,null,CDFileName+".gmt");
 	        }
 
 
@@ -561,9 +570,12 @@ public class CellDesignerColorProteins {
   
   public static void createAttributeTable(SimpleTable tabl,SbmlDocument sbmlp,String path, String pathhugos){
 	  try{
-		  FileWriter fw = new FileWriter(path);
+		  FileWriter fw = null;
+		  if(tabl!=null)
+			  fw = new FileWriter(path);
 		  FileWriter fwhugos = new FileWriter(pathhugos);
 		  HashMap<String,Integer> proteins = new HashMap<String,Integer>();
+		  if(tabl!=null)
 		  for(int i=0;i<tabl.rowCount;i++){
 			  String name = tabl.tab[i][0];
 			  proteins.put(name, i);
@@ -603,10 +615,11 @@ public class CellDesignerColorProteins {
 				}			  
 		  }*/
 		  
-		  
+		  if(tabl!=null){
 		  for(int i=0;i<tabl.fnames.length;i++)
 			  fw.write(tabl.fnames[i]+"\t");
 		  fw.write("\n");
+		  }
 		  for(int i=0;i<sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			  CelldesignerProteinDocument.CelldesignerProtein protein = sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			  String pname = Utils.getValue(protein.getName());
@@ -640,7 +653,8 @@ public class CellDesignerColorProteins {
 						fd = true;
 			  }
 			  if(fd){
-			  fw.write(pname+"\t");
+			  if(fw!=null)
+				  fw.write(pname+"\t");
 			  for(int j=1;j<tabl.fnames.length;j++){
 				  float value = 0f;
 				  boolean found = false;
@@ -654,12 +668,15 @@ public class CellDesignerColorProteins {
 						}
 					}
 				  }
+				  if(fw!=null){
 				  if(found)
 					  fw.write(value+"\t");
 				  else
 					  fw.write("N/A\t");
+				  }
 			  }
-			  fw.write("\n");
+			  if(fw!=null)
+				  fw.write("\n");
 			  }
 		  }
 		  
@@ -691,7 +708,8 @@ public class CellDesignerColorProteins {
 						fd = true;
 			  }
 			  if(fd){
-			  fw.write(pname+"\t");
+			  if(fw!=null)	  
+			      fw.write(pname+"\t");
 
 			  fwhugos.write(pname+"\tna\t");
 			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
@@ -711,16 +729,19 @@ public class CellDesignerColorProteins {
 						}
 					}
 				  }
+				  if(fw!=null){
 				  if(found)
 					  fw.write(value+"\t");
 				  else
 					  fw.write("N/A\t");
+				  }
 			  }
-			  fw.write("\n");
+			  if(fw!=null)
+				  fw.write("\n");
 			  }
 		  }		  
-		  
-		  fw.close();
+		  if(fw!=null)
+			  fw.close();
 		  fwhugos.close();
 	  }catch(Exception e){
 		  e.printStackTrace();

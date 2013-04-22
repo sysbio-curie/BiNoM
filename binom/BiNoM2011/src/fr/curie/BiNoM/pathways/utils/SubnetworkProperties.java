@@ -72,20 +72,24 @@ public class SubnetworkProperties {
 			
 			SubnetworkProperties SP = new SubnetworkProperties();
 			//SP.path = "c:/datas/HPRD9/";
-			SP.path = "C:/Datas/SyntheticInteractions/Constanzo2010/";
+			SP.path = "c:/datas/biogrid/";
+			//SP.path = "C:/Datas/SyntheticInteractions/Constanzo2010/";
 			//SP.path = "C:/Datas/SERVIER/PPIanalysis/";
 			//SP.loadNetwork(SP.path+"hprd_pc_ppi.xgmml");
 			//XGMML.saveToXGMML(SP.network, SP.path+"hprd_pc_ppi1.xgmml");
 			//SP.loadNetwork(SP.path+"hprd9.xgmml");
 			//SP.loadNetwork(SP.path+"hprd8_.xgmml");
 			//SP.loadNetwork(SP.path+"hprd9.xgmml");
-			SP.loadNetwork(SP.path+"sgadata_costanzo2009_stringentCutoff_101120.txt.xgmml");
+			//SP.loadNetwork(SP.path+"sgadata_costanzo2009_stringentCutoff_101120.txt.xgmml");
+			SP.loadNetwork(SP.path+"biogrid.xgmml");
+			System.out.println("Loaded");
 			//SP.loadNetwork(SP.path+"prolif_hits.xgmml");
 			//SP.loadNetwork(SP.path+"hprd.xgmml");
 			//SP.loadNetwork(SP.path+"test2.xgmml");
-			Utils.CorrectCytoscapeEdgeIds(SP.network);
+			//Utils.CorrectCytoscapeEdgeIds(SP.network);
+			removeSelfInteractions(SP.network);
 			System.out.println("Loaded network: "+SP.network.Nodes.size()+" nodes, "+SP.network.Edges.size()+" edges");
-			
+			XGMML.saveToXGMML(SP.network, SP.path+"biogrid_noselfinteractions.xgmml");
 			calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, true);			
 			System.exit(0);
 			

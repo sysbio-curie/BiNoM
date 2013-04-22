@@ -963,7 +963,7 @@ while ((i = in.read()) >= 0) {
     }
 in.close(); }
 }
-catch(Exception e){ sb.append(e.getMessage()); }
+catch(Exception e){ System.out.println("Problem with connection to "+link); sb.append(e.getMessage()); }
 
 return sb.toString();
 }
@@ -1040,7 +1040,7 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	System.out.println("Accessing genenames.org.... for "+name);
 	
 	Vector<String> ids = new Vector<String>();
-	String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"\\&submit=Submit";
+	String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"&submit=Submit";
 	String html1 = downloadURL(query1);
 	
 	if(html1.contains("refused"))

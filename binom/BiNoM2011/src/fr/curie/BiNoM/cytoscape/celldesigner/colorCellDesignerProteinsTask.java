@@ -50,9 +50,14 @@ public class colorCellDesignerProteinsTask implements Task {
     public void run() {
     	try {
     		File fc = new File(CellDesignerFileName);
-    		File ft = new File(FeatureTableFileName);
-    		if(fc.exists()&&ft.exists()){
-    			CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),ft.getAbsolutePath());
+    		File ft = null;
+    		if(FeatureTableFileName!=null)
+    			ft = new File(FeatureTableFileName);
+    		if(fc.exists()){
+    			if(ft!=null)
+    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),ft.getAbsolutePath());
+    			else
+    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),null);
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
         	    taskMonitor.setPercentCompleted(99);

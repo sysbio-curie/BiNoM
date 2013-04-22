@@ -21,7 +21,7 @@ public class ModifyCellDesignerNotes {
 	//public boolean insertTemplateForSpecies = true;
 	public boolean formatAnnotation	= true;
 	
-	public boolean guessIdentifiers = false;
+	public boolean guessIdentifiers = true;
 	public boolean removeEmptySections = true;
 	public boolean removeInvalidTags = true;
 	public boolean moveNonannotatedTextToReferenceSection = true;
@@ -70,11 +70,11 @@ public class ModifyCellDesignerNotes {
 		//System.exit(0);
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
-		String nameCD = "C:/Datas/NaviCell/maps/mphase_src/M-Phase2";
+		String nameCD = "C:/Datas/Binomtest/annotation/EMT15042013-1";
 		//String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
 	    //String nameCD = "C:/Datas/NaviCell/maps/dnarepair_src/master";
 		//String nameCD = "c:/datas/binomtest/test_master";
-		String nameNotes = "c:/datas/basal/comm_temp.txt";
+		String nameNotes = "C:/Datas/Binomtest/annotation/comm_temp.txt";
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		String s = mn.exportCellDesignerNotes();
 		System.out.println(s);

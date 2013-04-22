@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -23,9 +24,10 @@ public class GeneticInteractionNetworks {
 		try{
 			
 			//makeYeastORFNameTable();
-			makeHumanizedBioGrid();
+			//makeHumanizedBioGrid();
 			//makeSLNetworkFromYeastScreen();
 			//extractBioGridMammalianNetwork();
+			analyzeGeneticInteractionBioGrid();
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -227,6 +229,58 @@ public class GeneticInteractionNetworks {
 		//	System.out.println(s);
 		//}
 
+	}
+	
+	public static void analyzeGeneticInteractionBioGrid() throws Exception{
+		SimpleTable tab = new SimpleTable();
+		tab.LoadFromSimpleDatFile("c:/datas/biogrid/BIOGRID-ALL-3.2.97.tab.txt", true, "\t");
+		HashMap<String, Vector<Integer>> ints = new HashMap<String, Vector<Integer>>(); 
+		for(int i=0;i<tab.rowCount;i++){
+			String geneA = tab.stringTable[i][tab.fieldNumByName("OFFICIAL_SYMBOL_A")];
+			String geneB = tab.stringTable[i][tab.fieldNumByName("OFFICIAL_SYMBOL_B")];
+			String pubmed = tab.stringTable[i][tab.fieldNumByName("PUBMED_ID")];
+			String organism = tab.stringTable[i][tab.fieldNumByName("ORGANISM_A_ID")];
+			if(organism.equals("10090")||organism.equals("9606")){
+			String key = "";
+			if(geneA.compareTo(geneB)>0)
+				key = geneA+"|"+geneB+"|"+pubmed;
+			else
+				key = geneB+"|"+geneA+"|"+pubmed;
+			Vector<Integer> lines = new Vector<Integer>();
+			if(ints.get(key)==null){
+				lines = new Vector<Integer>();
+				ints.put(key, lines);
+			}else{
+				lines = ints.get(key);
+			}
+			lines.add(i);
+			}
+		}
+		Set<String> keys = ints.keySet();
+		for(String key: keys){
+			Vector<Integer> lines = ints.get(key);
+			boolean phenotypicEnhancement = false;
+			boolean phenotypicSuppression = false;			
+			for(int i=0;i<lines.size();i++){
+				int k = lines.get(i);
+				String syst = tab.stringTable[k][tab.fieldNumByName("EXPERIMENTAL_SYSTEM")];
+				if(syst.equals("Phenotypic Enhancement")) phenotypicEnhancement = true;
+				if(syst.equals("Phenotypic Suppression")) phenotypicSuppression = true;				
+			}
+			if(phenotypicEnhancement&&phenotypicSuppression){
+				for(int i=0;i<lines.size();i++){
+					int k = lines.get(i);
+					String syst = tab.stringTable[k][tab.fieldNumByName("EXPERIMENTAL_SYSTEM")];
+					String geneA = tab.stringTable[k][tab.fieldNumByName("OFFICIAL_SYMBOL_A")];
+					String geneB = tab.stringTable[k][tab.fieldNumByName("OFFICIAL_SYMBOL_B")];
+					String source = tab.stringTable[k][tab.fieldNumByName("SOURCE")];
+					String pubmed = tab.stringTable[k][tab.fieldNumByName("PUBMED_ID")];
+					System.out.println(geneA+"\t"+geneB+"\t"+syst+"\t"+source+"\t"+pubmed);
+				}
+				System.out.println("-------------------------------------------");
+			}
+			
+		}
 	}
 	
 	

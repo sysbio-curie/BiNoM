@@ -99,6 +99,7 @@ import fr.curie.BiNoM.cytoscape.netwop.NetworksUpdate;
 import fr.curie.BiNoM.cytoscape.sbml.SBMLExportToFile;
 import fr.curie.BiNoM.cytoscape.utils.AboutBox;
 import fr.curie.BiNoM.cytoscape.utils.CopySelectedNodesAndEdges;
+import fr.curie.BiNoM.cytoscape.utils.CreateSetIntersectionGraph;
 import fr.curie.BiNoM.cytoscape.utils.ListAllNodes;
 import fr.curie.BiNoM.cytoscape.utils.ListAllReactions;
 import fr.curie.BiNoM.cytoscape.utils.MergeNetworksAndFilter;
@@ -595,6 +596,12 @@ public class BiNoMPlugin extends CytoscapePlugin {
 				pasteNodesAndEdgesMenuItem.setEnabled(!NodesAndEdgesClipboard.getInstance().isEmpty());
 			}
 		});
+		
+		binomUtilsMenu.addSeparator();
+		menuItem = new JMenuItem("Create set intersection graph in a folder");
+		menuItem.addActionListener(new CreateSetIntersectionGraph());
+		binomUtilsMenu.add(menuItem);
+		
 		
 		
 		menuItem = new JMenuItem("About BiNoM...");

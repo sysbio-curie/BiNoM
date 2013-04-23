@@ -286,14 +286,17 @@ public class MergingMapsProcessor {
 					String type = cmd.getType();
 					if (type.contains("BOOLEAN_LOGIC")) {
 						String str = Utils.getValue(cmd.getEditPoints());
-						String[] coord = str.split(",");
-						float x = Float.parseFloat(coord[0]);
-						float y = Float.parseFloat(coord[1]);
-						x += deltaX;
-						y += deltaY;
-						str = x+","+y;
-						Utils.setValue(cmd.getEditPoints(),str);
-						//System.out.println(">>>"+ cmd.getEditPoints());
+						String[] pair = str.split("\\s+");
+						for (int n=0;n<pair.length;n++) {
+							String[] coord = pair[n].split(",");
+							float x = Float.parseFloat(coord[0]);
+							float y = Float.parseFloat(coord[1]);
+							x += deltaX;
+							y += deltaY;
+							str = x+","+y;
+							Utils.setValue(cmd.getEditPoints(),str);
+							//System.out.println(">>>"+ cmd.getEditPoints());
+						}
 					}
 				}
 			}
@@ -305,14 +308,17 @@ public class MergingMapsProcessor {
 					String type = cmd.getType();
 					if (type.contains("BOOLEAN_LOGIC")) {
 						String str = Utils.getValue(cmd.getEditPoints());
-						String[] coord = str.split(",");
-						float x = Float.parseFloat(coord[0]);
-						float y = Float.parseFloat(coord[1]);
-						x += deltaX;
-						y += deltaY;
-						str = x+","+y;
-						Utils.setValue(cmd.getEditPoints(),str);
-						//System.out.println(cmd.getEditPoints());
+						String[] pair = str.split("\\s+");
+						for (int n=0;n<pair.length;n++) {
+							String[] coord = pair[n].split(",");
+							float x = Float.parseFloat(coord[0]);
+							float y = Float.parseFloat(coord[1]);
+							x += deltaX;
+							y += deltaY;
+							str = x+","+y;
+							Utils.setValue(cmd.getEditPoints(),str);
+							//System.out.println(cmd.getEditPoints());
+						}
 					}
 				}
 			}
@@ -583,6 +589,7 @@ public class MergingMapsProcessor {
 	 */
 	private void mergeElements() {
 
+		System.out.println("test");
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		XmlString xs = XmlString.Factory.newInstance();
 

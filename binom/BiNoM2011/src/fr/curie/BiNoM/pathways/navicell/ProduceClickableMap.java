@@ -358,6 +358,11 @@ public class ProduceClickableMap
 			e.printStackTrace();
 			System.exit(1);
 		}
+		catch (IOException e) {
+			Utils.eclipseErrorln(e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
+		}
 		System.out.println("Done");
 	}
 	static final String data_directory = "/data";
@@ -374,7 +379,7 @@ public class ProduceClickableMap
 		final String wordpress_user,
 		final String wordpress_blogname,
 		final File root
-	) throws NaviCellException
+	 ) throws NaviCellException, IOException
 	{
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
@@ -390,10 +395,12 @@ public class ProduceClickableMap
 		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
 		
 
+		final File json_map_file = new File(destination_common, json_map_list);
+		final PrintStream outjson = new PrintStream(json_map_file);
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, modules);
+			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, outjson, modules);
 		}
 		catch (IOException e)
 		{
@@ -414,7 +421,7 @@ public class ProduceClickableMap
 			if (!map_name.equals(master_map_name))
 				try
 				{
-					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, modules);
+					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, outjson, modules);
 				}
 				catch (IOException e)
 				{
@@ -422,6 +429,7 @@ public class ProduceClickableMap
 				}
 		}
 		
+		outjson.close();
 		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
 		
 		wp.remove_old_posts();
@@ -690,8 +698,8 @@ public class ProduceClickableMap
 	}
 	
 	private static final String right_panel_list = "right_panel.xml";
-	private static final String json_map_list = "map.json";
-	
+	private static final String json_map_list = "json_maps.js";
+
 	private static boolean empty_tiles(final File tiles_directory)
 	{
 		final File[] directories = tiles_directory.listFiles();
@@ -716,7 +724,7 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules) throws IOException
+					  BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules) throws IOException
 	{
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
@@ -727,12 +735,12 @@ public class ProduceClickableMap
 
 		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
-		clMap.generatePages(wp, new File(this_map_directory, json_map_list), new File(this_map_directory, right_panel_list), scales, master.master_format);
+		clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-		BlogCreator wp, boolean make_tiles, Map<String, ModuleInfo> modules
+							 BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules
 	)
 		throws IOException, NaviCellException
 	{
@@ -745,7 +753,7 @@ public class ProduceClickableMap
 		clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
-		clMap.right_panel = clMap.generatePages(wp, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
+		clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
 		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
 		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
@@ -1513,7 +1521,7 @@ public class ProduceClickableMap
 			outjson.print("\"y\" : " + scales.getY(place.y));
 			outjson.print("}");
 		}
-		outjson.println("]");
+		outjson.print("]");
 	}
 	
 	private static class Modif
@@ -1529,13 +1537,13 @@ public class ProduceClickableMap
 
 	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
 	{
-		outjson.println("    \"id\" : \"" + ent.getId() + "\",");
-		outjson.println("    \"name\" : \"" + ent.getName() + "\",");
-		outjson.println("    \"hugo\" : \"" + ent.getHugoName() + "\",");
-		outjson.println("    \"postid\" : \"" + ent.getPostId() + "\",");
+		outjson.print("\"id\" : \"" + ent.getId() + "\",");
+		outjson.print("\"name\" : \"" + ent.getName() + "\",");
+		outjson.print("\"hugo\" : \"" + ent.getHugoName() + "\",");
+		outjson.print("\"postid\" : \"" + ent.getPostId() + "\",");
 		if (ent.getComment() != null) {
-			//			outjson.println("    \"comment\" : \"" + ent.getComment().replaceAll("\\", "\\\\").replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
-			outjson.println("    \"comment\" : \"" + ent.getComment().replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
+			//			outjson.print("    \"comment\" : \"" + ent.getComment().replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
+			outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")) + "\",");
 		}
 
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
@@ -1549,39 +1557,38 @@ public class ProduceClickableMap
 		}
 
 		boolean first = true;
-		outjson.println("    \"modifs\" : [");
+		outjson.print("\"modifs\" : [");
 		for (final Modif q : modifs)
 		{
 			final Modification m = q.m;
 			if (first) {
 				first = false;
 			} else {
-				outjson.println(",");
+				outjson.print(",");
 			}
-			outjson.println("      {");
-			outjson.println("        \"name\" : \"" + m.getName() + "\",");
-			outjson.println("        \"id\" : \"" + m.getId() + "\",");
+			outjson.print("{");
+			outjson.print("\"name\" : \"" + m.getName() + "\",");
+			outjson.print("\"id\" : \"" + m.getId() + "\",");
 			if (q.associated)
 			{
-				outjson.println("        \"associated\" : true");
+				outjson.print("\"associated\" : true");
 			}
 			else
 			{
 				generate_json_entity_modification(outjson, m, speciesAliases, placeMap, scales);
 			}
-			outjson.print("      }");
+			outjson.print("}");
 		}
-		outjson.println("\n    ]");
+		outjson.print("]");
 	}
 
-	static private void generate_json_map(final File outjson_file, final Map<String, EntityBase> entityIDToEntityMap,
+	static private void generate_json_map(final String map, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
 		ImagesInfo scales) throws UnsupportedEncodingException, FileNotFoundException {
 		final String encoding = "UTF-8";
-		final PrintStream outjson = new PrintStream(outjson_file);
-		outjson.println("{");
+		outjson.print("var " + map + "_map = JSON.parse('[");
 		final List<EntityBase> entities = new ArrayList<EntityBase>();
 		boolean first = true;
 		for (final String[] s : class_name_to_human_name)
@@ -1591,37 +1598,46 @@ public class ProduceClickableMap
 				break;
 			}
 
+			if (first) {
+				first = false;
+			} else {
+				outjson.print(",");
+			}
+
+			outjson.print("{");
 			for (final EntityBase ent : entityIDToEntityMap.values()) {
 				if (clsname.equals(ent.getCls()) && !ent.isBad()) {
 					entities.add(ent);
 				}
 			}
 
-			if (first) {
-				first = false;
-			} else {
-				outjson.println(",");
-			}
+			outjson.print("\"class\" : \"" + clsname + "\",");
+			outjson.print("\"entity_size\" : \"" + entities.size() + "\",");
 
-			outjson.println("  \"class\" : \"" + clsname + "\",");
-			outjson.println("  \"entity_size\" : \"" + entities.size() + "\",");
-
-			outjson.println("  \"entities\" : [");
+			outjson.print("\"entities\" : [");
 			boolean first2 = true;
 			for (final EntityBase ent : entities) {
 				if (first2) {
 					first2 = false;
 				} else {
-					outjson.println(",");
+					outjson.print(",");
 				}
-				outjson.println("    {");
+				outjson.print("{");
 				generate_json_entity(speciesAliases, placeMap, format, scales, outjson, ent);
-				outjson.print("    }");
+				outjson.print("}");
 			}
-			outjson.println("\n  ]");
+			outjson.print("]");
+			outjson.print("}");
 		}
-		outjson.println("}");
-		outjson.close();
+		outjson.println("]');\n");
+		/*
+		if (true) {
+			outjson.println("\nconsole.log('REALLY read " + map + " json map ?');");
+			outjson.println("for (item in " + map + "_map) {");
+			outjson.println("console.log(" + map + "_map[item]['class']);");
+			outjson.println("}");
+		}
+		*/
 	}
 
 	static private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
@@ -1859,7 +1875,7 @@ public class ProduceClickableMap
 	
 	private FormatProteinNotes master_format;
 	
-	private void generatePages(final BlogCreator wp, File json_map_file, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
+	private void generatePages(final String map, final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		final Model model = cd.getSbml().getModel();
 		
@@ -1867,7 +1883,8 @@ public class ProduceClickableMap
 			ent.setPost(wp);
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
-		generate_json_map(json_map_file, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		System.out.println("_generate_ module " + map + " json ?");
+		generate_json_map(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
 		{
@@ -1908,7 +1925,7 @@ public class ProduceClickableMap
 
 	}
 
-	private ItemCloser generatePages(final BlogCreator wp, File rpanel_index, ImagesInfo scales,
+	private ItemCloser generatePages(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales,
 		final FormatProteinNotes format,
 		Map<String, ModuleInfo> modules_set
 	)
@@ -1934,6 +1951,18 @@ public class ProduceClickableMap
 
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
+		System.out.println("_generate_ master json ?");
+		generate_json_map("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+
+		// create master file (must move to a method)
+		/*final File master_map = new File("/tmp/alpha.js"); // for now
+		final PrintStream outmaster_map = new PrintStream(master_map);
+		for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
+			final String module_map = k.getKey();
+			outmaster_map.println("var xx = " + module_map + "_map;");
+		}
+		outmaster_map.close();
+		*/
 		final List<String> modules = new ArrayList<String>();
 		if(model.getListOfReactions()!=null)
 		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
@@ -4231,6 +4260,7 @@ public class ProduceClickableMap
 		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
 		
 		out.println("<script src='../../../lib/splitter-1.5.1-patched.js' type='text/javascript'></script>");
+		out.println("<script src=\"" + common_directory_url + "/" + json_map_list + "\" type='text/javascript'></script>");
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 

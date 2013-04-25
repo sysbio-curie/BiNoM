@@ -113,9 +113,7 @@ import fr.curie.BiNoM.cytoscape.utils.ShowClipboardContents;
 
 public class BiNoMPlugin extends CytoscapePlugin {
 
-	
 	static int time_count = 1;
-	static boolean ocsanaShortMenuOn = false;
 	JMenuItem exportBioPAXMenuItem;
 	JMenuItem exportCellDesignerMenuItem;
 	JMenuItem exportSBMLMenuItem;
@@ -161,16 +159,8 @@ public class BiNoMPlugin extends CytoscapePlugin {
 
 		initVisualStyles();
 
-		if (ocsanaShortMenuOn == true) {
-			JMenuItem menuItem = new JMenuItem("OCSANA");
-			menuItem.addActionListener(new OptimalCutSetAnalyzer());
-			cyMenus.getOperationsMenu().add(menuItem);
-		}
-		
-		if (ocsanaShortMenuOn == false) {
-		
 		JMenu plugInMenu = cyMenus.getOperationsMenu();
-		JMenu binomMainMenu = new JMenu("BiNoM 2.2");
+		JMenu binomMainMenu = new JMenu("BiNoM 2.3");
 		plugInMenu.add(binomMainMenu);
 		
 		/*
@@ -602,13 +592,9 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem.addActionListener(new CreateSetIntersectionGraph());
 		binomUtilsMenu.add(menuItem);
 		
-		
-		
 		menuItem = new JMenuItem("About BiNoM...");
 		menuItem.addActionListener(new AboutBox());
 		binomMainMenu.add(menuItem);
-		
-		}// end test ocsana menu
 
 	}
 

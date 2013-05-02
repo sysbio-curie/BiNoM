@@ -45,12 +45,31 @@ public class testCellDesigner {
 			
 			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/M-Phase2.xml");
 			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/test_infl.xml");
-			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/louvard/Notch_p53_29_deg.xml");
+			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/louvard/Notch_p53_29_deg.xml");
 			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/TestPos.xml");
 			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/TestPos.xgmml"));
 			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/M-Phase2.xgmml"));
 			//GraphDocument gr = (XGMML.loadFromXMGML("c:/datas/binomtest/test.xgmml"));
 			//modifyPositionOfSpecies(cd4,gr);
+			Utils.printUsedMemory();
+			Date date = new Date();
+			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/mapmerging/merged18maps.xml");
+			Utils.printUsedMemory();
+			System.out.println(((new Date()).getTime()-date.getTime())/1000f+" secs");
+			int pn = cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();
+			int gn = cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();
+			int rn = cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();
+			int arn = cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();
+			int sn = cd4.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();
+			int ren = cd4.getSbml().getModel().getListOfReactions().sizeOfReactionArray();
+			
+			System.out.println(pn+" proteins, "+gn+" genes, "+rn+" RNAs, "+arn+" antisense RNAs, "+sn+" species, "+ren+" reactions");
+			for(int i=0;i<cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
+				String note = Utils.getValue(cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i).getCelldesignerNotes());
+			}
+			Utils.printUsedMemory();
+			System.exit(0);
+			
 			
 			addHypotheticalInfluences(cd4);
 			

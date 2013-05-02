@@ -1114,4 +1114,39 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	return ids;
 }
 
+public static String convertHGNC2HUGOthrowInternet(String hgnc) throws Exception{
+	String hugo = null;
+	String query1 = "http://www.genenames.org/data/hgnc_data.php?hgnc_id="+hgnc;
+	String html1 = downloadURL(query1);
+	LineNumberReader lr = new LineNumberReader(new StringReader(html1));
+	String s = null;
+	while((s=lr.readLine())!=null){
+		s = s.trim();
+		if(s.contains("Approved Symbol")){
+			//System.out.println(s);
+			//s = lr.readLine();
+			//System.out.println(s);
+			s = lr.readLine();
+			//System.out.println(s);
+			s = Utils.replaceString(s, "<td class=\"symbol_data-data-app_sym\"><strong>", "");
+			s = Utils.replaceString(s, "</strong></td>", "");
+			hugo = s.trim();
+			//System.out.println(hugo);
+		}
+	}
+	return hugo;
+}
+
+public static boolean isIntegerNumber(String s){
+	boolean isnumber = true;
+	for(int i=0;i<s.length();i++){
+		char c = s.charAt(i);
+		if((c!='0')&&(c!='1')&&(c!='2')&&(c!='3')&&(c!='4')&&(c!='5')&&(c!='6')&&(c!='7')&&(c!='8')&&(c!='9')&&(c!='.')){
+			isnumber = false;
+			break;
+		}
+	}
+	return isnumber;
+}
+
 }

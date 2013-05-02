@@ -14,12 +14,26 @@ public class testStructureAnalysis {
   public static void main(String[] args) {
     try{
 
-      //String prefix = "c:/datas/binomtest/text/";
-    	String prefix = "c:/datas/simon/";
-      String path = prefix+"toy3";
+      String prefix = "c:/datas/binomtest/";
+    	//String prefix = "c:/datas/simon/";
+      String path = prefix+"test";
 
       GraphDocument gr = XGMML.loadFromXMGML(path+".xgmml");
       Graph graph = XGMML.convertXGMMLToGraph(gr);
+      System.out.println(gr.getGraph().getNodeArray().length+"/"+gr.getGraph().getEdgeArray().length+" -> "+graph.Nodes.size()+"/"+graph.Edges.size());
+      Vector<GraphDocument> vg = StructureAnalysisUtils.getStronglyConnectedComponents(gr);
+      Vector<Vector<GraphDocument>> vv = new Vector<Vector<GraphDocument>>(); 
+      for(int i=0;i<vg.size();i++){
+    	  Vector<GraphDocument> vgi = StructureAnalysisUtils.getStronglyConnectedComponents(vg.get(i));
+          vv.add(vgi);
+      }
+      for(int i=0;i<vv.size();i++){
+    	  Vector<GraphDocument> vgg = vv.get(i);
+    	  System.out.println(vg.get(i).getGraph().getNodeArray().length+" nodes");
+    	  for(int j=0;j<vgg.size();j++)
+    		  System.out.println("\t"+vgg.get(j).getGraph().getNodeArray().length+" nodes");
+      }
+      System.exit(0);
       
       
       

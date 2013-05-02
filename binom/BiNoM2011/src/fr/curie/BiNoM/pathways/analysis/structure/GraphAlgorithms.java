@@ -67,6 +67,7 @@ public class GraphAlgorithms {
 		Vector<Graph> scc = new Vector<Graph>();
 	
 		Graph grcopy = graph.makeCopy();
+		//System.out.println(graph.Nodes.size()+"/"+graph.Edges.size()+" "+grcopy.Nodes.size()+"/"+grcopy.Edges.size());
 		int k=1;
 		/*Node n = (Node)grcopy.Nodes.get(4);
 		System.out.println("\nStarting from "+n.Id);
@@ -85,14 +86,15 @@ public class GraphAlgorithms {
 			Vector<Graph> extractedScc = RunTarjan(grcopy,n);
 			for(int i=0;i<extractedScc.size();i++){
 				Graph gr = extractedScc.get(i);
-				gr.addConnections(graph);
 				if(gr.Nodes.size()>=minimumComponentSize){
+					gr.addConnections(graph);
 					gr.name = "Scc"+(k++);
 					scc.add(gr);
 				}
 				grcopy.removeNodes(gr);
 				grcopy.removeObsoleteEdges();
 			}
+			
 		}
 		System.out.println("");
 		return scc;
@@ -120,13 +122,10 @@ public class GraphAlgorithms {
 			Node vs = ((Edge)v.outcomingEdges.get(i)).Node2;
 			if(unvisited.contains(vs)){
 				Tarjan(graph,vs,unvisited,stack,max_dfs,dfsMap,lowlinkMap,scc);
-			}
-			//if(stack.search(vs)!=-1)
 				lowlinkMap.put(v, Math.min(lowlinkMap.get(v), lowlinkMap.get(vs)));
-			
-			//}else if(stack.search(vs)!=-1){
-			//	lowlinkMap.put(v, Math.min(lowlinkMap.get(v), lowlinkMap.get(vs)));
-			//}
+			}else if(stack.search(vs)!=-1){
+				lowlinkMap.put(v, Math.min(lowlinkMap.get(v), dfsMap.get(vs)));
+			}
 		}
 		if(lowlinkMap.get(v).equals(dfsMap.get(v))){
 			System.out.print("\nSZK : ");

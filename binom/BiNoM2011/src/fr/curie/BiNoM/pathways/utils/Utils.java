@@ -26,8 +26,11 @@
 package fr.curie.BiNoM.pathways.utils;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
@@ -1005,6 +1008,28 @@ public static class Transparency {
 	    }
 	}
 
+public static BufferedImage getScaledImageSlow(BufferedImage image, int width, int height) throws IOException {
+	 Image scaledImage = image.getScaledInstance((int)width, (int)height, Image.SCALE_SMOOTH);
+     BufferedImage imageBuff = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_RGB);
+     Graphics g = imageBuff.createGraphics();
+     g.drawImage(scaledImage, 0, 0, new Color(0,0,0), null);
+     g.dispose();
+     return imageBuff;
+}
+
+public static BufferedImage getScaledImage(BufferedImage image, int width, int height) throws IOException {
+    int imageWidth  = image.getWidth();
+    int imageHeight = image.getHeight();
+
+    double scaleX = (double)width/imageWidth;
+    double scaleY = (double)height/imageHeight;
+    AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
+    AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_BICUBIC);
+
+    return bilinearScaleOp.filter(
+        image,
+        new BufferedImage(width, height, image.getType()));
+}
 
 public static String cutFirstLastNonVisibleSymbols(String s){
 	StringBuffer res = new StringBuffer(s);

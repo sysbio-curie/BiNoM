@@ -142,11 +142,11 @@ public class MergingMapsProcessor {
 	 * Add map data (filename, deltaX, deltaY) to the internal list of maps to be merged.
 	 * 
 	 * @param fileName
-	 * @param deltaX
-	 * @param deltaY
+	 * @param deltaX upper-left X coordinate of the map on the merged map.
+	 * @param deltaY upper-left Y coordinate of the map on the merged map.
 	 */
-	public void addMap(String fileName, int deltaX, int deltaY) {
-		mapList.add(new MapData(fileName,deltaX,deltaY));
+	public void addMap(String fileName, int coordX, int coordY) {
+		mapList.add(new MapData(fileName,coordX,coordY));
 	}
 	
 	/**
@@ -169,6 +169,8 @@ public class MergingMapsProcessor {
 	public void mergeAll() {
 		int nbFiles = mapList.size();
 		
+		// load file 1
+		System.out.println("loading file "+mapList.get(0).fileName+"...");
 		this.cd1 = CellDesigner.loadCellDesigner(mapList.get(0).fileName);
 		
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(sizeX);
@@ -227,6 +229,7 @@ public class MergingMapsProcessor {
 		 * new way: add prefix to second file
 		 * use an internal counter to generate a new prefix each time a new file is loaded
 		 */
+		System.out.println("loading file "+fileName+"...");
 		String text = Utils.loadString(fileName);
 		this.counter++;
 		String prefix = "cd" + counter + "_";
@@ -596,7 +599,6 @@ public class MergingMapsProcessor {
 	 */
 	private void mergeElements() {
 
-		System.out.println("test");
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		XmlString xs = XmlString.Factory.newInstance();
 
@@ -1378,64 +1380,65 @@ public class MergingMapsProcessor {
 		}
 		return true;
 	}
-	
+
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){
-		
-		  try{
-		
-		
-			  int gWidth = Integer.parseInt(sizeX);
-			  int gHeight = Integer.parseInt(sizeY);
-			  BufferedImage mergedImage = new BufferedImage(gWidth, gHeight, BufferedImage.TYPE_INT_RGB);
-			  Graphics2D g = mergedImage.createGraphics();
-			  g.setBackground(new Color(1f,1f,1f));
-			  g.clearRect(0,0,mergedImage.getWidth(),mergedImage.getHeight());
-			
-			  
-			  for(int j=0;j<mapList.size();j++){
-				  String fn = mapList.get(j).fileName;
-				  fn = fn.substring(0,fn.length()-4);
-				  fn = fn+"-"+zoomLevel+".png";
-				  File f = new File(fn);
-				  if(f.exists()){
-					  BufferedImage map = ImageIO.read(new File(fn));
-					  Image imap = Utils.Transparency.makeColorTransparent(map, new Color(1f, 1f, 1f));
-					  int x = mapList.get(j).deltaX;
-					  int y = mapList.get(j).deltaY;
-					  int width = map.getWidth();
-					  int height = map.getHeight();
-					  /*if(x+width>gWidth)
-						  width = gWidth-x-1;
-					  if(y+height>gHeight)
-						  height = gHeight-y-1;*/
-					  //boolean b = g.drawImage(map, x, y, x+10, y+10, null);
-					  boolean b = g.drawImage(imap, x, y, null);
-					  //System.out.println(fn+"\tSuccess="+b);
-
-					  //mergedImage = ImageIO.read(new File(outputFileName_prefix+"-"+zoomLevel+".png"));
-					  					  
+				
+				  try{
+				
+					  int gWidth = Integer.parseInt(sizeX);
+					  int gHeight = Integer.parseInt(sizeY);
+					  BufferedImage mergedImage = new BufferedImage(gWidth, gHeight, BufferedImage.TYPE_INT_RGB);
+					  Graphics2D g = mergedImage.createGraphics();
+					  g.setBackground(new Color(1f,1f,1f));
+					  g.clearRect(0,0,mergedImage.getWidth(),mergedImage.getHeight());
+					
 					  
-				  }else{
-					  System.out.println("ERROR: "+fn+" image is not found!!!");
+					  for(int j=0;j<mapList.size();j++){
+						  String fn = mapList.get(j).fileName;
+						  fn = fn.substring(0,fn.length()-4);
+						  fn = fn+"-"+zoomLevel+".png";
+						  File f = new File(fn);
+						  if(f.exists()){
+							  BufferedImage map = ImageIO.read(new File(fn));
+							  Image imap = Utils.Transparency.makeColorTransparent(map, new Color(1f, 1f, 1f));
+							  int x = mapList.get(j).deltaX;
+							  int y = mapList.get(j).deltaY;
+							  int width = map.getWidth();
+							  int height = map.getHeight();
+							  /*if(x+width>gWidth)
+								  width = gWidth-x-1;
+							  if(y+height>gHeight)
+								  height = gHeight-y-1;*/
+							  //boolean b = g.drawImage(map, x, y, x+10, y+10, null);
+							  boolean b = g.drawImage(imap, x, y, null);
+							  //System.out.println(fn+"\tSuccess="+b);
+		
+							  //mergedImage = ImageIO.read(new File(outputFileName_prefix+"-"+zoomLevel+".png"));
+							  					  
+							  
+						  }else{
+							  System.out.println("ERROR: "+fn+" image is not found!!!");
+						  }
+					  
+					  
+					  }
+					  
+					  g.dispose();
+					  ImageIO.write(mergedImage, "PNG", new File(outputFileName_prefix+"-"+zoomLevel+".png"));
+					  
+					  for(int i=0;i<numberOfTimesToScale;i++){
+						  gWidth/=2;
+						  gHeight/=2;
+						  BufferedImage im = Utils.getScaledImageSlow(mergedImage, gWidth, gHeight);
+						  ImageIO.write(im, "PNG", new File(outputFileName_prefix+"-"+(zoomLevel-i-1)+".png"));
+					  }
+				  
+				  }catch(Exception e){
+					  e.printStackTrace();
 				  }
-			  
-			  
-			  }
-			  
-			  g.dispose();
-			  ImageIO.write(mergedImage, "PNG", new File(outputFileName_prefix+"-"+zoomLevel+".png"));
-			  
-			  for(int i=0;i<numberOfTimesToScale;i++){
-				  gWidth/=2;
-				  gHeight/=2;
-				  BufferedImage im = Utils.getScaledImageSlow(mergedImage, gWidth, gHeight);
-				  ImageIO.write(im, "PNG", new File(outputFileName_prefix+"-"+(zoomLevel-i-1)+".png"));
-			  }
-		  
-		  }catch(Exception e){
-			  e.printStackTrace();
-		  }
+		
+			}
+		
 
-	}
-
+	
 }

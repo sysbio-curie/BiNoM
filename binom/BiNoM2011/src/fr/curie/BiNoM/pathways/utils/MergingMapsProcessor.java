@@ -199,6 +199,7 @@ public class MergingMapsProcessor {
 			mergeElements();
 		}
 		
+		formatLayers();
 		
 	}
 	
@@ -907,6 +908,25 @@ public class MergingMapsProcessor {
 		return true;
 	}
 
+	/**
+	 * modify Id and Names after merging layers. 
+	 * 
+	 * Id should be ordered integers and names should be unique for correct display and selection in CellDesigner.
+	 */
+	private void formatLayers() {
+		if (cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers() != null) {
+			for (int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray(); i++) {
+				String id = Integer.toString(i+1);
+				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).setId(id);
+				String name  = Utils.getValue(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).getName());
+				name = name + "_" + Integer.toString(i+1);
+				XmlString xs = XmlString.Factory.newInstance();
+				xs.setStringValue(name);
+				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).setName(xs);
+			}
+		}
+	}
+	
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){
 
 		try{

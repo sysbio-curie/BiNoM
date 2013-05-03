@@ -79,9 +79,9 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			
     			try{
     			if(produceBOversion)	
-    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, show_default_compartement_name, null, null, null, blog_name, destination);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, null, null, show_default_compartement_name, null, null, null, blog_name, destination);
     			else
-    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, destination);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, destination);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
             	    taskMonitor.setPercentCompleted(99);

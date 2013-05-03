@@ -446,50 +446,53 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 					}
 				);
 			};
-			$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
-			$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-		}).bind
-		(
-			"check_node.jstree",
-			function(event, data)
+			try {
+				$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
+				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+			} catch(f) {
+			}
+		/*}).bind("before.jstree", function(event, data) {
+			console.log("before.jstree: " + data.func + " " + data.args[0]);*/
+		}).bind("check_node.jstree", function(event, data) {
+			if (check_node_inhibit)
+				return;
+			check_node_inhibit = true;
+			make_new_markers_old();
+			var bounds = new google.maps.LatLngBounds();
+			var f = function(index, element)
 			{
-				if (check_node_inhibit)
-					return;
-				check_node_inhibit = true;
-				make_new_markers_old();
-				var bounds = new google.maps.LatLngBounds();
-				var f = function(index, element)
-				{
-					get_markers_for_modification(element, projection, map);
-					
-					$.each(element.markers,
-						function(key, i)
-						{
-							if (!i.getVisible())
-							{
-								extend(bounds, i);
-								make_marker_visible(i);
-							}
-						}
-					);
-					element.peers.each
+				get_markers_for_modification(element, projection, map);
+				
+				$.each(element.markers,
+				       function(key, i)
+				       {
+					       if (!i.getVisible())
+					       {
+						       extend(bounds, i);
+						       make_marker_visible(i);
+					       }
+				       }
+				      );
+				element.peers.each
 					(
 						function ()
 						{
 							jQuery.jstree._reference(jtree).check_node(this);
 						}
 					);
-				};
-				
+			};
+			
+			try {
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-//				jtree.jstree("get_checked", data.args[0], true).each(f);
-//				$(data.args[0].parentNode.parentNode).each(f);
-				if (!bounds.isEmpty())
-					map.panToBounds(bounds);
-				check_node_inhibit = false;
+			} catch(f) {
 			}
-		).bind("search.jstree", function (e, data) {
+			//				jtree.jstree("get_checked", data.args[0], true).each(f);
+			//				$(data.args[0].parentNode.parentNode).each(f);
+			if (!bounds.isEmpty())
+				map.panToBounds(bounds);
+			check_node_inhibit = false;
+		}).bind("search.jstree", function (e, data) {
 //			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");
 		});
 };
@@ -557,11 +560,12 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		var blog = maps[""];
 		if (blog && !blog.closed)
 		{
-			console.log("tell_opener yes", blog, maps);
+			//console.log("tell_opener yes", blog, maps);
 			blog.maps = maps;
 		}
-		else
-			console.log("tell_opener no", maps);
+		else {
+			//console.log("tell_opener no", maps);
+		}
 	};
 	tell_opener();
 	setup_icons();
@@ -600,7 +604,11 @@ function show_map_and_markers(map_name, ids)
 	else
 	{
 		console.log("not open is map", map, maps);
-		map = window.open("../" + map_name + "/index.html");
+		if (map_name.indexOf(".html") > 0) {
+			map = window.open(map_name);
+		} else {
+			map = window.open("../" + map_name + "/index.html");
+		}
 		map.to_open = ids;
 		map.maps = maps;
 		maps[map_name] = map;

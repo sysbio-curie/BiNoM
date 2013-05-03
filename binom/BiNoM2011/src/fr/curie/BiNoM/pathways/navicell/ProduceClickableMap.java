@@ -165,6 +165,121 @@ public class ProduceClickableMap
 	private ImagesInfo scales;
 	private ItemCloser right_panel;
 	
+	// should be moved to ProduceClickableMap.java
+	static class AtlasModuleInfo {
+		String name;
+		String url;
+		AtlasModuleInfo(String name, String url) {
+			this.name = name;
+			this.url = url;
+		}
+	}
+
+	static class AtlasMapInfo {
+		String id;
+		private String name;
+		String url;
+		Vector<AtlasModuleInfo> moduleInfo_v;
+		HashMap<String, AtlasModuleInfo> moduleInfo_map;
+		AtlasMapInfo(String id, String name, String url) {
+			this.id = id;
+			this.name = name;
+			this.url = url;
+			moduleInfo_v = new Vector<AtlasModuleInfo>();
+			moduleInfo_map = new HashMap<String, AtlasModuleInfo>();
+		}
+		void add(AtlasModuleInfo moduleInfo) {
+			moduleInfo_v.add(moduleInfo);
+			moduleInfo_map.put(moduleInfo.name, moduleInfo);
+		}
+
+		String getName() {
+			return name != null ? name : id;
+		}
+
+		AtlasModuleInfo getModuleInfo(String name) {
+			return moduleInfo_map.get(name);
+		}
+
+	}
+
+	static class AtlasInfo {
+		Vector<AtlasMapInfo> mapInfo_v;
+		HashMap<String, AtlasMapInfo> mapInfo_map;
+		AtlasInfo() {
+			mapInfo_v = new Vector<AtlasMapInfo>();
+			mapInfo_map = new HashMap<String, AtlasMapInfo>();
+		}
+		void add(AtlasMapInfo mapInfo) {
+			mapInfo_v.add(mapInfo);
+			mapInfo_map.put(mapInfo.id, mapInfo);
+		}
+
+		AtlasMapInfo getMapInfo(String name) {
+			return mapInfo_map.get(name);
+		}
+	}
+
+	static AtlasInfo parseAtlasInfo(String info) {
+		AtlasInfo atlasInfo = new AtlasInfo();
+		String[] atlas_arr = info.split("\\|");
+		for (int nn = 0; nn < atlas_arr.length; ++nn) {
+			String mapId = null;
+			String mapName = null;
+			String mapUrl = null;
+			AtlasMapInfo mapInfo = null;
+			String[] map_arr = atlas_arr[nn].split(";");
+			String moduleName = null;
+			String moduleUrl = null;
+			for (int jj = 0; jj < map_arr.length; ++jj) {
+				String[] map_item_arr = map_arr[jj].split(";");
+				for (int kk = 0; kk < map_item_arr.length; ++kk) {
+					String[] item_arr = map_item_arr[kk].split("=");
+					if (item_arr.length != 2) {
+						System.err.println("mapInfo syntax error at [" +  map_item_arr[kk] + "] (mapInfo: " + info + ")");
+						System.exit(1);
+					}
+					String key = item_arr[0];
+					String val = item_arr[1];
+					if (key.equals("map")) {
+						mapId = val;
+					} else if (key.equals("name")) {
+						mapName = val;
+					} else if (mapId != null && moduleName == null && key.equals("url")) {
+						mapUrl = val;
+					} else if (key.equals("module")) {
+						if (moduleName != null) {
+							if (mapInfo == null) {
+								atlasInfo.add(mapInfo = new AtlasMapInfo(mapId, mapName, mapUrl));
+								mapId = mapName = mapUrl = null;
+							}
+							mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl));
+							moduleName = moduleUrl = null;
+						}
+						moduleName = val;
+					} else if (moduleName != null && key.equals("url")) {
+						moduleUrl = val;
+					}
+
+					if (mapId != null && mapName != null && (mapUrl != null || jj == map_arr.length-1)) {
+						atlasInfo.add(mapInfo = new AtlasMapInfo(mapId, mapName, mapUrl));
+						mapId = mapName = mapUrl = null;
+					}
+
+					if (moduleName != null && (moduleUrl != null || jj == map_arr.length-1)) {
+						if (mapInfo == null) {
+							atlasInfo.add(mapInfo = new AtlasMapInfo(mapId, mapName, mapUrl));
+							mapId = mapName = mapUrl = null;
+						}
+						mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl));
+						moduleName = moduleUrl = null;
+					}
+				}
+			}
+		}
+		return atlasInfo;
+	}
+
 	public ProduceClickableMap(final String blog_name, File input)
 	{
 		this.blog_name = blog_name;
@@ -266,6 +381,7 @@ public class ProduceClickableMap
 		String base = null;
 		File wordpress_cfg_file = null;
 		File config = null;
+		File xref_file = null;
 		File source_directory = null;
 		File destination = null;
 		@SuppressWarnings("unused")
@@ -290,6 +406,8 @@ public class ProduceClickableMap
 				destination = f;
 			else if ((f = options.fileRequiredOption("config", "configuration file")) != null)
 				config = f;
+			else if ((f = options.fileRequiredOption("xrefs", "Xref file")) != null)
+				xref_file = f;
 			else if ((f = options.fileOption("source_directory", "directory containing cell designer files and images")) != null)
 				source_directory = f;
 			else if ((b = options.booleanOption("verbose", "verbose mode")) != null)
@@ -308,9 +426,15 @@ public class ProduceClickableMap
 		options.done();
 		
 		final Properties configuration = load_config(config);
+		final String[][] xrefs = load_xrefs(xref_file);
+		//FormatProteinNotes.make_xref_patterns(xrefs);
+
+		String info = configuration.getProperty("atlasInfo", null);
+		AtlasInfo atlasInfo = info != null ? parseAtlasInfo(info) : null;
 		
-		if (project_name == null)
+		if (project_name == null) {
 			project_name = configuration.getProperty("name", base);
+		}
 		
 		final String wordpress_server;
 		final String wordpress_passwd;
@@ -349,8 +473,8 @@ public class ProduceClickableMap
 		
 		try
 		{
-			run(base, source_directory, make_tiles, project_name, show_default_compartement_name, wordpress_server,
-				wordpress_passwd, wordpress_user, wordpress_blogname, root);
+			run(base, source_directory, make_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
+			    wordpress_passwd, wordpress_user, wordpress_blogname, root);
 		}
 		catch (NaviCellException e)
 		{
@@ -373,6 +497,8 @@ public class ProduceClickableMap
 		final File source_directory,
 		final boolean make_tiles,
 		final String project_name,
+		final AtlasInfo atlasInfo,
+		final String[][] xrefs,
 		final boolean show_default_compartement_name,
 		final String wordpress_server,
 		final String wordpress_passwd,
@@ -393,14 +519,13 @@ public class ProduceClickableMap
 
 		
 		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
-		
 
 		final File json_map_file = new File(destination_common, json_map_list);
 		final PrintStream outjson = new PrintStream(json_map_file);
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, outjson, modules);
+			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, outjson, modules, atlasInfo, xrefs);
 		}
 		catch (IOException e)
 		{
@@ -430,7 +555,7 @@ public class ProduceClickableMap
 		}
 		
 		outjson.close();
-		finish_right_panel_xml(master.right_panel, modules, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
+		finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
 		
 		wp.remove_old_posts();
 	}
@@ -592,8 +717,23 @@ public class ProduceClickableMap
 			final int width0 = image0.getWidth();
 			final int height0 = image0.getHeight();
 		
+			       
 			difference_zoom0_image0 = Math.max(get_maxscale(height0, max_height), get_maxscale(width0, max_width));
 			
+			//System.out.println("width0 " + width0 + ", height0 " + height0 + ", max_width " + max_width + ", max_height " + max_height + ", diff_zoom " + difference_zoom0_image0 + " " + get_maxscale(height0, max_height) + " " + get_maxscale(width0, max_width));
+
+			if (difference_zoom0_image0 < 0) {
+				//throw new NavicellException("image " + image_file + " is too small, minimum size is 128x128");
+				System.err.println("image at zoom level 0 " + image_file0 + " is too small, minimum size is 119x129");
+				/*
+				System.err.println("check 128x128: " + get_maxscale(128, max_width) + " " + get_maxscale(128, max_height));
+				System.err.println("check 128x132: " + get_maxscale(128, max_width) + " " + get_maxscale(132, max_height));
+				System.err.println("check 127x131: " + get_maxscale(127, max_width) + " " + get_maxscale(131, max_height));
+				System.err.println("check 119x129: " + get_maxscale(119, max_width) + " " + get_maxscale(129, max_height));
+				*/
+				System.exit(1);
+			}
+
 			width_zoom0 = width0 >> difference_zoom0_image0;
 			xshift_zoom0 = (max_width - width_zoom0) / 2 + xmargin;
 			height_zoom0 = height0 >> difference_zoom0_image0;
@@ -740,8 +880,7 @@ public class ProduceClickableMap
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-							 BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules
-	)
+							 BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs)
 		throws IOException, NaviCellException
 	{
 		final String map = master_map_name;
@@ -752,7 +891,7 @@ public class ProduceClickableMap
 
 		clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
-		clMap.master_format = new FormatProteinNotes(modules.keySet(), blog_name);
+		clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
 		clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
 		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
 		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
@@ -1141,8 +1280,10 @@ public class ProduceClickableMap
 					done += list.size();
 				}
 			}
-		assert done == model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray().length :
+		if (model.getAnnotation().getCelldesignerListOfIncludedSpecies() != null) {
+			assert done == model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray().length :
 			done + " " + model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray().length;
+		}
 	}
 
 	static private Modification makeClickMapEntity(final SbmlDocument cd, Species species, Map<String, EntityBase> entities, Map<String, Complex> complexes)
@@ -1503,7 +1644,7 @@ public class ProduceClickableMap
 	private static void generate_json_entity_modification(final PrintStream outjson, Modification m,	Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, ImagesInfo scales
 	)
 	{
-		outjson.print("        \"positions\" : [");
+		outjson.print("\"positions\" : [");
 		boolean first = true;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
 		{
@@ -1539,11 +1680,16 @@ public class ProduceClickableMap
 	{
 		outjson.print("\"id\" : \"" + ent.getId() + "\",");
 		outjson.print("\"name\" : \"" + ent.getName() + "\",");
-		outjson.print("\"hugo\" : \"" + ent.getHugoName() + "\",");
+		Vector<String> hugoNames = ent.getHugoNames();
+		int hugo_size = hugoNames.size();
+		outjson.print("\"hugo\" : [");
+		for (int nn = 0; nn < hugo_size; ++nn) {
+			outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
+		}
+		outjson.print("],");
 		outjson.print("\"postid\" : \"" + ent.getPostId() + "\",");
 		if (ent.getComment() != null) {
-			//			outjson.print("    \"comment\" : \"" + ent.getComment().replaceAll("\\\n", "\\\\n").replaceAll("\"", "\\\"") + "\",");
-			outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")) + "\",");
+			outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
 		}
 
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
@@ -1644,17 +1790,18 @@ public class ProduceClickableMap
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
-		/*final*/ BlogCreator wp,
-		/*final*/ SbmlDocument cd,
-		/*final*/ String blog_name,
+		final BlogCreator wp,
+		final SbmlDocument cd,
+		final String blog_name,
 		ImagesInfo scales
 	) throws UnsupportedEncodingException, FileNotFoundException
 	{
+		/*
 		// unused variables: cd, blog_name and wp
 		cd = null; // EV 2013-04-17
 		blog_name = null; // EV 2013-04-17
-		wp = null; // EV 2013-04-17
-		
+		*/
+
 		final String encoding = "UTF-8";
 		final PrintWriter output = new PrintWriter(output_file, encoding);
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
@@ -1747,7 +1894,7 @@ public class ProduceClickableMap
 		open_map_from_bubble(fw.append(" "), module_name);
 		if (parts.length > 1)
 		{
-			fw.append("<br>\n");
+			fw.append("<br>");
 			notes_formatter.module_bubble(fw, parts[1], wp);
 		}
 		return fw.toString();
@@ -1775,9 +1922,8 @@ public class ProduceClickableMap
 	}
 	
 	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set,
-		Model model, ImagesInfo scales, String blog_name,
-		Linker wp, FormatProteinNotes notes_formatter
-	)
+						   AtlasInfo atlasInfo,	Model model, ImagesInfo scales, String blog_name,
+						   Linker wp, FormatProteinNotes notes_formatter)
 	{
 		final PrintWriter output = right_close_entities(right);
 		
@@ -1804,42 +1950,68 @@ public class ProduceClickableMap
 			positions.put(name, null);
 		}
 	
-		final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
-		for (Entry<String, ModuleInfo> k : modules_set.entrySet())
-		{
-			if (master_map_name.equals(k.getKey()))
-				;
-			else if (!positions.containsKey(k.getKey()))
-				Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
-			else
-			{
-				double[] position = positions.get(k.getKey());
-				if (position == null)
-					Utils.eclipseErrorln("no objects in layer for " + k.getKey() + " in master map");
-				else if (k.getValue() == null)
-					Utils.eclipseErrorln("no post of module " + k.getKey());
+		if (modules_set.size() > 1) {
+			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
+			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
+				if (master_map_name.equals(k.getKey()))
+					;
+				else if (!positions.containsKey(k.getKey()))
+					Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
 				else
-				{
-					final int post_id = k.getValue().post_id;
-					ItemCloser indent = modules.add();
-					item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
-					indent.getOutput().print(" position=\"");
-					indent.getOutput().print(scales.getX(position[0]));
-					indent.getOutput().print(";");
-					indent.getOutput().print(scales.getY(position[1]));
-					indent.getOutput().println("\">");
-					content_line
-					(
-						indent.add(),
-						make_right_hand_module_entry(post_id, k.getKey()),
-						make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
-					);
-					indent.close();
-				}
+					{
+						double[] position = positions.get(k.getKey());
+						if (position == null)
+							Utils.eclipseErrorln("no objects in layer for " + k.getKey() + " in master map");
+						else if (k.getValue() == null)
+							Utils.eclipseErrorln("no post of module " + k.getKey());
+						else
+							{
+								final int post_id = k.getValue().post_id;
+								ItemCloser indent = modules.add();
+								item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
+								indent.getOutput().print(" position=\"");
+								indent.getOutput().print(scales.getX(position[0]));
+								indent.getOutput().print(";");
+								indent.getOutput().print(scales.getY(position[1]));
+								indent.getOutput().println("\">");
+								content_line
+									(
+									 indent.add(),
+									 make_right_hand_module_entry(post_id, k.getKey()),
+									 make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
+									 );
+								indent.close();
+							}
+					}
 			}
+			modules.close();
 		}
-		modules.close();
 		
+		if (atlasInfo != null) {
+			final ItemCloser maps = item_line(new ItemCloser(output), "maps", null, "Maps", null);
+			Vector<AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
+			int size = mapInfo_v.size();
+			for (int nn = 0; nn < size; ++nn) {
+				AtlasMapInfo mapInfo = mapInfo_v.get(nn);
+				ItemCloser map_item  = maps.add();
+				item_list_start(map_item, mapInfo.getName(), right_hand_tag);
+				map_item.getOutput().println(">");
+				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
+
+				int size2 = mapInfo.moduleInfo_v.size();
+				for (int jj = 0; jj < size2; ++jj) {
+					AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
+					ItemCloser module_item  = map_item.add();
+					item_list_start(module_item, moduleInfo.name, right_hand_tag);
+					module_item.getOutput().println(">");
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
+
+					module_item.close();
+				}
+				map_item.close();
+			}
+			maps.close();
+		}
 		right_close(output);
 	}
 
@@ -1883,18 +2055,20 @@ public class ProduceClickableMap
 			ent.setPost(wp);
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
-		System.out.println("_generate_ module " + map + " json ?");
+		//System.out.println("_generate_ module " + map + " json ?");
 		generate_json_map(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
-		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
-		{
-			final BlogCreator.Post post = wp.lookup(r.getId());
-			
-			if(post!=null){
-				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
-				reaction_line(right.add(), r, bubble, scales, post.getPostId());
-			}else{
-				System.out.println("ERROR: No post for "+r.getId());
+		if (model.getListOfReactions() != null) {
+			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+			{
+				final BlogCreator.Post post = wp.lookup(r.getId());
+				
+				if(post!=null){
+					final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+					reaction_line(right.add(), r, bubble, scales, post.getPostId());
+				}else{
+					System.out.println("ERROR: No post for "+r.getId());
+				}
 			}
 		}
 		
@@ -1915,8 +2089,9 @@ public class ProduceClickableMap
 		fw.append("<b>").append(parts[0]).append("</b>");
 		show_map_and_markers_from_post(fw, map_name, Collections.<String>emptyList(), map_name, wp);
 		
-		if (parts.length > 1)
-			notes_formatter.module_post(fw.append("<br>\n"), parts[1], wp);
+		if (parts.length > 1) {
+			notes_formatter.module_post(fw.append("<br>"), parts[1], wp);
+		}
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
 		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body);
@@ -1951,7 +2126,7 @@ public class ProduceClickableMap
 
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
-		System.out.println("_generate_ master json ?");
+		//System.out.println("_generate_ master json ?");
 		generate_json_map("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		// create master file (must move to a method)
@@ -1964,18 +2139,19 @@ public class ProduceClickableMap
 		outmaster_map.close();
 		*/
 		final List<String> modules = new ArrayList<String>();
-		if(model.getListOfReactions()!=null)
-		for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
-		{
-			modules.clear();
-			final String title = r.getId();
-			final String body = createReactionBody(r, format, wp);
-			final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body);
-			
-			final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
-			reaction_line(right.add(), r, bubble, scales, post.getPostId());
-			
-			wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules);
+		if (model.getListOfReactions() != null) {
+			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+			{
+				modules.clear();
+				final String title = r.getId();
+				final String body = createReactionBody(r, format, wp);
+				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body);
+				
+				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+				reaction_line(right.add(), r, bubble, scales, post.getPostId());
+				
+				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules);
+			}
 		}
 		
 		for (final EntityBase ent : entityIDToEntityMap.values())
@@ -2302,7 +2478,7 @@ public class ProduceClickableMap
 		return show_map_and_markers_from_post(fw, master_map_name, Arrays.asList(r.getId()), r.getId(), wp);
 	}
 
-	static private void show_map_icon(final StringBuffer fw, Linker wp)
+	static void show_map_icon(final StringBuffer fw, Linker wp)
 	{
 		show_map_icon(fw, wp.getMapIconURL());
 	}
@@ -2379,174 +2555,13 @@ public class ProduceClickableMap
 			return head_leadin + id + head_seperator + getHash() + " -->";
 		}
 	}
-	static StringBuffer add_link(final StringBuffer res, String tag, String value, String url)
+	static StringBuffer add_link(final StringBuffer res, String tag, String value, String url, String target)
 	{
-		res.append("<a target='_blank' href='http://");
+		res.append("<a href='");
 		res.append(url);
-		res.append(value).append("'>").append(tag).append(":").append(value).append("</a>");
+		res.append("' target='" + target + "'>").append(tag).append(value).append("</a>");
 		return res;
 	}
-	
-		/*
-	private static StringBuilder add_links(String comment, final StringBuilder res, Hasher h, Entity ent){
-		if (comment == null)
-			return res;
-		Pattern pat = Pattern.compile("(HUGO|UNIPROT|PMID|PATHWAY|CHECKPOINT|LAYER):([a-zA-Z0-9]+)");
-		
-		String[][] urls = {
-			{ "HUGO", "www.ncbi.nlm.nih.gov/sites/entrez?cmd=search&db=gene&dopt=full_report&term=" },
-			{ "PMID", "www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&Cmd=ShowDetailView&TermToSearch=" },
-			{ "UNIPROT", "www.expasy.org/uniprot/" },
-		};
-		
-		int prev = 0;
-		for (Matcher m = pat.matcher(comment); m.find();)
-		{
-			res.append(comment, prev, m.start());
-			prev = m.end();
-			if (Arrays.binarySearch(layer_tags, m.group(1)) >= 0)
-				show_shapes_on_map(h, res, ent, m.group(1), m.group(2));
-			else
-			{
-				boolean done = false;
-				for (String[] url : urls)
-				{
-					if (url[0].equals(m.group(1)))
-					{
-				//		add_link(res, m, url[1]);
-						done = true;
-						break;
-					}
-				}
-
-				if (!done)
-				{
-					res.append("<b>").append(comment, m.start(1), m.end(1)).append("</b>");
-					res.append(":");
-					res.append("<i>").append(comment, m.start(2), m.end(2)).append("</i>");
-				}
-
-			}
-		}
-		res.append(comment, prev, comment.length());
-		if (true) return res;
-		
-		Vector refs = new Vector();
-		try{
-
-			String dbid = "";
-			StringTokenizer st = new StringTokenizer(comment," >:;\r\n");
-			String s = "";
-			while(st.hasMoreTokens()){
-				String ss = st.nextToken();
-				//System.out.println(ss);
-				if(ss.toLowerCase().equals("pmid")){
-					if(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						res.append("<a target='_blank' href='http://www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&Cmd=ShowDetailView&TermToSearch=").append(dbid).append("'>PMID:").append(dbid).append("</a> ");
-					}
-				}else if(ss.toLowerCase().equals("hugo")){
-					if(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						res.append("<a target='_blank' href='http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=search&db=gene&dopt=full_report&term=").append(dbid).append("'>HUGO:").append(dbid).append("</a> ");
-					}
-				}else if(ss.toLowerCase().equals("uniprot")){
-					while(st.hasMoreTokens()){
-						dbid = st.nextToken();
-						if(dbid.length()!=6){
-							res.append(dbid).append(" ");
-							break;
-						}else
-							res.append("<a target='_blank' href='http://www.expasy.org/uniprot/").append(dbid).append("'>UNIPROT:").append(dbid).append("</a> ");
-					}
-				}
-				else
-					res.append(ss).append(" ");
-			}
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return res;
-	}
-		*/
-	
-/*	
-	private interface CDObject
-	{
-		String getId();
-		CelldesignerNotes getCelldesignerNotes();
-	};
-	private static CDObject makeCDObject(CelldesignerGeneDocument.CelldesignerGene gene)
-	{
-		return new Gene2CDObject(gene);
-	}
-	private static CDObject makeCDObject(CelldesignerProteinDocument.CelldesignerProtein protein)
-	{
-		return new Protein2CDObject(protein);
-	}
-	private static CDObject makeCDObject(final CelldesignerRNA v)
-	{
-		return new RNA2CDObject(v);
-	}
-	private static class Gene2CDObject implements CDObject
-	{
-		private CelldesignerGeneDocument.CelldesignerGene gene;
-		Gene2CDObject(CelldesignerGeneDocument.CelldesignerGene gene)
-		{
-			this.gene = gene;
-		}
-		@Override
-		public String getId()
-		{
-			return gene.getId();
-		}
-		@Override
-		public CelldesignerNotes getCelldesignerNotes()
-		{
-			return gene.getCelldesignerNotes();
-		}
-	};
-	private static class Protein2CDObject implements CDObject
-	{
-		private CelldesignerProtein protein;
-
-		Protein2CDObject(CelldesignerProteinDocument.CelldesignerProtein protein)
-		{
-			this.protein = protein;
-		}
-		@Override
-		public String getId()
-		{
-			return protein.getId();
-		}
-		@Override
-		public CelldesignerNotes getCelldesignerNotes()
-		{
-			return protein.getCelldesignerNotes();
-		}
-	};
-	private static class RNA2CDObject implements CDObject
-	{
-		private CelldesignerRNA v;
-
-		RNA2CDObject(CelldesignerRNA v)
-		{
-			this.v = v;
-		}
-		@Override
-		public String getId()
-		{
-			return v.getId();
-		}
-
-		@Override
-		public CelldesignerNotes getCelldesignerNotes()
-		{
-			return v.getCelldesignerNotes();
-		}
-	};
-	*/
 	
 	static final Hasher null_hasher = new Hasher()
 	{
@@ -2572,11 +2587,6 @@ public class ProduceClickableMap
 		return post_to_post_link(post_id, fw, wp).append(text).append("</a>");
 	}
 
-/*	static StringBuffer post_link_base(int post_id, final StringBuffer notes)
-	{
-		return notes.append("index.php?p=").append(post_id);
-	}
-*/
 	static private StringBuffer post_to_post_link(int post_id, final StringBuffer notes, Linker wp)
 	{
 		notes.append("<a href=\"");
@@ -2596,19 +2606,7 @@ public class ProduceClickableMap
 			.append(post_id)
 			.append("\">");
 	}
-	/*
-	private void create_entity_marker(FormatProteinNotes format, MarkerManager markers, int post_id, Notes celldesignerNotes, Entity ent) throws IOException
-	{
-		final String notes = celldesignerNotes == null ? null :Utils.getValue(celldesignerNotes);
-		create_entity_marker(format, markers, post_id, ent);
-	}
-	
-	private void create_entity_marker(FormatProteinNotes format, MarkerManager markers, int post_id, CelldesignerNotes celldesignerNotes, Entity ent) throws IOException
-	{
-		final String notes = celldesignerNotes == null ? null :Utils.getValue(celldesignerNotes);
-		create_entity_marker(format, markers, post_id, ent);
-	}
-	*/
+
 	private static final String js_show_markers = onclick_before + "show_markers(";
 	
 	static private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw)
@@ -2658,7 +2656,7 @@ public class ProduceClickableMap
 		final String human_cls = class_name_to_human_name_map.get(ent.getCls());
 		body_buf.append(human_cls == null ? ent.getCls() : human_cls);
 		visible_debug(body_buf, ent.getId());
-		body_buf.append("<br>\n");
+		body_buf.append("<br>");
 		
 		show_markers_from_map(ent, body_buf);
 		bubble_to_post_link_with_anchor(post_id, body_buf);
@@ -2670,13 +2668,13 @@ public class ProduceClickableMap
 		
 		body_buf.append("<hr>\n<b>Modification:</b>");
 		visible_debug(body_buf, modification.getId());
-		body_buf.append("<br>\n");
+		body_buf.append("<br>");
 		final int pos = modification.getName().lastIndexOf('@');
 		if (pos <= 0)
 			split_complex_for_marker(modification, modification.getName(), body_buf);
 		else
-			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>\nin ").append(modification.getName().substring(pos + 1));
-		body_buf.append("<br>\n");
+			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>in ").append(modification.getName().substring(pos + 1));
+		body_buf.append("<br>");
 	
 		format.bubble(body_buf, modification.getNotes(), Arrays.asList(modification), cd, wp);
 		return body_buf.toString();
@@ -3017,7 +3015,8 @@ public class ProduceClickableMap
 				complex = true;
 				if (!show_complexes)
 					break;
-				fw.append(heading_font_on).append(complexes).append(heading_font_off).append("<br>");
+				//fw.append(heading_font_on).append(complexes).append(heading_font_off).append("<br>");
+				fw.append(heading_font_on).append(complexes).append(heading_font_off);
 			}
 			if (!m.getCompartment().equals(compartment))
 			{
@@ -3186,7 +3185,7 @@ public class ProduceClickableMap
 		abstract String getId();
 		abstract String getCls();
 		abstract String getName();
-		abstract String getHugoName();
+		abstract Vector<String> getHugoNames();
 		private final ArrayList<Modification> modifications = new ArrayList<Modification>();
 		public ArrayList<Modification> getModifications()
 		{
@@ -3230,7 +3229,7 @@ public class ProduceClickableMap
 	static class Entity extends EntityBase {
 		String id;
 		String label;
-		String hugoName;
+		Vector<String> hugoNames;
 		String cls;
 		String comment = "";
 		private final ArrayList<Modification> associated = new ArrayList<Modification>();
@@ -3238,7 +3237,7 @@ public class ProduceClickableMap
 		public String getComment() { return comment; }
 		public String getName() { return label; }
 		public String getCls() { return cls; }
-		public String getHugoName() {return hugoName;}
+		public Vector<String> getHugoNames() {return hugoNames;}
 		@Override
 		public ArrayList<Modification> getAssociated()
 		{
@@ -3262,7 +3261,7 @@ public class ProduceClickableMap
 			this.cls = cls;
 			
 			String res = notes == null ? "" : notes.trim();
-			hugoName = findHugoName(res);
+			hugoNames = findHugoNames(res);
 			/*
 			if (hugoName.equals(""))
 				hugoName = label;
@@ -3374,9 +3373,9 @@ public class ProduceClickableMap
 			return label;
 		}
 		@Override
-		public String getHugoName()
+		public Vector<String> getHugoNames()
 		{
-			return "";
+			return new Vector<String>();
 		}
 		public boolean isBad()
 		{
@@ -3484,26 +3483,26 @@ public class ProduceClickableMap
 		  return reactionString;
 		}
 	
-	private static String findHugoName(String comment){
-		String res = "";
+	private static Vector<String> findHugoNames(String comment){
+		Vector<String> hugoNames = new Vector<String>();
 		try{
 
 			String dbid = "";
-			StringTokenizer st = new StringTokenizer(comment," >:;\r\n");
+			StringTokenizer st = new StringTokenizer(comment," >:;,\r\n");
 			while(st.hasMoreTokens()){
 				String ss = st.nextToken();
 				//System.out.println(ss);
 				if(ss.toLowerCase().equals("hugo")){
 					if(st.hasMoreTokens()){
 						dbid = st.nextToken();
-						res+=dbid;
+						hugoNames.add(dbid);
 					}
 				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return res;
+		return hugoNames;
 	}
 	
 	private Pair findCentralPlaceForReaction(ReactionDocument.Reaction r){
@@ -4378,4 +4377,45 @@ public class ProduceClickableMap
 	{
 		html_in_named_window(out, url, text, "_blank");
 	}
+
+	public static String[][] load_xrefs(File xref_file)
+	{
+		final BufferedReader xref_stream;
+		try
+		{
+			xref_stream = new BufferedReader(new FileReader(xref_file));
+		}
+		catch (FileNotFoundException e1)
+		{
+			System.err.println(e1.getMessage());
+			System.exit(1);
+			return null;
+		}
+		try
+		{
+			Vector<String[]> ret = new Vector<String[]>();
+			String line;
+			while ((line = xref_stream.readLine()) != null) {
+				String[] cols = line.replaceAll("#.*", "").split("\t");
+				//System.out.println("line [" + line + "] -> " + cols.length);
+				if (cols.length >= 3) {
+					ret.add(cols);
+				}
+			}
+			Object[] arr = ret.toArray();
+			String[][] xrefs = new String[arr.length][];
+			for (int nn = 0; nn < arr.length; ++nn) {
+				xrefs[nn] = (String[])arr[nn];
+			}
+			return xrefs;
+
+		}
+		catch (IOException e1)
+		{
+			System.err.println("failed to load Xref file " + xref_file + ": " + e1.getMessage());
+			System.exit(1);
+			return null;
+		}
+	}
+	
 }

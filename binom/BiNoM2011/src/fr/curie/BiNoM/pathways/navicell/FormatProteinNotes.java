@@ -22,8 +22,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
@@ -37,54 +39,123 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 
 class FormatProteinNotesBase
 {
-	final private static String[] layer_tags = new String[]{ "CC_phase", "LAYER", "CHECKPOINT", "PATHWAY", "MODULE" };
+	final private static String[] layer_tags = new String[]{ "CC_phase", "LAYER", "CHECKPOINT", "PATHWAY", "MODULE"};
 	static
 	{
 		java.util.Arrays.sort(layer_tags);
 	}
-	protected static final String[] pmid_rule = {"PMID", "www.ncbi.nlm.nih.gov/sites/entrez?Db=pubmed&amp;Cmd=ShowDetailView&amp;TermToSearch=", "[0-9]+" };
-	
-	protected static final String[][] urls = {
-//		{ "HUGO", "www.ncbi.nlm.nih.gov/sites/entrez?cmd=search&db=gene&dopt=full_report&term=" },
-		{ "HUGO", "www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=equals&num=50&submit=Submit&search=", "[A-Z0-9]+" },
-		{ "HGNC", "www.genenames.org/data/hgnc_data.php?hgnc_id=", "[0-9]+" },
-		{ "ENTREZ", "www.ncbi.nlm.nih.gov/gene/", "[0-9]+" },
-		{ "UNIPROT", "www.expasy.org/uniprot/", "[A-Z][A-Z0-9]{5}" },
-		{ "PUBCHEM", "pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?sid=", "[0-9][-0-9]*[0-9]" },
-		{ "KEGGCOMPOUND", "www.genome.jp/dbget-bin/www_bget?cpd:", "[A-Z0-9]+" },
-		{ "CAS", "www.chemnet.com/cas/supplier.cgi?l=&exact=dict&f=plist&mark=&submit.x=43&submit.y=12&submit=search&terms=", "[0-9][-0-9]*[0-9]" },
-		{ "CHEBI", "www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:", "[0-9]+" },
-		{ "KEGGDRUG", "www.genome.jp/dbget-bin/www_bget?dr:", "[A-Z0-9]+" },
-		pmid_rule
-	};
-	protected static final Pattern pat_generic;
-	protected static final Pattern pat_bubble;
-	protected static final Pattern pat_pmid;
-	static
+
+	protected String[][] xrefs;
+	protected ProduceClickableMap.AtlasInfo atlasInfo;
+	protected Pattern pat_generic;
+	protected Pattern pat_bubble;
+	protected Pattern pat_pmid;
+
+	protected static String substitute(String val, final HashMap<String, String> value_map) {
+		for (Entry<String, String> e : value_map.entrySet()) {
+			val = val.replaceAll(e.getKey(), e.getValue());
+		}
+		return val;
+	}
+
+	void complete_atlas_info()
+        {
+		if (atlasInfo == null) {
+			return;
+		}
+		String mapUrlTempl = null;
+		String moduleUrlTempl = null;
+
+		for (final String[] entry : xrefs) {
+			if (entry[0].equals("MAP")) {
+				mapUrlTempl = entry[1];
+			} else if (entry[0].equals("MODULE")) {
+				moduleUrlTempl = entry[1];
+			}
+		}
+
+		String error = "";
+		Vector<ProduceClickableMap.AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
+		int map_size = mapInfo_v.size();
+		for (int nn = 0; nn < map_size; ++nn) {
+			ProduceClickableMap.AtlasMapInfo mapInfo = mapInfo_v.get(nn);
+			if (mapUrlTempl != null) {
+				if (mapInfo.url == null) {
+					HashMap<String, String> value_map = new HashMap<String, String>();
+					value_map.put("%MAP%", mapInfo.id);
+					mapInfo.url = substitute(mapUrlTempl, value_map);
+				}
+			}
+			if (mapInfo.url == null) {
+				error += (error.length() > 0 ? "\n" : "") + "map " + mapInfo.id + " has no URL";
+			}
+			Vector<ProduceClickableMap.AtlasModuleInfo> moduleInfo_v = mapInfo.moduleInfo_v;
+			int module_size = moduleInfo_v.size();
+			for (int jj = 0; jj < module_size; ++jj) {
+				ProduceClickableMap.AtlasModuleInfo moduleInfo = moduleInfo_v.get(jj);
+				if (moduleUrlTempl != null) {
+					if (moduleInfo.url == null) {
+						HashMap<String, String> value_map = new HashMap<String, String>();
+						value_map.put("%MAP%", mapInfo.id);
+						value_map.put("%MODULE%", moduleInfo.name);
+						moduleInfo.url = substitute(moduleUrlTempl, value_map);
+					}
+				}
+
+				if (moduleInfo.url == null) {
+					error += (error.length() > 0 ? "\n" : "") + "module " + mapInfo.id + "/" + moduleInfo.name + " has no URL";
+				}
+			}
+		}
+
+		if (error.length() > 0) {
+			System.err.println(error);
+			System.exit(1);
+		}
+        }
+
+	void make_xref_patterns()
 	{
-		final String block_name_pattern = "\\p{javaUpperCase}[\\p{javaUpperCase}\\p{javaLowerCase}\\p{Digit}]*";
+		if (xrefs == null) {
+			return;
+		}
+		final String block_name_pattern = "\\p{javaUpperCase}[\\p{javaUpperCase}\\p{javaLowerCase}\\p{Digit}_]*";
 		final StringBuilder sb = new StringBuilder();
 		sb.append("\\b(").append(block_name_pattern).append(")(_begin):");
 		sb.append("|");
 		sb.append("\\b(").append(block_name_pattern).append(")(_end)\\b");
-		for (final String tag : layer_tags)
+		for (final String tag : layer_tags) {
 			sb.append("|\\b(").append(tag).append(":)([A-Z][A-Z0-9_]*)\\b");
-		pat_pmid = Pattern.compile(add_link_rule(new StringBuilder(sb), pmid_rule).toString());
+		}
 
-		for (final String[] s : urls)
+		for (final String[] s : xrefs)
+		{
+			if (s[0].equals("PMID")) {
+				pat_pmid = Pattern.compile(add_link_rule(new StringBuilder(sb), s).toString());
+				break;
+			}
+		}
+		for (final String[] s : xrefs)
 		{
 			s[1] = s[1].replace("&", "&amp;");
 			add_link_rule(sb, s);
 		}
 
+		//System.out.println("SB [" + sb + "]");
 		pat_bubble = pat_generic = Pattern.compile(sb.toString());
-		//pat_bubble = Pattern.compile(sb.append("|(\n+)").toString());
 	}
 	private static StringBuilder add_link_rule(final StringBuilder sb, final String[] s)
 	{
-		return sb.append("|\\b(").append(s[0]).append(")(:)(").append(s[2]).append(")");
+		if (isValidEntry(s, 3)) {
+			return sb.append("|").append(s[3]).append("(").append(s[2]).append(")");
+		}
+		return sb.append("|").append("\\b(").append(s[0]).append(")(:)(").append(s[2]).append(")");
 	}
 	protected static final String[] colours = { "cyan", "LightGreen", "LightGoldenRodYellow", "Khaki", "SpringGreen", "Yellow" };
+
+	protected static boolean isValidEntry(String[] entry, int ind) {
+		return entry.length > ind && entry[ind].length() > 0 && !entry[ind].equals("-");
+	}
 }
 
 public class FormatProteinNotes extends FormatProteinNotesBase
@@ -92,10 +163,14 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	final private HashMap<String, String> colour_map = new HashMap<String, String>();
 	final private Set<String> modules;
 	final private String blog_name;
-	public FormatProteinNotes(final Set<String> modules, final String blog_name)
+	public FormatProteinNotes(final Set<String> modules, final ProduceClickableMap.AtlasInfo atlasInfo, String[][] xrefs, final String blog_name)
 	{
 		this.modules = modules;
+		this.atlasInfo = atlasInfo;
 		this.blog_name = blog_name;
+		this.xrefs = xrefs;
+		make_xref_patterns();
+		complete_atlas_info();
 	}
 	private String get_colour(String name)
 	{
@@ -109,8 +184,12 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		final StringBuffer sb = new StringBuffer(start == null ? "" : start);
 		if (modifications != null)
 		{
-			if (sb.length() > 0)
+			/*
+			if (sb.length() > 0) {
 				sb.append("\n");
+			}				
+			*/
+
 			for (final Modification sp : modifications)
 			{
 				final String notes = sp.getNotes();
@@ -183,6 +262,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		return format(ent.getComment(), res, h, ProduceClickableMap.extract_ids(ent.getModifications()), pat_generic, cd, modifications, show_shapes_on_map_from_post, modules_found, wp).append('\n');
 	}
+
 	private StringBuffer format(String note, final StringBuffer res, Hasher h,
 		List<String> all,
 		Pattern pat,
@@ -201,6 +281,8 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		
 		final Matcher m = pat.matcher(comment);
 		boolean after_block = false;
+		HashMap<String, String> value_map = new HashMap<String, String>();
+		ProduceClickableMap.AtlasMapInfo mapInfo = null;
 		while (m.find())
 		{
 			int offset = 1;
@@ -209,11 +291,14 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 			final String tag = m.group(offset);
 			if (tag.startsWith("\n") && tag.endsWith("\n"))
 			{
-				m.appendReplacement(res, (after_block) ? "\n" : "<bR>\n");
+				//m.appendReplacement(res, (after_block) ? "\n" : "<br>\n");
+				//m.appendReplacement(res, (after_block) ? "" : "<br>");
+				m.appendReplacement(res, "");
 			}
 			else
 			{
 				final String arg = m.group(offset + 1);
+				//System.out.println("tag [" + tag + "], arg [" + arg + "]");
 				if ("_end".equals(arg))
 				{
 					if (block != null && block.equals(tag))
@@ -222,8 +307,9 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 						m.appendReplacement(res, "</p>");
 						after_block = true;
 					}
-					else
+					else {
 						m.appendReplacement(res, "$0");
+					}
 				}
 				else if ("_begin".equals(arg))
 				{
@@ -236,43 +322,79 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							.append("\">")
 							.append("<b>")
 							.append(block)
-							.append("</b><Br>");
+							.append("</b>");
+						//.append("</b><br>");
 						after_block = false;
 					}
-					else
+					else {
 						m.appendReplacement(res, "$0");
+					}
 				}
 				else if (tag.endsWith(":"))
 				{
+					//System.out.println("  -> endsWidth :");
 					m.appendReplacement(res, "");
 					res.append(tag + arg);
-					if (modules.contains(arg))
-					{
+					if (modules.contains(arg)) {
+						//System.out.println("module found [" + arg + "]");
 						if (modules_found != null)
 							modules_found.add(arg);
 						show_shapes_on_map.show_shapes_on_map(h, res, all, arg, blog_name, wp);
+					} else {
+						//System.out.println("module NOT found [" + arg + "]");
 					}
+					after_block = false;
 				}
 				else
 				{	
 					boolean done = false;
-					for (final String[] entry : urls)
+					for (final String[] entry : xrefs)
 						if (entry[0].equals(tag))
 						{
 							m.appendReplacement(res, "");
-							ProduceClickableMap.add_link(res, tag, m.group(offset + 2), entry[1]);
+							String value = m.group(offset + 2);
+							value_map.put("%" + entry[0] + "%", value);
+							String url = substitute(entry[1], value_map);
+							if (tag.equals("MAP")) {
+								mapInfo = atlasInfo.getMapInfo(value);
+								if (mapInfo != null) {
+									value = mapInfo.getName();
+									assert mapInfo.url != null;
+									url = mapInfo.url;
+								}
+							} else if (tag.equals("MODULE")) {
+								ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
+								if (moduleInfo != null) {
+									assert moduleInfo.url != null;
+									url = moduleInfo.url;
+								}
+							}
+							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
+							String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
+							if (isValidEntry(entry, 6) && entry[6].equalsIgnoreCase("icon")) {
+								res.append(xtag).append(value).append("&nbsp;");
+								StringBuffer tmp = new StringBuffer();
+								ProduceClickableMap.show_map_icon(tmp, wp);
+								ProduceClickableMap.add_link(res, "", tmp.toString(), url, target);
+							} else {
+								ProduceClickableMap.add_link(res, xtag, value, url, target);
+							}
 							done = true;
 							break;
 						}
 
-					if (!done)
+					if (!done) {
 						m.appendReplacement(res, "<em>$0</em>");
+					}
+					after_block = false;
 				}
 			}
 		}
 		m.appendTail(res);
-		if (modules_found != null)
+		if (modules_found != null) {
 			Collections.sort(modules_found);
+		}
+		res.replace(0, res.length(), res.toString().replaceAll("\\\n", "<BR>").replaceAll("<BR></p>", "</p>").replaceAll("</p><BR>", "</p>"));
 		return res;
 	}
 	private void hash(final String comment, final Hasher h)

@@ -74,6 +74,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerAssociateSource;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportToFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerImportFromFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerVisualStyleDefinition;
+import fr.curie.BiNoM.cytoscape.celldesigner.MergingMaps;
 import fr.curie.BiNoM.cytoscape.celldesigner.ProduceNaviCellMapFiles;
 import fr.curie.BiNoM.cytoscape.celldesigner.checkCellDesignerFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.colorCellDesignerProteins;
@@ -138,6 +139,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	JMenuItem createNeighborhoodSetsMenuItem;
 	JMenuItem mergeNetworksAndFilterMenuItem;
 	JMenuItem produceNaviCellMenuItem;
+	JMenuItem mergingMapsMenuItem;
 
 	private void initVisualStyles() {
 		CyNetworkView networkView = Cytoscape.getCurrentNetworkView();
@@ -268,6 +270,9 @@ public class BiNoMPlugin extends CytoscapePlugin {
         binomIOMenu.add(produceNaviCellMenuItem);
         produceNaviCellMenuItem.addActionListener(new ProduceNaviCellMapFiles());	
 		
+        mergingMapsMenuItem = new JMenuItem("Merging Celldesigner map files...");
+        binomIOMenu.add(mergingMapsMenuItem);
+        mergingMapsMenuItem.addActionListener(new MergingMaps());	
 		
 		/*
 		 * Analysis functions menu

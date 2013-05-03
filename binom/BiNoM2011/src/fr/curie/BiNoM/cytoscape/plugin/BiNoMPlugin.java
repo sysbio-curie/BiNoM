@@ -270,7 +270,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
         binomIOMenu.add(produceNaviCellMenuItem);
         produceNaviCellMenuItem.addActionListener(new ProduceNaviCellMapFiles());	
 		
-        mergingMapsMenuItem = new JMenuItem("Merging Celldesigner map files...");
+        mergingMapsMenuItem = new JMenuItem("Merging CellDesigner map files...");
         binomIOMenu.add(mergingMapsMenuItem);
         mergingMapsMenuItem.addActionListener(new MergingMaps());	
 		

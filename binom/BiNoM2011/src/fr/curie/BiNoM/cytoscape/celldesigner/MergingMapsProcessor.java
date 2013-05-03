@@ -1,4 +1,4 @@
-package fr.curie.BiNoM.pathways.utils;
+package fr.curie.BiNoM.cytoscape.celldesigner;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -30,6 +30,8 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
+import fr.curie.BiNoM.pathways.utils.Utils;
+import fr.curie.BiNoM.pathways.utils.Utils.Transparency;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 

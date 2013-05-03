@@ -2,7 +2,7 @@ package fr.curie.BiNoM.pathways.test;
 
 import java.util.ArrayList;
 
-import fr.curie.BiNoM.pathways.utils.MergingMapsProcessor;
+import fr.curie.BiNoM.cytoscape.celldesigner.MergingMapsProcessor;
 
 public class TestMergeMapsACSN {
 	

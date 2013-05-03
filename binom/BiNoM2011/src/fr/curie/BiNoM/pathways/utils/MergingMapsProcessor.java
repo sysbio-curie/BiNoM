@@ -346,18 +346,15 @@ public class MergingMapsProcessor {
 		 */
 		if (cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers() != null) {
 			for (int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray(); i++) {
-				//cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i));
 				CelldesignerLayerDocument.CelldesignerLayer cl = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i);
 				for (int j=0;j<cl.getCelldesignerListOfSquares().sizeOfCelldesignerLayerCompartmentAliasArray();j++) {
-						CelldesignerLayerCompartmentAlias sq =  cl.getCelldesignerListOfSquares().getCelldesignerLayerCompartmentAliasArray(i);
-						//System.out.println(sq);
+						CelldesignerLayerCompartmentAlias sq =  cl.getCelldesignerListOfSquares().getCelldesignerLayerCompartmentAliasArray(j);
 						float  x = Float.parseFloat(sq.getCelldesignerBounds().getX());
 						float  y = Float.parseFloat(sq.getCelldesignerBounds().getY());
 						x += deltaX;
 						y += deltaY;
 						sq.getCelldesignerBounds().setX(Float.toString(x));
 						sq.getCelldesignerBounds().setY(Float.toString(y));
-						//System.out.println(sq);
 				}
 			}
 		}

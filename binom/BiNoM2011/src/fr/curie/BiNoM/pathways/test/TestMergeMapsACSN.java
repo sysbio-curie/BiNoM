@@ -2,7 +2,7 @@ package fr.curie.BiNoM.pathways.test;
 
 import java.util.ArrayList;
 
-import fr.curie.BiNoM.cytoscape.celldesigner.MergingMapsProcessor;
+import fr.curie.BiNoM.pathways.utils.MergingMapsProcessor;
 
 public class TestMergeMapsACSN {
 	
@@ -26,10 +26,15 @@ public class TestMergeMapsACSN {
 //		mm.mergeAll();
 //		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
 		
-		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/cellcycle_v1_names.xml",6500,50);
-		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/emtcellmotility_v1_names.xml",50,50);
-		
-		mm.setMapSize(14000, 7000);
+//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/cellcycle_v1_names.xml",6500,50);
+//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/emtcellmotility_v1_names.xml",50,50);
+//		mm.setMapSize(14000, 7000);
+//		mm.mergeAll();
+//		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
+
+		mm.addMap("/bioinfo/users/ebonnet/toto.xml",10,10);
+		mm.addMap("/bioinfo/users/ebonnet/toto.xml",650,10);
+		mm.setMapSize(1300, 500);
 		mm.mergeAll();
 		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
 		

@@ -1,4 +1,4 @@
-package fr.curie.BiNoM.cytoscape.celldesigner;
+package fr.curie.BiNoM.pathways.utils;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -20,6 +20,10 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGateMemberDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias;
+import org.sbml.x2001.ns.celldesigner.CelldesignerLayerCompartmentAliasDocument.CelldesignerLayerCompartmentAlias;
+import org.sbml.x2001.ns.celldesigner.CelldesignerLayerDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerLayerDocument.CelldesignerLayer;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
@@ -30,8 +34,6 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
-import fr.curie.BiNoM.pathways.utils.Utils;
-import fr.curie.BiNoM.pathways.utils.Utils.Transparency;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 
@@ -180,6 +182,7 @@ public class MergingMapsProcessor {
 		shiftCoordinates(cd1,mapList.get(0).deltaX, mapList.get(0).deltaY);
 		
 		setAndLoadFileName2(mapList.get(1).fileName);
+		//System.out.println("cd1 getId: "+this.cd1.getSbml().getModel().getName());
 		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
 		produceCandidateMergeLists();
 		mergeDiagrams();
@@ -288,50 +291,73 @@ public class MergingMapsProcessor {
 		/*
 		 * Special case: shift coordinates for boolean logic gates
 		 */
-		for(int i=0;i<cd.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
-			ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
-			
-			// cd version 4.1
-			if(r.getAnnotation().getCelldesignerListOfModification()!=null) {
-				for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
-					CelldesignerModificationDocument.CelldesignerModification cmd = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
-					String type = cmd.getType();
-					if (type.contains("BOOLEAN_LOGIC")) {
-						String str = Utils.getValue(cmd.getEditPoints());
-						String[] pair = str.split("\\s+");
-						for (int n=0;n<pair.length;n++) {
-							String[] coord = pair[n].split(",");
-							float x = Float.parseFloat(coord[0]);
-							float y = Float.parseFloat(coord[1]);
-							x += deltaX;
-							y += deltaY;
-							str = x+","+y;
-							Utils.setValue(cmd.getEditPoints(),str);
-							//System.out.println(">>>"+ cmd.getEditPoints());
+		if (cd.getSbml().getModel().getListOfReactions() != null) {
+			for(int i=0;i<cd.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
+				ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
+
+				// cd version 4.1
+				if(r.getAnnotation().getCelldesignerListOfModification()!=null) {
+					for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
+						CelldesignerModificationDocument.CelldesignerModification cmd = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
+						String type = cmd.getType();
+						if (type.contains("BOOLEAN_LOGIC")) {
+							String str = Utils.getValue(cmd.getEditPoints());
+							String[] pair = str.split("\\s+");
+							for (int n=0;n<pair.length;n++) {
+								String[] coord = pair[n].split(",");
+								float x = Float.parseFloat(coord[0]);
+								float y = Float.parseFloat(coord[1]);
+								x += deltaX;
+								y += deltaY;
+								str = x+","+y;
+								Utils.setValue(cmd.getEditPoints(),str);
+								//System.out.println(">>>"+ cmd.getEditPoints());
+							}
+						}
+					}
+				}
+
+				// cd files version 4.2
+				if(r.getAnnotation().getCelldesignerListOfGateMember()!=null) {
+					for(int j=0;j<r.getAnnotation().getCelldesignerListOfGateMember().sizeOfCelldesignerGateMemberArray();j++){
+						CelldesignerGateMemberDocument.CelldesignerGateMember cmd = r.getAnnotation().getCelldesignerListOfGateMember().getCelldesignerGateMemberArray(j);
+						String type = cmd.getType();
+						if (type.contains("BOOLEAN_LOGIC")) {
+							String str = Utils.getValue(cmd.getEditPoints());
+							String[] pair = str.split("\\s+");
+							for (int n=0;n<pair.length;n++) {
+								String[] coord = pair[n].split(",");
+								float x = Float.parseFloat(coord[0]);
+								float y = Float.parseFloat(coord[1]);
+								x += deltaX;
+								y += deltaY;
+								str = x+","+y;
+								Utils.setValue(cmd.getEditPoints(),str);
+								//System.out.println(cmd.getEditPoints());
+							}
 						}
 					}
 				}
 			}
-			
-			// cd files version 4.2
-			if(r.getAnnotation().getCelldesignerListOfGateMember()!=null) {
-				for(int j=0;j<r.getAnnotation().getCelldesignerListOfGateMember().sizeOfCelldesignerGateMemberArray();j++){
-					CelldesignerGateMemberDocument.CelldesignerGateMember cmd = r.getAnnotation().getCelldesignerListOfGateMember().getCelldesignerGateMemberArray(j);
-					String type = cmd.getType();
-					if (type.contains("BOOLEAN_LOGIC")) {
-						String str = Utils.getValue(cmd.getEditPoints());
-						String[] pair = str.split("\\s+");
-						for (int n=0;n<pair.length;n++) {
-							String[] coord = pair[n].split(",");
-							float x = Float.parseFloat(coord[0]);
-							float y = Float.parseFloat(coord[1]);
-							x += deltaX;
-							y += deltaY;
-							str = x+","+y;
-							Utils.setValue(cmd.getEditPoints(),str);
-							//System.out.println(cmd.getEditPoints());
-						}
-					}
+		}
+		
+		/*
+		 * Layers: squares
+		 */
+		if (cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers() != null) {
+			for (int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray(); i++) {
+				//cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i));
+				CelldesignerLayerDocument.CelldesignerLayer cl = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i);
+				for (int j=0;j<cl.getCelldesignerListOfSquares().sizeOfCelldesignerLayerCompartmentAliasArray();j++) {
+						CelldesignerLayerCompartmentAlias sq =  cl.getCelldesignerListOfSquares().getCelldesignerLayerCompartmentAliasArray(i);
+						//System.out.println(sq);
+						float  x = Float.parseFloat(sq.getCelldesignerBounds().getX());
+						float  y = Float.parseFloat(sq.getCelldesignerBounds().getY());
+						x += deltaX;
+						y += deltaY;
+						sq.getCelldesignerBounds().setX(Float.toString(x));
+						sq.getCelldesignerBounds().setY(Float.toString(y));
+						//System.out.println(sq);
 				}
 			}
 		}
@@ -415,6 +441,13 @@ public class MergingMapsProcessor {
 		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null)
 			for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++)
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().addNewCelldesignerComplexSpeciesAlias().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i));
+	
+		// Layers
+		if (cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers() != null) {
+			for (int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray(); i++) {
+				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i));
+			}
+		}
 	}
 
 	/**
@@ -539,23 +572,6 @@ public class MergingMapsProcessor {
 			}
 		}
 
-		/*
-		 *  before: find proteins sharing the same name, save them to "P" file
-		 *  
-		 *  now: for proteins having same name add string "id1-name1-id2-name2" to vector proteinMap
-		 *  
-		 */
-		//FileWriter fw = new FileWriter(prefix+"P.txt");
-//		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
-//			CelldesignerProteinDocument.CelldesignerProtein p = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
-//			String name = Utils.getValue(p.getName());
-//			if(proteinNames.containsKey(name)){
-//				//fw.write(proteinNames.get(name)+"\t"+name+"\t"+p.getId()+"\t"+name+"\n");
-//				proteinMap.add(proteinNames.get(name)+"\t"+name+"\t"+p.getId()+"\t"+name);
-//			}
-//		}
-		//fw.close();
-
 		// map species ID -> species obj
 		CellDesigner.entities = CellDesigner.getEntities(cd2);
 		HashMap<String,SpeciesDocument.Species> species2 = new HashMap<String,SpeciesDocument.Species>();
@@ -604,44 +620,7 @@ public class MergingMapsProcessor {
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		XmlString xs = XmlString.Factory.newInstance();
 
-//		HashMap<String,String> aliasMap = new HashMap<String,String>();
-//		HashMap<String,String> speciesMap = new HashMap<String,String>();
-//		Vector<String> subsAliases = new Vector<String>();
-//		Vector<String> subsSpecies = new Vector<String>();
-//
-//		for(int i=0;i<speciesMapStr.size();i++){
-//			String s = speciesMapStr.get(i); 
-//			StringTokenizer st = new StringTokenizer(s,"\t");
-//			// "alias_ID1 species_ID1 compartment1 species_name1 alias_ID2 species_ID2 compartment2 species_name2"
-//			String ato = st.nextToken(); //alias_ID1 
-//			String sto = st.nextToken(); // species_ID1
-//			st.nextToken();
-//			st.nextToken();
-//			String afrom = st.nextToken(); // alias_ID2
-//			String sfrom = st.nextToken(); // species_ID2
-//			st.nextToken(); 
-//			st.nextToken();
-//			aliasMap.put(afrom,ato); // alias_ID2 => alias_ID1
-//			speciesMap.put(sfrom, sto); // species_ID2 => species_ID1
-//			subsAliases.add(afrom); // alias_ID2
-//			subsSpecies.add(sfrom); // species_ID2
-//		}
-
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
-		
-//		int i;
-//		HashMap<String,String> idMap = new HashMap<String,String>();
-//		Vector<String> subsIds = new Vector<String>();
-//		for(i=0;i<proteinMapStr.size();i++){
-//			String s = proteinMapStr.get(i); 
-//			// "protein_id1 protein_name1 protein_id2 protein_name2"
-//			StringTokenizer st = new StringTokenizer(s,"\t");
-//			String ato = st.nextToken(); // protein_id1 
-//			st.nextToken(); 
-//			String afrom = st.nextToken(); // protein_id2
-//			idMap.put(afrom,ato); // protein_id2 => protein_id1
-//			subsIds.add(afrom); // list of protein_id2
-//		}
 
 		/*
 		 *  Deal with redundant proteins, genes and rnas

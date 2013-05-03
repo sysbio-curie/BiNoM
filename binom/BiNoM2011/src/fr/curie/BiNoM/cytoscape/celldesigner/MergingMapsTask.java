@@ -6,6 +6,7 @@ import java.io.FileReader;
 
 import cytoscape.task.Task;
 import cytoscape.task.TaskMonitor;
+import fr.curie.BiNoM.pathways.utils.MergingMapsProcessor;
 
 public class MergingMapsTask implements Task {
 

@@ -352,7 +352,7 @@ public class MergingMapsProcessor {
 		}
 		
 		/*
-		 * Layers: squares
+		 * Layers: squares and lines
 		 */
 		if (cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers() != null) {
 			for (int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray(); i++) {
@@ -822,7 +822,8 @@ public class MergingMapsProcessor {
 						proteinto.getCelldesignerListOfModificationResidues().addNewCelldesignerModificationResidue().set(protein.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j));
 				}
 				// remove duplicate in protein list
-				System.out.println("Protein "+protein.getId()+" ("+Utils.getValue(protein.getName())+") removed.");				
+				if (verbose)
+					System.out.println("Protein "+protein.getId()+" ("+Utils.getValue(protein.getName())+") removed.");				
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().removeCelldesignerProtein(i);
 				numberOfProteins--;
 			}

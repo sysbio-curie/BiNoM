@@ -27,7 +27,6 @@ public class TestMergeMapsACSN {
 //		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
 
 		
-
 		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/emtcellmotility_v1_names.xml",50,50);
 		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/cellcycle_v1_names.xml",6500,50);
 		mm.setMapSize(14000, 7000);

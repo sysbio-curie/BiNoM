@@ -518,7 +518,10 @@ public class ProduceClickableMap
 			throw new NaviCellException("failed to make " + destination_common);
 
 		
-		final Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
+		Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
+		if (modules.size() == 0 && atlasInfo != null) {
+			modules = get_module_list(atlasInfo);
+		}
 
 		final File json_map_file = new File(destination_common, json_map_list);
 		final PrintStream outjson = new PrintStream(json_map_file);
@@ -541,17 +544,18 @@ public class ProduceClickableMap
 			throw new NaviCellException("IO error installing static files", e);
 		}
 
-		for (final String map_name : modules.keySet())
-		{
-			if (!map_name.equals(master_map_name))
-				try
+		if (atlasInfo == null) {
+			for (final String map_name : modules.keySet()) {
+				if (!map_name.equals(master_map_name))
+					try
 				{
-					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, outjson, modules);
+						process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, outjson, modules);
 				}
 				catch (IOException e)
 				{
 					throw new NaviCellException("IO error creating map " + map_name, e);
 				}
+			}
 		}
 		
 		outjson.close();
@@ -605,6 +609,22 @@ public class ProduceClickableMap
 			}
 		}
 		return v;
+	}
+
+	private static Map<String, ModuleInfo> get_module_list(AtlasInfo atlasInfo)
+	{
+		final Map<String, ModuleInfo> list = new HashMap<String, ModuleInfo>();
+		Vector<AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
+		int size = mapInfo_v.size();
+		for (int nn = 0; nn < size; ++nn) {
+			AtlasMapInfo mapInfo = mapInfo_v.get(nn);
+			int size2 = mapInfo.moduleInfo_v.size();
+			for (int jj = 0; jj < size2; ++jj) {
+				AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
+				list.put(moduleInfo.name, null);
+			}
+		}
+		return list;
 	}
 
 	private static Map<String, ModuleInfo> get_module_list(final File source_directory, final String base)
@@ -1950,7 +1970,7 @@ public class ProduceClickableMap
 			positions.put(name, null);
 		}
 	
-		if (modules_set.size() > 1) {
+		if (atlasInfo == null && modules_set.size() > 1) {
 			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
 			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
 				if (master_map_name.equals(k.getKey()))
@@ -1994,15 +2014,31 @@ public class ProduceClickableMap
 			for (int nn = 0; nn < size; ++nn) {
 				AtlasMapInfo mapInfo = mapInfo_v.get(nn);
 				ItemCloser map_item  = maps.add();
+				double[] map_position = positions.get(mapInfo.id);
 				item_list_start(map_item, mapInfo.getName(), right_hand_tag);
+				if (map_position != null) {
+					map_item.getOutput().print(" position=\"");
+					map_item.getOutput().print(scales.getX(map_position[0]));
+					map_item.getOutput().print(";");
+					map_item.getOutput().print(scales.getY(map_position[1]));
+					map_item.getOutput().print("\"");
+				}
 				map_item.getOutput().println(">");
 				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
 
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
 					AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
+					double[] module_position = positions.get(moduleInfo.name);
 					ItemCloser module_item  = map_item.add();
 					item_list_start(module_item, moduleInfo.name, right_hand_tag);
+					if (module_position != null) {
+						module_item.getOutput().print(" position=\"");
+						module_item.getOutput().print(scales.getX(module_position[0]));
+						module_item.getOutput().print(";");
+						module_item.getOutput().print(scales.getY(module_position[1]));
+						module_item.getOutput().print("\"");
+					}
 					module_item.getOutput().println(">");
 					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
 

@@ -355,6 +355,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							String value = m.group(offset + 2);
 							value_map.put("%" + entry[0] + "%", value);
 							String url = substitute(entry[1], value_map);
+							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
 							if (tag.equals("MAP")) {
 								mapInfo = atlasInfo.getMapInfo(value);
 								if (mapInfo != null) {
@@ -362,22 +363,26 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 									assert mapInfo.url != null;
 									url = mapInfo.url;
 								}
+								res.append(xtag).append(value).append("&nbsp;");
+								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else if (tag.equals("MODULE")) {
 								ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
 								if (moduleInfo != null) {
 									assert moduleInfo.url != null;
 									url = moduleInfo.url;
 								}
-							}
-							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
-							String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
-							if (isValidEntry(entry, 6) && entry[6].equalsIgnoreCase("icon")) {
 								res.append(xtag).append(value).append("&nbsp;");
-								StringBuffer tmp = new StringBuffer();
-								ProduceClickableMap.show_map_icon(tmp, wp);
-								ProduceClickableMap.add_link(res, "", tmp.toString(), url, target);
+								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else {
-								ProduceClickableMap.add_link(res, xtag, value, url, target);
+								String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
+								if (isValidEntry(entry, 6) && entry[6].equalsIgnoreCase("icon")) {
+									res.append(xtag).append(value).append("&nbsp;");
+									StringBuffer tmp = new StringBuffer();
+									ProduceClickableMap.show_map_icon(tmp, wp);
+									ProduceClickableMap.add_link(res, "", tmp.toString(), url, target);
+								} else {
+									ProduceClickableMap.add_link(res, xtag, value, url, target);
+								}
 							}
 							done = true;
 							break;

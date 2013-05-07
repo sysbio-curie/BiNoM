@@ -155,23 +155,27 @@ function show_markers_ref(markers, ref)
 //					alert("show_markers_ref lookup " + this + " for " + id);
 					get_markers_for_modification(this, projection, map);
 		//			console.log(element.attr("id"), markers.length);
-					this.markers.forEach
-					(
-						function(i)
-						{
-							i.setVisible(false);
-							extend(bounds, i);
+					if (this.markers) {
+						this.markers.forEach
+						(
+							function(i)
+							{
+								i.setVisible(false);
+								extend(bounds, i);
+							}
+						);
+						this.markers.forEach(make_marker_visible);
+						ref.check_node(this);
+						if (this.peers) {
+							this.peers.each
+							(
+								function(i)
+								{
+									ref.check_node(this);
+								}
+							);
 						}
-					);
-					this.markers.forEach(make_marker_visible);
-					ref.check_node(this);
-					this.peers.each
-					(
-						function(i)
-						{
-							ref.check_node(this);
-						}
-					);
+					}
 				}
 			);
 		}
@@ -437,20 +441,25 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 		}).bind("uncheck_node.jstree", function(event, data) {
 			var f = function(index, element)
 			{
-				$.each(element.markers, function(key, i) { i.setVisible(false); });
-				element.peers.each
-				(
-					function()
-					{
-						jQuery.jstree._reference(jtree).uncheck_node(this);
+				if (element.markers) {
+					$.each(element.markers, function(key, i) { i.setVisible(false); });
+					if (element.peers) {
+						element.peers.each
+						(
+							function()
+							{
+								jQuery.jstree._reference(jtree).uncheck_node(this);
+							}
+						);
 					}
-				);
+				}
 			};
-			try {
+			/*try*/ {
 				$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-			} catch(f) {
-			}
+			} /*catch(f) {
+				console.log("get_unchecked error: " + f);
+			}*/
 		/*}).bind("before.jstree", function(event, data) {
 			console.log("before.jstree: " + data.func + " " + data.args[0]);*/
 		}).bind("check_node.jstree", function(event, data) {
@@ -463,30 +472,35 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			{
 				get_markers_for_modification(element, projection, map);
 				
-				$.each(element.markers,
-				       function(key, i)
-				       {
-					       if (!i.getVisible())
+				if (element.markers) {
+					$.each(element.markers,
+					       function(key, i)
 					       {
-						       extend(bounds, i);
-						       make_marker_visible(i);
+						       if (!i.getVisible())
+						       {
+							       extend(bounds, i);
+							       make_marker_visible(i);
+						       }
 					       }
-				       }
-				      );
-				element.peers.each
-					(
-						function ()
-						{
-							jQuery.jstree._reference(jtree).check_node(this);
-						}
-					);
+					      );
+					if (element.peers) {
+						element.peers.each
+							(
+								function ()
+								{
+									jQuery.jstree._reference(jtree).check_node(this);
+								}
+							);
+					}
+				}
 			};
 			
-			try {
+			/*try*/ {
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
-			} catch(f) {
-			}
+			} /*catch(f) {
+				console.log("get_checked error: " + f);
+			}*/
 			//				jtree.jstree("get_checked", data.args[0], true).each(f);
 			//				$(data.args[0].parentNode.parentNode).each(f);
 			if (!bounds.isEmpty())
@@ -505,7 +519,7 @@ function open_blog_click(e)
 	}
 	catch (f)
 	{
-	};
+	}
 	return false;
 }
 
@@ -517,7 +531,8 @@ function open_module_map_click(e)
 	}
 	catch (f)
 	{
-	};
+		console.log("open_module_map_click: " + f);
+	}
 	return false;
 }
 
@@ -589,7 +604,7 @@ function show_blog(postid)
 
 function show_map_and_markers(map_name, ids)
 {
-	console.log("show_map_and_markers", map_name, ids);
+//	console.log("show_map_and_markers", map_name, ids);
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
@@ -623,7 +638,9 @@ function uncheck_all_entities()
 	var ref = jQuery.jstree._reference(jtree);
 	var f = function(index, element)
 	{
-		$.each(element.markers, function(key, i) { i.setVisible(false); });
+		if (element.markers) {
+			$.each(element.markers, function(key, i) { i.setVisible(false); });
+		}
 	}
 		
 	$.each

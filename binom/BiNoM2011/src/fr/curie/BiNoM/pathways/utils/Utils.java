@@ -1174,4 +1174,28 @@ public static boolean isIntegerNumber(String s){
 	return isnumber;
 }
 
+public static Vector<String> getTagValues(String notes, String tag){
+	Vector<String> hugos = new Vector<String>();
+	StringTokenizer st = new StringTokenizer(notes," ,;\n");
+	while(st.hasMoreTokens()){
+		String s = st.nextToken();
+		if(s.startsWith(tag+":")){
+			StringTokenizer st1 = new StringTokenizer(s,":");
+			st1.nextToken();
+			try{
+			if(st1.hasMoreTokens()){
+			String hugo = st1.nextToken();
+			if(!hugos.contains(hugo))
+				hugos.add(hugo);
+			}
+			}catch(Exception e){
+				System.out.println("ERROR in "+s);
+				e.printStackTrace();
+			}
+		}
+	}
+	return hugos;
+}
+
+
 }

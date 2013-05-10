@@ -13,10 +13,18 @@ public class MergingMapsTask implements Task {
 	private TaskMonitor taskMonitor;
 	private String configFileName;
 	private String outputFileName;
+	private MergingMapsOptions options;
 	
-	public MergingMapsTask(String config, String output) {
+	public class MergingMapsOptions{
+		public boolean mergeImages = false;
+		public int zoomLevel = 3;
+		public int numberOfTimesToScale = 0;
+	}
+	
+	public MergingMapsTask(String config, String output, MergingMapsOptions _options) {
 		configFileName = config;
 		outputFileName = output;
+		options = _options;
 	}
 	
 	public void halt() {
@@ -50,13 +58,25 @@ public class MergingMapsTask implements Task {
 			}
 			mm.mergeAll();
 			mm.saveMap(outputFileName);
-			taskMonitor.setPercentCompleted(100);
-			taskMonitor.setStatus("Finished merging CellDesigner maps.");
+			
+			if(options.mergeImages){
+				String outputFileName_prefix = outputFileName;
+				if(outputFileName.endsWith(".xml"))
+						outputFileName_prefix = outputFileName.substring(0, outputFileName.length()-4);
+				mm.mergeMapImages(outputFileName_prefix, options.zoomLevel, options.numberOfTimesToScale);
+			}
+			
+			if(taskMonitor!=null){
+				taskMonitor.setPercentCompleted(100);
+				taskMonitor.setStatus("Finished merging CellDesigner maps.");
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error Creating NaviCell maps:" + e);
+			if(taskMonitor!=null){			
+				taskMonitor.setPercentCompleted(100);
+				taskMonitor.setStatus("Error Creating NaviCell maps:" + e);
+			}
 		}
 	}
 

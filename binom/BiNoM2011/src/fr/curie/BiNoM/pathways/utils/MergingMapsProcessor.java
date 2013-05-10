@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,6 +152,72 @@ public class MergingMapsProcessor {
 	public MergingMapsProcessor() {
 		// there is no life in the void.
 	}
+	
+	public static void main(String args[]){
+		String configFile = "";
+		String outputFileName = "";
+		
+		boolean mergeImages = false;
+		boolean processannotations = false;
+		int zoomLevel = 3;
+		int numberOfTimesToScale = 0;
+		
+		for(int i=0;i<args.length;i++){
+			if(args[i].equals("--config"))
+				configFile = args[i+1];
+			if(args[i].equals("--out"))
+				outputFileName = args[i+1];
+			if(args[i].equals("--mergeimages"))
+				mergeImages = true;
+			if(args[i].equals("--processannotations"))
+				processannotations = true;
+			if(args[i].equals("--zoomlevel"))
+				zoomLevel = Integer.parseInt(args[i+1]);
+			if(args[i].equals("--numberofscaleimages"))
+				numberOfTimesToScale = Integer.parseInt(args[i+1]);
+		}
+		
+		try{
+		BufferedReader buf = new BufferedReader(new FileReader(configFile));	
+		String line;
+		int ct=0;
+		MergingMapsProcessor mm = new MergingMapsProcessor();
+		while((line = buf.readLine()) != null) {
+			line.trim();
+			if (line.length()>0) {
+				String[] tk = line.split("\\t|\\s+");
+				if (ct==0) {
+					int sizeX = Integer.parseInt(tk[1]);
+					int sizeY = Integer.parseInt(tk[2]);
+					mm.setMapSize(sizeX, sizeY);
+				}
+				else {
+					String fn = tk[0];
+					int coordX = Integer.parseInt(tk[1]);
+					int coordY = Integer.parseInt(tk[2]);
+					mm.addMap(fn, coordX, coordY);
+				}
+			}
+			ct++;
+		}
+		mm.mergeAll();
+		mm.saveMap(outputFileName);
+		
+		if(mergeImages){
+			String outputFileName_prefix = outputFileName;
+			if(outputFileName.endsWith(".xml"))
+					outputFileName_prefix = outputFileName.substring(0, outputFileName.length()-4);
+			mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale);
+		}
+		
+		if(processannotations)
+			mm.postProcessAnnotations(outputFileName);
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}	
 
 	/**
 	 * Add map data (filename, deltaX, deltaY) to the internal list of maps to be merged.
@@ -972,7 +1040,7 @@ public class MergingMapsProcessor {
 				String id = Integer.toString(i+1);
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).setId(id);
 				String name  = Utils.getValue(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).getName());
-				name = name + "_" + Integer.toString(i+1);
+				//name = name + "_" + Integer.toString(i+1);
 				XmlString xs = XmlString.Factory.newInstance();
 				xs.setStringValue(name);
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i).setName(xs);
@@ -1037,5 +1105,22 @@ public class MergingMapsProcessor {
 		}
 
 	}
+
+	public void postProcessAnnotations(String outputFileName){
+		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+		mn.allannotations = true;
+		mn.formatAnnotation = true;
+		mn.moduleGMTFileName = null;
+		mn.guessIdentifiers = false;
+		mn.insertMapsTagBeforeModules = true;
+		mn.removeEmptySections = false;
+		mn.removeInvalidTags = true;
+		mn.moveNonannotatedTextToReferenceSection = false;
+
+		mn.sbmlDoc = CellDesigner.loadCellDesigner(outputFileName);
+		mn.automaticallyProcessNotes();
+		CellDesigner.saveCellDesigner(mn.sbmlDoc, outputFileName);
+	}
+
 	
 }

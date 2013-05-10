@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -34,6 +35,9 @@ public class MergingMapsDialog extends JDialog {
 	private JFileChooser fc;
 	private JTextField field1;
 	private JTextField field2;
+	private JCheckBox mergeImages;
+	private JTextField imageZoomLevel;
+	private JLabel lab1;
 	private JButton b1;
 	private JButton b2;
 
@@ -152,7 +156,37 @@ public class MergingMapsDialog extends JDialog {
 				}
 			}
 		});
+		
+		
+		mergeImages = new JCheckBox("Merge map images");
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 6;
+		c.anchor = GridBagConstraints.WEST;
+		c.insets = new Insets(10,10,10,10);
+		p.add(mergeImages,c);
+		
+		lab1 = new JLabel("at zoom level");
+		c = new GridBagConstraints();
+		c.gridx = 2;
+		c.gridy = 6;
+		c.anchor = GridBagConstraints.EAST;
+		c.insets = new Insets(10,10,10,10);
+		p.add(lab1,c);
 
+		imageZoomLevel = new JTextField(2);
+		c = new GridBagConstraints();
+		c.gridx = 3;
+		c.gridy = 6;
+		c.anchor = GridBagConstraints.WEST;
+		c.insets = new Insets(10,10,10,10);
+		p.add(imageZoomLevel,c);
+		
+		final MergingMapsTask.MergingMapsOptions options = new MergingMapsTask(null,null,null).new MergingMapsOptions();
+		
+		mergeImages.setSelected(options.mergeImages);
+		imageZoomLevel.setText(""+options.zoomLevel);
+		
 		/*
 		 *  Action: Ok - Cancel buttons
 		 */
@@ -161,7 +195,9 @@ public class MergingMapsDialog extends JDialog {
 		okB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 	            setVisible(false);			
-	            MergingMapsTask task = new MergingMapsTask(field1.getText(), field2.getText());
+	            options.mergeImages = mergeImages.isSelected();
+	            options.zoomLevel = Integer.parseInt(imageZoomLevel.getText());
+	            MergingMapsTask task = new MergingMapsTask(field1.getText(), field2.getText(), options);
 	  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
 
 			}

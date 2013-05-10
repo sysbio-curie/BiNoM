@@ -4,6 +4,9 @@ import org.w3c.dom.*;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 
+import cytoscape.Cytoscape;
+
+import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotesDialog;
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
@@ -16,16 +19,21 @@ public class ModifyCellDesignerNotes {
 
 	public SbmlDocument sbmlDoc = null;
 	public String comments = null;
+	public String moduleGMTFileName = null;
+	GMTFile gmtFile = null;
+	public boolean useHUGOIdsForModuleIdentification = true;
 	
 	public boolean allannotations = true;
 	//public boolean insertTemplateForEntitiesReactions = true;
 	//public boolean insertTemplateForSpecies = true;
-	public boolean formatAnnotation	= true;
+	public boolean formatAnnotation	= false;
 	
-	public boolean guessIdentifiers = true;
+	public boolean guessIdentifiers = false;
 	public boolean removeEmptySections = false;
 	public boolean removeInvalidTags = true;
 	public boolean moveNonannotatedTextToReferenceSection = true;
+	
+	public boolean insertMapsTagBeforeModules = true;
 	
 	
 	public String tags[] = {"HUGO","HGNC","PUBMED","ENTREZ","UNIPROT","GENECARDS","PMID","PATHWAY","MODULE","LAYER","NAME","ALT_NAME","CHEBI","KEGGCOMPOUND","CAS"};
@@ -72,23 +80,39 @@ public class ModifyCellDesignerNotes {
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
 		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v7_names";
-		String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
+		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
+		String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
+		//String nameCD = "C:/Datas/NaviCell/test/merged/merged_master";
 		//String nameCD = "C:/Datas/NaviCell/testNaviCellSuperMode/test/merged_testmap";
 		//String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
 	    //String nameCD = "C:/Datas/NaviCell/maps/dnarepair_src/master";
 		//String nameCD = "c:/datas/binomtest/test_master";
 		String nameNotes = "C:/Datas/Binomtest/annotation/comm_temp.txt";
+		
+		//extractCellDesignerNotesDialog dialog = new extractCellDesignerNotesDialog(); 
+		//dialog.raise();
+		
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
-		//String s = mn.exportCellDesignerNotes();
-		//System.out.println(s);
-		mn.comments = Utils.loadString(nameCD+"_notes.txt");
-		mn.ModifyCellDesignerNotes();
-		//Utils.saveStringToFile(s, nameCD+"_notes.txt");
+		//mn.moduleGMTFileName = "C:/Datas/NaviCell/test/merged/test.gmt";
+		String s = mn.exportCellDesignerNotes();
+		System.out.println(s);
+		//mn.comments = Utils.loadString(nameCD+"_notes.txt");
+		//mn.ModifyCellDesignerNotes();
+		Utils.saveStringToFile(s, nameCD+"_notes.txt");
 		CellDesigner.saveCellDesigner(mn.sbmlDoc, nameCD+"_notes.xml");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void automaticallyProcessNotes(){
+		try{
+			comments = exportCellDesignerNotes();
+			ModifyCellDesignerNotes();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void ModifyCellDesignerNotes() throws Exception{
@@ -98,6 +122,7 @@ public class ModifyCellDesignerNotes {
 		String s = null;
 		String ks = null;
 		String annot = null;
+		
 		while((s=lr.readLine())!=null){
 			/*StringTokenizer st = new StringTokenizer(s,"\t");
 			keys.add(st.nextToken());
@@ -147,6 +172,7 @@ public class ModifyCellDesignerNotes {
 				}
 			}*/
 		}
+		
 
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 			CelldesignerGeneDocument.CelldesignerGene p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
@@ -243,6 +269,13 @@ public class ModifyCellDesignerNotes {
 		StringBuffer annotations = new StringBuffer();
 		CellDesigner.entities = CellDesigner.getEntities(sbmlDoc);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(sbmlDoc.getSbml());
+
+		if(moduleGMTFileName!=null){
+			gmtFile = new GMTFile();
+			gmtFile.load(moduleGMTFileName);
+		}
+		
+		
 		int numberOfProteins = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			System.out.print(""+(i+1)+"/"+numberOfProteins+":");
@@ -256,7 +289,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+Utils.getValue(p.getName())+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+Utils.getValue(p.getName()));
 				if(formatAnnotation)
 					annot = processAnnotations(annot,Utils.getValue(p.getName()),reqsections,guessIdentifiers);
@@ -276,7 +309,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
@@ -296,7 +329,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
@@ -316,13 +349,14 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
+		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 			ReactionDocument.Reaction r = sbmlDoc.getSbml().getModel().getListOfReactions().getReactionArray(i);
 			String annot = Utils.getValue(r.getNotes());
@@ -334,7 +368,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+r.getId()+"\n");
 				annotations.append("### "+CellDesignerToCytoscapeConverter.getReactionString(r, sbmlDoc, true)+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+r.getId());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,null,reqsections,false);
@@ -366,7 +400,7 @@ public class ModifyCellDesignerNotes {
 				
 				annotations.append("### "+sp.getId()+"\n");
 				annotations.append("### "+spName+"\n");
-				String reqsections[] = {"Identifiers","Maps/Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+sp.getId()+"/"+spName);
 				boolean degraded = false;
 				System.out.println(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
@@ -387,6 +421,7 @@ public class ModifyCellDesignerNotes {
 					IdentifierSection.name = "Identifiers";
 					secs.add(IdentifierSection);
 				}*/
+				if(getSectionByName(secs,"Identifiers")!=null){
 				String identifiers = getSectionByName(secs,"Identifiers").content;
 				if(identifiers.trim().equals("")){
 					entName = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbmlDoc);
@@ -400,7 +435,7 @@ public class ModifyCellDesignerNotes {
 					for(int k=1;k<secs.size();k++) 
 						annot+=secs.get(k); 
 					//annot+=secs.get(0); 
-				}
+				}}
 			}
 			}
 			
@@ -424,34 +459,36 @@ public class ModifyCellDesignerNotes {
 		String annp = annot;
 		annp = Utils.cutFirstLastNonVisibleSymbols(annot);		
 		// Extract sections
-		Vector<AnnotationSection> secs = divideInSections(annp);
+		Vector<AnnotationSection> secs1 = divideInSections(annp);
 		//System.out.println(annp);
 		//for(int i=0;i<secs.size();i++)
 		//	System.out.println(secs.get(i));
 		// Rename sections if needed
-		for(int i=0;i<secs.size();i++){
-			if(secs.get(i).name!=null){
-				if(secs.get(i).name.equals("Generic"))
-					secs.get(i).name = "Identifiers";
-				if(secs.get(i).name.equals("Localisation"))
-					secs.get(i).name = "Maps/Modules";
-				if(secs.get(i).name.equals("Maps/Module"))
-					secs.get(i).name = "Maps/Modules";
+		for(int i=0;i<secs1.size();i++){
+			if(secs1.get(i).name!=null){
+				if(secs1.get(i).name.equals("Generic"))
+					secs1.get(i).name = "Identifiers";
+				if(secs1.get(i).name.equals("Localisation"))
+					secs1.get(i).name = "Maps_Modules";
+				if(secs1.get(i).name.equals("Maps_Module"))
+					secs1.get(i).name = "Maps_Modules";
 			}
-			secs.get(i).content = Utils.cutFirstLastNonVisibleSymbols(secs.get(i).content);
+			secs1.get(i).content = Utils.cutFirstLastNonVisibleSymbols(secs1.get(i).content);
 		}
-		// Make new sections if not present
+		// Make all sections in the corresponding order
+		Vector<AnnotationSection> secs = new Vector<AnnotationSection>();
+		AnnotationSection nosection = new AnnotationSection();
+		nosection.name = null;
+		nosection.content = secs1.get(0).content;
+		secs.add(nosection);
 		for(int i=0;i<reqsections.length;i++){
 			String sectionToMake = reqsections[i];
-			boolean found = false;
-			for(int j=1;j<secs.size();j++)
-				if(secs.get(j).name.equals(sectionToMake))
-					found = true;
-			if(!found){
 				AnnotationSection as = new AnnotationSection();
 				as.name = sectionToMake;
 				secs.add(as);
-			}	
+				for(int j=1;j<secs1.size();j++)
+					if(secs1.get(j).name.equals(as.name))
+						as.content = secs1.get(j).content; 
 		}
 		// Extract information from the default section
 		String nonannotated = secs.get(0).content;
@@ -492,11 +529,11 @@ public class ModifyCellDesignerNotes {
 				}
 			}else
 			if(s.startsWith("MODULE:")){
-				AnnotationSection sec = getSectionByName(secs,"Maps/Modules");
+				AnnotationSection sec = getSectionByName(secs,"Maps_Modules");
 				sec.content+=s+" ";
 			}else
 			if(s.startsWith("LAYER:")){
-				AnnotationSection sec = getSectionByName(secs,"Maps/Modules");
+				AnnotationSection sec = getSectionByName(secs,"Maps_Modules");
 				sec.content+=s+" ";
 			}else
 			{
@@ -558,6 +595,14 @@ public class ModifyCellDesignerNotes {
 				getSectionByName(secs, "Identifiers").content = "@@@ "+getSectionByName(secs, "Identifiers").content;
 		}
 		annp = "";
+		
+		// Re-assign modules names from gmtfile
+		if(moduleGMTFileName!=null)
+			addModuleNames(secs, entityName);
+		
+		if(insertMapsTagBeforeModules)
+			insertMapsTagBeforeModuleTag(secs);
+		
 		for(int i=1;i<secs.size();i++){
 			annp+=secs.get(i).toString();
 		}
@@ -567,7 +612,8 @@ public class ModifyCellDesignerNotes {
 		for(int i=0;i<secs.size();i++) _secs.add(secs.get(i));
 		
 		annp = guessPMIDIds(annp);
-		annp = Utils.replaceString(annp, "OR\n", "");
+		//annp = Utils.replaceString(annp, "OR\n", "");
+		
 		
 		return annp;
 	}
@@ -773,6 +819,29 @@ public class ModifyCellDesignerNotes {
 			}
 			//}
 		}
+		
+		// ProcessSections: remove repetitive and empty lines
+		for(int i=0;i<secs.size();i++){
+			String text = secs.get(i).content;
+			String newText = "";
+			try{
+			LineNumberReader lr = new LineNumberReader(new StringReader(text));
+			String s = null;
+			Vector<String> lines = new Vector<String>(); 
+			while((s=lr.readLine())!=null){
+				if(!Utils.cutFirstLastNonVisibleSymbols(s).equals(""))
+					if(!lines.contains(s)){
+						lines.add(s);
+					}
+			}
+			for(int j=0;j<lines.size();j++)
+				newText+=lines.get(j)+"\n";
+			secs.get(i).content = newText;
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		
 		return secs;
 	}
 	
@@ -796,6 +865,39 @@ public class ModifyCellDesignerNotes {
 		}
 		return annot;
 	}
+	
+	public void addModuleNames(Vector<AnnotationSection> secs, String id){
+		AnnotationSection identifiers = getSectionByName(secs, "Identifiers");
+		AnnotationSection moduleSection = getSectionByName(secs, "Maps_Modules");
+		Vector<String> hugos = Utils.getTagValues(identifiers.content, "HUGO");
+		Vector<String> moduleNames = gmtFile.getListOfSets(id);
+		if(useHUGOIdsForModuleIdentification){
+			for(int i=0;i<hugos.size();i++){
+				Vector<String> mns = gmtFile.getListOfSets(hugos.get(i));
+				for(int j=0;j<mns.size();j++)
+				if(!moduleNames.contains(mns.get(j)))
+					moduleNames.add(mns.get(j));
+			}
+		}
+		moduleSection.content = "";
+		for(int i=0;i<moduleNames.size();i++) 
+			moduleSection.content += "MODULE:"+moduleNames.get(i)+"\n";
+		if(moduleSection.content.length()>0)
+			moduleSection.content = moduleSection.content.substring(0, moduleSection.content.length()-1);
+	}
+
+	
+	public void insertMapsTagBeforeModuleTag(Vector<AnnotationSection> secs){
+		AnnotationSection moduleSection = getSectionByName(secs, "Maps_Modules");
+		Vector<String> modules = Utils.getTagValues(moduleSection.content, "MODULE");
+		String id = sbmlDoc.getSbml().getModel().getId();
+		moduleSection.content = "";
+		for(int i=0;i<modules.size();i++)
+			moduleSection.content+="MAP:"+id+" / MODULE:"+modules.get(i)+"\n";
+		if(moduleSection.content.length()>0)
+			moduleSection.content = moduleSection.content.substring(0, moduleSection.content.length()-1);
+	}
+	
 	
 	
 	

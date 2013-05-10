@@ -354,7 +354,7 @@ public class CellDesignerPathwayStaining {
 			//System.out.println(p.getId()); System.out.println(annotation);			
 		}
 		if(annotation!=null){
-			hugos = getTagValues(annotation,"HUGO");
+			hugos = Utils.getTagValues(annotation,"HUGO");
 		}
 		if(hugos.size()==0)
 			if(this.useProteinNameIfHUGOisntFound)
@@ -362,30 +362,7 @@ public class CellDesignerPathwayStaining {
 					hugos.add(name);
 		return hugos;
 	}
-	
-	public Vector<String> getTagValues(String notes, String tag){
-		Vector<String> hugos = new Vector<String>();
-		StringTokenizer st = new StringTokenizer(notes," ,;\n");
-		while(st.hasMoreTokens()){
-			String s = st.nextToken();
-			if(s.startsWith(tag+":")){
-				StringTokenizer st1 = new StringTokenizer(s,":");
-				st1.nextToken();
-				try{
-				if(st1.hasMoreTokens()){
-				String hugo = st1.nextToken();
-				if(!hugos.contains(hugo))
-					hugos.add(hugo);
-				}
-				}catch(Exception e){
-					System.out.println("ERROR in "+s);
-					e.printStackTrace();
-				}
-			}
-		}
-		return hugos;
-	}
-	
+		
 	public void writeListOfPoints(Vector<ColorPoint> points, String fncoordinates, String fnlabels, String fncolors){
 		try{
 			FileWriter fwc = new FileWriter(fncoordinates);
@@ -654,12 +631,12 @@ public class CellDesignerPathwayStaining {
 	  }
 	
 	  public void processAnnotation(String name, String notes, HashMap<String, Vector<String>> groups){
-		  Vector<String> hugos = getTagValues(notes, "HUGO");
-		  Vector<String> cc_phase = getTagValues(notes, "CC_PHASE");		  
-		  Vector<String> layer = getTagValues(notes, "LAYER");		  
-		  Vector<String> pathway = getTagValues(notes, "PATHWAY");		  		  
-		  Vector<String> checkpoints = getTagValues(notes,"CHECKPOINT");
-		  Vector<String> modules = getTagValues(notes,"MODULE");
+		  Vector<String> hugos = Utils.getTagValues(notes, "HUGO");
+		  Vector<String> cc_phase = Utils.getTagValues(notes, "CC_PHASE");		  
+		  Vector<String> layer = Utils.getTagValues(notes, "LAYER");		  
+		  Vector<String> pathway = Utils.getTagValues(notes, "PATHWAY");		  		  
+		  Vector<String> checkpoints = Utils.getTagValues(notes,"CHECKPOINT");
+		  Vector<String> modules = Utils.getTagValues(notes,"MODULE");
 		  Vector<String> module_names = new Vector<String>();
 		  module_names.addAll(cc_phase);
 		  module_names.addAll(pathway);

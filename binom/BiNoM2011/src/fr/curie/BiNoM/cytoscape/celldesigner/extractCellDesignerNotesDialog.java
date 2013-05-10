@@ -87,11 +87,16 @@ public class extractCellDesignerNotesDialog extends JFrame {
     private JCheckBox removeEmptySections = null;  
     private JCheckBox removeInvalidTags = null;
     private JCheckBox moveNonannotatedTextToReferenceSection = null;
+    private JCheckBox useHUGOIdsForModuleIdentification = null;
+    private JCheckBox insertMapsTagBeforeModules = null;
+    
+    private JTextField gmtFileField = null;
+    private JButton browseGMTIndex = null;    
     
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
 
-    private extractCellDesignerNotesDialog() {
+    public extractCellDesignerNotesDialog() {
 	super("Extract CellDesigner notes");
 	final JPanel panel = new JPanel(new GridBagLayout());
 	GridBagConstraints c;
@@ -133,7 +138,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	JPanel padPanel = new JPanel();
 	c = new GridBagConstraints();
 	c.ipadx = 5;
-	c.gridx = x++;
+	c.gridx = x;
 	c.gridy = y;
 	c.fill = GridBagConstraints.NONE;
 	c.weightx = 0;
@@ -196,11 +201,21 @@ public class extractCellDesignerNotesDialog extends JFrame {
 				guessIdentifiers.setEnabled(true);
 				removeEmptySections.setEnabled(true);
 				removeInvalidTags.setEnabled(true);
+				moveNonannotatedTextToReferenceSection.setEnabled(true);
+				gmtFileField.setEnabled(true);
+				useHUGOIdsForModuleIdentification.setEnabled(true);
+				browseGMTIndex.setEnabled(true);
+				insertMapsTagBeforeModules.setEnabled(true);
 			}else{
 				allAnnotations.setEnabled(false);
 				guessIdentifiers.setEnabled(false);
 				removeEmptySections.setEnabled(false);
 				removeInvalidTags.setEnabled(false);
+				moveNonannotatedTextToReferenceSection.setEnabled(false);
+				gmtFileField.setEnabled(false);
+				useHUGOIdsForModuleIdentification.setEnabled(false);
+				browseGMTIndex.setEnabled(false);
+				insertMapsTagBeforeModules.setEnabled(false);
 			}
 		
 		}
@@ -247,6 +262,67 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	c.weightx = 1.0;
 	panel.add(moveNonannotatedTextToReferenceSection, c);
 	
+	lab1 = new JLabel(" GMT file for modules:   ");
+	c = new GridBagConstraints();
+	c.gridx = 0;
+	c.gridy = y;
+	c.ipady = 10;	
+	c.weightx = 0.0;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	panel.add(lab1,c);
+	
+	gmtFileField = new JTextField(30);
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(gmtFileField, c);
+	
+
+	browseGMTIndex = new JButton("Browse...");
+	c = new GridBagConstraints();
+	c.gridx = 2;
+	c.gridy = y++;
+	c.anchor = GridBagConstraints.EAST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(browseGMTIndex,c);
+
+	browseGMTIndex.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    CyFileFilter gmtFileFieldFilter = new CyFileFilter();
+
+		    gmtFileFieldFilter.addExtension("gmt");
+		    gmtFileFieldFilter.setDescription("GMT files");
+
+		    File file = FileUtil.getFile
+			("Load GMT File", FileUtil.LOAD, new CyFileFilter[]{gmtFileFieldFilter});
+		    toFront();
+		    if (file != null) {
+			String fn = file.getAbsolutePath();
+			gmtFileField.setText(fn);
+		    }
+                }
+           });
+	
+	useHUGOIdsForModuleIdentification = new JCheckBox("use HUGO for module annotation");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(useHUGOIdsForModuleIdentification, c);
+
+	insertMapsTagBeforeModules = new JCheckBox("insert MAP: tag before MODULE:");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(insertMapsTagBeforeModules, c);
+	
 	
 	extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(null,null);
 	final extractCellDesignerNotesTask.extractingNotesOptions options = task.new extractingNotesOptions();
@@ -257,7 +333,10 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	removeEmptySections.setSelected(options.removeEmptySections);
 	removeInvalidTags.setSelected(options.removeInvalidTags);
 	moveNonannotatedTextToReferenceSection.setSelected(options.moveNonannotatedTextToReferenceSection);
-	JPanel buttonPanel = new JPanel();
+	useHUGOIdsForModuleIdentification.setSelected(options.useHUGOIdsForModuleIdentification);
+	insertMapsTagBeforeModules.setSelected(options.insertMapsTagBeforeModules);
+	
+	JPanel buttonPanel = new JPanel();	
 
 	okB = new JButton("OK");
 
@@ -270,6 +349,10 @@ public class extractCellDesignerNotesDialog extends JFrame {
             options.removeEmptySections = removeEmptySections.isSelected();
             options.removeInvalidTags = removeInvalidTags.isSelected();
             options.moveNonannotatedTextToReferenceSection = moveNonannotatedTextToReferenceSection.isSelected();
+            options.useHUGOIdsForModuleIdentification = useHUGOIdsForModuleIdentification.isSelected();
+            options.insertMapsTagBeforeModules = insertMapsTagBeforeModules.isSelected();
+            if(!gmtFileField.getText().trim().equals(""))
+            	options.moduleGMTFileName = gmtFileField.getText();
 			extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(indexField.getText(),options);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
@@ -305,7 +388,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
     public void raise() {
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 300));
+	setSize(new Dimension(550, 400));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

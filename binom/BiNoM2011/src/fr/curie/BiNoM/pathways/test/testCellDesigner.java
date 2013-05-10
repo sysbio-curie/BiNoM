@@ -53,7 +53,9 @@ public class testCellDesigner {
 			//modifyPositionOfSpecies(cd4,gr);
 			Utils.printUsedMemory();
 			Date date = new Date();
-			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/mapmerging/merged18maps.xml");
+			//SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/mapmerging/merged18maps.xml");
+			SbmlDocument cd4 = CellDesigner.loadCellDesigner("c:/datas/binomtest/mapmerging/merged_survival_names.xml");
+			System.out.println(cd4.getSbml().getModel().getId());
 			Utils.printUsedMemory();
 			System.out.println(((new Date()).getTime()-date.getTime())/1000f+" secs");
 			int pn = cd4.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();

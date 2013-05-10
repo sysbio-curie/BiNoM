@@ -55,6 +55,9 @@ public class extractCellDesignerNotesTask implements Task {
     	public boolean removeEmptySections = true;
     	public boolean removeInvalidTags = true;
     	public boolean moveNonannotatedTextToReferenceSection = true;
+    	public String moduleGMTFileName = null;
+    	public boolean useHUGOIdsForModuleIdentification = false;
+    	public boolean insertMapsTagBeforeModules = false;
     }
     
     public void run() {
@@ -76,6 +79,11 @@ public class extractCellDesignerNotesTask implements Task {
     			mn.removeEmptySections = options.removeEmptySections;
     			mn.removeInvalidTags = options.removeInvalidTags;
     			mn.moveNonannotatedTextToReferenceSection = options.moveNonannotatedTextToReferenceSection;
+    			if(options.moduleGMTFileName!=null)
+    				if(!options.moduleGMTFileName.trim().equals(""))
+    					mn.moduleGMTFileName = options.moduleGMTFileName;
+    			mn.useHUGOIdsForModuleIdentification = options.useHUGOIdsForModuleIdentification;
+    			mn.insertMapsTagBeforeModules = options.insertMapsTagBeforeModules;
     			mn.comments = mn.exportCellDesignerNotes();
     			//mn.comments = Utils.loadString(nameCD+"_notes.txt");
     			//mn.ModifyCellDesignerNotes();

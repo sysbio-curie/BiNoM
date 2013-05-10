@@ -1963,7 +1963,8 @@ public class ProduceClickableMap
 	static private String make_right_hand_module_entry(int post_id, String name)
 	{
 		final StringBuffer sb = make_right_hand_link_to_blog(null, post_id);
-		sb.append("&amp;nbsp;");
+		//sb.append("&amp;nbsp;");
+		sb.append(" ");
 		sb.append("<img align='top' class='mapmodulefromright' border='0' src='" + map_icon + "' alt='");
 		sb.append(name).append("'/>");
 		sb.append(" ").append(name);
@@ -2054,7 +2055,8 @@ public class ProduceClickableMap
 					map_item.getOutput().print("\"");
 				}
 				map_item.getOutput().println(">");
-				content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
+				//content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
+				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
 
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
@@ -2070,7 +2072,8 @@ public class ProduceClickableMap
 						module_item.getOutput().print("\"");
 					}
 					module_item.getOutput().println(">");
-					content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
+					//content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
 
 					module_item.close();
 				}
@@ -2395,7 +2398,8 @@ public class ProduceClickableMap
 		for (String e : entities)
 			do_span(fw, "entity", e);
 		show_map_icon(fw, wp);
-		fw.append("&amp;nbsp;");
+		//fw.append("&amp;nbsp;");
+		fw.append(" ");
 		return fw.append("</a>");
 	}
 

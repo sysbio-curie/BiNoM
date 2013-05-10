@@ -204,12 +204,21 @@ public class ProduceClickableMap
 	}
 
 	static class AtlasInfo {
+		static int ATLAS = 1;
+		static int MAP = 2;
 		Vector<AtlasMapInfo> mapInfo_v;
 		HashMap<String, AtlasMapInfo> mapInfo_map;
-		AtlasInfo() {
+		int type;
+
+		AtlasInfo(int type) {
+			this.type = type;
 			mapInfo_v = new Vector<AtlasMapInfo>();
 			mapInfo_map = new HashMap<String, AtlasMapInfo>();
 		}
+
+		boolean isAtlas() {return type == ATLAS;}
+		boolean isMap() {return type == MAP;}
+
 		void add(AtlasMapInfo mapInfo) {
 			mapInfo_v.add(mapInfo);
 			mapInfo_map.put(mapInfo.id, mapInfo);
@@ -221,9 +230,29 @@ public class ProduceClickableMap
 	}
 
 	static AtlasInfo parseAtlasInfo(String info) {
-		AtlasInfo atlasInfo = new AtlasInfo();
+		AtlasInfo atlasInfo = null;
 		String[] atlas_arr = info.split("\\|");
-		for (int nn = 0; nn < atlas_arr.length; ++nn) {
+		String[] type_arr = atlas_arr[0].split("=");
+		final String type_error = "mapInfo: type=atlas or type=map expected as a first item [" + info + "]";
+		if (type_arr.length != 2) {
+			System.err.println(type_error);
+			System.exit(1);
+		}
+		if (type_arr[0].equals("type")) {
+			if (type_arr[1].equals("atlas")) {
+				atlasInfo = new AtlasInfo(AtlasInfo.ATLAS);
+			} else if (type_arr[1].equals("map")) {
+				atlasInfo = new AtlasInfo(AtlasInfo.MAP);
+			} else {
+				System.err.println(type_error);
+				System.exit(1);
+			}
+		} else {
+			System.err.println(type_error);
+			System.exit(1);
+		}
+
+		for (int nn = 1; nn < atlas_arr.length; ++nn) {
 			String mapId = null;
 			String mapName = null;
 			String mapUrl = null;
@@ -519,7 +548,7 @@ public class ProduceClickableMap
 
 		
 		Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
-		if (modules.size() == 0 && atlasInfo != null) {
+		if (modules.size() == 0 && atlasInfo != null && atlasInfo.isAtlas()) {
 			modules = get_module_list(atlasInfo);
 		}
 
@@ -544,7 +573,7 @@ public class ProduceClickableMap
 			throw new NaviCellException("IO error installing static files", e);
 		}
 
-		if (atlasInfo == null) {
+		if (atlasInfo == null || !atlasInfo.isAtlas()) {
 			for (final String map_name : modules.keySet()) {
 				if (!map_name.equals(master_map_name))
 					try
@@ -1934,7 +1963,7 @@ public class ProduceClickableMap
 	static private String make_right_hand_module_entry(int post_id, String name)
 	{
 		final StringBuffer sb = make_right_hand_link_to_blog(null, post_id);
-		sb.append(" ");
+		sb.append("&amp;nbsp;");
 		sb.append("<img align='top' class='mapmodulefromright' border='0' src='" + map_icon + "' alt='");
 		sb.append(name).append("'/>");
 		sb.append(" ").append(name);
@@ -1970,7 +1999,8 @@ public class ProduceClickableMap
 			positions.put(name, null);
 		}
 	
-		if (atlasInfo == null && modules_set.size() > 1) {
+		boolean isAtlas = atlasInfo != null && atlasInfo.isAtlas();
+		if (!isAtlas && modules_set.size() > 1) {
 			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
 			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
 				if (master_map_name.equals(k.getKey()))
@@ -2007,7 +2037,7 @@ public class ProduceClickableMap
 			modules.close();
 		}
 		
-		if (atlasInfo != null) {
+		if (isAtlas) {
 			final ItemCloser maps = item_line(new ItemCloser(output), "maps", null, "Maps", null);
 			Vector<AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
 			int size = mapInfo_v.size();
@@ -2024,7 +2054,7 @@ public class ProduceClickableMap
 					map_item.getOutput().print("\"");
 				}
 				map_item.getOutput().println(">");
-				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
+				content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
 
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
@@ -2040,7 +2070,7 @@ public class ProduceClickableMap
 						module_item.getOutput().print("\"");
 					}
 					module_item.getOutput().println(">");
-					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
+					content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
 
 					module_item.close();
 				}
@@ -2365,6 +2395,7 @@ public class ProduceClickableMap
 		for (String e : entities)
 			do_span(fw, "entity", e);
 		show_map_icon(fw, wp);
+		fw.append("&amp;nbsp;");
 		return fw.append("</a>");
 	}
 

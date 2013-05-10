@@ -536,9 +536,17 @@ function open_module_map_click(e)
 	return false;
 }
 
+function dbg_sleep(millis)
+ {
+  var date = new Date();
+  var curDate = null;
+  do { curDate = new Date(); }
+  while(curDate-date < millis);
+}
+
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
 {
-	console.log("clickmap_start ... ", to_open);
+	console.log("clickmap_start ... ", to_open, window.to_open);
 	if (!maps)
 	{
 		maps = Object();
@@ -560,9 +568,12 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 //			data.inst.close_all(e, false); // -1 closes all nodes in the container
 //			data.inst.open_node(e, false, true);
 			var children = data.inst._get_children(e);
-			for (var i = 0; i < children.length; i++)
+			for (var i = 0; i < children.length; i++) {
 				data.inst.close_all(children[i], false);
+			}
 		}
+		//dbg_sleep(3000);
+		//console.log("AFTER SLEEP ", (window.to_open ? window.to_open : []));
 		to_open = [];
 		$("img.blogfromright").click(open_blog_click);
 		$("img.mapmodulefromright").click(open_module_map_click);
@@ -604,10 +615,11 @@ function show_blog(postid)
 
 function show_map_and_markers(map_name, ids)
 {
-//	console.log("show_map_and_markers", map_name, ids);
+	console.log("show_map_and_markers", map_name, ids);
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
+		console.log("map already open");
 		if (!map.to_open)
 			map.to_open = ids;
 		else if (map.to_open.length < 1)
@@ -618,7 +630,8 @@ function show_map_and_markers(map_name, ids)
 	}
 	else
 	{
-		console.log("not open is map", map, maps);
+		//console.log("not open is map", map, maps);
+		console.log("map not open");
 		if (map_name.indexOf(".html") > 0) {
 			map = window.open(map_name);
 		} else {

@@ -158,7 +158,8 @@ public class MergingMapsProcessor {
 		String outputFileName = "";
 		
 		boolean mergeImages = false;
-		boolean processannotations = false;
+		boolean preprocess = false;
+		boolean postprocess = false;		
 		int zoomLevel = 3;
 		int numberOfTimesToScale = 0;
 		
@@ -169,8 +170,10 @@ public class MergingMapsProcessor {
 				outputFileName = args[i+1];
 			if(args[i].equals("--mergeimages"))
 				mergeImages = true;
-			if(args[i].equals("--processannotations"))
-				processannotations = true;
+			if(args[i].equals("--preprocess"))
+				preprocess = true;
+			if(args[i].equals("--postprocess"))
+				postprocess = true;
 			if(args[i].equals("--zoomlevel"))
 				zoomLevel = Integer.parseInt(args[i+1]);
 			if(args[i].equals("--numberofscaleimages"))
@@ -200,8 +203,17 @@ public class MergingMapsProcessor {
 			}
 			ct++;
 		}
+		
+		if(preprocess)
+			mm.preProcessMergedMaps();
+
 		mm.mergeAll();
+		
 		mm.saveMap(outputFileName);
+		
+		if(postprocess)
+			mm.postProcessMergedMap(outputFileName);
+		
 		
 		if(mergeImages){
 			String outputFileName_prefix = outputFileName;
@@ -210,8 +222,7 @@ public class MergingMapsProcessor {
 			mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale);
 		}
 		
-		if(processannotations)
-			mm.postProcessAnnotations(outputFileName);
+		
 		
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1106,20 +1117,70 @@ public class MergingMapsProcessor {
 
 	}
 
-	public void postProcessAnnotations(String outputFileName){
+	public ModifyCellDesignerNotes postProcessAnnotations(String outputFileName){
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
 		mn.allannotations = true;
 		mn.formatAnnotation = true;
 		mn.moduleGMTFileName = null;
 		mn.guessIdentifiers = false;
-		mn.insertMapsTagBeforeModules = true;
+		mn.insertMapsTagBeforeModules = false;
 		mn.removeEmptySections = false;
 		mn.removeInvalidTags = true;
 		mn.moveNonannotatedTextToReferenceSection = false;
 
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(outputFileName);
 		mn.automaticallyProcessNotes();
+		
 		CellDesigner.saveCellDesigner(mn.sbmlDoc, outputFileName);
+		return mn;
+	}
+	
+	
+	public void preProcessMergedMaps(){
+		for(int i=0;i<mapList.size();i++){
+			String fileName = mapList.get(i).fileName;
+			// 1. Add MAP: tag before MODULE: tag
+			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+			mn.allannotations = true;
+			mn.formatAnnotation = true;
+			mn.moduleGMTFileName = null;
+			mn.guessIdentifiers = false;
+			mn.insertMapsTagBeforeModules = true;
+			mn.removeEmptySections = false;
+			mn.removeInvalidTags = true;
+			mn.moveNonannotatedTextToReferenceSection = false;
+			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
+			mn.automaticallyProcessNotes();
+			CellDesigner.saveCellDesigner(mn.sbmlDoc, fileName);
+		}
+
+	}
+	
+	public void postProcessMergedMap(String outputFileName) throws Exception{
+		System.out.println("Post-processing annotations for "+outputFileName);
+		ModifyCellDesignerNotes mcn = postProcessAnnotations(outputFileName);
+		// 1. Synchronize ids for entities in all maps
+
+		// 2. Make modules section identical in all maps
+		ModifyCellDesignerNotes global = new ModifyCellDesignerNotes();
+		global.sbmlDoc = CellDesigner.loadCellDesigner(outputFileName);
+		System.out.println("Synchronizing annotations for "+outputFileName);		
+		for(int i=0;i<mapList.size();i++){
+			String fileName = mapList.get(i).fileName;
+			System.out.println("\tsynchronizing "+fileName);			
+			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+			mn.allannotations = true;
+			mn.formatAnnotation = true;
+			mn.moduleGMTFileName = null;
+			mn.guessIdentifiers = false;
+			mn.insertMapsTagBeforeModules = true;
+			mn.removeEmptySections = false;
+			mn.removeInvalidTags = true;
+			mn.moveNonannotatedTextToReferenceSection = false;
+			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
+			mn.synchronizeAnnotations(mcn);
+			CellDesigner.saveCellDesigner(mn.sbmlDoc, fileName);			
+		}
 	}
 
 	

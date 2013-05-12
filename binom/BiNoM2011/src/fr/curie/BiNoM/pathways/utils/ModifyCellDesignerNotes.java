@@ -35,6 +35,10 @@ public class ModifyCellDesignerNotes {
 	
 	public boolean insertMapsTagBeforeModules = true;
 	
+	Vector<String> keys = new Vector<String>();
+	Vector<String> noteAdds = new Vector<String>();
+	
+	ModifyCellDesignerNotes synchronizingObject = null;
 	
 	public String tags[] = {"HUGO","HGNC","PUBMED","ENTREZ","UNIPROT","GENECARDS","PMID","PATHWAY","MODULE","LAYER","NAME","ALT_NAME","CHEBI","KEGGCOMPOUND","CAS"};
 
@@ -95,7 +99,7 @@ public class ModifyCellDesignerNotes {
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		//mn.moduleGMTFileName = "C:/Datas/NaviCell/test/merged/test.gmt";
 		String s = mn.exportCellDesignerNotes();
-		System.out.println(s);
+		//System.out.println(s);
 		//mn.comments = Utils.loadString(nameCD+"_notes.txt");
 		//mn.ModifyCellDesignerNotes();
 		Utils.saveStringToFile(s, nameCD+"_notes.txt");
@@ -116,8 +120,8 @@ public class ModifyCellDesignerNotes {
 	}
 	
 	public void ModifyCellDesignerNotes() throws Exception{
-		Vector<String> keys = new Vector<String>();
-		Vector<String> noteAdds = new Vector<String>();
+		//Vector<String> keys = new Vector<String>();
+		//Vector<String> noteAdds = new Vector<String>();
 		LineNumberReader lr = new LineNumberReader(new StringReader(comments));
 		String s = null;
 		String ks = null;
@@ -157,8 +161,8 @@ public class ModifyCellDesignerNotes {
 				  XmlString xs = XmlString.Factory.newInstance();
 				  xs.setStringValue(note);
 				  b.set(xs);
-				  System.out.println(key);
-				  System.out.println(note);
+				  //System.out.println(key);
+				  //System.out.println(note);
 			}
 			/*for(int j=0;j<keys.size();j++){
 				if(note.contains(keys.get(j))){
@@ -292,7 +296,7 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+Utils.getValue(p.getName()));
 				if(formatAnnotation)
-					annot = processAnnotations(annot,Utils.getValue(p.getName()),reqsections,guessIdentifiers);
+					annot = processAnnotations(annot,Utils.getValue(p.getName()),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}
@@ -312,7 +316,7 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
+					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -332,7 +336,7 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
+					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -352,7 +356,7 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),reqsections,guessIdentifiers);
+					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -371,7 +375,7 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+r.getId());
 				if(formatAnnotation)
-					annot = processAnnotations(annot,null,reqsections,false);
+					annot = processAnnotations(annot,null,r.getId(),reqsections,false);
 				annotations.append(annot+"\n\n");
 			}
 		}
@@ -403,12 +407,12 @@ public class ModifyCellDesignerNotes {
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				System.out.println("Processing "+sp.getId()+"/"+spName);
 				boolean degraded = false;
-				System.out.println(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
+				//System.out.println(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
 				if(sp.getAnnotation()!=null)
 					if(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("DEGRADED"))
 						degraded = true;
 				if(formatAnnotation)if(!degraded)
-					annot = processAnnotations(annot,null, reqsections, false, nonannotated, secs);
+					annot = processAnnotations(annot,null,sp.getId(),reqsections, false, nonannotated, secs);
 				
 			
 			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
@@ -423,19 +427,26 @@ public class ModifyCellDesignerNotes {
 				}*/
 				if(getSectionByName(secs,"Identifiers")!=null){
 				String identifiers = getSectionByName(secs,"Identifiers").content;
-				if(identifiers.trim().equals("")){
+				//if(identifiers.trim().equals("")){
 					entName = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbmlDoc);
 					spName = CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), sp.getId(), entName, sp.getCompartment(), true, true, "", sbmlDoc);					
 					Vector<String> names = BiographUtils.extractProteinNamesFromNodeName(spName);
 					Collections.sort(names);
 					String name = "";
 					for(int k=0;k<names.size();k++) name+=names.get(k)+":"; if(name.length()>0) name = name.substring(0,name.length()-1);
-					getSectionByName(secs,"Identifiers").content = name;
+					getSectionByName(secs,"Identifiers").content = "NAME:"+name;
+					String oldname = Utils.getValue(sp.getName());
+					if(!(oldname.startsWith("(")&&oldname.endsWith(")"))){
+						XmlString xs = XmlString.Factory.newInstance();
+						xs.setStringValue(name);
+						sp.setName(xs);
+					}
 					annot = ""; 
 					for(int k=1;k<secs.size();k++) 
 						annot+=secs.get(k); 
 					//annot+=secs.get(0); 
-				}}
+				//} // if the identifiers were empty
+				}
 			}
 			}
 			
@@ -447,13 +458,13 @@ public class ModifyCellDesignerNotes {
 		return annotations.toString();
 	}
 	
-	public String processAnnotations(String annot, String entityName, String reqsections[], boolean _guessIdentifiers){
+	public String processAnnotations(String annot, String entityName, String id, String reqsections[], boolean _guessIdentifiers){
 		StringBuffer bf = new StringBuffer();
 		Vector<AnnotationSection> secs = new Vector<AnnotationSection>(); 
-		return processAnnotations(annot, entityName, reqsections, _guessIdentifiers, bf, secs);
+		return processAnnotations(annot, entityName, id, reqsections, _guessIdentifiers, bf, secs);
 	}
 	
-	public String processAnnotations(String annot, String entityName, String reqsections[], boolean _guessIdentifiers, StringBuffer _newnonannotated, Vector<AnnotationSection> _secs){
+	public String processAnnotations(String annot, String entityName, String id, String reqsections[], boolean _guessIdentifiers, StringBuffer _newnonannotated, Vector<AnnotationSection> _secs){
 		if(annot==null)
 			annot = "";
 		String annp = annot;
@@ -603,6 +614,11 @@ public class ModifyCellDesignerNotes {
 		if(insertMapsTagBeforeModules)
 			insertMapsTagBeforeModuleTag(secs);
 		
+		if(synchronizingObject!=null){
+			synchronizeSections(id, secs);
+		}
+		
+		
 		for(int i=1;i<secs.size();i++){
 			annp+=secs.get(i).toString();
 		}
@@ -613,6 +629,7 @@ public class ModifyCellDesignerNotes {
 		
 		annp = guessPMIDIds(annp);
 		//annp = Utils.replaceString(annp, "OR\n", "");
+		
 		
 		
 		return annp;
@@ -890,13 +907,44 @@ public class ModifyCellDesignerNotes {
 	public void insertMapsTagBeforeModuleTag(Vector<AnnotationSection> secs){
 		AnnotationSection moduleSection = getSectionByName(secs, "Maps_Modules");
 		Vector<String> modules = Utils.getTagValues(moduleSection.content, "MODULE");
+		
+		Vector<String> existingModules = new Vector<String>();
+		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray();i++){
+			CelldesignerLayerDocument.CelldesignerLayer layer = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray(i);
+			String layerName = Utils.getValue(layer.getName());
+			if(!existingModules.contains(layerName))
+				existingModules.add(layerName);
+		}
+		
 		String id = sbmlDoc.getSbml().getModel().getId();
 		moduleSection.content = "";
 		for(int i=0;i<modules.size();i++)
-			moduleSection.content+="MAP:"+id+" / MODULE:"+modules.get(i)+"\n";
+			if(existingModules.contains(modules.get(i)))
+				moduleSection.content+="MAP:"+id+" / MODULE:"+modules.get(i)+"\n";
 		if(moduleSection.content.length()>0)
 			moduleSection.content = moduleSection.content.substring(0, moduleSection.content.length()-1);
 	}
+	
+	public void synchronizeAnnotations(ModifyCellDesignerNotes global) throws Exception{
+		synchronizingObject = global;
+		comments = exportCellDesignerNotes();
+		ModifyCellDesignerNotes();
+	}
+	
+	public void synchronizeSections(String id, Vector<AnnotationSection> secs){
+		int k = synchronizingObject.keys.indexOf(id);
+		if(k!=-1){
+			String global_note = synchronizingObject.noteAdds.get(k);
+			Vector<AnnotationSection> global_sections = synchronizingObject.divideInSections(global_note);
+			String global_modules = getSectionByName(global_sections,"Maps_Modules").content;
+			AnnotationSection modules = getSectionByName(secs,"Maps_Modules");
+			modules.content = Utils.cutFirstLastNonVisibleSymbols(global_modules);
+		}else{
+			System.out.println("WARNING: "+id+" is not found in the global map!");
+		}
+	}
+	
+	
 	
 	
 	

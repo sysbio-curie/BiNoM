@@ -890,8 +890,10 @@ public class MergingMapsProcessor {
 					if(proteinto.getCelldesignerNotes()==null)
 						proteinto.addNewCelldesignerNotes();
 					String commentto = Utils.getValue(proteinto.getCelldesignerNotes()).trim();
+					//System.out.println("comment:\n"+comment+"\ncommento:\n"+commentto+"\n\n");
 					xs.setStringValue("<&html><&body>"+commentto+"\n"+comment+"<&/body><&/html>");
 					proteinto.getCelldesignerNotes().set(xs);
+					//System.out.println("merge:"+proteinto.getCelldesignerNotes()+"\n\n");
 				}
 				// add modifications to prot 1
 				if(protein.getCelldesignerListOfModificationResidues()!=null){

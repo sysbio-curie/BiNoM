@@ -27,11 +27,11 @@ public class TestMergeMapsACSN {
 //		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
 
 		
-		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/emtcellmotility_v1_names.xml",50,50);
-		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/cellcycle_v1_names.xml",6500,50);
-		mm.setMapSize(14000, 7000);
-		mm.mergeAll();
-		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
+//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/emtcellmotility_v1_names.xml",50,50);
+//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/cellcycle_v1_names.xml",6500,50);
+//		mm.setMapSize(14000, 7000);
+//		mm.mergeAll();
+//		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
 
 //		mm.addMap("/bioinfo/users/ebonnet/layers.xml",10,10);
 //		mm.addMap("/bioinfo/users/ebonnet/layers.xml",650,10);
@@ -61,23 +61,23 @@ public class TestMergeMapsACSN {
 //		mm.saveMap("/bioinfo/users/ebonnet/big.xml");
 
 		// Survival maps only
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG01.xml",9254,3026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG02.xml",9254,5526);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG03.xml",9254,8026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_MAPK01.xml",22,3222);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_PI3K_AKT_MTOR01.xml",1554,5526);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_PI3K_AKT_MTOR02.xml",1554,8026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL01.xml",3754,26);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL02.xml",6754,526);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL03.xml",4254,3026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL04.xml",6754,3026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL01.xml",4054,8026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL02.xml",6754,8026);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL03.xml",6754,5526);
-//		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL04.xml",4254,5526);
-//		mm.setMapSize(11776,10752);
-//		mm.mergeAll();
-//		mm.saveMap("/bioinfo/users/ebonnet/merged_surv.xml");
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG01.xml",9254,3026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG02.xml",9254,5526);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_HEDGEHOG03.xml",9254,8026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_MAPK01.xml",22,3222);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_PI3K_AKT_MTOR01.xml",1554,5526);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_PI3K_AKT_MTOR02.xml",1554,8026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL01.xml",3754,26);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL02.xml",6754,526);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL03.xml",4254,3026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_CANONICAL04.xml",6754,3026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL01.xml",4054,8026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL02.xml",6754,8026);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL03.xml",6754,5526);
+		mm.addMap("/bioinfo/projects_prod/acsn/5_Release_xmls/survival_v2_names/survival_WNT_NON_CANONICAL04.xml",4254,5526);
+		mm.setMapSize(11776,10752);
+		mm.mergeAll();
+		mm.saveMap("/bioinfo/users/ebonnet/merged_surv.xml");
 
 	}
 

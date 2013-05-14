@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,31 +70,42 @@ public class MergingMapsProcessor {
 	 */
 	private SbmlDocument cd2;
 	
-	/** 
-	 * Simple counter to create specific prefix for cd2 files.
+	/**
+	 * Cell Designer file string.
+	 * 
+	 * This string will be used to set and save unique Ids.
 	 */
-	private int counter = 0;
+	private String cdFileString;
+	
+	/**
+	 * random 4-letters prefix to be added to CellDesigner Ids
+	 */
+	private String prefix;
 	
 	/**
 	 * map protein ID2 => protein ID1
 	 */
-	private HashMap<String, String> proteinMap;
+	private HashMap<String, String> proteinMap = new HashMap<String, String>();
+	
 	/**
 	 * List of protein ID2
 	 */
 	private ArrayList<String> proteinIdList;
+	
 	/**
 	 * map geneID2 => geneID1
 	 */
-	private HashMap<String, String> geneMap;
+	private HashMap<String, String> geneMap = new HashMap<String, String>();
+	
 	/**
 	 * map rnaID2 => rnaID1
 	 */
-	private HashMap<String, String> rnaMap;
+	private HashMap<String, String> rnaMap = new HashMap<String, String>();
+	
 	/**
 	 * map asRNA_ID2 => asRna_ID1
 	 */
-	private HashMap<String, String> asRnaMap;
+	private HashMap<String, String> asRnaMap = new HashMap<String, String>();
 	
 	/**
 	 * List of gene ID2
@@ -109,7 +121,6 @@ public class MergingMapsProcessor {
 	 * List of asRNA ID2
 	 */
 	private ArrayList<String> asRnaIdList;
-
 
 	/**
 	 * Simple class to store file name and coordinates for the maps to be merged.
@@ -265,6 +276,7 @@ public class MergingMapsProcessor {
 	 */
 	public void mergeAll() {
 		
+		
 		System.out.println("==============================");
 		System.out.println("=======   Merge maps    ======");		
 		System.out.println("==============================");		
@@ -272,10 +284,15 @@ public class MergingMapsProcessor {
 		
 		int nbFiles = mapList.size();
 		
-		// load file 1
+		// load file 1 and add prefix
 		System.out.print("loading file "+mapList.get(0).fileName+"...");
 		Date time = new Date();
-		this.cd1 = CellDesigner.loadCellDesigner(mapList.get(0).fileName);
+		String text = Utils.loadString(mapList.get(0).fileName);
+		generateRandomPrefix();
+		text = addPrefixToIds(text);
+		cdFileString = text;
+		setIdsAndSave(mapList.get(0).fileName);
+		this.cd1 = CellDesigner.loadCellDesignerFromText(text);
 		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(sizeX);
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(sizeY);
@@ -284,15 +301,16 @@ public class MergingMapsProcessor {
 		setAndLoadFileName2(mapList.get(1).fileName);
 		time = new Date();
 		System.out.print("merging file "+mapList.get(1).fileName+"...");
-		//System.out.println("cd1 getId: "+this.cd1.getSbml().getModel().getName());
 		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
 		produceCandidateMergeLists();
+		setIdsAndSave(mapList.get(1).fileName);
+		
 		mergeDiagrams();
 		mergeElements();
 		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		Utils.printUsedMemory();
 		
-		
+
 		for (int i=2;i<nbFiles;i++) {
 			// set new file 2 name
 			setAndLoadFileName2(mapList.get(i).fileName);
@@ -301,6 +319,7 @@ public class MergingMapsProcessor {
 			shiftCoordinates(cd2, mapList.get(i).deltaX, mapList.get(i).deltaY);
 			// create new common species names
 			produceCandidateMergeLists();
+			setIdsAndSave(mapList.get(i).fileName);
 			// merge maps
 			mergeDiagrams();
 			mergeElements();
@@ -309,7 +328,7 @@ public class MergingMapsProcessor {
 		}
 		
 		formatLayers();
-
+		
 	}
 	
 	/**
@@ -340,16 +359,12 @@ public class MergingMapsProcessor {
 	 * @param fileName
 	 */
 	private void setAndLoadFileName2 (String fileName) {
-		/*
-		 * new way: add prefix to second file
-		 * use an internal counter to generate a new prefix each time a new file is loaded
-		 */
 		Date time = new Date();
-		System.out.print("loading file "+fileName+"...");
+		System.out.println("loading file "+fileName+"...");
 		String text = Utils.loadString(fileName);
-		this.counter++;
-		String prefix = "cd" + counter + "_";
-		text = addPrefixToIds(text, prefix);
+		generateRandomPrefix();
+		text = addPrefixToIds(text);
+		this.cdFileString = text;
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
 		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 	}
@@ -497,14 +512,14 @@ public class MergingMapsProcessor {
 	 * Just add a given prefix to all IDs on a given CellDesigner map.
 	 * 
 	 * @param text the whole map as a string
-	 * @param prefix a string representing the prefix to add
 	 * @return string the whole modified map as a string
 	 */
-	private String addPrefixToIds(String text, String prefix){
+	private String addPrefixToIds(String text){
+		//System.out.println("---- add prefix to IDs");
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++) {
 			if(ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
-				//System.out.println(">>> id= "+ids.get(i));
+				//System.out.println("--> id= "+ids.get(i));
 				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
 				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
@@ -602,7 +617,7 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			proteinNames.put(Utils.getValue(p.getName()), p.getId());
-			//System.out.println(Utils.getValue(p.getName())+"\t"+p.getId());
+			//System.out.println("Names: "+Utils.getValue(p.getName())+"\t"+p.getId());
 		}
 		this.proteinMap = new HashMap<String, String>();
 		this.proteinIdList = new ArrayList<String>();
@@ -611,6 +626,7 @@ public class MergingMapsProcessor {
 			String name = Utils.getValue(p.getName());
 			if(proteinNames.containsKey(name)){
 				//proteinMap.add(proteinNames.get(name)+"\t"+name+"\t"+p.getId()+"\t"+name);
+				//System.out.println(name+"id2: "+p.getId());
 				this.proteinMap.put(p.getId(), proteinNames.get(name));
 				this.proteinIdList.add(p.getId());
 			}
@@ -915,8 +931,10 @@ public class MergingMapsProcessor {
 					if(proteinto.getCelldesignerNotes()==null)
 						proteinto.addNewCelldesignerNotes();
 					String commentto = Utils.getValue(proteinto.getCelldesignerNotes()).trim();
+					//System.out.println("comment:\n"+comment+"\ncommento:\n"+commentto+"\n\n");
 					xs.setStringValue("<&html><&body>"+commentto+"\n"+comment+"<&/body><&/html>");
 					proteinto.getCelldesignerNotes().set(xs);
+					//System.out.println("merge:"+proteinto.getCelldesignerNotes()+"\n\n");
 				}
 				// add modifications to prot 1
 				if(protein.getCelldesignerListOfModificationResidues()!=null){
@@ -1084,12 +1102,46 @@ public class MergingMapsProcessor {
 		}
 	}
 	
+	private void setIdsAndSave(String fileName) {
+		
+		for (String id : this.proteinMap.keySet())
+			cdFileString = Utils.replaceString(cdFileString, id, proteinMap.get(id));
+		
+		for (String id : this.rnaMap.keySet())
+			cdFileString = Utils.replaceString(cdFileString, id, rnaMap.get(id));
+		
+		for (String id : this.geneMap.keySet())
+			cdFileString = Utils.replaceString(cdFileString, id, geneMap.get(id));
+		
+		for (String id : this.asRnaMap.keySet())
+			cdFileString = Utils.replaceString(cdFileString, id, asRnaMap.get(id));
+		
+		if (fileName.endsWith(".xml")) {
+			fileName = fileName.substring(0, fileName.length() - 4);
+			fileName += "_newIds.xml";
+		}
+		else {
+			fileName += "_newIds.xml";
+		}
+			
+		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(cdFileString);
+		CellDesigner.saveCellDesigner(doc, fileName);
+	}
+	
+	private void generateRandomPrefix() {
+		prefix="";
+		String alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+		Random r = new Random();
+		for (int i=0;i<4;i++)
+			prefix += alphabet.charAt(r.nextInt(alphabet.length()));
+		prefix += "_";
+	}
+	
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){
 		
 		System.out.println("==============================");
 		System.out.println("=======  Merge images   ======");		
 		System.out.println("==============================");		
-
 
 		try{
 
@@ -1113,7 +1165,6 @@ public class MergingMapsProcessor {
 				if(f.exists()){
 					System.out.println("Reading "+fn+"...");
 					BufferedImage map = ImageIO.read(new File(fn));
-					//Utils.printUsedMemory();
 					Image imap = Utils.Transparency.makeColorTransparent(map, new Color(1f, 1f, 1f));
 					int x = mapList.get(j).deltaX;
 					int y = mapList.get(j).deltaY;
@@ -1135,7 +1186,7 @@ public class MergingMapsProcessor {
 				}else{
 					System.out.println("ERROR: "+fn+" image is not found!!!");
 				}
-				//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+
 
 			}
 

@@ -35,6 +35,10 @@ public class ModifyCellDesignerNotes {
 	
 	public boolean insertMapsTagBeforeModules = true;
 	
+	public boolean verbose = false;
+	
+	public boolean generateReadableNamesForReactionsAndSpecies = true;
+	
 	Vector<String> keys = new Vector<String>();
 	Vector<String> noteAdds = new Vector<String>();
 	
@@ -147,6 +151,7 @@ public class ModifyCellDesignerNotes {
 		annot = Utils.cutFirstLastNonVisibleSymbols(annot);
 		noteAdds.add(annot);
 		
+		if(sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			String key = p.getId();
@@ -178,6 +183,7 @@ public class ModifyCellDesignerNotes {
 		}
 		
 
+		if(sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 			CelldesignerGeneDocument.CelldesignerGene p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
 			String key = p.getId();
@@ -195,6 +201,7 @@ public class ModifyCellDesignerNotes {
 			}
 		}		
 
+		if(sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
 			CelldesignerRNADocument.CelldesignerRNA p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
 			String key = p.getId();
@@ -213,6 +220,7 @@ public class ModifyCellDesignerNotes {
 
 		}
 		
+		if(sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			String key = p.getId();
@@ -231,6 +239,7 @@ public class ModifyCellDesignerNotes {
 
 		}		
 
+		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 			ReactionDocument.Reaction r =  sbmlDoc.getSbml().getModel().getListOfReactions().getReactionArray(i);
 			String key = r.getId();
@@ -279,10 +288,11 @@ public class ModifyCellDesignerNotes {
 			gmtFile.load(moduleGMTFileName);
 		}
 		
-		
 		int numberOfProteins = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();
+		System.out.println("Processing proteins ("+numberOfProteins+")");
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
-			System.out.print(""+(i+1)+"/"+numberOfProteins+":");
+			if(verbose)
+				System.out.print(""+(i+1)+"/"+numberOfProteins+":");
 			CelldesignerProteinDocument.CelldesignerProtein p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			String annot = Utils.getValue(p.getCelldesignerNotes());
 			boolean annotationEmpty = false;
@@ -294,15 +304,18 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+Utils.getValue(p.getName())+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+p.getId()+"/"+Utils.getValue(p.getName()));
+				if(verbose)
+					System.out.println("Processing "+p.getId()+"/"+Utils.getValue(p.getName()));
 				if(formatAnnotation)
 					annot = processAnnotations(annot,Utils.getValue(p.getName()),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}
 		int numberOfGenes = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();
+		System.out.println("Processing genes ("+numberOfGenes+")");		
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
-			System.out.print(""+(i+1)+"/"+numberOfGenes+":");
+			if(verbose)
+				System.out.print(""+(i+1)+"/"+numberOfGenes+":");
 			CelldesignerGeneDocument.CelldesignerGene p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
 			String annot = Utils.getValue(p.getCelldesignerNotes());
 			boolean annotationEmpty = false;
@@ -314,15 +327,18 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+p.getId()+"/"+p.getName());
+				if(verbose)
+					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
 		int numberOfRNAs = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();
+		System.out.println("Processing RNAs ("+numberOfRNAs+")");		
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
-			System.out.print(""+(i+1)+"/"+numberOfRNAs+":");
+			if(verbose)
+				System.out.print(""+(i+1)+"/"+numberOfRNAs+":");
 			CelldesignerRNADocument.CelldesignerRNA p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
 			String annot = Utils.getValue(p.getCelldesignerNotes());
 			boolean annotationEmpty = false;
@@ -334,15 +350,18 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+p.getId()+"/"+p.getName());
+				if(verbose)
+					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
 		int numberOfAntisenseRNAs = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();
+		System.out.println("Processing asRNAs ("+numberOfAntisenseRNAs+")");		
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
-			System.out.print(""+(i+1)+"/"+numberOfAntisenseRNAs+":");
+			if(verbose)
+				System.out.print(""+(i+1)+"/"+numberOfAntisenseRNAs+":");
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA p = sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			String annot = Utils.getValue(p.getCelldesignerNotes());
 			boolean annotationEmpty = false;
@@ -354,13 +373,15 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+p.getId()+"/"+p.getName());
+				if(verbose)
+					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
 				annotations.append(annot+"\n\n");
 			}
 		}		
-		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null)
+		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null){
+		System.out.println("Processing reactions ("+sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray()+")");
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
 			ReactionDocument.Reaction r = sbmlDoc.getSbml().getModel().getListOfReactions().getReactionArray(i);
 			String annot = Utils.getValue(r.getNotes());
@@ -371,14 +392,19 @@ public class ModifyCellDesignerNotes {
 			}
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+r.getId()+"\n");
-				annotations.append("### "+CellDesignerToCytoscapeConverter.getReactionString(r, sbmlDoc, true)+"\n");
+				if(generateReadableNamesForReactionsAndSpecies)
+					annotations.append("### "+CellDesignerToCytoscapeConverter.getReactionString(r, sbmlDoc, true)+"\n");
+				else
+					annotations.append("### "+r.getId()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+r.getId());
+				if(verbose)
+					System.out.println("Processing "+r.getId());
 				if(formatAnnotation)
 					annot = processAnnotations(annot,null,r.getId(),reqsections,false);
 				annotations.append(annot+"\n\n");
 			}
-		}
+		}}
+		System.out.println("Processing species ("+sbmlDoc.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray()+")");
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species sp = sbmlDoc.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
 			String annot = Utils.getValue(sp.getNotes());
@@ -395,8 +421,11 @@ public class ModifyCellDesignerNotes {
 				String entName = null;
 				String spName = null;
 				if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
-					entName = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbmlDoc);
-					spName = CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), sp.getId(), entName, sp.getCompartment(), true, true, "", sbmlDoc);
+					if(generateReadableNamesForReactionsAndSpecies){
+						entName = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbmlDoc);
+						spName = CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), sp.getId(), entName, sp.getCompartment(), true, true, "", sbmlDoc);
+					}else
+						spName = entName;
 				}else{
 					entName = Utils.getValue(sp.getName());
 					spName = entName;
@@ -405,7 +434,8 @@ public class ModifyCellDesignerNotes {
 				annotations.append("### "+sp.getId()+"\n");
 				annotations.append("### "+spName+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
-				System.out.println("Processing "+sp.getId()+"/"+spName);
+				if(verbose)
+					System.out.println("Processing "+sp.getId()+"/"+spName);
 				boolean degraded = false;
 				//System.out.println(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
 				if(sp.getAnnotation()!=null)
@@ -417,6 +447,8 @@ public class ModifyCellDesignerNotes {
 			
 			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
 			String cl = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
+			
+			// Inserting complex name and re-name them
 			if(cl.equals("COMPLEX")){
 				/*Vector<AnnotationSection> secs = divideInSections(annot);
 				AnnotationSection IdentifierSection = getSectionByName(secs,"Identifiers"); 
@@ -447,7 +479,9 @@ public class ModifyCellDesignerNotes {
 					//annot+=secs.get(0); 
 				//} // if the identifiers were empty
 				}
-			}
+			}// end complex processing
+			
+			
 			}
 			
 			annotations.append(annot+"\n\n");
@@ -936,9 +970,12 @@ public class ModifyCellDesignerNotes {
 		if(k!=-1){
 			String global_note = synchronizingObject.noteAdds.get(k);
 			Vector<AnnotationSection> global_sections = synchronizingObject.divideInSections(global_note);
-			String global_modules = getSectionByName(global_sections,"Maps_Modules").content;
-			AnnotationSection modules = getSectionByName(secs,"Maps_Modules");
-			modules.content = Utils.cutFirstLastNonVisibleSymbols(global_modules);
+			if(getSectionByName(global_sections,"Maps_Modules")!=null){
+				String global_modules = getSectionByName(global_sections,"Maps_Modules").content;
+				AnnotationSection modules = getSectionByName(secs,"Maps_Modules");
+				if(modules!=null)
+					modules.content = Utils.cutFirstLastNonVisibleSymbols(global_modules);
+			}
 		}else{
 			System.out.println("WARNING: "+id+" is not found in the global map!");
 		}

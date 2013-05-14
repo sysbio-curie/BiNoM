@@ -110,6 +110,7 @@ import fr.curie.BiNoM.cytoscape.utils.SelectDownstreamNeighbours;
 import fr.curie.BiNoM.cytoscape.utils.SelectEdgesBetweenSelectedNodes;
 import fr.curie.BiNoM.cytoscape.utils.SelectUpstreamNeighbours;
 import fr.curie.BiNoM.cytoscape.utils.ShowClipboardContents;
+import fr.curie.BiNoM.cytoscape.utils.SelectNodesByAttributeSubstring;
 
 
 public class BiNoMPlugin extends CytoscapePlugin {
@@ -140,6 +141,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 	JMenuItem mergeNetworksAndFilterMenuItem;
 	JMenuItem produceNaviCellMenuItem;
 	JMenuItem mergingMapsMenuItem;
+	JMenuItem selectNodesByAttributeSubstringItem;
 
 	private void initVisualStyles() {
 		CyNetworkView networkView = Cytoscape.getCurrentNetworkView();
@@ -546,7 +548,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		mergeNetworksAndFilterMenuItem.addActionListener(new MergeNetworksAndFilter());
 		binomUtilsMenu.add(mergeNetworksAndFilterMenuItem);
 
-
+		selectNodesByAttributeSubstringItem = new JMenuItem("Select nodes by substring in attribute");
+		selectNodesByAttributeSubstringItem.addActionListener(new SelectNodesByAttributeSubstring());
+		binomUtilsMenu.add(selectNodesByAttributeSubstringItem);
+		
 		JMenu clipboardMenu = new JMenu("Clipboard");
 
 		binomUtilsMenu.add(clipboardMenu);

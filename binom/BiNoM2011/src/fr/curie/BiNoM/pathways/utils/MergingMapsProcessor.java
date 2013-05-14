@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -158,6 +159,7 @@ public class MergingMapsProcessor {
 		String outputFileName = "";
 		
 		boolean mergeImages = false;
+		boolean mergeMaps = false;
 		boolean preprocess = false;
 		boolean postprocess = false;		
 		int zoomLevel = 3;
@@ -170,6 +172,8 @@ public class MergingMapsProcessor {
 				outputFileName = args[i+1];
 			if(args[i].equals("--mergeimages"))
 				mergeImages = true;
+			if(args[i].equals("--mergemaps"))
+				mergeMaps = true;
 			if(args[i].equals("--preprocess"))
 				preprocess = true;
 			if(args[i].equals("--postprocess"))
@@ -207,9 +211,10 @@ public class MergingMapsProcessor {
 		if(preprocess)
 			mm.preProcessMergedMaps();
 
-		mm.mergeAll();
-		
-		mm.saveMap(outputFileName);
+		if(mergeMaps){
+			mm.mergeAll();
+			mm.saveMap(outputFileName);
+		}
 		
 		if(postprocess)
 			mm.postProcessMergedMap(outputFileName);
@@ -259,36 +264,52 @@ public class MergingMapsProcessor {
 	 * @param sizeY
 	 */
 	public void mergeAll() {
+		
+		System.out.println("==============================");
+		System.out.println("=======   Merge maps    ======");		
+		System.out.println("==============================");		
+		
+		
 		int nbFiles = mapList.size();
 		
 		// load file 1
-		System.out.println("loading file "+mapList.get(0).fileName+"...");
+		System.out.print("loading file "+mapList.get(0).fileName+"...");
+		Date time = new Date();
 		this.cd1 = CellDesigner.loadCellDesigner(mapList.get(0).fileName);
-		
+		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(sizeX);
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(sizeY);
 		shiftCoordinates(cd1,mapList.get(0).deltaX, mapList.get(0).deltaY);
 		
 		setAndLoadFileName2(mapList.get(1).fileName);
+		time = new Date();
+		System.out.print("merging file "+mapList.get(1).fileName+"...");
 		//System.out.println("cd1 getId: "+this.cd1.getSbml().getModel().getName());
 		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
 		produceCandidateMergeLists();
 		mergeDiagrams();
 		mergeElements();
+		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+		Utils.printUsedMemory();
+		
 		
 		for (int i=2;i<nbFiles;i++) {
 			// set new file 2 name
 			setAndLoadFileName2(mapList.get(i).fileName);
+			time = new Date();
+			System.out.print("merging file "+mapList.get(i).fileName+"...");
 			shiftCoordinates(cd2, mapList.get(i).deltaX, mapList.get(i).deltaY);
 			// create new common species names
 			produceCandidateMergeLists();
 			// merge maps
 			mergeDiagrams();
 			mergeElements();
+			System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+			Utils.printUsedMemory();
 		}
 		
 		formatLayers();
-		
+
 	}
 	
 	/**
@@ -323,12 +344,14 @@ public class MergingMapsProcessor {
 		 * new way: add prefix to second file
 		 * use an internal counter to generate a new prefix each time a new file is loaded
 		 */
-		System.out.println("loading file "+fileName+"...");
+		Date time = new Date();
+		System.out.print("loading file "+fileName+"...");
 		String text = Utils.loadString(fileName);
 		this.counter++;
 		String prefix = "cd" + counter + "_";
 		text = addPrefixToIds(text, prefix);
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
+		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 	}
 	
 	/**
@@ -884,16 +907,16 @@ public class MergingMapsProcessor {
 				// get corresponding prot id1 and CD object
 				String pto = proteinMap.get(protein.getId());
 				CelldesignerProteinDocument.CelldesignerProtein proteinto = getProtein(cd1,pto);
+				if(proteinto==null)
+					System.out.println("ERROR: protein "+protein.getId()+"("+Utils.getValue(protein.getName())+") not found in "+cd1.getSbml().getModel().getId());
 				// merge comments into prot 1
 				if(protein.getCelldesignerNotes()!=null){
 					String comment = Utils.getValue(protein.getCelldesignerNotes()).trim();
 					if(proteinto.getCelldesignerNotes()==null)
 						proteinto.addNewCelldesignerNotes();
 					String commentto = Utils.getValue(proteinto.getCelldesignerNotes()).trim();
-					//System.out.println("comment:\n"+comment+"\ncommento:\n"+commentto+"\n\n");
 					xs.setStringValue("<&html><&body>"+commentto+"\n"+comment+"<&/body><&/html>");
 					proteinto.getCelldesignerNotes().set(xs);
-					//System.out.println("merge:"+proteinto.getCelldesignerNotes()+"\n\n");
 				}
 				// add modifications to prot 1
 				if(protein.getCelldesignerListOfModificationResidues()!=null){
@@ -1062,12 +1085,19 @@ public class MergingMapsProcessor {
 	}
 	
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){
+		
+		System.out.println("==============================");
+		System.out.println("=======  Merge images   ======");		
+		System.out.println("==============================");		
+
 
 		try{
 
 			int gWidth = Integer.parseInt(sizeX);
 			int gHeight = Integer.parseInt(sizeY);
+			System.out.println("Allocating memory for global image...");
 			BufferedImage mergedImage = new BufferedImage(gWidth, gHeight, BufferedImage.TYPE_INT_RGB);
+			Utils.printUsedMemory();
 			Graphics2D g = mergedImage.createGraphics();
 			g.setBackground(new Color(1f,1f,1f));
 			g.clearRect(0,0,mergedImage.getWidth(),mergedImage.getHeight());
@@ -1075,11 +1105,15 @@ public class MergingMapsProcessor {
 
 			for(int j=0;j<mapList.size();j++){
 				String fn = mapList.get(j).fileName;
+				Date time = new Date();
+				System.out.println("--------- Merging "+fn);
 				fn = fn.substring(0,fn.length()-4);
 				fn = fn+"-"+zoomLevel+".png";
 				File f = new File(fn);
 				if(f.exists()){
+					System.out.println("Reading "+fn+"...");
 					BufferedImage map = ImageIO.read(new File(fn));
+					//Utils.printUsedMemory();
 					Image imap = Utils.Transparency.makeColorTransparent(map, new Color(1f, 1f, 1f));
 					int x = mapList.get(j).deltaX;
 					int y = mapList.get(j).deltaY;
@@ -1090,7 +1124,9 @@ public class MergingMapsProcessor {
 							  if(y+height>gHeight)
 								  height = gHeight-y-1;*/
 					//boolean b = g.drawImage(map, x, y, x+10, y+10, null);
+					System.out.println("Drawing "+fn+"...");					
 					boolean b = g.drawImage(imap, x, y, null);
+					Utils.printUsedMemory();
 					//System.out.println(fn+"\tSuccess="+b);
 
 					//mergedImage = ImageIO.read(new File(outputFileName_prefix+"-"+zoomLevel+".png"));
@@ -1099,28 +1135,36 @@ public class MergingMapsProcessor {
 				}else{
 					System.out.println("ERROR: "+fn+" image is not found!!!");
 				}
-
+				//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 
 			}
 
 			g.dispose();
+			System.out.println("Saving "+outputFileName_prefix+"-"+zoomLevel+".png"+"...");
 			ImageIO.write(mergedImage, "PNG", new File(outputFileName_prefix+"-"+zoomLevel+".png"));
 
 			for(int i=0;i<numberOfTimesToScale;i++){
 				gWidth/=2;
 				gHeight/=2;
+				System.out.println("Scaling to "+gWidth+","+gHeight);
 				BufferedImage im = Utils.getScaledImageSlow(mergedImage, gWidth, gHeight);
+				Utils.printUsedMemory();
+				System.out.println("Saving "+outputFileName_prefix+"-"+(zoomLevel-i-1)+".png"+"...");				
 				ImageIO.write(im, "PNG", new File(outputFileName_prefix+"-"+(zoomLevel-i-1)+".png"));
 			}
 
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		
+		Utils.printUsedMemory();
 
 	}
 
 	public ModifyCellDesignerNotes postProcessAnnotations(String outputFileName){
+		
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+		mn.generateReadableNamesForReactionsAndSpecies = false;
 		mn.allannotations = true;
 		mn.formatAnnotation = true;
 		mn.moduleGMTFileName = null;
@@ -1132,17 +1176,26 @@ public class MergingMapsProcessor {
 
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(outputFileName);
 		mn.automaticallyProcessNotes();
-		
+		System.out.println("Saving...");		
 		CellDesigner.saveCellDesigner(mn.sbmlDoc, outputFileName);
 		return mn;
 	}
 	
 	
 	public void preProcessMergedMaps(){
+		
+		System.out.println("==============================");
+		System.out.println("=======  Preprocessing  ======");		
+		System.out.println("==============================");		
+		
+		Date time = new Date();
+		
 		for(int i=0;i<mapList.size();i++){
 			String fileName = mapList.get(i).fileName;
+			System.out.println("---------- Map "+fileName);
 			// 1. Add MAP: tag before MODULE: tag
 			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+			mn.generateReadableNamesForReactionsAndSpecies = false;
 			mn.allannotations = true;
 			mn.formatAnnotation = true;
 			mn.moduleGMTFileName = null;
@@ -1153,12 +1206,22 @@ public class MergingMapsProcessor {
 			mn.moveNonannotatedTextToReferenceSection = false;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
 			mn.automaticallyProcessNotes();
+			System.out.println("Saving...");
 			CellDesigner.saveCellDesigner(mn.sbmlDoc, fileName);
 		}
+		System.out.println("Preprocessing took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+		Utils.printUsedMemory();		
 
 	}
 	
 	public void postProcessMergedMap(String outputFileName) throws Exception{
+		
+		System.out.println("==============================");
+		System.out.println("=======  Postprocessing  =====");		
+		System.out.println("==============================");		
+
+		Date time = new Date();		
+		
 		System.out.println("Post-processing annotations for "+outputFileName);
 		ModifyCellDesignerNotes mcn = postProcessAnnotations(outputFileName);
 		// 1. Synchronize ids for entities in all maps
@@ -1169,8 +1232,9 @@ public class MergingMapsProcessor {
 		System.out.println("Synchronizing annotations for "+outputFileName);		
 		for(int i=0;i<mapList.size();i++){
 			String fileName = mapList.get(i).fileName;
-			System.out.println("\tsynchronizing "+fileName);			
+			System.out.println("-----------Synchronizing "+fileName);			
 			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+			mn.generateReadableNamesForReactionsAndSpecies = false;
 			mn.allannotations = true;
 			mn.formatAnnotation = true;
 			mn.moduleGMTFileName = null;
@@ -1181,8 +1245,13 @@ public class MergingMapsProcessor {
 			mn.moveNonannotatedTextToReferenceSection = false;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
 			mn.synchronizeAnnotations(mcn);
+			System.out.println("Saving...");			
 			CellDesigner.saveCellDesigner(mn.sbmlDoc, fileName);			
 		}
+		
+		Utils.printUsedMemory();
+		System.out.println("Postprocessing took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");		
+		
 	}
 
 	

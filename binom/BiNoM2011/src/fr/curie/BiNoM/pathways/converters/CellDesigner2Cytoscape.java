@@ -70,7 +70,8 @@ public class CellDesigner2Cytoscape {
 	    //String prefix = "C:/Datas/Basal/dnarepairmap2/modules/CellCycle_Sphase_c";
 	    //String prefix = "C:/Datas/OCSANA/egfr";
 	    //String prefix = "C:/Datas/ClickableMap/2011_10_05_Model/2011_10_05_Model_Mistakes/2011_10_05_Model_master_mistakes_OVAL";
-	     String prefix = "c:/datas/binomtest/BIOMD0000000001";
+	     //String prefix = "c:/datas/binomtest/BIOMD0000000001";
+	    String prefix = "C:/Datas/NaviCell/test/testmap1_src/test1_master";
 
 	    if(args.length>0){
 		prefix = args[0];

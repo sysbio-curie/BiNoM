@@ -103,6 +103,7 @@ public class CheckCellDesignerFile {
 				for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
 					CelldesignerModificationDocument.CelldesignerModification sr = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
 					String spid = sr.getModifiers();
+					if(spid!=null){
 					StringTokenizer st = new StringTokenizer(spid,",");
 					boolean found = false;
 					while(st.hasMoreTokens())
@@ -114,6 +115,7 @@ public class CheckCellDesignerFile {
 						try{
 							
 							String modifiers = sr.getModifiers();
+							if(modifiers!=null){
 							String aliases = sr.getAliases();
 							StringTokenizer stm = new StringTokenizer(modifiers,",");
 							StringTokenizer sta = new StringTokenizer(aliases,",");
@@ -143,11 +145,12 @@ public class CheckCellDesignerFile {
 							}
 							
 							report+=" (FIXED)\n";
+							}
 						}catch(Exception e){
 							report+=" (NOT FIXED)\n";
 							e.printStackTrace();
 						}
-					}
+					}}
 				}
 			}
 		}catch(Exception e){

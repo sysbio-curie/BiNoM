@@ -85,7 +85,8 @@ public class CellDesignerToCytoscapeConverter {
     public static HashMap<String,Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>> complexSpeciesMap = null;
     public static HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>> speciesAliasMap = null;
     public static HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>> complexSpeciesAliasMap = null;
-    
+
+    public static boolean addSuffixForMultipleAliases = true;
     
 
     /**
@@ -149,7 +150,7 @@ public class CellDesignerToCytoscapeConverter {
         String lab = convertSpeciesToName(sbml,sp.getId(),true,true);
         //System.out.println("convertSpeciesToName time = "+((new Date()).getTime()-tm.getTime()));
         
-//        System.out.println((i+1)+"/"+sbml.getModel().getListOfSpecies().getSpeciesArray().length+": "+lab+"\t"+sp.getId());
+        System.out.println((i+1)+"/"+sbml.getModel().getListOfSpecies().getSpeciesArray().length+": "+lab+"\t"+sp.getId());
         
         if((lab!=null)&&(!lab.startsWith("null"))){
         	
@@ -162,7 +163,8 @@ public class CellDesignerToCytoscapeConverter {
           String labs = convertSpeciesToName(sbml,sp.getId(),true,true,false,alias);
           
           GraphicNode n1 = (GraphicNode)NodeIDs.get(sp.getId()+"_"+alias);
-          labs += getSuffixForMultipleAliases(sbml,sp.getId(),alias);
+          if(addSuffixForMultipleAliases)
+        	  labs += getSuffixForMultipleAliases(sbml,sp.getId(),alias);
           
           if(n1==null){
             n1 = grf.addNewNode();
@@ -178,12 +180,18 @@ public class CellDesignerToCytoscapeConverter {
             Utils.addAttribute(n1,"CELLDESIGNER_SPECIES","CELLDESIGNER_SPECIES",sp.getId(),ObjectType.STRING);
             Utils.addAttribute(n1,"CELLDESIGNER_ALIAS","CELLDESIGNER_ALIAS",alias,ObjectType.STRING);
 
+            boolean annotateSpeciesFromEntityAnnotation = true;
             if(sp.getNotes()!=null){
             	Vector<Vector<String>> atts = extractAttributesFromNotes(sp.getNotes());
+            	// Here some exceptions for ACSN: if species already annotated by MODULES then it is not annotated from entity
             	for(int k=0;k<atts.size();k++){
+            		if(atts.get(k).get(0).equals("MODULE"))
+            			annotateSpeciesFromEntityAnnotation = false;
             		Utils.addAttributeUniqueNameConcatenatedValues(n1, atts.get(k).get(0), atts.get(k).get(0), atts.get(k).get(1), ObjectType.STRING);
             	}
             }
+            
+            if(annotateSpeciesFromEntityAnnotation){
             if(species_type.equals("PROTEIN")){
             	String id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
             	CelldesignerProteinDocument.CelldesignerProtein protein = (CelldesignerProteinDocument.CelldesignerProtein)CellDesigner.entities.get(id);
@@ -236,16 +244,25 @@ public class CellDesignerToCytoscapeConverter {
                    		Utils.addAttributeUniqueNameConcatenatedValues(n1, atts.get(k).get(0), atts.get(k).get(0), atts.get(k).get(1), ObjectType.STRING);
                    	}
             }}
+            if(species_type.equals("RNA")){
+               	String id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
+               	CelldesignerRNADocument.CelldesignerRNA rna = (CelldesignerRNADocument.CelldesignerRNA)CellDesigner.entities.get(id);
+               	if(rna.getCelldesignerNotes()!=null){
+                   	Vector<Vector<String>> atts = extractAttributesFromNotes(rna.getCelldesignerNotes());
+                   	for(int k=0;k<atts.size();k++){
+                   		Utils.addAttributeUniqueNameConcatenatedValues(n1, atts.get(k).get(0), atts.get(k).get(0), atts.get(k).get(1), ObjectType.STRING);
+                   	}
+            }}
             if(species_type.equals("ANTISENSE_RNA")){
                	String id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
                	CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA arna = (CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA)CellDesigner.entities.get(id);
-               	/*if(arna.getCelldesignerNotes()!=null){
+               	if(arna.getCelldesignerNotes()!=null){
                    	Vector<Vector<String>> atts = extractAttributesFromNotes(arna.getCelldesignerNotes());
                    	for(int k=0;k<atts.size();k++){
                    		Utils.addAttributeUniqueNameConcatenatedValues(n1, atts.get(k).get(0), atts.get(k).get(0), atts.get(k).get(1), ObjectType.STRING);
                    	}
-            }*/}
-            
+            }}
+            }
             	
             
             setSpeciesPositionForXGMML(alias,n1,sbml);
@@ -262,13 +279,14 @@ public class CellDesignerToCytoscapeConverter {
       if(r.getAnnotation()!=null)
         if(r.getAnnotation().getCelldesignerReactionType()!=null)
           rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());;
-//      System.out.println((i+1)+"/"+sbml.getModel().getListOfReactions().getReactionArray().length+": "+r.getId());
+      System.out.println((i+1)+"/"+sbml.getModel().getListOfReactions().getReactionArray().length+": "+r.getId());
       if(r.getListOfReactants()!=null)
       for(int j=0;j<r.getListOfReactants().getSpeciesReferenceArray().length;j++){
         String id = r.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
         String alias = getSpeciesAliasInReaction(r,id,"reactant");
         String nam = convertSpeciesToName(sbml,id,true,true,false,alias);
-        nam+=getSuffixForMultipleAliases(sbml,id,alias);
+        if(addSuffixForMultipleAliases)
+        	nam+=getSuffixForMultipleAliases(sbml,id,alias);
         if((nam!=null)&&(!nam.startsWith("null"))){
 
           GraphicNode n1 = (GraphicNode)NodeIDs.get(id+"_"+alias);
@@ -312,12 +330,10 @@ public class CellDesignerToCytoscapeConverter {
       for(int j=0;j<r.getListOfProducts().getSpeciesReferenceArray().length;j++){
         String id = r.getListOfProducts().getSpeciesReferenceArray(j).getSpecies();
         String alias = getSpeciesAliasInReaction(r,id,"product");
-        
-        if(alias.equals("csa9"))
-        	System.out.println("csa9");
-        
+                
         String nam = convertSpeciesToName(sbml,id,true,true,false,alias);
-        nam+=getSuffixForMultipleAliases(sbml,id,alias);
+        if(addSuffixForMultipleAliases)
+        	nam+=getSuffixForMultipleAliases(sbml,id,alias);
         if((nam!=null)&&(!nam.startsWith("null"))){
 
           GraphicNode n2 = (GraphicNode)NodeIDs.get(id+"_"+alias);
@@ -362,6 +378,11 @@ public class CellDesignerToCytoscapeConverter {
       for(int k=0;k<r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray().length;k++){
         CelldesignerModificationDocument.CelldesignerModification modif = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(k);
         String ids = modif.getModifiers();
+        if(ids==null){
+        	if(!modif.getType().startsWith("BOOLEAN"))
+        		System.out.println("ERROR: modifiers=null for modification "+(k+1)+" in reaction "+r.getId());
+        }
+        else
         if(!ids.contains(",")){
         //StringTokenizer stid = new StringTokenizer(ids,",");
         //while(stid.hasMoreTokens()){
@@ -376,7 +397,8 @@ public class CellDesignerToCytoscapeConverter {
 //        	System.out.println(modif);
         }
         String alias = getSpeciesAliasInReaction(r,id,"modifier");
-        nam+=getSuffixForMultipleAliases(sbml,id,alias);
+        if(addSuffixForMultipleAliases)
+        	nam+=getSuffixForMultipleAliases(sbml,id,alias);
         GraphicNode n1 = (GraphicNode)NodeIDs.get(id+"_"+alias);
         if(n1==null){
           n1 = grf.addNewNode();
@@ -426,7 +448,8 @@ public class CellDesignerToCytoscapeConverter {
       	//System.out.println("IN MODIFIERS "+id);
         String alias = getSpeciesAliasInReaction(r,id,"modifier");
         String nam = convertSpeciesToName(sbml,id,true,true);
-        nam+=getSuffixForMultipleAliases(sbml,id,alias);
+        if(addSuffixForMultipleAliases)
+        	nam+=getSuffixForMultipleAliases(sbml,id,alias);
         if((nam!=null)&&(!nam.startsWith("null"))){
 
           GraphicNode n1 = (GraphicNode)NodeIDs.get(id+"_"+alias);
@@ -609,6 +632,7 @@ public class CellDesignerToCytoscapeConverter {
     for(int i=0;i<r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray().length;i++){
       CelldesignerModificationDocument.CelldesignerModification spa =
               (CelldesignerModificationDocument.CelldesignerModification)r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(i);
+      if(spa.getModifiers()!=null)
       if(spa.getModifiers().equals(id))
         if(!takenaliases.containsKey(r.getId()+"_"+spa.getAliases()+"_"+role))
             alias = spa.getAliases();

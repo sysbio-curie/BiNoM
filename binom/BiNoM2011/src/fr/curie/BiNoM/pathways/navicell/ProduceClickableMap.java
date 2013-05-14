@@ -1320,9 +1320,14 @@ public class ProduceClickableMap
 							final String id = get_entity_id(identity);
 							final EntityBase e = map.get(id);
 							assert e != null : id + " " +species_id + " " + Utils.getValue(sp.getName());
+
+							if(e==null)
+								System.out.println("ERROR: entity "+id+" is not found for included species "+included.getId()+" in complex "+complex_id);
+
 							((Entity)e).addAssociated(modification);
 							if (empty)
 								complex.addComponent(e);
+
 						}
 						//complex.addModification(new Modification(sp, complex));
 					}

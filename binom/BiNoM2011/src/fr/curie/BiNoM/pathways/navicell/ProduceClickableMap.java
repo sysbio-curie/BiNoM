@@ -340,8 +340,16 @@ public class ProduceClickableMap
 		 * be done once the maps are set up. Which maps? Who knows?
 		 */
 		int i = 0;
+		int k = 0;
+		
+		System.out.println("Calculating modifications/species ("+_speciesIDToModificationMap.size()+")...");
+		Date time = new Date();
 		for (Modification m : _speciesIDToModificationMap.values())
 		{
+			k++;
+			if(k==100*(int)(k*0.01f))
+				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			
 			try
 			{
 				m.calculateName(cd);
@@ -353,7 +361,15 @@ public class ProduceClickableMap
 				i++;
 			}
 		}
-		for (EntityBase e : _entityIDToEntityMap.values())
+		System.out.println();
+		System.out.println("Calculating modifications/entities ("+_entityIDToEntityMap.size()+")...");
+		time = new Date();
+		k = 0;		
+		for (EntityBase e : _entityIDToEntityMap.values()){
+			k++;
+			if(k==100*(int)(k*0.01f))
+				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			
 			for (Modification m : e.getModifications())
 				try
 				{
@@ -364,6 +380,8 @@ public class ProduceClickableMap
 					Utils.eclipseErrorln("exceptions " + m.getId());
 					i++;
 				}
+		}
+		System.out.println();
 
 		if (i != 0)
 			Utils.eclipseErrorln(i + " exceptions");
@@ -416,6 +434,8 @@ public class ProduceClickableMap
 		@SuppressWarnings("unused")
 		boolean verbose = false;
 		boolean make_tiles = true;
+		boolean only_tiles = false;
+
 		String project_name = null;
 		
 		Boolean show_default_compartement_name = null;
@@ -445,6 +465,8 @@ public class ProduceClickableMap
 				make_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("notile", "do not force tile creation")) != null)
 				make_tiles = !b.booleanValue();
+			else if ((b = options.booleanOption("onlytile", "only create tiles")) != null)
+				only_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
 				show_default_compartement_name = b.booleanValue();
 			else if ((b = options.booleanOption("nodefcptname", "don't show default compartement name")) != null)
@@ -502,7 +524,7 @@ public class ProduceClickableMap
 		
 		try
 		{
-			run(base, source_directory, make_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
+			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
 			    wordpress_passwd, wordpress_user, wordpress_blogname, root);
 		}
 		catch (NaviCellException e)
@@ -525,6 +547,7 @@ public class ProduceClickableMap
 		final String base,
 		final File source_directory,
 		final boolean make_tiles,
+		final boolean only_tiles,
 		final String project_name,
 		final AtlasInfo atlasInfo,
 		final String[][] xrefs,
@@ -557,7 +580,7 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, outjson, modules, atlasInfo, xrefs);
+			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs);
 		}
 		catch (IOException e)
 		{
@@ -566,7 +589,8 @@ public class ProduceClickableMap
 		
 		try
 		{
-			master.copy_files(data_directory, destination_common);
+			if(master!=null)
+				master.copy_files(data_directory, destination_common);
 		}
 		catch (IOException e)
 		{
@@ -578,7 +602,7 @@ public class ProduceClickableMap
 				if (!map_name.equals(master_map_name))
 					try
 				{
-						process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, outjson, modules);
+						process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules);
 				}
 				catch (IOException e)
 				{
@@ -588,7 +612,8 @@ public class ProduceClickableMap
 		}
 		
 		outjson.close();
-		finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
+		if(master!=null)
+			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
 		
 		wp.remove_old_posts();
 	}
@@ -735,6 +760,7 @@ public class ProduceClickableMap
 	
 	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
 	{
+		System.out.println("Making tiles...");
 		int[] shifts = new int[2];
 		final int xmargin = 10;
 		final int tile_width = 256;
@@ -797,6 +823,7 @@ public class ProduceClickableMap
 		for (int file_number = 1;; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
+			System.out.println("------------"+root + "-" + file_number + image_suffix);			
 			final BufferedImage image;
 			try
 			{
@@ -829,6 +856,8 @@ public class ProduceClickableMap
 				count += write_tiles(padded_image, outdir, i, tiled, g, tile_width, tile_height, shifts);
 			}
 			last_found = scale_factor;
+			
+			Utils.printUsedMemory();
 		}
 	}
 
@@ -913,31 +942,49 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-					  BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules) throws IOException
+					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules) throws IOException
 	{
+
+		if(only_tiles){
+			
+			final File this_map_directory = mk_maps_directory(map, destination);
+			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+
+		}else{
+		
 		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
 		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 
 		final File this_map_directory = mk_maps_directory(map, destination);
-
 		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
+		
+		}
 	}
 
 	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
-							 BlogCreator wp, boolean make_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs)
+							 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs)
 		throws IOException, NaviCellException
 	{
+		
+		if(only_tiles){
+			
+		final String map = master_map_name;		
+		final File this_map_directory = mk_maps_directory(map, destination);
+		make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+		return null;
+		
+		}else{
+		
 		final String map = master_map_name;
 		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
 		final String module_notes = clMap.get_map_notes();
 
 		final File this_map_directory = mk_maps_directory(map, destination);
-
 		clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
@@ -946,6 +993,8 @@ public class ProduceClickableMap
 		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
 		modules.put(map, new ModuleInfo(module_notes, module_post));
 		return clMap;
+		
+		}
 	}
 
 	private static ProduceClickableMap make_clickmap(final String blog_name, final String map, String base, File source_directory)
@@ -1078,8 +1127,14 @@ public class ProduceClickableMap
 	/* Function to find all coordinate information.
 	 * */
 	private void findAllPlacesInCellDesigner(){
-		System.out.println("Finding places in CellDesigner: "+this.module_name);
-		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;i++){
+		int numberOfAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;
+		System.out.println("Finding places for aliases ("+numberOfAliases+") in CellDesigner: "+this.module_name);
+		Date time = new Date();
+		for(int i=0;i<numberOfAliases;i++){
+			if(i==100*(int)(i*0.01f))
+				System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			//Date time1 = new Date();
+			//System.out.println((new Date().getTime())-time1.getTime());			
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 			final String species_id = spa.getSpecies();
 			if (speciesIDToModificationMap.get(species_id) == null)
@@ -1096,6 +1151,7 @@ public class ProduceClickableMap
 			place.sbmlid = species_id;
 			
 			Object obj = CellDesigner.entities.get(species_id);
+			
 			//System.out.println(obj.getClass().getName().toLowerCase());
 			if(!obj.getClass().getName().toLowerCase().contains("celldesignerspecies")){
 				SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(species_id);
@@ -1122,7 +1178,13 @@ public class ProduceClickableMap
 				*/
 			}
 		}
+		System.out.println();
+		int numberOfComplexAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;		
+		System.out.println("Finding places for complex aliases ("+numberOfComplexAliases+") in CellDesigner: "+this.module_name);
+		time = new Date();
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
+			if(i==100*(int)(i*0.01f))
+				System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cspa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 			Place place = new Place();
 			place.id = cspa.getId();
@@ -1176,14 +1238,22 @@ public class ProduceClickableMap
 				System.out.println(place.sbmlid+" is not species in findAllPlacesInCellDesigner/elldesignerListOfComplexSpeciesAliases");
 			}
 		}
+		System.out.println();
 		// Now species comments
+		int numberOfSpecies = cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();
+		System.out.println("Processing species ("+numberOfSpecies+")");
 		for(int i=0;i<cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
 			speciesSBML.put(sp.getId(), sp);
 		}
 		// Now reactions
+		int numberOfReactions = cd.getSbml().getModel().getListOfReactions().getReactionArray().length;
+		System.out.println("Processing reactions ("+numberOfReactions+")");
+		time = new Date();
 		if(cd.getSbml().getModel().getListOfReactions()!=null)
 			for(int i=0;i<cd.getSbml().getModel().getListOfReactions().getReactionArray().length;i++){
+				if(i==100*(int)(i*0.01f))
+					System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 				ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
 				if(r.getListOfReactants()!=null)
 				for(int j=0;j<r.getListOfReactants().getSpeciesReferenceArray().length;j++){
@@ -1209,10 +1279,10 @@ public class ProduceClickableMap
 						v = new Vector<ReactionDocument.Reaction>();
 					v.add(r); speciesInReactions.put(spid,v);
 				}
-				
 				generatePlacesForReaction(r);
 				
 			}
+		System.out.println();
 		
 //		complex_composition = get_complex_compositions();
 //		complex_to_modifications = make_complex_to_modifications();
@@ -2123,6 +2193,8 @@ public class ProduceClickableMap
 	
 	private void generatePages(final String map, final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
+		
+		System.out.println("Generating pages...");
 		final Model model = cd.getSbml().getModel();
 		
 		for (final EntityBase ent : entityIDToEntityMap.values())
@@ -3629,7 +3701,7 @@ public class ProduceClickableMap
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			
 			if(r.getAnnotation().getCelldesignerEditPoints()==null){
 				Place place = new Place();
@@ -3654,13 +3726,13 @@ public class ProduceClickableMap
 				if(points.size()>0)
 					kk = (int)(0.5f*(float)points.size());
 				position = getKthPoint(startPoints.get(0).x, startPoints.get(0).y, endPoints.get(0).x, endPoints.get(0).y, points, r, v, kk);
-			}
+			}}
 		}}else
 		if(rtype.equals("HETERODIMER_ASSOCIATION")){
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>=1)if(endPoints.size()>=1){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			Vector<Place> points = readEditPoints(Utils.getValue(r.getAnnotation().getCelldesignerEditPoints()));
 			Place central = getAbsolutePosition(startPoints.get(0).centerx,startPoints.get(0).centery,axis1,axis2,points.get(points.size()-1).x,points.get(points.size()-1).y);
 			int num0 = Integer.parseInt(r.getAnnotation().getCelldesignerEditPoints().getNum0());
@@ -3689,13 +3761,13 @@ public class ProduceClickableMap
 			if(ep.size()>0)
 				kk = (int)(0.5f*(float)ep.size());
 			position = getKthPoint(central.x,central.y,endPoints.get(0).x,endPoints.get(0).y,ep,r,v, kk);
-			
+			}
 		}}else
 		if(rtype.equals("DISSOCIATION")){
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			Vector<Place> points = readEditPoints(Utils.getValue(r.getAnnotation().getCelldesignerEditPoints()));
 			Place central = getAbsolutePosition(startPoints.get(0).centerx,startPoints.get(0).centery,axis1,axis2,points.get(points.size()-1).x,points.get(points.size()-1).y);
 			int num0 = Integer.parseInt(r.getAnnotation().getCelldesignerEditPoints().getNum0());
@@ -3723,6 +3795,7 @@ public class ProduceClickableMap
 			for(int i=0;i<num2;i++){
 				ep.add(points.get(k));
 				k++;
+			}
 			}
 			//addPolyLine(central.x,central.y,endPoints.get(1).x,endPoints.get(1).y,ep,r,v);			
 		}}else
@@ -3811,14 +3884,13 @@ public class ProduceClickableMap
 			cdm.ge
 		}*/
 		
-		
 		Vector v = new Vector();
 		
 		if (one_reactant_one_product.contains(rtype)) {
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			
 			if(r.getAnnotation().getCelldesignerEditPoints()==null){
 				Place place = new Place();
@@ -3864,13 +3936,13 @@ public class ProduceClickableMap
 					current.y = place.y;
 					v.add(place);
 				}*/
-			}
+			}}
 		}}else
 		if(rtype.equals("HETERODIMER_ASSOCIATION")){
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>=1)if(endPoints.size()>=1){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			Vector<Place> points = readEditPoints(Utils.getValue(r.getAnnotation().getCelldesignerEditPoints()));
 			Place central = getAbsolutePosition(startPoints.get(0).centerx,startPoints.get(0).centery,axis1,axis2,points.get(points.size()-1).x,points.get(points.size()-1).y);
 			int num0 = Integer.parseInt(r.getAnnotation().getCelldesignerEditPoints().getNum0());
@@ -3894,13 +3966,14 @@ public class ProduceClickableMap
 				ep.add(points.get(k));
 				k++;
 			}
-			addPolyLine(central.x,central.y,endPoints.get(0).x,endPoints.get(0).y,ep,r,v);			
+			addPolyLine(central.x,central.y,endPoints.get(0).x,endPoints.get(0).y,ep,r,v);
+			}
 		}}else
 		if(rtype.equals("DISSOCIATION")){
 			Place axis1 = new Place();
 			Place axis2 = new Place();
 			if(startPoints.size()>0)if(endPoints.size()>0){
-			getCoordAxes(startPoints,endPoints,axis1,axis2,r);
+			if(getCoordAxes(startPoints,endPoints,axis1,axis2,r)){
 			Vector<Place> points = readEditPoints(Utils.getValue(r.getAnnotation().getCelldesignerEditPoints()));
 			Place central = getAbsolutePosition(startPoints.get(0).centerx,startPoints.get(0).centery,axis1,axis2,points.get(points.size()-1).x,points.get(points.size()-1).y);
 			int num0 = Integer.parseInt(r.getAnnotation().getCelldesignerEditPoints().getNum0());
@@ -3924,7 +3997,8 @@ public class ProduceClickableMap
 				ep.add(points.get(k));
 				k++;
 			}
-			addPolyLine(central.x,central.y,endPoints.get(1).x,endPoints.get(1).y,ep,r,v);			
+			addPolyLine(central.x,central.y,endPoints.get(1).x,endPoints.get(1).y,ep,r,v);
+			}
 		}}else
 			Utils.eclipseErrorln("In generatePlacesForReaction "+rtype+" not found for "+r.getId());
 		
@@ -4024,8 +4098,9 @@ public class ProduceClickableMap
 		return res;
 	}
 	
-	private void getCoordAxes(Vector<Place> starts, Vector<Place> ends, Place x1, Place x2,ReactionDocument.Reaction r){
+	private boolean getCoordAxes(Vector<Place> starts, Vector<Place> ends, Place x1, Place x2,ReactionDocument.Reaction r){
 		String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
+		boolean res = true;
 		if(rtype.equals("STATE_TRANSITION")||rtype.equals("TRANSPORT")||rtype.equals("TRANSCRIPTIONAL_INHIBITION")||rtype.equals("TRANSCRIPTIONAL_ACTIVATION")||rtype.equals("UNKNOWN_TRANSITION")||rtype.equals("KNOWN_TRANSITION_OMITTED")||rtype.equals("TRANSLATIONAL_INHIBITION")||rtype.equals("UNKNOWN_CATALYSIS")){		
 		//if(rtype.equals("STATE_TRANSITION")||rtype.equals("TRANSPORT")||){
 			x1.x = ends.get(0).x-starts.get(0).x;
@@ -4034,17 +4109,30 @@ public class ProduceClickableMap
 			x2.y = x1.x;
 		}
 		if(rtype.equals("HETERODIMER_ASSOCIATION")){
+			
+			if(starts.size()<2){
+				System.out.println("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough starts ("+starts.size()+").");
+				res = false;
+			}else{
 			x1.x = starts.get(1).centerx-starts.get(0).centerx;
 			x1.y = starts.get(1).centery-starts.get(0).centery;
 			x2.x = ends.get(0).centerx-starts.get(0).centerx;
 			x2.y = ends.get(0).centery-starts.get(0).centery;
+			}
 		}
 		if(rtype.equals("DISSOCIATION")){
+			
+			if(ends.size()<2){
+				System.out.println("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough ends ("+ends.size()+").");
+				res = false;
+			}else{
 			x1.x = ends.get(0).centerx-starts.get(0).centerx;
 			x1.y = ends.get(0).centery-starts.get(0).centery;
 			x2.x = ends.get(1).centerx-starts.get(0).centerx;
 			x2.y = ends.get(1).centery-starts.get(0).centery;
+			}
 		}
+		return res;
 	}
 	
 	private Place getAnchorPosition(Place place, String anchor){

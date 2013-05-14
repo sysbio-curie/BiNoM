@@ -85,6 +85,11 @@ public class CellDesignerToCytoscapeConverter {
     public static HashMap<String,Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>> complexSpeciesMap = null;
     public static HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>> speciesAliasMap = null;
     public static HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>> complexSpeciesAliasMap = null;
+    
+	public static String defcomp_id = "default";
+	public static Vector comp_ids = new Vector();
+	public static Vector comp_ids_n = new Vector();
+    
 
     public static boolean addSuffixForMultipleAliases = true;
     
@@ -828,18 +833,9 @@ public class CellDesignerToCytoscapeConverter {
 	 public static String convertSpeciesToName(SbmlDocument.Sbml sbml, String speciesID, boolean addCompartmentName, boolean addModifications, boolean uniqueName, String alias){
 	   String s = "";
 
-	   String defcomp_id = "default";
-	   Vector comp_ids = new Vector();
-	   Vector comp_ids_n = new Vector();
-	   for(int i=0;i<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
-	     SpeciesDocument.Species sp = sbml.getModel().getListOfSpecies().getSpeciesArray(i);
-	     if(comp_ids.indexOf(sp.getCompartment())<0){
-	       comp_ids.add(sp.getCompartment());
-	       comp_ids_n.add(new Integer(1));
-	     }else{
-	       comp_ids_n.setElementAt(new Integer(((Integer)comp_ids_n.elementAt(comp_ids.indexOf(sp.getCompartment()))).intValue()+1),comp_ids.indexOf(sp.getCompartment()));
-	     }
-	   }
+		Date time1 = new Date();
+		//System.out.println((new Date().getTime())-time1.getTime());	   
+	   
 	   int kmax=-1, vmax = -1;
 	   for(int i=0;i<comp_ids_n.size();i++){
 	     if(((Integer)comp_ids_n.elementAt(i)).intValue()>vmax)
@@ -909,7 +905,6 @@ public class CellDesignerToCytoscapeConverter {
 	         s+="_in_"+convertSpeciesToName(sbml,compl_id,true,true);
 		   }
 	   }
-
 	   return s;
 	 }
 
@@ -952,7 +947,7 @@ public class CellDesignerToCytoscapeConverter {
 	     }
 
 	     String active = "";
-	     for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+	     /*for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
 	       CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csc = sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 	       if(csc.getSpecies().equals(sp_id)){
 	       if(csc.getCelldesignerActivity()!=null){
@@ -961,7 +956,15 @@ public class CellDesignerToCytoscapeConverter {
 	           { active="|active"; break; }
 	       }
 	       }
-	     }
+	     }*/
+	     Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> cscv = complexSpeciesAliasMap.get(sp_id);
+	     for(CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csc: cscv){
+		       if(csc.getSpecies().equals(sp_id)){
+			       if(csc.getCelldesignerActivity()!=null){
+			         if(Utils.getText(csc.getCelldesignerActivity()).equals("active"))
+			           { active="|active"; break; }
+			       }
+	     }}
 	     
 	     if(!active.equals(""))
 	    	 s="("+s+")|"+active;
@@ -1007,13 +1010,21 @@ public class CellDesignerToCytoscapeConverter {
 	   }
 
 	   String active = "";
-	   for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+	   /*for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 	     CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csc = sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 	     if(csc.getSpecies().equals(sp_id))
 	     if(csc.getCelldesignerActivity()!=null)
 	       if(Utils.getText(csc.getCelldesignerActivity()).equals("active"))
 	         { active="|active"; break; }
+	   }*/
+	   Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> cscv = speciesAliasMap.get(sp_id);
+	   for(CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csc: cscv){
+		     if(csc.getSpecies().equals(sp_id))
+			     if(csc.getCelldesignerActivity()!=null)
+			       if(Utils.getText(csc.getCelldesignerActivity()).equals("active"))
+			         { active="|active"; break; }
 	   }
+	   
 	   s+=active;
 	   
 	   String structuralState = "";
@@ -1830,7 +1841,21 @@ public class CellDesignerToCytoscapeConverter {
 		    	  }
 		    	  v.add(spal);
 		  }		  
-		   
+	
+		   defcomp_id = "default";
+		   comp_ids = new Vector();
+		   comp_ids_n = new Vector();
+		   for(int i=0;i<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
+		     SpeciesDocument.Species sp = sbml.getModel().getListOfSpecies().getSpeciesArray(i);
+		     if(comp_ids.indexOf(sp.getCompartment())<0){
+		       comp_ids.add(sp.getCompartment());
+		       comp_ids_n.add(new Integer(1));
+		     }else{
+		       comp_ids_n.setElementAt(new Integer(((Integer)comp_ids_n.elementAt(comp_ids.indexOf(sp.getCompartment()))).intValue()+1),comp_ids.indexOf(sp.getCompartment()));
+		     }
+		   }
+		  
+		  
 	}
 	
 	public static Vector<Vector<String>> extractAttributesFromNotes(Notes notes){

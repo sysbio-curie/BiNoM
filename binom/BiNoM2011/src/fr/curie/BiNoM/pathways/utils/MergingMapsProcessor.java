@@ -285,7 +285,7 @@ public class MergingMapsProcessor {
 		int nbFiles = mapList.size();
 		
 		// load file 1 and add prefix
-		System.out.print("loading file "+mapList.get(0).fileName+"...");
+		System.out.println("loading file "+mapList.get(0).fileName+"...");
 		Date time = new Date();
 		String text = Utils.loadString(mapList.get(0).fileName);
 		generateRandomPrefix();
@@ -516,9 +516,21 @@ public class MergingMapsProcessor {
 	 */
 	private String addPrefixToIds(String text){
 		//System.out.println("---- add prefix to IDs");
+		
+		/*
+		 * find out model ID, we don't want to add a prefix to this ID.
+		 */
+		Pattern pat = Pattern.compile("model\\s+\\S+\\s+id=\"(\\S+)\"");
+		Matcher mat = pat.matcher(text);
+		String modelID = "";
+		if(mat.find()) {
+			//System.out.println(">>>pat: "+mat.group(0)+" "+mat.group(1));
+			modelID = mat.group(1);
+		}
+		
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++) {
-			if(ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
+			if(!ids.get(i).equals(modelID) && ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
 				//System.out.println("--> id= "+ids.get(i));
 				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
@@ -1123,8 +1135,10 @@ public class MergingMapsProcessor {
 		else {
 			fileName += "_newIds.xml";
 		}
-			
+		
+		//System.out.println("saving file "+fileName+"...");
 		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(cdFileString);
+		//addLayerID(doc);
 		CellDesigner.saveCellDesigner(doc, fileName);
 	}
 	
@@ -1135,6 +1149,26 @@ public class MergingMapsProcessor {
 		for (int i=0;i<4;i++)
 			prefix += alphabet.charAt(r.nextInt(alphabet.length()));
 		prefix += "_";
+	}
+	
+	private void addLayerID(SbmlDocument cd) {
+		String modelId = cd.getSbml().getModel().getId();
+		
+	    int size = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().sizeOfCelldesignerLayerArray();
+	    System.out.println("layer size: "+size);
+	    if (size>0)
+	    	size++;
+	    CelldesignerLayerDocument.CelldesignerLayer layer = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer();
+	    layer.setId(Integer.toString(size));
+		XmlString xs = XmlString.Factory.newInstance();
+		xs.setStringValue(modelId);
+		layer.setName(xs);
+		xs.setStringValue("true");
+		layer.setVisible(xs);
+		xs.setStringValue("false");
+		layer.setLocked(xs);
+//		cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer().set(layer);
+		//layer.addNewCelldesignerListOfSquares().addNewCelldesignerLayerCompartmentAlias().addNewCelldesignerBounds();
 	}
 	
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){

@@ -10,11 +10,11 @@ public class TestMergeMapsACSN {
 		
 		MergingMapsProcessor mm = new MergingMapsProcessor();
 		
-		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml",50,15);
-		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml",650, 15);
-		mm.setMapSize(1300, 500);
-		mm.mergeAll();
-		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
+//		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml",50,15);
+//		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml",650, 15);
+//		mm.setMapSize(1300, 500);
+//		mm.mergeAll();
+//		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
 
 //		mm.addMap("/bioinfo/users/ebonnet/test2.xml",50,15);
 //		mm.addMap("/bioinfo/users/ebonnet/test1.xml",650, 15);
@@ -85,7 +85,13 @@ public class TestMergeMapsACSN {
 //		mm.setMapSize(11776,10752);
 //		mm.mergeAll();
 //		mm.saveMap("/bioinfo/users/ebonnet/merged_surv.xml");
-
+		
+		mm.addMap("/bioinfo/users/ebonnet/test/survival_HEDGEHOG01.xml",9254,3026);
+		mm.addMap("/bioinfo/users/ebonnet/test/survival_HEDGEHOG02.xml",9254,5526);
+		mm.addMap("/bioinfo/users/ebonnet/test/survival_HEDGEHOG03.xml",9254,8026);
+		mm.setMapSize(11776,10752);
+		mm.mergeAll();
+		mm.saveMap("/bioinfo/users/ebonnet/merged_surv.xml");
 	}
 
 }

@@ -520,17 +520,20 @@ public class MergingMapsProcessor {
 		/*
 		 * find out model ID, we don't want to add a prefix to this ID.
 		 */
-		Pattern pat = Pattern.compile("model\\s+\\S+\\s+id=\"(\\S+)\"");
+		//Pattern pat = Pattern.compile("model\\s+\\S+\\s+id=\"(\\S+)\"");
+		Pattern pat = Pattern.compile("model\\s+metaid=\"(\\S+)\"\\s+id=\"(\\S+)\"");
 		Matcher mat = pat.matcher(text);
-		String modelID = "";
+		String id1 = "";
+		String id2 = "";
 		if(mat.find()) {
 			//System.out.println(">>>pat: "+mat.group(0)+" "+mat.group(1));
-			modelID = mat.group(1);
+			id1 = mat.group(1);
+			id2 = mat.group(2);
 		}
 		
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
 		for(int i=0;i<ids.size();i++) {
-			if(!ids.get(i).equals(modelID) && ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
+			if(!ids.get(i).equals(id1) && !ids.get(i).equals(id2) && ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
 				//System.out.println("--> id= "+ids.get(i));
 				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");

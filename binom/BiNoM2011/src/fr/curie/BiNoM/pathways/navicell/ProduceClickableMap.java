@@ -891,6 +891,7 @@ public class ProduceClickableMap
 		final int width = image0.getWidth();
 		final int height = image0.getHeight();
 		
+		//for (int file_number = last_found + 1;; file_number++)
 		for (int file_number = last_found + 1;; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
@@ -1247,10 +1248,10 @@ public class ProduceClickableMap
 			speciesSBML.put(sp.getId(), sp);
 		}
 		// Now reactions
+		if(cd.getSbml().getModel().getListOfReactions()!=null){
 		int numberOfReactions = cd.getSbml().getModel().getListOfReactions().getReactionArray().length;
 		System.out.println("Processing reactions ("+numberOfReactions+")");
 		time = new Date();
-		if(cd.getSbml().getModel().getListOfReactions()!=null)
 			for(int i=0;i<cd.getSbml().getModel().getListOfReactions().getReactionArray().length;i++){
 				if(i==100*(int)(i*0.01f))
 					System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
@@ -1283,6 +1284,7 @@ public class ProduceClickableMap
 				
 			}
 		System.out.println();
+		}
 		
 //		complex_composition = get_complex_compositions();
 //		complex_to_modifications = make_complex_to_modifications();
@@ -1741,9 +1743,9 @@ public class ProduceClickableMap
 			else
 				indent.getOutput().print(" ");
 			
-			indent.getOutput().print(scales.getX(place.x));
-			indent.getOutput().print(";");
-			indent.getOutput().print(scales.getY(place.y));
+				indent.getOutput().print(scales.getX(place.x));
+				indent.getOutput().print(";");
+				indent.getOutput().print(scales.getY(place.y));
 		}
 		indent.getOutput().println("\">");
 		content_line(indent.add(), m.getName(), bubble);
@@ -1781,10 +1783,10 @@ public class ProduceClickableMap
 				outjson.print(",");
 			}
 			
-			outjson.print("{");
-			outjson.print("\"x\" : " + scales.getX(place.x) + ", ");
-			outjson.print("\"y\" : " + scales.getY(place.y));
-			outjson.print("}");
+				outjson.print("{");
+				outjson.print("\"x\" : " + scales.getX(place.x) + ", ");
+				outjson.print("\"y\" : " + scales.getY(place.y));
+				outjson.print("}");
 		}
 		outjson.print("]");
 	}

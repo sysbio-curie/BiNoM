@@ -760,7 +760,6 @@ public class ProduceClickableMap
 	
 	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
 	{
-		System.out.println("Making tiles...");
 		int[] shifts = new int[2];
 		final int xmargin = 10;
 		final int tile_width = 256;
@@ -822,6 +821,12 @@ public class ProduceClickableMap
 		
 		for (int file_number = 1;; file_number++)
 		{
+			/*
+			System.out.println("performing file_num=" + file_number);
+			System.gc();
+			Utils.printUsedMemory();
+			*/
+
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
 			System.out.println("------------"+root + "-" + file_number + image_suffix);			
 			final BufferedImage image;
@@ -834,29 +839,43 @@ public class ProduceClickableMap
 				return new ImagesInfo(difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
 			}
 			
+			/*
+			System.out.println("performing #2 GC");
+			System.gc();
+			Utils.printUsedMemory();
+			*/
+
 			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, max_width, max_height);
 			assert scale_factor > last_found : scale_factor + " " + last_found;
 			
 			for (int i = last_found + 1; i <= scale_factor; i++)
 			{
 				final BufferedImage resize;
-				if (i == scale_factor)
+				if (i == scale_factor) {
 					resize = image;
-				else
-				{
+				} else {
 					final int d = scale_factor - i;
 					final int w = image.getWidth() >> d;
 					resize = Scalr.resize(image, Scalr.Method.QUALITY, w, image.getHeight() >> d, Scalr.OP_ANTIALIAS);
 					Utils.eclipsePrintln("resized image " + file_number + " to " + i + " by " + d + " width " + image.getWidth() + " -> " + w);
 				}
+
+				// 2013-05-16: EV patch: do not create a padded image, use the already created image (resize) although it is smaller then required
+
+				/*
+				System.out.println("Creating padded image " + (tile_width << i) + "x" + (tile_height << i));
 				final BufferedImage padded_image = new BufferedImage(tile_width << i, tile_height << i, BufferedImage.TYPE_INT_RGB);
+				System.out.println("Done: " + padded_image.getWidth() + "x" + padded_image.getHeight());
 				padded_image.createGraphics().drawRenderedImage(resize, null);
+				*/
 				
+				final BufferedImage padded_image = resize;
 				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, i);
 				count += write_tiles(padded_image, outdir, i, tiled, g, tile_width, tile_height, shifts);
 			}
 			last_found = scale_factor;
 			
+			System.gc();
 			Utils.printUsedMemory();
 		}
 	}
@@ -946,24 +965,21 @@ public class ProduceClickableMap
 					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules) throws IOException
 	{
 
-		if(only_tiles){
-			
+		if (only_tiles) {
 			final File this_map_directory = mk_maps_directory(map, destination);
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
-		}else{
-		
-		final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
-		final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
-		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
-		modules.put(map, new ModuleInfo(module_notes, module_post));
-
-		final File this_map_directory = mk_maps_directory(map, destination);
-		ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
-
-		clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
-		make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
-		
+		} else {
+			final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
+			final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
+			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
+			modules.put(map, new ModuleInfo(module_notes, module_post));
+			
+			final File this_map_directory = mk_maps_directory(map, destination);
+			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+			
+			clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
+			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
 		}
 	}
 
@@ -972,29 +988,26 @@ public class ProduceClickableMap
 		throws IOException, NaviCellException
 	{
 		
-		if(only_tiles){
+		if (only_tiles) {
+			final String map = master_map_name;		
+			final File this_map_directory = mk_maps_directory(map, destination);
+			make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+			return null;
+		} else {
+		
+			final String map = master_map_name;
+			final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
+			final String module_notes = clMap.get_map_notes();
 			
-		final String map = master_map_name;		
-		final File this_map_directory = mk_maps_directory(map, destination);
-		make_tiles(map, base, source_directory, make_tiles, this_map_directory);
-		return null;
-		
-		}else{
-		
-		final String map = master_map_name;
-		final ProduceClickableMap clMap = make_clickmap(blog_name, map, base, source_directory);
-		final String module_notes = clMap.get_map_notes();
-
-		final File this_map_directory = mk_maps_directory(map, destination);
-		clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
-
-		clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
-		clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
-		final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
-		make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
-		modules.put(map, new ModuleInfo(module_notes, module_post));
-		return clMap;
-		
+			final File this_map_directory = mk_maps_directory(map, destination);
+			clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+			
+			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
+			clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
+			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
+			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
+			modules.put(map, new ModuleInfo(module_notes, module_post));
+			return clMap;
 		}
 	}
 
@@ -1009,17 +1022,23 @@ public class ProduceClickableMap
 		final File tiles_directory = new File(this_map_directory, "tiles");
 		final boolean tiles_exist = tiles_directory.exists();
 		ImagesInfo scales;
-		if (make_tiles || !tiles_exist)
+		//if (make_tiles || !tiles_exist)
+		if (make_tiles)
 		{
-			if (tiles_exist)
+			if (tiles_exist) {
 				empty_tiles(tiles_directory);
+			}
 			tiles_directory.mkdir();
 			scales = make_tiles(source_directory, base + map, tiles_directory);
-		}
-		else
+		} 
+		else {
 			scales = get_zooms(source_directory, base + map);
-		if (scales == null)
-			Utils.eclipseErrorln("no images found");
+		}
+
+		if (scales == null) {
+			Utils.eclipseErrorln("no tiles found");
+			System.exit(1);
+		}
 		return scales;
 	}
 
@@ -1743,9 +1762,9 @@ public class ProduceClickableMap
 			else
 				indent.getOutput().print(" ");
 			
-				indent.getOutput().print(scales.getX(place.x));
-				indent.getOutput().print(";");
-				indent.getOutput().print(scales.getY(place.y));
+			indent.getOutput().print(scales.getX(place.x));
+			indent.getOutput().print(";");
+			indent.getOutput().print(scales.getY(place.y));
 		}
 		indent.getOutput().println("\">");
 		content_line(indent.add(), m.getName(), bubble);

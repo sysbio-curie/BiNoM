@@ -438,7 +438,6 @@ public class MergingMapsProcessor {
 								y += deltaY;
 								str = x+","+y;
 								Utils.setValue(cmd.getEditPoints(),str);
-								//System.out.println(">>>"+ cmd.getEditPoints());
 							}
 						}
 					}
@@ -460,7 +459,6 @@ public class MergingMapsProcessor {
 								y += deltaY;
 								str = x+","+y;
 								Utils.setValue(cmd.getEditPoints(),str);
-								//System.out.println(cmd.getEditPoints());
 							}
 						}
 					}
@@ -539,6 +537,15 @@ public class MergingMapsProcessor {
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
 				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
 				text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
+				
+				/*
+				 * Special case: change id in boolean gate elements:
+				 * 
+				 * model = <celldesigner:modification type="BOOLEAN_LOGIC_GATE_AND" modifiers="cd2_s187,cd2_s801,cd2_s608" aliases="sa43,csa5,sa44"
+				 */
+				text = Utils.replaceString(text, "\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
+				text = Utils.replaceString(text, ","+ids.get(i)+",", ","+prefix+ids.get(i)+",");
+				text = Utils.replaceString(text, ","+ids.get(i)+"\"", ","+prefix+ids.get(i)+"\"");
 			}
 		}
 		
@@ -547,18 +554,18 @@ public class MergingMapsProcessor {
 		 * so here we find all occurences of "units" and set them back 
 		 * to an accepted value. 
 		 */
-		Pattern p = Pattern.compile("units=\"(\\S+)\"");
-		Matcher m = p.matcher(text);
+		pat = Pattern.compile("units=\"(\\S+)\"");
+		mat = pat.matcher(text);
 		HashSet<String> w = new HashSet<String>();
-		while(m.find()) {
-			if (!m.group(1).equalsIgnoreCase("volume"))
-				w.add(m.group(1));
+		while(mat.find()) {
+			if (!mat.group(1).equalsIgnoreCase("volume"))
+				w.add(mat.group(1));
 		}
 		for (String s : w) {
-			p = Pattern.compile("units=\""+s+"\"");
-			m = p.matcher(text);
-			while(m.find())
-				text = m.replaceAll("units=\"volume\"");
+			pat = Pattern.compile("units=\""+s+"\"");
+			mat = pat.matcher(text);
+			while(mat.find())
+				text = mat.replaceAll("units=\"volume\"");
 		}
 		return text;
 	}

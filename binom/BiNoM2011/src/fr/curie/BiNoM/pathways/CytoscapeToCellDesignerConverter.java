@@ -510,12 +510,17 @@ public class CytoscapeToCellDesignerConverter {
                         if(r.getAnnotation().getCelldesignerListOfModification()!=null)
                         for(int j=0;j<r.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
                                 CelldesignerModificationDocument.CelldesignerModification cm = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
-                                String source_target = cm.getModifiers()+"%%"+id;
+                                String mods = cm.getModifiers();
+                                StringTokenizer st = new StringTokenizer(mods,",");
+                                while(st.hasMoreTokens()){
+                                String modifier = st.nextToken();
+                                String source_target = modifier+"%%"+id;
                                 String color_edge = (String)colorTable.get(source_target);
                                 //System.out.println("Edge "+source_target+" Color:"+color_edge);                              
                                 if(color_edge!=null){
                                         color_edge = Utils.replaceString(color_edge, "#", "ff");
                                         cm.getCelldesignerLine().setColor(color_edge);
+                                }
                                 }
                         }
                 }       

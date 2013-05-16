@@ -836,6 +836,9 @@ public class CellDesignerToCytoscapeConverter {
 		Date time1 = new Date();
 		//System.out.println((new Date().getTime())-time1.getTime());	   
 	   
+	   if(comp_ids_n==null)
+		   createSpeciesMap(sbml);
+		
 	   int kmax=-1, vmax = -1;
 	   for(int i=0;i<comp_ids_n.size();i++){
 	     if(((Integer)comp_ids_n.elementAt(i)).intValue()>vmax)
@@ -1058,6 +1061,7 @@ public class CellDesignerToCytoscapeConverter {
 	           s+="@"+cp.getId();
 	         }
 	       }
+	       
 	     }
 	   }
 	   return s;

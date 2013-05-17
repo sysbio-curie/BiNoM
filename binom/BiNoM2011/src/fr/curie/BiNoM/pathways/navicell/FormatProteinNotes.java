@@ -195,7 +195,11 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 				final String notes = sp.getNotes();
 				if (notes != null)
 				{
-					sb.append(ProduceClickableMap.makeFoldable(sp.getName()));
+					if(sp.getName()==null){
+						sb.append("NONAME");
+						System.out.println("ERROR: Species "+sp.getId()+" does not have name!");
+					}else
+						sb.append(ProduceClickableMap.makeFoldable(sp.getName()));
 					ProduceClickableMap.visible_debug(sb, sp.getId());
 					sb.append("\n").append(notes).append("\n");
 				}

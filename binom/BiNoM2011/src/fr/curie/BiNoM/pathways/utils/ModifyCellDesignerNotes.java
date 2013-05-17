@@ -22,18 +22,19 @@ public class ModifyCellDesignerNotes {
 	public String moduleGMTFileName = null;
 	GMTFile gmtFile = null;
 	public boolean useHUGOIdsForModuleIdentification = true;
+	public boolean overwriteModuleSection = true;
 	
 	public boolean allannotations = true;
 	//public boolean insertTemplateForEntitiesReactions = true;
 	//public boolean insertTemplateForSpecies = true;
-	public boolean formatAnnotation	= false;
+	public boolean formatAnnotation	= true;
 	
 	public boolean guessIdentifiers = false;
-	public boolean removeEmptySections = false;
+	public boolean removeEmptySections = true;
 	public boolean removeInvalidTags = true;
-	public boolean moveNonannotatedTextToReferenceSection = true;
+	public boolean moveNonannotatedTextToReferenceSection = false;
 	
-	public boolean insertMapsTagBeforeModules = true;
+	public boolean insertMapsTagBeforeModules = false;
 	
 	public boolean verbose = false;
 	
@@ -87,9 +88,9 @@ public class ModifyCellDesignerNotes {
 		//System.exit(0);
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
-		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v7_names";
+		String nameCD = "C:/Datas/Binomtest/annotation/gmt/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
-		String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
+		//String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
 		//String nameCD = "C:/Datas/NaviCell/test/merged/merged_master";
 		//String nameCD = "C:/Datas/NaviCell/testNaviCellSuperMode/test/merged_testmap";
 		//String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
@@ -101,7 +102,7 @@ public class ModifyCellDesignerNotes {
 		//dialog.raise();
 		
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
-		//mn.moduleGMTFileName = "C:/Datas/NaviCell/test/merged/test.gmt";
+		mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/gmt/apoptosis_modules.gmt";
 		String s = mn.exportCellDesignerNotes();
 		//System.out.println(s);
 		//mn.comments = Utils.loadString(nameCD+"_notes.txt");
@@ -442,7 +443,7 @@ public class ModifyCellDesignerNotes {
 					if(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("DEGRADED"))
 						degraded = true;
 				if(formatAnnotation)if(!degraded)
-					annot = processAnnotations(annot,null,sp.getId(),reqsections, false, nonannotated, secs);
+					annot = processAnnotations(annot,Utils.getValue(sp.getName()),sp.getId(),reqsections, false, nonannotated, secs);
 				
 			
 			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
@@ -643,7 +644,7 @@ public class ModifyCellDesignerNotes {
 		
 		// Re-assign modules names from gmtfile
 		if(moduleGMTFileName!=null)
-			addModuleNames(secs, entityName);
+			addModuleNames(secs, entityName, id);
 		
 		if(insertMapsTagBeforeModules)
 			insertMapsTagBeforeModuleTag(secs);
@@ -917,11 +918,15 @@ public class ModifyCellDesignerNotes {
 		return annot;
 	}
 	
-	public void addModuleNames(Vector<AnnotationSection> secs, String id){
+	public void addModuleNames(Vector<AnnotationSection> secs, String entityName, String id){
 		AnnotationSection identifiers = getSectionByName(secs, "Identifiers");
 		AnnotationSection moduleSection = getSectionByName(secs, "Maps_Modules");
 		Vector<String> hugos = Utils.getTagValues(identifiers.content, "HUGO");
-		Vector<String> moduleNames = gmtFile.getListOfSets(id);
+		Vector<String> moduleNames = gmtFile.getListOfSets(entityName);
+		Vector<String> moduleNamesbyId = gmtFile.getListOfSets(id);
+		if(moduleNamesbyId!=null)
+			for(int i=0;i<moduleNamesbyId.size();i++)
+				moduleNames.add(moduleNamesbyId.get(i));
 		if(useHUGOIdsForModuleIdentification){
 			for(int i=0;i<hugos.size();i++){
 				Vector<String> mns = gmtFile.getListOfSets(hugos.get(i));
@@ -930,7 +935,8 @@ public class ModifyCellDesignerNotes {
 					moduleNames.add(mns.get(j));
 			}
 		}
-		moduleSection.content = "";
+		if(overwriteModuleSection)
+			moduleSection.content = "";
 		for(int i=0;i<moduleNames.size();i++) 
 			moduleSection.content += "MODULE:"+moduleNames.get(i)+"\n";
 		if(moduleSection.content.length()>0)

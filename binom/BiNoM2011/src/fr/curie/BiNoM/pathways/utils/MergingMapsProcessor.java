@@ -33,6 +33,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerListOfFreeLinesDocument.Cellde
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfSquaresDocument.CelldesignerListOfSquares;
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfTextsDocument.CelldesignerListOfTexts;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerModificationResidueDocument.CelldesignerModificationResidue;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
@@ -962,8 +963,30 @@ public class MergingMapsProcessor {
 				if(protein.getCelldesignerListOfModificationResidues()!=null){
 					if(proteinto.getCelldesignerListOfModificationResidues()==null)
 						proteinto.addNewCelldesignerListOfModificationResidues();
-					for(int j=0;j<protein.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray();j++)
-						proteinto.getCelldesignerListOfModificationResidues().addNewCelldesignerModificationResidue().set(protein.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j));
+					
+					// build list of residue names for target protein
+					HashSet<String> residueName = new HashSet<String>();
+					for(int j=0;j<proteinto.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray();j++) {
+						CelldesignerModificationResidue res = proteinto.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j);
+						String name = Utils.getValue(res.getName());
+						if (name != null)
+							residueName.add(name);
+					}
+					
+					// merge residues from source (protein) to target (proteinto) protein
+					for(int j=0;j<protein.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray();j++) {
+						CelldesignerModificationResidue res = protein.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j);
+						String name = Utils.getValue(res.getName());
+						/*
+						 * Copy residue to proteinto only if it is not there already
+						 * ie there is not a residue having the same name
+						 * 
+						 * residues with no names (null) are copied anyway
+						 */
+						if (residueName.contains(name) == false)
+							proteinto.getCelldesignerListOfModificationResidues().addNewCelldesignerModificationResidue().set(protein.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j));
+					}
+					
 				}
 				// remove duplicate in protein list
 				if (verbose)

@@ -10,11 +10,11 @@ public class TestMergeMapsACSN {
 		
 		MergingMapsProcessor mm = new MergingMapsProcessor();
 		
-//		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml",50,15);
-//		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml",650, 15);
-//		mm.setMapSize(1300, 500);
-//		mm.mergeAll();
-//		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
+		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml",50,15);
+		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml",650, 15);
+		mm.setMapSize(1300, 500);
+		mm.mergeAll();
+		mm.saveMap("/bioinfo/users/ebonnet/merged_maps.xml");
 
 //		mm.addMap("/bioinfo/users/ebonnet/test2.xml",50,15);
 //		mm.addMap("/bioinfo/users/ebonnet/test1.xml",650, 15);
@@ -93,16 +93,11 @@ public class TestMergeMapsACSN {
 //		mm.mergeAll();
 //		mm.saveMap("/bioinfo/users/ebonnet/merged_surv.xml");
 		
-		
-//		mapsize 1250 1250
-//		D:\MAP1_AND.xml 10 10
-//		D:\MAP2_AND.xML 10 620
-		
-		mm.addMap("/bioinfo/users/ebonnet/test_gate/MAP1_AND.xml", 10, 10);
-		mm.addMap("/bioinfo/users/ebonnet/test_gate/MAP2_AND.xml",650,10);
-		mm.setMapSize(1500,1500);
-		mm.mergeAll();
-		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
+//		mm.addMap("/bioinfo/users/ebonnet/test_gate/MAP1_AND.xml", 10, 10);
+//		mm.addMap("/bioinfo/users/ebonnet/test_gate/MAP2_AND.xml",650,10);
+//		mm.setMapSize(1500,1500);
+//		mm.mergeAll();
+//		mm.saveMap("/bioinfo/users/ebonnet/test.xml");
 
 	}
 

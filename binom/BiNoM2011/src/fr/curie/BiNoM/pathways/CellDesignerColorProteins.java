@@ -58,12 +58,12 @@ public class CellDesignerColorProteins {
     args = new String[2];
     
     //String path = "c:/datas/basal/220210/";
-    String path = "c:/datas/temp3/";
+    String path = "c:/datas/acsn/acsn_only/acsn_src/";
     
     //args[0] = path+"test.xml";
     //args[0] = path+"CC_DNArepair_22_02_2010_corrected_1.xml";
-    args[0] = path+"dnarepair.xml";
-    args[1] = path+"bc3log_addcol.txt";
+    args[0] = path+"acsn_master.xml";
+    args[1] = "";
 
     //CellDesigner celld = new CellDesigner();
     //SbmlDocument sbmlc = celld.loadCellDesigner(args[0]);

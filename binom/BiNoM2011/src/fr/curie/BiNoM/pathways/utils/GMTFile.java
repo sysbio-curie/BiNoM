@@ -7,7 +7,18 @@ public class GMTFile{
 	
 	public Vector<HashSet<String>> sets = null;
 	public Vector<String> setnames = null; 
-	public Vector<String> allnames = null; 
+	public Vector<String> allnames = null;
+	
+	public static void main(String args[]){
+		try{
+			GMTFile gmt = new GMTFile();
+			gmt.load("c:/datas/acsn/acsn_only/acsn_src/temp.gmt");
+			gmt.saveAllNamesToFile("c:/datas/acsn/acsn_only/acsn_src/allnames.txt");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	
 	public void load(String fn){
 		try{
@@ -46,6 +57,18 @@ public class GMTFile{
 				res.add(setnames.get(i));
 		}
 		return res;
+	}
+	
+	public void saveAllNamesToFile(String fn){
+		try{
+			FileWriter fw = new FileWriter(fn);
+			Collections.sort(allnames);
+			for(int i=0;i<allnames.size();i++)
+				fw.write(allnames.get(i)+"\n");
+			fw.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 }

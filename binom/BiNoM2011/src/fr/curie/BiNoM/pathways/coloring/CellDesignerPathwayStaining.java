@@ -71,9 +71,13 @@ public class CellDesignerPathwayStaining {
 	public static void main(String[] args) {
 		try{
 			
-			String prefix = "c:/datas/colormaps/";
+			String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
 				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
+			cm.loadMap(prefix+"acsn_master.xml");
+			HashMap<String, Vector<String>> gmt = cm.extractGMTFromCellDesigner("c:/datas/acsn/acsn.gmt");
+			System.exit(0);
+			
 			
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", null, prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");

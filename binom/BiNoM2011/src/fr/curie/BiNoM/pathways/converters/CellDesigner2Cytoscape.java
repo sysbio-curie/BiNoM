@@ -71,7 +71,8 @@ public class CellDesigner2Cytoscape {
 	    //String prefix = "C:/Datas/OCSANA/egfr";
 	    //String prefix = "C:/Datas/ClickableMap/2011_10_05_Model/2011_10_05_Model_Mistakes/2011_10_05_Model_master_mistakes_OVAL";
 	     //String prefix = "c:/datas/binomtest/BIOMD0000000001";
-	    String prefix = "C:/Datas/NaviCell/test/testmap1_src/test1_master";
+	    //String prefix = "C:/Datas/NaviCell/test/testmap1_src/test1_master";
+	    String prefix = "c:/datas/acsn/acsn_only/acsn_src/acsn_master";
 
 	    if(args.length>0){
 		prefix = args[0];

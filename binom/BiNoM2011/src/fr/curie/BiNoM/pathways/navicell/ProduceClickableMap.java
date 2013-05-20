@@ -1413,7 +1413,7 @@ public class ProduceClickableMap
 							assert e != null : id + " " +species_id + " " + Utils.getValue(sp.getName());
 
 							if(e==null)
-								System.out.println("ERROR: entity "+id+" is not found for included species "+included.getId()+" in complex "+complex_id);
+								Utils.eclipseErrorln("ERROR: entity "+id+" is not found for included species "+included.getId()+" in complex "+complex_id);
 
 							((Entity)e).addAssociated(modification);
 							if (empty)
@@ -2009,7 +2009,7 @@ public class ProduceClickableMap
 					String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
 					modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
 				}else{
-					System.out.println("ERROR: no Post for "+ent.getId());
+					Utils.eclipseErrorln("ERROR: no Post for "+ent.getId());
 				}
 			}
 		}
@@ -2234,7 +2234,7 @@ public class ProduceClickableMap
 					final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 					reaction_line(right.add(), r, bubble, scales, post.getPostId());
 				}else{
-					System.out.println("ERROR: No post for "+r.getId());
+					Utils.eclipseErrorln("ERROR: No post for "+r.getId());
 				}
 			}
 		}
@@ -2562,8 +2562,14 @@ public class ProduceClickableMap
 						fw.append("<dt>").append(h.add(g.getKey())).append("</dt><dd><ol>");
 						final ArrayList<String> regulators = g.getValue();
 						Collections.sort(regulators);
-						for (final String v : regulators)
-							show_regulators_in_post(fw.append("<li>"), h, v, pass2, wp);
+						for (final String v : regulators){
+							if(v!=null)
+								show_regulators_in_post(fw.append("<li>"), h, v, pass2, wp);
+							else{
+								if(!g.getKey().toLowerCase().startsWith("boolean"))
+									Utils.eclipseErrorln("ERROR: For reaction "+r.getId()+" there is a null value in regulators");
+							}
+						}
 						fw.append("</ol></dd>\n");
 					}
 					fw.append("</dl>");
@@ -3695,7 +3701,7 @@ public class ProduceClickableMap
 				startPoints.add(point);
 			}else{
 				String spid = Utils.getValue(react.getSpecies());
-				System.out.println("ERROR: no places found for alias "+alias+", species "+spid+" ("+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd.getSbml(),spid,true,true)+")");
+				Utils.eclipseErrorln("ERROR: no places found for alias "+alias+", species "+spid+" ("+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd.getSbml(),spid,true,true)+")");
 			}
 		}
 		for(int i=0;i<r.getAnnotation().getCelldesignerBaseProducts().sizeOfCelldesignerBaseProductArray();i++){
@@ -3850,6 +3856,13 @@ public class ProduceClickableMap
 				add("UNKNOWN_POSITIVE_INFLUENCE");
 				add("UNKNOWN_NEGATIVE_INFLUENCE");
 				add("TRUNCATION");
+				add("MODULATION");
+				add("REDUCED_MODULATION");
+				add("REDUCED_PHYSICAL_STIMULATION");
+				add("REDUCED_TRIGGER");
+				add("UNKNOWN_REDUCED_MODULATION");
+				add("UNKNOWN_REDUCED_PHYSICAL_STIMULATION");
+				add("UNKNOWN_REDUCED_TRIGGER");				
 			}
 		}
 	);
@@ -3878,7 +3891,7 @@ public class ProduceClickableMap
 				startPoints.add(point);
 			}else{
 				String spid = Utils.getValue(react.getSpecies());
-				System.out.println("ERROR: no places found for alias "+alias+", species "+spid+" ("+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd.getSbml(),spid,true,true)+")");
+				Utils.eclipseErrorln("ERROR: no places found for alias "+alias+", species "+spid+" ("+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd.getSbml(),spid,true,true)+")");
 			}
 		}
 		for(int i=0;i<r.getAnnotation().getCelldesignerBaseProducts().sizeOfCelldesignerBaseProductArray();i++){
@@ -4132,7 +4145,7 @@ public class ProduceClickableMap
 		if(rtype.equals("HETERODIMER_ASSOCIATION")){
 			
 			if(starts.size()<2){
-				System.out.println("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough starts ("+starts.size()+").");
+				Utils.eclipseErrorln("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough starts ("+starts.size()+").");
 				res = false;
 			}else{
 			x1.x = starts.get(1).centerx-starts.get(0).centerx;
@@ -4144,7 +4157,7 @@ public class ProduceClickableMap
 		if(rtype.equals("DISSOCIATION")){
 			
 			if(ends.size()<2){
-				System.out.println("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough ends ("+ends.size()+").");
+				Utils.eclipseErrorln("ERROR: In reaction "+r.getId()+" getCoordAxes did not receive enough ends ("+ends.size()+").");
 				res = false;
 			}else{
 			x1.x = ends.get(0).centerx-starts.get(0).centerx;

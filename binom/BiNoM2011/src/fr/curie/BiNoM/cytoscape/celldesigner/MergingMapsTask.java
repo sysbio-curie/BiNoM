@@ -2,6 +2,7 @@ package fr.curie.BiNoM.cytoscape.celldesigner;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import cytoscape.task.Task;
@@ -34,28 +35,8 @@ public class MergingMapsTask implements Task {
 	public void run() {
 		
 		try {
-			BufferedReader buf = new BufferedReader(new FileReader(configFileName));	
-			String line;
-			int ct=0;
 			MergingMapsProcessor mm = new MergingMapsProcessor();
-			while((line = buf.readLine()) != null) {
-				line.trim();
-				if (line.length()>0) {
-					String[] tk = line.split("\\t|\\s+");
-					if (ct==0) {
-						int sizeX = Integer.parseInt(tk[1]);
-						int sizeY = Integer.parseInt(tk[2]);
-						mm.setMapSize(sizeX, sizeY);
-					}
-					else {
-						String fn = tk[0];
-						int coordX = Integer.parseInt(tk[1]);
-						int coordY = Integer.parseInt(tk[2]);
-						mm.addMap(fn, coordX, coordY);
-					}
-				}
-				ct++;
-			}
+			mm.loadConfigFile(configFileName);
 			mm.mergeAll();
 			mm.saveMap(outputFileName);
 			
@@ -78,6 +59,7 @@ public class MergingMapsTask implements Task {
 				taskMonitor.setStatus("Error Creating NaviCell maps:" + e);
 			}
 		}
+		
 	}
 
     public void setTaskMonitor(TaskMonitor taskMonitor) throws IllegalThreadStateException {

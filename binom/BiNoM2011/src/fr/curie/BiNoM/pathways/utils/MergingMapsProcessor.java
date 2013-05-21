@@ -154,6 +154,11 @@ public class MergingMapsProcessor {
 	 */
 	private String sizeY;
 
+	/**
+	 * List of maps to be updated with global Ids
+	 */
+	private ArrayList<String> updateMapList = new ArrayList<String>();
+	
 	/** 
 	 * Print extended informations while merging elements
 	 */
@@ -197,50 +202,28 @@ public class MergingMapsProcessor {
 		}
 		
 		try{
-		BufferedReader buf = new BufferedReader(new FileReader(configFile));	
-		String line;
-		int ct=0;
-		MergingMapsProcessor mm = new MergingMapsProcessor();
-		while((line = buf.readLine()) != null) {
-			line.trim();
-			if (line.length()>0) {
-				String[] tk = line.split("\\t|\\s+");
-				if (ct==0) {
-					int sizeX = Integer.parseInt(tk[1]);
-					int sizeY = Integer.parseInt(tk[2]);
-					mm.setMapSize(sizeX, sizeY);
-				}
-				else {
-					String fn = tk[0];
-					int coordX = Integer.parseInt(tk[1]);
-					int coordY = Integer.parseInt(tk[2]);
-					mm.addMap(fn, coordX, coordY);
-				}
-			}
-			ct++;
-		}
-		
-		if(preprocess)
-			mm.preProcessMergedMaps();
+			MergingMapsProcessor mm = new MergingMapsProcessor();
+			mm.loadConfigFile(configFile);
 
-		if(mergeMaps){
-			mm.mergeAll();
-			mm.saveMap(outputFileName);
-		}
-		
-		if(postprocess)
-			mm.postProcessMergedMap(outputFileName);
-		
-		
-		if(mergeImages){
-			String outputFileName_prefix = outputFileName;
-			if(outputFileName.endsWith(".xml"))
+			if(preprocess)
+				mm.preProcessMergedMaps();
+
+			if(mergeMaps){
+				mm.mergeAll();
+				mm.saveMap(outputFileName);
+			}
+
+			if(postprocess)
+				mm.postProcessMergedMap(outputFileName);
+
+
+			if(mergeImages){
+				String outputFileName_prefix = outputFileName;
+				if(outputFileName.endsWith(".xml"))
 					outputFileName_prefix = outputFileName.substring(0, outputFileName.length()-4);
-			mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale);
-		}
-		
-		
-		
+				mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale);
+			}
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -329,6 +312,7 @@ public class MergingMapsProcessor {
 		}
 		
 		formatLayers();
+		updateMapFileIds();
 		
 	}
 	
@@ -1147,6 +1131,12 @@ public class MergingMapsProcessor {
 		}
 	}
 	
+	/**
+	 * Update cd file 2 with global Ids from cd file 1 (merged file)
+	 * Rename file and save it.
+	 * 
+	 * @param fileName
+	 */
 	private void setIdsAndSave(String fileName) {
 		
 		for (String id : this.proteinMap.keySet())
@@ -1202,6 +1192,53 @@ public class MergingMapsProcessor {
 		layer.setLocked(xs);
 //		cd.getSbml().getModel().getAnnotation().getCelldesignerListOfLayers().addNewCelldesignerLayer().set(layer);
 		//layer.addNewCelldesignerListOfSquares().addNewCelldesignerLayerCompartmentAlias().addNewCelldesignerBounds();
+	}
+	
+	/**
+	 * Update Ids to global Ids, do not merge the map. 
+	 */
+	private void updateMapFileIds() {
+		for (String fileName : updateMapList) {
+			this.setAndLoadFileName2(fileName);
+			this.produceCandidateMergeLists();
+			this.setIdsAndSave(fileName);
+		}
+	}
+	
+	/**
+	 * Load the configuration file.
+	 * 
+	 * @param fileName
+	 */
+	public void loadConfigFile(String fileName) throws Exception {
+		BufferedReader buf = new BufferedReader(new FileReader(fileName));	
+		String line;
+		int ct=0;
+		while((line = buf.readLine()) != null) {
+			line.trim();
+			if (line.length()>0) {
+				String[] tk = line.split("\\t|\\s+");
+				if (ct==0) {
+					int sizeX = Integer.parseInt(tk[1]);
+					int sizeY = Integer.parseInt(tk[2]);
+					setMapSize(sizeX, sizeY);
+				}
+				else {
+					// maps files to be updated with global Ids
+					if (tk[1].equalsIgnoreCase("update") || tk[2].equalsIgnoreCase("update")) {
+						this.updateMapList.add(tk[0]);
+					}
+					// maps to be merged
+					else {
+						String fn = tk[0];
+						int coordX = Integer.parseInt(tk[1]);
+						int coordY = Integer.parseInt(tk[2]);
+						addMap(fn, coordX, coordY);
+					}
+				}
+			}
+			ct++;
+		}
 	}
 	
 	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){

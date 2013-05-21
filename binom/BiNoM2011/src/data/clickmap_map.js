@@ -71,7 +71,8 @@ function setup_icons()
 	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
 	var icon = function(w, h, anchor_x, anchor_y)
 	{
-		var normal_icon1 = simple_icon("FE7569", w, h, anchor_x, anchor_y);
+//		var normal_icon1 = simple_icon("FE7569", w, h, anchor_x, anchor_y);
+		var normal_icon1 = simple_icon("EEEEEE", w, h, anchor_x, anchor_y);
 		var new_icon1 = simple_icon("5555FF", w, h, anchor_x, anchor_y);
 		normal_icon1.new_icon = new_icon1;
 		normal_icon1.normal_icon = normal_icon1;
@@ -80,8 +81,8 @@ function setup_icons()
 		return normal_icon1;
 	}
 	
-	medium_icon = icon(0.5, 34, 10, 34);
 	small_icon = icon(0.4, 17, 5, 17);	
+	medium_icon = icon(0.5, 34, 10, 34);
 	big_icon = icon(0.75, 68, 20, 68);	
 	
 	/*
@@ -101,6 +102,7 @@ function make_marker_visible(marker)
 
 function make_new_markers_old()
 {
+	//console.log("make_new_markers_old " + new_markers.length);
 	while (new_markers.length != 0)
 	{
 		var i = new_markers.pop();
@@ -137,8 +139,13 @@ function extend(bounds, marker)
 	}
 }
 
+var check_node_inhibit = false;
+
 function show_markers_ref(markers, ref)
 {
+	//console.log("show_markers_ref");
+	var o_check_node_inhibit = check_node_inhibit;
+	check_node_inhibit = true;
 	make_new_markers_old();
 	var bounds = new google.maps.LatLngBounds();
 	$.each
@@ -180,8 +187,11 @@ function show_markers_ref(markers, ref)
 			);
 		}
 	);
-	if (!bounds.isEmpty())
+	if (!bounds.isEmpty()) {
 		map.panToBounds(bounds);
+	}
+
+	check_node_inhibit = o_check_node_inhibit;
 }
 
 function show_markers(markers)
@@ -289,11 +299,12 @@ function get_markers_for_modification(element, projection, map)
 			var id = $(element).attr("id");
 			var cls = $(element).parent().parent().attr("id");
 			var icon = medium_icon;
-			if (cls == "REACTION")
+			if (cls == "REACTION") {
 				icon = small_icon;
-			else if (cls == "modules")
+			} else if (cls == "modules") {
 				icon = big_icon;
-				
+			}
+
 //			alert("get_markers_for_modification create " + id);
 			element.markers = Array();
 			var positions = position.split(" ");
@@ -372,8 +383,6 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 	return false;
 	
 };
-
-var check_node_inhibit = false;
 
 function start_right_hand_panel(selector, source, map, projection, whenloaded)
 {
@@ -463,8 +472,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 		/*}).bind("before.jstree", function(event, data) {
 			console.log("before.jstree: " + data.func + " " + data.args[0]);*/
 		}).bind("check_node.jstree", function(event, data) {
-			if (check_node_inhibit)
+			if (check_node_inhibit) {
 				return;
+			}
 			check_node_inhibit = true;
 			make_new_markers_old();
 			var bounds = new google.maps.LatLngBounds();

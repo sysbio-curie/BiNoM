@@ -85,6 +85,9 @@ public class CellDesignerToCytoscapeConverter {
     public static HashMap<String,Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>> complexSpeciesMap = null;
     public static HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>> speciesAliasMap = null;
     public static HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>> complexSpeciesAliasMap = null;
+    public static HashMap<String,CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> speciesAliasIdMap = null;
+    public static HashMap<String,CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> complexSpeciesAliasIdMap = null;
+    
     
 	public static String defcomp_id = "default";
 	public static Vector comp_ids = new Vector();
@@ -153,7 +156,6 @@ public class CellDesignerToCytoscapeConverter {
         Vector aliases = findAllAliasesForSpecies(sbml,sp.getId());
         
         String lab = convertSpeciesToName(sbml,sp.getId(),true,true);
-        //System.out.println("convertSpeciesToName time = "+((new Date()).getTime()-tm.getTime()));
         
         System.out.println((i+1)+"/"+sbml.getModel().getListOfSpecies().getSpeciesArray().length+": "+lab+"\t"+sp.getId());
         
@@ -166,6 +168,7 @@ public class CellDesignerToCytoscapeConverter {
           String alias = (String)aliases.elementAt(j);
 
           String labs = convertSpeciesToName(sbml,sp.getId(),true,true,false,alias);
+          //System.out.println("convertSpeciesToName time = "+((new Date()).getTime()-tm.getTime()));
           
           GraphicNode n1 = (GraphicNode)NodeIDs.get(sp.getId()+"_"+alias);
           if(addSuffixForMultipleAliases)
@@ -240,7 +243,8 @@ public class CellDesignerToCytoscapeConverter {
             		Utils.addAttributeUniqueNameConcatenatedValues(n1, all_atts.get(k).get(0), all_atts.get(k).get(0), all_atts.get(k).get(1), ObjectType.STRING);
             	}
             }
-            if(species_type.equals("GENE")){
+            
+             if(species_type.equals("GENE")){
                	String id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
                	CelldesignerGeneDocument.CelldesignerGene gene = (CelldesignerGeneDocument.CelldesignerGene)CellDesigner.entities.get(id);
                	if(gene.getCelldesignerNotes()!=null){
@@ -269,13 +273,16 @@ public class CellDesignerToCytoscapeConverter {
             }}
             }
             	
-            
             setSpeciesPositionForXGMML(alias,n1,sbml);
             NodeIDs.put(sp.getId()+"_"+alias,n1);
           }
           }
         }
-      }// end end species  
+        
+        //System.out.println("Species time = "+((new Date()).getTime()-tm.getTime()));
+        
+      }// end end species
+    
 
     if(sbml.getModel().getListOfReactions()!=null)
     for(int i=0;i<sbml.getModel().getListOfReactions().getReactionArray().length;i++){
@@ -533,24 +540,33 @@ public class CellDesignerToCytoscapeConverter {
    * @param sbml
    */
   public static void setSpeciesPositionForXGMML(String spalias, GraphicNode nod, SbmlDocument.Sbml sbml){
-    if(sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases()!=null)
-    for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;i++){
-      CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias)sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
-      if(spa.getId().equals(spalias)){
+    if(sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases()!=null){
+    
+    //for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;i++){
+      //CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias)sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+      CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = speciesAliasIdMap.get(spalias); 
+     // if(spa.getId().equals(spalias)){
+  		if(spa!=null){      
         GraphicsDocument.Graphics gr = nod.addNewGraphics();
         gr.setX(Double.parseDouble(spa.getCelldesignerBounds().getX()));
         gr.setY(Double.parseDouble(spa.getCelldesignerBounds().getY()));
-      }
+  		}
+      //}
+    //}
     }
-    if(sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null)
-    for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
-      CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias spa =
-              (CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias)sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
-      if(spa.getId().equals(spalias)){
+    if(sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null){
+    //for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
+      //CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias spa =
+      //        (CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias)sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+    	CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias spa = complexSpeciesAliasIdMap.get(spalias);	
+      //if(spa.getId().equals(spalias)){
+    	if(spa!=null){
         GraphicsDocument.Graphics gr = nod.addNewGraphics();
         gr.setX(Double.parseDouble(spa.getCelldesignerBounds().getX()));
         gr.setY(Double.parseDouble(spa.getCelldesignerBounds().getY()));
-      }
+    	}
+      //}
+    //}
     }
   }
 
@@ -1813,6 +1829,10 @@ public class CellDesignerToCytoscapeConverter {
 		complexSpeciesMap = new HashMap<String,Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>>();
 		speciesAliasMap = new HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>>();
 		complexSpeciesAliasMap = new HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>>();
+		speciesAliasIdMap = new HashMap<String,CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>();
+		complexSpeciesAliasIdMap = new HashMap<String,CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>();
+		
+		
 		for(int i=0;i<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();i++)
 			speciesMap.put(sbml.getModel().getListOfSpecies().getSpeciesArray(i).getId(), sbml.getModel().getListOfSpecies().getSpeciesArray(i));
 		if(sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
@@ -1834,6 +1854,7 @@ public class CellDesignerToCytoscapeConverter {
 		  if(sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases()!=null) 
 	      for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 	    	  CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spal = sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+	    	  speciesAliasIdMap.put(spal.getId(), spal);
 	    	  Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> v = speciesAliasMap.get(spal.getSpecies());
 	    	  if(v==null){
 	    		  v = new Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>();
@@ -1844,6 +1865,7 @@ public class CellDesignerToCytoscapeConverter {
 		  if(sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) 
 		      for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
 		    	  CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias spal = sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+		    	  complexSpeciesAliasIdMap.put(spal.getId(), spal);
 		    	  Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> v = complexSpeciesAliasMap.get(spal.getSpecies());
 		    	  if(v==null){
 		    		  v = new Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>();

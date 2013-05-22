@@ -126,7 +126,6 @@ Dataset.prototype = {
 		if (datatable_name == new_datatable_name) {
 			var datatable = this.datatables[datatable_name];
 			datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
-			console.log("setting #1 " + new_datatable_type + " -> " + datatable.biotype);
 			return true;
 		}
 		if (this.datatables[new_datatable_name]) {
@@ -136,7 +135,6 @@ Dataset.prototype = {
 		delete this.datatables[datatable_name];
 		datatable.name = new_datatable_name;
 		datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
-		console.log("setting #2 " + new_datatable_type + " -> " + datatable.biotype);
 		this.datatables[new_datatable_name] = datatable;
 		return true;
 	},

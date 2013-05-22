@@ -250,11 +250,25 @@ function update_gene_status_table() {
 function update_datatable_status_table() {
 	var table = $("#dt_datatable_status_table");
 	var update = $("#dt_datatable_status_update").attr("checked");
-	//var update_button = $("#dt_datatable_status Update")
+	var support_remove = false;
+
+	var buttons = $("#dt_datatable_status").parent().find(".ui-button-text");
+	buttons.each(function() {
+		var button  = $(this);
+		var text = button.text();
+		if (text == "Update" || text == "Cancel" ) {
+			if (update) {
+				button.parent().removeClass("zz-hidden");
+			} else {
+				button.parent().addClass("zz-hidden");
+			}
+		}
+	});
+
 	table.children().remove();
 
 	var str = "<thead><tr>";
-	if (update) {
+	if (support_remove && update) {
 		str += "<th>Remove</th>";
 	}
 	str += "<th>Datatable</th>";
@@ -268,7 +282,9 @@ function update_datatable_status_table() {
 		var datatable = navicell.dataset.datatables[dt_name];
 		str += "<tr>";
 		if (update) {
-			str += "<td><input id=\"dt_remove_" + datatable.name + "\" type=\"checkbox\"></td>";
+			if (support_remove) {
+				str += "<td><input id=\"dt_remove_" + datatable.name + "\" type=\"checkbox\"></td>";
+			}
 			str += "<td><input id=\"dt_name_" + datatable.name + "\" type=\"text\" value=\"" + datatable.name + "\"/></td>";
 			str += "<td>" + get_biotype_select("dt_type_" + datatable.name, false, datatable.biotype.name) + "</td>";
 		} else {

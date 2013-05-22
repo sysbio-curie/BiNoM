@@ -99,6 +99,7 @@ $(function() {
 			}
 		}});
 
+	/*
 	$("#dt_sample_status").dialog({
 		autoOpen: false,
 		height: 700,
@@ -107,6 +108,14 @@ $(function() {
 	});
 
 	$("#dt_gene_status").dialog({
+		autoOpen: false,
+		height: 700,
+		width: 500,
+		modal: false
+	});
+	*/
+
+	$("#dt_status_tabs").dialog({
 		autoOpen: false,
 		height: 700,
 		width: 500,
@@ -149,6 +158,7 @@ $(function() {
 				if (update_cnt) {
 					var update = $("#dt_datatable_status_update");
 					update.attr('checked', false);
+					update.text('Unlock Datatables');
 					update_status_tables();
 				}
 			},
@@ -160,20 +170,36 @@ $(function() {
 		}
 	});
 
-	$("#sample_status").button().click(function() {
-		$("#dt_sample_status").dialog("open");
-	});
-
 	$("#import_dialog").button().click(function() {
 		$("#dt_import_dialog").dialog("open");
 	});
 
-	$("#gene_status").button().click(function() {
-		$("#dt_gene_status").dialog("open");
+	$("#dt_status_tabs").tabs();
+
+	$("#status_tabs").button().click(function() {
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_status_tabs").dialog("open");
+		}
 	});
 
+	/*
+	$("#sample_status").button().click(function() {
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_sample_status").dialog("open");
+		}
+	});
+
+	$("#gene_status").button().click(function() {
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_gene_status").dialog("open");
+		}
+	});
+	*/
+
 	$("#datatable_status").button().click(function() {
-		$("#dt_datatable_status").dialog("open");
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_datatable_status").dialog("open");
+		}
 	});
 
 });
@@ -249,7 +275,9 @@ function update_gene_status_table() {
 
 function update_datatable_status_table() {
 	var table = $("#dt_datatable_status_table");
-	var update = $("#dt_datatable_status_update").attr("checked");
+	var update_label = $("#dt_datatable_status_update_label");
+	var update_checkbox = $("#dt_datatable_status_update");
+	var update = update_checkbox.attr("checked");
 	var support_remove = false;
 
 	var buttons = $("#dt_datatable_status").parent().find(".ui-button-text");
@@ -265,6 +293,7 @@ function update_datatable_status_table() {
 		}
 	});
 
+	update_label.text(update ? "Uncheck to Lock Datatables" : "Check to Unlock Datatables");
 	table.children().remove();
 
 	var str = "<thead><tr>";

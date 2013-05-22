@@ -279,11 +279,13 @@ label {font-size: 12px; vertical-align: middle;}
     color: #222222;
 }
 
+/*
 #dt_sample_status, #dt_gene_status, #dt_datatable_status {
     overflow: scroll;
 }
+*/
 
-#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3 {
+#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3 {
     margin-top: 20px;
     text-align: center;
 }
@@ -320,4 +322,14 @@ label {font-size: 12px; vertical-align: middle;}
 
 #dt_datatable_status_table td {
     min-width: 100px;
+}
+
+.zz-hidden {
+    visibility: hidden;
+}
+
+.update-checkbox {
+    font-size: 13px;
+    color: darkred;
+    vertical-align: top;
 }

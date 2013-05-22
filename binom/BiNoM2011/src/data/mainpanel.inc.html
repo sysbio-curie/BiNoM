@@ -46,16 +46,23 @@
   <div id="dt_import_status"></div> 
 </div>
 
-<div id="dt_sample_status">
-  <h3>Sample Status</h3>
-  <table id="dt_sample_status_table">
-  </table>
-</div>
-
-<div id="dt_gene_status">
-  <h3>Gene Status</h3>
-  <table id="dt_gene_status_table">
-  </table>
+<div id="dt_status_tabs">
+  <h3>Sample/Gene Status</h3>
+  <ul>
+    <li><a class="ui-button-text" href="#dt_sample_status">Samples</a></li>
+    <li><a class="ui-button-text" href="#dt_gene_status">Genes</a></li>
+  </ul>
+  <div id="dt_sample_status">
+    <h3>Sample Status</h3>
+    <table id="dt_sample_status_table">
+    </table>
+  </div>
+  
+  <div id="dt_gene_status">
+    <h3>Gene Status</h3>
+    <table id="dt_gene_status_table">
+    </table>
+  </div>
 </div>
 
 <div id="dt_datatable_status">
@@ -65,7 +72,7 @@
   </table>
   <br/>
   <br/>
-  <label for="update_datatables">Update datatables</label>
+  <label id="dt_datatable_status_update_label" for="update_datatables" class="update-checkbox"></label>
   <input type="checkbox" id="dt_datatable_status_update" name="update_datatables" onchange='update_datatable_status_table();'></input>
   </form>
 </div>

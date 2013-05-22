@@ -179,7 +179,7 @@ html, body {
 
 /* for dialog */
 
-#dt_import_dialog, #dt_sample_status {
+#dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_datatable_status {
     font-size: 80%;
 /*    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif"; */
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
@@ -258,13 +258,13 @@ label {font-size: 12px; vertical-align: middle;}
     font-size: smaller;
 }
 
-#dt_sample_status_table table, #dt_sample_status_table th, #dt_sample_status_table td {
+#dt_sample_status_table table, #dt_sample_status_table th, #dt_sample_status_table td, #dt_gene_status_table table, #dt_gene_status_table th, #dt_gene_status_table td, #dt_datatable_status_table table, #dt_datatable_status_table th, #dt_datatable_status_table td {
     border: 1px solid lightgray;
     border-spacing: 10px;
     border-padding: 10px;
 }
 
-#dt_sample_status_table {
+#dt_sample_status_table, #dt_gene_status_table, #dt_datatable_status_table {
     width: 200px;
 }
 
@@ -279,14 +279,45 @@ label {font-size: 12px; vertical-align: middle;}
     color: #222222;
 }
 
-#dt_sample_status {
-//    overflow: auto;
-//    width: 100%;
+#dt_sample_status, #dt_gene_status, #dt_datatable_status {
     overflow: scroll;
 }
 
-#dt_sample_status h3 {
+#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3 {
     margin-top: 20px;
     text-align: center;
 }
 
+.error_message {
+    color: red;
+}
+
+#dt_gene_status_table thead {
+    background-color: rgb(160, 138, 189);
+    color: white;
+}
+
+#dt_gene_status_table tbody {
+/*    background-color: rgb(200, 238, 0) */
+    background-color: white;
+    color: #222222;
+}
+
+#dt_datatable_status_table thead {
+    background-color: rgb(0, 0, 60);
+    color: white;
+}
+
+#dt_datatable_status_table tbody {
+/*    background-color: rgb(200, 238, 0) */
+    background-color: white;
+    color: #222222;
+}
+
+#dt_datatable_status_table tbody {
+    text-align: center;
+}
+
+#dt_datatable_status_table td {
+    min-width: 100px;
+}

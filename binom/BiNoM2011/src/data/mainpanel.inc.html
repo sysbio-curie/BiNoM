@@ -6,29 +6,16 @@
       <h4>Import Options</h4>
 
       <div id="dt_import_main">
-	<label for="name">Name</label>
-	<input type="text" name="name" id="dt_import_name" class="text ui-widget-content ui-corner-all" />
-	<div id="dt_import_name_help"></div>
-
 	<label for="file">File</label>
 	<input type="file" name="file" id="dt_import_file" value="" class="text ui-widget-content ui-corner-all" />
 	<div id="dt_import_file_help"></div>
 
+	<label for="name">Name</label>
+	<input type="text" name="name" id="dt_import_name" class="text ui-widget-content ui-corner-all" />
+	<div id="dt_import_name_help"></div>
+
 	<label for="type">Type</label>
-        <select id="dt_import_type">
-	  <!-- list could be built from javascript -->
-	  <!-- continuous -->
-	  <option value="_none_"></option>
-	  <option value="mrna_expr">mRNA expression data</option>
-	  <option value="microrna_expr">microRNA expression data</option>
-	  <option value="prt_expr">Protein expression data</option>
-	  <option value="copynum">Copy number data mRNA, microRNA</option>
-	  <option value="epi_met">Epigenic data: methylation profiles</option>
-	  <option value="epi_his">Epigenic data: histone modifications</option>
-	  <!-- discrete -->
-	  <option value="poly">Polymorphism data: SNPs</option>
-	  <option value="mutation">Mutation data: gene re-sequencing</option>
-	</select>
+	<div id="dt_import_type_select"></div>
 
 	<div id="dt_import_type_help"></div>
 
@@ -70,3 +57,28 @@
   <table id="dt_gene_status_table">
   </table>
 </div>
+
+<div id="dt_datatable_status">
+  <form>
+  <h3>Datatable Status</h3>
+  <table id="dt_datatable_status_table">
+  </table>
+  <br/>
+  <br/>
+  <label for="update_datatables">Update datatables</label>
+  <input type="checkbox" id="dt_datatable_status_update" name="update_datatables" onchange='update_datatable_status_table();'></input>
+  </form>
+</div>
+
+<div id="dt_sample_annot">
+  <h3>Sample_Annot Status</h3>
+  <table id="dt_sample_annot_status">
+  </table>
+</div>
+
+<div id="dt_group_sample_status">
+  <h3>Group Sample Status</h3>
+  <table id="dt_group_sample_status_table">
+  </table>
+</div>
+

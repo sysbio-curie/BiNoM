@@ -119,18 +119,25 @@ Dataset.prototype = {
 		return this.genes[gene_name];
 	},
 
-	updateDatatable: function(datatable_name, new_datatable_name) {
-		if (datatable_name != new_datatable_name) {
-			if (this.datatables[datatable_name]) {
-				if (this.datatables[new_datatable_name]) {
-					return false;
-				}					
-				var datatable = this.datatables[datatable_name];
-				delete this.datatables[datatable_name];
-				datatable.name = new_datatable_name;
-				this.datatables[new_datatable_name] = datatable;
-			}
+	updateDatatable: function(datatable_name, new_datatable_name, new_datatable_type) {
+		if (!this.datatables[datatable_name]) {
+			return true;
 		}
+		if (datatable_name == new_datatable_name) {
+			var datatable = this.datatables[datatable_name];
+			datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
+			console.log("setting #1 " + new_datatable_type + " -> " + datatable.biotype);
+			return true;
+		}
+		if (this.datatables[new_datatable_name]) {
+			return false;
+		}					
+		var datatable = this.datatables[datatable_name];
+		delete this.datatables[datatable_name];
+		datatable.name = new_datatable_name;
+		datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
+		console.log("setting #2 " + new_datatable_type + " -> " + datatable.biotype);
+		this.datatables[new_datatable_name] = datatable;
 		return true;
 	},
 
@@ -143,16 +150,14 @@ Dataset.prototype = {
 // Encapsulate datatable contents (but only for genes existing in map) and type
 //
 
-function Datatable(dataset, biotype, name, file) {
+function Datatable(dataset, biotype_name, name, file) {
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
 		return;
 	}
 	this.dataset = dataset;
-	this.biotype = biotype;
+	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 
-	// must compute type according to type
-	this.type = 0;
 	this.name = name;
 
 	this.gene_index = {};
@@ -214,8 +219,7 @@ function Datatable(dataset, biotype, name, file) {
 
 Datatable.prototype = {
 	dataset: null,
-	biotype: "",
-	type: 0,
+	biotype: null,
 	name: "",
 	gene_index: {},
 	sample_index: {},
@@ -346,6 +350,51 @@ GroupFactory.prototype = {
 	getClass: function() {return "GroupFactory";}
 };
 
+function Biotype(name, type) {
+	this.name = name;
+	this.type = type;
+}
+
+Biotype.prototype = {
+	name: "",
+	type: null
+};
+
+function BiotypeType(type) {
+	this.type = type;
+}
+
+BiotypeType.prototype = {
+	type: 0,
+
+	isContinuous: function() {
+		return this.type == navicell.CONTINUOUS;
+	},
+
+	isDiscrete: function() {
+		return this.type == navicell.DISCRETE;
+	},
+
+	isSet: function() {
+		return this.type == navicell.SET;
+	}
+};
+
+function BiotypeFactory() {
+}
+
+BiotypeFactory.prototype = {
+	biotypes: {},
+
+	addBiotype: function(biotype) {
+		this.biotypes[biotype.name] = biotype;
+	},
+
+	getBiotype: function(biotype_name) {
+		return this.biotypes[biotype_name];
+	}
+};
+
 /*
 function SampleFactory() {
 }
@@ -390,6 +439,22 @@ var navicell = {}; // namespace
 navicell.mapdata = new Mapdata();
 navicell.dataset = new Dataset("navicell");
 navicell.group_factory = new GroupFactory();
+navicell.biotype_factory = new BiotypeFactory();
+
+navicell.CONTINUOUS = 1;
+navicell.DISCRETE = 2;
+navicell.SET = 3;
+
+navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("Copy number data mRNA, microRNA", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", navicell.CONTINUOUS));
+navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", navicell.DISCRET));
+navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", navicell.DISCRETE));
+navicell.biotype_factory.addBiotype(new Biotype("Interaction data", navicell.SET));
+navicell.biotype_factory.addBiotype(new Biotype("Set data", navicell.SET));
 
 // .....................................................
 // unit test

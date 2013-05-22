@@ -20,6 +20,13 @@
 
 
 $(function() {
+	function build_datatable_import_dialog() {
+		var select = $("#dt_import_type_select");
+		select.html(get_biotype_select("dt_import_type", true));
+	}
+
+	build_datatable_import_dialog();
+
 	var name = $("#dt_import_name");
 	var file = $("#dt_import_file");
 	var type = $("#dt_import_type");
@@ -33,7 +40,7 @@ $(function() {
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
 		height: 700,
-		width: 380,
+		width: 500,
 		modal: false,
 		buttons: {
 			"Import": function() {
@@ -101,8 +108,8 @@ $(function() {
 
 	$("#dt_gene_status").dialog({
 		autoOpen: false,
-		height: 800,
-		width: 350,
+		height: 700,
+		width: 500,
 		modal: false
 	});
 
@@ -115,19 +122,33 @@ $(function() {
 			"Update": function() {
 				var update_cnt = 0;
 				for (var dt_name in navicell.dataset.datatables) {
-					var elem = $("#dt_name_" + dt_name);
-					var new_dt_name = elem.val();
-					if (dt_name !== new_dt_name) {
-						if (!navicell.dataset.updateDatatable(dt_name, new_dt_name)) {
-							elem.val(dt_name);
+					var datatable = navicell.dataset.datatables[dt_name];
+					var dt_name_elem = $("#dt_name_" + dt_name);
+					var dt_type_elem = $("#dt_type_" + dt_name);
+					var new_dt_name = dt_name_elem.val();
+					var new_dt_type = dt_type_elem.val();
+
+					if (!new_dt_name || !new_dt_type) {
+						update_cnt = 0;
+						break;
+					}
+
+					if (dt_name !== new_dt_name ||
+					    new_dt_type !==  datatable.biotype.name) {
+						if (!navicell.dataset.updateDatatable(dt_name, new_dt_name, new_dt_type)) {
+							dt_name_elem.val(dt_name);
+							dt_type_elem.val(datatable.biotype.name);
 							
 						} else {
 							update_cnt++;
 						}
 
 					}
+
 				}
 				if (update_cnt) {
+					var update = $("#dt_datatable_status_update");
+					update.attr('checked', false);
 					update_status_tables();
 				}
 			},
@@ -138,106 +159,6 @@ $(function() {
 			}
 		}
 	});
-
-	function update_sample_status_table() {
-		var table = $("#dt_sample_status_table");
-		table.children().remove();
-		// should use a string buffer
-		var str = "<thead><tr><th>Samples</th>";
-
-		for (var dt_name in navicell.dataset.datatables) {
-			var datatable = navicell.dataset.datatables[dt_name];
-			str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
-		}
-		str += "</tr></thead>";
-		str += "<tbody>\n";
-		for (var sample_name in navicell.dataset.samples) {
-			if (sample_name == "") {
-				continue;
-			}
-			str += "<tr><td>" + sample_name + "</td>";
-			for (var dt_name in navicell.dataset.datatables) {
-				var datatable = navicell.dataset.datatables[dt_name];
-				if (datatable.sample_index[sample_name] !== undefined) {
-					//str += "<td>" + mapSize(datatable.gene_index) + "</td>";
-					str += "<td style=\"width: 100%; text-align: center\">X</td>";
-				} else {
-					str += "<td>&nbsp;</td>";
-				}
-			}
-			str += "</tr>";
-		}
-		
-		str += "</tbody>";
-		//console.log("table: " + table.html());
-		//console.log("table_str: " + str);
-		table.append(str);
-	}
-
-	function update_gene_status_table() {
-		var table = $("#dt_gene_status_table");
-		table.children().remove();
-		// should use a string buffer
-		var str = "<thead><tr><th>Genes</th>";
-
-		for (var dt_name in navicell.dataset.datatables) {
-			var datatable = navicell.dataset.datatables[dt_name];
-			str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
-		}
-		str += "</tr></thead>";
-		str += "<tbody>\n";
-		for (var gene_name in navicell.dataset.genes) {
-			if (gene_name == "") {
-				continue;
-			}
-			str += "<tr><td>" + gene_name + "</td>";
-			for (var dt_name in navicell.dataset.datatables) {
-				var datatable = navicell.dataset.datatables[dt_name];
-				if (datatable.gene_index[gene_name] !== undefined) {
-					str += "<td style=\"width: 100%; text-align: center\">X</td>";
-				} else {
-					str += "<td>&nbsp;</td>";
-				}
-			}
-			str += "</tr>";
-		}
-		
-		str += "</tbody>";
-		//console.log("table: " + table.html());
-		//console.log("table_str: " + str);
-		table.append(str);
-	}
-
-	function update_datatable_status_table() {
-		var table = $("#dt_datatable_status_table");
-		table.children().remove();
-
-		var str = "<thead><tr>";
-		str += "<th>Datatable</th>";
-		str += "<th>Type</th>";
-		str += "<th>Genes</th>";
-		str += "<th>Samples</th>";
-		str += "</tr></thead>";
-
-		str += "<tbody>";
-		for (var dt_name in navicell.dataset.datatables) {
-			var datatable = navicell.dataset.datatables[dt_name];
-			str += "<tr>";
-			//str += "<td>&nbsp;" + datatable.name + "&nbsp;</td>";
-			str += "<td><input id=\"dt_name_" + datatable.name + "\" type=\"text\" value=\"" + datatable.name + "\"/></td>";
-			str += "<td>&nbsp;" + datatable.biotype + "&nbsp;</td>";
-			str += "<td>" + mapSize(datatable.gene_index) + "</td>";
-			str += "<td>" + mapSize(datatable.sample_index) + "</td>";
-			str += "</tr>";
-		}
-		table.append(str);
-	}
-
-	function update_status_tables() {
-		update_sample_status_table();
-		update_gene_status_table();
-		update_datatable_status_table();
-	}
 
 	$("#sample_status").button().click(function() {
 		$("#dt_sample_status").dialog("open");
@@ -254,4 +175,130 @@ $(function() {
 	$("#datatable_status").button().click(function() {
 		$("#dt_datatable_status").dialog("open");
 	});
+
 });
+
+function update_sample_status_table() {
+	var table = $("#dt_sample_status_table");
+	table.children().remove();
+	// should use a string buffer
+	var str = "<thead><tr><th>Samples</th>";
+
+	for (var dt_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[dt_name];
+		str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
+	}
+	str += "</tr></thead>";
+	str += "<tbody>\n";
+	for (var sample_name in navicell.dataset.samples) {
+		if (sample_name == "") {
+			continue;
+		}
+		str += "<tr><td>" + sample_name + "</td>";
+		for (var dt_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[dt_name];
+			if (datatable.sample_index[sample_name] !== undefined) {
+				//str += "<td>" + mapSize(datatable.gene_index) + "</td>";
+				str += "<td style=\"width: 100%; text-align: center\">X</td>";
+			} else {
+				str += "<td>&nbsp;</td>";
+			}
+		}
+		str += "</tr>";
+	}
+	
+	str += "</tbody>";
+	//console.log("table: " + table.html());
+	//console.log("table_str: " + str);
+	table.append(str);
+}
+
+function update_gene_status_table() {
+	var table = $("#dt_gene_status_table");
+	table.children().remove();
+	// should use a string buffer
+	var str = "<thead><tr><th>Genes</th>";
+
+	for (var dt_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[dt_name];
+		str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
+	}
+	str += "</tr></thead>";
+	str += "<tbody>\n";
+	for (var gene_name in navicell.dataset.genes) {
+		if (gene_name == "") {
+			continue;
+		}
+		str += "<tr><td>" + gene_name + "</td>";
+		for (var dt_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[dt_name];
+			if (datatable.gene_index[gene_name] !== undefined) {
+				str += "<td style=\"width: 100%; text-align: center\">X</td>";
+			} else {
+				str += "<td>&nbsp;</td>";
+			}
+		}
+		str += "</tr>";
+	}
+	
+	str += "</tbody>";
+	//console.log("table: " + table.html());
+	//console.log("table_str: " + str);
+	table.append(str);
+}
+
+function update_datatable_status_table() {
+	var table = $("#dt_datatable_status_table");
+	var update = $("#dt_datatable_status_update").attr("checked");
+	//var update_button = $("#dt_datatable_status Update")
+	table.children().remove();
+
+	var str = "<thead><tr>";
+	if (update) {
+		str += "<th>Remove</th>";
+	}
+	str += "<th>Datatable</th>";
+	str += "<th>Type</th>";
+	str += "<th>Genes</th>";
+	str += "<th>Samples</th>";
+	str += "</tr></thead>";
+
+	str += "<tbody>";
+	for (var dt_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[dt_name];
+		str += "<tr>";
+		if (update) {
+			str += "<td><input id=\"dt_remove_" + datatable.name + "\" type=\"checkbox\"></td>";
+			str += "<td><input id=\"dt_name_" + datatable.name + "\" type=\"text\" value=\"" + datatable.name + "\"/></td>";
+			str += "<td>" + get_biotype_select("dt_type_" + datatable.name, false, datatable.biotype.name) + "</td>";
+		} else {
+			str += "<td>&nbsp;" + datatable.name + "&nbsp;</td>";
+			str += "<td style='min-width: 170px'>&nbsp;" + datatable.biotype.name + "&nbsp;</td>";
+		}
+		str += "<td>" + mapSize(datatable.gene_index) + "</td>";
+		str += "<td>" + mapSize(datatable.sample_index) + "</td>";
+		str += "</tr>";
+	}
+	table.append(str);
+}
+
+function update_status_tables() {
+	update_sample_status_table();
+	update_gene_status_table();
+	update_datatable_status_table();
+}
+
+function get_biotype_select(id, include_none, value) {
+	var str = '<select id="' + id + '">';
+	if (include_none) {
+		str += '<option value="_none_"></option>';
+	}
+	for (var biotype_name in navicell.biotype_factory.biotypes) {
+		var biotype = navicell.biotype_factory.biotypes[biotype_name];
+		var selected = biotype.name == value ? ' selected' : '';
+		str += '<option value="' + biotype.name + '"' + selected + '>' + biotype.name + '</option>';
+	}
+	str += "</select>";
+	return str;
+}
+

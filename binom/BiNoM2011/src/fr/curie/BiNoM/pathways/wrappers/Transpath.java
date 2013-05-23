@@ -241,7 +241,7 @@ public class Transpath {
 //                        for(int k=0;k<ann.getSource().getItemArray().length;k++){
 //                          ItemDocument.Item it1 = ann.getSource().getItemArray(k);
 //                          String sid = getXLink(it1,"href");
-//                          publicationXref pxf = (publicationXref)entities.get(sid);
+//                          PublicationXref pxf = (PublicationXref)entities.get(sid);
 //                          if(pxf==null){
 //                            pxf = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+sid,biopax.biopaxmodel);
 //                          }
@@ -482,7 +482,7 @@ public class Transpath {
 //           	System.out.print(i+"("+((int)((tc.getTime()-t.getTime())/1000))+")");
 //           	t = new Date();
 //        }
-//        publicationXref pxr = (publicationXref)entities.get(ra[i].getId());
+//        PublicationXref pxr = (PublicationXref)entities.get(ra[i].getId());
 //        if(pxr==null){
 //          pxr = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+ra[i].getId(),biopax.biopaxmodel);
 //          entities.put(ra[i].getId(),pxr);
@@ -642,7 +642,7 @@ public class Transpath {
 //                   for(int k=0;k<ann.getSource().getItemArray().length;k++){
 //                     ItemDocument.Item it1 = ann.getSource().getItemArray(k);
 //                     String sid = getXLink(it1,"href");
-//                     publicationXref pxf = (publicationXref)entities.get(sid);
+//                     PublicationXref pxf = (PublicationXref)entities.get(sid);
 //                     if(pxf==null){
 //                       pxf = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+sid,biopax.biopaxmodel);
 //                     }
@@ -764,7 +764,7 @@ public class Transpath {
 //  public void addPublication(entity ent, ItemDocument.Item it) throws Exception{
 //    String id = getXLink(it,"href");
 //    if(id!=null){
-//      publicationXref px = (publicationXref)entities.get(id);
+//      PublicationXref px = (PublicationXref)entities.get(id);
 //      if(px==null){
 //        px = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+id,biopax.biopaxmodel);
 //        entities.put(id,px);
@@ -934,7 +934,7 @@ public class Transpath {
 //    for(int i=0;i<r.getReferences().getItemArray().length;i++){
 //      ItemDocument.Item item = r.getReferences().getItemArray(i);
 //      String reactid = getXLink(item,"href");
-//      publicationXref xrp = (publicationXref)entities.get(reactid);
+//      PublicationXref xrp = (PublicationXref)entities.get(reactid);
 //      if(xrp==null){
 //        xrp = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+reactid,biopax.biopaxmodel);
 //        entities.put(reactid,xrp);
@@ -953,7 +953,7 @@ public class Transpath {
 //             for(int k=0;k<ann.getSource().getItemArray().length;k++){
 //               ItemDocument.Item it = ann.getSource().getItemArray(k);
 //               String sid = getXLink(it,"href");
-//               publicationXref pxf = (publicationXref)entities.get(sid);
+//               PublicationXref pxf = (PublicationXref)entities.get(sid);
 //               if(pxf==null){
 //                 pxf = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+sid,biopax.biopaxmodel);
 //               }

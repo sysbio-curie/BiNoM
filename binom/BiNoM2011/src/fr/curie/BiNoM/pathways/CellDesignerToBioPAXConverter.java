@@ -1025,7 +1025,7 @@ public class CellDesignerToBioPAXConverter {
 		try{
 			Vector present = new Vector();
 			for(int i=0;i<v.size();i++){
-				publicationXref xref = (publicationXref)v.elementAt(i);
+				PublicationXref xref = (PublicationXref)v.elementAt(i);
 				if(present.indexOf(xref)<0)
 					ent.addXref((Xref)xref);
 			}

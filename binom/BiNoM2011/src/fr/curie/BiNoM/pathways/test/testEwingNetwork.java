@@ -363,7 +363,7 @@ public class testEwingNetwork {
 		if(pub.length()>2){
 			StringTokenizer st = new StringTokenizer(pub,":(");
 			String pmid = st.nextToken(); pmid = st.nextToken();
-			publicationXref publ = (publicationXref)publications.get("pubmed_"+pmid);
+			PublicationXref publ = (PublicationXref)publications.get("pubmed_"+pmid);
 			if(publ==null){
 				publ = biopax_DASH_level2_DOT_owlFactory.createpublicationXref(biopax.namespaceString+"pubmed_"+pmid, biopax.biopaxmodel);
 				publ.setDB("Pubmed");

@@ -57,7 +57,7 @@ public class ACSNProcedures {
 			//doMakeHiddenLevel2("C:/Datas/acsn/survival_merge/hedgehog.xml", "C:/Datas/acsn/survival_merge/hedgehog_level2.xml", 20);
 			//doScalePng("C:/Datas/NaviCell/test/merged/merged_master-3_1.png","C:/Datas/NaviCell/test/merged/merged_master-2_1.png");
 			//doScalePng("C:/Datas/acsn/survival_merge/hedgehog-3-1.png", "C:/Datas/acsn/survival_merge/hedgehog-2-1.png");
-			updateLinks("c:/datas/acsn/assembly/merge_config","c:/datas/acsn/assembly/connectionDBTable.txt");
+			//updateLinks("c:/datas/navicell/test/merge_config","c:/datas/navicell/test/connectionIDs.txt");
 			
 			for(int i=0;i<args.length;i++){
 				if(args[i].equals("--xml"))
@@ -247,6 +247,8 @@ public class ACSNProcedures {
       							if(tab.stringTable[i][tab.fieldNumByName(fieldName)].equals(tag))
       								if(!foundRowsInTable.contains(i))
       									foundRowsInTable.add(i);
+      						s = Utils.replaceString(s, fieldName+":"+tag+" ,", "");
+      						s = Utils.replaceString(s, fieldName+":"+tag+",", "");
       						s = Utils.replaceString(s, fieldName+":"+tag, "");
       					}
       				}
@@ -263,7 +265,7 @@ public class ACSNProcedures {
       				if(foundRowsInTable.size()==0)
       					s = scopy;
       				else
-      					text.append(prefix+" "+s);
+      					text.append(prefix+" "+s+"\n");
       			//	
       			}else{
       				text.append(s+"\n");

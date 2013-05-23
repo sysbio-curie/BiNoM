@@ -19,8 +19,9 @@ public class ConnectionToDatabases {
 		try{
 			
 			//findLinksToAtlasOfOncology("c:/datas/acsn/allnames.txt");
-			//findLinksReactome("c:/datas/acsn/test_uniprots.txt");
-			//findKeggLinks("c:/datas/acsn/test.txt");
+			findLinksReactome("c:/datas/acsn/uniprots.txt");
+			//findKeggLinks("c:/datas/acsn/allnames.txt");
+			//makeIdentifiersTable("c:/datas/acsn/allnames.txt");
 			//makeIdentifiersTable("c:/datas/acsn/test1.txt");
 			
 			
@@ -79,6 +80,7 @@ public class ConnectionToDatabases {
       		  listIDs.add("");
 
       	  for(int i=0;i<list.size();i++){
+      		  System.out.print(i+" ");
       		  String link = "http://www.reactome.org/cgi-bin/search2?OPERATOR=ALL&SPECIES=48887&QUERY="+list.get(i);
       		  String page = Utils.downloadURL(link);
       		  LineNumberReader lr = new LineNumberReader(new StringReader(page));
@@ -93,6 +95,7 @@ public class ConnectionToDatabases {
       		  }
       		  listIDs.set(i,id);
       	  }
+      	  System.out.println();
       	  
       	  for(int i=0;i<list.size();i++){
       		  System.out.println(list.get(i)+"\t"+listIDs.get(i));
@@ -143,6 +146,7 @@ public class ConnectionToDatabases {
   	  Vector<Vector<String>> listIDs = new Vector<Vector<String>>();
   	  Vector<String> idnames = new Vector<String>();
   	  for(int i=0;i<list.size();i++){
+  		  System.out.print(i+" ");
   		  String id = list.get(i);
   		  Vector<String> ids = Utils.guessProteinIdentifiers(id);
   		  listIDs.add(ids);
@@ -152,14 +156,18 @@ public class ConnectionToDatabases {
   				  idnames.add(name);
   		  }
   	  }
+  	  System.out.println();
   	  for(int i=0;i<idnames.size();i++) System.out.print(idnames.get(i)+"\t"); System.out.println();
   	  for(int i=0;i<listIDs.size();i++){
   		  String idm[] = new String[idnames.size()];
+  		  for(int j=0;j<idm.length;j++) idm[j] = "";
   		  Vector<String> ids = listIDs.get(i);
   		  for(int j=0;j<ids.size();j++){
   			  String id = ids.get(j);
-  			  String name = id.split(":")[0];
-  			  idm[idnames.indexOf(name)] = id.split(":")[1];
+  			  String v[] = id.split(":");
+  			  String name = v[0];
+  			  if(v.length>1)
+  				  idm[idnames.indexOf(name)] = v[1];
   		  }
   		  for(int j=0;j<idm.length;j++) System.out.print(idm[j]+"\t"); System.out.println();
   	  }

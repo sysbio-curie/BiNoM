@@ -47,10 +47,12 @@
 </div>
 
 <div id="dt_status_tabs">
-  <h3>Sample/Gene Status</h3>
+  <h3>Sample &amp; Gene Status</h3>
   <ul>
     <li><a class="ui-button-text" href="#dt_sample_status">Samples</a></li>
     <li><a class="ui-button-text" href="#dt_gene_status">Genes</a></li>
+<!--    <li><a class="ui-button-text" href="#dt_datatable_status">Datatables</a></li> -->
+    <li><a class="ui-button-text" href="#dt_group_status">Groups</a></li>
   </ul>
   <div id="dt_sample_status">
     <h3>Sample Status</h3>
@@ -61,6 +63,26 @@
   <div id="dt_gene_status">
     <h3>Gene Status</h3>
     <table id="dt_gene_status_table">
+    </table>
+  </div>
+
+<!--
+  <div id="dt_datatable_status">
+    <form>
+      <h3>Datatable Status</h3>
+      <table id="dt_datatable_status_table">
+      </table>
+      <br/>
+      <br/>
+      <label id="dt_datatable_status_update_label" for="update_datatables" class="update-checkbox"></label>
+      <input type="checkbox" id="dt_datatable_status_update" name="update_datatables" onchange='update_datatable_status_table();'></input>
+    </form>
+  </div>
+-->
+
+  <div id="dt_group_status">
+    <h3>Group Status</h3>
+    <table id="dt_group_status_table">
     </table>
   </div>
 </div>
@@ -78,14 +100,18 @@
 </div>
 
 <div id="dt_sample_annot">
-  <h3>Sample_Annot Status</h3>
-  <table id="dt_sample_annot_status">
-  </table>
+  <h3>Sample Annotations</h3>
+  <form>
+    <fieldset>
+      <div id="dt_sample_annot_table_div">
+	<table id="dt_sample_annot_table">
+	</table>
+      </div>
+      <br/>
+      <br/>
+      <label for="file">Annotation File</label>
+      <input type="file" name="file" id="dt_sample_file" value="" class="text ui-widget-content ui-corner-all" />
+      <div id="dt_sample_annot_status"></div> 
+    </fieldset>
+  </form>
 </div>
-
-<div id="dt_group_sample_status">
-  <h3>Group Sample Status</h3>
-  <table id="dt_group_sample_status_table">
-  </table>
-</div>
-

@@ -37,8 +37,7 @@ public class MergingMapsTask implements Task {
 		try {
 			MergingMapsProcessor mm = new MergingMapsProcessor();
 			mm.loadConfigFile(configFileName);
-			mm.mergeAll();
-			mm.saveMap(outputFileName);
+			mm.mergeAll(outputFileName);
 			
 			if(options.mergeImages){
 				String outputFileName_prefix = outputFileName;

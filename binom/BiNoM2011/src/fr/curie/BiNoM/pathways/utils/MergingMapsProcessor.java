@@ -38,6 +38,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
@@ -155,9 +156,9 @@ public class MergingMapsProcessor {
 	private String sizeY;
 
 	/**
-	 * List of maps to be updated with global Ids
+	 * Map of files to be updated with global Ids
 	 */
-	private ArrayList<String> updateMapList = new ArrayList<String>();
+	private HashMap<String,String> updateMap = new HashMap<String,String>();
 	
 	/** 
 	 * Print extended informations while merging elements
@@ -208,10 +209,8 @@ public class MergingMapsProcessor {
 			if(preprocess)
 				mm.preProcessMergedMaps();
 
-			if(mergeMaps){
-				mm.mergeAll();
-				mm.saveMap(outputFileName);
-			}
+			if(mergeMaps)
+				mm.mergeAll(outputFileName);
 
 			if(postprocess)
 				mm.postProcessMergedMap(outputFileName);
@@ -258,7 +257,7 @@ public class MergingMapsProcessor {
 	 * @param sizeX
 	 * @param sizeY
 	 */
-	public void mergeAll() {
+	public void mergeAll(String outputFileName) {
 		
 		
 		System.out.println("==============================");
@@ -312,32 +311,12 @@ public class MergingMapsProcessor {
 		}
 		
 		formatLayers();
-		updateMapFileIds();
+		System.out.println("saving merged file "+outputFileName+"...");
+		CellDesigner.saveCellDesigner(cd1, outputFileName);
 		
+		updateMapAll();
 	}
 	
-	/**
-	 * save merged map
-	 * @param fileName
-	 */
-	public void saveMap(String fileName) {
-		System.out.println("saving file " +fileName);
-		CellDesigner.saveCellDesigner(cd1, fileName);
-		System.out.println("Done.");
-	}
-
-	//  ------ full process to merge two maps (original AZ procedure) ------------------	
-	//	String file1Text = Utils.loadString(fileName1);
-	//	file1Text = addPrefixToIds(file1Text,"rb_");
-	//	cd1 = CellDesigner.loadCellDesignerFromText(file1Text);
-	//	countAll(cd1);
-	//	cd2 = CellDesigner.loadCellDesigner(fileName2);
-	//	produceCandidateMergeLists(cd1, cd2, proteinMap, speciesMap);
-	//	mergeDiagrams(cd1,cd2);
-	//	rewireDiagram(cd1, speciesMap,proteinMap);
-	//	CellDesigner.saveCellDesigner(cd1, "/bioinfo/users/ebonnet/rew.xml");
-	//	--------------------------------------------------------------------------------
-
 	/**
 	 * Load CD file 2. Add a prefix to all element IDs.
 	 * 
@@ -1197,13 +1176,114 @@ public class MergingMapsProcessor {
 	/**
 	 * Update Ids to global Ids, do not merge the map. 
 	 */
-	private void updateMapFileIds() {
-		for (String fileName : updateMapList) {
-			this.setAndLoadFileName2(fileName);
-			this.produceCandidateMergeLists();
-			this.setIdsAndSave(fileName);
+	private void updateMapAll() {
+		for (String target : updateMap.keySet()) {
+			String source = updateMap.get(target);
+			updateMap(target, source);
 		}
 	}
+	
+	/**
+	 * Update IDs for species, reaction and entities for a target map from a source map
+	 * 
+	 * @param target
+	 * @param source
+	 */
+	private void updateMap(String target, String source) {
+		
+		System.out.println("updating target file "+target+" with source file "+source+"...");
+		
+		cd1 = CellDesigner.loadCellDesigner(target);
+		cd2 = CellDesigner.loadCellDesigner(source);
+		
+		HashMap<String, String> spMap = new HashMap<String, String>();
+		for (SpeciesDocument.Species targetSpecies : cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
+			String targetID = targetSpecies.getId();
+			boolean found = false;
+			for (SpeciesDocument.Species sourceSpecies : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
+				String sourceID = sourceSpecies.getId();
+				if (sourceID.endsWith(targetID)) {
+					//System.out.println(sourceID+" ==> "+targetID);
+					spMap.put(targetID, sourceID);
+					found = true;
+					break;
+				}
+			}
+			if (found == false)
+				System.out.println("warning: no match for species "+targetID+" ("+target+") in source file "+ source);
+		}
+		
+		HashMap<String, String> reMap = new HashMap<String, String>();
+		for (ReactionDocument.Reaction targetReaction : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
+			String targetID = targetReaction.getId();
+			boolean found = false;
+			for (ReactionDocument.Reaction sourceReaction : cd2.getSbml().getModel().getListOfReactions().getReactionArray()) {
+				String sourceID = sourceReaction.getId();
+				if (sourceID.endsWith(targetID)) {
+					//System.out.println(sourceID+" ==> "+targetID);
+					reMap.put(targetID, sourceID);
+					found = true;
+					break;
+				}
+			}
+			if (found == false)
+				System.out.println("warning: no match for reaction "+targetID+" ("+target+") in source file "+ source);
+		}
+		
+		produceCandidateMergeLists();
+		
+		String targetXml = cd1.toString();
+		
+		// update species IDs
+		for (String targetID : spMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+targetID+"\"", "\""+spMap.get(targetID)+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+targetID+"<", ">"+spMap.get(targetID)+"<");
+		}	
+		
+		// update reaction IDs
+		for (String targetID : reMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+targetID+"\"", "\""+reMap.get(targetID)+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+targetID+"<", ">"+reMap.get(targetID)+"<");
+		}
+		
+		// update protein IDs
+		for (String id : this.proteinMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+proteinMap.get(id)+"\"", "\""+id+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+proteinMap.get(id)+"<", ">"+id+"<");
+		}
+		
+		// update rna IDs
+		for (String id : this.rnaMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+rnaMap.get(id)+"\"", "\""+id+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+rnaMap.get(id)+"<", ">"+id+"<");
+		}
+		
+		// update asRNA IDs
+		for (String id : this.asRnaMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+asRnaMap.get(id)+"\"", "\""+id+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+asRnaMap.get(id)+"<", ">"+id+"<");
+		}
+		
+		// update gene IDs
+		for (String id : this.geneMap.keySet()) {
+			targetXml = Utils.replaceString(targetXml, "\""+geneMap.get(id)+"\"", "\""+id+"\"");
+			targetXml = Utils.replaceString(targetXml, ">"+geneMap.get(id)+"<", ">"+id+"<");
+		}
+		
+		String outputFile = target;
+		if (outputFile.endsWith(".xml")) {
+			outputFile = outputFile.substring(0, target.length() - 4);
+			outputFile += ".update.xml";
+		}
+		else {
+			outputFile += ".update.xml";
+		}
+		
+		System.out.println("saving updated map "+outputFile+"...");
+		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(targetXml);
+		CellDesigner.saveCellDesigner(doc, outputFile);
+	}
+	
 	
 	/**
 	 * Load the configuration file.
@@ -1225,8 +1305,8 @@ public class MergingMapsProcessor {
 				}
 				else {
 					// maps files to be updated with global Ids
-					if (tk[1].equalsIgnoreCase("update") || tk[2].equalsIgnoreCase("update")) {
-						this.updateMapList.add(tk[0]);
+					if (tk[1].equalsIgnoreCase("update")) {
+						this.updateMap.put(tk[0], tk[2]);
 					}
 					// maps to be merged
 					else {

@@ -106,12 +106,19 @@ Dataset.prototype = {
 		this.datatables[datatable.name] = datatable;
 	},
 
+	getSample: function(sample_name) {
+		return this.samples[sample_name];
+	},
+	
+	// behaves as a sample factory
 	addSample: function(sample_name) {
 		if (!this.samples[sample_name]) {
 			this.samples[sample_name] = new Sample(sample_name);
 		}
+		return this.samples[sample_name];
 	},
 
+	// behaves as a gene factory
 	addGene: function(gene_name, entity_map) {
 		if (!this.genes[gene_name]) {
 			this.genes[gene_name] = new Gene(gene_name, entity_map);
@@ -212,7 +219,7 @@ function Datatable(dataset, biotype_name, name, file) {
 
 	reader.onerror = function(e) {  // If anything goes wrong
 		console.log("Error", e);    // Just log it
-	};
+	}
 }
 
 Datatable.prototype = {
@@ -266,11 +273,84 @@ Annotation.prototype = {
 };
 
 //
+// AnnotationFactory class
+//
+
+function AnnotationFactory() {
+}
+
+AnnotationFactory.prototype = {
+	annots: {},
+	ready: null,
+	sample_read: 0,
+	sample_annotated: 0,
+
+	readfile: function(file) {
+		var reader = new FileReader();
+		reader.readAsBinaryString(file);
+
+		var annot_factory = this;
+		this.sample_read = 0;
+		this.sample_annotated = 0;
+		var ready = this.ready = $.Deferred(reader.onload);
+		reader.onload = function() { 
+			var text = reader.result;
+			console.log("reading annot file");
+			var lines = text.split("\n");
+			var header = lines[0].split("\t");
+			var annots = [];
+			for (var nn = 1; nn < header.length; ++nn) {
+				annots.push(annot_factory.getAnnotation(header[nn]));
+			}
+			var annot_cnt = annots.length;
+			var sample_cnt = lines.length-1;
+			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
+				var line = lines[sample_nn+1].split("\t");
+				if (line.length < 2) {
+					continue;
+				}
+				var sample_name = line[0];
+				//var sample = navicell.dataset.addSample(sample_name);
+				var sample = navicell.dataset.getSample(sample_name);
+				if (sample) {
+					for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
+						var annot_value = line[annot_nn+1];
+						var annot_name = annots[annot_nn].name;
+						sample.addAnnotValue(annot_name, annot_value);
+						navicell.group_factory.getGroup(annot_name, annot_value);
+					}
+					annot_factory.sample_annotated++;
+				}
+				annot_factory.sample_read++;
+			}
+			ready.resolve();
+			console.log("annot_cnt: " + annot_cnt);
+			console.log("sample_cnt: " + sample_cnt);
+		},
+		reader.onerror = function(e) {  // If anything goes wrong
+			console.log("Error", e);    // Just log it
+		}
+	},
+
+	getAnnotation : function(name) {
+		if (!this.annots[name]) {
+			this.annots[name] = new Annotation(name);
+		}
+		return this.annots[name];
+	},
+
+	getAnnotCount: function() {
+		return mapSize(this.annots);
+	}
+};
+
+//
 // Sample class
 //
 
 function Sample(name) {
 	this.name = name;
+	this.annots = {};
 }
 
 Sample.prototype = {
@@ -278,6 +358,7 @@ Sample.prototype = {
 	annots: {},
 
 	addAnnotValue: function(annot, value) {
+		//console.log("sample: " + this.name + " add annot value: '" + annot + "' '" + value + "'");
 		this.annots[annot] = value;
 	},
 
@@ -304,16 +385,18 @@ Gene.prototype = {
 // Group class
 //
 
-function Group(annot, value) {
-	this.annot = annot;
+function Group(annot_name, value) {
+	this.annot_name = annot_name;
 	this.value = value;
-	this.name = annot.name + ": " + value;
+	this.name = annot_name + ": " + value;
+	this.html_name = '<span class="group_name">' + annot_name + ':</span>&nbsp;<span class="group_value">' + value + '</span>';
 }
 
 Group.prototype = {
-	annot: null,
+	annot_name: null,
 	value: null,
 	name: "",
+	html_name: "",
 	samples: [],
 
 	addSample: function(sample) {
@@ -333,16 +416,16 @@ function GroupFactory() {
 GroupFactory.prototype = {
 	group_map: {},
 
-	buildName: function(annot, value) {
-		return annot + ": " + value;
+	buildName: function(annot_name, value) {
+		return annot_name + ": " + value;
 	},
 
-	getGroup: function(annot, value) {
-		var name = this.buildName(annot, value);
-		if (!this.group_map[name]) {
-			this.group_map[name] = new Group(annot, value);
+	getGroup: function(annot_name, value) {
+		var group_name = this.buildName(annot_name, value);
+		if (!this.group_map[group_name]) {
+			this.group_map[group_name] = new Group(annot_name, value);
 		}
-		return this.group_map[name];
+		return this.group_map[group_name];
 	},
 
 	getClass: function() {return "GroupFactory";}
@@ -438,6 +521,7 @@ navicell.mapdata = new Mapdata();
 navicell.dataset = new Dataset("navicell");
 navicell.group_factory = new GroupFactory();
 navicell.biotype_factory = new BiotypeFactory();
+navicell.annot_factory = new AnnotationFactory();
 
 navicell.CONTINUOUS = 1;
 navicell.DISCRETE = 2;

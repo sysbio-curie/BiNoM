@@ -112,15 +112,17 @@ public class BioPAX {
 	 * Standard BioPAX v.3 prefix
 	 */
 	public static String importString = "http://www.biopax.org/Downloads/Level3v1.0/biopax-level3.owl";
+	
+	public static String baseString  = "http://sysbio.curie.fr";
 
 	/**
 	 * not yet used
 	 */
-	public static String modelnamespaceString = "http://www.ihes.fr/~zinovyev/biopax/biopaxmodel.owl#";
+	//public static String modelnamespaceString = "http://www.ihes.fr/~zinovyev/biopax/biopaxmodel.owl#";
 	/**
 	 * not yet used
 	 */
-	public static String modelnamespaceFileString = "http://www.ihes.fr/~zinovyev/biopax/biopaxmodel.owl";
+	//public static String modelnamespaceFileString = "http://www.ihes.fr/~zinovyev/biopax/biopaxmodel.owl";
 
 	/**
 	 * Some identifier for this BioPAX
@@ -139,23 +141,20 @@ public class BioPAX {
 	 * com.hp.hpl.jena.ontology.Ontology object 
 	 */
 	public Ontology ontology = null;
-	public Ontology modelontology = null;
 
-	/**
-	 * not used
-	 */
-	public static boolean addBiopaxModelOntology = false;
 
 	// Extra things
 
 	/**
 	 * Map from cellular location names to openControlledVocabulary terms 
 	 */
-	HashMap compartments = new HashMap();
+	HashMap<String, CellularLocationVocabulary> compartments = new HashMap();
+	HashMap<String, ControlledVocabulary> terms = new HashMap();
 
 
 	public BioPAX(){
-		this(biopaxString,namespaceString,modelnamespaceString);
+		//this(biopaxString,namespaceString,modelnamespaceString);
+		this(biopaxString,namespaceString,null);
 	}
 
 	/**
@@ -167,25 +166,28 @@ public class BioPAX {
 	public BioPAX(String _biopaxString, String _namespaceString, String _modelnamespaceString){
 		biopaxString = _biopaxString;
 		namespaceString = _namespaceString;
-		modelnamespaceString = _modelnamespaceString;
+		//modelnamespaceString = _modelnamespaceString;
 		namespaceFileString = _namespaceString.substring(0,_namespaceString.length()-1);
-		modelnamespaceFileString = _modelnamespaceString.substring(0,_modelnamespaceString.length()-1);
-		biopaxmodel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,null);
+		//modelnamespaceFileString = _modelnamespaceString.substring(0,_modelnamespaceString.length()-1);
+		//biopaxmodel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,null);
+		biopaxmodel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM_TRANS_INF,null);
 		biopaxmodel.setNsPrefix("bp",biopaxString);
-		biopaxmodel.setNsPrefix("",namespaceString);
-		ontology = biopaxmodel.createOntology(namespaceFileString);
+		biopaxmodel.setNsPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
+		biopaxmodel.setNsPrefix("",baseString+"#");
+		ontology = biopaxmodel.createOntology("");
 		Resource imprt = biopaxmodel.getResource(biopaxFileString);
 		ontology.setImport(imprt);
 
-		imprt = biopaxmodel.getResource("http://www.biopax.org/Downloads/Level3v1.0/biopax-level3.owl");
-		ontology.addImport(imprt);
-		imprt = null;
+		//imprt = biopaxmodel.getResource("http://www.biopax.org/Downloads/Level3v1.0/biopax-level3.owl");
+		//imprt = biopaxmodel.getResource("http://www.biopax.org/release/biopax-level3.owl");
+		//ontology.addImport(imprt);
+		//imprt = null;
 
-		if(addBiopaxModelOntology){
-			biopaxmodel.setNsPrefix("bm",modelnamespaceString);
-			imprt = biopaxmodel.getResource(modelnamespaceFileString);
-			ontology.addImport(imprt);
-		}
+		//if(addBiopaxModelOntology){
+			//biopaxmodel.setNsPrefix("bm",modelnamespaceString);
+			//imprt = biopaxmodel.getResource(modelnamespaceFileString);
+			//ontology.addImport(imprt);
+		//}
 	}
 	/**
 	 * Save an OntModel object to file
@@ -196,8 +198,10 @@ public class BioPAX {
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter(new FileOutputStream(fileName,false));
+			//RDFWriter writer = model.getWriter("RDF/XML-ABBREV") ;
 			RDFWriter writer = model.getWriter("RDF/XML-ABBREV") ;
-			writer.setProperty("xmlbase",namespaceFileString) ;
+			//writer.setProperty("xmlbase",namespaceFileString) ;
+			writer.setProperty("xmlbase",baseString) ;
 			// Save the OWL model
 			writer.write(model,out,namespaceString);
 		}
@@ -219,7 +223,7 @@ public class BioPAX {
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter(new FileOutputStream(fileName,false));
-			RDFWriter writer = model.getWriter("RDF/XML-ABBREV") ;
+			RDFWriter writer = model.getWriter(); //getWriter("RDF/XML-ABBREV") ;
 			writer.setProperty("xmlbase",namespaceFileString) ;
 			// Save the OWL model
 			writer.write(model,out,namespaceString);
@@ -297,13 +301,13 @@ public class BioPAX {
 		standardname = st.nextToken();
 		UnificationXref xref = biopax_DASH_level3_DOT_owlFactory.createUnificationXref(namespaceString+"GO_"+id,biopaxmodel);
 		xref.setDb("GO");
-		xref.setId(id);
+		xref.setId("GO:"+id);
 		ControlledVocabulary voc = biopax_DASH_level3_DOT_owlFactory.createControlledVocabulary(namespaceString+standardname,biopaxmodel);
 		voc.addXref(xref);
 		voc.addTerm(standardname);
-		compartments.put(standardname,voc);
+		terms.put(standardname,voc);
 		while(st.hasMoreTokens())
-			compartments.put(st.nextToken(),voc);
+			terms.put(st.nextToken(),voc);
 		return voc;
 	}
 
@@ -320,8 +324,8 @@ public class BioPAX {
 		standardname = st.nextToken();
 		UnificationXref xref = biopax_DASH_level3_DOT_owlFactory.createUnificationXref(namespaceString+"GO_"+id,biopaxmodel);
 		xref.setDb("GO");
-		xref.setId(id);
-		ControlledVocabulary voc = biopax_DASH_level3_DOT_owlFactory.createControlledVocabulary(namespaceString+standardname,biopaxmodel);
+		xref.setId("GO:"+id);
+		CellularLocationVocabulary voc = biopax_DASH_level3_DOT_owlFactory.createCellularLocationVocabulary(namespaceString+standardname,biopaxmodel);
 		voc.addXref(xref);
 		voc.addTerm(standardname);
 		compartments.put(standardname,voc);
@@ -393,7 +397,7 @@ public class BioPAX {
 			addGOCompartment("0005788","endoplasmic_reticulum_lumen;endoplasmic_reticulum");
 			addGOCompartment("0005783","endoplasmic_reticulum;ER");
 			addGOCompartment("0005768","endosome");
-			addGOCompartment("0005576","extracellular_region;extracellular");
+			addGOCompartment("0005576","extracellular_region;extracellular;extracellular_space");
 			addGOCompartment("0031012","extracellular_matrix");
 			addGOCompartment("0005796","Golgi_lumen;Golgi");
 			addGOCompartment("0005770","late_endosome;lysosome_targeted_late_endosomes");
@@ -401,15 +405,14 @@ public class BioPAX {
 			addGOCompartment("0030526","macrophage");
 			addGOCompartment("0005739","mitochondrion;mitochondria");
 			addGOCompartment("0005654","nucleoplasm");
-			addGOCompartment("0005634","nucleus");
+			addGOCompartment("0005634","nucleus;gene_compartment");
 			addGOCompartment("0005730","nucleolus;nucleole");
 			addGOCompartment("0043226","organelle");
 			addGOCompartment("0005886","plasma_membrane");
 			addGOCompartment("0005764","recycling_endosome");
 			addGOCompartment("0031982","vesicle");
-			//addGOCompartment("","");
-			//addGOCompartment("","");
-			addGOCompartment("0008372","cellular_component_unknown;unknown");
+			addGOCompartment("0000502","proteasome");			
+			addGOCompartment("0008372","cellular_component_unknown;unknown;default");
 
 		}catch(Exception e){
 			e.printStackTrace();
@@ -421,14 +424,14 @@ public class BioPAX {
 	 * @param name
 	 * @return openControlledVocabulary term named name
 	 */
-	public ControlledVocabulary getCompartment(String name){
-		ControlledVocabulary ov = null;
+	public CellularLocationVocabulary getCompartment(String name){
+		CellularLocationVocabulary ov = null;
 		if(name==null) name = "unknown";
 		if(name.equals("")) name = "unknown";
 		name = name.toLowerCase();
-		ov = (ControlledVocabulary)compartments.get(name);
+		ov = compartments.get(name);
 		if(ov==null)
-			ov = (ControlledVocabulary)compartments.get("unknown");
+			ov = compartments.get("unknown");
 		return ov;
 	}
 

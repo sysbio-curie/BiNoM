@@ -14,6 +14,8 @@ public class GMTFile{
 			GMTFile gmt = new GMTFile();
 			gmt.load("c:/datas/acsn/acsn_only/acsn_src/temp.gmt");
 			gmt.saveAllNamesToFile("c:/datas/acsn/acsn_only/acsn_src/allnames.txt");
+			//gmt.load("c:/datas/navicell/test/merged/temp.gmt");
+			//gmt.saveAllNamesToFile("c:/datas/navicell/test/merged/allnames.txt");
 			
 		}catch(Exception e){
 			e.printStackTrace();

@@ -6,13 +6,19 @@ import java.util.*;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 
+import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.wrappers.*;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.utils.*;
 
 public class test {
   public static void main(String[] args) {
     try{
 
+      GraphDocument xgml = XGMML.loadFromXMGML("c:/datas/binomtest/biopax3/merged_master.xgmml");
+      Graph gr = XGMML.convertXGMMLToGraph(xgml);
+      XGMML.saveToXGMML(gr, "c:/datas/binomtest/biopax3/merged_master1.xgmml");
+    	
       /*System.out.println("Loading sbmlex...");
       SbmlDocument sbmlex = CellDesigner.loadCellDesigner("c:/datas/calzone/problem7/gene0.xml");
 

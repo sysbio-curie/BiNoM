@@ -59,10 +59,12 @@ public class CellDesignerColorProteins {
     
     //String path = "c:/datas/basal/220210/";
     String path = "c:/datas/acsn/acsn_only/acsn_src/";
+    //String path = "c:/datas/navicell/test/merged/";
     
     //args[0] = path+"test.xml";
     //args[0] = path+"CC_DNArepair_22_02_2010_corrected_1.xml";
     args[0] = path+"acsn_master.xml";
+    //args[0] = path+"merged_master.xml";
     args[1] = "";
 
     //CellDesigner celld = new CellDesigner();
@@ -701,6 +703,11 @@ public class CellDesignerColorProteins {
 			  for(int l=0;l<pnames.size();l++) System.out.print(pnames.get(l)+"\t");
 			  System.out.println();
 			  
+			  fwhugos.write("g"+pname+"\tna\t");
+			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
+			  for(int j=1;j<pnames.size();j++) fwhugos.write(pnames.get(j)+"\t");
+			  fwhugos.write("\n");
+			  
 			  boolean fd = false;
 			  for(int k=0;k<pnames.size();k++){
 					Integer ind = proteins.get(pnames.get(k));
@@ -711,11 +718,67 @@ public class CellDesignerColorProteins {
 			  if(fw!=null)	  
 			      fw.write(pname+"\t");
 
-			  fwhugos.write(pname+"\tna\t");
+			  for(int j=1;j<tabl.fnames.length;j++){
+				  float value = 0f;
+				  boolean found = false;
+				  for(int k=0;k<pnames.size();k++){
+					Integer ind = proteins.get(pnames.get(k));
+					if(ind!=null){
+						float val = Float.parseFloat(tabl.tab[ind][j]);
+						if(Math.abs(val)>Math.abs(value)){
+							value = val;
+							found = true;
+						}
+					}
+				  }
+				  if(fw!=null){
+				  if(found)
+					  fw.write(value+"\t");
+				  else
+					  fw.write("N/A\t");
+				  }
+			  }
+			  if(fw!=null)
+				  fw.write("\n");
+			  }
+		  }
+		  
+		  for(int i=0;i<sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
+			  CelldesignerRNADocument.CelldesignerRNA rna = sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
+			  String pname = rna.getName();
+			  Vector<String> pnames = new Vector<String>();
+			  pnames.add(pname.toUpperCase());
+			  if(rna.getCelldesignerNotes()!=null){
+				String proteinNotes = Utils.getValue(rna.getCelldesignerNotes());
+	        	Vector<Vector<String>> atts = extractAttributesFromNotes(proteinNotes);
+	        	for(int k=0;k<atts.size();k++){
+	        		 String db = atts.get(k).get(0); 
+	        		 String id = atts.get(k).get(1);
+	        		 //System.out.println("ATTS "+db+"\t"+id);
+	        		 if(db.equals("HUGO"))
+	        			 pnames.add(id);
+	        	}
+	          }
+			  
+			  System.out.print(pname+"\t");
+			  for(int l=0;l<pnames.size();l++) System.out.print(pnames.get(l)+"\t");
+			  System.out.println();
+			  
+			  fwhugos.write("r"+pname+"\tna\t");
 			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
 			  for(int j=1;j<pnames.size();j++) fwhugos.write(pnames.get(j)+"\t");
 			  fwhugos.write("\n");
 			  
+			  boolean fd = false;
+			  for(int k=0;k<pnames.size();k++){
+					Integer ind = proteins.get(pnames.get(k));
+					if(ind!=null)
+						fd = true;
+			  }
+			  if(fd){
+			  if(fw!=null)	  
+			      fw.write(pname+"\t");
+
 			  for(int j=1;j<tabl.fnames.length;j++){
 				  float value = 0f;
 				  boolean found = false;
@@ -740,6 +803,83 @@ public class CellDesignerColorProteins {
 				  fw.write("\n");
 			  }
 		  }		  
+		  
+		  for(int i=0;i<sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
+			  CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA arna = sbmlp.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+			  String pname = arna.getName();
+			  Vector<String> pnames = new Vector<String>();
+			  pnames.add(pname.toUpperCase());
+			  if(arna.getCelldesignerNotes()!=null){
+				String proteinNotes = Utils.getValue(arna.getCelldesignerNotes());
+	        	Vector<Vector<String>> atts = extractAttributesFromNotes(proteinNotes);
+	        	for(int k=0;k<atts.size();k++){
+	        		 String db = atts.get(k).get(0); 
+	        		 String id = atts.get(k).get(1);
+	        		 //System.out.println("ATTS "+db+"\t"+id);
+	        		 if(db.equals("HUGO"))
+	        			 pnames.add(id);
+	        	}
+	          }
+			  
+			  System.out.print(pname+"\t");
+			  for(int l=0;l<pnames.size();l++) System.out.print(pnames.get(l)+"\t");
+			  System.out.println();
+			  
+			  fwhugos.write("ar"+pname+"\tna\t");
+			  if(pnames.size()==1)if(!pname.contains("*")) fwhugos.write(pname.toUpperCase()+"\t");
+			  for(int j=1;j<pnames.size();j++) fwhugos.write(pnames.get(j)+"\t");
+			  fwhugos.write("\n");
+			  
+			  boolean fd = false;
+			  for(int k=0;k<pnames.size();k++){
+					Integer ind = proteins.get(pnames.get(k));
+					if(ind!=null)
+						fd = true;
+			  }
+			  if(fd){
+			  if(fw!=null)	  
+			      fw.write(pname+"\t");
+
+			  for(int j=1;j<tabl.fnames.length;j++){
+				  float value = 0f;
+				  boolean found = false;
+				  for(int k=0;k<pnames.size();k++){
+					Integer ind = proteins.get(pnames.get(k));
+					if(ind!=null){
+						float val = Float.parseFloat(tabl.tab[ind][j]);
+						if(Math.abs(val)>Math.abs(value)){
+							value = val;
+							found = true;
+						}
+					}
+				  }
+				  if(fw!=null){
+				  if(found)
+					  fw.write(value+"\t");
+				  else
+					  fw.write("N/A\t");
+				  }
+			  }
+			  if(fw!=null)
+				  fw.write("\n");
+			  }
+		  }
+		  
+		  for(int i=0;i<sbmlp.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
+			  SpeciesDocument.Species sp = sbmlp.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
+			  if(sp.getAnnotation()!=null)
+				  if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
+					  String type = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
+					  if(type.equals("PHENOTYPE"))
+						  fwhugos.write("ph"+Utils.getValue(sp.getName())+"\tna\t"+Utils.getValue(sp.getName())+"\n");
+					  if(type.equals("SIMPLE_MOLECULE"))
+						  fwhugos.write("sm"+Utils.getValue(sp.getName())+"\tna\t"+Utils.getValue(sp.getName())+"\n");
+					  if(type.equals("ION"))
+						  fwhugos.write("ion"+Utils.getValue(sp.getName())+"\tna\t"+Utils.getValue(sp.getName())+"\n");
+				  }
+		  }
+
+		  
 		  if(fw!=null)
 			  fw.close();
 		  fwhugos.close();

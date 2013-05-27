@@ -318,6 +318,45 @@ public class SetOverlapAnalysis {
 						if(fw!=null)
 							fw.write(names.get(k)+",");
 					}
+				String namei = setnames.get(i).toLowerCase();
+				String namej = setnames.get(j).toLowerCase();
+				namei = Utils.replaceString(namei, " ", "");
+				namei = Utils.replaceString(namei, "_", "");
+				namei = Utils.replaceString(namei, "*", "");
+				namei = Utils.replaceString(namei, "'", "");
+				namei = Utils.replaceString(namei, "endsub", "");
+				namei = Utils.replaceString(namei, "sub", "");
+				namei = Utils.replaceString(namei, "endsuper", "");
+				namei = Utils.replaceString(namei, "super", "");
+				namei = Utils.replaceString(namei, "(", "");
+				namei = Utils.replaceString(namei, ")", "");
+				namei = Utils.replaceString(namei, "-", "");
+				namei = Utils.replaceString(namei, "br", "");
+				namei = Utils.replaceString(namei, "/", "");
+				namei = Utils.replaceString(namei, "~", "");				
+				
+				namej = Utils.replaceString(namej, " ", "");
+				namej = Utils.replaceString(namej, "_", "");
+				namej = Utils.replaceString(namej, "*", "");
+				namej = Utils.replaceString(namej, "'", "");
+				namej = Utils.replaceString(namej, "endsub", "");
+				namej = Utils.replaceString(namej, "sub", "");
+				namej = Utils.replaceString(namej, "endsuper", "");
+				namej = Utils.replaceString(namej, "super", "");
+				namej = Utils.replaceString(namej, "(", "");
+				namej = Utils.replaceString(namej, ")", "");
+				namej = Utils.replaceString(namej, "-", "");
+				namej = Utils.replaceString(namej, "br", "");
+				namej = Utils.replaceString(namej, "/", "");
+				namej = Utils.replaceString(namej, "~", "");				
+				
+				if(namei.equals(namej)){
+					System.out.print(setnames.get(i)+"\t"+setnames.get(j)+"\tintersectsname\t"+names.size()+"\tname");
+					if(fw!=null)
+						fw.write(setnames.get(i)+"\t"+setnames.get(j)+"\tintersectsname\t"+names.size()+"\tname\n");
+					
+				}
+				
 				
 			}
 		}
@@ -341,7 +380,7 @@ public class SetOverlapAnalysis {
 				so.sets.add(si.sets.get(j));
 			}
 		}
-		so.printSetIntersections(folder+"\\_intersection.txt");
+		so.printSetIntersections(folder+"/_intersection.txt");
 	}
 	
 	public void findMinimalHittingSet(int maxSetSize, String fileNamePreifix) throws Exception{

@@ -87,6 +87,7 @@ public class CellDesignerToCytoscapeConverter {
     public static HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>> complexSpeciesAliasMap = null;
     public static HashMap<String,CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias> speciesAliasIdMap = null;
     public static HashMap<String,CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> complexSpeciesAliasIdMap = null;
+    public static HashMap<String,CelldesignerProteinDocument.CelldesignerProtein> proteinMap = null;    
     
     
 	public static String defcomp_id = "default";
@@ -1155,7 +1156,7 @@ public class CellDesignerToCytoscapeConverter {
 	   if(ident.getCelldesignerProteinReference()!=null)
 		   prot = Utils.getText(ident.getCelldesignerProteinReference());
 	   if(prot!=null){
-	     for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
+	     /*for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 	       CelldesignerProteinDocument.CelldesignerProtein cpr = sbml.getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 	       if(cpr.getId().equals(prot)){
 	    	 if(cpr.getCelldesignerListOfModificationResidues()!=null)
@@ -1168,7 +1169,18 @@ public class CellDesignerToCytoscapeConverter {
 	           }
 	         }
 	       }
-	     }
+	     }*/
+		   CelldesignerProteinDocument.CelldesignerProtein cpr = proteinMap.get(prot);
+	    	 if(cpr.getCelldesignerListOfModificationResidues()!=null)
+		         for(int j=0;j<cpr.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray();j++){
+		           CelldesignerModificationResidueDocument.CelldesignerModificationResidue cmr = cpr.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j);
+		           if(cmr.getId().equals(residueID)){
+		             if(cmr.getName()!=null)
+		               s = cmr.getName().getStringValue();
+		             else s = null;
+		           }
+		         }
+		   
 	   }
 	   return s;
 	 }
@@ -1831,15 +1843,18 @@ public class CellDesignerToCytoscapeConverter {
 		complexSpeciesAliasMap = new HashMap<String,Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>>();
 		speciesAliasIdMap = new HashMap<String,CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>();
 		complexSpeciesAliasIdMap = new HashMap<String,CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>();
+		proteinMap = new HashMap<String,CelldesignerProteinDocument.CelldesignerProtein>();
 		
 		
 		for(int i=0;i<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();i++)
 			speciesMap.put(sbml.getModel().getListOfSpecies().getSpeciesArray(i).getId(), sbml.getModel().getListOfSpecies().getSpeciesArray(i));
+		
 		if(sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for(int j=0;j<sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();j++){
 		     CelldesignerSpeciesDocument.CelldesignerSpecies isp = sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(j);
 		     includedSpeciesMap.put(isp.getId(), isp);
 		}
+		
 		if(sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		   for(int j=0;j<sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();j++){
 		     CelldesignerSpeciesDocument.CelldesignerSpecies csp = sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(j);
@@ -1850,7 +1865,8 @@ public class CellDesignerToCytoscapeConverter {
 		    	 complexSpeciesMap.put(complexsp, v);
 		     }
 		     v.add(csp);
-		   }		
+		   }
+		
 		  if(sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases()!=null) 
 	      for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 	    	  CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spal = sbml.getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
@@ -1873,6 +1889,12 @@ public class CellDesignerToCytoscapeConverter {
 		    	  }
 		    	  v.add(spal);
 		  }		  
+		  if(sbml.getModel().getAnnotation().getCelldesignerListOfProteins()!=null){
+			  for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
+				  CelldesignerProteinDocument.CelldesignerProtein prot = sbml.getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
+				  proteinMap.put(prot.getId(), prot);
+			  }
+		  }
 	
 		   defcomp_id = "default";
 		   comp_ids = new Vector();

@@ -58,21 +58,29 @@ public class CellDesignerToBioPAXConverter {
 	public static boolean useBiopaxModelOntology = false;
 
 	/**
-	 * List of CellDesigner SpeciesDocument.Species objects
+	 * Map of CellDesigner SpeciesDocument.Species objects
 	 */
 	public HashMap<String, SpeciesDocument.Species> species = null;
+	public HashMap<String, CelldesignerSpeciesDocument.CelldesignerSpecies> includedSpecies = null;
 	/**
-	 * List of CellDesigner ReactionDocument.Reaction objects
+	 * Map of CellDesigner ReactionDocument.Reaction objects
 	 */  
-	public Vector reactions = null;
+	public HashMap<String, ReactionDocument.Reaction> reactions = null;
 	/**
-	 * List of CellDesigner CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias objects
+	 * Map of CellDesigner CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias objects
 	 */  
-	public Vector complexes_list = null;
+	public HashMap<String, CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> complexes = null;
 	/**
-	 * List of CellDesigner CelldesignerProteinDocument.CelldesignerProtein objects
+	 * Map of CellDesigner Celldesigner entity objects
 	 */  
-	public Vector proteins = null;
+	public HashMap<String, CelldesignerProteinDocument.CelldesignerProtein> proteins = null;
+	public HashMap<String, CelldesignerGeneDocument.CelldesignerGene> genes = null;
+	public HashMap<String, CelldesignerRNADocument.CelldesignerRNA> rnas = null;	
+	public HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA> asrnas = null;
+	
+	public HashMap<String, EntityReference> entityReferences = null;
+	public HashMap<String, PhysicalEntity> entities = null;
+	
 
 	/**
 	 * Name of CellDesigner file
@@ -89,7 +97,8 @@ public class CellDesignerToBioPAXConverter {
 	/**
 	 * Map from compartment ids to CompartmentDocument.Compartment objects
 	 */  
-	public HashMap compartmentHash = null;
+	public HashMap<String, CompartmentDocument.Compartment> compartmentHash = null;
+	public HashMap<String, CellularLocationVocabulary> cellularLocationVocabularyHash = null;
 	/**
 	 * Map from Pubmed ids to publicationXref objects
 	 */  
@@ -108,35 +117,41 @@ public class CellDesignerToBioPAXConverter {
 	public BioPAX convert(){
 		if(biopax==null) biopax = new BioPAX();
 		CellDesignerToBioPAXConverter.useBiopaxModelOntology = false;
-		BioPAX.addBiopaxModelOntology = CellDesignerToBioPAXConverter.useBiopaxModelOntology;
+		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = true;
+		CellDesignerToCytoscapeConverter.createSpeciesMap(sbml.getSbml());
 		alwaysMentionCompartment = true;
-		//biopax.makeCompartments();
-		//createCellDesignerTerms();
+		biopax.makeCompartments();
+		createCellDesignerTerms();
 		compartmentHash = getCompartmentHash(sbml.getSbml());
 		CellDesigner.entities = CellDesigner.getEntities(sbml);
-		return populateModel();
+		//return populateModel();
+		populateModelnew();
+		return biopax;
 	}
 
 	/**
 	 * The converter itself 
 	 */
-	public BioPAX populateModel(){
+	
+	public void populateModelnew(){
 		try{
 			
-			CellDesignerToCytoscapeConverter.createSpeciesMap(sbml.getSbml());
-			
-			// First, create a pathway (one for everything)
+			CellDesignerToCytoscapeConverter.createSpeciesMap(sbml.getSbml());			
 			Pathway path = biopax_DASH_level3_DOT_owlFactory.createPathway(biopax.namespaceString+sbml.getSbml().getModel().getId(),biopax.biopaxmodel);
 			path.addName(sbml.getSbml().getModel().getId());
-			//path.setSHORT_DASH_NAME(filename);
-			path.addComment("This pathway is generated automatically from the CellDesigner 3.0 XML file "+filename+" using CellDesigner2BioPAX converter developed by Andrei Zinovyev at the Bioinformatics Service of Institut Curie (andrei.zinovyev@curie.fr)");
-
-			HashMap<String, EntityReference> entityReferences = new HashMap<String, EntityReference>();
-			HashMap<String, PhysicalEntity> entities = new HashMap<String, PhysicalEntity>();
+			path.addComment("This pathway is generated automatically from the CellDesigner XML file "+filename+" using BiNoM software (http://binom.curie.fr) developed by the Computational Systems Biology Group at Institut Curie (http://sysbio.curie.fr)");			
+			// We have to create modules as pathways
+			
+			entityReferences = new HashMap<String, EntityReference>();
+			entities = new HashMap<String, PhysicalEntity>();
 			species = getSpecies(sbml.getSbml());
+			includedSpecies = getIncludedSpecies(sbml.getSbml());			
 			reactions = getReactions(sbml.getSbml());
-			complexes_list = getComplexes(sbml.getSbml());
+			complexes = getComplexes(sbml.getSbml());
 			proteins = getProteins(sbml.getSbml());
+			genes = getGenes(sbml.getSbml());			
+			rnas = getRNAs(sbml.getSbml());
+			asrnas = getAntisenseRNAs(sbml.getSbml());			
 
 			//Phenotypes and Unknowns are treated as PhysicalEntityReferences
 			Iterator<String> itspecies = species.keySet().iterator();
@@ -153,7 +168,7 @@ public class CellDesignerToBioPAXConverter {
 						pheno.addComment("This is a CellDesigner PHENOTYPE entity. It is not a real protein but rather an abstract representation of a process.");
 						if(sp.getNotes()!=null){
 							if(sp.getNotes().getHtml()!=null)if(sp.getNotes().getHtml().getBody()!=null)
-								pheno.addComment(Utils.getValue(sp.getNotes().getHtml().getBody()));
+								pheno.addComment(Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sp.getNotes().getHtml().getBody())));
 						}
 						entityReferences.put(sp.getId(),pheno);
 					}
@@ -173,15 +188,15 @@ public class CellDesignerToBioPAXConverter {
 						pheno.addComment("This is a CellDesigner UNKNOWN entity.");
 						if(sp.getNotes()!=null){
 							if(sp.getNotes().getHtml()!=null)if(sp.getNotes().getHtml().getBody()!=null)
-								pheno.addComment(Utils.getValue(sp.getNotes().getHtml().getBody()));
+								pheno.addComment(Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sp.getNotes().getHtml().getBody())));
 						}
 						entityReferences.put(sp.getId(),pheno);
 					}
 			}
 
-			// Unique proteins
-			for(int i=0;i<proteins.size();i++){
-				CelldesignerProteinDocument.CelldesignerProtein prot = (CelldesignerProteinDocument.CelldesignerProtein)proteins.elementAt(i);
+			// Proteins
+			for(String id: proteins.keySet()){
+				CelldesignerProteinDocument.CelldesignerProtein prot = proteins.get(id);
 				System.out.println("Protein: "+prot.getName().getStringValue());
 				ProteinReference protein_ = biopax_DASH_level3_DOT_owlFactory.createProteinReference(biopax.namespaceString+prot.getId(),biopax.biopaxmodel);
 				protein_.addName(prot.getName().getStringValue());
@@ -189,7 +204,7 @@ public class CellDesignerToBioPAXConverter {
 				String cleanname = correctName(prot.getName().getStringValue());
 				protein_.addName(cleanname);
 				if(prot.getCelldesignerNotes()!=null)if(prot.getCelldesignerNotes().getHtml()!=null)if(prot.getCelldesignerNotes().getHtml().getBody()!=null)
-					protein_.addComment(Utils.getValue(prot.getCelldesignerNotes().getHtml().getBody()));
+					protein_.addComment((Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(prot.getCelldesignerNotes().getHtml().getBody()))));
 				entityReferences.put(prot.getId(),protein_);
 			}
 			// Genes
@@ -221,7 +236,7 @@ public class CellDesignerToBioPAXConverter {
 					rna_.addName(aRNA.getName());
 					rna_.addName(aRNA.getName());
 					entityReferences.put(aRNA.getId(),rna_);
-				}
+			}
 			// Small molecules
 			for(int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++){
 				SpeciesDocument.Species sp = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -251,6 +266,29 @@ public class CellDesignerToBioPAXConverter {
 				}
 			}
 			
+
+			for(int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++){
+				SpeciesDocument.Species sp = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
+				String spcl = "";
+				if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
+					spcl = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
+				if(!spcl.equals("DEGRADED")){
+					PhysicalEntity ent = createEntityForSpecies(sp.getId(),sbml.getSbml(),biopax);
+				}
+				}
+			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void populateModel(){
+		try{
+		
+			/*
 			// Now let us create all species and included species but not complexes, homodimers and degraded
 			for(int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++){
 				SpeciesDocument.Species sp = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -349,7 +387,7 @@ public class CellDesignerToBioPAXConverter {
 			}
 			
 			// Interactions
-			for(int i=0;i<reactions.size();i++)/*if(isRealReaction((Reaction)reactions.elementAt(i),sbml))*/{
+			for(int i=0;i<reactions.size();i++){
 				ReactionDocument.Reaction r = (ReactionDocument.Reaction)reactions.elementAt(i);
 				String rtype = "UNKNOWN_TRANSITION";
 				if(r.getAnnotation()!=null)if(r.getAnnotation().getCelldesignerReactionType()!=null)
@@ -550,26 +588,24 @@ public class CellDesignerToBioPAXConverter {
 				// Layout
 			}
 
-
+		*/
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 
-		return biopax;
 	}
 
 	/**
 	 * Creates the list of proteins 
 	 */
-	public static Vector getProteins(SbmlDocument.Sbml sbml){
-		Vector v = new Vector();
+	public static HashMap<String, CelldesignerProteinDocument.CelldesignerProtein> getProteins(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerProteinDocument.CelldesignerProtein> v = new HashMap<String, CelldesignerProteinDocument.CelldesignerProtein>();
 		if(sbml.getModel().getAnnotation()!=null)if(sbml.getModel().getAnnotation().getCelldesignerListOfProteins()!=null){
 			for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray().length;i++){
 				CelldesignerProteinDocument.CelldesignerProtein prot = sbml.getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
-				v.add(prot);
+				v.put(prot.getId(),prot);
 			}}else{
 				// if the model is not annotated at all, we are going to create pseudo-entitites (proteins)
-				if(getGenes(sbml).size()==0){
 					for(int i=0;i<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 						SpeciesDocument.Species sp = sbml.getModel().getListOfSpecies().getSpeciesArray(i);
 						CelldesignerProteinDocument.CelldesignerProtein prot = CelldesignerProteinDocument.Factory.newInstance().addNewCelldesignerProtein();
@@ -585,55 +621,71 @@ public class CellDesignerToBioPAXConverter {
 							prot.setName(xs);
 						}
 						prot.setId(sp.getId());
-						v.add(prot);
+						v.put(prot.getId(),prot);
 					}
-				}
 			}
 		return v;
 	}
 	/**
 	 * Creates the list of genes 
 	 */
-	public static Vector getGenes(SbmlDocument.Sbml sbml){
-		Vector v = new Vector();
-		//for(int i=0;i<sbml.getModel().getAnnotation().get;i++){
-		//  Celldesigner_gene prot = sbml.getModel().getAnnotation().getCelldesigner_listOfProteins().getCelldesigner_protein(i);
-		//  v.add(prot);
-		//}
+	public static HashMap<String, CelldesignerGeneDocument.CelldesignerGene> getGenes(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerGeneDocument.CelldesignerGene> v = new HashMap<String, CelldesignerGeneDocument.CelldesignerGene>();
+		if(sbml.getModel().getAnnotation()!=null)if(sbml.getModel().getAnnotation().getCelldesignerListOfGenes()!=null){
+		for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
+		  CelldesignerGeneDocument.CelldesignerGene prot = sbml.getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
+		  v.put(prot.getId(),prot);
+		}}
+		return v;
+	}
+	
+	public static HashMap<String, CelldesignerRNADocument.CelldesignerRNA> getRNAs(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerRNADocument.CelldesignerRNA> v = new HashMap<String, CelldesignerRNADocument.CelldesignerRNA>();
+		if(sbml.getModel().getAnnotation()!=null)if(sbml.getModel().getAnnotation().getCelldesignerListOfRNAs()!=null){
+		for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
+		  CelldesignerRNADocument.CelldesignerRNA prot = sbml.getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
+		  v.put(prot.getId(),prot);
+		}}
 		return v;
 	}
 
-	public static CelldesignerProteinDocument.CelldesignerProtein getProteinById(Vector proteins, String pid){
-		CelldesignerProteinDocument.CelldesignerProtein pr = null;
-		for(int i=0;i<proteins.size();i++){
-			CelldesignerProteinDocument.CelldesignerProtein prot = (CelldesignerProteinDocument.CelldesignerProtein)proteins.elementAt(i);
-			if(prot.getId().equals(pid))
-				pr = prot;
-		}
-		return pr;
+	public static HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA> getAntisenseRNAs(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA> v = new HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA>();
+		if(sbml.getModel().getAnnotation()!=null)if(sbml.getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs()!=null){
+		for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
+		  CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA prot = sbml.getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+		  v.put(prot.getId(),prot);
+		}}
+		return v;
 	}
+	
+
+	public CelldesignerProteinDocument.CelldesignerProtein getProteinById(String pid){
+		return proteins.get(pid);
+	}
+	public CelldesignerRNADocument.CelldesignerRNA getRNAById(String pid){
+		return rnas.get(pid);
+	}
+	public CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA getAntisenseRNAById(String pid){
+		return asrnas.get(pid);
+	}
+	
 
 	/**
 	 * Creates the list of reactions 
 	 */
-	public static Vector getReactions(SbmlDocument.Sbml sbml){
-		Vector v = new Vector();
+	public static HashMap<String, ReactionDocument.Reaction> getReactions(SbmlDocument.Sbml sbml){
+		HashMap<String, ReactionDocument.Reaction> v = new HashMap<String, ReactionDocument.Reaction>(); 
 		if(sbml.getModel().getListOfReactions()!=null)
 			for(int i=0;i<sbml.getModel().getListOfReactions().getReactionArray().length;i++){
 				ReactionDocument.Reaction r = sbml.getModel().getListOfReactions().getReactionArray(i);
-				v.add(r);
+				v.put(r.getId(),r);
 			}
 		return v;
 	}
 
-	public static ReactionDocument.Reaction getReactionById(Vector reactions, String id){
-		ReactionDocument.Reaction r = null;
-		for(int i=0;i<reactions.size();i++){
-			ReactionDocument.Reaction re = (ReactionDocument.Reaction)reactions.elementAt(i);
-			if(r.getId().equals(id))
-				r = re;
-		}
-		return r;
+	public ReactionDocument.Reaction getReactionById(String id){
+		return reactions.get(id);
 	}
 
 	/**
@@ -647,38 +699,38 @@ public class CellDesignerToBioPAXConverter {
 		}
 		return v;
 	}
-
-	public static SpeciesDocument.Species getSpeciesById(Vector species, String id){
-		SpeciesDocument.Species s = null;
-		for(int i=0;i<species.size();i++){
-			SpeciesDocument.Species sp = (SpeciesDocument.Species)species.elementAt(i);
-			if(sp.getId().equals(id))
-				s = sp;
+	
+	public static HashMap<String, CelldesignerSpeciesDocument.CelldesignerSpecies> getIncludedSpecies(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerSpeciesDocument.CelldesignerSpecies> v = new HashMap<String, CelldesignerSpeciesDocument.CelldesignerSpecies>();
+		if(sbml.getModel().getAnnotation()!=null)
+		if(sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
+		for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
+			CelldesignerSpeciesDocument.CelldesignerSpecies s = sbml.getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+			v.put(s.getId(),s);
 		}
-		return s;
+		return v;
+	}
+	
+
+	public SpeciesDocument.Species getSpeciesById(String id){
+		return species.get(id);
 	}
 
 	/**
 	 * Creates the list of complexes 
 	 */
-	public static Vector getComplexes(SbmlDocument.Sbml sbml){
-		Vector v = new Vector();
+	public static HashMap<String, CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> getComplexes(SbmlDocument.Sbml sbml){
+		HashMap<String, CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> v = new HashMap<String, CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias>();
 		if(sbml.getModel().getAnnotation()!=null)if(sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null)
 			for(int i=0;i<sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
 				CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias c = sbml.getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
-				v.add(c);
+				v.put(c.getId(),c);
 			}
 		return v;
 	}
 
-	public static CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias getComplexById(Vector complexes, String id){
-		CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias s = null;
-		for(int i=0;i<complexes.size();i++){
-			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias sp = (CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias)complexes.elementAt(i);
-			if(sp.getSpecies().equals(id))
-				s = sp;
-		}
-		return s;
+	public CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias getComplexById(String id){
+		return complexes.get(id);
 	}
 
 	/**
@@ -694,11 +746,207 @@ public class CellDesignerToBioPAXConverter {
 	}
 
 	/**
-	 * Converts physicalEntity participant for a reaction rId  
+	 * Makes a physical entity from CellDesigner species   
 	 */
-	public PhysicalEntity createEntityForSpecies(String id, HashMap<String, SpeciesDocument.Species> species, Vector complexes_list, HashMap<String, PhysicalEntity> entities, HashMap<String, EntityReference> entityReferences, SbmlDocument.Sbml sbml, BioPAX biopax, String rId){
-		//physicalEntityParticipant pep = null;
+	
+	public PhysicalEntity createEntityForSpecies(String id, SbmlDocument.Sbml sbml, BioPAX biopax) throws Exception{
+		return createEntityForSpecies(id, sbml, biopax, false);
+	}
+	
+	public PhysicalEntity createEntityForSpecies(String id, SbmlDocument.Sbml sbml, BioPAX biopax, boolean entityForHomodimer) throws Exception{
 		PhysicalEntity pep = null;
+		SpeciesDocument.Species sp = species.get(id);
+		CelldesignerSpeciesDocument.CelldesignerSpecies isp = null;		
+		String spname = "";
+		String spname_native = "";
+		String sp_id = "";
+		CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si = null;		
+		if(sp!=null){
+			spname_native = Utils.getValue(sp.getName());
+			spname = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,sp.getId(),true,true);
+			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null)
+				si = sp.getAnnotation().getCelldesignerSpeciesIdentity();
+			sp_id = sp.getId();
+		}else{
+			isp = includedSpecies.get(id);
+			spname_native = Utils.getValue(isp.getName());
+			spname = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,isp.getId(),true,true);
+			si = isp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
+			sp_id = isp.getId();
+		}
+		
+		if(spname==null) return null;
+				
+		if(entityForHomodimer){
+			for(int i=2;i<10;i++){
+				String nm = spname.split("@")[0];
+				String comp = spname.split("@")[1];				
+				String s = "|hm"+i;
+				if(nm.endsWith(s))
+					spname = nm.substring(0,nm.length()-s.length())+"@"+comp;
+			}
+		}
+		
+		String entityUri = biopax.namespaceString+correctName(spname);
+		String cl = "UNKNOWN";
+
+		if(entities.get(entityUri)==null){
+			if((spname!=null)&&(!spname.toLowerCase().startsWith("null"))){
+				String eid = "";
+				if(si!=null)
+					cl = Utils.getValue(si.getCelldesignerClass());
+				if(cl.equals("PROTEIN")){
+					
+					boolean homodimer = false;
+					if(si.getCelldesignerState()!=null)
+						if(si.getCelldesignerState().getCelldesignerHomodimer()!=null)
+							homodimer = true;
+					if(homodimer&&!entityForHomodimer){
+						Complex compl = biopax_DASH_level3_DOT_owlFactory.createComplex(entityUri,biopax.biopaxmodel);
+						System.out.println("Created homodimer as complex "+compl.uri());
+						compl.addName(spname);
+						int ihm = Integer.parseInt(Utils.getValue(si.getCelldesignerState().getCelldesignerHomodimer()));
+						Stoichiometry stoich = biopax_DASH_level3_DOT_owlFactory.createStoichiometry(entityUri+"_stoich", biopax.biopaxmodel);
+						stoich.setStoichiometricCoefficient((float)ihm);
+						PhysicalEntity pepcomp = createEntityForSpecies(id, sbml, biopax, true);
+						stoich.setPhysicalEntity(pepcomp);
+						compl.addComponent(pepcomp);
+						compl.addComponentStoichiometry(stoich);
+						pep = compl;
+					}else{
+						Protein protein = biopax_DASH_level3_DOT_owlFactory.createProtein(entityUri,biopax.biopaxmodel);
+						System.out.println("Created protein "+protein.uri());
+						protein.addName(spname);
+						protein.setEntityReference(entityReferences.get(Utils.getValue(si.getCelldesignerProteinReference())));
+						entities.put(entityUri, protein);
+						pep = protein;
+					}
+				}else
+				if(cl.equals("COMPLEX")){
+					Complex compl = biopax_DASH_level3_DOT_owlFactory.createComplex(entityUri,biopax.biopaxmodel);
+					System.out.println("Created complex "+compl.uri());
+					compl.addName(spname);
+					Vector<CelldesignerSpeciesDocument.CelldesignerSpecies> vis = CellDesignerToCytoscapeConverter.complexSpeciesMap.get(id);
+					for(CelldesignerSpeciesDocument.CelldesignerSpecies ispc: vis){
+						CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity ispi = ispc.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
+						PhysicalEntity pepi = createEntityForSpecies(ispc.getId(),sbml,biopax);
+						if(pepi==null)
+							System.out.println("ERROR: no entity for a complex "+entityUri+" component "+ispc.getId());
+						compl.addComponent(pepi);
+					}
+					entities.put(entityUri, compl);	
+					pep = compl;
+				}else
+				if(cl.equals("GENE")){
+					Dna dna = biopax_DASH_level3_DOT_owlFactory.createDna(entityUri,biopax.biopaxmodel);
+					System.out.println("Created dna "+dna.uri());
+					dna.addName(spname);
+					dna.setEntityReference(entityReferences.get(Utils.getValue(si.getCelldesignerGeneReference())));
+					entities.put(entityUri, dna);
+					pep = dna;
+				}else
+				if(cl.equals("RNA")){
+					Rna rna = biopax_DASH_level3_DOT_owlFactory.createRna(entityUri,biopax.biopaxmodel);
+					System.out.println("Created rna "+rna.uri());					
+					rna.addName(spname);
+					rna.setEntityReference(entityReferences.get(Utils.getValue(si.getCelldesignerRnaReference())));
+					entities.put(entityUri, rna);
+					pep = rna;
+				}else
+				if(cl.equals("UNKNOWN")){
+					pep = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(entityUri,biopax.biopaxmodel);
+					System.out.println("Created unknown type entity "+pep.uri());					
+					pep.addName(spname_native);
+					entities.put(entityUri, pep);
+				}else
+				if(cl.equals("ANTISENSE_RNA")){
+					Rna rna = biopax_DASH_level3_DOT_owlFactory.createRna(entityUri,biopax.biopaxmodel);
+					System.out.println("Created rna "+rna.uri());					
+					rna.addName(spname);
+					rna.setEntityReference(entityReferences.get(Utils.getValue(si.getCelldesignerAntisensernaReference())));
+					entities.put(entityUri, rna);
+					pep = rna;
+				}else
+				if(cl.equals("PHENOTYPE")){
+					pep = biopax_DASH_level3_DOT_owlFactory.createPhysicalEntity(entityUri,biopax.biopaxmodel);
+					System.out.println("Created phenotype as entity "+pep.uri());					
+					pep.addName(spname_native);
+					entities.put(entityUri, pep);
+				}else
+				if(cl.equals("SIMPLE_MOLECULE")){
+					pep = biopax_DASH_level3_DOT_owlFactory.createSmallMolecule(entityUri,biopax.biopaxmodel);
+					System.out.println("Created smallMolecule "+pep.uri());					
+					pep.addName(spname_native);
+					entities.put(entityUri, pep);
+				}else
+				if(cl.equals("ION")){
+					pep = biopax_DASH_level3_DOT_owlFactory.createSmallMolecule(entityUri,biopax.biopaxmodel);
+					System.out.println("Created smallMolecule "+pep.uri());
+					pep.addName(spname_native);
+					entities.put(entityUri, pep);
+				}else
+				if(cl.equals("DRUG")){
+					pep = biopax_DASH_level3_DOT_owlFactory.createSmallMolecule(entityUri,biopax.biopaxmodel);
+					System.out.println("Created smallMolecule "+pep.uri());
+					pep.addName(spname_native);
+					entities.put(entityUri, pep);
+				}
+				
+				
+			}
+		
+		if(pep==null){
+			System.out.println("Unknown species type! "+sp.getId()+" "+cl);
+		}else{
+			
+			// Set location
+			CellularLocationVocabulary comp = null;
+			if(sp!=null){
+					String scomp = sp.getCompartment();
+					CompartmentDocument.Compartment bcomp = (CompartmentDocument.Compartment)compartmentHash.get(scomp);
+					if(bcomp.getName()!=null)
+								comp = biopax.getCompartment(bcomp.getName().getStringValue());
+					else
+								comp = biopax.getCompartment("0008372");
+			}
+			else{
+								String compl_id = Utils.getValue(isp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
+								SpeciesDocument.Species spt = species.get(compl_id);
+								String compartment = spt.getCompartment();
+								CompartmentDocument.Compartment compo = (CompartmentDocument.Compartment)compartmentHash.get(compartment);
+								String compname = compartment;
+								if(compo.getName()!=null)
+										compname = compo.getName().getStringValue();
+								comp = biopax.getCompartment(compname);
+			}
+
+			pep.setCellularLocation((CellularLocationVocabulary)comp);
+			
+			// Add comments and publications to Entity (not Reference)
+			if(sp!=null)
+				if(sp.getNotes()!=null){
+					pep.addComment(Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sp.getNotes())));
+					Vector v = extractPubMedReferenceFromComment(Utils.getValue(sp.getNotes()));
+					addPublicationXrefsToEntity(pep,v);
+				}
+
+			// Set modifications
+			addModification(sp_id, pep, si);
+		}
+		
+		}else{
+			pep = entities.get(entityUri);
+		}
+		
+		
+		return pep;
+	}
+	
+	
+	public PhysicalEntity createEntityForSpecies(String id, HashMap<String, SpeciesDocument.Species> species, Vector complexes_list, HashMap<String, PhysicalEntity> entities, HashMap<String, EntityReference> entityReferences, SbmlDocument.Sbml sbml, BioPAX biopax, String rId){
+		
+		PhysicalEntity pep = null;
+		/*
 		try{
 			
 			
@@ -907,7 +1155,7 @@ public class CellDesignerToBioPAXConverter {
 		
 		if(pep==null)
 			System.out.println("ERROR: no entity for the species "+id+" is generated");
-		
+		*/
 		return pep;
 	}
 	
@@ -1037,11 +1285,23 @@ public class CellDesignerToBioPAXConverter {
 	/**
 	 * Eliminates spaces, stars, dashes from the string 
 	 */
-	public static String correctName(String name){
-		name = Utils.replaceString(name," ","");
-		name = Utils.replaceString(name,"*","");
-		name = Utils.replaceString(name,"-","");
-		return name;
+	public static String correctName(String s){
+    	s = Utils.replaceString(s, "@", "_at_");
+    	s = Utils.replaceString(s, ":", "_");
+    	s = Utils.replaceString(s, "|", "_");
+        char c[] = s.toCharArray();
+        for(int i=0;i<c.length;i++){
+        	if((c[i]>='a')&&(c[i]<='z')) continue;
+        	if((c[i]>='A')&&(c[i]<='Z')) continue;
+        	if((c[i]>='0')&&(c[i]<='9')) continue;
+        	if(c[i]=='_') continue;
+        	c[i] = '_';
+        }
+        s = new String(c);
+        if((c[0]>='0')&&(c[0]<='9'))
+        	s = "id_"+s;
+        //System.out.println("AFTER : "+s);
+    	return s;
 	}
 
 	/**

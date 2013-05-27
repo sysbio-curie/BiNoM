@@ -68,7 +68,10 @@ public class CellDesigner2BioPAX {
     	//String prefix = "C:/Datas/binomtest/BioPAX3/simplest";
     	//String prefix = "C:/Datas/binomtest/BioPAX3/modif1";
     	//String prefix = "C:/Datas/binomtest/BioPAX3/complex";
-    	String prefix = "C:/Datas/binomtest/BioPAX3/dimer1";
+    	//String prefix = "C:/Datas/binomtest/BioPAX3/dimer1";
+    	//String prefix = "C:/Datas/binomtest/BioPAXtest/PKC";
+    	String prefix = "C:/Datas/binomtest/BioPAXtest/test";
+    	//String prefix = "C:/Datas/acsn/acsn_only/acsn_src/acsn_master";
 
     if(args.length>0){
       prefix = args[0];
@@ -76,9 +79,6 @@ public class CellDesigner2BioPAX {
         prefix = prefix.substring(0,prefix.length()-4);
     }
 
-
-    CellDesignerToBioPAXConverter.useBiopaxModelOntology = false;
-    BioPAX.addBiopaxModelOntology = CellDesignerToBioPAXConverter.useBiopaxModelOntology;
 
     CellDesignerToBioPAXConverter cdbp = new CellDesignerToBioPAXConverter();
     //cdbp.biopax = new BioPAX(BioPAX.biopaxString,"http://bioinfo.curie.fr/binom/"+prefix+"#","http://bioinfo.curie.fr/biopaxmodel#");
@@ -90,20 +90,22 @@ public class CellDesigner2BioPAX {
     //cdbp.loadFromCellDesignerXML("Nfkb_simplest_plus3.xml");
 
     // Converting to BioPAX
-    cdbp.alwaysMentionCompartment = true;
+    //cdbp.alwaysMentionCompartment = true;
     //cdbp.biopax.makeCompartments();
     //cdbp.createCellDesignerTerms();
-    cdbp.compartmentHash = cdbp.getCompartmentHash(cdbp.sbml.getSbml());
-    CellDesigner.entities = CellDesigner.getEntities(cdbp.sbml);
-    cdbp.populateModel();
+    //cdbp.compartmentHash = cdbp.getCompartmentHash(cdbp.sbml.getSbml());
+    //CellDesigner.entities = CellDesigner.getEntities(cdbp.sbml);
+    //cdbp.populateModel();
 
+    //
+    cdbp.convert();
     // Saving to BioPAX
     BioPAX.saveToFile(prefix+".owl",cdbp.biopax.biopaxmodel);
 
     // Reading from BioPAX
-    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
-    model.read(new FileInputStream(prefix+".owl"),"");
-    BioPAX.printDump(model);
+    //com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    //model.read(new FileInputStream(prefix+".owl"),"");
+    //BioPAX.printDump(model);
 
 
     }catch(Exception e){

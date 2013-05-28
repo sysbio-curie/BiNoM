@@ -374,3 +374,11 @@ label {font-size: 12px; vertical-align: middle;}
   color: #333333;
 /*  color: green; */
 }
+
+.group_annot {
+    background: lightblue;
+}
+
+.non_group_annot {
+/*    background: #DDDDDD; */
+}

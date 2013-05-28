@@ -105,6 +105,27 @@ Dataset.prototype = {
 
 	addDatatable: function(datatable) {
 		this.datatables[datatable.name] = datatable;
+		// TBD: datatable id management
+		//this.datatables_id[datatable.id] = datatable;
+	},
+
+	removeDatatable: function(datatable) {
+		if (this.datatables[datatable.name] == datatable) {
+			console.log("should remove " + datatable.name);
+			for (var sample_name in datatable.sample_index) {
+				var sample = this.samples[sample_name];
+				if (!--sample.refcnt) {
+					delete this.samples[sample_name];
+				}
+			}
+			for (var gene_name in datatable.gene_index) {
+				var gene = this.genes[gene_name];
+				if (!--gene.refcnt) {
+					delete this.genes[gene_name];
+				}
+			}
+			delete this.datatables[datatable.name];
+		}
 	},
 
 	getSample: function(sample_name) {
@@ -115,6 +136,8 @@ Dataset.prototype = {
 	addSample: function(sample_name) {
 		if (!this.samples[sample_name]) {
 			this.samples[sample_name] = new Sample(sample_name);
+		} else {
+			this.samples[sample_name].refcnt++;
 		}
 		return this.samples[sample_name];
 	},
@@ -123,6 +146,8 @@ Dataset.prototype = {
 	addGene: function(gene_name, entity_map) {
 		if (!this.genes[gene_name]) {
 			this.genes[gene_name] = new Gene(gene_name, entity_map);
+		} else {
+			this.genes[gene_name].refcnt++;
 		}
 		return this.genes[gene_name];
 	},
@@ -156,11 +181,15 @@ Dataset.prototype = {
 // Encapsulate datatable contents (but only for genes existing in map) and type
 //
 
+// TBD datatable id management
+var datatable_id = 1;
+
 function Datatable(dataset, biotype_name, name, file) {
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
 		return;
 	}
+	this.id = datatable_id++;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 
@@ -315,7 +344,6 @@ AnnotationFactory.prototype = {
 					continue;
 				}
 				var sample_name = line[0];
-				//var sample = navicell.dataset.addSample(sample_name);
 				var sample = navicell.dataset.getSample(sample_name);
 				if (sample) {
 					for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
@@ -364,6 +392,7 @@ AnnotationFactory.prototype = {
 function Sample(name) {
 	this.name = name;
 	this.annots = {};
+	this.refcnt = 1;
 }
 
 Sample.prototype = {
@@ -393,6 +422,7 @@ Sample.prototype = {
 function Gene(name, entity_map) {
 	this.name = name;
 	this.entity_map = entity_map;
+	this.refcnt = 1;
 }
 
 Gene.prototype = {
@@ -418,11 +448,13 @@ Group.prototype = {
 	value: null,
 	name: "",
 	html_name: "",
+	/*
 	samples: [],
 
 	addSample: function(sample) {
 		samples.push(sample);
 	},
+	*/
 
 	getClass: function() {return "Group";}
 };

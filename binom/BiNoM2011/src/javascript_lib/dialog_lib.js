@@ -227,11 +227,11 @@ $(function() {
 		}
 	});
 
-	update_sample_annot_table();
+	update_sample_annot_table(window.document);
 });
 
-function update_sample_status_table() {
-	var table = $("#dt_sample_status_table");
+function update_sample_status_table(doc) {
+	var table = $("#dt_sample_status_table", doc);
 	table.children().remove();
 	// should use a string buffer
 	var str = "<thead><tr><th>Samples (" + mapSize(navicell.dataset.samples) + ")</th>";
@@ -263,19 +263,42 @@ function update_sample_status_table() {
 	table.append(str);
 }
 
-function update_sample_annot_table() {
-	var table = $("#dt_sample_annot_table");
+function annot_set_group(annot_id, doc) {
+	var checkbox = $("#cb_annot_" + annot_id);
+	var checked = checkbox.attr("checked");
+	var annot = navicell.annot_factory.getAnnotationPerId(annot_id);
+	//console.log(annot_id + " checked: " + checked);
+	annot.setIsGroup(checked);
+	update_status_tables();
+}
+
+function is_annot_group(annot_id) {
+	var annot = navicell.annot_factory.getAnnotationPerId(annot_id);
+	return annot.is_group ? "checked" : "";
+}
+
+function update_sample_annot_table(doc) {
+	var table = $("#dt_sample_annot_table", doc);
 	table.children().remove();
-	var str = "<thead><tr><th>Samples (" + mapSize(navicell.dataset.samples) + ")</th>";
-	var annots = navicell.annot_factory.annots;
-	if (mapSize(annots) == 0) {
+	var str = "<thead>";
+	var annots = navicell.annot_factory.annots_per_name;
+	var annot_cnt = mapSize(annots);
+	str += '<tr><td style="text-align: center; font-size: smaller; font-style: italic;">' + (annot_cnt ? 'Use as group' : '&nbsp;') + '</td>';
+	for (var annot_name in annots) {
+		var annot = navicell.annot_factory.getAnnotation(annot_name);
+		var annot_id = annot.id;
+		str += "<td style='text-align: center;'><input id='cb_annot_" + annot_id + "' type='checkbox' " + is_annot_group(annot_id) + " onchange='annot_set_group(\"" + annot_id + "\", window.document)'></input></td>";
+	}
+	str += "</tr>";
+	str += "<tr><th>Samples (" + mapSize(navicell.dataset.samples) + ")</th>";
+	if (0 == annot_cnt) {
 		//str += "<th>No Annotations</th>";
 	} else {
 		for (var annot_name in annots) {
 			str += "<th>&nbsp;" + annot_name + "&nbsp;</th>";
 		}
 	}
-	str += "</thead>";
+	str += "</tr></thead>";
 	str += "<tbody>";
 	if (0 == mapSize(navicell.dataset.samples)) {
 		str += "<tr><td>&nbsp;</td><tr>";
@@ -285,12 +308,15 @@ function update_sample_annot_table() {
 		str += "<td>" + sample_name + "</td>";
 		var sample = navicell.dataset.samples[sample_name];
 		for (var annot_name in annots) {
+			var annot = navicell.annot_factory.getAnnotation(annot_name);
 			var annot_value = sample.annots[annot_name];
+			str += "<td class='" + (annot.is_group ? "group_annot" : " non_group_annot") + "'>";
 			if (annot_value) {
-				str += "<td>" + annot_value + "</td>"
+				str += annot_value;
 			} else {
-				str += "<td>&nbsp;</td>"
+				str += "&nbsp;";
 			}
+			str += "</td>";
 		}
 		str += "</tr>";
 	}
@@ -298,8 +324,8 @@ function update_sample_annot_table() {
 	table.append(str);
 }
 
-function update_group_status_table() {
-	var table = $("#dt_group_status_table");
+function update_group_status_table(doc) {
+	var table = $("#dt_group_status_table", doc);
 	table.children().remove();
 	var str = "<thead><tr><th>Group (" + mapSize(navicell.group_factory.group_map) + ")</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
@@ -319,8 +345,8 @@ function update_group_status_table() {
 				var sample = navicell.dataset.samples[sample_name];
 				if (datatable.sample_index[sample_name] != undefined) {
 					for (var annot_name in sample.annots) {
-						var annot_value = sample.annots[annot_name];
-						if (navicell.group_factory.buildName(annot_name, annot_value) == group_name) {
+						var group = sample.getGroup(annot_name);
+						if (group && group.name == group_name) {
 							cnt++;
 						}
 					}
@@ -334,8 +360,8 @@ function update_group_status_table() {
 	table.append(str);
 }
 
-function update_gene_status_table() {
-	var table = $("#dt_gene_status_table");
+function update_gene_status_table(doc) {
+	var table = $("#dt_gene_status_table", doc);
 	table.children().remove();
 	// should use a string buffer
 	var str = "<thead><tr><th>Genes (" + mapSize(navicell.dataset.genes) + ")</th>";
@@ -368,14 +394,18 @@ function update_gene_status_table() {
 	table.append(str);
 }
 
-function update_datatable_status_table() {
-	var table = $("#dt_datatable_status_table");
-	var update_label = $("#dt_datatable_status_update_label");
-	var update_checkbox = $("#dt_datatable_status_update");
+function update_datatable_status_table(doc) {
+	console.log("update_datatable_status_table");
+	var table = $("#dt_datatable_status_table", doc);
+	var update_label = $("#dt_datatable_status_update_label", doc);
+	var update_checkbox = $("#dt_datatable_status_update", doc);
+	if (doc != window.document) {
+		update_checkbox.attr("checked", false);
+	}
 	var update = update_checkbox.attr("checked");
 	var support_remove = false;
 
-	var buttons = $("#dt_datatable_status").parent().find(".ui-button-text");
+	var buttons = $("#dt_datatable_status", doc).parent().find(".ui-button-text");
 	buttons.each(function() {
 		var button  = $(this);
 		var text = button.text();
@@ -423,11 +453,15 @@ function update_datatable_status_table() {
 }
 
 function update_status_tables() {
-	update_sample_status_table();
-	update_gene_status_table();
-	update_group_status_table();
-	update_datatable_status_table();
-	update_sample_annot_table();
+	for (var map_name in maps) {
+		var doc = maps[map_name].document;
+		update_sample_status_table(doc);
+		update_gene_status_table(doc);
+		update_group_status_table(doc);
+		update_datatable_status_table(doc);
+		update_sample_annot_table(doc);
+	}
+//	navicell_session.write();
 }
 
 function get_biotype_select(id, include_none, value) {

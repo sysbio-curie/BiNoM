@@ -82,6 +82,7 @@ Mapdata.prototype = {
 
 function Dataset(name) {
 	this.name = name;
+	this.genes = {};
 }
 
 Dataset.prototype = {
@@ -256,13 +257,15 @@ Datatable.prototype = {
 // Annotation class
 //
 
-function Annotation(name) {
+function Annotation(name, id) {
 	this.name = name;
+	this.is_group = false;
+	this.id = id;
 }
 
 Annotation.prototype = {
 	name: "",
-	is_group: true,
+	is_group: false,
 	desc: "",
 
 	setIsGroup: function(is_group) {
@@ -277,10 +280,12 @@ Annotation.prototype = {
 //
 
 function AnnotationFactory() {
+	this.annot_id = 1;
 }
 
 AnnotationFactory.prototype = {
-	annots: {},
+	annots_per_name: {},
+	annots_per_id: {},
 	ready: null,
 	sample_read: 0,
 	sample_annotated: 0,
@@ -333,14 +338,21 @@ AnnotationFactory.prototype = {
 	},
 
 	getAnnotation : function(name) {
-		if (!this.annots[name]) {
-			this.annots[name] = new Annotation(name);
+		if (!this.annots_per_name[name]) {
+			var annot = new Annotation(name, this.annot_id);
+			this.annots_per_name[name] = annot;
+			this.annots_per_id[this.annot_id] = annot;
+			this.annot_id++;
 		}
-		return this.annots[name];
+		return this.annots_per_name[name];
+	},
+
+	getAnnotationPerId : function(annot_id) {
+		return this.annots_per_id[annot_id];
 	},
 
 	getAnnotCount: function() {
-		return mapSize(this.annots);
+		return mapSize(this.annots_per_name);
 	}
 };
 
@@ -357,9 +369,17 @@ Sample.prototype = {
 	name: "",
 	annots: {},
 
-	addAnnotValue: function(annot, value) {
+	addAnnotValue: function(annot_name, value) {
 		//console.log("sample: " + this.name + " add annot value: '" + annot + "' '" + value + "'");
-		this.annots[annot] = value;
+		this.annots[annot_name] = value;
+	},
+
+	getGroup: function(annot_name) {
+		var annot_value = this.annots[annot_name];
+		if (annot_value != undefined) {
+			return navicell.group_factory.getGroup(annot_name, annot_value);
+		}
+		return null;
 	},
 
 	getClass: function() {return "Sample";}
@@ -388,7 +408,7 @@ Gene.prototype = {
 function Group(annot_name, value) {
 	this.annot_name = annot_name;
 	this.value = value;
-	this.name = annot_name + ": " + value;
+	this.name = navicell.group_factory.buildName(annot_name, value);
 	this.html_name = '<span class="group_name">' + annot_name + ':</span>&nbsp;<span class="group_value">' + value + '</span>';
 }
 
@@ -462,6 +482,7 @@ BiotypeType.prototype = {
 };
 
 function BiotypeFactory() {
+	this.biotypes = {};
 }
 
 BiotypeFactory.prototype = {
@@ -511,32 +532,119 @@ GeneFactory.prototype = {
 */
 
 
-// 
-// Main objects instantiation
+//
+// Session class
 //
 
-var navicell = {}; // namespace
+function Session(name) {
+	this.name = name;
+}
 
-navicell.mapdata = new Mapdata();
-navicell.dataset = new Dataset("navicell");
-navicell.group_factory = new GroupFactory();
-navicell.biotype_factory = new BiotypeFactory();
-navicell.annot_factory = new AnnotationFactory();
+Storage.prototype.setObject = function(key, value) {
+	console.log("JSON: " + JSON.stringify(value));
+    this.setItem(key, JSON.stringify(value));
+}
 
-navicell.CONTINUOUS = 1;
-navicell.DISCRETE = 2;
-navicell.SET = 3;
+Storage.prototype.getObject = function(key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
+}
 
-navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("Copy number data mRNA, microRNA", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", navicell.CONTINUOUS));
-navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", navicell.DISCRET));
-navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", navicell.DISCRETE));
-navicell.biotype_factory.addBiotype(new Biotype("Interaction data", navicell.SET));
-navicell.biotype_factory.addBiotype(new Biotype("Set data", navicell.SET));
+Session.prototype = {
+	name: "",
+	data: null,
+
+	setData: function(data) {
+		//jQuery.localStorage(this.name, data);
+		localStorage.setObject(this.name, data);
+	},
+
+	getData: function() {
+		//return jQuery.localStorage(this.name);
+		return localStorage.getObject(this.name);
+	},
+
+	exists: function() {
+		//return jQuery.localStorage(this.name) !== null;
+		return localStorage.getObject(this.name) !== null;
+	}
+		
+};
+
+function NavicellSession(name) {
+	this.session = new Session(name);
+}
+
+NavicellSession.prototype = {
+
+	reset: function() {
+		this.session.setData(null);
+	},
+
+	read: function() {
+		navicell = this.session.getData();
+	},
+
+	write: function() {
+		this.session.setData(navicell);
+	},
+
+	init: function() {
+		var _navicell = this.session.getData();
+		//console.log("session init: " + _navicell);
+		if (_navicell) {
+			//data.dataset.prototype = Dataset.prototype;
+			_navicell.dataset.geneCount = Dataset.prototype.geneCount;
+			//_navicell.mapdata = Mapdata.prototype;
+			/*
+			console.log("session init2: " + data.dataset);
+			console.log("session init3: " + data.dataset.genes);
+			console.log("session init3.2: " + data.biotype_factory);
+			console.log("session init3.3: " + mapSize(data.biotype_factory.biotypes));
+			console.log("session init4: " + mapSize(data.dataset.genes));
+			console.log("session init4: " + data.dataset.geneCount());
+			*/
+			return _navicell;
+		}
+		return navicell_init();
+	}
+}
+
+//var navicell_session = new NavicellSession("navicell");
+//navicell_session.reset();
+
+function navicell_init() {
+	var _navicell = {}; // namespace
+
+	_navicell.mapdata = new Mapdata();
+	_navicell.dataset = new Dataset("navicell");
+	_navicell.group_factory = new GroupFactory();
+	_navicell.biotype_factory = new BiotypeFactory();
+	_navicell.annot_factory = new AnnotationFactory();
+
+	_navicell.CONTINUOUS = 1;
+	_navicell.DISCRETE = 2;
+	_navicell.SET = 3;
+
+	_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Copy number data mRNA, microRNA", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRET));
+	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", _navicell.DISCRETE));
+	_navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
+	_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
+
+	return _navicell;
+}
+
+var navicell;
+
+if (typeof navicell == 'undefined') {
+	navicell = navicell_init();
+}
 
 // .....................................................
 // unit test

@@ -108,7 +108,7 @@ html, body {
     border-left: solid;
     border-width: 2px;
     border-color: gray;
-/*    background-color: lightyellow;*/
+    /*    background-color: lightyellow;*/
     background-color: rgb(254, 238, 189);
     padding-top: 5px;
 }
@@ -181,7 +181,7 @@ html, body {
 
 #dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_group_status, #dt_datatable_status, #dt_sample_annot {
     font-size: 80%;
-/*    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif"; */
+    /*    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif"; */
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
@@ -306,7 +306,7 @@ label {font-size: 12px; vertical-align: middle;}
 }
 
 #dt_gene_status_table tbody {
-/*    background-color: rgb(200, 238, 0) */
+    /*    background-color: rgb(200, 238, 0) */
     background-color: white;
     color: #222222;
 }
@@ -317,7 +317,7 @@ label {font-size: 12px; vertical-align: middle;}
 }
 
 #dt_datatable_status_table tbody {
-/*    background-color: rgb(200, 238, 0) */
+    /*    background-color: rgb(200, 238, 0) */
     background-color: white;
     color: #222222;
 }
@@ -347,8 +347,11 @@ label {font-size: 12px; vertical-align: middle;}
 }
 
 #dt_sample_annot_table thead {
-    background-color: rgb(0, 0, 60);
-    color: white;
+/*    background-color: rgb(0, 0, 60); */
+/*    color: white; */
+/*    background-color: rgb(20, 28, 169); */
+    background-color: lightblue;
+    color: #555555;
 }
 
 #dt_sample_annot_table tbody {
@@ -360,7 +363,8 @@ label {font-size: 12px; vertical-align: middle;}
     overflow: auto;
     min-height: 400px;
     max-height: 400px;
-    max-width: 700px;
+/*    max-width: 700px; */
+/*    max-width: 900px; */
     padding-left: 20px;
     padding-right: 20px;
 }
@@ -371,14 +375,94 @@ label {font-size: 12px; vertical-align: middle;}
 }
 
 .group_value {
-  color: #333333;
+    color: #333333;
 /*  color: green; */
 }
 
 .group_annot {
-    background: lightblue;
+    background: lightyellow;
 }
 
 .non_group_annot {
 /*    background: #DDDDDD; */
 }
+
+/* TableSorter */
+
+table.tablesorter {
+    font-family:arial;
+/*     background-color: #CDCDCD; */
+    margin:10px 0pt 15px;
+/*    font-size: 8pt; */
+    width: 100%;
+    text-align: left;
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+/*     background-color: #E6EEEE; */
+    border: 1px solid #FFF;
+/*    font-size: 8pt; */
+    padding: 4px;
+}
+
+table.tablesorter thead tr .header {
+    background-image: url(bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+
+/*
+table.tablesorter tbody td {
+    color: #3D3D3D;
+    padding: 4px;
+    background-color: #FFF;
+    vertical-align: top;
+}
+
+table.tablesorter tbody tr.odd td {
+    background-color:#F0F0F6;
+}
+*/
+
+table.tablesorter thead tr .headerSortUp {
+    background-image: url(asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+    background-image: url(desc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+    background-color: #8DBDD8;
+    color: #777777;
+}
+
+/*
+div.tablesorterPager {
+    padding: 10px 0 10px 0;
+    background-color: #D6D2C2;
+    text-align: center;
+}
+
+div.tablesorterPager span {
+    padding: 0 5px 0 5px;
+}
+
+div.tablesorterPager input.prev {
+    width: auto;
+    margin-right: 10px;
+}
+
+div.tablesorterPager input.next {
+    width: auto;
+    margin-left: 10px;
+}
+
+div.tablesorterPager input {
+    font-size: 8px;
+    width: 50px;
+    border: 1px solid #330000;
+    text-align: center;
+}
+*/

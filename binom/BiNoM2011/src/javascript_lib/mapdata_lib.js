@@ -410,7 +410,7 @@ function Group(annot_name, value) {
 	this.annot_name = annot_name;
 	this.value = value;
 	this.name = navicell.group_factory.buildName(annot_name, value);
-	this.html_name = '<span class="group_name">' + annot_name + ':</span>&nbsp;<span class="group_value">' + value + '</span>';
+	this.html_name = '<span class="group_name">' + annot_name.replace(/ /g, '&nbsp;') + ':</span>&nbsp;<span class="group_value">' + value.replace(/ /g, '&nbsp;')  + '</span>';
 }
 
 Group.prototype = {

@@ -327,7 +327,7 @@ function update_sample_annot_table(doc) {
 function update_group_status_table(doc) {
 	var table = $("#dt_group_status_table", doc);
 	table.children().remove();
-	var str = "<thead><tr><th>Group (" + mapSize(navicell.group_factory.group_map) + ")</th>";
+	var str = "<thead><tr><th>Groups (" + mapSize(navicell.group_factory.group_map) + ")</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
 		str += "<th>&nbsp;" + datatable_name + "&nbsp;</th>";
 	}
@@ -453,6 +453,7 @@ function update_datatable_status_table(doc) {
 }
 
 function update_status_tables() {
+	navicell.group_factory.buildGroups();
 	for (var map_name in maps) {
 		var doc = maps[map_name].document;
 		update_sample_status_table(doc);

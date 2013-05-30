@@ -105,14 +105,15 @@ public class Graph {
   public void saveAsCytoscapeXGMML(String fn){
     try{
       FileWriter fw = new FileWriter(fn);
-      fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<graph xmlns=\"http://www.cs.rpi.edu/XGMML\">\n");
+      fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<graph xmlns=\"http://www.cs.rpi.edu/XGMML\" id=\""+name+"\" name=\""+name+"\" label=\""+name+"\">\n");
       for(int i=0;i<Nodes.size();i++){
     	  Node n = (Node)Nodes.get(i);
-    	  fw.write("\t<node id=\""+correct(n.Id)+"\" label=\""+correct(n.NodeLabel)+"\">\n");
+    	  fw.write("\t<node id=\""+correct(n.Id)+"\" name=\""+correct(n.Id)+"\" label=\""+correct(n.NodeLabel)+"\">\n");
     	  for(int j=0;j<n.Attributes.size();j++){
     		  Attribute at = (Attribute)n.Attributes.get(j);
     		  fw.write("\t\t<att name=\""+correct(at.name)+"\" value=\""+correct(at.value)+"\" type=\"string\"/>\n");
     	  }
+    	  fw.write("\t\t<graphics x=\""+n.x+"\" y=\""+n.y+"\"/>\n");
     	  fw.write("\t</node>\n");
       }
       for(int i=0;i<Edges.size();i++){

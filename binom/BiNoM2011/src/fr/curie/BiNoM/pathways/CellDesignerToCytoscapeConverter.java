@@ -1171,7 +1171,12 @@ public class CellDesignerToCytoscapeConverter {
 	       }
 	     }*/
 		   CelldesignerProteinDocument.CelldesignerProtein cpr = proteinMap.get(prot);
-	    	 if(cpr.getCelldesignerListOfModificationResidues()!=null)
+		   if(cpr==null){
+			   CellDesignerToCytoscapeConverter.createSpeciesMap(sbml);
+			   cpr = proteinMap.get(prot);
+		   }
+		     
+	    	 if(cpr!=null)if(cpr.getCelldesignerListOfModificationResidues()!=null)
 		         for(int j=0;j<cpr.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray();j++){
 		           CelldesignerModificationResidueDocument.CelldesignerModificationResidue cmr = cpr.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray(j);
 		           if(cmr.getId().equals(residueID)){

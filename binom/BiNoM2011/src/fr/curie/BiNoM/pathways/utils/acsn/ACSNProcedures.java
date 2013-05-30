@@ -91,7 +91,7 @@ public class ACSNProcedures {
 					fontsize = Integer.parseInt(args[i+1]);
 				
 				if(args[i].equals("--updatedbids"))
-					updateDBconnections = Boolean.parseBoolean(args[i+1]);
+					updateDBconnections = true;
 				if(args[i].equals("--mergeconfig"))
 					mergeConfigFileName = args[i+1];
 				if(args[i].equals("--idfile"))
@@ -219,12 +219,15 @@ public class ACSNProcedures {
       }
       
       public static void updateLinks(String mergeConfigFile, String connectionDBTable) throws Exception{
+    	System.out.println("Updating links to databases...");
       	Vector<String> mergeConfig = Utils.loadStringListFromFile(mergeConfigFile);
       	Vector<String> listFiles = new Vector<String>();
       	for(String s: mergeConfig){
+      		if(!s.contains("update")){
       		String fn = s.split("\t")[0];
       		if((new File(fn)).exists())
       			listFiles.add(fn);
+      		}
       	}
       	SimpleTable tab = new SimpleTable();
       	tab.LoadFromSimpleDatFile(connectionDBTable, true, "\t");
@@ -265,7 +268,7 @@ public class ACSNProcedures {
       				if(foundRowsInTable.size()==0)
       					s = scopy;
       				else
-      					text.append(prefix+" "+s+"\n");
+      					text.append(prefix+"\n"+s+"\n");
       			//	
       			}else{
       				text.append(s+"\n");

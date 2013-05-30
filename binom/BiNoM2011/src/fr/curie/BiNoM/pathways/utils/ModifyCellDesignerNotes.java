@@ -36,6 +36,8 @@ public class ModifyCellDesignerNotes {
 	
 	public boolean insertMapsTagBeforeModules = false;
 	
+	public boolean markMissingInformation = false;
+	
 	public boolean verbose = false;
 	
 	public boolean generateReadableNamesForReactionsAndSpecies = true;
@@ -637,6 +639,7 @@ public class ModifyCellDesignerNotes {
 						hugofound = true;
 				}
 			}
+			if(markMissingInformation)
 			if(!hugofound)
 				getSectionByName(secs, "Identifiers").content = "@@@ "+getSectionByName(secs, "Identifiers").content;
 		}
@@ -657,8 +660,9 @@ public class ModifyCellDesignerNotes {
 		for(int i=1;i<secs.size();i++){
 			annp+=secs.get(i).toString();
 		}
-		if(!Utils.cutFirstLastNonVisibleSymbols(newnonannotated).equals(""))
-			annp+="@@@\n"+newnonannotated;
+		if(markMissingInformation)
+			if(!Utils.cutFirstLastNonVisibleSymbols(newnonannotated).equals(""))
+				annp+="@@@\n"+newnonannotated;
 		_newnonannotated.append(newnonannotated);
 		for(int i=0;i<secs.size();i++) _secs.add(secs.get(i));
 		
@@ -880,10 +884,26 @@ public class ModifyCellDesignerNotes {
 			LineNumberReader lr = new LineNumberReader(new StringReader(text));
 			String s = null;
 			Vector<String> lines = new Vector<String>(); 
+			Vector<String> hashlines = new Vector<String>();
 			while((s=lr.readLine())!=null){
 				if(!Utils.cutFirstLastNonVisibleSymbols(s).equals(""))
-					if(!lines.contains(s)){
-						lines.add(s);
+					if(Utils.cutFirstLastNonVisibleSymbols(s).length()>2){
+						String hash = s.toLowerCase();
+						hash = Utils.replaceString(hash, " ", "");
+						hash = Utils.replaceString(hash, ",", "");
+						hash = Utils.replaceString(hash, ";", "");
+						hash = Utils.replaceString(hash, ".", "");
+						hash = Utils.replaceString(hash, "\t", "");
+						hash = Utils.replaceString(hash, "(", "");
+						hash = Utils.replaceString(hash, ")", "");
+						hash = Utils.replaceString(hash, "*", "");
+						hash = Utils.replaceString(hash, "-", "");
+						hash = Utils.replaceString(hash, "'", "");
+						hash = Utils.replaceString(hash, ":", "");
+						if(!hashlines.contains(hash)){
+							lines.add(s);
+							hashlines.add(hash);
+						}
 					}
 			}
 			for(int j=0;j<lines.size();j++)

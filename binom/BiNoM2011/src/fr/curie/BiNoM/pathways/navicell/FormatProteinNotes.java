@@ -370,6 +370,9 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 								res.append(xtag).append(value).append("&nbsp;");
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else if (tag.equals("MODULE")) {
+								if(mapInfo==null)
+									System.out.println("ERROR: Map info = null for "+value);
+								else{
 								ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
 								if (moduleInfo != null) {
 									assert moduleInfo.url != null;
@@ -377,6 +380,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 								}
 								res.append(xtag).append(value).append("&nbsp;");
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
+								}
 							} else {
 								String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
 								if (isValidEntry(entry, 6) && entry[6].equalsIgnoreCase("icon")) {

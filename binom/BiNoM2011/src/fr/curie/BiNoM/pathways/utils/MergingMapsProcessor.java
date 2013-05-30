@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -271,7 +272,8 @@ public class MergingMapsProcessor {
 		System.out.println("loading file "+mapList.get(0).fileName+"...");
 		Date time = new Date();
 		String text = Utils.loadString(mapList.get(0).fileName);
-		generateRandomPrefix();
+		//generateRandomPrefifx();
+		makePrefix(text);
 		text = addPrefixToIds(text);
 		cdFileString = text;
 		setIdsAndSave(mapList.get(0).fileName);
@@ -326,7 +328,8 @@ public class MergingMapsProcessor {
 		Date time = new Date();
 		System.out.println("loading file "+fileName+"...");
 		String text = Utils.loadString(fileName);
-		generateRandomPrefix();
+		//generateRandomPrefix();
+		makePrefix(text);
 		text = addPrefixToIds(text);
 		this.cdFileString = text;
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
@@ -825,6 +828,27 @@ public class MergingMapsProcessor {
 						}
 					}
 				}
+
+				// asRNAs
+				if(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference()!=null){
+					String asrna = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
+					if(asRnaMap.get(asrna)!=null){
+						xs.setStringValue(asRnaMap.get(asrna));
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
+						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference().set(xs);
+						xs.setStringValue(getAsRNA(cd1,asRnaMap.get(asrna)).getName()); 
+						csp.setName(xs);
+						if (verbose)
+							System.out.println("Changed asrna reference in "+csp.getId()+" from "+asrna+" ("+getRNA(cd1,asrna).getName()+") to "+asRnaMap.get(asrna)+" ("+getAsRNA(cd1,asRnaMap.get(asrna)).getName()+")");
+						CellDesigner.entities = CellDesigner.getEntities(cd1);
+						if (verbose) {
+							System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
+							System.out.println();
+						}
+					}
+				}				
+				
 			}
 		}
 
@@ -1153,6 +1177,22 @@ public class MergingMapsProcessor {
 		prefix += "_";
 	}
 	
+	private void makePrefix(String text){
+		generateRandomPrefix();
+		StringTokenizer st = new StringTokenizer(text," =\"><");
+		while(st.hasMoreTokens()){
+			String s = st.nextToken();
+			if(s.equals("id")){
+				prefix = st.nextToken();
+				if(prefix.length()>4)
+					prefix = prefix.substring(0, 4);
+				prefix+="_";
+				break;
+			}
+		}
+	}
+	
+	
 	private void addLayerID(SbmlDocument cd) {
 		String modelId = cd.getSbml().getModel().getId();
 		
@@ -1197,9 +1237,11 @@ public class MergingMapsProcessor {
 		cd2 = CellDesigner.loadCellDesigner(source);
 		
 		HashMap<String, String> spMap = new HashMap<String, String>();
+		if(cd1.getSbml().getModel().getListOfSpecies()!=null)
 		for (SpeciesDocument.Species targetSpecies : cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String targetID = targetSpecies.getId();
 			boolean found = false;
+			if(cd2.getSbml().getModel().getListOfSpecies()!=null)
 			for (SpeciesDocument.Species sourceSpecies : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 				String sourceID = sourceSpecies.getId();
 				if (sourceID.endsWith(targetID)) {
@@ -1214,9 +1256,11 @@ public class MergingMapsProcessor {
 		}
 		
 		HashMap<String, String> reMap = new HashMap<String, String>();
+		if(cd1.getSbml().getModel().getListOfReactions()!=null)
 		for (ReactionDocument.Reaction targetReaction : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
 			String targetID = targetReaction.getId();
 			boolean found = false;
+			if(cd2.getSbml().getModel().getListOfReactions()!=null)
 			for (ReactionDocument.Reaction sourceReaction : cd2.getSbml().getModel().getListOfReactions().getReactionArray()) {
 				String sourceID = sourceReaction.getId();
 				if (sourceID.endsWith(targetID)) {
@@ -1405,7 +1449,7 @@ public class MergingMapsProcessor {
 		mn.moduleGMTFileName = null;
 		mn.guessIdentifiers = false;
 		mn.insertMapsTagBeforeModules = false;
-		mn.removeEmptySections = false;
+		mn.removeEmptySections = true;
 		mn.removeInvalidTags = true;
 		mn.moveNonannotatedTextToReferenceSection = false;
 
@@ -1436,7 +1480,7 @@ public class MergingMapsProcessor {
 			mn.moduleGMTFileName = null;
 			mn.guessIdentifiers = false;
 			mn.insertMapsTagBeforeModules = true;
-			mn.removeEmptySections = false;
+			mn.removeEmptySections = true;
 			mn.removeInvalidTags = true;
 			mn.moveNonannotatedTextToReferenceSection = false;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
@@ -1475,7 +1519,7 @@ public class MergingMapsProcessor {
 			mn.moduleGMTFileName = null;
 			mn.guessIdentifiers = false;
 			mn.insertMapsTagBeforeModules = true;
-			mn.removeEmptySections = false;
+			mn.removeEmptySections = true;
 			mn.removeInvalidTags = true;
 			mn.moveNonannotatedTextToReferenceSection = false;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);

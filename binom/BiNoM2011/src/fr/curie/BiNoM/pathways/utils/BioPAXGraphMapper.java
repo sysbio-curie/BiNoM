@@ -53,29 +53,25 @@ import fr.curie.BiNoM.pathways.*;
 public class BioPAXGraphMapper {
 
   /**
-   * Map from node ids to Node objects 
+   * Map from node ids and object uris to Node objects 
    */
   public HashMap<String,Node> nodes = new HashMap<String,Node>();
   /**
-   * Map from complete uris to physicalEntityParticipants
+   * Map from entity uris to reference uris 
    */
-  public HashMap participants = new HashMap();
-  /**
-   * Map from complete uris to entity objects
-   */
-  public HashMap entities = new HashMap();
+  public HashMap<String, String> entityToReferenceUris = new HashMap<String, String>();
   /**
    * Map from complete uris to interaction objects
    */
-  public HashMap interactions = new HashMap();
+  public HashMap<String,Interaction> interactions = new HashMap();
   /**
    * Map from complete uris to pathwaySteps objects
    */
-  public HashMap pathwaySteps = new HashMap();
+  public HashMap<String, PathwayStep> pathwaySteps = new HashMap();
   /**
    * Map from complete uris to pathway objects
    */
-  public HashMap pathways = new HashMap();
+  public HashMap<String, Pathway> pathways = new HashMap();
   /**
    * Map from edge ids to Edge objects 
    */
@@ -124,6 +120,44 @@ public class BioPAXGraphMapper {
         PathwayStep p = (PathwayStep)pl.get(i);
         pathwaySteps.put(p.uri(),p);
     }
+    System.out.println("Hashing entity to reference connections...");
+    List<PhysicalEntity> l = biopax_DASH_level3_DOT_owlFactory.getAllProtein(biopax.model);
+    for(PhysicalEntity p: l) 
+		if(((Protein)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((Protein)p).getEntityReference().uri());
+    l = biopax_DASH_level3_DOT_owlFactory.getAllDna(biopax.model);
+    for(PhysicalEntity p: l) 
+		if(((Dna)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((Dna)p).getEntityReference().uri());
+    l = biopax_DASH_level3_DOT_owlFactory.getAllRna(biopax.model);
+    for(PhysicalEntity p: l)
+		if(((Rna)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((Rna)p).getEntityReference().uri());
+	l = biopax_DASH_level3_DOT_owlFactory.getAllSmallMolecule(biopax.model);
+	for(PhysicalEntity p: l)
+		if(((SmallMolecule)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((SmallMolecule)p).getEntityReference().uri());
+	l = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(biopax.model);
+	for(PhysicalEntity p: l) 
+		if(((DnaRegion)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((DnaRegion)p).getEntityReference().uri());
+	l = biopax_DASH_level3_DOT_owlFactory.getAllRnaRegion(biopax.model);
+	for(PhysicalEntity p: l)
+		if(((RnaRegion)p).getEntityReference()==null)
+			System.out.println("EntityReference = null for "+p.uri());
+		else
+			entityToReferenceUris.put(p.uri(), ((RnaRegion)p).getEntityReference().uri());
+
 
       System.out.println("Generating names...");
       biopaxNaming.generateNames(biopax,false);
@@ -146,28 +180,20 @@ public class BioPAXGraphMapper {
       pl = biopax_DASH_level3_DOT_owlFactory.getAllPublicationXref(biopax.model);
       for (int i=0;i<pl.size();i++) addPublicationNode((PublicationXref)pl.get(i));
 
-      // add physicalEntities
+      // add entityReferences
       System.out.println("Adding entities...");
       
-      List el = biopax_DASH_level3_DOT_owlFactory.getAllProtein(biopax.model);
-      for(int i=0;i<el.size();i++) addEntityNode((Entity)el.get(i));
-      el = biopax_DASH_level3_DOT_owlFactory.getAllSmallMolecule(biopax.model);
-      for(int i=0;i<el.size();i++) addEntityNode((Entity)el.get(i));
-      el = biopax_DASH_level3_DOT_owlFactory.getAllDna(biopax.model);
-      for(int i=0;i<el.size();i++) addEntityNode((Entity)el.get(i));
-      el = biopax_DASH_level3_DOT_owlFactory.getAllRna(biopax.model);
-      for(int i=0;i<el.size();i++) addEntityNode((Entity)el.get(i));
-      el = biopax_DASH_level3_DOT_owlFactory.getAllPhysicalEntity(biopax.model);
-      for(int i=0;i<el.size();i++) addEntityNode((Entity)el.get(i));
+      List el = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(biopax.model);
+      for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllSmallMoleculeReference(biopax.model);
+      for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllDnaReference(biopax.model);
+      for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllRnaReference(biopax.model);
+      for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllEntityReference(biopax.model);
+      for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
       
-      el = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
-      for(int i=0;i<el.size();i++) {
-    	  addEntityNode((Complex)el.get(i));
-      }
-
-      el = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
-      for(int i=0;i<el.size();i++) addComplexNode((Complex)el.get(i));
-
       // Add species
       System.out.println("Adding species...");
 
@@ -177,6 +203,12 @@ public class BioPAXGraphMapper {
         BioPAXToSBMLConverter.BioPAXSpecies bs = (BioPAXToSBMLConverter.BioPAXSpecies)bsc.independentSpecies.get(id);
         addSpeciesNode(bs);
       }
+
+      // Connect complex to entityReferences
+      el = biopax_DASH_level3_DOT_owlFactory.getAllComplex(biopax.model);
+      for(int i=0;i<el.size();i++) 
+    	  addComplexNode((Complex)el.get(i));
+      
 
       // Add conversion reactions
       System.out.println("Adding conversions...");
@@ -226,9 +258,11 @@ public class BioPAXGraphMapper {
       for(int i=0;i<el.size();i++) addControlEdge((Control)el.get(i));
       el = biopax_DASH_level3_DOT_owlFactory.getAllModulation(biopax.model);
       for(int i=0;i<el.size();i++) addControlEdge((Control)el.get(i));
+      
+
   }
 
-  private Node addEntityNode(Entity en) throws Exception{
+  private Node addEntityReferenceNode(EntityReference en) throws Exception{
 	  Node n = null;
 	  String name = biopaxNaming.getNameByUri(en.uri());
 	  String id = getID(en);
@@ -266,6 +300,7 @@ public class BioPAXGraphMapper {
 		  }
 		  nodes.put(id,n);
 		  nodes.put(en.uri(),n);
+		  nodes.put(getID(en),n);
 		  connectEntityToPublications(en);
 	  }else{
 		  System.out.println("WARNING!!! DOUBLED NAME "+id+"\tName: "+name);
@@ -276,18 +311,19 @@ public class BioPAXGraphMapper {
 
  
   private Node addComplexNode(Complex compl) throws Exception{
-	  Node n = nodes.get(getID(compl));
+	  Node n = nodes.get(compl.uri());
 	  if(n==null)
 		  System.out.println("WARNING!!! Something strange, complex node is not found: "+getID(compl));
 	  else{
 		  Iterator itc = compl.getComponent();
 		  while(itc.hasNext()){
-			  //TODO this change should be tested!!!
 			  PhysicalEntity pep = (PhysicalEntity)itc.next();
-			  String idcomp = getID(pep);
-			  Node n1 = nodes.get(idcomp);
+			  String refuri = "";
+			  if(entityToReferenceUris.get(pep.uri())!=null)
+				  refuri = entityToReferenceUris.get(pep.uri());
+			  Node n1 = nodes.get(refuri);
 			  if(n1==null)
-				  System.out.println("WARNING!!! COMPLEX COMPONENT IS NOT INCLUDED: "+idcomp);
+				  System.out.println("WARNING!!! COMPLEX COMPONENT IS NOT INCLUDED: "+getID(compl));
 			  else{
 				  Edge ee = new Edge(); 
 				  ee.Id = n1.Id+" (CONTAINS) "+n.Id;
@@ -319,10 +355,11 @@ public class BioPAXGraphMapper {
 			  n.Attributes.add(new Attribute("BIOPAX_URI",getID(pep)));
 			  n.Attributes.add(new Attribute("BIOPAX_URI",pep.uri()));
 			  nodes.put(pep.uri(),n);
+			  nodes.put(getID(pep),n);			  
 		  }
 		  PhysicalEntity ent = (PhysicalEntity)bs.sinonymSpecies.get(0);
 		  if(ent!=null){
-			  Node n1 = nodes.get(getID(ent));
+			  Node n1 = nodes.get(entityToReferenceUris.get(ent.uri()));
 			  /*
 			   * ebo 01.2012
 			   * little kludge here: to avoid systematic self loops, test if 
@@ -365,6 +402,7 @@ public class BioPAXGraphMapper {
       
       nodes.put(id,n);
       nodes.put(conv.uri(),n);
+      nodes.put(getID(conv),n);
       connectEntityToPublications(conv);
       interactions.put(conv.uri(),conv);
       Vector reactants = new Vector();
@@ -502,15 +540,15 @@ public class BioPAXGraphMapper {
 	  if (inter_controlled != null) {
 		  while(pat_controller.hasNext()) {
 			  Pathway p = (Pathway) pat_controller.next();
-			  Node controller_node = nodes.get(getID(p));
-			  Node controlled_node = nodes.get(getID(inter_controlled));
+			  Node controller_node = nodes.get(p.uri());
+			  Node controlled_node = nodes.get(inter_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
 		  while(pe_controller.hasNext()) {
 			  PhysicalEntity pe = (PhysicalEntity) pe_controller.next();
-			  Node controller_node = nodes.get(getID(pe));
-			  Node controlled_node = nodes.get(getID(inter_controlled));
+			  Node controller_node = nodes.get(pe.uri());
+			  Node controlled_node = nodes.get(inter_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
@@ -519,15 +557,15 @@ public class BioPAXGraphMapper {
 	  if (pat_controlled != null) {
 		  while(pat_controller.hasNext()) {
 			  Pathway p = (Pathway) pat_controller.next();
-			  Node controller_node = nodes.get(getID(p));
-			  Node controlled_node = nodes.get(getID(pat_controlled));
+			  Node controller_node = nodes.get(p.uri());
+			  Node controlled_node = nodes.get(pat_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
 		  while(pe_controller.hasNext()) {
 			  PhysicalEntity pe = (PhysicalEntity) pe_controller.next();
-			  Node controller_node = nodes.get(getID(pe));
-			  Node controlled_node = nodes.get(getID(pat_controlled));
+			  Node controller_node = nodes.get(pe.uri());
+			  Node controlled_node = nodes.get(pat_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
@@ -536,15 +574,15 @@ public class BioPAXGraphMapper {
 	  if (conv_controlled != null) {
 		  while(pat_controller.hasNext()) {
 			  Pathway p = (Pathway) pat_controller.next();
-			  Node controller_node = nodes.get(getID(p));
-			  Node controlled_node = nodes.get(getID(conv_controlled));
+			  Node controller_node = nodes.get(p.uri());
+			  Node controlled_node = nodes.get(conv_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
 		  while(pe_controller.hasNext()) {
 			  PhysicalEntity pe = (PhysicalEntity) pe_controller.next();
-			  Node controller_node = nodes.get(getID(pe));
-			  Node controlled_node = nodes.get(getID(conv_controlled));
+			  Node controller_node = nodes.get(pe.uri());
+			  Node controlled_node = nodes.get(conv_controlled.uri());
 			  if (controller_node != null && controlled_node != null)
 				  this.addControlEdgeElement(co, controller_node, controlled_node);
 		  }
@@ -628,6 +666,7 @@ public class BioPAXGraphMapper {
 			  n.Attributes.add(new Attribute("BIOPAX_URI",mi.uri()));
 			  nodes.put(intn,n);
 			  nodes.put(mi.uri(),n);
+			  nodes.put(getID(mi),n);
 			  connectEntityToPublications(mi);
 			  for (int i=0;i<v.size();i++) {
 				  String ur = v.get(i);
@@ -668,6 +707,7 @@ public class BioPAXGraphMapper {
           n.NodeLabel = name;
           graph.addNode(n);
           nodes.put(p.uri(),n);
+          nodes.put(getID(p),n);
           nodes.put(id,n);
           nodes.put(name,n);
           n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","Pathway"));
@@ -731,6 +771,7 @@ public class BioPAXGraphMapper {
           graph.addNode(n);
           n.NodeLabel = Utils.cutUri(ps.uri());
           nodes.put(ps.uri(),n);
+          nodes.put(getID(ps),n);
           n.Attributes.add(new Attribute("BIOPAX_NODE_TYPE","PathwayStep"));
           n.Attributes.add(new Attribute("BIOPAX_URI",ps.uri()));
       }
@@ -776,6 +817,7 @@ public class BioPAXGraphMapper {
           n.Id = name; n.NodeLabel = name;
           graph.addNode(n);
           nodes.put(in.uri(),n);
+          nodes.put(getID(in),n);
           nodes.put(name,n);
           String iname = in.getClass().getName();
           iname = Utils.replaceString(iname,"Impl","");
@@ -846,6 +888,7 @@ public class BioPAXGraphMapper {
         n.Attributes.add(new Attribute("BIOPAX_URI",pub.uri()));
         nodes.put(id,n);
         nodes.put(pub.uri(),n);
+        nodes.put(getID(pub),n);
       }else{
         System.out.println("WARNING!!! DOUBLED NAME "+id+"\tName: "+name);
         n = nodes.get(id);
@@ -876,6 +919,31 @@ public class BioPAXGraphMapper {
       }
     }
   }
+  
+  private void connectEntityToPublications(EntityReference en) throws Exception{
+	    Iterator it = en.getXref();
+	    if(it!=null){
+	      while(it.hasNext()){
+	        Xref xrf = (Xref)it.next();
+	        Node ent = nodes.get(en.uri());
+	        Node pub = nodes.get(xrf.uri());
+	        if((ent!=null)&&(pub!=null)){
+	          Edge e = new Edge(); 
+	          e.Id = pub.Id+" ("+"REFERENCE"+") "+ent.Id;
+	          e.EdgeLabel = "REFERENCE";
+	          graph.addEdge(e);
+	          e.Node1 = pub;
+	          e.Node2 = ent;
+	          e.Attributes.add(new Attribute("BIOPAX_EDGE_TYPE","REFERENCE"));
+	          e.Attributes.add(new Attribute("BIOPAX_EDGE_ID",pub.Id+"("+"NEXT"+")"+ent.Id));
+	        }else{
+	          if(ent==null)
+	            System.out.println("WARNING!!! Entity not found "+Utils.cutUri(en.uri()));
+	        }
+	      }
+	    }
+	  }
+  
 
   private String getID(com.ibm.adtech.jastor.Thing thing){
     String id = "";

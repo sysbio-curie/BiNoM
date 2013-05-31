@@ -101,7 +101,6 @@ html, body {
 
 #datatable_input {
     top: 70%;
-    background-color: white;
     position: absolute;
     right: 0;
     padding: 0;
@@ -112,8 +111,8 @@ html, body {
     border-left: solid;
     border-width: 2px;
     border-color: gray;
-    /*    background-color: lightyellow;*/
-    background-color: rgb(254, 238, 189);
+    /*background-color: rgb(254, 238, 189);*/
+    background-color: rgb(255, 238, 195);
     padding-top: 5px;
 }
 
@@ -445,7 +444,7 @@ table.tablesorter thead tr .headerSortUp {
 }
 
 table.tablesorter thead tr .headerSortDown {
-    background-image: url(desc.gif);
+/*    background-image: url(desc.gif); */
 }
 
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {

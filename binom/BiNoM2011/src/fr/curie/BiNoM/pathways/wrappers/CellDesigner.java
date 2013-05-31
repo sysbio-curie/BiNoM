@@ -75,15 +75,26 @@ public static String reactionNodeTypes[] = {
    * @param sbml
    * @param fn
    */
+  
+  public static void main(String args[]){
+	  try{
+		  
+		  CellDesigner cd = new CellDesigner();
+		  SbmlDocument sbml = cd.loadCellDesigner("c:/datas/navicell/test/merged/merged_master.xml");
+		  cd.saveCellDesigner(sbml,"c:/datas/navicell/test/merged/merged_master1.xml");
+		  
+	  }catch(Exception e){
+		  e.printStackTrace();
+	  }
+  }
+  
+  
   public static void saveCellDesigner(SbmlDocument sbml, String fn){
    try{
      FileWriter fw = new FileWriter(fn);
      String s = sbml.toString();
      //s = parseCellDesigner.replaceString(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\"");
      s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
-     s = Utils.replaceStringCount(s,"&lt;&amp;","<");
-     s = Utils.replaceStringCount(s,"<&","^^^");
-     s = Utils.replaceStringCount(s,"^^^","<");
      
      
      /*s = Utils.replaceStringCount(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
@@ -103,16 +114,19 @@ public static String reactionNodeTypes[] = {
      s = Utils.replaceStringCount(s, "<notes xsi:nil=\"true\"/>", "");
      s = Utils.replaceStringCount(s,"<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");*/
 
-     HashMap<String, String> replaceMap = new HashMap<String, String>(); 
+     // We have to do these replacements sequentially because other depend on them
+     s = s.replaceAll("<&","^^^");
+     
+     // Now the fast replacement mode
+     HashMap<String, String> replaceMap = new HashMap<String, String>();
+     replaceMap.put("^^^","<");
+     replaceMap.put("celldesigner_","celldesigner:");
+     replaceMap.put("&lt;&amp;","<");
      replaceMap.put("xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
      replaceMap.put("SpeciesAnnotation","annotation");
      replaceMap.put("ReactionAnnotation","annotation");
-     replaceMap.put("celldesigner_","celldesigner:");
-     //replaceMap.put("&lt;&amp;","<");
      replaceMap.put("<![CDATA[","");
      replaceMap.put("]]>","");
-     //replaceMap.put("<&","^^^");
-     //replaceMap.put("^^^","<");
      replaceMap.put("<math>","<math xmlns=\"http://www.w3.org/1998/Math/MathML\">");
      replaceMap.put("<html>","<html xmlns=\"http://www.w3.org/1999/xhtml\">");
      replaceMap.put("&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
@@ -120,10 +134,12 @@ public static String reactionNodeTypes[] = {
      replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xhtml\">","");
      replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
      replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xh","");
-     replaceMap.put("<celldesigner:notes xsi:nil=\"true\"/>", "");
      replaceMap.put("<notes xsi:nil=\"true\"/>", "");
      replaceMap.put("<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");
+     
      s = Utils.replaceByList(s, replaceMap);
+     
+     s = s.replaceAll("<celldesigner:notes xsi:nil=\"true\"/>", "");
      
      fw.write(s);
      fw.close();
@@ -140,53 +156,31 @@ public static String reactionNodeTypes[] = {
  public static org.sbml.x2001.ns.celldesigner.SbmlDocument loadCellDesigner(String fn){
    org.sbml.x2001.ns.celldesigner.SbmlDocument sbmlDoc = null;
    try{
-   /*String filename = fn;
-   LineNumberReader lr = new LineNumberReader(new FileReader(fn));
-   String s = null;
-   FileWriter fw = new FileWriter("~temp.xml");
-   while((s=lr.readLine())!=null){
-     String sp = Utils.replaceString(s,"celldesigner:","celldesigner_");
-     //sp = Utils.replaceString(sp,"xmlns=\"http://www.sbml.org/sbml/level2\"","xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"");
-     sp = Utils.replaceString(sp,"\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
-     fw.write(sp+"\r\n");
-   }
-   fw.close();
-
-   //s = Utils.loadString(fn);
-   //String sp = Utils.replaceString(s,"xmlns=\"http://www.sbml.org/sbml/level2\"","xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"");
-   //sbmlDoc = SbmlDocument.Factory.parse(sp);
-
-   sbmlDoc = org.sbml.x2001.ns.celldesigner.SbmlDocument.Factory.parse(new File("~temp.xml"));
-   */
    String text = Utils.loadString(fn);
    
    // Here we have to make a correction for the version 4.1 of CellDesigner
+   /*
    text = text.replaceAll("<celldesigner:extension>", "");
    text = text.replaceAll("</celldesigner:extension>", "");
    text = text.replaceAll("/version4", "");
    text = text.replaceAll("version=\"4\"", "version=\"1\"");
-   
-   //text = Utils.replaceString(text,"celldesigner:","celldesigner_");
-   //System.out.print("replacing celldesigner string... ");
    text = text.replaceAll("celldesigner:", "celldesigner_");
-   text = Utils.replaceString(text,"\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
-   //System.out.print("replacing header... ");
-   //text = text.replaceAll("\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
-
-   //String newheader = "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
-   //String oldheader = "<sbml xmlns=\"http://www.sbml.org/sbml/level2\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"1\">";
-   //text = text.replaceAll(newheader,oldheader);
+   text = Utils.replaceString(text,"\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");*/
    
-   StringReader st1 = new StringReader(text);
+   HashMap<String, String> replaceMap = new HashMap<String, String>(); 
+   replaceMap.put("<celldesigner:extension>", "");
+   replaceMap.put("</celldesigner:extension>", "");
+   text = Utils.replaceByList(text, replaceMap);
+   replaceMap.put("/version4", "");
+   replaceMap.put("version=\"4\"", "version=\"1\"");		   
+   replaceMap.put("celldesigner:", "celldesigner_");   
+   text = Utils.replaceByList(text, replaceMap);
    
-   //LineNumberReader lr = new LineNumberReader(st1);
-   //for(int i=0;i<4;i++)
-   //   System.out.println(lr.readLine());
-   
-   StringReader st = new StringReader(text);   
-   //System.out.print("parsing the file... ");
+   text = text.replaceAll("\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
+		   
+   StringReader st = new StringReader(text);
    sbmlDoc = org.sbml.x2001.ns.celldesigner.SbmlDocument.Factory.parse(st);
-   //System.out.print("\n");
+   
    }catch(Exception e){
      e.printStackTrace();
    }
@@ -207,13 +201,21 @@ public static String reactionNodeTypes[] = {
 	 try {
 
 		 // Here we have to make a correction for the version 4.1 of CellDesigner
-		 text = text.replaceAll("<celldesigner:extension>", "");
+		 /*text = text.replaceAll("<celldesigner:extension>", "");
 		 text = text.replaceAll("</celldesigner:extension>", "");
 		 text = text.replaceAll("/version4", "");
 		 text = text.replaceAll("version=\"4\"", "version=\"1\"");
-
 		 text = text.replaceAll("celldesigner:", "celldesigner_");
 		 text = Utils.replaceString(text,"\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
+		 */
+		   HashMap<String, String> replaceMap = new HashMap<String, String>(); 
+		   replaceMap.put("<celldesigner:extension>", "");
+		   replaceMap.put("</celldesigner:extension>", "");
+		   replaceMap.put("/version4", "");
+		   replaceMap.put("version=\"4\"", "version=\"1\"");		   
+		   replaceMap.put("celldesigner:", "celldesigner_");   
+		   replaceMap.put("\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
+		   text = Utils.replaceByList(text, replaceMap);		 
 
 		 StringReader st = new StringReader(text);   
 		 sbmlDoc = org.sbml.x2001.ns.celldesigner.SbmlDocument.Factory.parse(st);

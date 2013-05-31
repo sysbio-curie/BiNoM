@@ -184,16 +184,16 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		final StringBuffer sb = new StringBuffer(start == null ? "" : start);
 		if (modifications != null)
 		{
-			/*
+			
 			if (sb.length() > 0) {
 				sb.append("\n");
 			}				
-			*/
+			
 
 			for (final Modification sp : modifications)
 			{
 				final String notes = sp.getNotes();
-				if (notes != null)
+				if (notes != null)if(!notes.trim().equals(""))
 				{
 					if(sp.getName()==null){
 						sb.append("NONAME");

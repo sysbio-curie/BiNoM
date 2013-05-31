@@ -2901,7 +2901,7 @@ public class ProduceClickableMap
 		fw.append("<b>").append(human == null ? ent.getCls() : human).append(" ").append(h.add(ent.getName())).append("</b> ");
 		show_shapes_on_master_map(h, fw, ent, wp);
 		visible_debug(fw, ent.getId());
-		fw.append("<Br>");
+		fw.append("<br>");
 		format.full(fw, h, ent, cd, ent.getPostTranslational(), modules, wp);
 		format_modifications(h, fw, true, ent.getModifications(), pass2, wp);
 
@@ -3173,7 +3173,7 @@ public class ProduceClickableMap
 		Linker wp)
 	{
 		fw.append("<hr>");
-		fw.append(heading_font_on).append("Modifications:").append(heading_font_off).append("\n");
+		fw.append(heading_font_on).append("Modifications:").append(heading_font_off).append("<br>\n");
 
 		final String complexes = "Participates in complexes:";
 		boolean complex = false;
@@ -3191,7 +3191,7 @@ public class ProduceClickableMap
 				if (!show_complexes)
 					break;
 				//fw.append(heading_font_on).append(complexes).append(heading_font_off).append("<br>");
-				fw.append(heading_font_on).append(complexes).append(heading_font_off);
+				fw.append(heading_font_on).append(complexes).append(heading_font_off).append("<br>\n");
 			}
 			if (!m.getCompartment().equals(compartment))
 			{
@@ -3227,7 +3227,7 @@ public class ProduceClickableMap
 	
 	static StringBuffer visible_debug(StringBuffer fw, String v)
 	{
-		if (true)
+		if (false)
 			fw.append(" <font size=\"3\" face=\"sans-serif\" color=\"green\">").append(v).append("</font>");
 		return fw;
 	}

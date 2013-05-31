@@ -295,7 +295,7 @@ public class MergingMapsProcessor {
 		
 		setAndLoadFileName2(mapList.get(1).fileName);
 		time = new Date();
-		System.out.print("merging file "+mapList.get(1).fileName+"...");
+		System.out.println("merging file "+mapList.get(1).fileName+"...");
 		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
 		//System.out.println(" shift "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		produceCandidateMergeLists();
@@ -313,7 +313,7 @@ public class MergingMapsProcessor {
 			// set new file 2 name
 			setAndLoadFileName2(mapList.get(i).fileName);
 			time = new Date();
-			System.out.print("merging file "+mapList.get(i).fileName+"...");
+			System.out.println("merging file "+mapList.get(i).fileName+"...");
 			shiftCoordinates(cd2, mapList.get(i).deltaX, mapList.get(i).deltaY);
 			// create new common species names
 			produceCandidateMergeLists();
@@ -651,6 +651,98 @@ public class MergingMapsProcessor {
 		String res = new String(ctextnew,0,in);
 		return res;
 	}
+	
+	public static String replaceCellDesignerPrefixList(String text, HashMap<String, String> map){
+		char ctext[] = text.toCharArray();
+		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
+		// some hashing of ids by first two letters
+		HashMap<String, Vector<char[]>> hash = new HashMap<String, Vector<char[]>>();
+		int maxidlength = 0;
+		
+		Vector<String> ids = new Vector<String>();
+		for(String s: map.keySet()){
+			ids.add(s);
+		}
+		
+		for(String s: ids){
+			char cs[] = s.toCharArray();
+			String s2 = s.substring(0, 2);
+			Vector<char[]> vcs = new Vector<char[]>(); 
+			if(hash.get(s2)!=null)
+				vcs = hash.get(s2);
+			vcs.add(cs);
+			hash.put(s2, vcs);
+			if(cs.length>maxidlength)
+				maxidlength = cs.length;
+		}
+		
+		int i=0; int textlength = ctext.length-maxidlength-1;
+		int in=0;
+		while(i<textlength){
+			char h[] = new char[2];
+			h[0] = ctext[i];
+			h[1] = ctext[i+1];
+			String s2 = new String(h);
+			//if(s2.equals("ks")){
+			//	System.out.println(i+"\t"+new String(ctext,i,5));
+			//}
+			Vector<char[]> candidates = hash.get(s2);
+			if(candidates==null){ 
+				ctextnew[in++] = ctext[i++];
+			}else{
+
+				boolean replacementmade = false;
+				for(char cid[] :candidates){
+					
+				boolean idfound = true;
+				
+				for(int j=0;j<cid.length;j++)
+					if(ctext[i+j]!=cid[j]){
+						idfound = false;
+						break;
+					}
+
+				if(idfound){
+				boolean goodcontext = true;
+				/*if((ctext[i-1]=='\"')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='>')&&(ctext[i+cid.length]=='<'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;*/
+				char cprefix[] = map.get(new String(cid)).toCharArray();
+				if(goodcontext){
+					for(int k=0;k<cprefix.length;k++)
+						ctextnew[in+k] = cprefix[k];
+					in+=cprefix.length;
+					i+=cid.length;
+					replacementmade = true;
+					break;
+				}
+			}
+			}
+			if(!replacementmade)
+				ctextnew[in++] = ctext[i++];
+				
+			}
+		}
+		
+		for(int k=textlength;k<ctext.length;k++)
+			ctextnew[in++] = ctext[k];
+		
+		
+		String res = new String(ctextnew,0,in);
+		return res;
+	}
+	
 	
 	public static String replaceCellDesignerPrefix(String text, String id, String prefix){
 		//text = text.replaceAll("\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
@@ -1318,17 +1410,29 @@ public class MergingMapsProcessor {
 	 */
 	private void setIdsAndSave(String fileName) {
 		
-		for (String id : this.proteinMap.keySet())
-			cdFileString = cdFileString.replaceAll(id, proteinMap.get(id));
+		HashMap<String, String> map = new HashMap<String, String>();
+		
+		for (String id : this.proteinMap.keySet()) 
+			if(proteinMap.get(id)!=null)
+				map.put(id, proteinMap.get(id));
+		//cdFileString = cdFileString.replaceAll(id, proteinMap.get(id));
 		
 		for (String id : this.rnaMap.keySet())
-			cdFileString = cdFileString.replaceAll(id, rnaMap.get(id));
+			if(rnaMap.get(id)!=null)
+				map.put(id, rnaMap.get(id));
+			//cdFileString = cdFileString.replaceAll(id, rnaMap.get(id));
 		
 		for (String id : this.geneMap.keySet())
-			cdFileString = cdFileString.replaceAll(id, geneMap.get(id));
+			if(geneMap.get(id)!=null)
+				map.put(id, geneMap.get(id));
+			//cdFileString = cdFileString.replaceAll(id, geneMap.get(id));
 		
 		for (String id : this.asRnaMap.keySet())
-			cdFileString = cdFileString.replaceAll(id, asRnaMap.get(id));
+			if(asRnaMap.get(id)!=null)
+				map.put(id, asRnaMap.get(id));
+			
+			//cdFileString = cdFileString.replaceAll(id, asRnaMap.get(id));
+		cdFileString = replaceCellDesignerPrefixList(cdFileString, map);
 		
 		if (fileName.endsWith(".xml")) {
 			fileName = fileName.substring(0, fileName.length() - 4);

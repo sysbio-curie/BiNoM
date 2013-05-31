@@ -83,11 +83,15 @@ Mapdata.prototype = {
 function Dataset(name) {
 	this.name = name;
 	this.genes = {};
+	this.datatable_id = 1;
+	this.datatables = {};
+	this.datatables_id = {};
 }
 
 Dataset.prototype = {
 	name: "",
 	datatables: {},
+	datatables_id: {},
 	genes: {},
 	samples: {},
 
@@ -103,10 +107,25 @@ Dataset.prototype = {
 		return mapSize(this.datatables);
 	},
 
+	readDatatable: function(biotype_name, name, file) {
+		var datatable =  new Datatable(this, biotype_name, name, file, this.datatable_id++);
+		if (!datatable.error) {
+			this.addDatatable(datatable);
+		}
+		return datatable;
+	},
+
 	addDatatable: function(datatable) {
 		this.datatables[datatable.name] = datatable;
-		// TBD: datatable id management
-		//this.datatables_id[datatable.id] = datatable;
+		this.datatables_id[datatable.getId()] = datatable;
+	},
+
+	getDatatableByName: function(name) {
+		return this.datatables[name];
+	},
+
+	getDatatableById: function(id) {
+		return this.datatables_id[id];
 	},
 
 	removeDatatable: function(datatable) {
@@ -166,7 +185,8 @@ Dataset.prototype = {
 		}					
 		var datatable = this.datatables[datatable_name];
 		delete this.datatables[datatable_name];
-		datatable.name = new_datatable_name;
+		//datatable.name = new_datatable_name;
+		datatable.setName(new_datatable_name);
 		datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
 		this.datatables[new_datatable_name] = datatable;
 		return true;
@@ -182,18 +202,17 @@ Dataset.prototype = {
 //
 
 // TBD datatable id management
-var datatable_id = 1;
-
-function Datatable(dataset, biotype_name, name, file) {
+function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
 		return;
 	}
-	this.id = datatable_id++;
+	this.error = "";
+	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 
-	this.name = name;
+	this.setName(name);
 
 	this.gene_index = {};
 	this.sample_index = {};
@@ -241,13 +260,14 @@ function Datatable(dataset, biotype_name, name, file) {
 			++gene_nn;
 		}
 
-		dataset.addDatatable(datatable);
+		//dataset.addDatatable(datatable);
 
 		//console.log("done: " + dataset.datatableCount() + " " + dataset.geneCount() + " " + dataset.sampleCount());
 		ready.resolve();
 	}
 
 	reader.onerror = function(e) {  // If anything goes wrong
+		this.error = e.toString();
 		console.log("Error", e);    // Just log it
 	}
 }
@@ -261,7 +281,8 @@ Datatable.prototype = {
 	data: [],
 	ready: null,
 
-	display_markers: function(module_name) {
+	display_markers: function(module_name, _window) {
+		console.log("display_markers: " + module_name);
 		var id_arr = [];
 		//		for (var gene_name in this.dataset.genes) {
 		for (var gene_name in this.gene_index) {
@@ -276,8 +297,15 @@ Datatable.prototype = {
 				}
 			}
 		}
-		show_markers(id_arr);
+		_window.show_markers(id_arr);
 	},
+
+	setName: function(name) {
+		this.name = name;
+		this.html_name = name.replace(/ /g, "&nbsp;");
+	},
+
+	getId: function() {return this.id;},
 
 	getClass: function() {return "Datatable";}
 };

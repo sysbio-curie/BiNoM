@@ -71,7 +71,8 @@ $(function() {
 				} else {
 					var file_elem = file.get()[0];
 					// file_elem <=> document.getElementById("dt_import_file");
-					var datatable = new Datatable(navicell.dataset, type.val(), name.val(), file_elem.files[0]);
+					//var datatable = new Datatable(navicell.dataset, type.val(), name.val(), file_elem.files[0]);
+					var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0]);
 					if (datatable.error) {
 						error_message(datatable.error);
 					} else {
@@ -84,7 +85,7 @@ $(function() {
 						
 						if (display_markers.attr("checked")) {
 							datatable.ready.then(function() {
-								datatable.display_markers(navicell.module_name);
+								datatable.display_markers(navicell.module_name, window);
 							});
 						}
 					}
@@ -134,9 +135,10 @@ $(function() {
 				for (var dt_name in navicell.dataset.datatables) {
 					// TBD: do not support space in names: check all selector
 					var datatable = navicell.dataset.datatables[dt_name];
-					var dt_name_elem = $("#dt_name_" + dt_name);
-					var dt_type_elem = $("#dt_type_" + dt_name);
-					var dt_remove_elem = $("#dt_remove_" + dt_name);
+					var dt_id = datatable.getId();
+					var dt_name_elem = $("#dt_name_" + dt_id);
+					var dt_type_elem = $("#dt_type_" + dt_id);
+					var dt_remove_elem = $("#dt_remove_" + dt_id);
 					var new_dt_name = dt_name_elem.val();
 					var new_dt_type = dt_type_elem.val();
 					var new_dt_remove = dt_remove_elem.attr('checked');
@@ -174,7 +176,8 @@ $(function() {
 			},
 			Cancel: function() {
 				for (var dt_name in navicell.dataset.datatables) {
-					$("#dt_name_" + dt_name).val(dt_name);
+					var datatable = navicell.dataset.datatables[dt_name];
+					$("#dt_name_" + datatable.getId()).val(dt_name);
 				}
 			}
 		}
@@ -247,7 +250,7 @@ function update_sample_status_table(doc, params) {
 
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
-		str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
+		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
 	}
 	str += "</tr></thead>";
 	str += "<tbody>\n";
@@ -371,7 +374,8 @@ function update_group_status_table(doc, params) {
 	table.children().remove();
 	var str = "<thead><tr><th>Groups&nbsp;(" + mapSize(navicell.group_factory.group_map) + ")</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
-		str += "<th>&nbsp;" + datatable_name + "&nbsp;</th>";
+		var datatable = navicell.dataset.datatables[datatable_name];
+		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
 	}
 	str += "</thead>";
 	str += "<tbody>";
@@ -403,6 +407,38 @@ function update_group_status_table(doc, params) {
 	table.tablesorter();
 }
 
+function update_module_status_table(doc, params) {
+	var table = $("#dt_module_status_table", doc);
+	table.children().remove();
+	var str = "<thead><tr><th>Module</th>";
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
+	}
+	str += "</thead>";
+
+	str += "<tbody>";
+	for (var module_name in navicell.mapdata.module_mapdata) {
+		str += "<tr><td>" + module_name + "</td>";
+		for (var datatable_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[datatable_name];
+			var gene_cnt = 0;
+			for (var gene_name in datatable.gene_index) {
+				var hugo_entry = navicell.mapdata.hugo_map[gene_name];
+				if (hugo_entry && hugo_entry[module_name]) {
+					gene_cnt++;
+				}
+			}
+			str += "<td>" + gene_cnt + "</td>";
+		}
+		str += "</tr>";
+	}
+	str += "</tbody>";
+
+	table.append(str);
+	table.tablesorter();
+}
+
 function update_gene_status_table(doc, params) {
 	var table = $("#dt_gene_status_table", doc);
 	table.children().remove();
@@ -411,7 +447,7 @@ function update_gene_status_table(doc, params) {
 
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
-		str += "<th>&nbsp;" + datatable.name + "&nbsp;</th>";
+		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
 	}
 	str += "</tr></thead>";
 	str += "<tbody>\n";
@@ -481,10 +517,10 @@ function update_datatable_status_table(doc, params) {
 		str += "<tr>";
 		if (update) {
 			if (support_remove) {
-				str += "<td><input id=\"dt_remove_" + datatable.name + "\" type=\"checkbox\"></td>";
+				str += "<td><input id=\"dt_remove_" + datatable.getId() + "\" type=\"checkbox\"></td>";
 			}
-			str += "<td><input id=\"dt_name_" + datatable.name + "\" type=\"text\" value=\"" + datatable.name + "\"/></td>";
-			str += "<td>" + get_biotype_select("dt_type_" + datatable.name, false, datatable.biotype.name) + "</td>";
+			str += "<td><input id=\"dt_name_" + datatable.getId() + "\" type=\"text\" value=\"" + datatable.name + "\"/></td>";
+			str += "<td>" + get_biotype_select("dt_type_" + datatable.getId(), false, datatable.biotype.name) + "</td>";
 		} else {
 			str += "<td>&nbsp;" + datatable.name + "&nbsp;</td>";
 			str += "<td style='min-width: 170px'>&nbsp;" + datatable.biotype.name + "&nbsp;</td>";
@@ -504,6 +540,7 @@ function update_status_tables(params) {
 		update_sample_status_table(doc, params);
 		update_gene_status_table(doc, params);
 		update_group_status_table(doc, params);
+		update_module_status_table(doc, params);
 		update_datatable_status_table(doc, params);
 		update_sample_annot_table(doc, params);
 	}

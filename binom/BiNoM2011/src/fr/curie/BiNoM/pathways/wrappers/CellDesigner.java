@@ -81,41 +81,49 @@ public static String reactionNodeTypes[] = {
      String s = sbml.toString();
      //s = parseCellDesigner.replaceString(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\"");
      s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
-     //System.out.println("Substituting... "+"xmlns");
-     s = Utils.replaceStringCount(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
-     //System.out.println("Substituting... "+"SpeciesAnnotation");
-     s = Utils.replaceStringCount(s,"SpeciesAnnotation","annotation");
-     //System.out.println("Substituting... "+"ReactionAnnotation");
-     s = Utils.replaceStringCount(s,"ReactionAnnotation","annotation");
-     //System.out.println("Substituting... "+"celldesigner_");
-     s = Utils.replaceStringChar(s,"celldesigner_","celldesigner:");
-     //System.out.println("Substituting... "+"&lt;&amp;");
      s = Utils.replaceStringCount(s,"&lt;&amp;","<");
-     //System.out.println("Substituting... "+"<![CDATA[");
-     s = Utils.replaceStringCount(s,"<![CDATA[","");
-     //System.out.println("Substituting... "+"]]>");
-     s = Utils.replaceStringCount(s,"]]>","");
-     //System.out.println("Substituting... "+"<&");
      s = Utils.replaceStringCount(s,"<&","^^^");
-     //System.out.println("Substituting... "+"^^^");
      s = Utils.replaceStringCount(s,"^^^","<");
-     //System.out.println("Substituting... "+"<math>");
-     s = Utils.replaceStringCount(s,"<math>","<math xmlns=\"http://www.w3.org/1998/Math/MathML\">");
-     //System.out.println("Substituting... "+"<html>");
-     s = Utils.replaceStringCount(s,"<html>","<html xmlns=\"http://www.w3.org/1999/xhtml\">");
      
-
+     
+     /*s = Utils.replaceStringCount(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
+     s = Utils.replaceStringCount(s,"SpeciesAnnotation","annotation");
+     s = Utils.replaceStringCount(s,"ReactionAnnotation","annotation");
+     s = Utils.replaceStringChar(s,"celldesigner_","celldesigner:");
+     s = Utils.replaceStringCount(s,"<![CDATA[","");
+     s = Utils.replaceStringCount(s,"]]>","");
+     s = Utils.replaceStringCount(s,"<math>","<math xmlns=\"http://www.w3.org/1998/Math/MathML\">");
+     s = Utils.replaceStringCount(s,"<html>","<html xmlns=\"http://www.w3.org/1999/xhtml\">");
      s = Utils.replaceStringCount(s,"&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
      s = Utils.replaceStringCount(s,"&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">","");
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xhtml\">","");
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
-     
      s = Utils.replaceStringCount(s,"<body xmlns=\"http://www.w3.org/1999/xh","");
-     
      s = Utils.replaceStringCount(s, "<celldesigner:notes xsi:nil=\"true\"/>", "");
      s = Utils.replaceStringCount(s, "<notes xsi:nil=\"true\"/>", "");
-     
-     s = Utils.replaceStringCount(s,"<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");     
+     s = Utils.replaceStringCount(s,"<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");*/
+
+     HashMap<String, String> replaceMap = new HashMap<String, String>(); 
+     replaceMap.put("xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
+     replaceMap.put("SpeciesAnnotation","annotation");
+     replaceMap.put("ReactionAnnotation","annotation");
+     replaceMap.put("celldesigner_","celldesigner:");
+     //replaceMap.put("&lt;&amp;","<");
+     replaceMap.put("<![CDATA[","");
+     replaceMap.put("]]>","");
+     //replaceMap.put("<&","^^^");
+     //replaceMap.put("^^^","<");
+     replaceMap.put("<math>","<math xmlns=\"http://www.w3.org/1998/Math/MathML\">");
+     replaceMap.put("<html>","<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+     replaceMap.put("&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
+     replaceMap.put("&lt;body xmlns=\"http://www.w3.org/1999/xhtml\">","");
+     replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xhtml\">","");
+     replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
+     replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xh","");
+     replaceMap.put("<celldesigner:notes xsi:nil=\"true\"/>", "");
+     replaceMap.put("<notes xsi:nil=\"true\"/>", "");
+     replaceMap.put("<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");
+     s = Utils.replaceByList(s, replaceMap);
      
      fw.write(s);
      fw.close();

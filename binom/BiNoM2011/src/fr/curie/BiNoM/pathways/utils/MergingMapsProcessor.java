@@ -326,8 +326,10 @@ public class MergingMapsProcessor {
 		}
 		
 		formatLayers();
+		time = new Date();
 		System.out.println("saving merged file "+outputFileName+"...");
 		CellDesigner.saveCellDesigner(cd1, outputFileName);
+		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		
 		updateMapAll();
 	}
@@ -652,96 +654,6 @@ public class MergingMapsProcessor {
 		return res;
 	}
 	
-	public static String replaceCellDesignerPrefixList(String text, HashMap<String, String> map){
-		char ctext[] = text.toCharArray();
-		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
-		// some hashing of ids by first two letters
-		HashMap<String, Vector<char[]>> hash = new HashMap<String, Vector<char[]>>();
-		int maxidlength = 0;
-		
-		Vector<String> ids = new Vector<String>();
-		for(String s: map.keySet()){
-			ids.add(s);
-		}
-		
-		for(String s: ids){
-			char cs[] = s.toCharArray();
-			String s2 = s.substring(0, 2);
-			Vector<char[]> vcs = new Vector<char[]>(); 
-			if(hash.get(s2)!=null)
-				vcs = hash.get(s2);
-			vcs.add(cs);
-			hash.put(s2, vcs);
-			if(cs.length>maxidlength)
-				maxidlength = cs.length;
-		}
-		
-		int i=0; int textlength = ctext.length-maxidlength-1;
-		int in=0;
-		while(i<textlength){
-			char h[] = new char[2];
-			h[0] = ctext[i];
-			h[1] = ctext[i+1];
-			String s2 = new String(h);
-			//if(s2.equals("ks")){
-			//	System.out.println(i+"\t"+new String(ctext,i,5));
-			//}
-			Vector<char[]> candidates = hash.get(s2);
-			if(candidates==null){ 
-				ctextnew[in++] = ctext[i++];
-			}else{
-
-				boolean replacementmade = false;
-				for(char cid[] :candidates){
-					
-				boolean idfound = true;
-				
-				for(int j=0;j<cid.length;j++)
-					if(ctext[i+j]!=cid[j]){
-						idfound = false;
-						break;
-					}
-
-				if(idfound){
-				boolean goodcontext = true;
-				/*if((ctext[i-1]=='\"')&&(ctext[i+cid.length]=='\"'))
-					goodcontext = true;
-				else
-				if((ctext[i-1]=='>')&&(ctext[i+cid.length]=='<'))
-					goodcontext = true;
-				else
-				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]==','))
-					goodcontext = true;
-				else
-				if((ctext[i-1]==',')&&(ctext[i+cid.length]==','))
-					goodcontext = true;
-				else
-				if((ctext[i-1]==',')&&(ctext[i+cid.length]=='\"'))
-					goodcontext = true;*/
-				char cprefix[] = map.get(new String(cid)).toCharArray();
-				if(goodcontext){
-					for(int k=0;k<cprefix.length;k++)
-						ctextnew[in+k] = cprefix[k];
-					in+=cprefix.length;
-					i+=cid.length;
-					replacementmade = true;
-					break;
-				}
-			}
-			}
-			if(!replacementmade)
-				ctextnew[in++] = ctext[i++];
-				
-			}
-		}
-		
-		for(int k=textlength;k<ctext.length;k++)
-			ctextnew[in++] = ctext[k];
-		
-		
-		String res = new String(ctextnew,0,in);
-		return res;
-	}
 	
 	
 	public static String replaceCellDesignerPrefix(String text, String id, String prefix){
@@ -1432,7 +1344,7 @@ public class MergingMapsProcessor {
 				map.put(id, asRnaMap.get(id));
 			
 			//cdFileString = cdFileString.replaceAll(id, asRnaMap.get(id));
-		cdFileString = replaceCellDesignerPrefixList(cdFileString, map);
+		cdFileString = Utils.replaceByList(cdFileString, map);
 		
 		if (fileName.endsWith(".xml")) {
 			fileName = fileName.substring(0, fileName.length() - 4);

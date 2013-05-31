@@ -367,8 +367,8 @@ public class ProduceClickableMap
 		k = 0;		
 		for (EntityBase e : _entityIDToEntityMap.values()){
 			k++;
-			if(k==500*(int)(k*0.002f))
-				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			//if(k==500*(int)(k*0.002f))
+			//	System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			
 			for (Modification m : e.getModifications())
 				try

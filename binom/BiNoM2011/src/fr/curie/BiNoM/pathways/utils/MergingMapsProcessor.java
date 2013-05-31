@@ -305,7 +305,7 @@ public class MergingMapsProcessor {
 		mergeDiagrams();
 		//System.out.println(" merge diagrams "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		mergeElements();
-		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+		//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		Utils.printUsedMemory();
 		
 
@@ -321,7 +321,7 @@ public class MergingMapsProcessor {
 			// merge maps
 			mergeDiagrams();
 			mergeElements();
-			System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+			//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 			Utils.printUsedMemory();
 		}
 		
@@ -346,7 +346,7 @@ public class MergingMapsProcessor {
 		text = addPrefixToIds(text);
 		this.cdFileString = text;
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
-		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
+		//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 	}
 	
 	/**
@@ -1319,16 +1319,16 @@ public class MergingMapsProcessor {
 	private void setIdsAndSave(String fileName) {
 		
 		for (String id : this.proteinMap.keySet())
-			cdFileString = Utils.replaceString(cdFileString, id, proteinMap.get(id));
+			cdFileString = cdFileString.replaceAll(id, proteinMap.get(id));
 		
 		for (String id : this.rnaMap.keySet())
-			cdFileString = Utils.replaceString(cdFileString, id, rnaMap.get(id));
+			cdFileString = cdFileString.replaceAll(id, rnaMap.get(id));
 		
 		for (String id : this.geneMap.keySet())
-			cdFileString = Utils.replaceString(cdFileString, id, geneMap.get(id));
+			cdFileString = cdFileString.replaceAll(id, geneMap.get(id));
 		
 		for (String id : this.asRnaMap.keySet())
-			cdFileString = Utils.replaceString(cdFileString, id, asRnaMap.get(id));
+			cdFileString = cdFileString.replaceAll(id, asRnaMap.get(id));
 		
 		if (fileName.endsWith(".xml")) {
 			fileName = fileName.substring(0, fileName.length() - 4);

@@ -849,6 +849,7 @@ public static java.awt.Color convertPaintToColor(java.awt.Paint paint) throws Ex
 }
 
 public static Vector<String> extractAllStringBetween(String text, String from, String to){
+	HashSet<String> setoccs = new HashSet<String>(); 
 	Vector<String> occs = new Vector<String>();
 	char ctext[] = text.toCharArray();
 	char cfrom[] = from.toCharArray();
@@ -876,10 +877,14 @@ public static Vector<String> extractAllStringBetween(String text, String from, S
 					sb.append(ctext[i]); i++;
 				}
 			}
-			occs.add(sb.toString());
+			setoccs.add(sb.toString());
 		}else
 			i++;
 	}
+	for ( Iterator<String> it = setoccs.iterator(); it.hasNext(); ){
+		occs.add(it.next());
+	}
+	Collections.sort(occs);
 	return occs;
 }
 

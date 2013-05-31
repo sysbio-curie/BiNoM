@@ -234,6 +234,7 @@ public class ACSNProcedures {
       	tab.createIndex("HUGO");
       	tab.createSecondaryIndex("UNIPROT");
       	for(String fn: listFiles){
+      		System.out.println("updating "+fn+"...");
       		StringBuffer text = new StringBuffer();
       		File f = new File(fn);
       		LineNumberReader lr = new LineNumberReader(new FileReader(f));

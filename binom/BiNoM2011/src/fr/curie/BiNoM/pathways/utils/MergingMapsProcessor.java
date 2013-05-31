@@ -174,6 +174,16 @@ public class MergingMapsProcessor {
 	}
 	
 	public static void main(String args[]){
+
+		/*Vector<String> ids = new Vector<String>();
+		ids.add("re1");
+		ids.add("re12");
+		ids.add("re2");
+		ids.add("sa123");
+		String text = "some words and \"re1\" \"sa123\" and after >re1< and\nsuddenly \"re2,\n\"re12\" after.everything.goes.until.point.";
+		System.out.println(replaceCellDesignerPrefixList(text, ids, "test_"));
+		System.exit(0);*/
+		
 		String configFile = "";
 		String outputFileName = "";
 		
@@ -497,24 +507,38 @@ public class MergingMapsProcessor {
 		}
 		
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
+		//System.out.println("ids = "+ids.size());
+		Vector<String> newids = new Vector<String>();
 		for(int i=0;i<ids.size();i++) {
 			if(!ids.get(i).equals(id1) && !ids.get(i).equals(id2) && ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
 				//System.out.println("--> id= "+ids.get(i));
 				//System.out.println("replace: "+"\""+ids.get(i)+"\""+ " with "+ "\""+prefix+""+ids.get(i)+"\"");
 				//System.out.println("replace: " + ">"+ids.get(i)+"<" + " with "+ ">"+prefix+""+ids.get(i)+"<");
-				text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
-				text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
 				
+				//text = Utils.replaceString(text, "\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
+				//text = Utils.replaceString(text, ">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
 				/*
 				 * Special case: change id in boolean gate elements:
 				 * 
 				 * model = <celldesigner:modification type="BOOLEAN_LOGIC_GATE_AND" modifiers="cd2_s187,cd2_s801,cd2_s608" aliases="sa43,csa5,sa44"
 				 */
-				text = Utils.replaceString(text, "\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
-				text = Utils.replaceString(text, ","+ids.get(i)+",", ","+prefix+ids.get(i)+",");
-				text = Utils.replaceString(text, ","+ids.get(i)+"\"", ","+prefix+ids.get(i)+"\"");
+				//text = Utils.replaceString(text, "\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
+				//text = Utils.replaceString(text, ","+ids.get(i)+",", ","+prefix+ids.get(i)+",");
+				//text = Utils.replaceString(text, ","+ids.get(i)+"\"", ","+prefix+ids.get(i)+"\"");
+				
+		
+				//Date time = new Date();
+				//text = replaceCellDesignerPrefix(text,ids.get(i), prefix);
+				//text = text.replaceAll("\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
+				//text = text.replaceAll(">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
+				//text = text.replaceAll("\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
+				//text = text.replaceAll(","+ids.get(i)+",", ","+prefix+ids.get(i)+",");
+				//text = text.replaceAll(","+ids.get(i)+"\"", ","+prefix+ids.get(i)+"\"");
+				//System.out.println("Time to replace "+((new Date()).getTime()-time.getTime()));
+				newids.add(ids.get(i));
 			}
 		}
+		text = replaceCellDesignerPrefixList(text,newids, prefix);
 		
 		/*
 		 * id replacement in tag "units" is giving a bug in CellDesigner
@@ -535,6 +559,153 @@ public class MergingMapsProcessor {
 				text = mat.replaceAll("units=\"volume\"");
 		}
 		return text;
+	}
+	
+	public static String replaceCellDesignerPrefixList(String text, Vector<String> ids, String prefix){
+		char ctext[] = text.toCharArray();
+		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
+		// some hashing of ids by first two letters
+		HashMap<String, Vector<char[]>> hash = new HashMap<String, Vector<char[]>>();
+		int maxidlength = 0;
+		for(String s: ids){
+			char cs[] = s.toCharArray();
+			String s2 = s.substring(0, 2);
+			Vector<char[]> vcs = new Vector<char[]>(); 
+			if(hash.get(s2)!=null)
+				vcs = hash.get(s2);
+			vcs.add(cs);
+			hash.put(s2, vcs);
+			if(cs.length>maxidlength)
+				maxidlength = cs.length;
+		}
+		
+		char cprefix[] = prefix.toCharArray();
+		int i=0; int textlength = ctext.length-maxidlength-1;
+		int in=0;
+		while(i<textlength){
+			char h[] = new char[2];
+			h[0] = ctext[i];
+			h[1] = ctext[i+1];
+			String s2 = new String(h);
+			//if(s2.equals("ks")){
+			//	System.out.println(i+"\t"+new String(ctext,i,5));
+			//}
+			Vector<char[]> candidates = hash.get(s2);
+			if(candidates==null){ 
+				ctextnew[in++] = ctext[i++];
+			}else{
+
+				boolean replacementmade = false;
+				for(char cid[] :candidates){
+					
+				boolean idfound = true;
+				
+				for(int j=0;j<cid.length;j++)
+					if(ctext[i+j]!=cid[j]){
+						idfound = false;
+						break;
+					}
+
+				if(idfound){
+				boolean goodcontext = false;
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='>')&&(ctext[i+cid.length]=='<'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				if(goodcontext){
+					for(int k=0;k<cprefix.length;k++)
+						ctextnew[in+k] = cprefix[k];
+					in+=cprefix.length;
+					for(int k=0;k<cid.length;k++)
+						ctextnew[in+k] = cid[k];
+					in+=cid.length;
+					i+=cid.length;
+					replacementmade = true;
+					break;
+				}
+			}
+			}
+			if(!replacementmade)
+				ctextnew[in++] = ctext[i++];
+				
+			}
+		}
+		
+		for(int k=textlength;k<ctext.length;k++)
+			ctextnew[in++] = ctext[k];
+		
+		
+		String res = new String(ctextnew,0,in);
+		return res;
+	}
+	
+	public static String replaceCellDesignerPrefix(String text, String id, String prefix){
+		//text = text.replaceAll("\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
+		//text = text.replaceAll(">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
+		//text = text.replaceAll("\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
+		//text = text.replaceAll(","+ids.get(i)+",", ","+prefix+ids.get(i)+",");
+		//text = text.replaceAll(","+ids.get(i)+"\"", ","+prefix+ids.get(i)+"\"");
+		//StringBuilder res = new StringBuilder();
+		char ctext[] = text.toCharArray();
+		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
+		char cid[] = id.toCharArray();
+		char cprefix[] = prefix.toCharArray();
+		int i=0; int textlength = ctext.length-cid.length-1;
+		int in=0;
+		while(i<textlength){
+			boolean idfound = true;
+			for(int j=0;j<cid.length;j++)
+				if(ctext[i+j]!=cid[j]){
+					idfound = false;
+					break;
+				}
+			if(idfound){
+				boolean goodcontext = false;
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='>')&&(ctext[i+cid.length]=='<'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+			if(goodcontext){
+				for(int k=0;k<cprefix.length;k++)
+					ctextnew[in+k] = cprefix[k];
+				in+=cprefix.length;
+				for(int k=0;k<cid.length;k++)
+					ctextnew[in+k] = cid[k];
+				in+=cid.length;
+				i+=id.length();
+			}else{
+				ctextnew[in++] = ctext[i++];
+			}
+			}else{
+				ctextnew[in++] = ctext[i++];
+			}
+		}
+		for(int k=textlength;k<ctext.length;k++)
+			ctextnew[in++] = ctext[k];
+		
+		
+		String res = new String(ctextnew,0,in);
+		return res;
 	}
 
 	/**
@@ -689,6 +860,7 @@ public class MergingMapsProcessor {
 		HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>> speciesAliases = new HashMap<String,Vector<CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias>>(); // From species IDs to all corresponding aliases 
 		CellDesignerToCytoscapeConverter c2c = new CellDesignerToCytoscapeConverter();
 		c2c.sbml = cd1;
+		c2c.createSpeciesMap(cd1.getSbml());
 
 		for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias cas = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);

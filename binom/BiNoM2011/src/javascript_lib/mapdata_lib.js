@@ -281,10 +281,19 @@ Datatable.prototype = {
 	data: [],
 	ready: null,
 
+	// 2013-05-31
+	// TBD: need methods:
+	// - to get positions from an id or a set of ids (called from
+	//   show_markers or from the jstree search),
+	// - to get positions from a name or a set of names.
+	// 
+	// In the following method, we get positions sucessfully, but not from
+	// an id but scanning the fill array => a map indexed by id (mind:
+	// multiple id per gene) is missing.
 	display_markers: function(module_name, _window) {
 		console.log("display_markers: " + module_name);
 		var id_arr = [];
-		//		for (var gene_name in this.dataset.genes) {
+		var pos_arr = [];
 		for (var gene_name in this.gene_index) {
 			var entity_map = this.dataset.genes[gene_name].entity_map;
 			var entity = entity_map[module_name];
@@ -292,11 +301,21 @@ Datatable.prototype = {
 				var modif_arr = entity.modifs;
 				if (modif_arr) {
 					for (var nn = 0; nn < modif_arr.length; ++nn) {
-						id_arr.push(modif_arr[nn].id);
+						var modif = modif_arr[nn];
+						id_arr.push(modif.id);
+						// >> getting positions
+						var positions = modif.positions;
+						if (positions) {
+							for (var kk = 0; kk < positions.length; ++kk) {
+								pos_arr.push({id : modif.id, p : new google.maps.Point(positions[kk].x, positions[kk].y)});
+							}
+						}
+						// << getting positions
 					}
 				}
 			}
 		}
+		//console.log("pos_arr: " + pos_arr.length);
 		_window.show_markers(id_arr);
 	},
 
@@ -476,13 +495,6 @@ Group.prototype = {
 	value: null,
 	name: "",
 	html_name: "",
-	/*
-	samples: [],
-
-	addSample: function(sample) {
-		samples.push(sample);
-	},
-	*/
 
 	getClass: function() {return "Group";}
 };
@@ -501,15 +513,6 @@ GroupFactory.prototype = {
 		return annot_name + ": " + value;
 	},
 
-	/*
-	getGroup: function(annot_name, value) {
-		var group_name = this.buildName(annot_name, value);
-		if (!this.group_map[group_name]) {
-			this.group_map[group_name] = new Group(annot_name, value);
-		}
-		return this.group_map[group_name];
-	},
-	*/
 	addGroup: function(annot_name, value) {
 		var group_name = this.buildName(annot_name, value);
 		if (!this.group_map[group_name]) {

@@ -73,6 +73,9 @@ $(function() {
 					// file_elem <=> document.getElementById("dt_import_file");
 					//var datatable = new Datatable(navicell.dataset, type.val(), name.val(), file_elem.files[0]);
 					var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0]);
+				// test
+					//readfile(file_elem.files[0], all_maps);
+				// eo test
 					if (datatable.error) {
 						error_message(datatable.error);
 					} else {
@@ -142,13 +145,6 @@ $(function() {
 					var new_dt_name = dt_name_elem.val();
 					var new_dt_type = dt_type_elem.val();
 					var new_dt_remove = dt_remove_elem.attr('checked');
-					/*
-					if (!new_dt_name || !new_dt_type) {
-						update_cnt = 0;
-						break;
-						}
-						*/
-					
 					if (new_dt_remove) {
 						navicell.dataset.removeDatatable(datatable);
 						update_cnt++;

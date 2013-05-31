@@ -347,7 +347,7 @@ public class ProduceClickableMap
 		for (Modification m : _speciesIDToModificationMap.values())
 		{
 			k++;
-			if(k==100*(int)(k*0.01f))
+			if(k==500*(int)(k*0.002f))
 				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			
 			try
@@ -367,7 +367,7 @@ public class ProduceClickableMap
 		k = 0;		
 		for (EntityBase e : _entityIDToEntityMap.values()){
 			k++;
-			if(k==100*(int)(k*0.01f))
+			if(k==500*(int)(k*0.002f))
 				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			
 			for (Modification m : e.getModifications())
@@ -1151,8 +1151,8 @@ public class ProduceClickableMap
 		System.out.println("Finding places for aliases ("+numberOfAliases+") in CellDesigner: "+this.module_name);
 		Date time = new Date();
 		for(int i=0;i<numberOfAliases;i++){
-			if(i==100*(int)(i*0.01f))
-				System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			//if(i==100*(int)(i*0.01f))
+			//	System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			//Date time1 = new Date();
 			//System.out.println((new Date().getTime())-time1.getTime());			
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
@@ -1203,8 +1203,8 @@ public class ProduceClickableMap
 		System.out.println("Finding places for complex aliases ("+numberOfComplexAliases+") in CellDesigner: "+this.module_name);
 		time = new Date();
 		for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
-			if(i==100*(int)(i*0.01f))
-				System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			//if(i==100*(int)(i*0.01f))
+			//	System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cspa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 			Place place = new Place();
 			place.id = cspa.getId();
@@ -1272,8 +1272,8 @@ public class ProduceClickableMap
 		System.out.println("Processing reactions ("+numberOfReactions+")");
 		time = new Date();
 			for(int i=0;i<cd.getSbml().getModel().getListOfReactions().getReactionArray().length;i++){
-				if(i==100*(int)(i*0.01f))
-					System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+				//if(i==100*(int)(i*0.01f))
+				//	System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
 				ReactionDocument.Reaction r = cd.getSbml().getModel().getListOfReactions().getReactionArray(i);
 				if(r.getListOfReactants()!=null)
 				for(int j=0;j<r.getListOfReactants().getSpeciesReferenceArray().length;j++){

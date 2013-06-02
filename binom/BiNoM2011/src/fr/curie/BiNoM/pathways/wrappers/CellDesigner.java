@@ -211,12 +211,14 @@ public static String reactionNodeTypes[] = {
 		   HashMap<String, String> replaceMap = new HashMap<String, String>(); 
 		   replaceMap.put("<celldesigner:extension>", "");
 		   replaceMap.put("</celldesigner:extension>", "");
+		   text = Utils.replaceByList(text, replaceMap);
 		   replaceMap.put("/version4", "");
 		   replaceMap.put("version=\"4\"", "version=\"1\"");		   
 		   replaceMap.put("celldesigner:", "celldesigner_");   
-		   replaceMap.put("\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
-		   text = Utils.replaceByList(text, replaceMap);		 
-
+		   text = Utils.replaceByList(text, replaceMap);
+		   
+		   text = text.replaceAll("\"http://www.sbml.org/sbml/level2\"","\"http://www.sbml.org/2001/ns/celldesigner\"");
+		   
 		 StringReader st = new StringReader(text);   
 		 sbmlDoc = org.sbml.x2001.ns.celldesigner.SbmlDocument.Factory.parse(st);
 	 } catch(Exception e) {

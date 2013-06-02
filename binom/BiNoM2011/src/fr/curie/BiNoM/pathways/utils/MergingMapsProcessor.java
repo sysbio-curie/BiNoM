@@ -193,6 +193,7 @@ public class MergingMapsProcessor {
 		boolean postprocess = false;		
 		int zoomLevel = 3;
 		int numberOfTimesToScale = 0;
+		int scale = 1;
 		
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("--config"))
@@ -207,6 +208,8 @@ public class MergingMapsProcessor {
 				preprocess = true;
 			if(args[i].equals("--postprocess"))
 				postprocess = true;
+			if(args[i].equals("--scale"))
+				scale = Integer.parseInt(args[i+1]);
 			if(args[i].equals("--zoomlevel"))
 				zoomLevel = Integer.parseInt(args[i+1]);
 			if(args[i].equals("--numberofscaleimages"))
@@ -231,7 +234,7 @@ public class MergingMapsProcessor {
 				String outputFileName_prefix = outputFileName;
 				if(outputFileName.endsWith(".xml"))
 					outputFileName_prefix = outputFileName.substring(0, outputFileName.length()-4);
-				mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale);
+				mm.mergeMapImages(outputFileName_prefix, zoomLevel, numberOfTimesToScale, scale);
 			}
 
 		}catch(Exception e){
@@ -714,6 +717,98 @@ public class MergingMapsProcessor {
 		String res = new String(ctextnew,0,in);
 		return res;
 	}
+	
+	public static String replaceCellDesignerByList(String text, HashMap<String, String> map){
+		char ctext[] = text.toCharArray();
+		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
+		// some hashing of ids by first two letters
+		HashMap<String, Vector<char[]>> hash = new HashMap<String, Vector<char[]>>();
+		int maxidlength = 0;
+		
+		Vector<String> ids = new Vector<String>();
+		for(String s: map.keySet()){
+			ids.add(s);
+		}
+		
+		for(String s: ids){
+			char cs[] = s.toCharArray();
+			String s2 = s.substring(0, 2);
+			Vector<char[]> vcs = new Vector<char[]>(); 
+			if(hash.get(s2)!=null)
+				vcs = hash.get(s2);
+			vcs.add(cs);
+			hash.put(s2, vcs);
+			if(cs.length>maxidlength)
+				maxidlength = cs.length;
+		}
+		
+		int i=0; int textlength = ctext.length-maxidlength-1;
+		int in=0;
+		while(i<textlength){
+			char h[] = new char[2];
+			h[0] = ctext[i];
+			h[1] = ctext[i+1];
+			String s2 = new String(h);
+			//if(s2.equals("ks")){
+			//	System.out.println(i+"\t"+new String(ctext,i,5));
+			//}
+			Vector<char[]> candidates = hash.get(s2);
+			if(candidates==null){ 
+				ctextnew[in++] = ctext[i++];
+			}else{
+
+				boolean replacementmade = false;
+				for(char cid[] :candidates){
+					
+				boolean idfound = true;
+				
+				for(int j=0;j<cid.length;j++)
+					if(ctext[i+j]!=cid[j]){
+						idfound = false;
+						break;
+					}
+
+				if(idfound){
+				boolean goodcontext = false;
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='>')&&(ctext[i+cid.length]=='<'))
+					goodcontext = true;
+				else
+				if((ctext[i-1]=='\"')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]==','))
+					goodcontext = true;
+				else
+				if((ctext[i-1]==',')&&(ctext[i+cid.length]=='\"'))
+					goodcontext = true;
+				char cprefix[] = map.get(new String(cid)).toCharArray();
+				if(goodcontext){
+					for(int k=0;k<cprefix.length;k++)
+						ctextnew[in+k] = cprefix[k];
+					in+=cprefix.length;
+					i+=cid.length;
+					replacementmade = true;
+					break;
+				}
+			}
+			}
+			if(!replacementmade)
+				ctextnew[in++] = ctext[i++];
+				
+			}
+		}
+		
+		for(int k=textlength;k<ctext.length;k++)
+			ctextnew[in++] = ctext[k];
+		
+		
+		String res = new String(ctextnew,0,in);
+		return res;
+	}
+	
 
 	/**
 	 * Merge "mechanically" all the CellDesigner components of file cd2 into file cd1.
@@ -1344,7 +1439,7 @@ public class MergingMapsProcessor {
 				map.put(id, asRnaMap.get(id));
 			
 			//cdFileString = cdFileString.replaceAll(id, asRnaMap.get(id));
-		cdFileString = Utils.replaceByList(cdFileString, map);
+		cdFileString = replaceCellDesignerByList(cdFileString, map);
 		
 		if (fileName.endsWith(".xml")) {
 			fileName = fileName.substring(0, fileName.length() - 4);
@@ -1427,6 +1522,37 @@ public class MergingMapsProcessor {
 		
 		cd1 = CellDesigner.loadCellDesigner(target);
 		cd2 = CellDesigner.loadCellDesigner(source);
+
+		// We create lists of species names to match them is ids are not found
+		HashMap<String, String> mapNameId1 = new HashMap<String, String>();
+		HashMap<String, String> mapNameId2 = new HashMap<String, String>();
+		HashMap<String, String> mapIdName1 = new HashMap<String, String>();
+		HashMap<String, String> mapIdName2 = new HashMap<String, String>();
+		
+		CellDesigner.entities = CellDesigner.getEntities(cd1);
+		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
+		System.out.println("");
+		for (SpeciesDocument.Species sp : cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
+			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1, sp.getId(), true, true);
+			if(name!=null)if(!name.startsWith("null"))
+				if(mapNameId1.get(name)!=null)
+					System.out.println("warning: map "+cd1.getSbml().getModel().getId()+", "+name+" species name coincides between "+mapNameId1.get(name)+" and "+sp.getId());
+			mapNameId1.put(name, sp.getId());
+			mapIdName1.put(sp.getId(), name);
+			//System.out.println(sp.getId()+"\t"+name);
+		}
+		System.out.println("");
+		CellDesigner.entities = CellDesigner.getEntities(cd2);
+		CellDesignerToCytoscapeConverter.createSpeciesMap(cd2.getSbml());
+		for (SpeciesDocument.Species sp : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
+			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
+			if(name!=null)if(!name.startsWith("null"))			
+				if(mapNameId2.get(name)!=null)
+					System.out.println("warning: map "+cd2.getSbml().getModel().getId()+", "+name+" species name coincides between "+mapNameId2.get(name)+" and "+sp.getId());
+			mapNameId2.put(name, sp.getId());
+			mapIdName2.put(sp.getId(), name);
+			//System.out.println(sp.getId()+"\t"+name);
+		}
 		
 		HashMap<String, String> spMap = new HashMap<String, String>();
 		if(cd1.getSbml().getModel().getListOfSpecies()!=null)
@@ -1443,8 +1569,17 @@ public class MergingMapsProcessor {
 					break;
 				}
 			}
-			if (found == false)
-				System.out.println("warning: no match for species "+targetID+" ("+target+") in source file "+ source);
+			if(found == false){
+				// Try to match by name
+				String nameTarget = mapIdName1.get(targetID);
+				if(nameTarget!=null)if(!nameTarget.startsWith("null")){
+					String sourceID = mapIdName2.get(nameTarget);
+					if(sourceID!=null){
+						spMap.put(targetID, sourceID);
+					}else
+						System.out.println("warning: no match for species ("+mapIdName1.get(targetID)+") "+targetID+" ("+target+") in source file "+ source);
+					}
+			}
 		}
 		
 		HashMap<String, String> reMap = new HashMap<String, String>();
@@ -1517,7 +1652,33 @@ public class MergingMapsProcessor {
 		
 		System.out.println("saving updated map "+outputFile+"...");
 		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(targetXml);
+		
+		updateAnnotations(doc, cd2);
+		
 		CellDesigner.saveCellDesigner(doc, outputFile);
+	}
+	
+	
+	public void updateAnnotations(SbmlDocument target, SbmlDocument source){
+
+		ModifyCellDesignerNotes mns = new ModifyCellDesignerNotes();
+		mns.generateReadableNamesForReactionsAndSpecies = false;
+		mns.allannotations = true;
+		mns.formatAnnotation = false;
+		mns.sbmlDoc = source;
+		
+		
+		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+		mn.generateReadableNamesForReactionsAndSpecies = false;
+		mn.allannotations = true;
+		mn.formatAnnotation = false;
+		mn.sbmlDoc = target;
+		try{
+			mn.comments = mns.exportCellDesignerNotes();
+			mn.ModifyCellDesignerNotes();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -1557,7 +1718,7 @@ public class MergingMapsProcessor {
 		}
 	}
 	
-	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale){
+	public void mergeMapImages(String outputFileName_prefix, int zoomLevel, int numberOfTimesToScale, int scale){
 		
 		System.out.println("==============================");
 		System.out.println("=======  Merge images   ======");		
@@ -1565,8 +1726,8 @@ public class MergingMapsProcessor {
 
 		try{
 
-			int gWidth = Integer.parseInt(sizeX);
-			int gHeight = Integer.parseInt(sizeY);
+			int gWidth = (int)((float)Integer.parseInt(sizeX)/(float)scale+0.001f);
+			int gHeight = (int)((float)Integer.parseInt(sizeY)/(float)scale+0.001f);
 			System.out.println("Allocating memory for global image...");
 			BufferedImage mergedImage = new BufferedImage(gWidth, gHeight, BufferedImage.TYPE_INT_RGB);
 			Utils.printUsedMemory();
@@ -1586,10 +1747,10 @@ public class MergingMapsProcessor {
 					System.out.println("Reading "+fn+"...");
 					BufferedImage map = ImageIO.read(new File(fn));
 					Image imap = Utils.Transparency.makeColorTransparent(map, new Color(1f, 1f, 1f));
-					int x = mapList.get(j).deltaX;
-					int y = mapList.get(j).deltaY;
-					int width = map.getWidth();
-					int height = map.getHeight();
+					int x = (int)((float)mapList.get(j).deltaX/(float)scale+0.001f);
+					int y = (int)((float)mapList.get(j).deltaY/(float)scale+0.001f);
+					int width = (int)((float)map.getWidth()/(float)scale+0.001f);
+					int height = (int)((float)map.getHeight()/(float)scale+0.001f);
 					/*if(x+width>gWidth)
 								  width = gWidth-x-1;
 							  if(y+height>gHeight)

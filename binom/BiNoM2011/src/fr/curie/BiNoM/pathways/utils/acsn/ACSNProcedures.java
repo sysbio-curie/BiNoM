@@ -45,12 +45,14 @@ public class ACSNProcedures {
 			float transparency2 = 1f;
 			float transparency3 = 1f;			
 			int fontsize = 12;
+			String modelnotes = "";
 			
 			boolean removeReactions = false;
 			boolean mergepngs = false;
 			boolean scalepng = false;
 			boolean makehiddenlevel2 = false;
 			boolean updateDBconnections = false;
+			boolean changeModelNotes = false;			
 			
 			//doRemoveReactions("C:/Datas/NaviCell/test/merged/merged_master.xml");
 			//doMergePngs("C:/Datas/NaviCell/test/merged/merged_master-3.png",1f,"C:/Datas/NaviCell/test/merged/merged_master_noreactions.png",0.5f,null,1f,"C:/Datas/NaviCell/test/merged/merged_master-3_1.png");
@@ -72,6 +74,9 @@ public class ACSNProcedures {
 					scalepng = true;
 				if(args[i].equals("--makezoomlevel2"))
 					makehiddenlevel2 = true;
+				if(args[i].equals("--changemodelnotes"))
+					changeModelNotes = true;
+				
 				
 				if(args[i].equals("--png1"))
 					pngFileName1 = args[i+1];
@@ -89,6 +94,9 @@ public class ACSNProcedures {
 					transparency3 = Float.parseFloat(args[i+1]);
 				if(args[i].equals("--fontsize"))
 					fontsize = Integer.parseInt(args[i+1]);
+				if(args[i].equals("--modelnotes"))
+					modelnotes = args[i+1];
+				
 				
 				if(args[i].equals("--updatedbids"))
 					updateDBconnections = true;
@@ -114,6 +122,10 @@ public class ACSNProcedures {
 			
 			if(updateDBconnections)
 				updateLinks(mergeConfigFileName, tableOfIDsFileName);
+			
+			if(changeModelNotes)
+				changeModelNotes(modelnotes, xmlFileName);
+			
 			
 			
 		}catch(Exception e){
@@ -278,6 +290,15 @@ public class ACSNProcedures {
       		Utils.saveStringToFile(text.toString(), fn);
       	}
       }
-	
+      
+      
+      public static void changeModelNotes(String modelnotes, String xmlFileName){
+    	  String s = Utils.loadString(modelnotes);
+    	  SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
+    	  XmlString xs = XmlString.Factory.newInstance();
+    	  xs.setStringValue(s);
+    	  sbml.getSbml().getModel().getNotes().set(xs);
+    	  CellDesigner.saveCellDesigner(sbml, xmlFileName);
+      }
 
 }

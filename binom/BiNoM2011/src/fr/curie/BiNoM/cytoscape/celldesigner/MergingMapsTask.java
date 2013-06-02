@@ -43,7 +43,7 @@ public class MergingMapsTask implements Task {
 				String outputFileName_prefix = outputFileName;
 				if(outputFileName.endsWith(".xml"))
 						outputFileName_prefix = outputFileName.substring(0, outputFileName.length()-4);
-				mm.mergeMapImages(outputFileName_prefix, options.zoomLevel, options.numberOfTimesToScale);
+				mm.mergeMapImages(outputFileName_prefix, options.zoomLevel, options.numberOfTimesToScale, 1);
 			}
 			
 			if(taskMonitor!=null){

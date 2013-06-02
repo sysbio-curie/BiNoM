@@ -110,6 +110,10 @@ public class ProduceClickableMap
 
 
 	private static final String map_icon = icons_directory + "/map.png";
+	private static final String reset_icon = icons_directory + "/reset.png";
+	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
+	private static final String help_icon = icons_directory + "/help.png";	
+	
 
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = base_directory + "/doc";
@@ -347,9 +351,6 @@ public class ProduceClickableMap
 		for (Modification m : _speciesIDToModificationMap.values())
 		{
 			k++;
-			if(k==500*(int)(k*0.002f))
-				System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
-			
 			try
 			{
 				m.calculateName(cd);
@@ -970,14 +971,17 @@ public class ProduceClickableMap
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		} else {
+			System.out.println("Making map...");
 			final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 			final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
 			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
+			System.out.println("Making tiles...");
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
+			System.out.println("Generating pages...");			
 			clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
 		}
@@ -2504,6 +2508,7 @@ public class ProduceClickableMap
 	private void show_links_to_post_and_map(final String species_id, final Modification m, StringBuffer fw, final Hasher h,
 		ReactionDisplayType pass2, Linker wp)
 	{
+		if(m!=null){
 		if (m.isDegraded())
 			fw.append("degraded");
 		else if (m.isBad())
@@ -2522,6 +2527,8 @@ public class ProduceClickableMap
 				post_to_post_link_checked(m.getEntityBase(), folded, fw, pass2, wp);
 				show_shapes_on_map(h, fw, m, master_map_name, blog_name, wp);
 			}
+		}}else{
+			System.out.println("ERROR: show_links_to_post_and_map, modification=null for species "+species_id);
 		}
 	}
 
@@ -4367,7 +4374,8 @@ public class ProduceClickableMap
 		out.print(");");
 		out.print(onclick_after);
 		out.print(" title='uncheck all entities'>");
-		out.print("reset");
+		//out.print("reset");
+		out.print("<img src=\""+reset_icon+"\" />");
 		out.print("</a>");
 		out.println();
 		return out;
@@ -4532,9 +4540,11 @@ public class ProduceClickableMap
 		
 		out.println(bubble_to_post_link_with_anchor(module_post.getPostId(), new StringBuffer()).toString());
 		create_reset_button(out);
-		doc_in_new_window(out, "map_symbols", "map symbols");
+		//doc_in_new_window(out, "map_symbols", "map symbols");
+		doc_in_new_window(out, "map_symbols", "<img src=\""+mapsymbols_icon+"\"/>");
 		out.print(" ");
-		doc_in_new_window(out, "map_help", "help");
+		//doc_in_new_window(out, "map_help", "help");
+		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\"/>");
 		
 		out.println("<input type='text' size='14' id='query_text'/>");
 		header_right.close();

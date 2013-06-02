@@ -913,18 +913,23 @@ public class CellDesignerToCytoscapeConverter {
 		   if(isp!=null){
 	       String compl_id = Utils.getText(isp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
 	       String compartment = "";
-	       for(int k=0;k<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();k++){
+	       SpeciesDocument.Species sp = speciesMap.get(compl_id);
+	       compartment = sp.getCompartment();
+	       /*for(int k=0;k<sbml.getModel().getListOfSpecies().sizeOfSpeciesArray();k++){
 	         SpeciesDocument.Species sp = sbml.getModel().getListOfSpecies().getSpeciesArray(k);
 	         if(sp.getId().equals(compl_id)){
 	           compartment = sp.getCompartment();
 	         }
-	       }
+	       }*/
 	       CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity ident = isp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
 	       s = getSpeciesName(ident,isp.getId(),getEntityName(isp.getId(),ident,sbml),compartment,addModifications,addCompartmentName,defcomp_id,sbml,alias);
 	       if(uniqueName)
 	         s+="_in_"+convertSpeciesToName(sbml,compl_id,true,true);
 		   }
 	   }
+	   long time = (new Date().getTime())-time1.getTime();
+	   if(time>100)
+		   System.out.println(time+"\t"+s+"\t"+speciesID);
 	   return s;
 	 }
 

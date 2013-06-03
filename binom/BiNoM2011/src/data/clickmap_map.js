@@ -284,6 +284,9 @@ function get_markers_for_modification(element, projection, map)
 		{
 			var cls = $(element).attr("class");
 			var nid = /\bs\d+\b/.exec(cls);
+			if (!nid) {
+				nid = /\b[a-zA-Z0-9_]+_+s\d+\b/.exec(cls);
+			}
 			var selector = "li#" + nid;
 			var idl = $(selector);
 			idl.each

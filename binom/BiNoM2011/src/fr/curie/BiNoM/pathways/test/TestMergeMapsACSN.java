@@ -9,13 +9,14 @@ public class TestMergeMapsACSN {
 	public static void main(String[] args) {
 		
 		MergingMapsProcessor mm = new MergingMapsProcessor();
+		mm.runScript();
 		
-		try {
-			mm.loadConfigFile("/bioinfo/users/ebonnet/test/test.txt");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		mm.mergeAll("/bioinfo/users/ebonnet/out.xml");
+//		try {
+//			mm.loadConfigFile("/bioinfo/users/ebonnet/test/test.txt");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		mm.mergeAll("/bioinfo/users/ebonnet/out.xml");
 		
 //		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-3.xml",50,15);
 //		mm.addMap("/bioinfo/users/ebonnet/Binom/mergeMaps/inna_toy_models/ToyModel-4.xml",650, 15);

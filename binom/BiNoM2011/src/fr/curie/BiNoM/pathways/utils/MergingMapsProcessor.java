@@ -81,7 +81,7 @@ public class MergingMapsProcessor {
 	private String cdFileString;
 	
 	/**
-	 * random 4-letters prefix to be added to CellDesigner Ids
+	 * prefix to be added to CellDesigner Ids
 	 */
 	private String prefix;
 	
@@ -1455,6 +1455,9 @@ public class MergingMapsProcessor {
 		CellDesigner.saveCellDesigner(doc, fileName);
 	}
 	
+	/**
+	 * Generate random 4 letters prefix
+	 */
 	private void generateRandomPrefix() {
 		prefix="";
 		String alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
@@ -1464,12 +1467,17 @@ public class MergingMapsProcessor {
 		prefix += "_";
 	}
 	
+	/** 
+	 * Generate prefix based on the model ID of the map
+	 * 
+	 * @param text map XML text
+	 */
 	private void makePrefix(String text){
 		generateRandomPrefix();
-		StringTokenizer st = new StringTokenizer(text," =\"><");
+		StringTokenizer st = new StringTokenizer(text," =\"><"); 
 		while(st.hasMoreTokens()){
 			String s = st.nextToken();
-			if(s.equals("id")){
+			if(s.equals("id")){ // first id encountered is the model id
 				prefix = st.nextToken();
 				if(prefix.length()>4)
 					prefix = prefix.substring(0, 4);
@@ -1479,7 +1487,11 @@ public class MergingMapsProcessor {
 		}
 	}
 	
-	
+	/**
+	 * Experimental code to merge layers.
+	 * 
+	 * @param cd
+	 */
 	private void addLayerID(SbmlDocument cd) {
 		String modelId = cd.getSbml().getModel().getId();
 		
@@ -1886,5 +1898,18 @@ public class MergingMapsProcessor {
 		
 	}
 
-	
+	/**
+	 * User specific script for manipulating map
+	 */
+	public void runScript() {
+		//addMap("bioinfo/users/ebonnet/MAPK01.xml",60,0);
+		String text = Utils.loadString("/bioinfo/users/ebonnet/MAPK01.xml");
+		makePrefix(text);
+		text = addPrefixToIds(text);
+		SbmlDocument cd = CellDesigner.loadCellDesignerFromText(text);
+		this.shiftCoordinates(cd, 60, 0);
+		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("4352");
+		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY("2304");
+		CellDesigner.saveCellDesigner(cd, "/bioinfo/users/ebonnet/MAPK01_new.xml");
+	}
 }

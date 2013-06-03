@@ -161,6 +161,7 @@ class FormatProteinNotesBase
 public class FormatProteinNotes extends FormatProteinNotesBase
 {
 	final private HashMap<String, String> colour_map = new HashMap<String, String>();
+	final private HashMap<String, String> class_map = new HashMap<String, String>();
 	final private Set<String> modules;
 	final private String blog_name;
 	public FormatProteinNotes(final Set<String> modules, final ProduceClickableMap.AtlasInfo atlasInfo, String[][] xrefs, final String blog_name)
@@ -178,6 +179,10 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		if (colour == null)
 			colour_map.put(name, colour = colours[colour_map.size() < colours.length ? colour_map.size() : 0]);
 		return colour;
+	}
+	private String get_class(String name)
+	{
+		return "bubble-" + get_colour(name);
 	}
 	private String build_comment(final String start, final List<Modification> modifications)
 	{
@@ -321,8 +326,16 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 					{
 						block = tag;
 						m.appendReplacement(res, "");
+						/*
 						res.append("<p style=\"background: ")
 							.append(get_colour(block))
+							.append("\">")
+							.append("<b>")
+							.append(block)
+							.append("</b>");
+						*/
+						res.append("<p class=\"")
+							.append(get_class(block))
 							.append("\">")
 							.append("<b>")
 							.append(block)

@@ -1062,9 +1062,12 @@ public class ProduceClickableMap
 
 	private void copy_files(final String source, final File destination) throws IOException
 	{
-		for (final String suffix : new String[]{"js", "css"})
-			for (final String base : new String[]{ included_blog_base, included_map_base })
+		for (final String suffix : new String[]{"js", "css"}) {
+			for (final String base : new String[]{ included_blog_base, included_map_base }) {
 				copy_file_between_directories(source, destination, base + "." + suffix);
+			}
+		}
+		copy_file_between_directories(source, destination, included_map_base + "_v2.css");
 	}
 
 	private void copy_file_between_directories(final String source, File destination, final String file) throws IOException
@@ -3466,7 +3469,7 @@ public class ProduceClickableMap
 		Entity(String id, String label, String cls, final String notes)
 		{
 			assert id.indexOf('<') < 0 && id.indexOf(' ') < 0: id;
-			assert !id.startsWith("s") : id;
+			//assert !id.startsWith("s") : id; // EV 2013-06-03
 //			assert !cls.equals(COMPLEX_CLASS_NAME) : id + " " + label;
 			this.id = id;
 			this.label = label;

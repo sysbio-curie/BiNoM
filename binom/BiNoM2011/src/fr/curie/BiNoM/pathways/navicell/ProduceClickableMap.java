@@ -80,6 +80,8 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 
 public class ProduceClickableMap
 {
+	private static boolean NV2 = false;
+
 	public static class NaviCellException extends java.lang.Exception
 	{
 		private static final long serialVersionUID = 5898681220888228646L;
@@ -110,10 +112,10 @@ public class ProduceClickableMap
 
 
 	private static final String map_icon = icons_directory + "/map.png";
+
 	private static final String reset_icon = icons_directory + "/reset.png";
 	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
 	private static final String help_icon = icons_directory + "/help.png";	
-	
 
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = base_directory + "/doc";
@@ -162,8 +164,12 @@ public class ProduceClickableMap
 	private static final String image_suffix = ".png";
 	private static final String common_directory_name = "_common";
 	static final String common_directory_url = "../" + common_directory_name;
-	private static final String jstree_directory_url = "../../../lib/jstree_pre1.0_fix_1";
+	private static final String jslib_dir = "../../../lib";
+	private static final String jquery_ui_dir = jslib_dir + "/jquery-ui-1.10.3";
+	private static final String jquery_ui_themes_dir = jslib_dir + "/jquery-ui-themes-1.10.3";
+	private static final String jstree_directory_url = jslib_dir + "/jstree_pre1.0_fix_1";
 	static final String jquery_js = jstree_directory_url + "/_lib/jquery.js";
+	static final String jquery_NV2_js = jslib_dir + "/jquery/jquery-1.8.3.js";
 	
 	private final String blog_name;
 	private ImagesInfo scales;
@@ -370,7 +376,7 @@ public class ProduceClickableMap
 			k++;
 			//if(k==500*(int)(k*0.002f))
 			//	System.out.print((k+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
-			
+
 			for (Modification m : e.getModifications())
 				try
 				{
@@ -466,6 +472,8 @@ public class ProduceClickableMap
 				make_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("notile", "do not force tile creation")) != null)
 				make_tiles = !b.booleanValue();
+			else if ((b = options.booleanOption("nv2", "Navicell2 file generation")) != null)
+				NV2 = b.booleanValue();
 			else if ((b = options.booleanOption("onlytile", "only create tiles")) != null)
 				only_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
@@ -542,6 +550,8 @@ public class ProduceClickableMap
 		System.out.println("Done");
 	}
 	static final String data_directory = "/data";
+	static final String rightpanel_include_file = data_directory + "/rightpanel.inc.html";
+	static final String mainpanel_include_file = data_directory + "/mainpanel.inc.html";
 
 	public static void run
 	(
@@ -576,8 +586,8 @@ public class ProduceClickableMap
 			modules = get_module_list(atlasInfo);
 		}
 
-		final File json_map_file = new File(destination_common, json_map_list);
-		final PrintStream outjson = new PrintStream(json_map_file);
+		final File mapdata_file = new File(destination_common, mapdata_list);
+		final PrintStream outjson = new PrintStream(mapdata_file);
 		final ProduceClickableMap master;
 		try
 		{
@@ -937,7 +947,7 @@ public class ProduceClickableMap
 	}
 	
 	private static final String right_panel_list = "right_panel.xml";
-	private static final String json_map_list = "json_maps.js";
+	private static final String mapdata_list = "mapdata.js";
 
 	private static boolean empty_tiles(final File tiles_directory)
 	{
@@ -971,17 +981,14 @@ public class ProduceClickableMap
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 
 		} else {
-			System.out.println("Making map...");
 			final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 			final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
 			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
-			System.out.println("Making tiles...");
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
-			System.out.println("Generating pages...");			
 			clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
 		}
@@ -1095,6 +1102,25 @@ public class ProduceClickableMap
 			canon = new File(canonDir, file.getName());
 		}
 		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+	}
+
+	static String file_contents(String filename)
+	{
+		StringBuffer strbuf = new StringBuffer();
+		try {
+			final InputStream resource = ProduceClickableMap.class.getResourceAsStream(filename);
+			BufferedInputStream bufis = new BufferedInputStream(resource);
+			byte[] buffer = new byte[2048];
+			int cc;
+			while ((cc = bufis.read(buffer, 0, buffer.length)) > 0) {
+				strbuf.append(new String(buffer, 0, cc));
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return strbuf.toString();
 	}
 
 	static private void fatal_error(String message)
@@ -1629,9 +1655,11 @@ public class ProduceClickableMap
 
 	private static void cdata(final PrintWriter output, String content2)
 	{
-		output.print("<![CDATA[");
+		output.print("<![CDATA[<span class=\"bubble\">");
+		//output.print("<![CDATA[");
 		output.print(content2.replace(cdata_end, cdata_end_rep));
-		output.print(cdata_end);
+		output.print("</span>" + cdata_end);
+		//output.print(cdata_end);
 	}
 	
 	static private void content_line_data(ItemCloser indent, String content)
@@ -1877,7 +1905,7 @@ public class ProduceClickableMap
 		outjson.print("]");
 	}
 
-	static private void generate_json_map(final String map, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
+	static private void generate_mapdata(final String map, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
@@ -1925,6 +1953,8 @@ public class ProduceClickableMap
 			outjson.print("}");
 		}
 		outjson.println("]');\n");
+		outjson.println("navicell.mapdata.addModuleMapdata(\"" + map + "\", " + map + "_map);\n");
+
 		/*
 		if (true) {
 			outjson.println("\nconsole.log('REALLY read " + map + " json map ?');");
@@ -2227,7 +2257,7 @@ public class ProduceClickableMap
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 		//System.out.println("_generate_ module " + map + " json ?");
-		generate_json_map(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		generate_mapdata(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		if (model.getListOfReactions() != null) {
 			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
@@ -2298,7 +2328,7 @@ public class ProduceClickableMap
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		//System.out.println("_generate_ master json ?");
-		generate_json_map("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		generate_mapdata("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		// create master file (must move to a method)
 		/*final File master_map = new File("/tmp/alpha.js"); // for now
@@ -2569,7 +2599,7 @@ public class ProduceClickableMap
 						fw.append("<dt>").append(h.add(g.getKey())).append("</dt><dd><ol>");
 						final ArrayList<String> regulators = g.getValue();
 						Collections.sort(regulators);
-						for (final String v : regulators){
+						for (final String v : regulators) {
 							if(v!=null)
 								show_regulators_in_post(fw.append("<li>"), h, v, pass2, wp);
 							else{
@@ -2908,7 +2938,7 @@ public class ProduceClickableMap
 		fw.append("<b>").append(human == null ? ent.getCls() : human).append(" ").append(h.add(ent.getName())).append("</b> ");
 		show_shapes_on_master_map(h, fw, ent, wp);
 		visible_debug(fw, ent.getId());
-		fw.append("<br>");
+		fw.append("<Br>");
 		format.full(fw, h, ent, cd, ent.getPostTranslational(), modules, wp);
 		format_modifications(h, fw, true, ent.getModifications(), pass2, wp);
 
@@ -4457,36 +4487,73 @@ public class ProduceClickableMap
 		out.println("<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=" + key + "' type='text/javascript'></script>");
 		out.println("<script src='http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js' type='text/javascript'></script>");
 		*/
-		
+
+		// CSS [
+		if (NV2) {
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_dir + "/themes/base/jquery.ui.all.css\"/>");
+			//out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/sunny/jquery.ui.theme.css\"/>");
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery.ui.theme.css\"/>");
+		}
+
 		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
+
+		// ] CSS
+
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='" + jquery_js + "' type='text/javascript'></script>");
+		out.println("<script src='" + (NV2 ? jquery_NV2_js : jquery_js) + "' type='text/javascript'></script>");
 		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
 		
-		out.println("<script src='../../../lib/splitter-1.5.1-patched.js' type='text/javascript'></script>");
-		out.println("<script src=\"" + common_directory_url + "/" + json_map_list + "\" type='text/javascript'></script>");
+		out.println("<script src='" + jslib_dir + "/splitter-1.5.1-patched.js' type='text/javascript'></script>");
+		if (NV2) {
+			out.println("<script src=\"" + jslib_dir + "/mapdata_lib.js" + "\" type='text/javascript'></script>");
+			out.println("<script src=\"" + common_directory_url + "/" + mapdata_list + "\" type='text/javascript'></script>");
+			out.println("<script src=\"" + jslib_dir + "/dialog_lib.js" + "\" type='text/javascript'></script>");
+		}
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
+
+		if (NV2) {
+			/* jquery-UI files */
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.core.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.widget.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.mouse.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.button.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.draggable.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.position.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.resizable.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.button.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.dialog.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.tabs.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");
+			out.println("<script src=\"" + jslib_dir + "/jquery.tablesorter.js\"></script>");
+		}
 
 		final String map_div_name = "map"; // see css
 		final String marker_div_name = "marker_checkboxes"; // see css
 		
 		out.println("<script type='text/javascript'>");
-		out.println("$(document).ready(function(){");
+
+		if (NV2) {
+			out.println("  navicell.module_name = \"" + map_name + "\";");
+		} else {
+			out.println("  var navicell = {};");
+		}
+
+		out.println("  $(document).ready(function() {");
 		
 		{
 			// http://methvin.com/splitter/index.html
-			out.println("$('#MySplitter').splitter({");
-			out.println("outline: true,");
-			/*out.println("resizeTo: window,");*/
-			out.println("resizeToWidth: true,");
-			out.println("sizeRight: 200,");
-			out.println("splitVertical: true");
-			out.println("});");		
+			out.println("    $('#MySplitter').splitter({");
+			out.println("      outline: true,");
+  		        /*out.println("      resizeTo: window,");*/
+			out.println("      resizeToWidth: true,");
+			out.println("      sizeRight: 230,");
+			out.println("      splitVertical: true");
+			out.println("    });\n");		
 		}
 		
-		out.print("clickmap_start(");
+		out.print("    clickmap_start(");
 		out.print(html_quote(blog_name));
 		out.print(html_quote(new StringBuffer(","), map_name).toString());
 		out.print(", '#" + marker_div_name + "'");
@@ -4508,9 +4575,10 @@ public class ProduceClickableMap
 		out.print(scales.xshift_zoom0);
 		out.print(", ");
 		out.print(scales.yshift_zoom0);
-		out.print(");");
-		out.println("});");
-		out.println(wp.getBlogLinker());
+		out.print(");\n");
+		out.println("    update_status_tables();");
+		out.println("  });\n");
+		out.println("  " + wp.getBlogLinker());
 		
 		out.println("</script>");
 		out.println("</head>");
@@ -4545,7 +4613,7 @@ public class ProduceClickableMap
 		out.print(" ");
 		//doc_in_new_window(out, "map_help", "help");
 		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\"/>");
-		
+
 		out.println("<input type='text' size='14' id='query_text'/>");
 		header_right.close();
 		header.close();
@@ -4556,9 +4624,39 @@ public class ProduceClickableMap
 		
 		left_content.close();
 		
-		(new Div(my_splitter, "id='" + marker_div_name + "'")).close();
+		final Div right_div = new Div(my_splitter, "id='" + "right_panel" + "'");
+		final Div marker_div = new Div(right_div, "id='" + marker_div_name + "'");
+		marker_div.close();
+
+		if (NV2) {
+			out.println(file_contents(rightpanel_include_file));
+			/*
+			final Div datatable_div = new Div(right_div, "id='" + "datatable_input" + "' align='center'");
 		
+			out.println("<h4>User Data</h4>");
+			out.println("<table>");
+			out.println("<tr><td>");
+			out.println("<button id=\"import_dialog\">Import Datatables</button>");
+			out.println("</td></tr>");
+			out.println("<tr><td>");
+			out.println("<button id=\"import_annot\">Import Annotations</button>");
+			out.println("</td></tr>");
+			out.println("<tr><td>");
+			out.println("<button id=\"data_status\">Data Status</button>");
+			out.println("</td></tr>");
+			out.println("</table>");
+
+			datatable_div.close();
+			*/
+		}
+
+		right_div.close();
+
 		my_splitter.close();
+
+		if (NV2) {
+			out.println(file_contents(mainpanel_include_file));
+		}
 		
 		out.println("</body>");
 		out.println("</html>");

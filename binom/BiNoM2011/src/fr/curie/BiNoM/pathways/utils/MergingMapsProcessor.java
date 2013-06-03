@@ -1665,7 +1665,7 @@ public class MergingMapsProcessor {
 		System.out.println("saving updated map "+outputFile+"...");
 		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(targetXml);
 		
-		updateAnnotations(doc, cd2);
+		//updateAnnotations(doc, cd2);
 		
 		CellDesigner.saveCellDesigner(doc, outputFile);
 	}

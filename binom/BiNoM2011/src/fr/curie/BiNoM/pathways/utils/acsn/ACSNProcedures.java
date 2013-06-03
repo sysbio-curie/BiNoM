@@ -21,6 +21,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
+import fr.curie.BiNoM.pathways.utils.ModifyCellDesignerNotes;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
 import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
@@ -53,6 +54,7 @@ public class ACSNProcedures {
 			boolean makehiddenlevel2 = false;
 			boolean updateDBconnections = false;
 			boolean changeModelNotes = false;			
+			boolean updateAnnotations = false;
 			
 			//doRemoveReactions("C:/Datas/NaviCell/test/merged/merged_master.xml");
 			//doMergePngs("C:/Datas/NaviCell/test/merged/merged_master-3.png",1f,"C:/Datas/NaviCell/test/merged/merged_master_noreactions.png",0.5f,null,1f,"C:/Datas/NaviCell/test/merged/merged_master-3_1.png");
@@ -76,6 +78,8 @@ public class ACSNProcedures {
 					makehiddenlevel2 = true;
 				if(args[i].equals("--changemodelnotes"))
 					changeModelNotes = true;
+				if(args[i].equals("--updateannotations"))
+					updateAnnotations = true;
 				
 				
 				if(args[i].equals("--png1"))
@@ -125,6 +129,9 @@ public class ACSNProcedures {
 			
 			if(changeModelNotes)
 				changeModelNotes(modelnotes, xmlFileName);
+			
+			if(updateAnnotations)
+				updateAnnotations(xmlFileName, xmlOutFileName);
 			
 			
 			
@@ -299,6 +306,31 @@ public class ACSNProcedures {
     	  xs.setStringValue(s);
     	  sbml.getSbml().getModel().getNotes().set(xs);
     	  CellDesigner.saveCellDesigner(sbml, xmlFileName);
+      }
+      
+      public static void updateAnnotations(String sourceFileName, String targetFileName){
+  		SbmlDocument cdsource = CellDesigner.loadCellDesigner(sourceFileName);
+  		SbmlDocument cdtarget = CellDesigner.loadCellDesigner(targetFileName);
+  		
+		ModifyCellDesignerNotes mns = new ModifyCellDesignerNotes();
+		mns.generateReadableNamesForReactionsAndSpecies = false;
+		mns.allannotations = true;
+		mns.formatAnnotation = false;
+		mns.sbmlDoc = cdsource;
+
+		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
+		mn.generateReadableNamesForReactionsAndSpecies = false;
+		mn.allannotations = true;
+		mn.formatAnnotation = false;
+		mn.sbmlDoc = cdtarget;
+		try{
+			mn.comments = mns.exportCellDesignerNotes();
+			mn.ModifyCellDesignerNotes();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		CellDesigner.saveCellDesigner(cdtarget, targetFileName);
       }
 
 }

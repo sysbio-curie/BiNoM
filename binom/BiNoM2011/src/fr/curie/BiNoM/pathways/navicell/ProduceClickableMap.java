@@ -4493,10 +4493,10 @@ public class ProduceClickableMap
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_dir + "/themes/base/jquery.ui.all.css\"/>");
 			//out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/sunny/jquery.ui.theme.css\"/>");
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery.ui.theme.css\"/>");
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + "_v2.css\"/>");
+		} else {
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
 		}
-
-		out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
-
 		// ] CSS
 
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
@@ -4630,24 +4630,6 @@ public class ProduceClickableMap
 
 		if (NV2) {
 			out.println(file_contents(rightpanel_include_file));
-			/*
-			final Div datatable_div = new Div(right_div, "id='" + "datatable_input" + "' align='center'");
-		
-			out.println("<h4>User Data</h4>");
-			out.println("<table>");
-			out.println("<tr><td>");
-			out.println("<button id=\"import_dialog\">Import Datatables</button>");
-			out.println("</td></tr>");
-			out.println("<tr><td>");
-			out.println("<button id=\"import_annot\">Import Annotations</button>");
-			out.println("</td></tr>");
-			out.println("<tr><td>");
-			out.println("<button id=\"data_status\">Data Status</button>");
-			out.println("</td></tr>");
-			out.println("</table>");
-
-			datatable_div.close();
-			*/
 		}
 
 		right_div.close();

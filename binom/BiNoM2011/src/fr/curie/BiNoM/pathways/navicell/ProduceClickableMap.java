@@ -107,6 +107,7 @@ public class ProduceClickableMap
 
 	
 	static final String module_list_category_name = "module list";
+	//static final String map_list_category_name = "map list";
 	private static final String base_directory = "../../..";
 	static final String icons_directory = base_directory + "/map_icons";
 
@@ -574,7 +575,7 @@ public class ProduceClickableMap
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, atlasInfo);
 
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir())
@@ -613,7 +614,7 @@ public class ProduceClickableMap
 				if (!map_name.equals(master_map_name))
 					try
 				{
-						process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules);
+					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo);
 				}
 				catch (IOException e)
 				{
@@ -626,9 +627,14 @@ public class ProduceClickableMap
 		if(master!=null)
 			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
 		
-		wp.remove_old_posts();
+		wp.remove_old_posts(atlasInfo);
 	}
 	
+	static boolean isMapInAtlas(AtlasInfo atlasInfo)
+	{
+		return atlasInfo != null && atlasInfo.isMap();
+	}
+
 	private static String make_tag_for_comments()
 	{
 		final StringBuffer sb = new StringBuffer();
@@ -973,7 +979,7 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules) throws IOException
+					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo) throws IOException
 	{
 
 		if (only_tiles) {
@@ -983,7 +989,7 @@ public class ProduceClickableMap
 		} else {
 			final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 			final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
-			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format);
+			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format, atlasInfo);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
@@ -1014,8 +1020,8 @@ public class ProduceClickableMap
 			clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
 			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
-			clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules);
-			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format);
+			clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
+			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format, atlasInfo);
 			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			return clMap;
@@ -2284,8 +2290,7 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
-	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name,
-		final FormatProteinNotes notes_formatter)
+	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name, final FormatProteinNotes notes_formatter, AtlasInfo atlasInfo)
 	{
 		final Hasher h = new Hasher();
 		StringBuffer fw = create_buffer_for_post_body(h);
@@ -2298,16 +2303,13 @@ public class ProduceClickableMap
 		}
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
-		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body);
-		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList());
+		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo);
+		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo);
 		return post;
 
 	}
 
-	private ItemCloser generatePages(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales,
-		final FormatProteinNotes format,
-		Map<String, ModuleInfo> modules_set
-	)
+	private ItemCloser generatePages(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set, AtlasInfo atlasInfo)
 		throws UnsupportedEncodingException, FileNotFoundException, NaviCellException
 	{
 		final Model model = cd.getSbml().getModel();
@@ -2319,12 +2321,12 @@ public class ProduceClickableMap
 				final Complex complex = (Complex)ent;
 				final String body = create_complex_body(complex, format, ReactionDisplayType.FirstPass, wp);
 				if (body != null)
-					complex.setPost(wp.updateBlogPostId(complex.getId(), complex.getName(), body));
+					complex.setPost(wp.updateBlogPostId(complex.getId(), complex.getName(), body, atlasInfo));
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
 				final String body = create_entity_body(format, ent, ReactionDisplayType.FirstPass, wp, null);
-				ent.setPost(wp.updateBlogPostId(ent.getId(), ent.getName(), body));
+				ent.setPost(wp.updateBlogPostId(ent.getId(), ent.getName(), body, atlasInfo));
 			}
 		}
 
@@ -2349,12 +2351,12 @@ public class ProduceClickableMap
 				modules.clear();
 				final String title = r.getId();
 				final String body = createReactionBody(r, format, wp);
-				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body);
+				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo);
 				
 				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 				reaction_line(right.add(), r, bubble, scales, post.getPostId());
 				
-				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules);
+				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo);
 			}
 		}
 		
@@ -2368,7 +2370,7 @@ public class ProduceClickableMap
 				if (body != null)
 				{
 					final BlogCreator.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
-					wp.updateBlogPostIfRequired(post, complex.getName(), body, COMPLEX_CLASS_NAME, modules);
+					wp.updateBlogPostIfRequired(post, complex.getName(), body, COMPLEX_CLASS_NAME, modules, atlasInfo);
 				}
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
@@ -2376,7 +2378,7 @@ public class ProduceClickableMap
 //				do_entity(wp, format, xml, all_posts, ent);
 				final String body = create_entity_body(format, ent, ReactionDisplayType.SecondPass, wp, modules);
 				final BlogCreator.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
-				wp.updateBlogPostIfRequired(post, ent.getName(), body, ent.getCls(), modules);
+				wp.updateBlogPostIfRequired(post, ent.getName(), body, ent.getCls(), modules, atlasInfo);
 			}
 		}
 		return right;
@@ -2526,7 +2528,23 @@ public class ProduceClickableMap
 	
 	static private StringBuffer show_map_and_markers_from_post(StringBuffer fw, String map, List<String> entities, String title, Linker wp)
 	{
-		fw.append(" <a href='/maps/javascript_required.html' class='show_map_and_markers' title=");
+		//System.out.println("show_map_and_markers_from_post [" + title + "]");
+		// HACKs to be compliant with clickmap_blog.js
+		if (wp.isWordPress()) {
+				if (title.startsWith("../")) {
+					title = title.substring(3);
+					map = title;
+				}
+				if (title.endsWith("/index.html")) {
+					int idx = title.indexOf("/index.html");
+					title = title.substring(0, idx);
+					map = title;
+					//System.out.println("NEW title and map [" + title + "] entities " + entities.size());
+				}
+			}
+
+		//fw.append(" <a href='/maps/javascript_required.html' class='show_map_and_markers' title=");
+		fw.append(" <a href='javascript_required.html' class='show_map_and_markers' title=");
 		html_quote(fw, title);
 		fw.append(">");
 		do_span(fw, "map", map);
@@ -2633,7 +2651,8 @@ public class ProduceClickableMap
 		return fw;
 	}
 	
-	private static String onclick_before = "<a href=\"javascript_required.html\" onclick='try { ";
+	//private static String onclick_before = "<a href=\"#\" onclick='try { ";
+	private static String onclick_before = "<a href='javascript_required.html' onclick='try { ";
 	private static String onclick_after = " } catch (e) {}; return false;'";
 	
 	private String createReactionBubble(ReactionDocument.Reaction r, int post_id, FormatProteinNotes format, Linker wp)
@@ -4579,7 +4598,9 @@ public class ProduceClickableMap
 		out.print(", ");
 		out.print(scales.yshift_zoom0);
 		out.print(");\n");
-		out.println("    update_status_tables();");
+		if (NV2) {
+			out.println("    update_status_tables();");
+		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());
 		

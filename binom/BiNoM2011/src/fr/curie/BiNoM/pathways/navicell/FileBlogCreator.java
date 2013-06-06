@@ -66,7 +66,7 @@ class FileBlogCreator extends BlogCreator
 		return id_to_post.get(id);
 	}
 	@Override
-	BlogCreator.Post updateBlogPostId(String id, String title, String body)
+	BlogCreator.Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo)
 	{
 		final Post post = new Post(id_to_post.size(), id, title, body);
 		final Post old = id_to_post.put(id, post);
@@ -74,8 +74,7 @@ class FileBlogCreator extends BlogCreator
 		return post;
 	}
 	@Override
-	void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type,
-			List<String> modules)
+	void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo)
 	{
 		final Post post = (Post)bpost;
 		assert title == post.title : post.title + " " + title;
@@ -86,7 +85,7 @@ class FileBlogCreator extends BlogCreator
 	static private final String post_suffix = ".html";
 	static private final String blog_location = "_blog";
 	@Override
-	void remove_old_posts() throws ProduceClickableMap.NaviCellException
+	void remove_old_posts(ProduceClickableMap.AtlasInfo atlasInfo) throws ProduceClickableMap.NaviCellException
 	{
 		final java.io.File rd = root_directory;
 		rd.mkdir();
@@ -115,8 +114,9 @@ class FileBlogCreator extends BlogCreator
 				
 				html.write("<script type='text/javascript'>var map_location='..'</script>\n");
 				html.write("<script type='text/javascript' src='" + ProduceClickableMap.jquery_js + "'></script>\n");
-				html.write("<script type='text/javascript' src='" + common + "/clickmap_blog.js'></script>\n");
-				html.write("<style src='" + common + "/clickmap_blog.css'></style>\n");
+				html.write("<link rel='stylesheet' type='text/css' href='../_common/clickmap_map.css'/>");
+				//				html.write("<style src='" + common + "/clickmap_blog.css'></style>\n");
+				html.write("<style src='" + common + "/clickmap_map.css'></style>\n");
 				
 				html.write("<title>\n");
 				html.write(p.title);
@@ -148,5 +148,11 @@ class FileBlogCreator extends BlogCreator
 	public String getMapIconURL()
 	{
 		return ProduceClickableMap.icons_directory + "/map.png";
+	}
+
+	@Override
+	public boolean isWordPress()
+	{
+		return false;
 	}
 }

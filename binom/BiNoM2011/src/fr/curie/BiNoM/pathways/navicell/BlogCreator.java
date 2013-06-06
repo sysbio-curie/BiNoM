@@ -23,6 +23,7 @@ interface Linker
 	StringBuffer post_link_base(int post_id, StringBuffer notes);
 	String getBlogLinker();
 	String getMapIconURL();
+	boolean isWordPress();
 }
 
 abstract public class BlogCreator implements Linker
@@ -31,8 +32,8 @@ abstract public class BlogCreator implements Linker
 	{
 		int getPostId();
 	}
-	abstract void remove_old_posts() throws ProduceClickableMap.NaviCellException;
+	abstract void remove_old_posts(ProduceClickableMap.AtlasInfo atlasInfo) throws ProduceClickableMap.NaviCellException;
 	abstract Post lookup(final String id);
-	abstract Post updateBlogPostId(String id, String title, String body);
-	abstract void updateBlogPostIfRequired(Post post, String title, String body, String reactionClassName, java.util.List<String> modules);
+	abstract Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo);
+	abstract void updateBlogPostIfRequired(Post post, String title, String body, String reactionClassName, java.util.List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo);
 }

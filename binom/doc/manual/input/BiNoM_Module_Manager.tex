@@ -36,12 +36,11 @@ connections between modules" links modules according to the reference global net
 \label{M-Phase_Material_Modular}
 \end{figure}
 
-\subsection{Create Modules from Networks}
+\subsection{Pack Network In Modules}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Create Modules from Networks}\\
-This function creates modules in the active network from a list of sub-networks (sub-networks are selected in the network list)\\
-All edges are kept. See edge attribute PREVIOUS\_ID for their origin.\\
+This function creates modules in a copy of the active network from a list of sub-networks (sub-networks are selected in the network list). All edges are kept and duplicated if necessary by making an edge ID from those in the inital network\\
 The attribute BIOPAX\_NODE\_TYPE is set to “pathway” (see visual style BiNoM BioPAX).\\
-\includegraphics[width=20pt,height=20pt]{graphics/warning} All nodes of sub-networks must be found once in the active network (no intersection between sub-networks).
+\includegraphics[width=20pt,height=20pt]{graphics/warning} All nodes of sub-networks must be found in the active network.
 
 \subsection{Agglomerate the Nearest Nodes in Modules}
 \textbf{Plugins$\Rightarrow$BiNoM 2.1$\Rightarrow$BiNoM Module Manager$\Rightarrow$Agglomerate the Nearest Nodes in Modules}\\
@@ -52,7 +51,7 @@ There are two input parameters in order to limit the computational time and the 
 \item Maximal number of nodes in modules.
 \end{itemize}
 Confirm creation if agree with displayed result (see dialog~\ref{Agglomerate_in_modules_dialog}).\\\\
-Sub-networks are created and gathered in a packed network as the function "Create modules from networks" (see figure~\ref{M-Phase_packed}).
+Sub-networks are created and the corresponding network of modules. In it, nodes are links by creating connections between modules  (see figure~\ref{M-Phase_packed}).
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{graphics/Agglomerate_in_modules_dialog}

@@ -292,47 +292,42 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 		boolean after_block = false;
 		HashMap<String, String> value_map = new HashMap<String, String>();
 		ProduceClickableMap.AtlasMapInfo mapInfo = null;
-		while (m.find())
-		{
+		while (m.find()) {
 			int offset = 1;
-			while (m.start(offset) == m.end(offset))
+			while (m.start(offset) == m.end(offset)) {
 				offset++;
+			}
 			final String tag = m.group(offset);
-			if (tag.startsWith("\n") && tag.endsWith("\n"))
-			{
+			if (tag.startsWith("\n") && tag.endsWith("\n"))	{
 				//m.appendReplacement(res, (after_block) ? "\n" : "<br>\n");
 				//m.appendReplacement(res, (after_block) ? "" : "<br>");
 				m.appendReplacement(res, "");
-			}
-			else
-			{
+			} else {
 				final String arg = m.group(offset + 1);
 				//System.out.println("tag [" + tag + "], arg [" + arg + "]");
 				if ("_end".equals(arg))
-				{
-					if (block != null && block.equals(tag))
 					{
-						block = null;
-						m.appendReplacement(res, "</p>");
-						after_block = true;
+						if (block != null && block.equals(tag))
+							{
+								block = null;
+								m.appendReplacement(res, "</p>");
+								after_block = true;
+							}
+						else {
+							m.appendReplacement(res, "$0");
+						}
 					}
-					else {
-						m.appendReplacement(res, "$0");
-					}
-				}
-				else if ("_begin".equals(arg))
-				{
-					if (block == null)
-					{
+				else if ("_begin".equals(arg)) {
+					if (block == null) {
 						block = tag;
 						m.appendReplacement(res, "");
 						/*
-						res.append("<p style=\"background: ")
-							.append(get_colour(block))
-							.append("\">")
-							.append("<b>")
-							.append(block)
-							.append("</b>");
+						  res.append("<p style=\"background: ")
+						  .append(get_colour(block))
+						  .append("\">")
+						  .append("<b>")
+						  .append(block)
+						  .append("</b>");
 						*/
 						res.append("<p class=\"")
 							.append(get_class(block))
@@ -342,13 +337,10 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							.append("</b>");
 						//.append("</b><br>");
 						after_block = false;
-					}
-					else {
+					} else {
 						m.appendReplacement(res, "$0");
 					}
-				}
-				else if (tag.endsWith(":"))
-				{
+				} else if (tag.endsWith(":")) {
 					//System.out.println("  -> endsWidth :");
 					m.appendReplacement(res, "");
 					res.append(tag + arg);
@@ -361,13 +353,10 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 						//System.out.println("module NOT found [" + arg + "]");
 					}
 					after_block = false;
-				}
-				else
-				{	
+				} else {
 					boolean done = false;
 					for (final String[] entry : xrefs)
-						if (entry[0].equals(tag))
-						{
+						if (entry[0].equals(tag)) {
 							m.appendReplacement(res, "");
 							String value = m.group(offset + 2);
 							value_map.put("%" + entry[0] + "%", value);
@@ -383,16 +372,16 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 								res.append(xtag).append(value).append("&nbsp;");
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else if (tag.equals("MODULE")) {
-								if(mapInfo==null)
+								if (mapInfo==null) {
 									System.out.println("ERROR: Map info = null for "+value+"\n"+note	);
-								else{
-								ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
-								if (moduleInfo != null) {
-									assert moduleInfo.url != null;
-									url = moduleInfo.url;
-								}
-								res.append(xtag).append(value).append("&nbsp;");
-								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
+								} else {
+									ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
+									if (moduleInfo != null) {
+										assert moduleInfo.url != null;
+										url = moduleInfo.url;
+									}
+									res.append(xtag).append(value).append("&nbsp;");
+									show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 								}
 							} else {
 								String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
@@ -427,12 +416,12 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		final String[] split = comment.split("[\n \t\r]+");
 		for (final String s : split)
-		{
-			if (!s.isEmpty())
 			{
-				h.add(s);
-				h.add(" ");
+				if (!s.isEmpty())
+					{
+						h.add(s);
+						h.add(" ");
+					}
 			}
-		}
 	}
 }

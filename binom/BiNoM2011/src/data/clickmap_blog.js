@@ -90,6 +90,7 @@ function show_map_and_markers(map_name, ids)
 	{
 		console.log("not open", map_name, maps);
 		var url = map_location + "/" + map_name + "/index.html";
+		console.log("opening " + url);
 		map = window.open(url);
 		map.to_open = ids;
 		map.maps = maps;

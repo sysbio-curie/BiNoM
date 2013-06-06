@@ -114,9 +114,10 @@ class FileBlogCreator extends BlogCreator
 				
 				html.write("<script type='text/javascript'>var map_location='..'</script>\n");
 				html.write("<script type='text/javascript' src='" + ProduceClickableMap.jquery_js + "'></script>\n");
+				html.write("<script type='text/javascript' src='" + common + "/clickmap_blog.js'></script>\n");
 				html.write("<link rel='stylesheet' type='text/css' href='../_common/clickmap_map.css'/>");
-				//				html.write("<style src='" + common + "/clickmap_blog.css'></style>\n");
-				html.write("<style src='" + common + "/clickmap_map.css'></style>\n");
+				html.write("<link rel='stylesheet' type='text/css' href='../_common/clickmap_blog.css'/>");
+				html.write("<style type='text/javascript' src='" + common + "/clickmap_map.css'></style>\n");
 				
 				html.write("<title>\n");
 				html.write(p.title);

@@ -2211,8 +2211,7 @@ public class ProduceClickableMap
 						module_item.getOutput().print("\"");
 					}
 					module_item.getOutput().println(">");
-					//content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
-					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "");
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "Module " + moduleInfo.name);
 
 					module_item.close();
 				}
@@ -2529,19 +2528,19 @@ public class ProduceClickableMap
 	static private StringBuffer show_map_and_markers_from_post(StringBuffer fw, String map, List<String> entities, String title, Linker wp)
 	{
 		//System.out.println("show_map_and_markers_from_post [" + title + "]");
-		// HACKs to be compliant with clickmap_blog.js
-		if (wp.isWordPress()) {
-				if (title.startsWith("../")) {
-					title = title.substring(3);
-					map = title;
-				}
-				if (title.endsWith("/index.html")) {
-					int idx = title.indexOf("/index.html");
-					title = title.substring(0, idx);
-					map = title;
-					//System.out.println("NEW title and map [" + title + "] entities " + entities.size());
-				}
+		// EV: 2013-06-06: hack to be compliant with clickmap_blog.js
+		/*if (wp.isWordPress())*/ {
+			if (title.startsWith("../")) {
+				title = title.substring(3);
+				map = title;
 			}
+			if (title.endsWith("/index.html")) {
+				int idx = title.indexOf("/index.html");
+				title = title.substring(0, idx);
+				map = title;
+				//System.out.println("NEW title and map [" + title + "] entities " + entities.size());
+			}
+		}
 
 		//fw.append(" <a href='/maps/javascript_required.html' class='show_map_and_markers' title=");
 		fw.append(" <a href='javascript_required.html' class='show_map_and_markers' title=");

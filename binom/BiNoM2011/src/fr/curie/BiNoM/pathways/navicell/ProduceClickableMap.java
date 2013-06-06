@@ -81,6 +81,7 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 public class ProduceClickableMap
 {
 	private static boolean NV2 = false;
+	private static File config = null;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -180,9 +181,11 @@ public class ProduceClickableMap
 	static class AtlasModuleInfo {
 		String name;
 		String url;
-		AtlasModuleInfo(String name, String url) {
+		String desc;
+		AtlasModuleInfo(String name, String url, String desc) {
 			this.name = name;
 			this.url = url;
+			this.desc = desc != null ? desc : "Module " + name;
 		}
 	}
 
@@ -271,6 +274,7 @@ public class ProduceClickableMap
 			String[] map_arr = atlas_arr[nn].split(";");
 			String moduleName = null;
 			String moduleUrl = null;
+			String moduleDesc = null;
 			for (int jj = 0; jj < map_arr.length; ++jj) {
 				String[] map_item_arr = map_arr[jj].split(";");
 				for (int kk = 0; kk < map_item_arr.length; ++kk) {
@@ -293,10 +297,20 @@ public class ProduceClickableMap
 								atlasInfo.add(mapInfo = new AtlasMapInfo(mapId, mapName, mapUrl));
 								mapId = mapName = mapUrl = null;
 							}
-							mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl));
-							moduleName = moduleUrl = null;
+							mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl, moduleDesc));
+							moduleName = moduleUrl = moduleDesc = null;
 						}
 						moduleName = val;
+					} else if (key.equals("desc")) {
+						if (val.charAt(0) == '@') {
+							String file = val.substring(1);
+							if (file.charAt(0) != '/' && config != null) {
+								file = config.getParent().toString() + "/" + file;
+							}
+							moduleDesc = file_contents(file, false);
+						} else {
+							moduleDesc = val;
+						}
 					} else if (moduleName != null && key.equals("url")) {
 						moduleUrl = val;
 					}
@@ -311,8 +325,8 @@ public class ProduceClickableMap
 							atlasInfo.add(mapInfo = new AtlasMapInfo(mapId, mapName, mapUrl));
 							mapId = mapName = mapUrl = null;
 						}
-						mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl));
-						moduleName = moduleUrl = null;
+						mapInfo.add(new AtlasModuleInfo(moduleName, moduleUrl, moduleDesc));
+						moduleName = moduleUrl = moduleDesc = null;
 					}
 				}
 			}
@@ -435,7 +449,7 @@ public class ProduceClickableMap
 		OptionParser options = new fr.curie.BiNoM.pathways.utils.OptionParser(args, null);
 		String base = null;
 		File wordpress_cfg_file = null;
-		File config = null;
+		//File config = null;
 		File xref_file = null;
 		File source_directory = null;
 		File destination = null;
@@ -1113,11 +1127,16 @@ public class ProduceClickableMap
 		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
 	}
 
-	static String file_contents(String filename)
+	static String file_contents(String filename, boolean is_local)
 	{
 		StringBuffer strbuf = new StringBuffer();
 		try {
-			final InputStream resource = ProduceClickableMap.class.getResourceAsStream(filename);
+			final InputStream resource;
+			if (is_local) {
+				resource = ProduceClickableMap.class.getResourceAsStream(filename);
+			} else {
+				resource = new FileInputStream(new File(filename));
+			}
 			BufferedInputStream bufis = new BufferedInputStream(resource);
 			byte[] buffer = new byte[2048];
 			int cc;
@@ -2211,7 +2230,7 @@ public class ProduceClickableMap
 						module_item.getOutput().print("\"");
 					}
 					module_item.getOutput().println(">");
-					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, "Module " + moduleInfo.name);
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, moduleInfo.desc);
 
 					module_item.close();
 				}
@@ -4652,7 +4671,7 @@ public class ProduceClickableMap
 		marker_div.close();
 
 		if (NV2) {
-			out.println(file_contents(rightpanel_include_file));
+			out.println(file_contents(rightpanel_include_file, true));
 		}
 
 		right_div.close();
@@ -4660,7 +4679,7 @@ public class ProduceClickableMap
 		my_splitter.close();
 
 		if (NV2) {
-			out.println(file_contents(mainpanel_include_file));
+			out.println(file_contents(mainpanel_include_file, true));
 		}
 		
 		out.println("</body>");

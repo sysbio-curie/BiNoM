@@ -1543,24 +1543,26 @@ public class MergingMapsProcessor {
 		
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
-		System.out.println("");
+		//System.out.println("");
 		for (SpeciesDocument.Species sp : cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1, sp.getId(), true, true);
-			if(name!=null)if(!name.startsWith("null"))
+			/*if(name!=null)if(!name.startsWith("null"))
 				if(mapNameId1.get(name)!=null)
 					System.out.println("warning: map "+cd1.getSbml().getModel().getId()+", "+name+" species name coincides between "+mapNameId1.get(name)+" and "+sp.getId());
+					*/
 			mapNameId1.put(name, sp.getId());
 			mapIdName1.put(sp.getId(), name);
 			//System.out.println(sp.getId()+"\t"+name);
 		}
-		System.out.println("");
+		//System.out.println("");
 		CellDesigner.entities = CellDesigner.getEntities(cd2);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd2.getSbml());
 		for (SpeciesDocument.Species sp : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
-			if(name!=null)if(!name.startsWith("null"))			
+			/*if(name!=null)if(!name.startsWith("null"))			
 				if(mapNameId2.get(name)!=null)
 					System.out.println("warning: map "+cd2.getSbml().getModel().getId()+", "+name+" species name coincides between "+mapNameId2.get(name)+" and "+sp.getId());
+					*/
 			mapNameId2.put(name, sp.getId());
 			mapIdName2.put(sp.getId(), name);
 			//System.out.println(sp.getId()+"\t"+name);
@@ -1664,6 +1666,7 @@ public class MergingMapsProcessor {
 		
 		System.out.println("saving updated map "+outputFile+"...");
 		SbmlDocument doc = CellDesigner.loadCellDesignerFromText(targetXml);
+		System.out.println("");
 		
 		//updateAnnotations(doc, cd2);
 		

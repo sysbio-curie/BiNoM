@@ -47,6 +47,10 @@ public class ACSNProcedures {
 			float transparency3 = 1f;			
 			int fontsize = 12;
 			String modelnotes = "";
+			String name = "";
+			String fileIn = "";
+			String fileOut = "";
+			String folder = "";			
 			
 			boolean removeReactions = false;
 			boolean mergepngs = false;
@@ -55,6 +59,10 @@ public class ACSNProcedures {
 			boolean updateDBconnections = false;
 			boolean changeModelNotes = false;			
 			boolean updateAnnotations = false;
+			boolean changeModelName = false;
+			boolean copyModelNotesToFile = false;
+			
+			
 			
 			//doRemoveReactions("C:/Datas/NaviCell/test/merged/merged_master.xml");
 			//doMergePngs("C:/Datas/NaviCell/test/merged/merged_master-3.png",1f,"C:/Datas/NaviCell/test/merged/merged_master_noreactions.png",0.5f,null,1f,"C:/Datas/NaviCell/test/merged/merged_master-3_1.png");
@@ -80,6 +88,10 @@ public class ACSNProcedures {
 					changeModelNotes = true;
 				if(args[i].equals("--updateannotations"))
 					updateAnnotations = true;
+				if(args[i].equals("--changemodelname"))
+					changeModelName = true;
+				if(args[i].equals("--copymodelnotestofile"))
+					copyModelNotesToFile = true;
 				
 				
 				if(args[i].equals("--png1"))
@@ -90,6 +102,14 @@ public class ACSNProcedures {
 					pngFileName3 = args[i+1];
 				if(args[i].equals("--pngout"))
 					pngOutFileName = args[i+1];
+				if(args[i].equals("--in"))
+					fileIn = args[i+1];
+				if(args[i].equals("--out"))
+					fileOut = args[i+1];
+				if(args[i].equals("--folder"))
+					folder = args[i+1];
+				
+				
 				if(args[i].equals("--transparency1"))
 					transparency1 = Float.parseFloat(args[i+1]);
 				if(args[i].equals("--transparency2"))
@@ -100,6 +120,8 @@ public class ACSNProcedures {
 					fontsize = Integer.parseInt(args[i+1]);
 				if(args[i].equals("--modelnotes"))
 					modelnotes = args[i+1];
+				if(args[i].equals("--name"))
+					name = args[i+1];
 				
 				
 				if(args[i].equals("--updatedbids"))
@@ -133,6 +155,17 @@ public class ACSNProcedures {
 			if(updateAnnotations)
 				updateAnnotations(xmlFileName, xmlOutFileName);
 			
+			if(changeModelName)
+				changeModelName(xmlFileName, name);
+			
+			if(copyModelNotesToFile){
+				if(!folder.equals("")){
+					File f = new File(folder);
+					copyModelNotesToFile(f, fileIn, fileOut);
+				}else{
+					copyModelNotesToFile(xmlFileName, fileIn, fileOut);
+				}
+			}
 			
 			
 		}catch(Exception e){
@@ -308,6 +341,12 @@ public class ACSNProcedures {
     	  CellDesigner.saveCellDesigner(sbml, xmlFileName);
       }
       
+      public static void changeModelName(String xmlFileName, String name){
+    	  SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
+    	  sbml.getSbml().getModel().setId(name);
+    	  CellDesigner.saveCellDesigner(sbml, xmlFileName);
+      }      
+      
       public static void updateAnnotations(String sourceFileName, String targetFileName){
   		SbmlDocument cdsource = CellDesigner.loadCellDesigner(sourceFileName);
   		SbmlDocument cdtarget = CellDesigner.loadCellDesigner(targetFileName);
@@ -332,5 +371,38 @@ public class ACSNProcedures {
 		
 		CellDesigner.saveCellDesigner(cdtarget, targetFileName);
       }
+      
+      public static void copyModelNotesToFile(File folder, String fileIn, String fileOut){
+    	  String xmlFileName = "";
+    	  for(File f: folder.listFiles()){
+    		  String fn = f.getAbsolutePath();
+    		  if(fn.endsWith(".xml"))
+    		  if(!fn.contains("_master"))
+    			  xmlFileName+=fn+";";
+    	  }
+    	  if(xmlFileName.length()>1)
+    		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
+    	  copyModelNotesToFile(xmlFileName, fileIn, fileOut);
+      }
+      
+      public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut){
+    	  String prefix = Utils.loadString(fileIn);
+    	  String fns[] = xmlFileName.split(";");
+    	  String s = "";    	  
+    	  for(String fn: fns){
+    		  SbmlDocument sbml = CellDesigner.loadCellDesigner(fn);
+    		  fn = (new File(fn)).getName();
+    		  fn = fn.substring(0,fn.length()-4);
+    		  String parts[] = fn.split("_");
+    		  if(parts.length>1)
+    		  for(int i=1;i<parts.length;i++)
+    			  s+=parts[i]+"_";
+    		  if(s.length()>1)
+    			  s = s.substring(0,s.length()-1)+"\n";
+    		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
+    	  }
+    	  Utils.saveStringToFile(prefix+"\n\n"+s, fileOut);
+      }
+      
 
 }

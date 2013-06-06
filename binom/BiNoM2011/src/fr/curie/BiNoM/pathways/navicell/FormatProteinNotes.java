@@ -384,7 +384,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else if (tag.equals("MODULE")) {
 								if(mapInfo==null)
-									System.out.println("ERROR: Map info = null for "+value);
+									System.out.println("ERROR: Map info = null for "+value+"\n"+note	);
 								else{
 								ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
 								if (moduleInfo != null) {

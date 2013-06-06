@@ -81,6 +81,15 @@ import fr.curie.BiNoM.cytoscape.celldesigner.colorCellDesignerProteins;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.pathwayStainingCellDesigner;
+import fr.curie.BiNoM.cytoscape.influence.FromToNodes;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceAreaInArray;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceAreaInAttribute;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceArrayAsGraphic;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceArrayAsText;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceByAttribute;
+import fr.curie.BiNoM.cytoscape.influence.InfluenceFeatures;
+import fr.curie.BiNoM.cytoscape.influence.InputReachParameter;
+import fr.curie.BiNoM.cytoscape.influence.UpdateInfluenceAttrib;
 import fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory;
 import fr.curie.BiNoM.cytoscape.nestmanager.ClusterByShortPath;
 import fr.curie.BiNoM.cytoscape.nestmanager.CreateConnectionsBetweenNests;
@@ -428,6 +437,68 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(DestroyUnusedNetworksAsNest.title);
 		binomNestManagerMenu.add(menuItem);
 		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
+		
+		/*
+		 * Fade Model menu
+		 */
+	    JMenu binomInfluenceMenu = new JMenu("BiNoM Fade Model");
+	    binomMainMenu.add(binomInfluenceMenu);
+		
+		menuItem=new JMenuItem(FromToNodes.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new FromToNodes());
+		
+		binomInfluenceMenu.addSeparator();
+
+		menuItem=new JMenuItem(UpdateInfluenceAttrib.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  UpdateInfluenceAttrib());
+				
+		menuItem=new JMenuItem(InputReachParameter.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InputReachParameter());
+				
+		menuItem=new JMenuItem(InfluenceFeatures.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceFeatures());
+		
+		binomInfluenceMenu.addSeparator();
+		
+		JMenu textMenu=new JMenu(InfluenceArrayAsText.title);
+		binomInfluenceMenu.add(textMenu);
+
+		menuItem = new JMenuItem(InfluenceArrayAsText.titleV);
+		menuItem.addActionListener(new InfluenceArrayAsText("0.000"));
+		textMenu.add(menuItem);
+
+		menuItem = new JMenuItem(InfluenceArrayAsText.titleC);
+		menuItem.addActionListener(new InfluenceArrayAsText(null));
+		textMenu.add(menuItem);
+				
+		JMenu graphicMenu=new JMenu(InfluenceArrayAsGraphic.title);
+		binomInfluenceMenu.add(graphicMenu);
+
+		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleF);
+		menuItem.addActionListener(new InfluenceArrayAsGraphic(false));
+		graphicMenu.add(menuItem);
+
+		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleT);
+		menuItem.addActionListener(new InfluenceArrayAsGraphic(true));
+		graphicMenu.add(menuItem);
+		
+		menuItem=new JMenuItem(InfluenceByAttribute.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceByAttribute());
+	
+		binomInfluenceMenu.addSeparator();
+		
+		menuItem=new JMenuItem(InfluenceAreaInArray.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceAreaInArray());
+		
+		menuItem=new JMenuItem(InfluenceAreaInAttribute.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceAreaInAttribute());
 
 		/*
 		 * BioPAX 3 utils menu

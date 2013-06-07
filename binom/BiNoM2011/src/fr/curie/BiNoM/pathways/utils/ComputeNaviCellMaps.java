@@ -16,9 +16,16 @@ public class ComputeNaviCellMaps {
 			File currentDir = new File(".");
 			File listofdirs[] = currentDir.listFiles();
 			
+			Vector<String> names = new Vector<String>();
 			for(int i=0;i<listofdirs.length;i++){
-				if(listofdirs[i].isDirectory()){
-					File dir = listofdirs[i];
+				names.add(listofdirs[i].getAbsolutePath());
+			}
+			Collections.sort(names);
+			
+			for(int i=0;i<names.size();i++){
+				File f = new File(names.get(i));
+				if(f.isDirectory()){
+					File dir = f;
 					System.out.println("DIR: "+dir.getAbsolutePath());
 					File listOfFiles[] = dir.listFiles();
 					for(int j=0;j<listOfFiles.length;j++)if(listOfFiles[j].getName().equals("config")){

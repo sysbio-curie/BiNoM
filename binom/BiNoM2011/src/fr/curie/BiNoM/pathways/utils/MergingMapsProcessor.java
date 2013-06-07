@@ -165,6 +165,7 @@ public class MergingMapsProcessor {
 	 * Print extended informations while merging elements
 	 */
 	public boolean verbose = false;
+	public int prefixLength = 4;
 	
 	/**
 	 * Constructor
@@ -194,6 +195,7 @@ public class MergingMapsProcessor {
 		int zoomLevel = 3;
 		int numberOfTimesToScale = 0;
 		int scale = 1;
+		int preflength = 4;
 		
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("--config"))
@@ -214,10 +216,14 @@ public class MergingMapsProcessor {
 				zoomLevel = Integer.parseInt(args[i+1]);
 			if(args[i].equals("--numberofscaleimages"))
 				numberOfTimesToScale = Integer.parseInt(args[i+1]);
+			if(args[i].equals("--prefixlength"))
+				preflength = Integer.parseInt(args[i+1]);
+			
 		}
 		
 		try{
 			MergingMapsProcessor mm = new MergingMapsProcessor();
+			mm.prefixLength = preflength;
 			mm.loadConfigFile(configFile);
 
 			if(preprocess)
@@ -1479,8 +1485,8 @@ public class MergingMapsProcessor {
 			String s = st.nextToken();
 			if(s.equals("id")){ // first id encountered is the model id
 				prefix = st.nextToken();
-				if(prefix.length()>4)
-					prefix = prefix.substring(0, 4);
+				if(prefix.length()>prefixLength)
+					prefix = prefix.substring(0, prefixLength);
 				prefix+="_";
 				break;
 			}

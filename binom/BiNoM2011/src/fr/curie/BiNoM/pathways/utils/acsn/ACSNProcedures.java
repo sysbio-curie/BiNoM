@@ -161,7 +161,10 @@ public class ACSNProcedures {
 			if(copyModelNotesToFile){
 				if(!folder.equals("")){
 					File f = new File(folder);
-					copyModelNotesToFile(f, fileIn, fileOut);
+					if(fileIn.equals(""))
+						copyModelNotesToFile(f, fileOut);
+					else	
+						copyModelNotesToFile(f, fileIn, fileOut);
 				}else{
 					copyModelNotesToFile(xmlFileName, fileIn, fileOut);
 				}
@@ -385,6 +388,20 @@ public class ACSNProcedures {
     	  copyModelNotesToFile(xmlFileName, fileIn, fileOut);
       }
       
+      public static void copyModelNotesToFile(File folder, String folderOut){
+    	  String xmlFileName = "";
+    	  for(File f: folder.listFiles()){
+    		  String fn = f.getAbsolutePath();
+    		  if(fn.endsWith(".xml"))
+    		  if(!fn.contains("_master"))
+    			  xmlFileName+=fn+";";
+    	  }
+    	  if(xmlFileName.length()>1)
+    		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
+    	  copyModelNotesToFile(xmlFileName, folderOut);
+      }
+      
+      
       public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut){
     	  String prefix = Utils.loadString(fileIn);
     	  String fns[] = xmlFileName.split(";");
@@ -403,6 +420,26 @@ public class ACSNProcedures {
     	  }
     	  Utils.saveStringToFile(prefix+"\n\n"+s, fileOut);
       }
+      
+      public static void copyModelNotesToFile(String xmlFileName, String folderOut){
+    	  String fns[] = xmlFileName.split(";");
+    	  for(String fn: fns){
+        	  String s = "";
+    		  SbmlDocument sbml = CellDesigner.loadCellDesigner(fn);
+    		  fn = (new File(fn)).getName();
+    		  fn = fn.substring(0,fn.length()-4);
+    		  String parts[] = fn.split("_");
+    		  if(parts.length>1)
+    		  for(int i=1;i<parts.length;i++)
+    			  s+=parts[i]+"_";
+    		  if(s.length()>1)
+    			  s = s.substring(0,s.length()-1)+"\n";
+    		  String moduleName = Utils.cutFirstLastNonVisibleSymbols(s);
+    		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
+        	  Utils.saveStringToFile(s,folderOut+moduleName+".txt");    		  
+    	  }
+      }
+      
       
 
 }

@@ -2221,7 +2221,7 @@ public class ProduceClickableMap
 					AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
 					double[] module_position = positions.get(moduleInfo.name);
 					ItemCloser module_item  = map_item.add();
-					item_list_start(module_item, moduleInfo.name, right_hand_tag);
+					item_list_start(module_item, moduleInfo.name, right_hand_tag + " module");
 					if (module_position != null) {
 						module_item.getOutput().print(" position=\"");
 						module_item.getOutput().print(scales.getX(module_position[0]));
@@ -2230,7 +2230,15 @@ public class ProduceClickableMap
 						module_item.getOutput().print("\"");
 					}
 					module_item.getOutput().println(">");
-					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, moduleInfo.desc);
+					String bubble_txt = "<b>Module " + moduleInfo.name + "</b>";
+					StringBuffer fw = new StringBuffer();
+					//int post_id = 1;
+					//bubble_to_post_link_with_anchor(post_id, fw);
+					//System.out.println("MODULE " + moduleInfo.name + " " + moduleInfo.url);
+					//open_map_from_bubble(fw.append(" "), moduleInfo.name);
+					open_map_from_bubble(fw.append(" "), moduleInfo.url);
+					bubble_txt += fw.toString() + "<br>" +  moduleInfo.desc;
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, bubble_txt);
 
 					module_item.close();
 				}
@@ -2323,6 +2331,7 @@ public class ProduceClickableMap
 		String body = h.insert(fw, id).toString();
 		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo);
 		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo);
+		//System.out.println("module: " + map_name + " " + post.getPostId());
 		return post;
 
 	}

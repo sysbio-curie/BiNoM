@@ -547,9 +547,11 @@ public class WordPressBlogCreator extends BlogCreator
 		//System.out.println("updateBlogPostId: " + id + " in " + (info != null ? info.cls : "<null>"));
 		if (ProduceClickableMap.isMapInAtlas(atlasInfo)) {
 			if (info == null) {
-				//Utils.eclipsePrintln("should not create a new post for map in atlas " + id + " " + title);
-				return addPage(id, createPost(wp, title, ProduceClickableMap.module_list_category_name));
+				BlogCreator.Post post = addPage(id, createPost(wp, title, ProduceClickableMap.module_list_category_name));
+				//Utils.eclipsePrintln("should not create a new post for map in atlas " + id + " " + title + " " + post.getPostId());
+				return post;
 			}
+			//Utils.eclipsePrintln("already created post for map in atlas " + id + " " + title + " " + info.getPostId());
 			return info;
 		}
 		if (body != null)

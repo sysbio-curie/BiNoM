@@ -301,10 +301,11 @@ function get_markers_for_modification(element, projection, map)
 		{
 			var id = $(element).attr("id");
 			var cls = $(element).parent().parent().attr("id");
+			var css_cls = $(element).attr("class");
 			var icon = medium_icon;
 			if (cls == "REACTION") {
 				icon = small_icon;
-			} else if (cls == "modules") {
+			} else if (cls == "modules" || /\bmodule\b/.test(css_cls)) {
 				icon = big_icon;
 			}
 

@@ -70,6 +70,7 @@ class FileBlogCreator extends BlogCreator
 	{
 		final Post post = new Post(id_to_post.size(), id, title, body);
 		final Post old = id_to_post.put(id, post);
+		//System.out.println("FileCreator.updateBlogPostId: " + id + " " + post.getPostId() + " " + title);
 		assert old == null : old.id + " " + post.id;
 		return post;
 	}
@@ -77,6 +78,7 @@ class FileBlogCreator extends BlogCreator
 	void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo)
 	{
 		final Post post = (Post)bpost;
+		//System.out.println("FileCreator.updateBlogPostIdIfRequired: " + id + " " + post.getPostId() + " " + title);
 		assert title == post.title : post.title + " " + title;
 		post.setEntityType(entity_type);
 		post.setBody(body);

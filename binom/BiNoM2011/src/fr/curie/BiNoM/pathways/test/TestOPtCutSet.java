@@ -163,7 +163,6 @@ public class TestOPtCutSet {
 			oca.maxHitSetSize = 10;
 			
 			long tic = System.currentTimeMillis();
-			oca.searchHitSetSeed();
 			//oca.searchHitSetPartial();
 			//oca.mainBerge(false);
 			//long toc = System.currentTimeMillis() - tic;

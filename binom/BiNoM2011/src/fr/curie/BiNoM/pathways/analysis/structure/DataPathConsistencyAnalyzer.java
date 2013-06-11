@@ -1381,23 +1381,6 @@ public class DataPathConsistencyAnalyzer {
 			oca.maxNbHitSet = this.maxSetNb;
 			oca.searchHitSetPartial();
 		}
-		else if (ocsSearch == OCS_SEED) {
-			/*
-			 * Seed based enumeration approach
-			 */
-			
-			/*
-			 * take into account exception nodes for the max set size cutoff
-			 */
-			if (oca.exceptionNode.size()>0) {
-				System.out.println("Correcting max. intervention set size for exception nodes("+oca.exceptionNode.size()+").");
-				this.maxSetSize = this.maxSetSize - oca.exceptionNode.size();
-			}
-			
-			oca.maxHitSetSize = this.maxSetSize;
-			oca.maxNbHitSet = this.maxSetNb;
-			oca.searchHitSetSeed();
-		}
 		
 		this.optCutSetReport.append(newline);
 		

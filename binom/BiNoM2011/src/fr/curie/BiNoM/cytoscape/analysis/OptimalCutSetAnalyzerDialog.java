@@ -50,7 +50,6 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_ROWS = 20;
 	private JList sourceList;
 	private JList targetList;
 	private JList sideList;
@@ -67,7 +66,6 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 	private JRadioButton allPathRB;
 	private JRadioButton bergeRB;
 	private JRadioButton partialRB;
-	private JRadioButton seedRB;
 
 	private JCheckBox limitationRadius;
 	private JTextField searchRadius;
@@ -464,22 +462,9 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 		c.anchor = GridBagConstraints.WEST;
 		panel.add(partialRB, c);
 		
-//		y++;
-//		seedRB = new JRadioButton();
-//		seedRB.setText("Seed based enumeration");
-//		seedRB.setActionCommand("enum");
-//		seedRB.addActionListener(this);
-//		c = new GridBagConstraints();
-//		c.gridx = x;
-//		c.gridy = y;
-//		c.gridwidth = 3;
-//		c.anchor = GridBagConstraints.WEST;
-//		panel.add(seedRB, c);
-		
 		ButtonGroup OCSgroup = new ButtonGroup();
 		OCSgroup.add(bergeRB);
 		OCSgroup.add(partialRB);
-		//OCSgroup.add(seedRB);
 		
 		y++;
 		JPanel p2 = new JPanel(new FlowLayout());

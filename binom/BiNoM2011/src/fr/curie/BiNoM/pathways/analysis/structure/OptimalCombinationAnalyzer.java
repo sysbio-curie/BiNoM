@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.text.DecimalFormat;
@@ -62,12 +61,12 @@ public class OptimalCombinationAnalyzer {
 	/**
 	 * List of path matrix columns (nodes) encoded as binary (BitSet) objects.
 	 */
-	public ArrayList<BitSet> pathMatrixColBin = new ArrayList<BitSet>();
+	private ArrayList<BitSet> pathMatrixColBin = new ArrayList<BitSet>();
 	
 	/**
 	 * List of path matrix rows, encoded as BitSet objects.
 	 */
-	public ArrayList<BitSet> pathMatrixRowBin = new ArrayList<BitSet>();
+	private ArrayList<BitSet> pathMatrixRowBin = new ArrayList<BitSet>();
 	
 	/**
 	 * Ordered list of nodes nodes with their corresponding omega scores. 
@@ -90,102 +89,6 @@ public class OptimalCombinationAnalyzer {
 	public long maxNbHitSet;
 	
 	/**
-	 * Simple data structure to store seed sets.
-	 */
-	private class SeedSet implements Comparable {
-		
-		/**
-		 * set as Binary Set object.
-		 */
-		public BitSet set;
-		/**
-		 * set score: number of paths the set is hitting.
-		 */
-		public int setScore;
-		
-		// constructor
-		public SeedSet(BitSet _set, int _setScore) {
-			this.set = _set; 
-			this.setScore = _setScore;
-		}
-
-		// sort by decreasing score value
-		@Override
-		public int compareTo(Object o) {
-			SeedSet b = (SeedSet) o;
-			if (this == b) return 0;
-			
-			if(this.set.equals(b.set) && this.setScore == b.setScore)
-				return 0;
-			
-			else if(this.setScore < b.setScore)
-				return 1;
-				
-			else return -1;
-		}
-		
-		public boolean equals(Object o) {
-			  return compareTo(o) == 0;
-		}
-
-	}
-
-	/**
-	 * Inner class to store seed sets.
-	 * 
-	 * Seeds are added to the list (a hashset) as long as the list has not reached the limit.
-	 * Then, seeds are added only if their set score is above the minimal set score value in the list. 
-	 * The size of the list is kept constant by removing the seed having the smallest value.
-	 * 
-	 * @author ebo
-	 *
-	 */
-	private class SeedSetData {
-
-		public HashSet<SeedSet> list;
-		public int maxSize;
-		public int minSetScoreValue;
-
-		public SeedSetData(int max) {
-			this.maxSize = max;
-			this.list = new HashSet<SeedSet>();
-			this.minSetScoreValue = Integer.MAX_VALUE;
-		}
-
-		public void addData(SeedSet s) {
-			if (list.size() < maxSize)
-				list.add(s);
-			else {
-				if (s.setScore > minSetScoreValue) {
-					boolean ins = list.add(s);
-					if (ins == true) {
-						SeedSet rem = null;
-						int minVal = Integer.MAX_VALUE;
-						for (SeedSet ss : list) {
-							if (ss.setScore<minVal) {
-								minVal = ss.setScore;
-								rem = ss;
-							}
-						}
-						list.remove(rem);
-						minSetScoreValue = Integer.MAX_VALUE;
-						for (SeedSet ss : list) {
-							if (ss.setScore<minVal) {
-								minSetScoreValue = ss.setScore;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * List of SeedSet objects.
-	 */
-	public ArrayList<SeedSet> seedSetList;
-	
-	/**
 	 * A report to log events on.
 	 */
 	public StringBuffer report;
@@ -193,7 +96,7 @@ public class OptimalCombinationAnalyzer {
 	/**
 	 * System independent newline character
 	 */
-	public static String newline = System.getProperty("line.separator");
+	private static String newline = System.getProperty("line.separator");
 	
 	/**
 	 * flag to indicate if Berge's search is restricted, default is false  
@@ -217,8 +120,6 @@ public class OptimalCombinationAnalyzer {
 	public void mainBerge(boolean printLog) {
 		
 		System.out.println("Start Berge's algorithm search...");
-		//System.out.println("restrictBerge= "+this.restrictBerge);
-		//System.out.println("maxHitSetSize= "+this.maxHitSetSize);
 		
 		// Minimal cut set
 		hitSetSB = initFirstRowBerge();
@@ -253,7 +154,6 @@ public class OptimalCombinationAnalyzer {
 			report.append(newline+"Total timing for the search: "+df.format(t)+" sec."+newline);
 		}
 		System.out.println("timing: "+toc);
-		//this.saveHitSetSB("/bioinfo/users/ebonnet/hit_set.txt");
 	}
 	
 	/**
@@ -264,7 +164,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @author ebo
 	 */
-	public HashSet<BitSet> checkMinimalityBerge(HashSet<BitSet> mcs) {
+	private HashSet<BitSet> checkMinimalityBerge(HashSet<BitSet> mcs) {
 		
 		HashSet<BitSet> flag = new HashSet<BitSet>();
 		
@@ -308,7 +208,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @author ebo
 	 */
-	public HashSet<BitSet> createCandidateSetBerge(HashSet<BitSet> mcs, BitSet row) {
+	private HashSet<BitSet> createCandidateSetBerge(HashSet<BitSet> mcs, BitSet row) {
 		HashSet<BitSet> cand = new HashSet<BitSet>();
 		for (BitSet cs : mcs) {
 			/*
@@ -344,7 +244,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @author ebo
 	 */
-	public HashSet<BitSet> createCandidateSetBergeRestrict(HashSet<BitSet> mcs, BitSet row) {
+	private HashSet<BitSet> createCandidateSetBergeRestrict(HashSet<BitSet> mcs, BitSet row) {
 		HashSet<BitSet> cand = new HashSet<BitSet>();
 		for (BitSet cs : mcs) {
 			/*
@@ -382,7 +282,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @author ebo
 	 */
-	public HashSet<BitSet> initFirstRowBerge() {
+	private HashSet<BitSet> initFirstRowBerge() {
 		
 		HashSet<BitSet> mcs = new HashSet<BitSet>();
 		
@@ -439,7 +339,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @param b
 	 */
-	public void printHitSet (BitSet b) {
+	private void printHitSet (BitSet b) {
 		System.out.print("[");
 		for(int i=b.nextSetBit(0); i>=0; i=b.nextSetBit(i+1)) {
 			System.out.print(pathMatrixNodeList.get(i)+":");
@@ -450,7 +350,7 @@ public class OptimalCombinationAnalyzer {
 	/**
 	 * Print out hit set list
 	 */
-	public void printHitSetList() {
+	private void printHitSetList() {
 		for (BitSet b : hitSetSB) {
 			printHitSet(b);
 		}
@@ -489,7 +389,7 @@ public class OptimalCombinationAnalyzer {
 	 * @param len BitSet length
 	 * @return string
 	 */
-	public String convertBitSetToString(BitSet b, int len) {
+	private String convertBitSetToString(BitSet b, int len) {
 		String ret = "";
 		for (int i=0;i<len;i++) {
 			if (b.get(i) == true)
@@ -507,7 +407,7 @@ public class OptimalCombinationAnalyzer {
 	 * @param indices array of integers
 	 * @return BitSet object
 	 */
-	public BitSet getBitSetRow(int[] indices) {
+	private BitSet getBitSetRow(int[] indices) {
 		BitSet ret = new BitSet(pathMatrixNbCol);
 		for (int i=0;i<indices.length;i++) {
 			ret.set(indices[i]);
@@ -522,7 +422,7 @@ public class OptimalCombinationAnalyzer {
 	 * @param HashSet of integers
 	 * @return BitSet object
 	 */
-	public BitSet getBitSetRowHS(HashSet<Integer> indices) {
+	private BitSet getBitSetRowHS(HashSet<Integer> indices) {
 		BitSet ret = new BitSet(pathMatrixNbCol);
 		for (int i : indices) {
 			ret.set(i);
@@ -536,7 +436,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @param max maximum set size to search for.
 	 */
-	public void searchHitSetFull(int max) {
+	private void searchHitSetFull(int max) {
 		
 		System.out.println("starting full enumeration search...");
 		
@@ -743,149 +643,14 @@ public class OptimalCombinationAnalyzer {
 		System.out.println("timing: "+toc);
 	}
 
-	/**
-	 * Search for hitting sets by seed based enumeration.
-	 * Set combinations that are not hitting sets are kept in a list as 
-	 * seeds for the next round of searching.
-	 */
-	public void searchHitSetSeed() {
-		
-		int setSize = 3;
-		
-		System.out.println("Start seed enumeration search...");
-		long tic = System.currentTimeMillis();
-		
-		NumberFormat form = NumberFormat.getInstance();
-		form.setGroupingUsed(true);
-		
-		/*
-		 * Initialize seed list with all combinations of size 2
-		 */
-		searchHitSetSizeTwo();
-		
-		while (setSize <= maxHitSetSize) {
-			
-			System.out.println("search for set size "+setSize);
-			
-			// stop if we don't have seed sets 
-			if (seedSetList.size() == 0) {
-				setSize--;
-				System.out.println("Stop: seed set list equal to zero.");
-				break;
-			}
-			
-			Collections.sort(seedSetList);
-			System.out.println("seed set list size: "+form.format(seedSetList.size()));
-
-			/*
-			 * store new seeds
-			 */
-			int maxSeedSetNumber = (int)(this.maxNbHitSet / (this.pathMatrixNbCol - setSize));
-			//System.out.println("max number of seed sets: "+form.format(maxSeedSetNumber));
-			SeedSetData newSeedList = new SeedSetData(maxSeedSetNumber);
-			
-			/*
-			 * Build the new set candidates list from previous seed list
-			 * and check them on the fly.
-			 */
-			
-			System.out.println("start checking sets from seeds...");
-			int foundHitSet = 0;
-
-			for (SeedSet seed : seedSetList) {
-				for (int j=0;j<pathMatrixNbCol;j++) {
-					/*
-					 * add node only if the seed does not already contain it
-					 */
-					if (seed.set.get(j) == true) 
-						continue;
-					else {
-						BitSet n = (BitSet) seed.set.clone();
-						n.set(j);
-						foundHitSet += checkSeedSet(n, newSeedList);
-					}
-				}
-			}
-
-			System.out.println("found "+foundHitSet+" hitting sets.");
-			
-			// reset seed list and build the new one from the new seed list
-			seedSetList = new ArrayList<SeedSet>();
-			for (SeedSet s : newSeedList.list)
-				seedSetList.add(s);
-				
-			setSize++;
-		}
-		long toc = System.currentTimeMillis() - tic;
-		if (report != null) {
-			long t = toc / 1000;
-			report.append(newline+"Total timing for the search: "+t+" sec."+newline);
-		}
-		System.out.println("timing: "+toc);
-	}
-	
-	/**
-	 * Check if a seed set is a true hitting set and is minimal.
-	 *  
-	 * @param candidateHitSet hit set to check
-	 * @param newSeedList 
-	 * @return 0 no hit set 1 hit set
-	 */
-	private int checkSeedSet(BitSet candidateHitSet, SeedSetData newSeedList) {
-		
-		int ret = 0;
-		/*
-		 * check if we have a true hitting set with logical OR between columns.
-		 */
-		BitSet testHitSet = new BitSet(pathMatrixNbRow);
-		for(int i=candidateHitSet.nextSetBit(0); i>=0; i=candidateHitSet.nextSetBit(i+1)) {
-			testHitSet.or(pathMatrixColBin.get(i));
-		}
-		
-		/*
-		 * set score = number of paths hit by the set
-		 */
-		int candidateHitSetScore = testHitSet.cardinality();
-		
-		if (testHitSet.cardinality() == pathMatrixNbRow) {
-			/*
-			 * We have a hitting set, now check if the set is minimal, i.e do not overlap with any previous hitting set
-			 */
-			boolean isMinimal = true;
-			for (BitSet hs : hitSetSB) {
-				BitSet test = (BitSet) hs.clone();
-				test.and(candidateHitSet);
-				/*
-				 * test if the previous set is a subset (i.e. is contained) of the previous 
-				 * hitting set by logical AND
-				 */
-				if (test.cardinality() == hs.cardinality()) {
-					isMinimal = false;
-					break;
-				}
-			}
-			if (isMinimal == true) {
-				ret = 1;
-				hitSetSB.add(candidateHitSet);
-			}
-		}
-		else {
-			/*
-			 * We don't have a hitting set, store it as a seed for next round.
-			 */
-			newSeedList.addData(new SeedSet(candidateHitSet, candidateHitSetScore));
-		}
-		return ret;
-	}
 	
 	
 	/**
 	 * Search for hit sets of size 2.
 	 */
-	public void searchHitSetSizeTwo() {
+	private void searchHitSetSizeTwo() {
 		
 		System.out.println("Search for intervention sets size 2");
-		seedSetList = new ArrayList<SeedSet>();
 		
 		int[] indices;
 		// generate all possible combinations of size 2
@@ -900,7 +665,6 @@ public class OptimalCombinationAnalyzer {
 			 */
 			BitSet tmp = (BitSet) pathMatrixColBin.get(indices[0]).clone();
 			tmp.or(pathMatrixColBin.get(indices[1]));
-			int setScore = tmp.cardinality();
 			BitSet nbs = new BitSet(pathMatrixNbCol);
 			nbs.set(indices[0]);
 			nbs.set(indices[1]);
@@ -909,26 +673,8 @@ public class OptimalCombinationAnalyzer {
 				// we have a hitting set
 				hitSetSB.add(nbs);
 			}
-			else {
-				// not a hitting set, store the set and the set score in a list for next round.
-				seedSetList.add(new SeedSet(nbs, setScore));
-			}
 		}
 		System.out.println("found "+hitSetSB.size()+" hitting sets");
-		Collections.sort(seedSetList);
-	}
-	
-	/**
-	 * For testing.
-	 */
-	public void printSeedList() {
-		//this.printPathMatrix();
-		Collections.sort(seedSetList);
-//		for (SeedSet s : seedSetList) {
-//			this.printHitSet(s.set);
-//			System.out.println("set score: "+s.setScore);
-//		}
-		System.out.println("seed set list size: "+seedSetList.size());
 	}
 	
 	/**
@@ -936,7 +682,7 @@ public class OptimalCombinationAnalyzer {
 	 * 
 	 * @param maxSize size threshold
 	 */
-	public void selectHitSetSize(int maxSize) {
+	private void selectHitSetSize(int maxSize) {
 		HashSet<BitSet> n = new HashSet<BitSet>();
 		for (BitSet b : hitSetSB) {
 			if (b.cardinality() <= maxSize) {
@@ -1006,7 +752,6 @@ public class OptimalCombinationAnalyzer {
 				if (idx >= 0) 
 					orderedNodesByScore.remove(idx);
 			}
-
 		}
 	}
 	
@@ -1090,7 +835,7 @@ public class OptimalCombinationAnalyzer {
 	/**
 	 * Print out the path matrix.
 	 */
-	public void printPathMatrix() {
+	private void printPathMatrix() {
 		
 		System.out.println("Path matrix:");
 		
@@ -1114,7 +859,7 @@ public class OptimalCombinationAnalyzer {
 	 * @param dataFileName output file name for path matrix
 	 * @param nodeListFileName output file name for node list
 	 */
-	public void savePathMatrix(String dataFileName, String nodeListFileName) {
+	private void savePathMatrix(String dataFileName, String nodeListFileName) {
 		System.out.println("Saving data...");
 		try {
 			PrintWriter data = new PrintWriter(new FileWriter(dataFileName));
@@ -1148,7 +893,7 @@ public class OptimalCombinationAnalyzer {
 	 * @param k the size of the subset
 	 * @return BigInteger the number of combinations
 	 */
-	public long calcCombinations(int n, int k) {
+	private long calcCombinations(int n, int k) {
 		BigInteger num = Utils.factorial(n);
 		BigInteger den = Utils.factorial(k);
 		den = den.multiply(Utils.factorial(n-k));
@@ -1178,8 +923,12 @@ public class OptimalCombinationAnalyzer {
 		return(n);
 	}
 
-	
-	public void saveHitSetSB(String filename) {
+	/**
+	 * Saving hit sets to a file.
+	 * 
+	 * @param filename
+	 */
+	private void saveHitSetSB(String filename) {
 		System.out.println("Saving hit sets to file "+filename+"...");
 		try {
 			BufferedWriter bf = new BufferedWriter(new FileWriter(filename));

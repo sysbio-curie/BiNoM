@@ -431,6 +431,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 				"icons" : false
 			},
 			core : {
+				strings : {
+					loading : "<div class='loading-jstree'>Loading the tree...<br/>please wait, may take a while.</div>"
+				},
 				"animation" : 200,
 				"initially_open" : [ "entities" ]
 			},

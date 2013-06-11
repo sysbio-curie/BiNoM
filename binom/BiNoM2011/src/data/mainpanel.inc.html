@@ -64,8 +64,11 @@
 
   <div id="dt_sample_status">
     <h3>Sample Status</h3>
-    <table id="dt_sample_status_table" class="tablesorter">
-    </table>
+    <form>
+      <table id="dt_sample_status_table" class="tablesorter">
+      </table>
+      <input type="submit" class="ui-button-text" id="sample_submit_test" value="So ?"></input>
+    </form>
   </div>
   
   <div id="dt_gene_status">
@@ -87,6 +90,7 @@
   </div>
 </div>
 
+<!--
 <div id="dt_datatable_status">
   <form>
   <h3>Datatable Management</h3>
@@ -97,6 +101,37 @@
   <label id="dt_datatable_status_update_label" for="update_datatables" class="update-checkbox"></label>
   <input type="checkbox" id="dt_datatable_status_update" name="update_datatables" onchange='update_datatable_status_table(window.document);'></input>
   </form>
+</div>
+-->
+
+<div id="dt_datatable_tabs">
+<h3>Datatable Management</h3>
+
+  <ul>
+    <li><a class="ui-button-text" href="#dt_datatable_status">General</a></li>
+  </ul>
+
+  <div id="dt_datatable_status">
+    <form>
+      <table id="dt_datatable_status_table" class="tablesorter">
+      </table>
+      <br/>
+      <br/>
+      <label id="dt_datatable_status_update_label" for="unlock_datatables" class="update-checkbox"></label>
+      <input type="checkbox" id="dt_datatable_status_update" name="unlock_datatables" onchange='update_datatable_status_table(window.document);'></input>
+     <div id="dt_datatable_buttonpane">
+       <table border='0'>
+	 <tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td>
+	   <td>
+	    <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_update" value="Update" onclick='update_datatables()'></input>
+	</td>
+	<td>
+	    <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_cancel" value="Cancel" onclick='cancel_datatables()'></input>
+	</td></tr>
+	</table>
+     </div>
+    </form>
+  </div>
 </div>
 
 <div id="dt_sample_annot">

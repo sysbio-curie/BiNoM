@@ -304,7 +304,7 @@ label {font-size: 12px; vertical-align: middle;}
     color: #222222;
 }
 
-#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3, #dt_group_status h3, #dt_module_status h3 {
+#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3, #dt_datatable_tabs h3, #dt_group_status h3, #dt_module_status h3 {
     margin-top: 20px;
     text-align: center;
 }
@@ -381,6 +381,12 @@ label {font-size: 12px; vertical-align: middle;}
     padding-left: 20px;
     padding-right: 20px;
     margin-right: 20px;
+}
+
+#dt_datatable_buttonpane {
+    border-top: 1px solid black;
+    margin-top: 20px;
+    padding-top: 20px;
 }
 
 .group_name {

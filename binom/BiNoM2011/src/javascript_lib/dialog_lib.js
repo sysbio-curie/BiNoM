@@ -83,6 +83,7 @@ $(function() {
 
 						datatable.ready.then(function() {
 							status.html("Import Successful<br/>Genes: " + mapSize(datatable.gene_index) + "<br/>" + "Samples: " + mapSize(datatable.sample_index));
+							navicell.annot_factory.sync();
 							update_status_tables();
 						});
 						
@@ -195,7 +196,7 @@ $(function() {
 				navicell.annot_factory.readfile(file_elem.files[0]);
 				navicell.annot_factory.ready.then(function() {
 					var status = $("#dt_sample_annot_status");
-					status.html(navicell.annot_factory.sample_read + " sample read<br/>" + navicell.annot_factory.sample_annotated + " sample annotated");
+					status.html(navicell.annot_factory.sample_read + " samples read<br/>" + navicell.annot_factory.sample_annotated + " samples annotated");
 					update_status_tables();
 				});
 			}
@@ -386,9 +387,16 @@ function update_group_status_table(doc, params) {
 			for (var sample_name in navicell.dataset.samples) {
 				var sample = navicell.dataset.samples[sample_name];
 				if (datatable.sample_index[sample_name] != undefined) {
+					/*
 					for (var annot_name in sample.annots) {
 						var group = sample.getGroup(annot_name);
 						if (group && group.name == group_name) {
+							cnt++;
+						}
+					}
+					*/
+					for (var sample_group_name in sample.groups) {
+						if (sample_group_name == group_name) {
 							cnt++;
 						}
 					}
@@ -435,11 +443,22 @@ function update_module_status_table(doc, params) {
 	table.tablesorter();
 }
 
+function in_module_gene_count(module_name) {
+	var cnt = 0;
+	for (var gene_name in navicell.dataset.genes) {
+		if (navicell.mapdata.hugo_map[gene_name][navicell.module_name]) {
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
 function update_gene_status_table(doc, params) {
 	var table = $("#dt_gene_status_table", doc);
 	table.children().remove();
 	// should use a string buffer
 	var str = "<thead><tr><th>Genes&nbsp;(" + mapSize(navicell.dataset.genes) + ")</th>";
+	str += "<th>In&nbsp;" + navicell.module_name + "&nbsp;(" + in_module_gene_count(navicell.module_name) + ")</th>";
 
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
@@ -452,6 +471,11 @@ function update_gene_status_table(doc, params) {
 			continue;
 		}
 		str += "<tr><td>" + gene_name + "</td>";
+		if (navicell.mapdata.hugo_map[gene_name][navicell.module_name]) {
+			str += "<td>" + gene_name + "</td>";
+		} else {
+			str += "<td>&nbsp;</td>";
+		}
 		for (var dt_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[dt_name];
 			if (datatable.gene_index[gene_name] !== undefined) {
@@ -530,6 +554,7 @@ function update_datatable_status_table(doc, params) {
 }
 
 function update_status_tables(params) {
+//	navicell.annot_factory.sync();
 	navicell.group_factory.buildGroups();
 	for (var map_name in maps) {
 		var doc = maps[map_name].document;

@@ -365,6 +365,34 @@ AnnotationFactory.prototype = {
 	ready: null,
 	sample_read: 0,
 	sample_annotated: 0,
+	annot_samples: {},
+
+	addAnnotValue: function(sample_name, annot_name, annot_value) {
+		if (!this.annot_samples[sample_name]) {
+			this.annot_samples[sample_name] = {};
+		}
+		if (!this.annot_samples[sample_name][annot_name]) {
+			this.annot_samples[sample_name][annot_name] = {};
+		}
+
+		this.annot_samples[sample_name][annot_name][annot_value] = true;
+	},
+
+	sync: function() {
+		var annotated = 0;
+		for (var sample_name in this.annot_samples) {
+			var sample = navicell.dataset.getSample(sample_name);
+			if (sample) {
+				for (var annot_name in this.annot_samples[sample_name]) {
+					for (var annot_value in this.annot_samples[sample_name][annot_name]) {
+						sample.addAnnotValue(annot_name, annot_value);
+						annotated++;
+					}
+				}
+			}
+		}
+		return annotated;
+	},
 
 	readfile: function(file) {
 		var reader = new FileReader();
@@ -391,6 +419,13 @@ AnnotationFactory.prototype = {
 					continue;
 				}
 				var sample_name = line[0];
+				for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
+					var annot_value = line[annot_nn+1];
+					var annot_name = annots[annot_nn].name;
+					annot_factory.addAnnotValue(sample_name, annot_name, annot_value);
+					//annot_factory.sample_annotated++;
+				}
+				/*
 				var sample = navicell.dataset.getSample(sample_name);
 				if (sample) {
 					for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
@@ -401,9 +436,11 @@ AnnotationFactory.prototype = {
 					}
 					annot_factory.sample_annotated++;
 				}
+				*/
 				annot_factory.sample_read++;
 			}
 			//navicell.group_factory.buildGroups();
+			annot_factory.sample_annotated = annot_factory.sync();
 			ready.resolve();
 			console.log("annot_cnt: " + annot_cnt);
 			console.log("sample_cnt: " + sample_cnt);
@@ -440,23 +477,37 @@ function Sample(name) {
 	this.name = name;
 	this.annots = {};
 	this.refcnt = 1;
+	this.groups = {};
 }
 
 Sample.prototype = {
 	name: "",
 	annots: {},
+	groups: {},
 
 	addAnnotValue: function(annot_name, value) {
 		//console.log("sample: " + this.name + " add annot value: '" + annot + "' '" + value + "'");
 		this.annots[annot_name] = value;
 	},
 
-	getGroup: function(annot_name) {
+	getGroup_old: function(annot_name) {
 		var annot_value = this.annots[annot_name];
 		if (annot_value != undefined) {
 			return navicell.group_factory.getGroup(annot_name, annot_value);
 		}
 		return null;
+	},
+
+	clearGroups: function() {
+		this.groups = {}; // or clear the map ?
+	},
+
+	addGroup: function(group) {
+		this.groups[group.name] = group;
+	},
+
+	getGroup: function(group_name) {
+		return this.groups[group_name];
 	},
 
 	getClass: function() {return "Sample";}
@@ -483,6 +534,7 @@ Gene.prototype = {
 // Group class
 //
 
+/*
 function Group(annot_name, value) {
 	this.annot_name = annot_name;
 	this.value = value;
@@ -498,6 +550,27 @@ Group.prototype = {
 
 	getClass: function() {return "Group";}
 };
+*/
+
+function Group(annots, values) {
+	this.annots = annots;
+	this.values = values;
+	this.name = navicell.group_factory.buildName(annots, values);
+	this.html_name = "";
+	for (var nn = 0; nn < annots.length; ++nn) {
+		this.html_name += (this.html_name.length > 0 ? "<br>" : "") + '<span class="group_name">' + annots[nn].replace(/ /g, '&nbsp;') + ':</span>&nbsp;<span class="group_value">' + values[nn].replace(/ /g, '&nbsp;')  + '</span>';
+	}
+}
+
+Group.prototype = {
+	annots: [],
+	values: [],
+	name: "",
+	html_name: "",
+
+	getClass: function() {return "Group";}
+};
+
 
 //
 // GroupFactory class
@@ -509,23 +582,18 @@ function GroupFactory() {
 GroupFactory.prototype = {
 	group_map: {},
 
-	buildName: function(annot_name, value) {
+	buildName_old: function(annot_name, value) {
 		return annot_name + ": " + value;
 	},
 
-	addGroup: function(annot_name, value) {
+	addGroup_old: function(annot_name, value) {
 		var group_name = this.buildName(annot_name, value);
 		if (!this.group_map[group_name]) {
 			this.group_map[group_name] = new Group(annot_name, value);
 		}
 	},
 
-	getGroup: function(annot_name, value) {
-		var group_name = this.buildName(annot_name, value);
-		return this.group_map[group_name];
-	},
-
-	buildGroups: function() {
+	buildGroups_old: function() {
 		this.group_map = {};
 		for (var sample_name in navicell.dataset.samples) {
 			var sample = navicell.dataset.samples[sample_name];
@@ -533,6 +601,56 @@ GroupFactory.prototype = {
 				var annot = navicell.annot_factory.annots_per_name[annot_name];
 				if (annot.is_group) {
 					this.addGroup(annot_name, sample.annots[annot_name]);
+				}
+			}
+		}
+	},
+
+	buildName: function(group_annots, group_values) {
+		var str = "";
+		for (var nn = 0; nn < group_annots.length; ++nn) {
+			str += (str.length > 0 ? "; " : "") + group_annots[nn] + ": " + group_values[nn];
+		}
+		return str;
+	},
+
+	addGroup: function(group_annots, group_values) {
+		var group_name = this.buildName(group_annots, group_values);
+		if (!this.group_map[group_name]) {
+			this.group_map[group_name] = new Group(group_annots, group_values);
+		}
+		return this.group_map[group_name];
+	},
+
+	getGroup: function(group_annots, group_values) {
+		var group_name = this.buildName(group_annots, group_values);
+		return this.group_map[group_name];
+	},
+
+	buildGroups: function() {
+		this.group_map = {};
+		for (var sample_name in navicell.dataset.samples) {
+			var sample = navicell.dataset.samples[sample_name];
+			sample.clearGroups();
+			var annot_arr = [];
+			for (var annot_name in sample.annots) {
+				annot_arr.push(navicell.annot_factory.annots_per_name[annot_name]);
+			}
+			if (annot_arr.length) {
+				var annot_len = annot_arr.length;
+				var group_annots = [];
+				var group_values = [];
+				for (var nn = 0; nn < annot_len; ++nn) {
+					var annot = annot_arr[nn];
+					if (annot.is_group) {
+						group_annots.push(annot.name);
+						group_values.push(sample.annots[annot.name]);
+					}
+				}
+				
+				if (group_annots.length) {
+					var group = this.addGroup(group_annots, group_values);
+					sample.addGroup(group);
 				}
 			}
 		}

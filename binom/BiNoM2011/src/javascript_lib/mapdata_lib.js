@@ -218,6 +218,11 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.sample_index = {};
 	this.data = [];
 
+	var tab_body = $("#dt_datatable_tabs");
+	tab_body.append("<div id='dt_datatable_id" + this.id + "'><table id='dt_datatable_table_id" + this.id + "'></table></div>");
+	this.data_div = $("#dt_datatable_id" + this.id);
+	this.data_table = $("#dt_datatable_table_id" + this.id);
+
 	var reader = new FileReader();
 	reader.readAsBinaryString(file);
 
@@ -404,7 +409,6 @@ AnnotationFactory.prototype = {
 		var ready = this.ready = $.Deferred(reader.onload);
 		reader.onload = function() { 
 			var text = reader.result;
-			console.log("reading annot file");
 			var lines = text.split("\n");
 			var header = lines[0].split("\t");
 			var annots = [];
@@ -423,27 +427,11 @@ AnnotationFactory.prototype = {
 					var annot_value = line[annot_nn+1];
 					var annot_name = annots[annot_nn].name;
 					annot_factory.addAnnotValue(sample_name, annot_name, annot_value);
-					//annot_factory.sample_annotated++;
 				}
-				/*
-				var sample = navicell.dataset.getSample(sample_name);
-				if (sample) {
-					for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
-						var annot_value = line[annot_nn+1];
-						var annot_name = annots[annot_nn].name;
-						sample.addAnnotValue(annot_name, annot_value);
-						//navicell.group_factory.getGroup(annot_name, annot_value);
-					}
-					annot_factory.sample_annotated++;
-				}
-				*/
 				annot_factory.sample_read++;
 			}
-			//navicell.group_factory.buildGroups();
 			annot_factory.sample_annotated = annot_factory.sync();
 			ready.resolve();
-			console.log("annot_cnt: " + annot_cnt);
-			console.log("sample_cnt: " + sample_cnt);
 		},
 		reader.onerror = function(e) {  // If anything goes wrong
 			console.log("Error", e);    // Just log it
@@ -490,14 +478,6 @@ Sample.prototype = {
 		this.annots[annot_name] = value;
 	},
 
-	getGroup_old: function(annot_name) {
-		var annot_value = this.annots[annot_name];
-		if (annot_value != undefined) {
-			return navicell.group_factory.getGroup(annot_name, annot_value);
-		}
-		return null;
-	},
-
 	clearGroups: function() {
 		this.groups = {}; // or clear the map ?
 	},
@@ -534,24 +514,6 @@ Gene.prototype = {
 // Group class
 //
 
-/*
-function Group(annot_name, value) {
-	this.annot_name = annot_name;
-	this.value = value;
-	this.name = navicell.group_factory.buildName(annot_name, value);
-	this.html_name = '<span class="group_name">' + annot_name.replace(/ /g, '&nbsp;') + ':</span>&nbsp;<span class="group_value">' + value.replace(/ /g, '&nbsp;')  + '</span>';
-}
-
-Group.prototype = {
-	annot_name: null,
-	value: null,
-	name: "",
-	html_name: "",
-
-	getClass: function() {return "Group";}
-};
-*/
-
 function Group(annots, values) {
 	this.annots = annots;
 	this.values = values;
@@ -581,30 +543,6 @@ function GroupFactory() {
 
 GroupFactory.prototype = {
 	group_map: {},
-
-	buildName_old: function(annot_name, value) {
-		return annot_name + ": " + value;
-	},
-
-	addGroup_old: function(annot_name, value) {
-		var group_name = this.buildName(annot_name, value);
-		if (!this.group_map[group_name]) {
-			this.group_map[group_name] = new Group(annot_name, value);
-		}
-	},
-
-	buildGroups_old: function() {
-		this.group_map = {};
-		for (var sample_name in navicell.dataset.samples) {
-			var sample = navicell.dataset.samples[sample_name];
-			for (var annot_name in sample.annots) {
-				var annot = navicell.annot_factory.annots_per_name[annot_name];
-				if (annot.is_group) {
-					this.addGroup(annot_name, sample.annots[annot_name]);
-				}
-			}
-		}
-	},
 
 	buildName: function(group_annots, group_values) {
 		var str = "";

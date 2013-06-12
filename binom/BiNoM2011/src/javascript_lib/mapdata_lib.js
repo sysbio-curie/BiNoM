@@ -201,17 +201,189 @@ Dataset.prototype = {
 // Encapsulate datatable contents (but only for genes existing in map) and type
 //
 
+if (!String.prototype.trim) {
+ String.prototype.trim = function() {
+  return this.replace(/^\s+|\s+$/g,'');
+ }
+}
+
+function make_button(name, id, onclick) {
+	return "<input type='button' style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class='ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content' id='" + id + "' value='" + name + "'onclick='" + onclick + "'></input>";
+}
+
+function is_empty_value(value) {
+	if (!value) {
+		return true;
+	}
+	var tvalue = value.trim().toUpperCase();
+	return tvalue == '' || tvalue == '_' || tvalue == '-' || tvalue == 'NA' || tvalue == 'N/A';
+}
+
+function DisplayStepConfig(datatable) {
+	this.datatable = datatable;
+	this.setStep(3);
+}
+
+DisplayStepConfig.prototype = {
+	datatable: null,
+	values: [], // numeric step values
+	colors: [], // rgb values
+	sizes: [], // pixel values
+	shapes: [], // shape types
+
+	setStep: function(step_cnt) {
+		if (step_cnt+2 == this.values.length) {
+			return;
+		}
+		this.values = [];
+		this.values.push(this.datatable.minval);
+		var step = (this.datatable.maxval - this.datatable.minval)/step_cnt;
+		for (var nn = 0; nn < step_cnt; ++nn) {
+			this.values.push(this.datatable.minval + nn*step);
+		}
+		this.values.push(this.datatable.maxval);
+		this.colors = new Array(step_cnt);
+		this.sizes = new Array(step_cnt);
+		this.shapes = new Array(step_cnt);
+	},
+
+	setStepInfo: function(idx, step, color, size, shape) {
+		idx++;
+		this.values[idx] = step;
+		this.colors[idx] = color;
+		this.sizes[idx] = size;
+		this.shapes[idx] = shape;
+	},
+
+	getStepIndex: function(value) {
+		var len = values.length-1;
+		for (var nn = 1; nn < len; ++nn) {
+			if (value < values[nn]) {
+				return nn-1;
+			}
+		}
+		return len-2;
+	},
+
+	getStepCount: function() {
+		return this.values.length-2;
+	},
+
+	getMinValue: function() {
+		return this.values[0];
+	},
+
+	getMaxValue: function() {
+		return this.values[this.values.length-1];
+	},
+
+	getValueAt: function(idx) {
+		return this.values[idx+1];
+	},
+
+	getColorAt: function(idx) {
+		return this.colors[idx+1];
+	},
+
+	getSizeAt: function(idx) {
+		return this.sizes[idx+1];
+	},
+
+	getShapesAt: function(idx) {
+		return this.shapes[idx+1];
+	},
+
+	getColor: function(value) {
+		return this.colors[this.getStepIndex(value)];
+	},
+
+	getSize: function(value) {
+		return this.sizes[this.getStepIndex(value)];
+	},
+
+	getShape: function(value) {
+		return this.shapes[this.getStepIndex(value)];
+	},
+
+	buildHTML: function() {
+		var html = "<div class='step-color'>\n";
+		var id = datatable.getId();
+		html += "<h3>" + this.datatable.name + "</h3>";
+		html += "<table class='step-color-table'><thead>";
+		html += "<th>&nbsp;</th>";
+		html += "<th>Value</th>";
+		html += "<th>Color</th>";
+		html += "<th>Size</th>";
+		html += "<th>Shape</th>";
+		html += "</thead><tbody>";
+		html += "<tr><td>" + datatable.minval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+		var step_cnt = this.getStepCount();
+		for (var idx = 0; idx < step_cnt; idx++) {
+			html += "<tr>";
+			html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "'></input></td>";
+			html += "<td><input type='text' id='step_color_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
+			html += "<option value='_none_'>Choose a size</option>";
+			var selsize = this.getSizeAt(idx);
+			for (var size in [4, 6, 8, 10, 12]) {
+				html += "<option value='" + size + "' " + (size == selsize ? "selected" : "") + ">" + size + "</option>";
+			}
+			html += "</select></td>";
+			html += "<option value='_none_'>Choose a shape</option>";
+			var selshape = this.getShapeAt(idx);
+			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shape + "</option>";
+			}
+			html += "</select></td>";
+			html += "</tr>\n";
+		}
+		html += "<tr><td>" + datatable.maxval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+		html += "</tbody></table>";
+
+		html += "<select id='step_count_" + id + "'>";
+		for (var step = 3; step < 12; ++step) {
+			html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
+		}
+		html += "</select>";
+
+		html += "<div class='buttonpane'>";
+		html += "<table border='0'>";
+		html += "<tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td><td>";
+		html += make_button("Cancel", "step_cancel_" + id, "step_cancel(" + id + ")");
+		html += "</td><td>";
+		html += make_button("Apply", "step_apply_" + id, "step_apply(" + id + ")");
+		html += "</td></tr>";
+		html += "</table></div>";
+		html += "</div>";
+
+		return html;
+	},
+
+	getClass: function() {
+		return "DisplayStepConfig";
+	}
+};
+
 // TBD datatable id management
 function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
 		return;
 	}
+	this.minval = Number.MAX_NUMBER;
+	this.maxval = Number.MIN_NUMBER;
 	this.error = "";
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 
+	if (this.biotype.isContinuous()) {
+		this.displayStepConfig = new DisplayStepConfig(this);
+		this.displayDiscreteConfig = null;
+	} else {
+		this.displayStepConfig = null;
+		this.displayDiscreteConfig = null; // new DisplayDiscreteConfig(this);
+	}
 	this.setName(name);
 
 	this.gene_index = {};
@@ -219,9 +391,14 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.data = [];
 
 	var tab_body = $("#dt_datatable_tabs");
-	tab_body.append("<div id='dt_datatable_id" + this.id + "'><table id='dt_datatable_table_id" + this.id + "'></table></div>");
+	tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 	this.data_div = $("#dt_datatable_id" + this.id);
 	this.data_table = $("#dt_datatable_table_id" + this.id);
+	this.switch_button = $("#switch_view_" + this.id);
+	//this.switch_button.addClass('switch-button');
+	this.switch_button.css('font-size', '10px');
+	this.switch_button.css('background', 'white');
+	this.switch_button.css('color', 'darkblue');
 
 	var reader = new FileReader();
 	reader.readAsBinaryString(file);
@@ -260,7 +437,8 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 			datatable.data[gene_nn] = [];
 			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
 				var value = line[sample_nn+1];
-				datatable.data[gene_nn][sample_nn] = value;
+				//datatable.data[gene_nn][sample_nn] = value;
+				datatable.setData(gene_nn, sample_nn, value);
 			}
 			++gene_nn;
 		}
@@ -268,6 +446,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 		//dataset.addDatatable(datatable);
 
 		//console.log("done: " + dataset.datatableCount() + " " + dataset.geneCount() + " " + dataset.sampleCount());
+		datatable.epilogue();
 		ready.resolve();
 	}
 
@@ -285,6 +464,8 @@ Datatable.prototype = {
 	sample_index: {},
 	data: [],
 	ready: null,
+	minval: null,
+	maxval: null,
 
 	// 2013-05-31
 	// TBD: need methods:
@@ -331,8 +512,98 @@ Datatable.prototype = {
 
 	getId: function() {return this.id;},
 
+	epilogue: function() {
+		this.makeGeneView();
+	},
+
+	makeGeneView: function() {
+		this.current_view = "gene";
+		this.data_table.children().remove();
+		this.data_table.append(this.makeDataTable_genes());
+		this.data_table.tablesorter();
+	},
+
+	makeSampleView: function() {
+		this.current_view = "sample";
+		this.data_table.children().remove();
+		this.data_table.append(this.makeDataTable_samples());
+		this.data_table.tablesorter();
+	},
+
+	switchView: function() {
+		if (this.current_view == "gene") {
+			this.makeSampleView();
+		} else {
+			this.makeGeneView();
+		}
+	},
+
+	makeDataTable_genes: function() {
+		this.switch_button.val("Switch to Samples / Genes");
+		var str = "<thead><th>Genes</th>";
+		for (var sample_name in this.sample_index) {
+			str += "<th>" + sample_name + "</th>";
+		}
+		str += "</thead>";
+		str += "<tbody>";
+		for (var gene_name in this.gene_index) {
+			str += "<tr><td>" + gene_name + "</td>";
+			for (var sample_name in this.sample_index) {
+				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+				str += "<td class='datacell'>" + value + "</td>";
+			}
+			str += "</tr>";
+		}
+		str += "</tbody>";
+		return str;
+	},
+
+	makeDataTable_samples: function() {
+		this.switch_button.val("Switch to Genes / Samples");
+		var str = "<thead><th>Samples</th>";
+		for (var gene_name in this.gene_index) {
+			str += "<th>" + gene_name + "</th>";
+		}
+		str += "</thead>";
+		str += "<tbody>";
+		for (var sample_name in this.sample_index) {
+			str += "<tr><td>" + sample_name + "</td>";
+			for (var gene_name in this.gene_index) {
+				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+				str += "<td class='datacell'>" + value + "</td>";
+			}
+			str += "</tr>";
+		}
+		str += "</tbody>";
+		return str;
+	},
+
+	setData: function(gene_nn, sample_nn, value) {
+		if (is_empty_value(value)) {
+			value = '';
+		} else {
+			var ivalue = parseInt(value);
+			if (ivalue != NaN) {
+				if (ivalue < this.minval) {
+					this.minval = ivalue;
+				}
+				if (ivalue > this.maxval) {
+					this.maxval = ivalue;
+				}
+			}
+		}
+		this.data[gene_nn][sample_nn] = value;
+	},
+
 	getClass: function() {return "Datatable";}
 };
+
+function switch_view(id) {
+	var datatable = navicell.dataset.datatables_id[id];
+	if (datatable) {
+		datatable.switchView();
+	}
+}
 
 //
 // Annotation class
@@ -604,15 +875,7 @@ function Biotype(name, type) {
 
 Biotype.prototype = {
 	name: "",
-	type: null
-};
-
-function BiotypeType(type) {
-	this.type = type;
-}
-
-BiotypeType.prototype = {
-	type: 0,
+	type: null,
 
 	isContinuous: function() {
 		return this.type == navicell.CONTINUOUS;
@@ -626,6 +889,10 @@ BiotypeType.prototype = {
 		return this.type == navicell.SET;
 	}
 };
+
+function BiotypeType(name) {
+	this.name = name;
+}
 
 function BiotypeFactory() {
 	this.biotypes = {};
@@ -768,9 +1035,9 @@ function navicell_init() {
 	_navicell.biotype_factory = new BiotypeFactory();
 	_navicell.annot_factory = new AnnotationFactory();
 
-	_navicell.CONTINUOUS = 1;
-	_navicell.DISCRETE = 2;
-	_navicell.SET = 3;
+	_navicell.CONTINUOUS = new BiotypeType("continuous");
+	_navicell.DISCRETE = new BiotypeType("discrete");
+	_navicell.SET = new BiotypeType("set");
 
 	_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", _navicell.CONTINUOUS));
@@ -778,7 +1045,7 @@ function navicell_init() {
 	_navicell.biotype_factory.addBiotype(new Biotype("Copy number data mRNA, microRNA", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRET));
+	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));
 	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", _navicell.DISCRETE));
 	_navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
 	_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));

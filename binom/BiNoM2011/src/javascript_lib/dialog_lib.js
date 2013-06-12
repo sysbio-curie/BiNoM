@@ -510,7 +510,7 @@ function update_datatable_status_table(doc, params) {
 		buttonpane.addClass("zz-hidden");
 	}
 
-	update_label.text(update ? "Uncheck to Lock Datatables" : "Check to Unlock Datatables");
+	update_label.text(update ? "Uncheck to lock edition" : "Check to edit datatables");
 	table.children().remove();
 
 	var tab_header = $("#dt_datatable_tabs ul");
@@ -532,11 +532,14 @@ function update_datatable_status_table(doc, params) {
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
 		var data_div = datatable.data_div;
-		var data_table = datatable.data_table;
+		//var data_table = datatable.data_table;
 		tab_header.append('<li><a class="ui-button-text" href="#' + data_div.attr("id") + '">' + dt_name + '</a></li>');
+		/*
 		data_table.children().remove();
-		// as a lot of non-closed tags will be appended, must use a tmp string, then append the string
-		data_table.append("<tbody><tr><td>Datatable " + dt_name + "</td></tr></tbody>");
+		data_table.append(datatable.makeDataTable());
+		data_table.tablesorter();
+		*/
+		//data_table.append("<tbody><tr><td>Datatable " + dt_name + "</td></tr></tbody>");
 
 		str += "<tr>";
 		if (update) {
@@ -551,6 +554,9 @@ function update_datatable_status_table(doc, params) {
 		}
 		str += "<td>" + mapSize(datatable.gene_index) + "</td>";
 		str += "<td>" + mapSize(datatable.sample_index) + "</td>";
+		if (!update) {
+			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_display_pref(" + datatable.getId() + ")'>preferences</a></td>";
+		}
 		str += "</tr>";
 	}
 	table.append(str);

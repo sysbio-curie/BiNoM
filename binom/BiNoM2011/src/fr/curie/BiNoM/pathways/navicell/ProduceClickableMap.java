@@ -4576,6 +4576,7 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.tabs.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");
 			out.println("<script src=\"" + jslib_dir + "/jquery.tablesorter.js\"></script>");
+			out.println("<script src=\"" + jslib_dir + "/jscolor/jscolor.js\"></script>");
 		}
 
 		final String map_div_name = "map"; // see css

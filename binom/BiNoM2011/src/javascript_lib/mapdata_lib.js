@@ -237,14 +237,17 @@ DisplayStepConfig.prototype = {
 		}
 		this.values = [];
 		this.values.push(this.datatable.minval);
-		var step = (this.datatable.maxval - this.datatable.minval)/step_cnt;
+		var step = (this.datatable.maxval - this.datatable.minval)/(step_cnt+1);
 		for (var nn = 0; nn < step_cnt; ++nn) {
-			this.values.push(this.datatable.minval + nn*step);
+			var value = this.datatable.minval + (nn+1)*step;
+			value = parseInt(value*100)/100;
+			this.values.push(value);
 		}
 		this.values.push(this.datatable.maxval);
 		this.colors = new Array(step_cnt);
 		this.sizes = new Array(step_cnt);
 		this.shapes = new Array(step_cnt);
+		this.buildHTML();
 	},
 
 	setStepInfo: function(idx, step, color, size, shape) {
@@ -289,7 +292,7 @@ DisplayStepConfig.prototype = {
 		return this.sizes[idx+1];
 	},
 
-	getShapesAt: function(idx) {
+	getShapeAt: function(idx) {
 		return this.shapes[idx+1];
 	},
 
@@ -306,29 +309,32 @@ DisplayStepConfig.prototype = {
 	},
 
 	buildHTML: function() {
-		var html = "<div class='step-color'>\n";
-		var id = datatable.getId();
-		html += "<h3>" + this.datatable.name + "</h3>";
+		var id = this.datatable.getId();
+		var div_id = "step_color_" + id;
+		var html = "<div class='step-color' id='" + div_id + "'>\n";
+		html += "<h3>" + this.datatable.name + " Preferences</h3>";
 		html += "<table class='step-color-table'><thead>";
-		html += "<th>&nbsp;</th>";
 		html += "<th>Value</th>";
 		html += "<th>Color</th>";
 		html += "<th>Size</th>";
 		html += "<th>Shape</th>";
 		html += "</thead><tbody>";
-		html += "<tr><td>" + datatable.minval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+		html += "<tr><td>Minimum " + this.datatable.minval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
 		var step_cnt = this.getStepCount();
 		for (var idx = 0; idx < step_cnt; idx++) {
 			html += "<tr>";
 			html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "'></input></td>";
-			html += "<td><input type='text' id='step_color_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			//html += "<td><input id='step_color_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			html += "<td><input class='color' value='" + "000000" + "'></input></td>";
 			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
-			for (var size in [4, 6, 8, 10, 12]) {
-				html += "<option value='" + size + "' " + (size == selsize ? "selected" : "") + ">" + size + "</option>";
+			for (var size = 2; size < 7; size += 1) {
+				var size2 = 2*size;
+				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
 			html += "</select></td>";
+			html += "<td><select id='step_shape_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
 			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
@@ -337,10 +343,10 @@ DisplayStepConfig.prototype = {
 			html += "</select></td>";
 			html += "</tr>\n";
 		}
-		html += "<tr><td>" + datatable.maxval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+		html += "<tr><td>Maximum " + this.datatable.maxval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
 		html += "</tbody></table>";
 
-		html += "<select id='step_count_" + id + "'>";
+		html += "Step Count <select id='step_count_" + id + "'>";
 		for (var step = 3; step < 12; ++step) {
 			html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
 		}
@@ -356,7 +362,23 @@ DisplayStepConfig.prototype = {
 		html += "</table></div>";
 		html += "</div>";
 
-		return html;
+		//this.html = html;
+		this.div_id = div_id;
+		$('body').append(html);
+		jscolor.init();
+		/*
+		//return html;
+		$('body').append(html);
+		$("#" + div_id).dialog({
+			//autoOpen: false,
+			autoOpen: true,
+			height: 700,
+			width: 500,
+			modal: false
+		});
+		jscolor.init();
+		return div_id;
+		*/
 	},
 
 	getClass: function() {
@@ -370,20 +392,15 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 		this.error = "datatable " + name + " already exists";
 		return;
 	}
-	this.minval = Number.MAX_NUMBER;
-	this.maxval = Number.MIN_NUMBER;
+	//this.minval = Number.MAX_NUMBER;
+	//this.maxval = Number.MIN_NUMBER;
+	this.minval = 100000000000;
+	this.maxval = -100000000000;
 	this.error = "";
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 
-	if (this.biotype.isContinuous()) {
-		this.displayStepConfig = new DisplayStepConfig(this);
-		this.displayDiscreteConfig = null;
-	} else {
-		this.displayStepConfig = null;
-		this.displayDiscreteConfig = null; // new DisplayDiscreteConfig(this);
-	}
 	this.setName(name);
 
 	this.gene_index = {};
@@ -513,6 +530,13 @@ Datatable.prototype = {
 	getId: function() {return this.id;},
 
 	epilogue: function() {
+		if (this.biotype.isContinuous()) {
+			this.displayStepConfig = new DisplayStepConfig(this);
+			this.displayDiscreteConfig = null;
+		} else {
+			this.displayStepConfig = null;
+			this.displayDiscreteConfig = null; // new DisplayDiscreteConfig(this);
+		}
 		this.makeGeneView();
 	},
 
@@ -582,9 +606,11 @@ Datatable.prototype = {
 		if (is_empty_value(value)) {
 			value = '';
 		} else {
-			var ivalue = parseInt(value);
-			if (ivalue != NaN) {
+			var ivalue = parseFloat(value);
+			//console.log("value [" + value + "] [" + ivalue + "] " + this.minval);
+			if (ivalue !== NaN) {
 				if (ivalue < this.minval) {
+					console.log("yes [" + ivalue + "]");
 					this.minval = ivalue;
 				}
 				if (ivalue > this.maxval) {

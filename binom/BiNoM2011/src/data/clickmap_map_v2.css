@@ -549,3 +549,27 @@ div.tablesorterPager input {
     right: 10%;
 }
 */
+
+.step-color {
+    font-size: 80%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+}
+
+.step-color h3 {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.step-color-table thead {
+    background-color: rgb(0, 0, 60);
+    color: white;
+    text-align: center;
+}
+
+.step-color-table tbody {
+    text-align: center;
+    /*    background-color: rgb(200, 238, 0) */
+    background-color: white;
+    color: #222222;
+}
+

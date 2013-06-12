@@ -476,7 +476,28 @@ function update_gene_status_table(doc, params) {
 	table.tablesorter();
 }
 
-var coucou = 0;
+function show_display_config(id) {
+	var datatable = navicell.dataset.datatables_id[id];
+	console.log("show_display_config " + id);
+	if (datatable) {
+		var div_id = undefined;
+		if (datatable.displayStepConfig) {
+			div_id = datatable.displayStepConfig.div_id;
+		} else if (datatable.displayDiscretConfig) {
+			div_id = datatable.displayDiscreteConfig.div_id;
+		}
+		if (div_id) {
+			var div = $("#" + div_id);
+			div.dialog({
+				autoOpen: false,
+				height: 400,
+				width: 800,
+				modal: false
+			});
+			div.dialog("open");
+		}
+	}
+}
 
 function update_datatable_status_table(doc, params) {
 	//console.log("update_datatable_status_table");
@@ -555,7 +576,7 @@ function update_datatable_status_table(doc, params) {
 		str += "<td>" + mapSize(datatable.gene_index) + "</td>";
 		str += "<td>" + mapSize(datatable.sample_index) + "</td>";
 		if (!update) {
-			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_display_pref(" + datatable.getId() + ")'>preferences</a></td>";
+			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_display_config(" + datatable.getId() + ")'>preferences</a></td>";
 		}
 		str += "</tr>";
 	}

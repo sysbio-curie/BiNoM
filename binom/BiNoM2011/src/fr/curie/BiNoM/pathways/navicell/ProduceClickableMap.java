@@ -502,17 +502,13 @@ public class ProduceClickableMap
 		
 		final Properties configuration = load_config(config);
 
-		BufferedReader xref_stream;
-		String xref_filename;
+		final String[][] xrefs;
 		if (xref_file != null) {
-			xref_stream = open_file(xref_file);
-			xref_filename = xref_file.toString();
+			BufferedReader xref_stream = open_file(xref_file);
+			xrefs = load_xrefs(xref_stream, xref_file.toString());
 		} else {
-			xref_stream = open_file(default_xref_file);
-			xref_filename = default_xref_file;
+			xrefs = null;
 		}
-		
-		final String[][] xrefs = load_xrefs(xref_stream, xref_filename);
 
 		String info = configuration.getProperty("atlasInfo", null);
 		AtlasInfo atlasInfo = info != null ? parseAtlasInfo(info) : null;
@@ -587,7 +583,7 @@ public class ProduceClickableMap
 		final boolean only_tiles,
 		final String project_name,
 		final AtlasInfo atlasInfo,
-		final String[][] xrefs,
+		String[][] xrefs,
 		final boolean show_default_compartement_name,
 		final String wordpress_server,
 		final String wordpress_passwd,
@@ -596,6 +592,11 @@ public class ProduceClickableMap
 		final File root
 	 ) throws NaviCellException, IOException
 	{
+		if (xrefs == null) {
+			BufferedReader xref_stream = open_local_file(default_xref_file);
+			xrefs = load_xrefs(xref_stream, default_xref_file);
+		}
+
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = show_default_compartement_name;
 		
 		final String comment = make_tag_for_comments();
@@ -4743,7 +4744,7 @@ public class ProduceClickableMap
 		}
 	}
 
-	public static BufferedReader open_file(String filename)
+	public static BufferedReader open_local_file(String filename)
 	{
 		try
 		{
@@ -4757,22 +4758,6 @@ public class ProduceClickableMap
 			return null;
 		}
 	}
-
-	/*
-	public static String[][] load_xrefs(File xref_file)
-	{
-		final BufferedReader xref_stream;
-		try
-		{
-			xref_stream = new BufferedReader(new FileReader(xref_file));
-		}
-		catch (FileNotFoundException e1)
-		{
-			System.err.println(e1.getMessage());
-			System.exit(1);
-			return null;
-		}
-	*/
 
 	public static String[][] load_xrefs(BufferedReader xref_stream, String xref_file)
 	{

@@ -91,9 +91,14 @@ Mapdata.prototype = {
 function Dataset(name) {
 	this.name = name;
 	this.genes = {};
+
 	this.datatable_id = 1;
 	this.datatables = {};
 	this.datatables_id = {};
+
+	this.sample_id = 1;
+	this.samples = {};
+	this.samples_id = {};
 }
 
 Dataset.prototype = {
@@ -159,10 +164,16 @@ Dataset.prototype = {
 		return this.samples[sample_name];
 	},
 	
+	getSampleById: function(sample_id) {
+		return this.samples_id[sample_id];
+	},
+	
 	// behaves as a sample factory
 	addSample: function(sample_name) {
 		if (!this.samples[sample_name]) {
-			this.samples[sample_name] = new Sample(sample_name);
+			var sample = new Sample(sample_name, this.sample_id++);
+			this.samples[sample_name] = sample;
+			this.samples_id[sample.id] = sample;
 		} else {
 			this.samples[sample_name].refcnt++;
 		}
@@ -456,6 +467,43 @@ DisplayStepConfig.prototype = {
 	getClass: function() {
 		return "DisplayStepConfig";
 	}
+};
+
+function HeatmapConfig() {
+	this.reset();
+}
+
+HeatmapConfig.prototype = {
+
+	reset: function() {
+		this.datatables = {};
+		this.samples = {};
+		this.groups = {};
+	},
+
+	addDatatable: function(datatable) {
+		this.datatables[datatable] = true;
+	},
+
+	addSample: function(sample) {
+		this.samples[sample] = true;
+	},
+
+	addGroup: function(group) {
+		this.groups[group] = true;
+	},
+	
+	hasDatatable: function(datatable) {
+		return this.datatables[datatable] == true;
+	},
+
+	hasSample: function(sample) {
+		return this.samples[sample] == true;
+	},
+
+	hasGroup: function(group) {
+		return this.groups[group] == true;
+	},
 };
 
 // TBD datatable id management
@@ -870,8 +918,9 @@ AnnotationFactory.prototype = {
 // Sample class
 //
 
-function Sample(name) {
+function Sample(name, id) {
 	this.name = name;
+	this.id = id;
 	this.annots = {};
 	this.refcnt = 1;
 	this.groups = {};
@@ -899,6 +948,10 @@ Sample.prototype = {
 		return this.groups[group_name];
 	},
 
+	getId: function() {
+		return this.id;
+	},
+
 	getClass: function() {return "Sample";}
 };
 
@@ -923,9 +976,10 @@ Gene.prototype = {
 // Group class
 //
 
-function Group(annots, values) {
+function Group(annots, values, id) {
 	this.annots = annots;
 	this.values = values;
+	this.id = id;
 	this.name = navicell.group_factory.buildName(annots, values);
 	this.html_name = "";
 	for (var nn = 0; nn < annots.length; ++nn) {
@@ -948,6 +1002,7 @@ Group.prototype = {
 //
 
 function GroupFactory() {
+	this.group_id = 1;
 }
 
 GroupFactory.prototype = {
@@ -964,7 +1019,7 @@ GroupFactory.prototype = {
 	addGroup: function(group_annots, group_values) {
 		var group_name = this.buildName(group_annots, group_values);
 		if (!this.group_map[group_name]) {
-			this.group_map[group_name] = new Group(group_annots, group_values);
+			this.group_map[group_name] = new Group(group_annots, group_values, this.group_id++);
 		}
 		return this.group_map[group_name];
 	},
@@ -972,6 +1027,10 @@ GroupFactory.prototype = {
 	getGroup: function(group_annots, group_values) {
 		var group_name = this.buildName(group_annots, group_values);
 		return this.group_map[group_name];
+	},
+
+	getId: function() {
+		return this.id;
 	},
 
 	buildGroups: function() {
@@ -1172,6 +1231,7 @@ function navicell_init() {
 	_navicell.group_factory = new GroupFactory();
 	_navicell.biotype_factory = new BiotypeFactory();
 	_navicell.annot_factory = new AnnotationFactory();
+	_navicell.heatmap_config = new HeatmapConfig();
 
 	_navicell.CONTINUOUS = new BiotypeType("continuous");
 	_navicell.DISCRETE = new BiotypeType("discrete");

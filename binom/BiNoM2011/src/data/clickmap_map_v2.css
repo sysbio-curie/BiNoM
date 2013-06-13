@@ -91,7 +91,7 @@ html, body {
     right: 0;
     padding: 0;
     width: 100%;
-    height: 70%;
+    height: 60%;
     border-bottom: solid;
     border-left: solid;
     border-width: 1px;
@@ -184,12 +184,12 @@ html, body {
 /* NaviCell version 2 */
 
 #datatable_input {
-    top: 70%;
+    top: 60%;
     position: absolute;
     right: 0;
     padding: 0;
     width: 100%;
-    height: 30%;
+    height: 40%;
     border-bottom: solid;
     border-top: solid;
     border-left: solid;
@@ -207,7 +207,7 @@ html, body {
     font-size: 11px;
 }
 
-#dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_group_status, #dt_module_status, #dt_datatable_status, #dt_sample_annot {
+#dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_group_status, #dt_module_status, #dt_datatable_status, #dt_sample_annot, #drawing_config_div {
     font-size: 80%;
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
@@ -567,9 +567,52 @@ div.tablesorterPager input {
 }
 
 .step-color-table tbody {
-    text-align: center;
+    /*    text-align: center; */
     /*    background-color: rgb(200, 238, 0) */
     background-color: white;
     color: #222222;
+}
+
+#drawing_config_div {
+    font-size: small;
+}
+
+#drawing_config_div h3 {
+    text-align: center;
+    font-size: larger;
+}
+
+.drawing_config_box {
+    border: 1px solid lightgrey;
+    margin-left: 20px;
+    margin-right: 40px;
+    padding: 10px;
+    background: white;
+    font-size: small;
+}
+
+.drawing_config_link {
+    font-size: small;
+    text-decoration: none;
+    color: darkblue;
+}
+
+#heatmap_config_div {
+    font-size: small;
+}
+
+#heatmap_config_div h3 {
+    text-align: center;
+    font-size: larger;
+}
+
+#heatmap_config_datatable_list {
+    overflow: scroll;
+}
+
+.heatmap_config_head {
+    text-align: center;
+    font-weight: bold;
+    font-size: larger;
 }
 

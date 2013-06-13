@@ -476,29 +476,6 @@ function update_gene_status_table(doc, params) {
 	table.tablesorter();
 }
 
-function show_display_config(id) {
-	var datatable = navicell.dataset.datatables_id[id];
-	console.log("show_display_config " + id);
-	if (datatable) {
-		var div_id = undefined;
-		if (datatable.displayStepConfig) {
-			div_id = datatable.displayStepConfig.div_id;
-		} else if (datatable.displayDiscretConfig) {
-			div_id = datatable.displayDiscreteConfig.div_id;
-		}
-		if (div_id) {
-			var div = $("#" + div_id);
-			div.dialog({
-				autoOpen: false,
-				height: 400,
-				width: 800,
-				modal: false
-			});
-			div.dialog("open");
-		}
-	}
-}
-
 function update_datatable_status_table(doc, params) {
 	//console.log("update_datatable_status_table");
 	var table = $("#dt_datatable_status_table", doc);
@@ -576,7 +553,8 @@ function update_datatable_status_table(doc, params) {
 		str += "<td>" + mapSize(datatable.gene_index) + "</td>";
 		str += "<td>" + mapSize(datatable.sample_index) + "</td>";
 		if (!update) {
-			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_display_config(" + datatable.getId() + ")'>preferences</a></td>";
+			//str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_display_config(" + datatable.getId() + ")'>preferences</a></td>";
+			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='navicell.getDatatableById(" + datatable.getId() + ").showDisplayConfig()'>preferences</a></td>";
 		}
 		str += "</tr>";
 	}
@@ -675,3 +653,73 @@ function cancel_datatables() {
 		$("#dt_name_" + datatable.getId()).val(dt_name);
 	}
 }
+
+Datatable.prototype.showDisplayConfig = function() {
+	var div_id = undefined;
+	if (this.displayStepConfig) {
+		div_id = this.displayStepConfig.div_id;
+	} else if (this.displayDiscretConfig) {
+		div_id = this.displayDiscreteConfig.div_id;
+	}
+	console.log("div_id " + div_id);
+	if (div_id) {
+		var div = $("#" + div_id);
+		var datatable_id = this.getId();
+		div.dialog({
+			autoOpen: false,
+			height: 550,
+			width: 700,
+			modal: false,
+
+			buttons: {
+				"Apply": function() {
+					var datatable = navicell.getDatatableById(datatable_id);
+					var displayStepConfig = datatable.displayStepConfig;
+					
+					var prev_value = datatable.minval;
+					var error = 0;
+					var step_cnt = displayStepConfig.getStepCount();
+					for (var idx = 0; idx < step_cnt; ++idx) {
+						var value;
+						if (idx == step_cnt-1) {
+							value = datatable.maxval;
+						} else {
+							value = $("#step_value_" + datatable_id + "_" + idx).val();
+						}
+						value *= 1.;
+						if (value <= prev_value) {
+							// should pop an error dialog
+							error = 1;
+							break;
+						}
+						prev_value = value;
+					}
+					
+					if (!error) {
+						for (var idx = 0; idx < step_cnt; ++idx) {
+							var value;
+							if (idx == step_cnt-1) {
+								value = datatable.maxval;
+							} else {
+								value = $("#step_value_" + datatable_id + "_" + idx).val();
+							}
+							var color = $("#step_color_" + datatable_id + "_" + idx).val();
+							var size = $("#step_size_" + datatable_id + "_" + idx).val();
+							var shape = $("#step_shape_" + datatable_id + "_" + idx).val();
+							displayStepConfig.setStepInfo(idx, value, color, size, shape);
+						}
+						datatable.refresh();
+					}
+				},
+
+				"Cancel": function() {
+					var datatable = navicell.getDatatableById(datatable_id);
+					var displayStepConfig = datatable.displayStepConfig;
+					displayStepConfig.update();
+				}
+			}
+		});
+		div.dialog("open");
+	}
+}
+

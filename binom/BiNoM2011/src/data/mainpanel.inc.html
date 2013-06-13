@@ -205,14 +205,14 @@
   <table>
 
     <tr>
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_datatables(true)'></input></td>
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_datatables(false)'></input></td>
+      <td style='text-align: right'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_datatables(true)'></input></td>
+      <td style='text-align: left'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_datatables(false)'></input></td>
 
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_samples(true)'></input></td>
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_samples(false)'></input></td>
+      <td style='text-align: right'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_samples(true)'></input></td>
+      <td style='text-align: left'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_samples(false)'></input></td>
 
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_groups(true)'></input></td>
-      <td><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_groups(false)'></input></td>
+      <td style='text-align: right'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Select all" onclick='heatmap_config_select_all_groups(true)'></input></td>
+      <td style='text-align: left'><input style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" type="button" value="Unselect all" onclick='heatmap_config_select_all_groups(false)'></input></td>
     </tr>
 
     <tr>
@@ -226,18 +226,18 @@
     </tr>
 
     <tr>
-      <td style='height: 100%; width: 100%' colspan='2'>
-	<table id='heatmap_config_datatable_list' style='height: 100%; width: 100%'>
-	</table>
+      <td style='vertical-align: top' colspan='2'>
+	  <table id='heatmap_config_datatable_list' style='width: 100%'>
+	  </table>
       </td>
 
-      <td style='height: 100%; width: 100%' colspan='2' style='height: 100%; width: 100%'>
-	<table id='heatmap_config_sample_list'>
+      <td style='vertical-align: top' colspan='2'>
+	<table id='heatmap_config_sample_list' style='width: 100%'>
 	</table>
      </td>
 
-      <td style='height: 100%; width: 100%' colspan='2' style='height: 100%; width: 100%'>
-	<table id='heatmap_config_group_list'>
+      <td style='vertical-align: top' colspan='2'>
+	<table id='heatmap_config_group_list' style='width: 100%'>
 	</table>
       </td>
     </tr>

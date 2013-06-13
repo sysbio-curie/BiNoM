@@ -606,8 +606,16 @@ div.tablesorterPager input {
     font-size: larger;
 }
 
-#heatmap_config_datatable_list {
-    overflow: scroll;
+#heatmap_config_datatable_list, #heatmap_config_sample_list, #heatmap_config_group_list {
+    background: white;
+/*    width: 100%;
+    height: 100%;
+*/
+}
+
+#heatmap_config_datatable_list thead, #heatmap_config_sample_list thead, #heatmap_config_group_list thead {
+    text-align: center;
+    background-color: rgb(160, 138, 189);
 }
 
 .heatmap_config_head {

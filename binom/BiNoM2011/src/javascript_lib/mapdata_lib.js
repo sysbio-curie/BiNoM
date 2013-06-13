@@ -993,6 +993,10 @@ Group.prototype = {
 	name: "",
 	html_name: "",
 
+	getId: function() {
+		return this.id;
+	},
+
 	getClass: function() {return "Group";}
 };
 

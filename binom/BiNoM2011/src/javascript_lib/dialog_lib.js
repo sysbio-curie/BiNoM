@@ -188,8 +188,8 @@ $(function() {
 
 	$("#heatmap_config_div" ).dialog({
 		autoOpen: false,
-		height: 700,
-		width: 620,
+		height: 750,
+		width: 720,
 		modal: false,
 		buttons: {
 			"Apply": function() {
@@ -678,6 +678,27 @@ function drawing_config_chart() {
 }
 
 function update_heatmap_config(doc, params) {
+	// TBD:
+	/* this presentation is absolutely not good because:
+	   - this presentation is far from the final heatmap
+	   - in this way, the order is not defined
+	   
+	   it should be as follows:
+	   - a matrix of:
+	      - (upper line) X == array of 'select', each one to choose a sample or a group
+    	      - (left column) Y == array of 'select', each one to choose a datatable
+	  - the apply button will check about duplicata
+	  - must add a clear button
+	  - the number of select in X == #samples + #groups
+	  - the number of select in Y == #datatables
+
+	  may add a "Simulate on gene [select a gene]"
+
+	  ok, continue to think a little bit
+
+	  BUT, don't delete this code, maybe used for barplot or piechart (waiting for a minimal description about these 2 charts)
+	*/
+
 	var datatable_table = $("#heatmap_config_datatable_list");
 	var sample_table = $("#heatmap_config_sample_list");
 	var group_table = $("#heatmap_config_group_list");
@@ -687,16 +708,9 @@ function update_heatmap_config(doc, params) {
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
 
-	var max = datatable_cnt;
-	if (sample_cnt > max) {
-		max = sample_cnt;
-	}
-	if (group_cnt > max) {
-		max = group_cnt;
-	}
-
 	datatable_table.children().remove();
-	var html = "<tbody>";
+	var html = "<thead><th>&nbsp;</th><th>+/-</th></thead>";
+	html += "<tbody>";
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		html += "<tr>";
@@ -704,12 +718,10 @@ function update_heatmap_config(doc, params) {
 		html += "<td>" + datatable_name + "</td>";
 		html += "</tr>";
 	}
-	for (var nn = datatable_cnt; nn < max; ++nn) {
-		html += "<tr><td>&nbsp;</td></tr>";
-	}
 
 	html += "</tbody>";
 	datatable_table.append(html);
+	datatable_table.tablesorter();
 
 	sample_table.children().remove();
 
@@ -722,16 +734,14 @@ function update_heatmap_config(doc, params) {
 		html += "<td>" + sample_name + "</td>";
 		html += "</tr>";
 	}
-	for (var nn = sample_cnt; nn < max; ++nn) {
-		html += "<tr><td>&nbsp;</td></tr>";
-	}
 
 	html += "</tbody>";
 	sample_table.append(html);
 	sample_table.tablesorter();
 
 	group_table.children().remove();
-	html = "<tbody>";
+	html = "<thead><th>&nbsp;</th><th>+/-</th></thead>";
+	html += "<tbody>";
 
 	for (var group_name in navicell.group_factory.group_map) {
 		var group = navicell.group_factory.group_map[group_name];
@@ -740,10 +750,9 @@ function update_heatmap_config(doc, params) {
 		html += "<td>" + group_name + "</td>";
 		html += "</tr>";
 	}
-	for (var nn = group_cnt; nn < max; ++nn) {
-		html += "<tr><td>&nbsp;</td></tr>";
-	}
 
 	html += "</tbody>";
 	group_table.append(html);
+
+	group_table.tablesorter();
 }

@@ -10,6 +10,7 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 public class Matrix2Color {
 
 	public static float threshold_zvalue = 2f;
+	public static Color missingValueColor = new Color(0f,0f,0f);
 	
 	/**
 	 * @param args
@@ -18,7 +19,28 @@ public class Matrix2Color {
 		try{
 			
 			// we have a 2D-matrix with genes in first dimension and samples in second dimension
-			float matrix[][] = loadMatrixFromFile("c:/datas/Neuroblastoma/miRNA.txt");
+			float matrix[][] = loadMatrixFromFile("c:/datas/Neuroblastoma/test/miRNA.txt");
+			System.out.println("Positive threshold = "+getPositiveThreshold(matrix));
+			System.out.println("Negative threshold = "+getNegativeThreshold(matrix));			
+			
+			float pt = getPositiveThreshold(matrix);
+			float nt = getNegativeThreshold(matrix);			
+			float number = 0.5f;
+			Color c = colorForNumber(number,pt,nt);
+			System.out.println(""+number+" => "+c.getRed()+","+c.getGreen()+","+c.getBlue());
+			number = -2f;
+			c = colorForNumber(number,pt,nt);
+			System.out.println(""+number+" => "+c.getRed()+","+c.getGreen()+","+c.getBlue());
+			number = -0.8f;
+			c = colorForNumber(number,pt,nt);
+			System.out.println(""+number+" => "+c.getRed()+","+c.getGreen()+","+c.getBlue());			
+			number = -5f;
+			c = colorForNumber(number,pt,nt);
+			System.out.println(""+number+" => "+c.getRed()+","+c.getGreen()+","+c.getBlue());			
+			number = +100f;
+			c = colorForNumber(number,pt,nt);
+			System.out.println(""+number+" => "+c.getRed()+","+c.getGreen()+","+c.getBlue());			
+			
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -26,23 +48,56 @@ public class Matrix2Color {
 	}
 	
 	public static float getPositiveThreshold(float matrix[][]){
-		float thresh = 1;
-		return thresh;
+		float numbers[] =  matrix2Vector(matrix);
+		return getPositiveThreshold(numbers);
 	}
 	
 	public static float getPositiveThreshold(float numbers[]){
 		float thresh = 1;
-		return thresh;
+		Vector<Float> positives = new Vector<Float>();
+		for(int i=0;i<numbers.length;i++)if(!Float.isNaN(numbers[i])){
+			if(numbers[i]>0){ positives.add(numbers[i]); positives.add(-numbers[i]); }
+		}
+		float positives1[] = new float[positives.size()]; for(int i=0;i<positives.size();i++) positives1[i] = positives.get(i);		
+		float stdpositive = Utils.calcStandardDeviation(positives1);
+		return stdpositive;
 	}
 	
 	public static float getNegativeThreshold(float matrix[][]){
-		float thresh = 1;
-		return thresh;
+		float numbers[] = matrix2Vector(matrix);
+		return getNegativeThreshold(numbers);
 	}
 	
 	public static float getNegativeThreshold(float numbers[]){
 		float thresh = 1;
-		return thresh;
+		Vector<Float> negatives = new Vector<Float>();
+		for(int i=0;i<numbers.length;i++)if(!Float.isNaN(numbers[i])){
+			if(numbers[i]<0){ negatives.add(-numbers[i]); negatives.add(numbers[i]); }
+		}
+		float negatives1[] = new float[negatives.size()]; for(int i=0;i<negatives.size();i++) negatives1[i] = negatives.get(i);		
+		float stdnegative = Utils.calcStandardDeviation(negatives1);
+		return stdnegative;
+	}
+	
+	public static float[] matrix2Vector(float matrix[][]){
+		float res[] = new float[matrix.length*matrix[0].length];
+		int k = 0;
+		for(int i=0;i<matrix.length;i++)for(int j=0;j<matrix[i].length;j++)
+			res[k++] = matrix[i][j];
+		return res;
+	}
+	
+	public static Color colorForNumber(float number, float positive_thresh, float negative_thresh){
+		Color c = missingValueColor;
+		if(!Float.isNaN(number)){
+		if(number>0){
+			if(number/positive_thresh>=threshold_zvalue) c = new Color(1f,0f,0f);
+			if(number/positive_thresh<threshold_zvalue) c = new Color(1f,1f-number/positive_thresh/threshold_zvalue,1f-number/positive_thresh/threshold_zvalue);				
+		}else{
+			if(-number/negative_thresh>=threshold_zvalue) c = new Color(0f,1f,0f);
+			if(-number/negative_thresh<threshold_zvalue) c = new Color(1f+number/negative_thresh/threshold_zvalue,1f,1f+number/negative_thresh/threshold_zvalue);				
+		}}
+		return c;
 	}
 	
 	

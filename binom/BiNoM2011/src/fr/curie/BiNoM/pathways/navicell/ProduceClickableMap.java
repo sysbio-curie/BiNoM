@@ -477,7 +477,7 @@ public class ProduceClickableMap
 				destination = f;
 			else if ((f = options.fileRequiredOption("config", "configuration file")) != null)
 				config = f;
-			else if ((f = options.fileRequiredOption("xrefs", "Xref file")) != null)
+			else if ((f = options.fileOption("xrefs", "Xref file")) != null)
 				xref_file = f;
 			else if ((f = options.fileOption("source_directory", "directory containing cell designer files and images")) != null)
 				source_directory = f;
@@ -501,8 +501,18 @@ public class ProduceClickableMap
 		options.done();
 		
 		final Properties configuration = load_config(config);
-		final String[][] xrefs = load_xrefs(xref_file);
-		//FormatProteinNotes.make_xref_patterns(xrefs);
+
+		BufferedReader xref_stream;
+		String xref_filename;
+		if (xref_file != null) {
+			xref_stream = open_file(xref_file);
+			xref_filename = xref_file.toString();
+		} else {
+			xref_stream = open_file(default_xref_file);
+			xref_filename = default_xref_file;
+		}
+		
+		final String[][] xrefs = load_xrefs(xref_stream, xref_filename);
 
 		String info = configuration.getProperty("atlasInfo", null);
 		AtlasInfo atlasInfo = info != null ? parseAtlasInfo(info) : null;
@@ -567,6 +577,7 @@ public class ProduceClickableMap
 	static final String data_directory = "/data";
 	static final String rightpanel_include_file = data_directory + "/rightpanel.inc.html";
 	static final String mainpanel_include_file = data_directory + "/mainpanel.inc.html";
+	static final String default_xref_file = data_directory + "/xrefs_default.txt";
 
 	public static void run
 	(
@@ -4718,6 +4729,36 @@ public class ProduceClickableMap
 		html_in_named_window(out, url, text, "_blank");
 	}
 
+	public static BufferedReader open_file(File filename)
+	{
+		try
+		{
+			return new BufferedReader(new FileReader(filename));
+		}
+		catch (FileNotFoundException e1)
+		{
+			System.err.println(e1.getMessage());
+			System.exit(1);
+			return null;
+		}
+	}
+
+	public static BufferedReader open_file(String filename)
+	{
+		try
+		{
+			final InputStream resource = ProduceClickableMap.class.getResourceAsStream(filename);
+			return new BufferedReader(new InputStreamReader(resource));
+		}
+		catch (Exception e1)
+		{
+			System.err.println(e1.getMessage());
+			System.exit(1);
+			return null;
+		}
+	}
+
+	/*
 	public static String[][] load_xrefs(File xref_file)
 	{
 		final BufferedReader xref_stream;
@@ -4731,6 +4772,10 @@ public class ProduceClickableMap
 			System.exit(1);
 			return null;
 		}
+	*/
+
+	public static String[][] load_xrefs(BufferedReader xref_stream, String xref_file)
+	{
 		try
 		{
 			Vector<String[]> ret = new Vector<String[]>();

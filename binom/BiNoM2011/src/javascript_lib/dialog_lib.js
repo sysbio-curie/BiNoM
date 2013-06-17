@@ -839,7 +839,7 @@ function update_heatmap_editor(doc, params) {
 		html += "<option value='_none_'>Choose a group or sample</option>\n";
 		for (var group_name in navicell.group_factory.group_map) {
 			var group = navicell.group_factory.group_map[group_name];
-			html += "<option value='heatmap_editor_group_" + group.getId() + "'>" + group.name + "</option>";
+			html += "<option value='" + group.getId() + "'>" + group.name + "</option>";
 		}
 		for (var sample_name in navicell.dataset.samples) {
 			var sample = navicell.dataset.samples[sample_name];
@@ -858,7 +858,7 @@ function update_heatmap_editor(doc, params) {
 		html += "<option value='_none_'>Choose a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
-			html += "<option value='heatmap_editor_datatable_" + datatable.getId() + "'>" + datatable.name + "</option>";
+			html += "<option value='" + datatable.getId() + "'>" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {

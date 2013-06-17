@@ -81,7 +81,7 @@ html, body {
 }
 
 #right_panel {
-    min-width: 230px;
+    min-width: 245px;
 }
 
 #marker_checkboxes {
@@ -583,7 +583,7 @@ div.tablesorterPager input {
 }
 
 .drawing_config_box {
-    border: 1px solid lightgrey;
+    border: 1px solid lightgray;
     margin-left: 20px;
     margin-right: 40px;
     padding: 10px;
@@ -624,3 +624,42 @@ div.tablesorterPager input {
     font-size: larger;
 }
 
+
+#heatmap_editor_div {
+/*    font-size: small; */
+}
+
+#heatmap_editor_div h3 {
+    text-align: center;
+/*    font-size: larger; */
+}
+
+#heatmap_editor_table {
+/*    background: lightyellow;  */
+/*    border: 1px solid lightgray; */
+/*    border-spacing: 3px; */
+/*    border-padding: 3px; */
+    padding: 3px;
+/*    padding-right: 20px; */
+}
+
+#heatmap_editor_table td {
+    background: white;
+    border: 1px solid;
+    border-top: 1px solid;
+    border-color: lightgray;
+    font-size: x-small;
+}
+
+#heatmap_editor_table tbody {
+/*    border: 1px solid; */
+}
+
+#confirm_dialog {
+    font-size: 80%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+}
+
+.loading-jstree-head-msg {
+    font-weight: bold;
+}

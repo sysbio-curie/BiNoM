@@ -432,7 +432,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			},
 			core : {
 				strings : {
-					loading : "<div class='loading-jstree'>Loading the tree...<br/>please wait, may take a while.</div>"
+					loading: "<div><br/><br/><span class='loading-jstree-head-msg'>Loading all entities<br>(proteins, genes, RNAs...)</span><br/><br/>This action might take a few minutes<br/>when applied to the whole Atlas.<br/>If a pop-up message proposes you<br/>to kill or wait, choose wait.</div>"
 				},
 				"animation" : 200,
 				"initially_open" : [ "entities" ]
@@ -487,6 +487,12 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 			var bounds = new google.maps.LatLngBounds();
 			var f = function(index, element)
 			{
+				/*
+				for (var kk in event) {
+					console.log("event[" + kk + "] = " + event[kk]);
+				}
+				console.log("INDEX: " + index + " " + element + " " + data.args[0] + " class=" + $(element).attr("class") + " id=" + $(element).attr("id") + " type=" + $(element).attr("type"));
+				*/
 				get_markers_for_modification(element, projection, map);
 				
 				if (element.markers) {

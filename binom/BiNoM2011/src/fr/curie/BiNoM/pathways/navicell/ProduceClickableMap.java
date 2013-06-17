@@ -650,9 +650,13 @@ public class ProduceClickableMap
 		}
 		
 		outjson.close();
+		/*
 		if(master!=null)
 			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
-		
+		*/
+
+		if(master!=null)
+			right_close_entities(master.right_panel);
 		wp.remove_old_posts(atlasInfo);
 	}
 	
@@ -1022,7 +1026,7 @@ public class ProduceClickableMap
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
 			clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
-			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp);
+			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo);
 		}
 	}
 
@@ -1048,7 +1052,7 @@ public class ProduceClickableMap
 			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
 			clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
 			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format, atlasInfo);
-			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp);
+			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			return clMap;
 		}
@@ -1777,9 +1781,18 @@ public class ProduceClickableMap
 
 	static private ItemCloser item_line(final ItemCloser indent, String id, String cls, String name, String type)
 	{
+		return item_line(indent, id, cls, name, type, null);
+	}
+
+	static private ItemCloser item_line(final ItemCloser indent, String id, String cls, String name, String type, String etc)
+	{
 		item_list_start(indent, id, cls);
-		if (type != null)
-			indent.getOutput().print(" rel=\"" + type + "\"");
+		if (type != null) {
+			indent.getOutput().print(" rel=\"" + type + "\"" + " name=\"" + class_name_to_human_name_entities.get(type) + "\"");
+		}
+		if (etc != null) {
+			indent.getOutput().print(" " + etc);
+		}
 		return item_line_end(indent, name);
 	}
 
@@ -2006,13 +2019,16 @@ public class ProduceClickableMap
 	}
 
 	static private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
-		final Map<String, Vector<String>> speciesAliases,
-		final Map<String, Vector<Place>> placeMap,
-		final FormatProteinNotes format,
-		final BlogCreator wp,
-		final SbmlDocument cd,
-		final String blog_name,
-		ImagesInfo scales
+							   final Map<String, Vector<String>> speciesAliases,
+							   final Map<String, Vector<Place>> placeMap,
+							   final FormatProteinNotes format,
+							   final BlogCreator wp,
+							   final SbmlDocument cd,
+							   final String blog_name,
+							   ImagesInfo scales,
+							   Map<String, ModuleInfo> modules_set,
+							   AtlasInfo atlasInfo,
+							   Model model
 	) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		/*
@@ -2025,7 +2041,12 @@ public class ProduceClickableMap
 		final PrintWriter output = new PrintWriter(output_file, encoding);
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
 		output.println("<root>");
-		final ItemCloser entities = item_line(new ItemCloser(output), "entities", null, "Entities", null);
+		//
+		if (modules_set != null || (atlasInfo != null && atlasInfo.isAtlas())) {
+			finish_right_panel_xml(new ItemCloser(output), modules_set, atlasInfo, model, scales, blog_name, wp, format);
+		}
+		//
+		final ItemCloser entities = item_line(new ItemCloser(output), "entities", null, "Entities", "Entity");
 		final List<EntityBase> sorted = new ArrayList<EntityBase>();
 		for (final String[] s : class_name_to_human_name)
 		{
@@ -2145,7 +2166,8 @@ public class ProduceClickableMap
 						   AtlasInfo atlasInfo,	Model model, ImagesInfo scales, String blog_name,
 						   Linker wp, FormatProteinNotes notes_formatter)
 	{
-		final PrintWriter output = right_close_entities(right);
+		//final PrintWriter output = right_close_entities(right);
+		final PrintWriter output = right.getOutput();
 		
 		final Map<String, double[]> positions = new HashMap<String, double[]>();
 		loop : for (CelldesignerLayer l : model.getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray())
@@ -2172,7 +2194,7 @@ public class ProduceClickableMap
 	
 		boolean isAtlas = atlasInfo != null && atlasInfo.isAtlas();
 		if (!isAtlas && modules_set.size() > 1) {
-			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null);
+			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null, "state=\"open\"");
 			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
 				if (master_map_name.equals(k.getKey()))
 					;
@@ -2209,7 +2231,7 @@ public class ProduceClickableMap
 		}
 		
 		if (isAtlas) {
-			final ItemCloser maps = item_line(new ItemCloser(output), "maps", null, "Maps", null);
+			final ItemCloser maps = item_line(new ItemCloser(output), "maps", null, "Maps", null, "state=\"open\"");
 			Vector<AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
 			int size = mapInfo_v.size();
 			for (int nn = 0; nn < size; ++nn) {
@@ -2258,7 +2280,7 @@ public class ProduceClickableMap
 			}
 			maps.close();
 		}
-		right_close(output);
+		//right_close(output);
 	}
 
 	private static void right_close(final PrintWriter output)
@@ -2302,7 +2324,7 @@ public class ProduceClickableMap
 		for (final EntityBase ent : entityIDToEntityMap.values())
 			ent.setPost(wp);
 		
-		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
+		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, null, null, null);
 		//System.out.println("_generate_ module " + map + " json ?");
 		generate_mapdata(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
@@ -2369,7 +2391,7 @@ public class ProduceClickableMap
 			}
 		}
 
-		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
+		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, modules_set, atlasInfo, model);
 
 		//System.out.println("_generate_ master json ?");
 		generate_mapdata("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
@@ -4451,11 +4473,17 @@ public class ProduceClickableMap
 		{ REACTION_CLASS_NAME, "Reactions", "Reaction" }
 	};
 	static private final Map<String, String> class_name_to_human_name_map;
+	static private final Map<String, String> class_name_to_human_name_entities;
 	static {
 		final Map<String, String> map = new HashMap<String, String>();
-		for (String[] s : class_name_to_human_name)
+		final Map<String, String> map2 = new HashMap<String, String>();
+		for (String[] s : class_name_to_human_name) {
 			map.put(s[0], s.length == 2 ? s[1] : s[2]);
+			map2.put(s[0], s[1]);
+		}
+		map2.put("Entity", "Entities");
 		class_name_to_human_name_map = Collections.unmodifiableMap(map);
+		class_name_to_human_name_entities = Collections.unmodifiableMap(map2);
 	}
 
 	private static PrintStream create_reset_button(final PrintStream out)
@@ -4534,7 +4562,7 @@ public class ProduceClickableMap
 		final String map_name,
 		ImagesInfo scales,
 		BlogCreator.Post module_post,
-		final BlogCreator wp) throws FileNotFoundException
+					    final BlogCreator wp, AtlasInfo atlasInfo) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
@@ -4601,6 +4629,8 @@ public class ProduceClickableMap
 		} else {
 			out.println("  var navicell = {};");
 		}
+
+		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
 
 		out.println("  $(document).ready(function() {");
 		

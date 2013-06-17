@@ -40,8 +40,8 @@ $(function() {
 
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
-		height: 700,
 		width: 500,
+		height: 700,
 		modal: false,
 		buttons: {
 			"Import": function() {
@@ -107,8 +107,8 @@ $(function() {
 
 	$("#dt_status_tabs").dialog({
 		autoOpen: false,
-		height: 800,
 		width: 700,
+		height: 800,
 		modal: false
 	});
 
@@ -132,8 +132,8 @@ $(function() {
 
 	$("#dt_sample_annot").dialog({
 		autoOpen: false,
-		height: 750,
 		width: 800,
+		height: 750,
 		modal: false,
 		buttons: {
 			Add: function() {
@@ -170,8 +170,8 @@ $(function() {
 	// use tabs for datatable management
 	$("#dt_datatable_tabs").dialog({
 		autoOpen: false,
-		height: 550,
 		width: 850,
+		height: 550,
 		modal: false
 	});
 
@@ -188,8 +188,22 @@ $(function() {
 
 	$("#heatmap_config_div" ).dialog({
 		autoOpen: false,
-		height: 750,
 		width: 720,
+		height: 750,
+		modal: false,
+		buttons: {
+			"Apply": function() {
+			},
+			
+			"Cancel": function() {
+			}
+		}
+	});
+
+	$("#heatmap_editor_div" ).dialog({
+		autoOpen: false,
+		width: 750,
+		height: 450,
 		modal: false,
 		buttons: {
 			"Apply": function() {
@@ -540,7 +554,8 @@ function update_status_tables(params) {
 		update_module_status_table(doc, params);
 		update_datatable_status_table(doc, params);
 		update_sample_annot_table(doc, params);
-		update_heatmap_config(doc, params);
+		//update_heatmap_config(doc, params);
+		update_heatmap_editor(doc, params);
 	}
 //	navicell_session.write();
 }
@@ -617,8 +632,8 @@ Datatable.prototype.showDisplayConfig = function() {
 		var datatable_id = this.getId();
 		div.dialog({
 			autoOpen: false,
-			height: 550,
 			width: 700,
+			height: 550,
 			modal: false,
 
 			buttons: {
@@ -674,7 +689,8 @@ Datatable.prototype.showDisplayConfig = function() {
 }
 
 function drawing_config_chart() {
-	$("#heatmap_config_div").dialog("open");
+	//$("#heatmap_config_div").dialog("open");
+	$("#heatmap_editor_div").dialog("open");
 }
 
 function update_heatmap_config(doc, params) {
@@ -755,4 +771,104 @@ function update_heatmap_config(doc, params) {
 	group_table.append(html);
 
 	group_table.tablesorter();
+}
+
+var MAX_HEATMAP_X = 15;
+
+function update_heatmap_editor(doc, params) {
+	// TBD:
+	/* this presentation is absolutely not good because:
+	   - this presentation is far from the final heatmap
+	   - in this way, the order is not defined
+	   
+	   it should be as follows:
+	   - a matrix of:
+	      - (upper line) X == array of 'select', each one to choose a sample or a group
+    	      - (left column) Y == array of 'select', each one to choose a datatable
+	  - the apply button will check about duplicata
+	  - must add a clear button
+	  - the number of select in X == #samples + #groups
+	  - the number of select in Y == #datatables
+
+	  may add a "Simulate on gene [select a gene]"
+
+	  ok, continue to think a little bit
+
+	  BUT, don't delete this code, maybe used for barplot or piechart (waiting for a minimal description about these 2 charts)
+	*/
+	var heatmapConfig = navicell.heatmap_config;
+
+	var table = $("#heatmap_editor_table");
+
+	var datatable_cnt = mapSize(navicell.dataset.datatables);
+	var sample_cnt = mapSize(navicell.dataset.samples);
+	var group_cnt = mapSize(navicell.group_factory.group_map);
+	var sample_group_cnt = sample_cnt + group_cnt;
+
+	if (sample_group_cnt > MAX_HEATMAP_X) {
+		sample_group_cnt = MAX_HEATMAP_X;
+	}
+	table.children().remove();
+	var html = "";
+	html += "<tbody>";
+	/*
+	html += "<td class='zz-hidden'>&nbsp;</td>";
+
+	for (var idx = 0; idx < sample_group_cnt; ++idx) {
+		//html += "<td><input type='radio' name='heatmap_editor_group_radio_" + idx + "' id='heatmap_editor_group_radio_" + idx + "' " + (heatmapConfig.getGroupAt(idx) ? "checked" : "") + "></input>";
+		html += "<td><table><tr><td style='border: 0px'><input type='radio' name='heatmap_editor_radio_" + idx + "' id='heatmap_editor_group_radio_" + idx + "'></input>";
+		html += "</td><td style='border: 0px'><select id='heatmap_editor_group_" + idx + "'>\n";
+		html += "<option value='_none_'>Choose a group</option>\n";
+		for (var group_name in navicell.group_factory.group_map) {
+			var group = navicell.group_factory.group_map[group_name];
+			html += "<option value='heatmap_editor_group_" + group.getId() + "'>" + group.name + "</option>";
+		}
+		html += "</select>";
+		html += "</tr></td></table></td>";
+	}
+
+	html += "</tr>\n";
+	*/
+	html += "<tr><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
+	for (var idx = 0; idx < sample_group_cnt; ++idx) {
+		//html += "<td><input type='radio' name='heatmap_editor_sample_radio_" + idx + "' id='heatmap_editor_sample_radio_" + idx + "' " + (heatmapConfig.getSampleAt(idx) ? "checked" : "") + "></input>";
+		//html += "<td><table><tr><td style='border: 0px'><input type='radio' name='heatmap_editor_radio_" + idx + "' id='heatmap_editor_sample_radio_" + idx + "'></input>";
+//		html += "&nbsp;";
+		//html += "</td>";
+		html += "<td style='border: 0px'><select id='heatmap_editor_sample_" + idx + "'>\n";
+		html += "<option value='_none_'>Choose a group or sample</option>\n";
+		for (var group_name in navicell.group_factory.group_map) {
+			var group = navicell.group_factory.group_map[group_name];
+			html += "<option value='heatmap_editor_group_" + group.getId() + "'>" + group.name + "</option>";
+		}
+		for (var sample_name in navicell.dataset.samples) {
+			var sample = navicell.dataset.samples[sample_name];
+			html += "<option value='heatmap_editor_sample_" + sample.getId() + "'>" + sample.name + "</option>";
+		}
+		html += "</select>";
+		//html += "</tr></td></table></td>";
+		html += "</td>";
+	}
+
+	html += "</tr>\n";
+
+	for (var idx = 0; idx < datatable_cnt; ++idx) {
+		html += "<tr>";
+		html += "<td><select id='heatmap_editor_datatable_" + idx + "'>\n";
+		html += "<option value='_none_'>Choose a datatable</option>\n";
+		for (var datatable_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[datatable_name];
+			html += "<option value='heatmap_editor_datatable_" + datatable.getId() + "'>" + datatable.name + "</option>";
+		}
+		html += "</select></td>";
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			html += "<td>&nbsp;</td>";
+		}
+		html += "</tr>\n";
+	}
+
+	html += "</tbody>";
+
+	table.append(html);
+	table.tablesorter();
 }

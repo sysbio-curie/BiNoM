@@ -42,7 +42,7 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 
 public class WordPressBlogCreator extends BlogCreator
 {
-	private static final int maximum_number_of_posts = 20480; // might not be enough
+	private static final int maximum_number_of_posts = 3375; // might not be enough
 	static class Post implements BlogCreator.Post
 	{
 		final String hash;

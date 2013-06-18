@@ -72,7 +72,7 @@ public class CellDesigner2BioPAX {
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/PKC";
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/test";
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/cellcycle_master";
-    	String prefix = "C:/Datas/acsn/acsn_only/acsn_src/acsn_master";
+    	String prefix = "C:/Datas/acsn/assembly/acsn_src/acsn_master";
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/dnarepair_master";
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/apoptosis_master";
     	//String prefix = "C:/Datas/binomtest/BioPAXtest/emtcellmotility_master";

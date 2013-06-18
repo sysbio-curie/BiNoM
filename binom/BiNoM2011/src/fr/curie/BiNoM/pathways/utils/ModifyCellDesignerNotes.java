@@ -417,6 +417,9 @@ public class ModifyCellDesignerNotes {
 				if(annot.trim().equals("")) annotationEmpty = true;
 			}
 			
+			if(sp.getId().equals("tst1_s3326"))
+				System.out.println();
+			
 			StringBuffer nonannotated = new StringBuffer();
 			Vector<AnnotationSection> secs = new Vector<AnnotationSection>(); 
 			

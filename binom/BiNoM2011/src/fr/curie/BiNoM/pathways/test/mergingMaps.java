@@ -259,7 +259,7 @@ public class mergingMaps {
 					 CelldesignerInnerPositionDocument.CelldesignerInnerPosition ip = uv.addNewCelldesignerInnerPosition();
 					 ip.setX("0.0"); ip.setY("0.0");
 					 CelldesignerSingleLineDocument.CelldesignerSingleLine sl = uv.addNewCelldesignerSingleLine();
-					 sl.setWidth(CelldesignerSingleLineDocument.CelldesignerSingleLine.Width.X_1_0);
+					 sl.setWidth("1");
 					 CelldesignerPaintDocument.CelldesignerPaint paint = uv.addNewCelldesignerPaint();
 					 paint.setScheme(CelldesignerPaintDocument.CelldesignerPaint.Scheme.COLOR);
 					 xs.setStringValue("ff66ff66");

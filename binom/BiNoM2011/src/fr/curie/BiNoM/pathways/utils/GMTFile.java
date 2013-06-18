@@ -72,5 +72,14 @@ public class GMTFile{
 			e.printStackTrace();
 		}
 	}
+	
+	public Vector<String> findSet(String name){
+		Vector<String> res = new Vector<String>();
+		for(int i=0;i<sets.size();i++){
+			if(sets.get(i).contains(name))
+				res.add(setnames.get(i));
+		}
+		return res;
+	}
 
 }

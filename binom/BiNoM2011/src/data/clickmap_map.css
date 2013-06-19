@@ -190,3 +190,11 @@ html, body {
 .loading-jstree-head-msg {
     font-weight: bold;
 }
+
+.ui-button-text {
+    font-size: 13px;
+}
+
+.ui-dialog .ui-state-error { padding: .3em; }
+
+fieldset { padding: 0; border: 0; margin-top: 25px; }

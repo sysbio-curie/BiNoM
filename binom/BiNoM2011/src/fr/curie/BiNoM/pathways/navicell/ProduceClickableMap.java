@@ -82,6 +82,7 @@ public class ProduceClickableMap
 {
 	private static boolean NV2 = false;
 	private static File config = null;
+	private static boolean MAPS_MODULES_TOP = false;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -618,7 +619,7 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs);
+			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs);
 		}
 		catch (IOException e)
 		{
@@ -640,7 +641,7 @@ public class ProduceClickableMap
 				if (!map_name.equals(master_map_name))
 					try
 				{
-					process_a_map(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo);
+					process_a_map_module(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo);
 				}
 				catch (IOException e)
 				{
@@ -650,13 +651,14 @@ public class ProduceClickableMap
 		}
 		
 		outjson.close();
-		/*
-		if(master!=null)
-			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
-		*/
+		if (master!=null) {
+			if (MAPS_MODULES_TOP) {
+				close_right_panel_xml(master.right_panel);
+			} else {
+				finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
+			}
+		}
 
-		if(master!=null)
-			right_close_entities(master.right_panel);
 		wp.remove_old_posts(atlasInfo);
 	}
 	
@@ -785,12 +787,30 @@ public class ProduceClickableMap
 		return configuration;
 	}
 	
+	static final int XMARGIN = 10;
+	static final int TILE_WIDTH = 256;
+	static final int TILE_HEIGHT = 256;
+	static final int MAX_WIDTH = TILE_WIDTH - 2 * XMARGIN;
+	static final int MAX_HEIGHT = TILE_HEIGHT;
+
 	static class ImagesInfo
 	{
 		final int minzoom, maxzoom, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0;
 		final double z;
 		ImagesInfo(final int minzoom, final int maxzoom, final int tile_width, final int tile_height, final int xshift_zoom0, final int yshift_zoom0, final int width_zoom0, final int height_zoom0)
 		{
+			if (false) {
+				System.out.println("ImagesInfo {");
+				System.out.println("  minzoom: " + minzoom);
+				System.out.println("  maxzoom: " + maxzoom);
+				System.out.println("  tile_width: " + tile_width);
+				System.out.println("  tile_height: " + tile_height);
+				System.out.println("  xshift_zoom0: " + xshift_zoom0);
+				System.out.println("  yshift_zoom0: " + yshift_zoom0);
+				System.out.println("  width_zoom0: " + width_zoom0);
+				System.out.println("  height_zoom0: " + height_zoom0);
+				System.out.println("}");
+			}
 			this.minzoom = minzoom;
 			this.maxzoom = maxzoom;
 			this.tile_width = tile_width;
@@ -808,14 +828,9 @@ public class ProduceClickableMap
 	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
 	{
 		int[] shifts = new int[2];
-		final int xmargin = 10;
-		final int tile_width = 256;
-		final int tile_height = 256;
-		final int max_width = tile_width - 2 * xmargin;
-		final int max_height = tile_height;
 		int count = 0;
 		
-		final BufferedImage tiled = new BufferedImage(tile_width, tile_height, BufferedImage.TYPE_INT_RGB);
+		final BufferedImage tiled = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_RGB);
 		final java.awt.Graphics2D g = tiled.createGraphics();
 		
 		final int difference_zoom0_image0;
@@ -839,7 +854,7 @@ public class ProduceClickableMap
 			final int height0 = image0.getHeight();
 		
 			       
-			difference_zoom0_image0 = Math.max(get_maxscale(height0, max_height), get_maxscale(width0, max_width));
+			difference_zoom0_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
 			
 			//System.out.println("width0 " + width0 + ", height0 " + height0 + ", max_width " + max_width + ", max_height " + max_height + ", diff_zoom " + difference_zoom0_image0 + " " + get_maxscale(height0, max_height) + " " + get_maxscale(width0, max_width));
 
@@ -856,12 +871,12 @@ public class ProduceClickableMap
 			}
 
 			width_zoom0 = width0 >> difference_zoom0_image0;
-			xshift_zoom0 = (max_width - width_zoom0) / 2 + xmargin;
+			xshift_zoom0 = (MAX_WIDTH - width_zoom0) / 2 + XMARGIN;
 			height_zoom0 = height0 >> difference_zoom0_image0;
-			yshift_zoom0 = (max_height - height_zoom0) / 2;
+			yshift_zoom0 = (MAX_HEIGHT - height_zoom0) / 2;
 			
 			calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, difference_zoom0_image0);
-			count += write_tiles(image0, outdir, difference_zoom0_image0, tiled, g, tile_width, tile_height, shifts);
+			count += write_tiles(image0, outdir, difference_zoom0_image0, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
 		}
 		
 		int last_found = difference_zoom0_image0;
@@ -883,7 +898,7 @@ public class ProduceClickableMap
 			}
 			catch (IOException e)
 			{
-				return new ImagesInfo(difference_zoom0_image0, last_found, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
+				return new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
 			}
 			
 			/*
@@ -892,7 +907,7 @@ public class ProduceClickableMap
 			Utils.printUsedMemory();
 			*/
 
-			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, max_width, max_height);
+			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, MAX_WIDTH, MAX_HEIGHT);
 			assert scale_factor > last_found : scale_factor + " " + last_found;
 			
 			for (int i = last_found + 1; i <= scale_factor; i++)
@@ -918,7 +933,7 @@ public class ProduceClickableMap
 				
 				final BufferedImage padded_image = resize;
 				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, i);
-				count += write_tiles(padded_image, outdir, i, tiled, g, tile_width, tile_height, shifts);
+				count += write_tiles(padded_image, outdir, i, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
 			}
 			last_found = scale_factor;
 			
@@ -954,11 +969,21 @@ public class ProduceClickableMap
 		final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
 		final BufferedImage image0 = ImageIO.read(image_file0);
 		
-		final int width = image0.getWidth();
-		final int height = image0.getHeight();
+		final int width0 = image0.getWidth();
+		final int height0 = image0.getHeight();
+		final int difference_zoom0_image0;
+		final int xshift_zoom0;
+		final int yshift_zoom0;
+		final int width_zoom0;
+		final int height_zoom0;
+
+		difference_zoom0_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
+		width_zoom0 = width0 >> difference_zoom0_image0;
+		xshift_zoom0 = (MAX_WIDTH - width_zoom0) / 2 + XMARGIN;
+		height_zoom0 = height0 >> difference_zoom0_image0;
+		yshift_zoom0 = (MAX_HEIGHT - height_zoom0) / 2;
 		
-		//for (int file_number = last_found + 1;; file_number++)
-		for (int file_number = last_found + 1;; file_number++)
+		for (int file_number = last_found + 1; ; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
 			final BufferedImage image;
@@ -968,9 +993,20 @@ public class ProduceClickableMap
 			}
 			catch (IOException e)
 			{
-				return null; //new int[]{ last_found, width, height };
+				/*
+				System.out.println("  difference_zoom0_image0: " + difference_zoom0_image0);
+				System.out.println("  last_found: " + last_found);
+				System.out.println("  xshift_zoom0: " + xshift_zoom0);
+				System.out.println("  yshift_zoom0: " + yshift_zoom0);
+				System.out.println("  width_zoom0: " + width_zoom0);
+				System.out.println("  height_zoom0: " + height_zoom0);
+				*/
+
+				return new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
+				//return null; //new int[]{ last_found, width, height };
 			}
-			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width, height);
+			//last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width0, height0);
+			last_found = get_scale(image.getWidth(), image.getHeight(), image_file, MAX_WIDTH, MAX_HEIGHT);
 		}
 	}
 
@@ -1008,7 +1044,7 @@ public class ProduceClickableMap
 		return (notes == null) ? "" : Utils.getText(notes).trim();
 	}
 
-	private static void process_a_map(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
+	private static void process_a_map_module(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
 					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo) throws IOException
 	{
 
@@ -1025,12 +1061,12 @@ public class ProduceClickableMap
 			final File this_map_directory = mk_maps_directory(map, destination);
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
-			clMap.generatePages(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
+			clMap.generatePages_module(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo);
 		}
 	}
 
-	private static ProduceClickableMap process_a_map(final String blog_name, File destination, String base, File source_directory,
+	private static ProduceClickableMap process_a_map_master(final String blog_name, File destination, String base, File source_directory,
 							 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs)
 		throws IOException, NaviCellException
 	{
@@ -1050,7 +1086,7 @@ public class ProduceClickableMap
 			clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
 			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
-			clMap.right_panel = clMap.generatePages(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
+			clMap.right_panel = clMap.generatePages_master(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
 			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format, atlasInfo);
 			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
@@ -1822,6 +1858,17 @@ public class ProduceClickableMap
 		return sb;
 	}
 	
+	private static StringBuffer make_right_hand_link_to_blog_with_title(StringBuffer sb, int postid, String name)
+	{
+		if (sb == null)
+			sb = new StringBuffer();
+		sb.append("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
+		sb.append(postid);
+		sb.append("' title='go to ").append(name + " blog'");
+		sb.append("/>");
+		return sb;
+	}
+	
 	private static StringBuffer make_right_hand_link_to_blog_with_name(StringBuffer sb, int postid, String name)
 	{
 		return make_right_hand_link_to_blog(sb, postid).append(" ").append(name);
@@ -2041,11 +2088,12 @@ public class ProduceClickableMap
 		final PrintWriter output = new PrintWriter(output_file, encoding);
 		output.println("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
 		output.println("<root>");
-		//
-		if (modules_set != null || (atlasInfo != null && atlasInfo.isAtlas())) {
-			finish_right_panel_xml(new ItemCloser(output), modules_set, atlasInfo, model, scales, blog_name, wp, format);
+		if (MAPS_MODULES_TOP) {
+			if (modules_set != null || (atlasInfo != null && atlasInfo.isAtlas())) {
+				finish_right_panel_xml(new ItemCloser(output), modules_set, atlasInfo, model, scales, blog_name, wp, format);
+			}
 		}
-		//
+
 		final ItemCloser entities = item_line(new ItemCloser(output), "entities", null, "Entities", "Entity");
 		final List<EntityBase> sorted = new ArrayList<EntityBase>();
 		for (final String[] s : class_name_to_human_name)
@@ -2119,7 +2167,7 @@ public class ProduceClickableMap
 		sb.append("/>");
 		return item_line(entities , s[0], null, sb.toString(), s[0]);
 	}
-	static private void finish_right_panel_xml(final ItemCloser right)
+	static private void close_right_panel_xml(final ItemCloser right)
 	{
 		final PrintWriter output = right_close_entities(right);
 		right_close(output);
@@ -2153,11 +2201,13 @@ public class ProduceClickableMap
 	
 	static private String make_right_hand_module_entry(int post_id, String name)
 	{
-		final StringBuffer sb = make_right_hand_link_to_blog(null, post_id);
+		final StringBuffer sb = make_right_hand_link_to_blog_with_title(null, post_id, name);
 		//sb.append("&amp;nbsp;");
 		sb.append(" ");
 		sb.append("<img align='top' class='mapmodulefromright' border='0' src='" + map_icon + "' alt='");
-		sb.append(name).append("'/>");
+		sb.append(name);
+		sb.append("' title='go to ").append(name + " map view'");
+		sb.append("/>");
 		sb.append(" ").append(name);
 		return sb.toString();
 	}
@@ -2167,7 +2217,7 @@ public class ProduceClickableMap
 						   Linker wp, FormatProteinNotes notes_formatter)
 	{
 		//final PrintWriter output = right_close_entities(right);
-		final PrintWriter output = right.getOutput();
+		final PrintWriter output = MAPS_MODULES_TOP ? right.getOutput() : right_close_entities(right);
 		
 		final Map<String, double[]> positions = new HashMap<String, double[]>();
 		loop : for (CelldesignerLayer l : model.getAnnotation().getCelldesignerListOfLayers().getCelldesignerLayerArray())
@@ -2248,7 +2298,7 @@ public class ProduceClickableMap
 				}
 				map_item.getOutput().println(">");
 				//content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
-				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
+				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName(), "");
 
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
@@ -2272,7 +2322,7 @@ public class ProduceClickableMap
 					//open_map_from_bubble(fw.append(" "), moduleInfo.name);
 					open_map_from_bubble(fw.append(" "), moduleInfo.url);
 					bubble_txt += fw.toString() + "<br>" +  moduleInfo.desc;
-					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "'/> " + moduleInfo.name, bubble_txt);
+					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name, bubble_txt);
 
 					module_item.close();
 				}
@@ -2280,7 +2330,9 @@ public class ProduceClickableMap
 			}
 			maps.close();
 		}
-		//right_close(output);
+		if (!MAPS_MODULES_TOP) {
+			right_close(output);
+		}
 	}
 
 	private static void right_close(final PrintWriter output)
@@ -2315,7 +2367,7 @@ public class ProduceClickableMap
 	
 	private FormatProteinNotes master_format;
 	
-	private void generatePages(final String map, final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
+	private void generatePages_module(final String map, final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		
 		System.out.println("Generating pages...");
@@ -2342,7 +2394,7 @@ public class ProduceClickableMap
 			}
 		}
 		
-		finish_right_panel_xml(right);
+		close_right_panel_xml(right);
 	}
 	
 	static private String make_module_id(String map_name)
@@ -2370,7 +2422,7 @@ public class ProduceClickableMap
 
 	}
 
-	private ItemCloser generatePages(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set, AtlasInfo atlasInfo)
+	private ItemCloser generatePages_master(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set, AtlasInfo atlasInfo)
 		throws UnsupportedEncodingException, FileNotFoundException, NaviCellException
 	{
 		final Model model = cd.getSbml().getModel();
@@ -4578,10 +4630,13 @@ public class ProduceClickableMap
 		*/
 
 		// CSS [
-		if (NV2) {
+		boolean NV1_2 = true;
+		if (NV1_2) {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_dir + "/themes/base/jquery.ui.all.css\"/>");
 			//out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/sunny/jquery.ui.theme.css\"/>");
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery.ui.theme.css\"/>");
+		}
+		if (NV2) {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + "_v2.css\"/>");
 		} else {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
@@ -4590,8 +4645,8 @@ public class ProduceClickableMap
 
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
-		out.println("<script src='" + (NV2 ? jquery_NV2_js : jquery_js) + "' type='text/javascript'></script>");
-		out.println("<script src='" + jstree_directory_url + "/jquery.jstree.js" + "' type='text/javascript'></script>");
+		out.println("<script src='" + (NV1_2 ? jquery_NV2_js : jquery_js) + "' type='text/javascript'></script>");
+		out.println("<script src='" + jstree_directory_url + "/jquery.jstree-navicell.js" + "' type='text/javascript'></script>");
 		
 		out.println("<script src='" + jslib_dir + "/splitter-1.5.1-patched.js' type='text/javascript'></script>");
 		if (NV2) {
@@ -4602,7 +4657,7 @@ public class ProduceClickableMap
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 
-		if (NV2) {
+		if (NV1_2) {
 			/* jquery-UI files */
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.core.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.widget.js\"></script>");
@@ -4734,6 +4789,8 @@ public class ProduceClickableMap
 			out.println(file_contents(mainpanel_include_file, true));
 		}
 		
+		out.println("<div id='confirm_dialog' title='Warning'>");
+		out.println("</div>");
 		out.println("</body>");
 		out.println("</html>");
 		out.flush();

@@ -388,7 +388,7 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 	
 };
 
-function start_right_hand_panel(selector, source, map, projection, whenloaded)
+function start_right_hand_panel(selector, source, map, projection, whenloaded, firstEntityName)
 {
 	console.log("search setup");
 //	$("#search").click(function () {
@@ -400,7 +400,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded)
 	
 	var tree = $(selector);
 	var search_field = $('#query_text');
-	var search_label = "\u2002Search\u00a0";
+	var search_label = "\u2002Search (e.g. " + firstEntityName + ")\u00a0";
 	
 	//http://stackoverflow.com/questions/699065/submitting-a-form-on-enter-with-jquery
 	search_field.keypress(function(e) {
@@ -567,7 +567,7 @@ function dbg_sleep(millis)
   while(curDate-date < millis);
 }
 
-function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
+function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, firstEntityName)
 {
 	console.log("clickmap_start ... ", to_open, window.to_open);
 	if (!maps)
@@ -603,7 +603,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		console.log("to_open set", to_open, to_open.length);
 		
 	};
-	start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready);
+    start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
 	var tell_opener = function()
 	{
 		var blog = maps[""];

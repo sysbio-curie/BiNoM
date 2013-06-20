@@ -90,7 +90,10 @@ Mapdata.prototype = {
 
 function Dataset(name) {
 	this.name = name;
+
 	this.genes = {};
+	this.genes_id = {};
+	this.gene_id = 1;
 
 	this.datatable_id = 1;
 	this.datatables = {};
@@ -180,10 +183,20 @@ Dataset.prototype = {
 		return this.samples[sample_name];
 	},
 
+	getGene: function(gene_name) {
+		return this.genes[gene_name];
+	},
+	
+	getGeneById: function(gene_id) {
+		return this.genes_id[gene_id];
+	},
+	
 	// behaves as a gene factory
 	addGene: function(gene_name, entity_map) {
 		if (!this.genes[gene_name]) {
-			this.genes[gene_name] = new Gene(gene_name, entity_map);
+			var gene = new Gene(gene_name, entity_map, this.gene_id++);
+			this.genes[gene_name] = gene;
+			this.genes_id[gene.getId()] = gene;
 		} else {
 			this.genes[gene_name].refcnt++;
 		}
@@ -476,34 +489,71 @@ function HeatmapConfig() {
 HeatmapConfig.prototype = {
 
 	reset: function() {
-		this.datatables = {};
-		this.samples = {};
-		this.groups = {};
+		this.datatables = [];
+		this.samples_or_groups = [];
 	},
 
-	addDatatable: function(datatable) {
-		this.datatables[datatable] = true;
+	shrink: function() {
+		var new_samples_or_groups = []
+		var samples_or_groups_map = {};
+		for (var idx = 0; idx < this.samples_or_groups.length; idx++) {
+			var sample_or_group = this.samples_or_groups[idx];
+			if (sample_or_group && !samples_or_groups_map[sample_or_group.getId()]) {
+				new_samples_or_groups.push(sample_or_group);
+				samples_or_groups_map[sample_or_group.getId()] = true;
+			}
+		}
+		this.samples_or_groups = new_samples_or_groups;
+
+		var new_datatables = []
+		var datatables_map = []
+		for (var idx = 0; idx < this.datatables.length; idx++) {
+			var datatable = this.datatables[idx];
+			if (datatable && !datatables_map[datatable.getId()]) {
+				new_datatables.push(datatable);
+				datatables_map[datatable.getId()] = true;
+			}
+		}
+		this.datatables = new_datatables;
 	},
 
-	addSample: function(sample) {
-		this.samples[sample] = true;
+	setDatatableAt: function(idx, datatable) {
+		if (idx >= this.datatables.length) {
+			this.datatables.length = idx+1;
+		}
+		this.datatables[idx] = datatable;
 	},
 
-	addGroup: function(group) {
-		this.groups[group] = true;
-	},
-	
-	hasDatatable: function(datatable) {
-		return this.datatables[datatable] == true;
-	},
-
-	hasSample: function(sample) {
-		return this.samples[sample] == true;
+	getDatatableAt: function(idx) {
+		if (idx >= this.datatables.length) {
+			return undefined;
+		}
+		return this.datatables[idx];
 	},
 
-	hasGroup: function(group) {
-		return this.groups[group] == true;
+	setSampleOrGroupAt: function(idx, sample_or_group) {
+		if (idx >= this.samples_or_groups.length) {
+			this.samples_or_groups.length = idx+1;
+		}
+		this.samples_or_groups[idx] = sample_or_group;
 	},
+
+	getSampleOrGroupAt: function(idx) {
+		if (idx >= this.samples_or_groups.length) {
+			return undefined;
+		}
+		return this.samples_or_groups[idx];
+	},
+
+	getGroupAt: function(idx) {
+		var sample_or_group = this.getSampleOrGroupAt(idx);
+		return sample_or_group && sample_or_group.isGroup() ? sample_or_group : undefined;
+	},
+
+	getSampleAt: function(idx) {
+		var sample_or_group = this.getSampleOrGroupAt(idx);
+		return sample_or_group && sample_or_group.isSample() ? sample_or_group : undefined;
+	}
 };
 
 // TBD datatable id management
@@ -722,6 +772,10 @@ Datatable.prototype = {
 		return str;
 	},
 
+	getValue: function(sample_name, gene_name) {
+		return this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+	},
+
 	makeDataTable_samples: function() {
 		this.switch_button.val("Switch to Genes / Samples");
 		var str = "<thead><th>Samples</th>";
@@ -931,6 +985,14 @@ Sample.prototype = {
 	annots: {},
 	groups: {},
 
+	isGroup: function() {
+		return false;
+	},
+
+	isSample: function() {
+		return true;
+	},
+
 	addAnnotValue: function(annot_name, value) {
 		//console.log("sample: " + this.name + " add annot value: '" + annot + "' '" + value + "'");
 		this.annots[annot_name] = value;
@@ -959,15 +1021,20 @@ Sample.prototype = {
 // Gene class
 //
 
-function Gene(name, entity_map) {
+function Gene(name, entity_map, id) {
 	this.name = name;
 	this.entity_map = entity_map;
 	this.refcnt = 1;
+	this.id = id;
 }
 
 Gene.prototype = {
 	name: "",
 	entity_map: {},
+
+	getId: function() {
+		return this.id;
+	},
 
 	getClass: function() {return "Gene";}
 };
@@ -993,6 +1060,14 @@ Group.prototype = {
 	name: "",
 	html_name: "",
 
+	isGroup: function() {
+		return true;
+	},
+
+	isSample: function() {
+		return false;
+	},
+
 	getId: function() {
 		return this.id;
 	},
@@ -1011,6 +1086,7 @@ function GroupFactory() {
 
 GroupFactory.prototype = {
 	group_map: {},
+	group_id_map: {},
 
 	buildName: function(group_annots, group_values) {
 		var str = "";
@@ -1023,7 +1099,9 @@ GroupFactory.prototype = {
 	addGroup: function(group_annots, group_values) {
 		var group_name = this.buildName(group_annots, group_values);
 		if (!this.group_map[group_name]) {
-			this.group_map[group_name] = new Group(group_annots, group_values, this.group_id++);
+			var group = new Group(group_annots, group_values, this.group_id++);
+			this.group_map[group_name] = group;
+			this.group_id_map[group.getId()] = group;
 		}
 		return this.group_map[group_name];
 	},
@@ -1031,6 +1109,10 @@ GroupFactory.prototype = {
 	getGroup: function(group_annots, group_values) {
 		var group_name = this.buildName(group_annots, group_values);
 		return this.group_map[group_name];
+	},
+
+	getGroupById: function(group_id) {
+		return this.group_id_map[group_id];
 	},
 
 	getId: function() {

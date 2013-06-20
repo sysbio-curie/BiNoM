@@ -193,6 +193,7 @@ $(function() {
 		modal: false,
 		buttons: {
 			"Apply": function() {
+				console.log("applying");
 			},
 			
 			"Cancel": function() {
@@ -207,9 +208,45 @@ $(function() {
 		modal: false,
 		buttons: {
 			"Apply": function() {
+				var sample_cnt = mapSize(navicell.dataset.samples);
+				var group_cnt = mapSize(navicell.group_factory.group_map);
+				var sample_group_cnt = sample_cnt + group_cnt;
+				if (sample_group_cnt > MAX_HEATMAP_X) {
+					sample_group_cnt = MAX_HEATMAP_X;
+				}
+				for (var idx = 0; idx < sample_group_cnt; ++idx) {
+					var val = $("#heatmap_editor_gs_" + idx).val();
+					if (val == "_none_") {
+						navicell.heatmap_config.setSampleOrGroupAt(idx, undefined);
+					} else {
+						var prefix = val.substr(0, 2);
+						var id = val.substr(2);
+						if (prefix == 'g_') {
+							console.log("group selected " + id + " at index " + idx);
+							var group = navicell.group_factory.getGroupById(id);
+							navicell.heatmap_config.setSampleOrGroupAt(idx, group);
+						} else {
+							console.log("group selected " + id + " at index " + idx);
+							var sample = navicell.dataset.getSampleById(id);
+							navicell.heatmap_config.setSampleOrGroupAt(idx, sample);
+						}
+					}
+				}
+				var datatable_cnt = mapSize(navicell.dataset.datatables);
+				for (var idx = 0; idx < datatable_cnt; ++idx) {
+					var val = $("#heatmap_editor_datatable_" + idx).val();
+					if (val != "_none_") {
+						console.log("datatable selected " + val + " at index " + idx);
+						var datatable = navicell.getDatatableById(val);
+						navicell.heatmap_config.setDatatableAt(idx, datatable);
+					}
+				}
+				navicell.heatmap_config.shrink();
+				update_heatmap_editor();
 			},
 			
 			"Cancel": function() {
+				update_heatmap_editor();
 			}
 		}
 	});
@@ -776,29 +813,10 @@ function update_heatmap_config(doc, params) {
 var MAX_HEATMAP_X = 15;
 
 function update_heatmap_editor(doc, params) {
-	// TBD:
-	/* this presentation is absolutely not good because:
-	   - this presentation is far from the final heatmap
-	   - in this way, the order is not defined
-	   
-	   it should be as follows:
-	   - a matrix of:
-	      - (upper line) X == array of 'select', each one to choose a sample or a group
-    	      - (left column) Y == array of 'select', each one to choose a datatable
-	  - the apply button will check about duplicata
-	  - must add a clear button
-	  - the number of select in X == #samples + #groups
-	  - the number of select in Y == #datatables
-
-	  may add a "Simulate on gene [select a gene]"
-
-	  ok, continue to think a little bit
-
-	  BUT, don't delete this code, maybe used for barplot or piechart (waiting for a minimal description about these 2 charts)
-	*/
 	var heatmapConfig = navicell.heatmap_config;
-
 	var table = $("#heatmap_editor_table");
+	var sel_gene_id = $("#select_gene").val();
+	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
 
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 	var sample_cnt = mapSize(navicell.dataset.samples);
@@ -811,58 +829,60 @@ function update_heatmap_editor(doc, params) {
 	table.children().remove();
 	var html = "";
 	html += "<tbody>";
-	/*
-	html += "<td class='zz-hidden'>&nbsp;</td>";
-
-	for (var idx = 0; idx < sample_group_cnt; ++idx) {
-		//html += "<td><input type='radio' name='heatmap_editor_group_radio_" + idx + "' id='heatmap_editor_group_radio_" + idx + "' " + (heatmapConfig.getGroupAt(idx) ? "checked" : "") + "></input>";
-		html += "<td><table><tr><td style='border: 0px'><input type='radio' name='heatmap_editor_radio_" + idx + "' id='heatmap_editor_group_radio_" + idx + "'></input>";
-		html += "</td><td style='border: 0px'><select id='heatmap_editor_group_" + idx + "'>\n";
-		html += "<option value='_none_'>Choose a group</option>\n";
-		for (var group_name in navicell.group_factory.group_map) {
-			var group = navicell.group_factory.group_map[group_name];
-			html += "<option value='heatmap_editor_group_" + group.getId() + "'>" + group.name + "</option>";
-		}
-		html += "</select>";
-		html += "</tr></td></table></td>";
-	}
-
-	html += "</tr>\n";
-	*/
 	html += "<tr><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
-		//html += "<td><input type='radio' name='heatmap_editor_sample_radio_" + idx + "' id='heatmap_editor_sample_radio_" + idx + "' " + (heatmapConfig.getSampleAt(idx) ? "checked" : "") + "></input>";
-		//html += "<td><table><tr><td style='border: 0px'><input type='radio' name='heatmap_editor_radio_" + idx + "' id='heatmap_editor_sample_radio_" + idx + "'></input>";
-//		html += "&nbsp;";
-		//html += "</td>";
-		html += "<td style='border: 0px'><select id='heatmap_editor_sample_" + idx + "'>\n";
+		html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "'>\n";
 		html += "<option value='_none_'>Choose a group or sample</option>\n";
+		var sel_group = heatmapConfig.getGroupAt(idx);
+		var sel_sample = heatmapConfig.getSampleAt(idx);
 		for (var group_name in navicell.group_factory.group_map) {
 			var group = navicell.group_factory.group_map[group_name];
-			html += "<option value='" + group.getId() + "'>" + group.name + "</option>";
+			var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
+			html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
 		}
+		var sel_sample = heatmapConfig.getSampleAt(idx);
 		for (var sample_name in navicell.dataset.samples) {
 			var sample = navicell.dataset.samples[sample_name];
-			html += "<option value='heatmap_editor_sample_" + sample.getId() + "'>" + sample.name + "</option>";
+			var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
+			html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample.name + "</option>";
 		}
 		html += "</select>";
-		//html += "</tr></td></table></td>";
 		html += "</td>";
 	}
 
 	html += "</tr>\n";
 
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
+		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		html += "<tr>";
 		html += "<td><select id='heatmap_editor_datatable_" + idx + "'>\n";
 		html += "<option value='_none_'>Choose a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
-			html += "<option value='" + datatable.getId() + "'>" + datatable.name + "</option>";
+			var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
+			html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
-		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
-			html += "<td>&nbsp;</td>";
+		if (sel_gene && sel_datatable) {
+			var gene_name = sel_gene.name;
+			console.log("this case " + gene_name);
+			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+				var sel_group = heatmapConfig.getGroupAt(idx2);
+				var sel_sample = heatmapConfig.getSampleAt(idx2);
+				console.log("sel_sample at " + idx2 + " " + sel_sample);
+				if (sel_sample) {
+					var value = sel_datatable.getValue(sel_sample, gene_name);
+					var style = sel_datatable.getStyle(value);
+					console.log("value: " + value + " style:" + style);
+					html += "<td " + style + ">&nbsp;</td>";
+				} else {
+					html += "<td>&nbsp;</td>";
+				}
+			}
+		} else {
+			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+				html += "<td>&nbsp;</td>";
+			}
 		}
 		html += "</tr>\n";
 	}
@@ -871,4 +891,18 @@ function update_heatmap_editor(doc, params) {
 
 	table.append(html);
 	table.tablesorter();
+
+	html = "";
+	html += "<select id='select_gene' onclick='update_heatmap_editor()'>\n";
+	html += "<option value='_none_'>Choose a gene</option>\n";
+	for (var gene_name in navicell.dataset.genes) {
+		var gene = navicell.dataset.genes[gene_name];
+		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+	}
+	html += "</select>";
+	console.log("SELECT GENE [" + html + "]");
+	$("#gene_choice").html(html);
+	//console.log("SELECT GENE2: " + $("#dt_import_type_select").length);
+	//$("#select_gene").html(html);
 }

@@ -42,7 +42,7 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 
 public class WordPressBlogCreator extends BlogCreator
 {
-	private static final int maximum_number_of_posts = 3375; // might not be enough
+	private static final int maximum_number_of_posts = 50000; // might not be enough
 	static class Post implements BlogCreator.Post
 	{
 		final String hash;
@@ -120,8 +120,35 @@ public class WordPressBlogCreator extends BlogCreator
 		final List<Page> recentPosts;
 		try
 		{
-			recentPosts = wp.getRecentPosts(maximum_number_of_posts);
+			if (false) {
+				List<Page> theMostRecent = wp.getRecentPosts(1);
+				System.out.println(theMostRecent.get(0).getPostid());
+				int last_id = theMostRecent.get(0).getPostid();
+				recentPosts = new java.util.LinkedList<Page>();
+				int missed_id = 0;
+				for (int id = last_id; id >= 1; --id) {
+					System.out.println("id: " + id);
+					try {
+						recentPosts.add(wp.getPost(id));
+						System.out.println("added: " + recentPosts.size());
+					} catch(Exception e) {
+						missed_id++;
+						if ((missed_id % 1000) == 0) {
+							System.out.println("missed IDs: " + missed_id + " " + id);
+						}
+					}
+				}
+			} else {
+				recentPosts = wp.getRecentPosts(maximum_number_of_posts);
+			}
+			/*
+			for ( net.bican.wordpress.Page p : recentPosts) {
+				System.out.print(p.getPostid() + " ");
+			}
+			System.out.println();
+			*/
 			verbose("retrieved " + recentPosts.size() + " posts");
+			//System.exit(1);
 		}
 		catch (XmlRpcFault e)
 		{
@@ -189,8 +216,9 @@ public class WordPressBlogCreator extends BlogCreator
 				{
 					if (posts.get(r[0]) != null)
 						Utils.eclipsePrintln("duplicate entry for " + r[0]);
-					else
+					else {
 						posts.put(r[0], new Post(p.getPostid(), r[1], p.getTitle(), body, p.getCategories(), entities, modules));
+					}
 				}
 				else if (!mapInAtlas && body.length() > 0)
 				{

@@ -24,8 +24,8 @@ REACTOME	http://www.reactome.org/cgi-bin/eventbrowser?DB=gk_current&ID=%REACTOME
 WIKI	http://wikipedia.org/wiki/%WIKI%	[A-Z0-9]+
 KEGG	http://www.genome.jp/dbget-bin/www_bget?hsa:%KEGG%	[A-Z0-9]+
 GENECARDS	http://www.genecards.org/cgi-bin/carddisp.pl?gc_id=%GENECARDS%	[A-Z0-9]+
-
 ATLASONC	http://atlasgeneticsoncology.org//Genes/%ATLASONC%.html	[A-Za-z0-9_]+
+~[A-Za-z0-9_\.-]+	http://identifiers.org/@TAG/@VAL	[A-Za-z0-9_/\.:-]+
 
 MAP	../../%MAP%_light/master/index.html	[A-Za-z0-9_]+	-	&nbsp;	%MAP%_master	icon
 MODULE	../../%MAP%_light/%MODULE%/index.html	[A-Za-z0-9_]+	 */ *\b(MODULE)(:)	&nbsp;/&nbsp;	%MAP%_%MODULE%	icon

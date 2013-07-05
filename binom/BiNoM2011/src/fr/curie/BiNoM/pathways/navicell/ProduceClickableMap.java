@@ -28,6 +28,8 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -118,6 +120,7 @@ public class ProduceClickableMap
 
 	private static final String reset_icon = icons_directory + "/reset.png";
 	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
+	private static final String sources_icon = icons_directory + "/sources.png";
 	private static final String help_icon = icons_directory + "/help.png";	
 
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
@@ -458,6 +461,7 @@ public class ProduceClickableMap
 		boolean verbose = false;
 		boolean make_tiles = true;
 		boolean only_tiles = false;
+		boolean provide_sources = false;
 
 		String project_name = null;
 		
@@ -492,6 +496,8 @@ public class ProduceClickableMap
 				NV2 = b.booleanValue();
 			else if ((b = options.booleanOption("onlytile", "only create tiles")) != null)
 				only_tiles = b.booleanValue();
+			else if ((b = options.booleanOption("provide_sources", "provide sources")) != null)
+				provide_sources = b.booleanValue();
 			else if ((b = options.booleanOption("defcptname", "show default compartement name")) != null)
 				show_default_compartement_name = b.booleanValue();
 			else if ((b = options.booleanOption("nodefcptname", "don't show default compartement name")) != null)
@@ -556,7 +562,7 @@ public class ProduceClickableMap
 		try
 		{
 			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
-			    wordpress_passwd, wordpress_user, wordpress_blogname, root);
+			    wordpress_passwd, wordpress_user, wordpress_blogname, root, provide_sources);
 		}
 		catch (NaviCellException e)
 		{
@@ -590,7 +596,8 @@ public class ProduceClickableMap
 		final String wordpress_passwd,
 		final String wordpress_user,
 		final String wordpress_blogname,
-		final File root
+		final File root,
+		final boolean provide_sources
 	 ) throws NaviCellException, IOException
 	{
 		if (xrefs == null) {
@@ -605,10 +612,13 @@ public class ProduceClickableMap
 		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, atlasInfo);
 
 		final File destination_common = new File(root, common_directory_name);
-		if (!destination_common.exists() && !destination_common.mkdir())
+		if (!destination_common.exists() && !destination_common.mkdir()) {
 			throw new NaviCellException("failed to make " + destination_common);
-
+		}
 		
+		if (provide_sources) {
+			createZipSourceFiles(project_name, destination_common, source_directory);
+		}
 		Map<String, ModuleInfo> modules = get_module_list(source_directory, base);
 		if (modules.size() == 0 && atlasInfo != null && atlasInfo.isAtlas()) {
 			modules = get_module_list(atlasInfo);
@@ -619,7 +629,7 @@ public class ProduceClickableMap
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs);
+			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs, provide_sources);
 		}
 		catch (IOException e)
 		{
@@ -641,7 +651,7 @@ public class ProduceClickableMap
 				if (!map_name.equals(master_map_name))
 					try
 				{
-					process_a_map_module(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo);
+					process_a_map_module(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, provide_sources);
 				}
 				catch (IOException e)
 				{
@@ -662,6 +672,27 @@ public class ProduceClickableMap
 		wp.remove_old_posts(atlasInfo);
 	}
 	
+	static void createZipSourceFiles(String project_name, File destination_common, File source_directory) {
+		try {
+			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(destination_common, project_name + "_navicell_sources.zip")));
+			byte[] buf = new byte[4096];
+			for (final File file : source_directory.listFiles()) {
+				FileInputStream fis = new FileInputStream(file);
+				zos.putNextEntry(new ZipEntry(file.getName()));
+				int len;
+				while ((len = fis.read(buf)) > 0) {
+					zos.write(buf, 0, len);
+				}
+				zos.closeEntry();
+			}
+			zos.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
 	static boolean isMapInAtlas(AtlasInfo atlasInfo)
 	{
 		return atlasInfo != null && atlasInfo.isMap();
@@ -1045,7 +1076,7 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map_module(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-					  BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo) throws IOException
+						 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, boolean provide_sources) throws IOException
 	{
 
 		if (only_tiles) {
@@ -1062,12 +1093,12 @@ public class ProduceClickableMap
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
 			String firstEntityName = clMap.generatePages_module(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
-			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName);
+			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources);
 		}
 	}
 
 	private static ProduceClickableMap process_a_map_master(final String blog_name, File destination, String base, File source_directory,
-							 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs)
+								BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs, boolean provide_sources)
 		throws IOException, NaviCellException
 	{
 		
@@ -1089,7 +1120,7 @@ public class ProduceClickableMap
 			MasterInfo masterInfo = clMap.generatePages_master(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
 			clMap.right_panel = masterInfo.itemCloser;
 			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format, atlasInfo);
-			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo, masterInfo.firstEntityName);
+			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo, masterInfo.firstEntityName, provide_sources);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			return clMap;
 		}
@@ -1843,10 +1874,12 @@ public class ProduceClickableMap
 	private static ItemCloser item_list_start(final ItemCloser indent, String id, String cls)
 	{
 		indent.indent().print("<item");
-		if (id != null)
+		if (id != null) {
 			indent.getOutput().print(" id=\"" + id + "\"");
-		if (cls != null)
+		}
+		if (cls != null) {
 			indent.getOutput().print(" class=\"" + cls + "\"");
+		}
 		return indent;
 	}
 	
@@ -2170,6 +2203,23 @@ public class ProduceClickableMap
 			final Modification m = q.m;
 			if (q.associated)
 			{
+				// may be used for element.peers optimization like this:
+				/* 
+				   index.html:
+				   <script src="../_common/modif_map.js" type='text/javascript'></script>
+
+				   clickmap_map.js:
+				   if (modif_map && modif_map[id]) {
+				      element.peers = $("li." + id);
+				      ...
+				   }
+				*/
+
+				// to be put into the modif_map.js file
+				/* if (modif_map_opt) {
+				     System.out.println("modif_map[\"" + m.getId() + "\"] = true;");
+				   }
+				*/
 				ItemCloser modif = item_list_start(entity.add(), null, m.getId() + " " + right_hand_tag);
 				output.println(">");
 				content_line_data(modif.add(), m.getName());
@@ -4646,7 +4696,7 @@ public class ProduceClickableMap
 		final String map_name,
 		ImagesInfo scales,
 		BlogCreator.Post module_post,
-					    final BlogCreator wp, AtlasInfo atlasInfo, String firstEntityName) throws FileNotFoundException
+					    final BlogCreator wp, AtlasInfo atlasInfo, String firstEntityName, boolean provide_sources) throws FileNotFoundException
 	{
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
@@ -4796,6 +4846,10 @@ public class ProduceClickableMap
 		out.print(" ");
 		//doc_in_new_window(out, "map_help", "help");
 		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\" title=\"help\"/>");
+
+		if (provide_sources) {
+			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img src=\"" + sources_icon + "\" title=\"navicell sources\"/></a>");
+		}
 
 		out.println("&nbsp;<input type='text' size='24' id='query_text' style='font-size: small'/>");
 		header_right.close();

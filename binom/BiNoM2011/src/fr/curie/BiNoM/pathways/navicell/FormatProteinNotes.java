@@ -46,6 +46,7 @@ class FormatProteinNotesBase
 	}
 
 	protected String[][] xrefs;
+	protected HashMap<String, Pattern> xref_patterns;
 	protected ProduceClickableMap.AtlasInfo atlasInfo;
 	protected Pattern pat_generic;
 	protected Pattern pat_bubble;
@@ -119,6 +120,7 @@ class FormatProteinNotesBase
 		if (xrefs == null) {
 			return;
 		}
+		xref_patterns = new HashMap<String, Pattern>();
 		final String block_name_pattern = "\\p{javaUpperCase}[\\p{javaUpperCase}\\p{javaLowerCase}\\p{Digit}_]*";
 		final StringBuilder sb = new StringBuilder();
 		sb.append("\\b(").append(block_name_pattern).append(")(_begin):");
@@ -144,12 +146,20 @@ class FormatProteinNotesBase
 		//System.out.println("SB [" + sb + "]");
 		pat_bubble = pat_generic = Pattern.compile(sb.toString());
 	}
-	private static StringBuilder add_link_rule(final StringBuilder sb, final String[] s)
+
+	private StringBuilder add_link_rule(final StringBuilder sb, final String[] s)
 	{
 		if (isValidEntry(s, 3)) {
 			return sb.append("|").append(s[3]).append("(").append(s[2]).append(")");
 		}
-		return sb.append("|").append("\\b(").append(s[0]).append(")(:)(").append(s[2]).append(")");
+		String s_0;
+		if (s[0].charAt(0) == '~') {
+			s_0 = s[0].substring(1);
+			xref_patterns.put(s[0], Pattern.compile(s_0));
+		} else {
+			s_0 = s[0];
+		}
+		return sb.append("|").append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
 	}
 	protected static final String[] colours = { "cyan", "LightGreen", "LightGoldenRodYellow", "Khaki", "SpringGreen", "Yellow" };
 
@@ -355,11 +365,24 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 					after_block = false;
 				} else {
 					boolean done = false;
-					for (final String[] entry : xrefs)
-						if (entry[0].equals(tag)) {
+					for (final String[] entry : xrefs) {
+						String vtag;
+						boolean found;
+						boolean is_regex = entry[0].charAt(0) == '~';
+						if (is_regex) {
+							found = xref_patterns.get(entry[0]).matcher(tag).find();
+						} else {
+							found = entry[0].equals(tag);
+						}
+
+						if (found) {
 							m.appendReplacement(res, "");
 							String value = m.group(offset + 2);
-							value_map.put("%" + entry[0] + "%", value);
+							value_map.put("@TAG", tag);
+							value_map.put("@VAL", value);
+							if (!is_regex) {
+								value_map.put("%" + tag + "%", value);
+							}
 							String url = substitute(entry[1], value_map);
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
 							if (tag.equals("MAP")) {
@@ -397,6 +420,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							done = true;
 							break;
 						}
+					}
 
 					if (!done) {
 						m.appendReplacement(res, "<em>$0</em>");

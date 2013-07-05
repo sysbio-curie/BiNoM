@@ -82,6 +82,7 @@ html, body {
 
 #right_panel {
     min-width: 245px;
+    background-color: white;
 }
 
 #marker_checkboxes {

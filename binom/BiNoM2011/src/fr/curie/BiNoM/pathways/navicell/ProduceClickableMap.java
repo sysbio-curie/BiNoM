@@ -4843,13 +4843,11 @@ public class ProduceClickableMap
 		create_reset_button(out);
 		//doc_in_new_window(out, "map_symbols", "map symbols");
 		doc_in_new_window(out, "map_symbols", "<img src=\""+mapsymbols_icon+"\" title=\"map legends\"/>");
-		out.print(" ");
-		//doc_in_new_window(out, "map_help", "help");
-		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\" title=\"help\"/>");
-
 		if (provide_sources) {
 			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img src=\"" + sources_icon + "\" title=\"navicell sources\"/></a>");
 		}
+		out.print("&nbsp;");
+		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\" title=\"help\"/>");
 
 		out.println("&nbsp;<input type='text' size='24' id='query_text' style='font-size: small'/>");
 		header_right.close();

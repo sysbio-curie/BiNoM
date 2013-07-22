@@ -173,7 +173,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		initVisualStyles();
 
 		JMenu plugInMenu = cyMenus.getOperationsMenu();
-		JMenu binomMainMenu = new JMenu("BiNoM 2.3");
+		JMenu binomMainMenu = new JMenu("BiNoM 2.4");
 		plugInMenu.add(binomMainMenu);
 		
 		/*

@@ -69,7 +69,7 @@ public class ProduceNaviCellMapFiles implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-    	ProduceNaviCellMapFilesDialog.getInstance().raise(null);
+    	ProduceNaviCellMapFilesDialog.getInstance().raise();
     }
 }
 

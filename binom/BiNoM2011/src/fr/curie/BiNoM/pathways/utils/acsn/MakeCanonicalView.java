@@ -61,9 +61,10 @@ public class MakeCanonicalView {
 	
 	public SbmlDocument cd = null;
 	
-	public int fontSize = 80;
+	public int fontSize = 30;
 	
-	public int scale = 1;
+	public float scale = 1f;
+	public float scaleShape = 4f;
 	
 	public Vector<String> geneList = new Vector<String>();
 	public Vector<String> geneTypes = new Vector<String>();
@@ -102,7 +103,9 @@ public class MakeCanonicalView {
 				if(args[i].equals("--fontsize"))
 					mcv.fontSize = Integer.parseInt(args[i+1]);
 				if(args[i].equals("--scale"))
-					mcv.scale = Integer.parseInt(args[i+1]);
+					mcv.scale = Float.parseFloat(args[i+1]);
+				if(args[i].equals("--scaleshape"))
+					mcv.scaleShape = Float.parseFloat(args[i+1]);
 				if(args[i].equals("--referencegraph"))
 					mcv.fileNameReferenceGraph = args[i+1];
 				
@@ -334,8 +337,8 @@ public class MakeCanonicalView {
 				float h = Float.parseFloat(csa.getCelldesignerBounds().getH());
 				float x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 				float y = Float.parseFloat(csa.getCelldesignerBounds().getY());
-				csa.getCelldesignerBounds().setH(""+h*2f);
-				csa.getCelldesignerBounds().setW(""+w*2f);
+				csa.getCelldesignerBounds().setH(""+h*scaleShape);
+				csa.getCelldesignerBounds().setW(""+w*scaleShape);
 				
 				if(complexspid!=null){
 					CelldesignerComplexSpeciesAlias ccsa = complexAliasMap.get(complexspid);
@@ -351,7 +354,7 @@ public class MakeCanonicalView {
 				}
 				
 				XmlString xs = XmlString.Factory.newInstance();
-				xs.setStringValue("30");
+				xs.setStringValue(""+fontSize);
 				csa.getCelldesignerFont().setSize(xs);
 				if(csa.getCelldesignerUsualView().getCelldesignerSingleLine()==null)
 					csa.getCelldesignerUsualView().setCelldesignerSingleLine(null);
@@ -407,12 +410,12 @@ public class MakeCanonicalView {
 				float h = Float.parseFloat(csa.getCelldesignerBounds().getH());
 				float x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 				float y = Float.parseFloat(csa.getCelldesignerBounds().getY());
-				csa.getCelldesignerBounds().setH(""+h*2f);
-				csa.getCelldesignerBounds().setW(""+w*2f);
-				csa.getCelldesignerBounds().setX(""+(x-w/2f)/(1f*scale));
-				csa.getCelldesignerBounds().setY(""+(y-h/2f)/(1f*scale));
+				csa.getCelldesignerBounds().setH(""+h*scaleShape);
+				csa.getCelldesignerBounds().setW(""+w*scaleShape);
+				csa.getCelldesignerBounds().setX(""+(x-w/scaleShape)/(1f*scale));
+				csa.getCelldesignerBounds().setY(""+(y-h/scaleShape)/(1f*scale));
 				XmlString xs = XmlString.Factory.newInstance();
-				xs.setStringValue("30");
+				xs.setStringValue(""+fontSize);
 				csa.getCelldesignerFont().setSize(xs);
 				if(csa.getCelldesignerUsualView().getCelldesignerSingleLine()==null)
 					csa.getCelldesignerUsualView().setCelldesignerSingleLine(null);

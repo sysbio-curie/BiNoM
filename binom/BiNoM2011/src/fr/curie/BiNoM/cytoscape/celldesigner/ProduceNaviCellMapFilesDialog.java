@@ -1,5 +1,5 @@
 /*
-   BiNoM Cytoscape Plugin
+c   BiNoM Cytoscape Plugin
    Copyright (C) 2006-2007 Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
 
    BiNoM Cytoscape Plugin is free software; you can redistribute it and/or
@@ -85,10 +85,13 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
     private JButton browseIndex = null;
     private JCheckBox produceBrowseOnlyVersion = null;
     
+    private JTextField xrefFile = null;
+    private JButton browseXref = null;
+    private JCheckBox provideSourceFiles = null;
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
 
-    private ProduceNaviCellMapFilesDialog() {
+    public ProduceNaviCellMapFilesDialog() {
 	super("Color CellDesigner proteins");
 	final JPanel panel = new JPanel(new GridBagLayout());
 	GridBagConstraints c;
@@ -160,6 +163,61 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
            });
 
 	y++;
+	
+	x = 0;
+	JLabel lab3 = new JLabel("XREFs (link defs, optional)");
+	c = new GridBagConstraints();
+	c.gridx = x++;
+	c.gridy = y;
+	c.ipady = 10;	
+	c.weightx = 0.0;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	panel.add(lab3,c);
+
+	xrefFile = new JTextField(30);
+	c = new GridBagConstraints();
+	c.gridx = x++;
+	c.gridy = y;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(xrefFile, c);
+
+	x++;
+	browseXref = new JButton("Browse...");
+	c = new GridBagConstraints();
+	c.gridx = x++; 
+	c.gridy = y;
+	c.anchor = GridBagConstraints.EAST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(browseXref,c);
+
+	browseXref.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    CyFileFilter indexFilter = new CyFileFilter();
+
+		    File file = FileUtil.getFile
+			("Load xref file", FileUtil.LOAD, new CyFileFilter[]{indexFilter});
+		    toFront();
+		    if (file != null) {
+			String fn = file.getAbsolutePath();
+			xrefFile.setText(fn);
+		    }
+                }
+           });
+
+	y++;
+	
+	provideSourceFiles = new JCheckBox();
+	provideSourceFiles.setText("Provide NaviCell source files through interface");
+	provideSourceFiles.setSelected(true);
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.anchor = GridBagConstraints.WEST;
+	panel.add(provideSourceFiles, c);
+	
 	
 	produceBrowseOnlyVersion = new JCheckBox();
 	produceBrowseOnlyVersion.setText("Make browse-only version (no WordPress blog)");
@@ -254,7 +312,7 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
-			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected());
+			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected(), provideSourceFiles.isSelected(), xrefFile.getText());
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
            });
@@ -286,11 +344,10 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	return instance;
     }
 
-    public void raise(BioPAX biopax) {
-	this.biopax = biopax;
+    public void raise() {
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 300));
+	setSize(new Dimension(650, 300));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

@@ -1306,6 +1306,24 @@ NavicellSession.prototype = {
 	}
 }
 
+function load_mapdata(url, module) {
+	$.ajax(url,
+	       {
+		       async: true,
+		       dataType: 'json',
+
+		       success: function(mapdata) {
+			       navicell.mapdata.addModuleMapdata(module, mapdata);
+			       console.log("navicell: " + module + " mapdata loaded");
+		       },
+
+		       error: function() {
+			       console.log("navicell: error loading " + module + " mapdata");
+		       }
+	       }
+	      );
+}
+
 //var navicell_session = new NavicellSession("navicell");
 //navicell_session.reset();
 

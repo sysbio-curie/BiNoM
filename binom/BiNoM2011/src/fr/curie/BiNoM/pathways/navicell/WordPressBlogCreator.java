@@ -109,7 +109,30 @@ public class WordPressBlogCreator extends BlogCreator
 	private final Wordpress wp;
 	private final String url;
 
-	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd, ProduceClickableMap.AtlasInfo atlasInfo) throws NaviCellException
+	private List<Page> getAllPosts(Wordpress wp, boolean wordpress_xmlrpc_patched) throws XmlRpcFault {
+		System.out.println("getAllPosts: " + wordpress_xmlrpc_patched);
+		if (!wordpress_xmlrpc_patched) {
+			return wp.getRecentPosts(maximum_number_of_posts);
+		}
+
+		// EV patched protocol
+		List<Page> allPosts = new java.util.LinkedList<Page>();
+		final int NUMBER_OF_POSTS = 0x400;
+		final int NUMBER_OF_POSTS_1 = NUMBER_OF_POSTS-1;
+		for (int offset = 0; ; offset++) {
+			int number_of_posts = 0x10000000 | (offset << 12) | NUMBER_OF_POSTS_1;
+			System.out.println("number_of_posts: " + number_of_posts);
+			List<Page> recentPosts = wp.getRecentPosts(number_of_posts);
+			System.out.println("got: " + recentPosts.size());
+			allPosts.addAll(recentPosts);
+			if (recentPosts.size() < NUMBER_OF_POSTS) {
+				break;
+			}
+		}
+		return allPosts;
+	}
+
+	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd, boolean wordpress_xmlrpc_patched, ProduceClickableMap.AtlasInfo atlasInfo) throws NaviCellException
 	{
 		url = wordpress_server + "/" + wordpress_blogname;
 		wp = open_wordpress(url, wordpress_user, wordpress_passwd);
@@ -139,7 +162,8 @@ public class WordPressBlogCreator extends BlogCreator
 					}
 				}
 			} else {
-				recentPosts = wp.getRecentPosts(maximum_number_of_posts);
+				recentPosts = getAllPosts(wp, wordpress_xmlrpc_patched);
+				//recentPosts = wp.getRecentPosts(maximum_number_of_posts);
 			}
 			/*
 			for ( net.bican.wordpress.Page p : recentPosts) {
@@ -206,6 +230,7 @@ public class WordPressBlogCreator extends BlogCreator
 	{
 		String user_id = String.valueOf(o_user_id);
 		int deleted = 0;
+		System.out.println("recentPosts: " + recentPosts.size());
 		for (final net.bican.wordpress.Page p : recentPosts)
 		{
 			if (p.getMt_allow_comments() != 0 && user_id.equals((String)p.getUserid()))
@@ -214,14 +239,16 @@ public class WordPressBlogCreator extends BlogCreator
 				final String[] r = findIdAndHashInBody(body);
 				if (r != null)
 				{
-					if (posts.get(r[0]) != null)
+					if (posts.get(r[0]) != null) {
 						Utils.eclipsePrintln("duplicate entry for " + r[0]);
-					else {
+					} else {
+						//Utils.eclipsePrintln("getting post [" + r[0] + "] [" + body + "]");
 						posts.put(r[0], new Post(p.getPostid(), r[1], p.getTitle(), body, p.getCategories(), entities, modules));
 					}
 				}
 				else if (!mapInAtlas && body.length() > 0)
 				{
+					System.out.println("here");
 					try
 					{
 						wp.deletePost(p.getPostid(), "");
@@ -232,9 +259,14 @@ public class WordPressBlogCreator extends BlogCreator
 						Utils.eclipseErrorln("failed to delete post " + p.getPostid());
 						e.printStackTrace();
 					}
+				} else {
+					System.out.println("did not find id and body in [" + body + "] post [" + p.getPostid() + "]");
 				}
+			} else {
+				System.out.println("allow_comments: " + p.getMt_allow_comments() + " " + user_id + " " + p.getUserid() + " [" + p.getMt_text_more() + "]");
 			}
 		}
+		verbose(posts.size() + " posts in map");
 		verbose(deleted + " posts deleted");
 	}
 	private static void debugMessage(String m)
@@ -312,14 +344,14 @@ public class WordPressBlogCreator extends BlogCreator
 		return check_category_exists(module, wp, modules, modules_category_id);
 	}
 
-	private void updateBlogPost(Wordpress wp, int postid, String title, String body, String cls, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo)
+	private void updateBlogPost(Wordpress wp, int postid, String title, String body, String cls, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
 	{
 		//System.out.println("updateBlogPost: " + postid + " in " + cls);
 		if (wp == null) {
 			return;
 		}
 		assert postid >= 0 : postid + " " + title + " " + body;
-		if (ProduceClickableMap.isMapInAtlas(atlasInfo)) {
+		if (ProduceClickableMap.isMapInAtlas(atlasInfo) && !is_module) {
 			return;
 		}
 		final Page page;
@@ -398,7 +430,7 @@ public class WordPressBlogCreator extends BlogCreator
 		try
 		{
 			String page_id = wp.newPost(page, true);
-			verbose("created post for " + title + " -> " + page_id);
+			verbose("created post2 for " + title + " -> " + page_id);
 			assert page_id != null;
 			return Integer.parseInt(page_id);
 		}
@@ -535,6 +567,10 @@ public class WordPressBlogCreator extends BlogCreator
 		Map<String, fr.curie.BiNoM.pathways.navicell.WordPressBlogCreator.Post> map = java.util.Collections.unmodifiableMap(posts);
 		for (final Entry<String, WordPressBlogCreator.Post> entry : map.entrySet())
 		{
+			if (ProduceClickableMap.isAtlas(atlasInfo) && entry.getKey().endsWith("__")) { // for now
+				System.out.println("should be passing [" + entry.getKey() + "]");
+				continue;
+			}
 			final WordPressBlogCreator.Post post = entry.getValue();
 			final int post_id = post.getPostId();
 			try
@@ -576,10 +612,10 @@ public class WordPressBlogCreator extends BlogCreator
 		if (ProduceClickableMap.isMapInAtlas(atlasInfo)) {
 			if (info == null) {
 				BlogCreator.Post post = addPage(id, createPost(wp, title, ProduceClickableMap.module_list_category_name));
-				//Utils.eclipsePrintln("should not create a new post for map in atlas " + id + " " + title + " " + post.getPostId());
+				Utils.eclipsePrintln("if not a post module, should not create this new post for map in atlas " + id + " " + title + " " + post.getPostId());
 				return post;
 			}
-			//Utils.eclipsePrintln("already created post for map in atlas " + id + " " + title + " " + info.getPostId());
+			Utils.eclipsePrintln("already created post for map in atlas " + id + " " + title + " " + info.getPostId());
 			return info;
 		}
 		if (body != null)
@@ -597,16 +633,20 @@ public class WordPressBlogCreator extends BlogCreator
 		return info;
 	}
 	@Override
-        void updateBlogPostIfRequired(BlogCreator.Post p, String title, final String in_body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo)
+		void updateBlogPostIfRequired(BlogCreator.Post p, String title, final String in_body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
         {
-		if (ProduceClickableMap.isMapInAtlas(atlasInfo)) {
+		System.out.println("updateBlogPostIfRequired");
+		if (ProduceClickableMap.isMapInAtlas(atlasInfo) && !is_module) {
+			System.out.println("isMapInAtlas => returns");
 			return;
 		}
 
 		Post info = (Post)p;
 		final String cls = entity_type.toLowerCase();
-		if (in_body == null)
+		if (in_body == null) {
+			System.out.println("in_body is null => returns");
 			return;
+		}
 //		assert !body.endsWith("\n") : "bodies must not end with a \\n: " + body;
 		final String body = in_body.trim();
 		assert body.isEmpty() || body.charAt(body.length() - 1) != '\n';
@@ -635,8 +675,10 @@ public class WordPressBlogCreator extends BlogCreator
 			r = null;
 		if (r != null)
 		{
-			updateBlogPost(wp, info.getPostId(), title, body, cls, modules, atlasInfo);
-			verbose("updated post for " + info.getPostId() + " as " + r + " changed: " +  title + "(" + cls + ")");
+			updateBlogPost(wp, info.getPostId(), title, body, cls, modules, atlasInfo, is_module);
+			verbose("updated post for " + info.getPostId() + " as " + r + " changed: " +  title + "(" + cls + ") [" + body + "] [" + info.getBody() + "]");
+		} else {
+			System.out.println("body equals => nop");
 		}
 	}
 	
@@ -751,7 +793,12 @@ public class WordPressBlogCreator extends BlogCreator
 				}
 				catch (XmlRpcFault e)
 				{
-					throw new NaviCellException("unable to upload map icon to blog", e);
+					// EV: 2013-07-11, replaced:
+					//throw new NaviCellException("unable to upload map icon to blog", e);
+					// by these 3 lines (including return):
+					e.printStackTrace();
+					System.err.println("unable to upload map icon to blog");
+					return;
 				}
 				if (!does_map_icon_exist(url))
 					throw new NaviCellException("put " + map_icon_base + " into the blog but couldn't find it");
@@ -769,6 +816,7 @@ public class WordPressBlogCreator extends BlogCreator
 		final java.net.URL u;
 		try
 		{
+			System.out.println("image: " + url + "/" + map_icon_url_base);
 			u = new java.net.URL(url + "/" + map_icon_url_base);
 		}
 		catch (MalformedURLException e)

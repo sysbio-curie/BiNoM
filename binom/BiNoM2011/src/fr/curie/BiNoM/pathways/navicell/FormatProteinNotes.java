@@ -351,6 +351,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 						m.appendReplacement(res, "$0");
 					}
 				} else if (tag.endsWith(":")) {
+					//System.out.println("XTAG " + tag);
 					//System.out.println("  -> endsWidth :");
 					m.appendReplacement(res, "");
 					res.append(tag + arg);
@@ -385,6 +386,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							}
 							String url = substitute(entry[1], value_map);
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
+							//System.out.println("TAG " + tag);
 							if (tag.equals("MAP")) {
 								mapInfo = atlasInfo.getMapInfo(value);
 								if (mapInfo != null) {

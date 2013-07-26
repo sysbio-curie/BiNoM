@@ -35,5 +35,5 @@ abstract public class BlogCreator implements Linker
 	abstract void remove_old_posts(ProduceClickableMap.AtlasInfo atlasInfo) throws ProduceClickableMap.NaviCellException;
 	abstract Post lookup(final String id);
 	abstract Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo);
-	abstract void updateBlogPostIfRequired(Post post, String title, String body, String reactionClassName, java.util.List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo);
+	abstract void updateBlogPostIfRequired(Post post, String title, String body, String reactionClassName, java.util.List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module);
 }

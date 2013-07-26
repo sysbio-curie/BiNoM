@@ -85,6 +85,7 @@ public class ProduceClickableMap
 	private static boolean NV2 = false;
 	private static File config = null;
 	private static boolean MAPS_MODULES_TOP = false;
+	private static boolean USE_JSON = true;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -528,11 +529,14 @@ public class ProduceClickableMap
 		final String wordpress_passwd;
 		final String wordpress_user;
 		final String wordpress_blogname;
+		final boolean wordpress_xmlrpc_patched;
+
 		final File root;
 		
 		if (wordpress_cfg_file == null)
 		{
 			wordpress_server = wordpress_passwd = wordpress_user =  wordpress_blogname = null;
+			wordpress_xmlrpc_patched = false;
 			root = destination;
 		}
 		else
@@ -543,6 +547,9 @@ public class ProduceClickableMap
 			wordpress_passwd = wordpress_cfg.getProperty("password");
 			wordpress_user = wordpress_cfg.getProperty("user");
 			wordpress_blogname = wordpress_cfg.getProperty("blog", project_name);
+			String patched = wordpress_cfg.getProperty("xmlrpc_patched");
+			wordpress_xmlrpc_patched = patched == null ? false : Boolean.valueOf(patched);
+			System.out.println("patched [" + patched + "] " + wordpress_xmlrpc_patched);
 			if (wordpress_passwd == null)
 				fatal_error("no password to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
 			if (wordpress_user == null)
@@ -562,7 +569,7 @@ public class ProduceClickableMap
 		try
 		{
 			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
-			    wordpress_passwd, wordpress_user, wordpress_blogname, root, provide_sources);
+			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_xmlrpc_patched, root, provide_sources);
 		}
 		catch (NaviCellException e)
 		{
@@ -596,6 +603,7 @@ public class ProduceClickableMap
 		final String wordpress_passwd,
 		final String wordpress_user,
 		final String wordpress_blogname,
+		final boolean wordpress_xmlrpc_patched,
 		final File root,
 		final boolean provide_sources
 	 ) throws NaviCellException, IOException
@@ -609,7 +617,7 @@ public class ProduceClickableMap
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, atlasInfo);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, wordpress_xmlrpc_patched, atlasInfo);
 
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir()) {
@@ -625,11 +633,25 @@ public class ProduceClickableMap
 		}
 
 		final File mapdata_file = new File(destination_common, mapdata_list);
-		final PrintStream outjson = new PrintStream(mapdata_file);
+		final PrintStream outmapdata;
+		PrintStream outjson;
+		if (USE_JSON) {
+			outmapdata = new PrintStream(mapdata_file);
+			outjson = null;
+		} else {
+			outmapdata = null;
+			outjson = new PrintStream(mapdata_file);
+		}
 		final ProduceClickableMap master;
 		try
 		{
-			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, xrefs, provide_sources);
+			if (USE_JSON) {
+				outjson = new PrintStream(new File(destination_common, "master_mapdata.json"));
+			}
+			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, outjson, modules, atlasInfo, xrefs, provide_sources);
+			if (USE_JSON) {
+				outjson.close();
+			}
 		}
 		catch (IOException e)
 		{
@@ -651,7 +673,13 @@ public class ProduceClickableMap
 				if (!map_name.equals(master_map_name))
 					try
 				{
-					process_a_map_module(map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outjson, modules, atlasInfo, provide_sources);
+					if (USE_JSON) {
+						outjson = new PrintStream(new File(destination_common, map_name + "_mapdata.json"));
+					}
+					process_a_map_module(project_name, map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, outjson, modules, atlasInfo, provide_sources);
+					if (USE_JSON) {
+						outjson.close();
+					}
 				}
 				catch (IOException e)
 				{
@@ -660,7 +688,11 @@ public class ProduceClickableMap
 			}
 		}
 		
-		outjson.close();
+		if (USE_JSON) {
+			outmapdata.close();
+		} else {
+			outjson.close();
+		}
 		if (master!=null) {
 			if (MAPS_MODULES_TOP) {
 				close_right_panel_xml(master.right_panel);
@@ -696,6 +728,11 @@ public class ProduceClickableMap
 	static boolean isMapInAtlas(AtlasInfo atlasInfo)
 	{
 		return atlasInfo != null && atlasInfo.isMap();
+	}
+
+	static boolean isAtlas(AtlasInfo atlasInfo)
+	{
+		return atlasInfo != null && atlasInfo.isAtlas();
 	}
 
 	private static String make_tag_for_comments()
@@ -1075,8 +1112,8 @@ public class ProduceClickableMap
 		return (notes == null) ? "" : Utils.getText(notes).trim();
 	}
 
-	private static void process_a_map_module(final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-						 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, boolean provide_sources) throws IOException
+	private static void process_a_map_module(final String project_name, final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
+						 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, boolean provide_sources) throws IOException
 	{
 
 		if (only_tiles) {
@@ -1086,19 +1123,19 @@ public class ProduceClickableMap
 		} else {
 			final ProduceClickableMap clMap = make_clickmap(master.blog_name, map, base, source_directory);
 			final String module_notes = clMap.get_map_notes(); //Utils.getText(clMap.cd.getSbml().getModel().getNotes()).trim();
-			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, master.master_format, atlasInfo);
+			final BlogCreator.Post module_post = create_module_post(project_name, wp, module_notes, map, master.master_format, atlasInfo);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
-			String firstEntityName = clMap.generatePages_module(map, wp, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
+			String firstEntityName = clMap.generatePages_module(map, wp, outmapdata, outjson, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources);
 		}
 	}
 
 	private static ProduceClickableMap process_a_map_master(final String blog_name, File destination, String base, File source_directory,
-								BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs, boolean provide_sources)
+								BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs, boolean provide_sources)
 		throws IOException, NaviCellException
 	{
 		
@@ -1117,9 +1154,9 @@ public class ProduceClickableMap
 			clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
 			
 			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
-			MasterInfo masterInfo = clMap.generatePages_master(wp, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
+			MasterInfo masterInfo = clMap.generatePages_master(wp, outmapdata, outjson, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
 			clMap.right_panel = masterInfo.itemCloser;
-			final BlogCreator.Post module_post = create_module_post(wp, module_notes, map, clMap.master_format, atlasInfo);
+			final BlogCreator.Post module_post = create_module_post(blog_name, wp, module_notes, map, clMap.master_format, atlasInfo);
 			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo, masterInfo.firstEntityName, provide_sources);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
 			return clMap;
@@ -1997,6 +2034,10 @@ public class ProduceClickableMap
 		}
 	}
 
+	private static String NL_JSON = java.util.regex.Matcher.quoteReplacement("\\n");
+	private static String DQ_JSON = java.util.regex.Matcher.quoteReplacement("\\\"");
+	private static String TB_JSON = java.util.regex.Matcher.quoteReplacement("\\t");
+
 	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
 	{
 		outjson.print("\"id\" : \"" + ent.getId() + "\",");
@@ -2010,7 +2051,12 @@ public class ProduceClickableMap
 		outjson.print("],");
 		outjson.print("\"postid\" : \"" + ent.getPostId() + "\",");
 		if (ent.getComment() != null) {
-			outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
+			if (USE_JSON) {
+				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
+				outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\",");
+			} else {
+				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
+			}
 		}
 
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
@@ -2049,14 +2095,18 @@ public class ProduceClickableMap
 		outjson.print("]");
 	}
 
-	static private String generate_mapdata(final String map, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
+	static private String generate_mapdata(final String map, final PrintStream outmapdata, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
 		ImagesInfo scales) throws UnsupportedEncodingException, FileNotFoundException {
 		EntityBase firstEntity = null;
 		final String encoding = "UTF-8";
-		outjson.print("var " + map + "_map = JSON.parse('[");
+		if (USE_JSON) {
+			outjson.print("[");
+		} else {
+			outjson.print("var " + map + "_map = JSON.parse('[");
+		}
 		final List<EntityBase> entities = new ArrayList<EntityBase>();
 		boolean first = true;
 		for (final String[] s : class_name_to_human_name)
@@ -2105,8 +2155,13 @@ public class ProduceClickableMap
 			outjson.print("]");
 			outjson.print("}");
 		}
-		outjson.println("]');\n");
-		outjson.println("navicell.mapdata.addModuleMapdata(\"" + map + "\", " + map + "_map);\n");
+		if (USE_JSON) {
+			outjson.println("]");
+			outmapdata.println("load_mapdata(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + map + "\");");
+		} else {
+			outjson.println("]');\n");
+			outjson.println("navicell.mapdata.addModuleMapdata(\"" + map + "\", " + map + "_map);\n");
+		}
 
 		/*
 		if (true) {
@@ -2446,7 +2501,7 @@ public class ProduceClickableMap
 	
 	private FormatProteinNotes master_format;
 	
-	private String generatePages_module(final String map, final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
+	private String generatePages_module(final String map, final BlogCreator wp, PrintStream outmapdata, PrintStream outjson, File rpanel_index, ImagesInfo scales, FormatProteinNotes format) throws UnsupportedEncodingException, FileNotFoundException
 	{
 		
 		System.out.println("Generating pages...");
@@ -2457,7 +2512,7 @@ public class ProduceClickableMap
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, null, null, null);
 		//System.out.println("_generate_ module " + map + " json ?");
-		String firstEntityName = generate_mapdata(map, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		String firstEntityName = generate_mapdata(map, outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		if (model.getListOfReactions() != null) {
 			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
@@ -2482,13 +2537,14 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
-	static private BlogCreator.Post create_module_post(final BlogCreator wp, final String module_notes, final String map_name, final FormatProteinNotes notes_formatter, AtlasInfo atlasInfo)
+	static private BlogCreator.Post create_module_post(final String project_name, final BlogCreator wp, final String module_notes, final String map_name, final FormatProteinNotes notes_formatter, AtlasInfo atlasInfo)
 	{
 		final Hasher h = new Hasher();
 		StringBuffer fw = create_buffer_for_post_body(h);
 		String[] parts = module_notes.split("\n", 2);
 		fw.append("<b>").append(parts[0]).append("</b>");
-		show_map_and_markers_from_post(fw, map_name, Collections.<String>emptyList(), map_name, wp);
+		String map_title = isMapInAtlas(atlasInfo) ? "../../" + project_name + "/" + map_name : map_name;
+		show_map_and_markers_from_post(fw, map_title, Collections.<String>emptyList(), map_title, wp);
 		
 		if (parts.length > 1) {
 			notes_formatter.module_post(fw.append("<br>"), parts[1], wp);
@@ -2496,13 +2552,15 @@ public class ProduceClickableMap
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
 		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo);
-		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo);
+		System.out.println("create_module_post -> " + post.getPostId() + " " + isMapInAtlas(atlasInfo) + " " + map_name + " " + map_title);
+
+		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo, true);
 		//System.out.println("module: " + map_name + " " + post.getPostId());
 		return post;
 
 	}
 
-	private MasterInfo generatePages_master(final BlogCreator wp, PrintStream outjson, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set, AtlasInfo atlasInfo)
+	private MasterInfo generatePages_master(final BlogCreator wp, PrintStream outmapdata, PrintStream outjson, File rpanel_index, ImagesInfo scales, final FormatProteinNotes format, Map<String, ModuleInfo> modules_set, AtlasInfo atlasInfo)
 		throws UnsupportedEncodingException, FileNotFoundException, NaviCellException
 	{
 		final Model model = cd.getSbml().getModel();
@@ -2513,12 +2571,15 @@ public class ProduceClickableMap
 			{
 				final Complex complex = (Complex)ent;
 				final String body = create_complex_body(complex, format, ReactionDisplayType.FirstPass, wp);
-				if (body != null)
+				if (body != null) {
+					System.out.println("complex setpost");
 					complex.setPost(wp.updateBlogPostId(complex.getId(), complex.getName(), body, atlasInfo));
+				}
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
 				final String body = create_entity_body(format, ent, ReactionDisplayType.FirstPass, wp, null);
+				System.out.println("entity set post");
 				ent.setPost(wp.updateBlogPostId(ent.getId(), ent.getName(), body, atlasInfo));
 			}
 		}
@@ -2526,7 +2587,7 @@ public class ProduceClickableMap
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, modules_set, atlasInfo, model);
 
 		//System.out.println("_generate_ master json ?");
-		String firstEntityName = generate_mapdata("master", outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		String firstEntityName = generate_mapdata("master", outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
 
 		// create master file (must move to a method)
 		/*final File master_map = new File("/tmp/alpha.js"); // for now
@@ -2544,12 +2605,13 @@ public class ProduceClickableMap
 				modules.clear();
 				final String title = r.getId();
 				final String body = createReactionBody(r, format, wp);
+				System.out.println("reaction setpost");
 				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo);
 				
 				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 				reaction_line(right.add(), r, bubble, scales, post.getPostId());
 				
-				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo);
+				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
 			}
 		}
 		
@@ -2563,15 +2625,16 @@ public class ProduceClickableMap
 				if (body != null)
 				{
 					final BlogCreator.Post post = complex.getPost(); // updateBlogPostId(wp, all_posts, complex.getId(), complex.getName(), COMPLEX_CLASS_NAME, body);
-					wp.updateBlogPostIfRequired(post, complex.getName(), body, COMPLEX_CLASS_NAME, modules, atlasInfo);
+					wp.updateBlogPostIfRequired(post, complex.getName(), body, COMPLEX_CLASS_NAME, modules, atlasInfo, false);
 				}
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
 //				do_entity(wp, format, xml, all_posts, ent);
 				final String body = create_entity_body(format, ent, ReactionDisplayType.SecondPass, wp, modules);
+				//System.out.println("create_entity_body [" + body + "]");
 				final BlogCreator.Post post = ent.getPost(); // updateBlogPostId(wp, all_posts, ent.id, ent.label, ent.cls, body);
-				wp.updateBlogPostIfRequired(post, ent.getName(), body, ent.getCls(), modules, atlasInfo);
+				wp.updateBlogPostIfRequired(post, ent.getName(), body, ent.getCls(), modules, atlasInfo, false);
 			}
 		}
 		return new MasterInfo(right, firstEntityName);
@@ -2720,7 +2783,7 @@ public class ProduceClickableMap
 	
 	static private StringBuffer show_map_and_markers_from_post(StringBuffer fw, String map, List<String> entities, String title, Linker wp)
 	{
-		//System.out.println("show_map_and_markers_from_post [" + title + "]");
+		//System.out.println("show_map_and_markers_from_post [" + title + "] " + entities.size());
 		// EV: 2013-06-06: hack to be compliant with clickmap_blog.js
 		/*if (wp.isWordPress())*/ {
 			if (title.startsWith("../")) {

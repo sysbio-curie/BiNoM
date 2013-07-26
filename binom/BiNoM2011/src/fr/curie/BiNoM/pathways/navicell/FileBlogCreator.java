@@ -75,7 +75,7 @@ class FileBlogCreator extends BlogCreator
 		return post;
 	}
 	@Override
-	void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo)
+		void updateBlogPostIfRequired(BlogCreator.Post bpost, String title, String body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
 	{
 		final Post post = (Post)bpost;
 		//System.out.println("FileCreator.updateBlogPostIdIfRequired: " + id + " " + post.getPostId() + " " + title);

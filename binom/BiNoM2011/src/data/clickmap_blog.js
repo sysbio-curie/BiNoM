@@ -106,6 +106,10 @@ $(document).ready(
 			console.log("map", map);
 			var ids = [];
 			$(this).find("span.entity").each(function() { ids.push($(this).attr("title")); });
+			if (ids.length == 0) {
+				console.log("try again");
+                                $(this).parent().parent().find("span.entity").each(function() { ids.push($(this).attr("title")); });
+                        }
 			console.log("ids", ids);
 			show_map_and_markers(map, ids);
 			return false;

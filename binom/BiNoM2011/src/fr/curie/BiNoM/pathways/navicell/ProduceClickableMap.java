@@ -2551,8 +2551,8 @@ public class ProduceClickableMap
 		}
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
-		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo);
-		System.out.println("create_module_post -> " + post.getPostId() + " " + isMapInAtlas(atlasInfo) + " " + map_name + " " + map_title);
+		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo, true);
+		Utils.eclipsePrintln("create_module_post -> " + post.getPostId() + " " + isMapInAtlas(atlasInfo) + " " + map_name + " " + map_title);
 
 		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo, true);
 		//System.out.println("module: " + map_name + " " + post.getPostId());
@@ -2572,15 +2572,15 @@ public class ProduceClickableMap
 				final Complex complex = (Complex)ent;
 				final String body = create_complex_body(complex, format, ReactionDisplayType.FirstPass, wp);
 				if (body != null) {
-					System.out.println("complex setpost");
-					complex.setPost(wp.updateBlogPostId(complex.getId(), complex.getName(), body, atlasInfo));
+					//Utils.eclipsePrintln("complex setpost");
+					complex.setPost(wp.updateBlogPostId(complex.getId(), complex.getName(), body, atlasInfo, false));
 				}
 			}
 			else if (!DEGRADED_CLASS_NAME.equals(ent.getCls()))
 			{
 				final String body = create_entity_body(format, ent, ReactionDisplayType.FirstPass, wp, null);
-				System.out.println("entity set post");
-				ent.setPost(wp.updateBlogPostId(ent.getId(), ent.getName(), body, atlasInfo));
+				//Utils.eclipsePrintln("entity set post");
+				ent.setPost(wp.updateBlogPostId(ent.getId(), ent.getName(), body, atlasInfo, false));
 			}
 		}
 
@@ -2605,13 +2605,15 @@ public class ProduceClickableMap
 				modules.clear();
 				final String title = r.getId();
 				final String body = createReactionBody(r, format, wp);
-				System.out.println("reaction setpost");
-				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo);
+				//Utils.eclipsePrintln("reaction setpost");
+				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
 				
-				final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
-				reaction_line(right.add(), r, bubble, scales, post.getPostId());
+				if (post != null) {
+					final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+					reaction_line(right.add(), r, bubble, scales, post.getPostId());
 				
-				wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
+					wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
+				}
 			}
 		}
 		
@@ -2643,8 +2645,14 @@ public class ProduceClickableMap
 	static List<String> extract_ids(final List<Modification> sps)
 	{
 		final List<String> markers = new ArrayList<String>();
-		for (final Modification sp : sps)
-			markers.add(sp.getId());
+		final HashMap<String, Boolean> marker_map = new HashMap<String, Boolean>();
+		for (final Modification sp : sps) {
+			if (!marker_map.containsKey(sp.getId())) {
+				markers.add(sp.getId());
+				marker_map.put(sp.getId(), true);
+				//System.out.println("oups for key " + sp.getId());
+			}
+		}
 		return Collections.unmodifiableList(markers);
 	}
 	

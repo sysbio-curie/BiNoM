@@ -110,7 +110,7 @@ public class WordPressBlogCreator extends BlogCreator
 	private final String url;
 
 	private List<Page> getAllPosts(Wordpress wp, boolean wordpress_xmlrpc_patched) throws XmlRpcFault {
-		System.out.println("getAllPosts: " + wordpress_xmlrpc_patched);
+		System.out.println("getAllPosts xmlrpc_patched: " + wordpress_xmlrpc_patched);
 		if (!wordpress_xmlrpc_patched) {
 			return wp.getRecentPosts(maximum_number_of_posts);
 		}
@@ -121,9 +121,9 @@ public class WordPressBlogCreator extends BlogCreator
 		final int NUMBER_OF_POSTS_1 = NUMBER_OF_POSTS-1;
 		for (int offset = 0; ; offset++) {
 			int number_of_posts = 0x10000000 | (offset << 12) | NUMBER_OF_POSTS_1;
-			System.out.println("number_of_posts: " + number_of_posts);
+			//System.out.println("number_of_posts: " + number_of_posts);
 			List<Page> recentPosts = wp.getRecentPosts(number_of_posts);
-			System.out.println("got: " + recentPosts.size());
+			//System.out.println("got: " + recentPosts.size());
 			allPosts.addAll(recentPosts);
 			if (recentPosts.size() < NUMBER_OF_POSTS) {
 				break;
@@ -382,14 +382,23 @@ public class WordPressBlogCreator extends BlogCreator
 		page.setTitle(title);
 		page.setDescription("");
 		page.setExcerpt("");
+		//System.out.println(postid + " [cat " + cls + "] text_more -> [" + body + "] length=" + body.length());
+		/*
+		if (body.length() > 30000) {
+			body = body.substring(0, 30000);
+			System.out.println("body has been shrinked [" + body + "]");
+		}
+		*/
 		page.setMt_text_more(body);
 		try
 		{
 			final boolean r = wp.editPost(postid, page, "published");
-			if (r)
+			System.out.println("editPost -> " + r);
+			if (r) {
 				assert postid == page.getPostid() : postid + " " + page.getPostid();
-			else
+			} else {
 				errorMessage("failed to update post for " + postid + " " +  page.getTitle());
+			}
 		}
 		catch (XmlRpcFault e)
 		{
@@ -430,7 +439,7 @@ public class WordPressBlogCreator extends BlogCreator
 		try
 		{
 			String page_id = wp.newPost(page, true);
-			verbose("created post2 for " + title + " -> " + page_id);
+			verbose("created post2 for " + title + " -> " + page_id + " cat " + cls);
 			assert page_id != null;
 			return Integer.parseInt(page_id);
 		}
@@ -499,6 +508,7 @@ public class WordPressBlogCreator extends BlogCreator
 		final int new_post_id;
 		Page page = new Page();
 		page.setTitle(title);
+		System.out.println("text_more -> [please reload, description to come]");
 		page.setMt_text_more("please reload, description to come");
 		try
 		{
@@ -605,14 +615,18 @@ public class WordPressBlogCreator extends BlogCreator
 		}
 	}
 	@Override
-        BlogCreator.Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo)
+		BlogCreator.Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
         {
 		final Post info = lookup(id);
 		//System.out.println("updateBlogPostId: " + id + " in " + (info != null ? info.cls : "<null>"));
 		if (ProduceClickableMap.isMapInAtlas(atlasInfo)) {
 			if (info == null) {
-				BlogCreator.Post post = addPage(id, createPost(wp, title, ProduceClickableMap.module_list_category_name));
-				Utils.eclipsePrintln("if not a post module, should not create this new post for map in atlas " + id + " " + title + " " + post.getPostId());
+				if (!is_module) {
+					Utils.eclipsePrintln("NOT A POST MODULE: must not create this new post for map in atlas " + id + " " + title);
+					return null;
+				}
+				BlogCreator.Post post = addPage(id, createPost(wp, title, is_module ? ProduceClickableMap.module_list_category_name : null));
+				//Utils.eclipsePrintln("should not create this new post for map in atlas " + id + " " + title + " " + post.getPostId());
 				return post;
 			}
 			Utils.eclipsePrintln("already created post for map in atlas " + id + " " + title + " " + info.getPostId());
@@ -635,7 +649,7 @@ public class WordPressBlogCreator extends BlogCreator
 	@Override
 		void updateBlogPostIfRequired(BlogCreator.Post p, String title, final String in_body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
         {
-		System.out.println("updateBlogPostIfRequired");
+		System.out.println("updateBlogPostIfRequired -> " + (p != null ? ((Post)p).getPostId() : -1));
 		if (ProduceClickableMap.isMapInAtlas(atlasInfo) && !is_module) {
 			System.out.println("isMapInAtlas => returns");
 			return;
@@ -796,7 +810,7 @@ public class WordPressBlogCreator extends BlogCreator
 					// EV: 2013-07-11, replaced:
 					//throw new NaviCellException("unable to upload map icon to blog", e);
 					// by these 3 lines (including return):
-					e.printStackTrace();
+					//e.printStackTrace();
 					System.err.println("unable to upload map icon to blog");
 					return;
 				}

@@ -66,7 +66,7 @@ class FileBlogCreator extends BlogCreator
 		return id_to_post.get(id);
 	}
 	@Override
-	BlogCreator.Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo)
+		BlogCreator.Post updateBlogPostId(String id, String title, String body, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
 	{
 		final Post post = new Post(id_to_post.size(), id, title, body);
 		final Post old = id_to_post.put(id, post);

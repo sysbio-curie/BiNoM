@@ -29,7 +29,7 @@ public class ComputeNaviCellMaps {
 					System.out.println("DIR: "+dir.getAbsolutePath());
 					File listOfFiles[] = dir.listFiles();
 					for(int j=0;j<listOfFiles.length;j++)if(listOfFiles[j].getName().equals("config")){
-						System.out.println("config file found!");
+						//System.out.println("config file found!");
 						// read the config file
 						final Properties configuration = ProduceClickableMap.load_config(listOfFiles[j]);
 						String project_name = configuration.getProperty("name", "default");

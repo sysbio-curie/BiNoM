@@ -153,13 +153,31 @@ class FormatProteinNotesBase
 			return sb.append("|").append(s[3]).append("(").append(s[2]).append(")");
 		}
 		String s_0;
+		String prefix = "";
+		String word_boundary;
 		if (s[0].charAt(0) == '~') {
 			s_0 = s[0].substring(1);
+			/*
+			int s_0_len = s_0.length();
+			int idx = 0;
+			while (idx < s_0_len && s_0.charAt(idx) == '~') {
+				idx++;
+			}
+			if (idx > 0) {
+				int idx2 = 2*idx;
+				prefix = s_0.substring(idx, idx2);
+				s_0 = s_0.substring(idx2);
+			}
+			*/
 			xref_patterns.put(s[0], Pattern.compile(s_0));
+			word_boundary = "";
 		} else {
 			s_0 = s[0];
+			word_boundary = "\\b";
 		}
-		return sb.append("|").append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
+		//return sb.append("|").append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
+		//return sb.append("|").append(prefix).append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
+		return sb.append("|").append(prefix).append(word_boundary).append("(").append(s_0).append(")(:)(").append(s[2]).append(")");
 	}
 	protected static final String[] colours = { "cyan", "LightGreen", "LightGoldenRodYellow", "Khaki", "SpringGreen", "Yellow" };
 
@@ -307,7 +325,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 			while (m.start(offset) == m.end(offset)) {
 				offset++;
 			}
-			final String tag = m.group(offset);
+			String tag = m.group(offset);
 			if (tag.startsWith("\n") && tag.endsWith("\n"))	{
 				//m.appendReplacement(res, (after_block) ? "\n" : "<br>\n");
 				//m.appendReplacement(res, (after_block) ? "" : "<br>");
@@ -365,6 +383,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 					}
 					after_block = false;
 				} else {
+					//System.out.println("else...");
 					boolean done = false;
 					for (final String[] entry : xrefs) {
 						String vtag;
@@ -372,6 +391,19 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 						boolean is_regex = entry[0].charAt(0) == '~';
 						if (is_regex) {
 							found = xref_patterns.get(entry[0]).matcher(tag).find();
+							if (found) {
+								//System.out.println("entry len: " + entry.length + " " + entry[entry.length-1] + " " + tag);
+								if (isValidEntry(entry, 7)) {
+									String from_rep = entry[7];
+									String to_rep = isValidEntry(entry, 8) ? entry[8] : "";
+									if (from_rep.charAt(0) == '~') {
+										tag = tag.replaceFirst(from_rep.substring(1), to_rep);
+									} else {
+										tag = tag.replace(from_rep, to_rep);
+									}
+									//System.out.println("--> " + tag);
+								}
+							}
 						} else {
 							found = entry[0].equals(tag);
 						}
@@ -424,6 +456,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 						}
 					}
 
+					//System.out.println("done: " + done);
 					if (!done) {
 						m.appendReplacement(res, "<em>$0</em>");
 					}

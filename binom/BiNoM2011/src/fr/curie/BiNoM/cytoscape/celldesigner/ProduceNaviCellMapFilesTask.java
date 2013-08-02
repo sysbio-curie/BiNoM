@@ -83,6 +83,7 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			File destination = new File(source_directory+"/../"+blog_name);
     			if(!destination.exists()) destination.mkdir();
     			
+			final boolean wordpress_ssl = false; // EV 2013-08-01; set to false, but could be true according to a configuration file or whatever
 			final boolean wordpress_xmlrpc_patched = false; // EV 2013-07-19; set to false, but could be true according to a configuration file or whatever
     			String[][] xrefs = null;
     			if(xrefFile!=null){
@@ -100,9 +101,9 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			
     			try{
     			if(produceBOversion)	
-    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, null, null, null, blog_name, wordpress_xmlrpc_patched, destination, provideSourceFiles);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, null, null, null, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles);
     			else
-    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, wordpress_xmlrpc_patched, destination, provideSourceFiles);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
             	    taskMonitor.setPercentCompleted(99);

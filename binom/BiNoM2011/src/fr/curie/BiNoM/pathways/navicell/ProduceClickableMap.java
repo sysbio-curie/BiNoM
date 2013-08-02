@@ -529,6 +529,7 @@ public class ProduceClickableMap
 		final String wordpress_passwd;
 		final String wordpress_user;
 		final String wordpress_blogname;
+		final boolean wordpress_ssl;
 		final boolean wordpress_xmlrpc_patched;
 
 		final File root;
@@ -536,7 +537,7 @@ public class ProduceClickableMap
 		if (wordpress_cfg_file == null)
 		{
 			wordpress_server = wordpress_passwd = wordpress_user =  wordpress_blogname = null;
-			wordpress_xmlrpc_patched = false;
+			wordpress_ssl = wordpress_xmlrpc_patched = false;
 			root = destination;
 		}
 		else
@@ -549,7 +550,10 @@ public class ProduceClickableMap
 			wordpress_blogname = wordpress_cfg.getProperty("blog", project_name);
 			String patched = wordpress_cfg.getProperty("xmlrpc_patched");
 			wordpress_xmlrpc_patched = patched == null ? false : Boolean.valueOf(patched);
-			System.out.println("patched [" + patched + "] " + wordpress_xmlrpc_patched);
+			Utils.eclipsePrintln("wordpress.xmlrpc_patched [" + patched + "] " + wordpress_xmlrpc_patched);
+			String ssl = wordpress_cfg.getProperty("ssl");
+			wordpress_ssl = ssl == null ? false : Boolean.valueOf(ssl);
+			Utils.eclipsePrintln("wordpress.ssl [" + ssl + "] " + wordpress_ssl);
 			if (wordpress_passwd == null)
 				fatal_error("no password to connect to wordpress found in the configuration file: " + wordpress_cfg_file);
 			if (wordpress_user == null)
@@ -569,7 +573,7 @@ public class ProduceClickableMap
 		try
 		{
 			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
-			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_xmlrpc_patched, root, provide_sources);
+			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_ssl, wordpress_xmlrpc_patched, root, provide_sources);
 		}
 		catch (NaviCellException e)
 		{
@@ -603,6 +607,7 @@ public class ProduceClickableMap
 		final String wordpress_passwd,
 		final String wordpress_user,
 		final String wordpress_blogname,
+		final boolean wordpress_ssl,
 		final boolean wordpress_xmlrpc_patched,
 		final File root,
 		final boolean provide_sources
@@ -617,7 +622,7 @@ public class ProduceClickableMap
 		
 		final String comment = make_tag_for_comments();
 		
-		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, wordpress_xmlrpc_patched, atlasInfo);
+		final BlogCreator wp = wordpress_server == null ? new FileBlogCreator(root, comment) : new WordPressBlogCreator(wordpress_server, wordpress_blogname, wordpress_user, wordpress_passwd, wordpress_ssl, wordpress_xmlrpc_patched, atlasInfo);
 
 		final File destination_common = new File(root, common_directory_name);
 		if (!destination_common.exists() && !destination_common.mkdir()) {

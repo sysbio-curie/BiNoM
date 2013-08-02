@@ -108,6 +108,7 @@ public class WordPressBlogCreator extends BlogCreator
 	
 	private final Wordpress wp;
 	private final String url;
+	private final boolean ssl;
 
 	private List<Page> getAllPosts(Wordpress wp, boolean wordpress_xmlrpc_patched) throws XmlRpcFault {
 		System.out.println("getAllPosts xmlrpc_patched: " + wordpress_xmlrpc_patched);
@@ -132,10 +133,11 @@ public class WordPressBlogCreator extends BlogCreator
 		return allPosts;
 	}
 
-	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd, boolean wordpress_xmlrpc_patched, ProduceClickableMap.AtlasInfo atlasInfo) throws NaviCellException
+	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd, boolean ssl, boolean wordpress_xmlrpc_patched, ProduceClickableMap.AtlasInfo atlasInfo) throws NaviCellException
 	{
 		url = wordpress_server + "/" + wordpress_blogname;
 		wp = open_wordpress(url, wordpress_user, wordpress_passwd);
+		this.ssl = ssl;
 		String[] ids = read_categories(wp, entities, modules);
 		modules_category_id = Integer.parseInt(ids[0]);
 		entities_category_id = Integer.parseInt(ids[1]);
@@ -393,7 +395,7 @@ public class WordPressBlogCreator extends BlogCreator
 		try
 		{
 			final boolean r = wp.editPost(postid, page, "published");
-			System.out.println("editPost -> " + r);
+			//System.out.println("editPost -> " + r);
 			if (r) {
 				assert postid == page.getPostid() : postid + " " + page.getPostid();
 			} else {
@@ -578,7 +580,7 @@ public class WordPressBlogCreator extends BlogCreator
 		for (final Entry<String, WordPressBlogCreator.Post> entry : map.entrySet())
 		{
 			if (ProduceClickableMap.isAtlas(atlasInfo) && entry.getKey().endsWith("__")) { // for now
-				System.out.println("should be passing [" + entry.getKey() + "]");
+				//System.out.println("should be passing [" + entry.getKey() + "]");
 				continue;
 			}
 			final WordPressBlogCreator.Post post = entry.getValue();
@@ -649,9 +651,9 @@ public class WordPressBlogCreator extends BlogCreator
 	@Override
 		void updateBlogPostIfRequired(BlogCreator.Post p, String title, final String in_body, String entity_type, List<String> modules, ProduceClickableMap.AtlasInfo atlasInfo, boolean is_module)
         {
-		System.out.println("updateBlogPostIfRequired -> " + (p != null ? ((Post)p).getPostId() : -1));
+		//System.out.println("updateBlogPostIfRequired -> " + (p != null ? ((Post)p).getPostId() : -1));
 		if (ProduceClickableMap.isMapInAtlas(atlasInfo) && !is_module) {
-			System.out.println("isMapInAtlas => returns");
+			//System.out.println("isMapInAtlas => returns");
 			return;
 		}
 
@@ -692,7 +694,7 @@ public class WordPressBlogCreator extends BlogCreator
 			updateBlogPost(wp, info.getPostId(), title, body, cls, modules, atlasInfo, is_module);
 			verbose("updated post for " + info.getPostId() + " as " + r + " changed: " +  title + "(" + cls + ") [" + body + "] [" + info.getBody() + "]");
 		} else {
-			System.out.println("body equals => nop");
+			//System.out.println("body equals => nop");
 		}
 	}
 	
@@ -811,7 +813,7 @@ public class WordPressBlogCreator extends BlogCreator
 					//throw new NaviCellException("unable to upload map icon to blog", e);
 					// by these 3 lines (including return):
 					//e.printStackTrace();
-					System.err.println("unable to upload map icon to blog");
+					Utils.eclipsePrintln("unable to upload map icon to blog");
 					return;
 				}
 				if (!does_map_icon_exist(url))
@@ -864,7 +866,7 @@ public class WordPressBlogCreator extends BlogCreator
 	@Override
 	public String getBlogLinker()
 	{
-		return "function blog_link(postid) { return '" + url + "/" + post_prefix + "' + postid; }";
+		return "function blog_link(postid) { return '" + (ssl ? url.replace("http://", "https://") : url) + "/" + post_prefix + "' + postid; }";
 	}
 	@Override
 	public String getMapIconURL()

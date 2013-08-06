@@ -13,6 +13,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerBriefViewDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerClassDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerInnerPositionDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerModificationResidueDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerPaintDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinReferenceDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
@@ -28,6 +29,7 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
 
+import fr.curie.BiNoM.pathways.utils.SpeciesStructure.SpeciesStructureComponentModification;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 public class CellDesignerGenerator {
@@ -59,10 +61,10 @@ public class CellDesignerGenerator {
 		cg.createNewCellDesignerFile("Benchmark1",1000,1500);
 		
 		cg.createSpeciesFromString("s1", "A|Thr239_pho", "A@nucleus", 100, 100);
-		cg.createSpeciesFromString("s2", "B:C", "B:C@nucleus", 200, 100);
+		/*cg.createSpeciesFromString("s2", "B:C", "B:C@nucleus", 200, 100);
 		cg.createSpeciesFromString("s3", "B:C:D", "B:C:D@nucleus", 400, 100);
 		cg.createSpeciesFromString("s4", "A:B:C:D", "A:B:C:D@nucleus", 200, 600);
-		cg.createSpeciesFromString("s5", "A:B:C:D:E:F:G:T:S", "A:B:C:D:E:F:G:T:S@nucleus", 700, 400);
+		cg.createSpeciesFromString("s5", "A:B:C:D:E:F:G:T:S", "A:B:C:D:E:F:G:T:S@nucleus", 700, 400);*/
 
 		
 		CellDesigner.saveCellDesigner(cg.cd, "c:/datas/binomtest/testCreateCD.xml");
@@ -166,6 +168,13 @@ public class CellDesignerGenerator {
 			// Create simple species
 			SpeciesStructure.SpeciesStructureComponent ssm = ss.components.get(0);
 			createNewProtein("pr_"+ssm.name, ssm.name);
+			
+			if(ssm.modifications.size()>0){
+				for(SpeciesStructureComponentModification mod: ssm.modifications){
+					addModificationToProtein("pr_"+ssm.name, mod);
+				}
+			}
+			
 			Annotation annot = sp.addNewAnnotation();
 			CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity spi = annot.addNewCelldesignerSpeciesIdentity();
 			CelldesignerClassDocument.CelldesignerClass cc = spi.addNewCelldesignerClass();
@@ -321,6 +330,20 @@ public class CellDesignerGenerator {
 			csi.addNewCelldesignerProteinReference().set(xs);
 		}
 		celldesigner_species.put(id, cs);
+		}
+	}
+	
+	public void addModificationToProtein(String pid, SpeciesStructureComponentModification mod){
+		CelldesignerProteinDocument.CelldesignerProtein protein = proteins.get(pid);
+		CelldesignerModificationResidueDocument.CelldesignerModificationResidue residue = null;
+		for(CelldesignerModificationResidueDocument.CelldesignerModificationResidue res : protein.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray()){
+			String resname = Utils.getValue(res.getName());
+			if(resname.equals(mod.name))
+				residue = res;
+		}
+		if(residue==null){
+			CelldesignerModificationResidueDocument.CelldesignerModificationResidue res = protein.getCelldesignerListOfModificationResidues().addNewCelldesignerModificationResidue();
+			
 		}
 	}
 	

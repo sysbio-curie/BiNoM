@@ -97,6 +97,7 @@ public static String reactionNodeTypes[] = {
      s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+"\n"+s;
      
      
+     
      /*s = Utils.replaceStringCount(s,"xmlns=\"http://www.sbml.org/2001/ns/celldesigner\"","xmlns=\"http://www.sbml.org/sbml/level2\"");
      s = Utils.replaceStringCount(s,"SpeciesAnnotation","annotation");
      s = Utils.replaceStringCount(s,"ReactionAnnotation","annotation");
@@ -135,12 +136,12 @@ public static String reactionNodeTypes[] = {
      replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xhtml\">\n","");
      replaceMap.put("<body xmlns=\"http://www.w3.org/1999/xh","");
      replaceMap.put("<notes xsi:nil=\"true\"/>", "");
-     replaceMap.put("<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");
      
      s = Utils.replaceByList(s, replaceMap);
      
      s = s.replaceAll("<celldesigner:notes xsi:nil=\"true\"/>", "");
-     
+     s = s.replaceAll("<sbml xmlns=\"http://www.sbml.org/sbml/level2\">","<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">");     
+
      fw.write(s);
      fw.close();
    }catch(Exception e){

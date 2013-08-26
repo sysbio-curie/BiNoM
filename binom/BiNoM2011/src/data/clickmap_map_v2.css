@@ -664,3 +664,16 @@ div.tablesorterPager input {
 .loading-jstree-head-msg {
     font-weight: bold;
 }
+
+#gene_choice {
+    margin-top: 20px;
+    padding-top: 20px;
+    font-size: small;
+}
+
+#heatmap_editing {
+    font-size: small;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    font-style: italic;
+}

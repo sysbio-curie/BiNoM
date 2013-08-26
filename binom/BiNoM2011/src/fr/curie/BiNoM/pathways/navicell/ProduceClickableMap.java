@@ -4885,6 +4885,7 @@ public class ProduceClickableMap
 		out.print(");\n");
 		if (NV2) {
 			out.println("    update_status_tables();");
+			out.println("    heatmap_editor_set_editing(true);");
 		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());

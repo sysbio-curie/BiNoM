@@ -254,13 +254,6 @@ function is_empty_value(value) {
 	return tvalue == '' || tvalue == '_' || tvalue == '-' || tvalue == 'NA' || tvalue == 'N/A';
 }
 
-function DisplayStepConfig(datatable) {
-	this.datatable = datatable;
-	var step_cnt = 5;
-	this.buildDiv(step_cnt);
-	this.setStepCount(step_cnt);
-}
-
 function step_color_count_change(id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
@@ -268,6 +261,14 @@ function step_color_count_change(id) {
 		console.log("value: " + value);
 		datatable.displayStepConfig.setStepCount(value);
 	}
+}
+
+function DisplayStepConfig(datatable) {
+	this.datatable = datatable;
+	var step_cnt = 5;
+	this.buildDiv(step_cnt);
+	this.setStepCount(step_cnt);
+	this.setDefaults(step_cnt);
 }
 
 DisplayStepConfig.prototype = {
@@ -306,10 +307,23 @@ DisplayStepConfig.prototype = {
 
 	setStepInfo: function(idx, value, color, size, shape) {
 		console.log("setting at " + idx + " " + value + " (== " + this.values[idx+1] + ") " + color + " " + size + " " + shape);
-		this.values[idx+1] = value;
+		if (value != Number.MIN_NUMBER) {
+			this.values[idx+1] = value;
+		}
 		this.colors[idx] = color;
 		this.sizes[idx] = size;
 		this.shapes[idx] = shape;
+	},
+
+	setDefaults: function(step_cnt) {
+		if (step_cnt == 5) {
+			this.setStepInfo(0, Number.MIN_NUMBER, "F7FF19", 4, 0);
+			this.setStepInfo(1, Number.MIN_NUMBER, "D6ECFF", 6, 1);
+			this.setStepInfo(2, Number.MIN_NUMBER, "19FF57", 8, 2);
+			this.setStepInfo(3, Number.MIN_NUMBER, "6421FF", 10, 3);
+			this.setStepInfo(4, Number.MIN_NUMBER, "E64515", 12, 4);
+			this.update();
+		}
 	},
 
 	getStepIndex: function(value) {
@@ -746,7 +760,7 @@ Datatable.prototype = {
 				rgb2 = parseInt("0x" + rgb2)/256.;
 				rgb3 = parseInt("0x" + rgb3)/256.;
 				var fg = 0.213 * rgb1 +	0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? '#FFF' : '#000';
-				return " style='background: #" + color + "; color: " + fg + "'";
+				return " style='background: #" + color + "; color: " + fg + "; text-align: center;'";
 			}
 		}
 		return '';
@@ -773,7 +787,18 @@ Datatable.prototype = {
 	},
 
 	getValue: function(sample_name, gene_name) {
-		return this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+		var gene_idx = this.gene_index[gene_name];
+		var sample_idx = this.sample_index[sample_name];
+		if (gene_idx != undefined && sample_idx != undefined) {
+			return this.data[gene_idx][sample_idx];
+			/*
+			var gene_data = this.data[gene_idx];
+			if (gene_data) {
+				return gene_data[sample_idx];
+			}
+			*/
+		}
+		return null;
 	},
 
 	makeDataTable_samples: function() {

@@ -183,7 +183,7 @@ Dataset.prototype = {
 		return this.samples[sample_name];
 	},
 
-	getGene: function(gene_name) {
+	getGeneByName: function(gene_name) {
 		return this.genes[gene_name];
 	},
 	
@@ -231,6 +231,7 @@ Dataset.prototype = {
 		var size = 2;
 		context.fillStyle = 'rgba(100, 30, 100, 1)';
 		context.fillRect(topx, topy, (size+2)*scale, size*scale);
+		var gene = this.getGeneByName(gene_name);
 	},
 
 	getClass: function() {return "Dataset";}
@@ -1081,6 +1082,7 @@ Gene.prototype = {
 function Group(annots, values, id) {
 	this.annots = annots;
 	this.values = values;
+	this.samples = {};
 	this.id = id;
 	this.name = navicell.group_factory.buildName(annots, values);
 	this.html_name = "";
@@ -1092,6 +1094,7 @@ function Group(annots, values, id) {
 Group.prototype = {
 	annots: [],
 	values: [],
+	samples: {},
 	name: "",
 	html_name: "",
 
@@ -1101,6 +1104,10 @@ Group.prototype = {
 
 	isSample: function() {
 		return false;
+	},
+
+	addSample: function(sample) {
+		this.samples[sample.name] = sample;
 	},
 
 	getId: function() {
@@ -1178,6 +1185,7 @@ GroupFactory.prototype = {
 				if (group_annots.length) {
 					var group = this.addGroup(group_annots, group_values);
 					sample.addGroup(group);
+					group.addSample(sample);
 				}
 			}
 		}

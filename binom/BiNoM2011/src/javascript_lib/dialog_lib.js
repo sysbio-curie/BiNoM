@@ -928,6 +928,25 @@ function update_heatmap_editor(doc, params) {
 					console.log("value: " + value + " style:" + style);
 					/*html += "<td " + style + ">&nbsp;</td>";*/
 					html += "<td " + style + ">" + value + "</td>";
+				} else if (sel_group) {
+					var total_value = 0;
+					var cnt = 0;
+					for (var sample_name in sel_group.samples) {
+						var value = sel_datatable.getValue(sample_name, gene_name);
+						value *= 1.;
+						if (value) {
+							total_value += value;
+							cnt++;
+						}
+					}
+					if (cnt) {
+						console.log("total_value: " + total_value + " " + cnt);
+						total_value = total_value/cnt;
+						var style = sel_datatable.getStyle(total_value);
+						console.log("value: " + total_value + " style:" + style);
+						html += "<td " + style + ">" + total_value + "</td>";
+					}
+						
 				} else {
 					html += "<td>&nbsp;</td>";
 				}

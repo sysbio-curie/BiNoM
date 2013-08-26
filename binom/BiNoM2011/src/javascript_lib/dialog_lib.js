@@ -246,8 +246,15 @@ $(function() {
 				heatmap_editor_set_editing(false);
 			},
 			
+			"Clear": function() {
+				navicell.heatmap_config.reset();
+				update_heatmap_editor();
+				heatmap_editor_set_editing(true);
+			},
+
 			"Cancel": function() {
 				update_heatmap_editor();
+				heatmap_editor_set_editing(false);
 			}
 		}
 	});
@@ -822,7 +829,25 @@ function heatmap_editor_set_editing(val) {
 	if (val) {
 		/*$("#heatmap_editor_table tbody tr td").attr('style', '');*/
 		$("#heatmap_editor_table td").attr('style', '');
-		/*$("#select_gene").val('_none_');*/
+	}
+	if (0) {
+		var buttons = $("#heatmap_editor_div").parent().find(".ui-button-text");
+		buttons.each(function() {
+			var button  = $(this);
+			var text = button.text();
+			if (text == "Cancel" ) {
+				if (val) {
+					//button.parent().removeClass("zz-hidden");
+					/*button.parent().removeAttr("disabled");*/
+					button.parent().removeClass(".ui-state-disabled");
+					button.removeClass(".ui-state-disabled");
+				} else {
+					/*button.parent().attr("disabled", "disabled");*/
+					button.parent().addClass(".ui-state-disabled");
+					button.addClass(".ui-state-disabled");
+				}
+			}
+		});
 	}
 }
 

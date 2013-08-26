@@ -2127,6 +2127,7 @@ public class ProduceClickableMap
 				outjson.print(",");
 			}
 
+			entities.clear();
 			outjson.print("{");
 			for (final EntityBase ent : entityIDToEntityMap.values()) {
 				if (clsname.equals(ent.getCls()) && !ent.isBad()) {
@@ -4811,6 +4812,7 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jslib_dir + "/mapdata_lib.js" + "\" type='text/javascript'></script>");
 			out.println("<script src=\"" + common_directory_url + "/" + mapdata_list + "\" type='text/javascript'></script>");
 			out.println("<script src=\"" + jslib_dir + "/dialog_lib.js" + "\" type='text/javascript'></script>");
+			out.println("<script src=\"" + jslib_dir + "/overlay.js" + "\" type='text/javascript'></script>");
 		}
 	
 		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
@@ -4886,6 +4888,7 @@ public class ProduceClickableMap
 		if (NV2) {
 			out.println("    update_status_tables();");
 			out.println("    heatmap_editor_set_editing(true);");
+			out.println("    overlay_init();");
 		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());

@@ -130,8 +130,10 @@ USGSOverlay.prototype.draw = function() {
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
 			
-			var mod3 = (nn % 3);
-			var size = mod3+2;
+			/*
+			//var mod3 = (nn % 3);
+			var mod3 = 2;
+			var size = mod3+1;
 			if (mod3 == 0) {
 				this.context.fillStyle = 'rgba(100, 30, 100, 1)';
 			} else if (mod3 == 1) {
@@ -139,10 +141,14 @@ USGSOverlay.prototype.draw = function() {
 			} else {
 				this.context.fillStyle = 'rgba(100, 200, 100, 1)';
 			}
-			//console.log("Drawing " + arrpos[nn].id + " " + arrpos[nn].p);
-			this.context.fillRect(pix.x-div.left, pix.y-div.top, size*scale, size*scale);
+			console.log("Drawing " + arrpos[nn].gene_name);
+//			this.context.fillRect(pix.x-div.left, pix.y-div.top, size*scale, size*scale);
+			//this.context.fillRect(pix.x-div.left, pix.y-div.top, (size+2)*scale, size*scale);
+			*/
+			navicell.dataset.drawHeatmap(this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 		}
 		
+		/*
 		var latlng0 = mapProjection.fromPointToLatLng(arrpos[0].p);
 		var pix0 = overlayProjection.fromLatLngToDivPixel(latlng0);
 		this.context.strokeStyle = 'orange';
@@ -155,6 +161,7 @@ USGSOverlay.prototype.draw = function() {
 			this.context.lineTo(pix.x-div.left, pix.y-div.top);
 			this.context.stroke();
 		}
+		*/
 	}
 }
 

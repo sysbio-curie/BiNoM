@@ -227,6 +227,12 @@ Dataset.prototype = {
 		return true;
 	},
 
+	drawHeatmap: function(context, scale, gene_name, topx, topy) {
+		var size = 2;
+		context.fillStyle = 'rgba(100, 30, 100, 1)';
+		context.fillRect(topx, topy, (size+2)*scale, size*scale);
+	},
+
 	getClass: function() {return "Dataset";}
 };
 
@@ -675,7 +681,7 @@ Datatable.prototype = {
 	display_markers: function(module_name, _window) {
 		console.log("display_markers: " + module_name);
 		var id_arr = [];
-		var pos_arr = [];
+		var arrpos = [];
 		for (var gene_name in this.gene_index) {
 			var entity_map = this.dataset.genes[gene_name].entity_map;
 			var entity = entity_map[module_name];
@@ -684,21 +690,25 @@ Datatable.prototype = {
 				if (modif_arr) {
 					for (var nn = 0; nn < modif_arr.length; ++nn) {
 						var modif = modif_arr[nn];
-						id_arr.push(modif.id);
+						//id_arr.push(modif.id);
 						// >> getting positions
 						var positions = modif.positions;
 						if (positions) {
 							for (var kk = 0; kk < positions.length; ++kk) {
-								pos_arr.push({id : modif.id, p : new google.maps.Point(positions[kk].x, positions[kk].y)});
+								arrpos.push({id : modif.id, p : new google.maps.Point(positions[kk].x, positions[kk].y), gene_name: gene_name});
 							}
+							id_arr.push(modif.id);
 						}
 						// << getting positions
 					}
 				}
 			}
 		}
-		//console.log("pos_arr: " + pos_arr.length);
+		//console.log("arrpos: " + arrpos.length);
 		_window.show_markers(id_arr);
+
+		overlay.arrpos = arrpos;
+		overlay.draw();
 	},
 
 	setName: function(name) {

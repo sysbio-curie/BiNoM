@@ -89,7 +89,7 @@ $(function() {
 						
 						if (display_markers.attr("checked")) {
 							datatable.ready.then(function() {
-								datatable.display_markers(navicell.module_name, window);
+								datatable.display_markers(navicell_module_name, window);
 							});
 						}
 					}
@@ -460,7 +460,7 @@ function update_module_status_table(doc, params) {
 function in_module_gene_count(module_name) {
 	var cnt = 0;
 	for (var gene_name in navicell.dataset.genes) {
-		if (navicell.mapdata.hugo_map[gene_name][navicell.module_name]) {
+		if (navicell.mapdata.hugo_map[gene_name][navicell_module_name]) {
 			cnt++;
 		}
 	}
@@ -472,7 +472,7 @@ function update_gene_status_table(doc, params) {
 	table.children().remove();
 	// should use a string buffer
 	var str = "<thead><tr><th>Genes&nbsp;(" + mapSize(navicell.dataset.genes) + ")</th>";
-	str += "<th>In&nbsp;" + navicell.module_name + "&nbsp;(" + in_module_gene_count(navicell.module_name) + ")</th>";
+	str += "<th>In&nbsp;" + navicell_module_name + "&nbsp;(" + in_module_gene_count(navicell_module_name) + ")</th>";
 
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
@@ -485,7 +485,7 @@ function update_gene_status_table(doc, params) {
 			continue;
 		}
 		str += "<tr><td>" + gene_name + "</td>";
-		if (navicell.mapdata.hugo_map[gene_name][navicell.module_name]) {
+		if (navicell.mapdata.hugo_map[gene_name][navicell_module_name]) {
 			str += "<td>" + gene_name + "</td>";
 		} else {
 			str += "<td>&nbsp;</td>";

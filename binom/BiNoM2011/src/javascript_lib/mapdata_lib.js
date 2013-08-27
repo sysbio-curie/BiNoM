@@ -27,6 +27,12 @@ function mapSize(map) {
 	return size;
 }
 
+function array_push_all(arr, to_append) {
+	for (var nn = 0; nn < to_append.length; ++nn) {
+		arr.push(to_append[nn]);
+	}
+}
+
 if (!Number.MAX_NUMBER) {
 	Number.MAX_NUMBER = 4000000000; // not the correct value, but ok for our purposes
 }
@@ -102,6 +108,8 @@ function Dataset(name) {
 	this.sample_id = 1;
 	this.samples = {};
 	this.samples_id = {};
+
+	this.modifs_id = {};
 }
 
 Dataset.prototype = {
@@ -160,6 +168,45 @@ Dataset.prototype = {
 				}
 			}
 			delete this.datatables[datatable.name];
+		}
+	},
+
+	getGeneInfoByModifId: function(module_name, modif_id) {
+		console.log("getGeneInfoByModifId module_name: " + module_name + " " + navicell_module_name);
+		if (this.modifs_id[module_name]) {
+			return this.modifs_id[module_name][modif_id];
+		}
+		return null;
+	},
+
+	syncModifs: function() {
+		console.log("syncModifs starting " + mapSize(this.genes));
+		this.modifs_id = {};
+		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
+			var module_name = navicell.module_names[jj];
+			this.modifs_id[module_name] = {};
+			for (var gene_name in this.genes) {
+				var gene = this.genes[gene_name];
+				var entity_map = this.genes[gene_name].entity_map;
+				var entity = entity_map[module_name];
+				if (entity) {
+					var modif_arr = entity.modifs;
+					if (modif_arr) {
+						for (var nn = 0; nn < modif_arr.length; ++nn) {
+							var modif = modif_arr[nn];
+							var positions = modif.positions;
+							var arrpos = [];
+							if (positions) {
+								for (var kk = 0; kk < positions.length; ++kk) {
+									arrpos.push({id : modif.id, p : new google.maps.Point(positions[kk].x, positions[kk].y), gene_name: gene_name});
+								}
+							}
+							this.modifs_id[module_name][modif.id] = [gene, arrpos];
+						}
+					}
+				}
+			}
+			console.log("syncModifs " + module_name + " " + mapSize(this.modifs_id[module_name]));
 		}
 	},
 
@@ -227,11 +274,12 @@ Dataset.prototype = {
 		return true;
 	},
 
-	drawHeatmap: function(context, scale, gene_name, topx, topy) {
+	drawDLO: function(context, scale, gene_name, topx, topy) {
 		var size = 2;
+		console.log("Drawing " + gene_name);
 		context.fillStyle = 'rgba(100, 30, 100, 1)';
 		context.fillRect(topx, topy, (size+2)*scale, size*scale);
-		var gene = this.getGeneByName(gene_name);
+		//var gene = this.getGeneByName(gene_name);
 	},
 
 	getClass: function() {return "Dataset";}
@@ -651,6 +699,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 
 		datatable.epilogue();
 		ready.resolve();
+		dataset.syncModifs();
 	}
 
 	reader.onerror = function(e) {  // If anything goes wrong
@@ -1349,19 +1398,20 @@ NavicellSession.prototype = {
 	}
 }
 
-function load_mapdata(url, module) {
+function load_mapdata(url, module_name) {
+	navicell.module_names.push(module_name);
 	$.ajax(url,
 	       {
 		       async: true,
 		       dataType: 'json',
 
 		       success: function(mapdata) {
-			       navicell.mapdata.addModuleMapdata(module, mapdata);
-			       console.log("navicell: " + module + " mapdata loaded");
+			       navicell.mapdata.addModuleMapdata(module_name, mapdata);
+			       console.log("navicell: " + module_name + " mapdata loaded");
 		       },
 
 		       error: function() {
-			       console.log("navicell: error loading " + module + " mapdata");
+			       console.log("navicell: error loading " + module_name + " mapdata");
 		       }
 	       }
 	      );
@@ -1373,6 +1423,7 @@ function load_mapdata(url, module) {
 function navicell_init() {
 	var _navicell = {}; // namespace
 
+	_navicell.module_names = [];
 	_navicell.mapdata = new Mapdata();
 	_navicell.dataset = new Dataset("navicell");
 	_navicell.group_factory = new GroupFactory();

@@ -143,10 +143,13 @@ var check_node_inhibit = false;
 
 function show_markers_ref(markers, ref)
 {
-	//console.log("show_markers_ref");
+	console.log("show_markers_ref: " + markers.length);
 	var o_check_node_inhibit = check_node_inhibit;
 	check_node_inhibit = true;
 	make_new_markers_old();
+	if (overlay) {
+		overlay.reset();
+	}
 	var bounds = new google.maps.LatLngBounds();
 	$.each
 	(
@@ -154,14 +157,18 @@ function show_markers_ref(markers, ref)
 		function (key, id)
 		{
 			var elements = $("li#" + id + filter);
-//			alert("found " + elements.length + " for " + id);
 			elements.each
 			(
 				function ()
 				{
 //					alert("show_markers_ref lookup " + this + " for " + id);
 					get_markers_for_modification(this, projection, map);
-		//			console.log(element.attr("id"), markers.length);
+					if (navicell.dataset) {
+						var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, this.id);
+						if (gene_info) {
+							array_push_all(overlay.arrpos, gene_info[1]);
+						}
+					}
 					if (this.markers) {
 						this.markers.forEach
 						(
@@ -191,6 +198,9 @@ function show_markers_ref(markers, ref)
 		map.panToBounds(bounds);
 	}
 
+	if (overlay) {
+		overlay.draw();
+	}
 	check_node_inhibit = o_check_node_inhibit;
 }
 
@@ -296,6 +306,7 @@ function get_markers_for_modification(element, projection, map)
 					get_markers_for_modification(this, projection, map);
 				}
 			);
+			element.id = nid; // EV 2013-08-27
 		}
 		else
 		{
@@ -309,7 +320,6 @@ function get_markers_for_modification(element, projection, map)
 				icon = big_icon;
 			}
 
-//			alert("get_markers_for_modification create " + id);
 			element.markers = Array();
 			var positions = position.split(" ");
 			for (var index = 0; index < positions.length; index++)
@@ -359,6 +369,7 @@ function get_markers_for_modification(element, projection, map)
 					this.markers = element.markers;
 				}
 			);
+			element.id = id; // EV 2013-08-27
 //			console.log($(element).attr("id"), "created", element.markers.length);
 		}
 	}
@@ -455,8 +466,16 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			plugins : [ "themes", "search", "xml_data", "ui", "checkbox", "languages" ],
 			html_titles : true
 		}).bind("uncheck_node.jstree", function(event, data) {
+			var rm_arrpos = [];
 			var f = function(index, element)
 			{
+				if (navicell.dataset) {
+					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
+					if (gene_info) {
+						array_push_all(rm_arrpos, gene_info[1]);
+					}
+				}
+
 				if (element.markers) {
 					$.each(element.markers, function(key, i) { i.setVisible(false); });
 					if (element.peers) {
@@ -473,6 +492,10 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			/*try*/ {
 				$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
 				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				if (overlay && rm_arrpos.length) {
+					overlay.remove(rm_arrpos);
+					overlay.draw();
+				}
 			} /*catch(f) {
 				console.log("get_unchecked error: " + f);
 			}*/
@@ -481,6 +504,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 		}).bind("check_node.jstree", function(event, data) {
 			if (check_node_inhibit) {
 				return;
+			}
+			if (overlay) {
+				overlay.reset();
 			}
 			check_node_inhibit = true;
 			make_new_markers_old();
@@ -495,6 +521,13 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 				*/
 				get_markers_for_modification(element, projection, map);
 				
+				if (navicell.dataset) {
+					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
+					if (gene_info) {
+						array_push_all(overlay.arrpos, gene_info[1]);
+					}
+				}
+
 				if (element.markers) {
 					$.each(element.markers,
 					       function(key, i)
@@ -529,6 +562,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			if (!bounds.isEmpty())
 				map.panToBounds(bounds);
 			check_node_inhibit = false;
+			if (overlay) {
+				overlay.draw();
+			}
 		}).bind("search.jstree", function (e, data) {
 //			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");
 		});

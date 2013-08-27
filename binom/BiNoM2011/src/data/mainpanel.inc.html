@@ -27,6 +27,7 @@
 
       </div>
 
+<!--
       <h4>Display Options</h4>
 
       <div id="dt_import_display">
@@ -44,6 +45,7 @@
 	  </tr>
 	</table>
       </div>
+-->
     </fieldset>
   </form>
 
@@ -139,7 +141,15 @@
 
 <div id="drawing_config_div">
   <h3>Drawing Configuration</h3>
-  <h4>Chart Mode</h4>
+  <h4>Markers</h4>
+  <div class='drawing_config_box'>
+    <table>
+      <tr>
+	<td>Display</td><td><input id="drawing_config_markers_display" type="checkbox" checked="checked"></input></td>
+      </tr>
+    </table>
+  </div>
+  <h4>Chart</h4>
   <div class='drawing_config_box'>
     <table style=''>
       <tr>
@@ -164,7 +174,7 @@
     </table>
   </div>
 
-  <h4>Glyph Mode</h4>
+  <h4>Glyph</h4>
   <div class='drawing_config_box'>
     <table>
       <tr>
@@ -176,16 +186,18 @@
       </table>
   </div>
 
-  <h4>Label Mode</h4>
+  <h4>Label</h4>
   <div class='drawing_config_box'>
     <table>
       <tr>
 	<td>Display</td><td><input id="drawing_config_label_display" type="checkbox"></input></td>
       </tr>
+      <tr>
       <td><a href="#" class='drawing_config_link' onclick='drawing_config_label()'><span class='drawing_config_link'>configuration</span></a></td>
       </tr>
     </table>
   </div>
+<!--
   <br/>
   <br/>
   <table>
@@ -198,6 +210,7 @@
       <td><input name="drawing_config_display" type="radio"></input></td>
     </tr>
     </table>
+-->
 </div>
 
 <div id="heatmap_config_div">

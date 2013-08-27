@@ -4840,9 +4840,11 @@ public class ProduceClickableMap
 		out.println("<script type='text/javascript'>");
 
 		if (NV2) {
-			out.println("  navicell.module_name = \"" + map_name + "\";");
+			out.println("  var navicell_module_name = \"" + map_name + "\";");
+			out.println("  var overlay;");
 		} else {
 			out.println("  var navicell = {};");
+			out.println("  var navicell_module_name = null;");
 		}
 
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
@@ -4888,7 +4890,7 @@ public class ProduceClickableMap
 		if (NV2) {
 			out.println("    update_status_tables();");
 			out.println("    heatmap_editor_set_editing(true);");
-			out.println("    overlay_init();");
+			out.println("    overlay_init(map);");
 		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());

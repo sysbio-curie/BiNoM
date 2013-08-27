@@ -22,11 +22,10 @@
 //var MAX_SCREEN_HEIGHT = 1200;
 var MAX_SCREEN_WIDTH = 2500;
 var MAX_SCREEN_HEIGHT = 2000;
-var overlay;
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
-function overlay_init() {
+function overlay_init(map) {
 	overlay = new USGSOverlay(map);
 }
 
@@ -84,6 +83,10 @@ USGSOverlay.prototype.onAdd = function() {
 }
 
 USGSOverlay.prototype.resize = function() {
+	if (this.div_ == null) {
+		//this.onAdd();
+		return;
+	}
 	var overlayProjection = this.getProjection();
 	var ne = overlayProjection.fromLatLngToDivPixel(this.map_.getBounds().getSouthWest());
 	var sw = overlayProjection.fromLatLngToDivPixel(this.map_.getBounds().getNorthEast());
@@ -111,8 +114,12 @@ USGSOverlay.prototype.resize = function() {
 
 USGSOverlay.prototype.draw = function() {
 
+	if (this.div_ == null) {
+		return;
+	}
 	this.resize();
 
+	console.log("overlay.DRAW " + this.arrpos.length);
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 
 	var arrpos = this.arrpos;
@@ -127,6 +134,7 @@ USGSOverlay.prototype.draw = function() {
 		//console.log("drawing " + arrpos.length + " points");
 		for (var nn = 0; nn < arrpos.length; ++nn) {
 			//var latlng = map.getProjection().fromPointToLatLng(arrpos[nn].p);
+			console.log("drawing: " + arrpos[nn].gene_name + " " + arrpos[nn].p.x + " " + arrpos[nn].p.y);
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
 			
@@ -145,7 +153,7 @@ USGSOverlay.prototype.draw = function() {
 //			this.context.fillRect(pix.x-div.left, pix.y-div.top, size*scale, size*scale);
 			//this.context.fillRect(pix.x-div.left, pix.y-div.top, (size+2)*scale, size*scale);
 			*/
-			navicell.dataset.drawHeatmap(this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+			navicell.dataset.drawDLO(this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 		}
 		
 		/*
@@ -163,6 +171,41 @@ USGSOverlay.prototype.draw = function() {
 		}
 		*/
 	}
+}
+
+USGSOverlay.prototype.reset = function() {
+	console.log("resetting overlay");
+	this.arrpos = [];
+}
+
+USGSOverlay.prototype.remove = function(rm_arrpos) {
+	//console.log("trying to remove: " + rm_arrpos.length + " " + this.arrpos.length);
+	if (!rm_arrpos.length) {
+		return;
+	}
+	/*
+	for (var jj = 0; jj < rm_arrpos.length; ++jj) {
+		console.log("rm_pos " + rm_arrpos[jj].id);
+	}
+	for (var jj = 0; jj < this.arrpos.length; ++jj) {
+		console.log("pos " + this.arrpos[jj].id);
+	}
+	*/
+	var arrpos = [];
+	for (var ii = 0; ii < this.arrpos.length; ++ii) {
+		var pos = this.arrpos[ii];
+		var keep = 1;
+		for (var jj = 0; jj < rm_arrpos.length; ++jj) {
+			if (rm_arrpos[jj].id == pos.id) {
+				keep = 0;
+				break;
+			}
+		}
+		if (keep) {
+			arrpos.push(pos);
+		}
+	}
+	this.arrpos = arrpos;
 }
 
 USGSOverlay.prototype.onRemove = function() {

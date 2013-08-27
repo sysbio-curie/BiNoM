@@ -172,7 +172,7 @@ Dataset.prototype = {
 	},
 
 	getGeneInfoByModifId: function(module_name, modif_id) {
-		console.log("getGeneInfoByModifId module_name: " + module_name + " " + navicell_module_name);
+		//console.log("getGeneInfoByModifId module_name: " + module_name + " " + navicell_module_name);
 		if (this.modifs_id[module_name]) {
 			return this.modifs_id[module_name][modif_id];
 		}
@@ -923,6 +923,75 @@ Datatable.prototype = {
 	getClass: function() {return "Datatable";}
 };
 
+function DrawingConfig() {
+	this.display_markers = 1;
+	this.display_old_markers = 1;
+
+	this.display_charts = 0; // 1 for heatmap, 2 for barplot, 3 for piechart
+	this.heatmap_config = new HeatmapConfig();
+	//this.barplot_config = new BarplotConfig();
+	//this.piechart_config = new PiechartConfig();
+
+	this.display_glyphs = 0;
+	//this.glyph_config = new GlyphConfig();
+	this.display_labels = 0;
+}
+
+DrawingConfig.prototype = {
+
+	displayMarkers: function() {
+		return this.display_markers;
+	},
+
+	displayOldMarkers: function() {
+		return this.display_old_markers != "0";
+	},
+
+	displayOldMarkersWithDifferentColor: function() {
+		return this.display_old_markers == "1";
+	},
+
+	displayOldMarkersWithSameColor: function() {
+		return this.display_old_markers == "2";
+	},
+
+	displayCharts: function() {
+		return this.display_charts;
+	},
+
+	displayGlyphs: function() {
+		return this.display_glyphs;
+	},
+
+	displayLabels: function() {
+		return this.display_labels;
+	},
+
+	displayHeatmaps: function() {
+		return this.display_charts == "Heatmap";
+	},
+
+	displayDLOs: function() {
+		return this.displayCharts() || this.displayGlyphs() || this.displayLabels();
+	},
+
+	setDisplayMarkers: function(val) {
+		this.display_markers = val;
+	},
+
+	setDisplayOldMarkers: function(val) {
+		this.display_old_markers = val;
+	},
+
+	setDisplayCharts: function(val, chart_type) {
+		if (!val) {
+			this.display_charts = 0;
+		} else {
+			this.display_charts = chart_type;
+		}
+	}
+};
+
 function switch_view(id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
@@ -1429,7 +1498,7 @@ function navicell_init() {
 	_navicell.group_factory = new GroupFactory();
 	_navicell.biotype_factory = new BiotypeFactory();
 	_navicell.annot_factory = new AnnotationFactory();
-	_navicell.heatmap_config = new HeatmapConfig();
+	_navicell.drawing_config = new DrawingConfig();
 
 	_navicell.CONTINUOUS = new BiotypeType("continuous");
 	_navicell.DISCRETE = new BiotypeType("discrete");

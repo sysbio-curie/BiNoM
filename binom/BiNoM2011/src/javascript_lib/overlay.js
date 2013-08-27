@@ -122,6 +122,9 @@ USGSOverlay.prototype.draw = function() {
 	console.log("overlay.DRAW " + this.arrpos.length);
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 
+	if (!navicell.drawing_config.displayDLOs()) {
+		return;
+	}
 	var arrpos = this.arrpos;
 	if (arrpos.length) {
 		var div = this.div_;

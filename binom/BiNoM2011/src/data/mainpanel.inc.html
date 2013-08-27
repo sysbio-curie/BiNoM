@@ -145,7 +145,17 @@
   <div class='drawing_config_box'>
     <table>
       <tr>
-	<td>Display</td><td><input id="drawing_config_markers_display" type="checkbox" checked="checked"></input></td>
+	<td>Display</td><td><input id="drawing_config_marker_display" type="checkbox" checked="checked"></input></td>
+      </tr>
+      <tr>
+	<td>&nbsp;</td>
+	<td>
+	  <select id="drawing_config_old_marker">
+	    <option value="1">Keep old markers with a different color</option>
+	    <option value="2">Keep old markers with the same color</option>
+	    <option value="0">Don't keep old markers</option>
+	  </select>
+	</td>
       </tr>
     </table>
   </div>
@@ -161,7 +171,6 @@
 	</td>
 	<td>
 	  <select id="drawing_config_chart_type">
-	    <option value="_none_"></option>
 	    <option value="Heatmap">Heatmap</option>
 	    <option value="Barplot">Barplot</option>
 	    <option value="Piechart">Piechart</option>
@@ -169,6 +178,7 @@
 	</td>
       </tr>
       <tr>
+	<td>&nbsp;</td>
 	<td colspan="1"><a href="#" class='drawing_config_link' onclick='drawing_config_chart()'><span class='drawing_config_link'>configuration</span></a></td>
       </tr>
     </table>
@@ -181,6 +191,7 @@
 	<td>Display</td><td><input id="drawing_config_glyph_display" type="checkbox"></input></td>
 	</tr>
       <tr>
+	<td>&nbsp;</td>
 	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph()'><span class='drawing_config_link'>configuration</span></a></td>
       </tr>
       </table>
@@ -193,7 +204,8 @@
 	<td>Display</td><td><input id="drawing_config_label_display" type="checkbox"></input></td>
       </tr>
       <tr>
-      <td><a href="#" class='drawing_config_link' onclick='drawing_config_label()'><span class='drawing_config_link'>configuration</span></a></td>
+	<td>&nbsp;</td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_label()'><span class='drawing_config_link'>configuration</span></a></td>
       </tr>
     </table>
   </div>

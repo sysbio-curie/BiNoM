@@ -40,8 +40,8 @@ $(function() {
 
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
-		width: 500,
-		height: 700,
+		width: 450,
+		height: 550,
 		modal: false,
 		buttons: {
 			"Import": function() {
@@ -115,13 +115,23 @@ $(function() {
 	$("#drawing_config_div").dialog({
 		autoOpen: false,
 		width: 420,
-		height: 650,
+		height: 700,
 		modal: false,
 
 		buttons: {
 			"Apply": function() {
+				navicell.drawing_config.setDisplayMarkers($("#drawing_config_marker_display").attr("checked"));
+				navicell.drawing_config.setDisplayOldMarkers($("#drawing_config_old_marker").val());
+				navicell.drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
 			},
+
 			"Cancel": function() {
+				$("#drawing_config_marker_display").attr("checked", navicell.drawing_config.displayMarkers());
+				$("#drawing_config_chart_display").attr("checked", navicell.drawing_config.displayCharts() ? true : false);
+				if (navicell.drawing_config.displayCharts()) {
+					$("#drawing_config_chart_type").val(navicell.drawing_config.displayCharts());
+				}
+				$("#drawing_config_old_marker").val(navicell.drawing_config.displayOldMarkers());
 			}
 		}
 	});
@@ -217,18 +227,18 @@ $(function() {
 				for (var idx = 0; idx < sample_group_cnt; ++idx) {
 					var val = $("#heatmap_editor_gs_" + idx).val();
 					if (val == "_none_") {
-						navicell.heatmap_config.setSampleOrGroupAt(idx, undefined);
+						navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, undefined);
 					} else {
 						var prefix = val.substr(0, 2);
 						var id = val.substr(2);
 						if (prefix == 'g_') {
 							console.log("group selected " + id + " at index " + idx);
 							var group = navicell.group_factory.getGroupById(id);
-							navicell.heatmap_config.setSampleOrGroupAt(idx, group);
+							navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, group);
 						} else {
 							console.log("group selected " + id + " at index " + idx);
 							var sample = navicell.dataset.getSampleById(id);
-							navicell.heatmap_config.setSampleOrGroupAt(idx, sample);
+							navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, sample);
 						}
 					}
 				}
@@ -238,16 +248,16 @@ $(function() {
 					if (val && val != "_none_") {
 						console.log("datatable selected " + val + " at index " + idx);
 						var datatable = navicell.getDatatableById(val);
-						navicell.heatmap_config.setDatatableAt(idx, datatable);
+						navicell.drawing_config.heatmap_config.setDatatableAt(idx, datatable);
 					}
 				}
-				navicell.heatmap_config.shrink();
+				navicell.drawing_config.heatmap_config.shrink();
 				update_heatmap_editor();
 				heatmap_editor_set_editing(false);
 			},
 			
 			"Clear": function() {
-				navicell.heatmap_config.reset();
+				navicell.drawing_config.heatmap_config.reset();
 				update_heatmap_editor();
 				heatmap_editor_set_editing(true);
 			},
@@ -765,7 +775,7 @@ function update_heatmap_config(doc, params) {
 	var datatable_table = $("#heatmap_config_datatable_list");
 	var sample_table = $("#heatmap_config_sample_list");
 	var group_table = $("#heatmap_config_group_list");
-	var heatmapConfig = navicell.heatmap_config;
+	var heatmapConfig = navicell.drawing_config.heatmap_config;
 
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 	var sample_cnt = mapSize(navicell.dataset.samples);
@@ -827,8 +837,14 @@ function heatmap_editor_set_editing(val) {
 	$("#heatmap_editing").html(val ? "editing..." : "");
 	$("#gene_choice").css("visibility", val ? "hidden" : "visible");
 	if (val) {
-		/*$("#heatmap_editor_table tbody tr td").attr('style', '');*/
-		$("#heatmap_editor_table td").attr('style', '');
+		$("#heatmap_editor_table td.heatmap_cell").attr('style', '');
+		$("#heatmap_editor_table td.heatmap_cell").html('&nbsp;');
+		// <=>
+		/*
+		$("#heatmap_editor_table td.cell").each(function() {
+			$(this).html('&nbsp;');
+		});
+		*/
 	}
 	if (0) {
 		var buttons = $("#heatmap_editor_div").parent().find(".ui-button-text");
@@ -852,7 +868,7 @@ function heatmap_editor_set_editing(val) {
 }
 
 function update_heatmap_editor(doc, params) {
-	var heatmapConfig = navicell.heatmap_config;
+	var heatmapConfig = navicell.drawing_config.heatmap_config;
 	var table = $("#heatmap_editor_table");
 	var sel_gene_id = $("#select_gene").val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
@@ -927,7 +943,7 @@ function update_heatmap_editor(doc, params) {
 					var style = sel_datatable.getStyle(value);
 					console.log("value: " + value + " style:" + style);
 					/*html += "<td " + style + ">&nbsp;</td>";*/
-					html += "<td " + style + ">" + value + "</td>";
+					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
 				} else if (sel_group) {
 					var total_value = 0;
 					var cnt = 0;
@@ -944,16 +960,16 @@ function update_heatmap_editor(doc, params) {
 						total_value = total_value/cnt;
 						var style = sel_datatable.getStyle(total_value);
 						console.log("value: " + total_value + " style:" + style);
-						html += "<td " + style + ">" + total_value + "</td>";
+						html += "<td class='heatmap_cell' " + style + ">" + total_value + "</td>";
 					}
 						
 				} else {
-					html += "<td>&nbsp;</td>";
+					html += "<td class='heatmap_cell'>&nbsp;</td>";
 				}
 			}
 		} else {
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
-				html += "<td>&nbsp;</td>";
+				html += "<td class='heatmap_cell'>&nbsp;</td>";
 			}
 		}
 		html += "</tr>\n";

@@ -94,19 +94,26 @@ function setup_icons()
 
 function make_marker_visible(marker)
 {
-	marker.setIcon(marker.getIcon().new_icon);
-	marker.setAnimation(google.maps.Animation.DROP);
-	marker.setVisible(true);
-	new_markers.push(marker);
+	if (!navicell.drawing_config || navicell.drawing_config.displayMarkers()) {
+		marker.setIcon(marker.getIcon().new_icon);
+		marker.setAnimation(google.maps.Animation.DROP);
+		marker.setVisible(true);
+		new_markers.push(marker);
+	}
 }
 
 function make_new_markers_old()
 {
-	//console.log("make_new_markers_old " + new_markers.length);
+	var keep = !navicell.drawing_config || navicell.drawing_config.displayOldMarkers();
+	var diffcol = !navicell.drawing_config || navicell.drawing_config.displayOldMarkersWithDifferentColor();
 	while (new_markers.length != 0)
 	{
 		var i = new_markers.pop();
-		i.setIcon(i.getIcon().normal_icon);
+		if (!keep) {
+			i.setVisible(false);
+		} else if (diffcol) {
+			i.setIcon(i.getIcon().normal_icon);
+		}
 	}
 }
 

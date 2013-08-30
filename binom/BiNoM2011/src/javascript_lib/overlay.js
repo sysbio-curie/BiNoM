@@ -44,6 +44,22 @@ USGSOverlay.prototype.onAdd = function() {
 
 //	google.maps.event.addListener(this.getMap(), 'bounds_changed', simpleBindShim(this, this.resize));
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
+	google.maps.event.addListener(this.getMap(), 'click', function(e, e2) {
+		var x = e.pixel.x;
+		var y = e.pixel.y;
+		for (var nn = 0; nn < overlay.boundBoxes.length; ++nn) {
+			var box = overlay.boundBoxes[nn][0];
+			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
+				var gene_name = overlay.boundBoxes[nn][1];
+				console.log("click on: " + gene_name);
+				$("#select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
+				update_heatmap_editor();
+				$("#heatmap_editor_div").dialog("open");
+				break;
+			}
+		}
+	});
+
 	// ....
 
 	this.setMap(this.map_);
@@ -121,6 +137,7 @@ USGSOverlay.prototype.draw = function() {
 
 	console.log("overlay.DRAW " + this.arrpos.length);
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+	this.boundBoxes = [];
 
 	if (!navicell.drawing_config.displayDLOs()) {
 		return;
@@ -179,6 +196,10 @@ USGSOverlay.prototype.draw = function() {
 USGSOverlay.prototype.reset = function() {
 	console.log("resetting overlay");
 	this.arrpos = [];
+}
+
+USGSOverlay.prototype.addBoundBox = function(box, gene_name) {
+	this.boundBoxes.push([box, gene_name]);
 }
 
 USGSOverlay.prototype.remove = function(rm_arrpos) {

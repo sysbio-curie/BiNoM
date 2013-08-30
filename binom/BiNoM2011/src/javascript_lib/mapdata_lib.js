@@ -277,8 +277,9 @@ Dataset.prototype = {
 	drawDLO: function(context, scale, gene_name, topx, topy) {
 		var size = 2;
 		console.log("Drawing " + gene_name);
-		context.fillStyle = 'rgba(100, 30, 100, 1)';
-		context.fillRect(topx, topy, (size+2)*scale, size*scale);
+		//context.fillStyle = 'rgba(100, 30, 100, 1)';
+		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
+		draw_heatmap(context, scale, gene_name, topx, topy);
 		//var gene = this.getGeneByName(gene_name);
 	},
 
@@ -809,7 +810,30 @@ Datatable.prototype = {
 		}
 	},
 
+	getBG: function(value) {
+		if (this.displayStepConfig) {
+			return this.displayStepConfig.getColor(value);
+		}
+		return '';
+	},
+
+	getFG: function(value) {
+		var color = this.getBG(value);
+		if (color) {
+			return getFG_from_BG(color);
+		}
+		return '';
+	},
+
 	getStyle: function(value) {
+		var color = this.getBG(value);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return '';
+
+/*
 		if (this.displayStepConfig) {
 			var color = this.displayStepConfig.getColor(value);
 			if (color) {
@@ -824,6 +848,7 @@ Datatable.prototype = {
 			}
 		}
 		return '';
+*/
 	},
 
 	makeDataTable_genes: function() {
@@ -1555,6 +1580,16 @@ function jquery_to_dom(obj) {
 	return dom_objs;
 }
 */
+
+function getFG_from_BG(color) {
+	var rgb1 = color.substring(0, 2);
+	var rgb2 = color.substring(2, 4);
+	var rgb3 = color.substring(4, 6);
+	rgb1 = parseInt("0x" + rgb1)/256.;
+	rgb2 = parseInt("0x" + rgb2)/256.;
+	rgb3 = parseInt("0x" + rgb3)/256.;
+	return 0.213 * rgb1 + 0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? 'FFF' : '000';
+}
 
 var navicell;
 

@@ -128,7 +128,7 @@ $(function() {
 				//jtree.jstree("uncheck_node", $("li.navicell"));
 				//jtree.jstree("uncheck_node", $(".jstree-checked"));
 				set_old_marker_mode($("#drawing_config_old_marker").val());
-				jstree_refresh();
+				jstree_refresh(true);
 			},
 
 			"Cancel": function() {
@@ -260,6 +260,7 @@ $(function() {
 				navicell.drawing_config.heatmap_config.shrink();
 				update_heatmap_editor();
 				heatmap_editor_set_editing(false);
+				jstree_refresh(true);
 			},
 			
 			"Clear": function() {
@@ -736,6 +737,7 @@ Datatable.prototype.showDisplayConfig = function() {
 						}
 						datatable.refresh();
 						update_heatmap_editor(); // ??
+						jstree_refresh(true);
 					}
 				},
 
@@ -1001,3 +1003,87 @@ function update_heatmap_editor(doc, params) {
 	//console.log("SELECT GENE2: " + $("#dt_import_type_select").length);
 	//$("#select_gene").html(html);
 }
+
+function draw_heatmap(context, scale, gene_name, topx, topy)
+{
+	var heatmapConfig = navicell.drawing_config.heatmap_config;
+	var sample_cnt = mapSize(navicell.dataset.samples);
+	var group_cnt = mapSize(navicell.group_factory.group_map);
+	var sample_group_cnt = sample_cnt + group_cnt;
+
+	if (sample_group_cnt > MAX_HEATMAP_X) {
+		sample_group_cnt = MAX_HEATMAP_X;
+	}
+	var datatable_cnt = 0;
+
+	//console.log("sample_group_cnt: " + sample_group_cnt + " scale:" + scale);
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		if (datatable.displayStepConfig) {
+			datatable_cnt++;
+		}
+	}
+
+	var scale2 = Math.sqrt(scale*1.) / 3.;
+	console.log("scale: " + scale + " " + scale2);
+	var cell_w = 4*scale2; // does not depend on scale
+	var cell_h = 4*scale2;
+
+	topx += 12; // does not depend on scale
+	topy -= cell_h * datatable_cnt + 4;
+	var start_y = topy;
+
+	for (var idx = 0; idx < datatable_cnt; ++idx) {
+		var start_x = topx;
+		var sel_datatable = heatmapConfig.getDatatableAt(idx);
+		if (!sel_datatable) {
+			//console.log("no line");
+			continue;
+		}
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			var sel_group = heatmapConfig.getGroupAt(idx2);
+			var sel_sample = heatmapConfig.getSampleAt(idx2);
+			if (sel_sample) {
+				var value = sel_datatable.getValue(sel_sample.name, gene_name);
+				//var style = sel_datatable.getStyle(value);
+				var bg = sel_datatable.getBG(value);
+				if (bg) {
+					var fg = getFG_from_BG(bg);
+					//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
+					context.fillStyle = "#" + bg;
+					context.fillRect(start_x, start_y, cell_w, cell_h);
+					start_x += cell_w;
+				} else {
+					//console.log("no value");
+				}
+			} else if (sel_group) {
+				var total_value = 0;
+				var cnt = 0;
+				for (var sample_name in sel_group.samples) {
+					var value = sel_datatable.getValue(sample_name, gene_name);
+					value *= 1.;
+					if (value) {
+						total_value += value;
+						cnt++;
+					}
+				}
+				if (cnt) {
+					//console.log("total_value: " + total_value + " " + cnt);
+					total_value = total_value/cnt;
+					var bg = sel_datatable.getBG(value);
+					if (bg) {
+						var fg = getFG_from_BG(bg);
+						//console.log("value: " + total_value + " bg:" + bg + " fg: " + fg);
+					}
+				} else {
+					//console.log("no col");
+				}
+			} else {
+				//console.log("no col2");
+			}
+		}
+		start_y += cell_h;
+	}
+	overlay.addBoundBox([topx, topy, start_x-topx, start_y-topy], gene_name);
+}
+

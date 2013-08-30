@@ -37,6 +37,7 @@ var marker_list = [];
 
 var refreshing = false;
 var old_marker_mode = "1";
+var check_elements = {};
 
 function setup_icons()
 {
@@ -106,7 +107,7 @@ function make_marker_visible(marker)
 		marker.setVisible(true);
 		marker.setAnimation(google.maps.Animation.DROP);
 		marker.type = "new";
-		if (!refreshing) {
+		/*if (!refreshing) */ {
 			new_markers.push(marker);
 		}
 	}
@@ -267,23 +268,24 @@ function jstree_uncheck_all()
 	overlay.draw();
 }
 
-function jstree_refresh()
+function jstree_refresh(partial)
 {
-	if (false) {
-	if (navicell.drawing_config && !navicell.drawing_config.displayMarkers()) {
-		hide_all_markers();
-	} else {
-		/*
-		for (var nn = 0; nn < marker_list.length; ++nn) {
-			var marker = marker_list[nn];
-			marker.setAnimation(google.maps.Animation.DROP);
+	if (partial) {
+		if (navicell.drawing_config && !navicell.drawing_config.displayMarkers()) {
+			hide_all_markers();
+		} else {
+			refresh_old_markers();
 		}
-		*/
-		refresh_old_markers();
-	}
 
-	overlay.draw();
-	return;
+		overlay.reset();
+		for (var element_id in check_elements) {
+			var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element_id);
+			if (gene_info) {
+				array_push_all(overlay.arrpos, gene_info[1]);
+			}
+		}
+		overlay.draw();
+		return;
 	}
 	
 	for (var nn = 0; nn < marker_list.length; ++nn) {
@@ -370,7 +372,8 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 		zoom : min_zoom,
 		mapTypeId : id
 	});
-	
+
+	map.setOptions({draggableCursor:'default', draggingCursor: 'move'});
 //	console.log(width + " " +  height);
 	
 	var map_type = new google.maps.ImageMapType({
@@ -589,6 +592,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			var f = function(index, element)
 			{
 				if (navicell.dataset) {
+					if (element.id) {
+						check_elements[element.id] = false;
+					}
 					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
 					if (gene_info) {
 						array_push_all(rm_arrpos, gene_info[1]);
@@ -646,6 +652,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 				get_markers_for_modification(element, projection, map);
 				
 				if (navicell.dataset) {
+					if (element.id) {
+						check_elements[element.id] = true;
+					}
 					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
 					if (gene_info) {
 						array_push_all(overlay.arrpos, gene_info[1]);

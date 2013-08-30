@@ -4841,11 +4841,11 @@ public class ProduceClickableMap
 
 		if (NV2) {
 			out.println("  var navicell_module_name = \"" + map_name + "\";");
-			out.println("  var overlay;");
 		} else {
 			out.println("  var navicell = {};");
 			out.println("  var navicell_module_name = null;");
 		}
+		out.println("  var overlay;");
 
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
 
@@ -4942,6 +4942,11 @@ public class ProduceClickableMap
 		left_content.close();
 		
 		final Div right_div = new Div(my_splitter, "id='" + "right_panel" + "'");
+		if (NV2) {
+			final Div tree_control_div = new Div(right_div, "id='" + "tree_control" + "'");
+			out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'><span class='tree-control'>clear</span></a>");
+			tree_control_div.close();
+		}
 		final Div marker_div = new Div(right_div, "id='" + marker_div_name + "'");
 		marker_div.close();
 

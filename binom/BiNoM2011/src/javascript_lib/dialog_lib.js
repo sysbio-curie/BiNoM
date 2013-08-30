@@ -123,6 +123,12 @@ $(function() {
 				navicell.drawing_config.setDisplayMarkers($("#drawing_config_marker_display").attr("checked"));
 				navicell.drawing_config.setDisplayOldMarkers($("#drawing_config_old_marker").val());
 				navicell.drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+				//jQuery.jstree._reference(jtree).jstree("check_all");
+				//jtree.jstree("check_all");
+				//jtree.jstree("uncheck_node", $("li.navicell"));
+				//jtree.jstree("uncheck_node", $(".jstree-checked"));
+				set_old_marker_mode($("#drawing_config_old_marker").val());
+				jstree_refresh();
 			},
 
 			"Cancel": function() {

@@ -1525,6 +1525,37 @@ function navicell_init() {
 	return _navicell;
 }
 
+function jquery_to_dom(obj) {
+	var dom_objs = [];
+	for (var nn = 0; nn < obj.length; nn++) {
+		dom_objs.push(obj.get(nn));
+	}
+	return dom_objs;
+}
+
+/*
+function jquery_to_dom_r(dom_objs, obj) {
+	if (obj.childNodes.length == 0) {
+		dom_objs.push(obj);
+	} else {
+		for (var jj = 0; jj < obj.childNodes.length; ++jj) {
+			var child = obj.childNodes[jj];
+			dom_objs.push(child);
+			jquery_to_dom_r(dom_objs, child);
+		}
+	}
+}
+
+function jquery_to_dom(obj) {
+	var dom_objs = [];
+	for (var nn = 0; nn < obj.length; nn++) {
+		var o = obj.get(nn);
+		jquery_to_dom_r(dom_objs, o);
+	}
+	return dom_objs;
+}
+*/
+
 var navicell;
 
 if (typeof navicell == 'undefined') {

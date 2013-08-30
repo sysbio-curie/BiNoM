@@ -33,6 +33,11 @@ var medium_icon;
 var small_icon;
 var big_icon;
 
+var marker_list = [];
+
+var refreshing = false;
+var old_marker_mode = "1";
+
 function setup_icons()
 {
 	var normal_marker_colour = "FE7569";	
@@ -74,6 +79,8 @@ function setup_icons()
 //		var normal_icon1 = simple_icon("FE7569", w, h, anchor_x, anchor_y);
 		var normal_icon1 = simple_icon("EEEEEE", w, h, anchor_x, anchor_y);
 		var new_icon1 = simple_icon("5555FF", w, h, anchor_x, anchor_y);
+		normal_icon1.type = "normal";
+		new_icon1.type = "new";
 		normal_icon1.new_icon = new_icon1;
 		normal_icon1.normal_icon = normal_icon1;
 		new_icon1.new_icon = new_icon1;
@@ -96,9 +103,42 @@ function make_marker_visible(marker)
 {
 	if (!navicell.drawing_config || navicell.drawing_config.displayMarkers()) {
 		marker.setIcon(marker.getIcon().new_icon);
-		marker.setAnimation(google.maps.Animation.DROP);
 		marker.setVisible(true);
-		new_markers.push(marker);
+		marker.setAnimation(google.maps.Animation.DROP);
+		marker.type = "new";
+		if (!refreshing) {
+			new_markers.push(marker);
+		}
+	}
+}
+
+function hide_old_markers()
+{
+	for (var nn = 0; nn < marker_list.length; ++nn) {
+		var marker = marker_list[nn];
+		if (marker.type == "old") {
+			marker.setVisible(false);
+		}
+	}
+}
+
+function hide_all_markers()
+{
+	for (var nn = 0; nn < marker_list.length; ++nn) {
+		var marker = marker_list[nn];
+		marker.setVisible(false);
+	}
+}
+
+function set_old_markers_color(val)
+{
+	for (var nn = 0; nn < marker_list.length; ++nn) {
+		var marker = marker_list[nn];
+		if (marker.type == "old") {
+			//console.log("found an old marker");
+			marker.setIcon(val ? marker.getIcon().normal_icon : marker.getIcon().new_icon);
+			//marker.setVisible(true); // bad idea to make them visible back
+		}
 	}
 }
 
@@ -109,6 +149,7 @@ function make_new_markers_old()
 	while (new_markers.length != 0)
 	{
 		var i = new_markers.pop();
+		i.type = "old";
 		if (!keep) {
 			i.setVisible(false);
 		} else if (diffcol) {
@@ -215,6 +256,75 @@ function show_markers(markers)
 {
 	var ref = jQuery.jstree._reference(jtree);
 	show_markers_ref(markers, ref);
+}
+
+function jstree_uncheck_all()
+{
+	hide_all_markers();
+	//jtree.jstree("uncheck_node", jquery_to_dom($(".jstree-checked")));
+	jtree.jstree("uncheck_all");
+	overlay.reset();
+	overlay.draw();
+}
+
+function jstree_refresh()
+{
+	if (false) {
+	if (navicell.drawing_config && !navicell.drawing_config.displayMarkers()) {
+		hide_all_markers();
+	} else {
+		/*
+		for (var nn = 0; nn < marker_list.length; ++nn) {
+			var marker = marker_list[nn];
+			marker.setAnimation(google.maps.Animation.DROP);
+		}
+		*/
+		refresh_old_markers();
+	}
+
+	overlay.draw();
+	return;
+	}
+	
+	for (var nn = 0; nn < marker_list.length; ++nn) {
+		var marker = marker_list[nn];
+		marker.keep_old = marker.type == "old";
+	}
+	refreshing = true;
+	var undets = $(".jstree-undetermined");
+//	var objs = $(".jstree-checked");
+	var objs = jquery_to_dom($(".jstree-checked"));
+
+	jtree.jstree("uncheck_node", objs);
+	jtree.jstree("check_node", objs);
+
+	for (var nn = 0; nn < marker_list.length; ++nn) {
+		var marker = marker_list[nn];
+		if (marker.keep_old) {
+			marker.type = "old";
+		} else {
+			new_markers.push(marker);
+		}
+	}
+
+	refresh_old_markers();
+	refreshing = false;
+	undets.addClass("jstree-undetermined");
+
+}
+
+function set_old_marker_mode(val) {
+	old_marker_mode = val;
+}
+
+function refresh_old_markers() {
+	if (old_marker_mode == "0") {
+		hide_old_markers();
+	} else if (old_marker_mode == "1") {
+		set_old_markers_color(true);
+	} else if (old_marker_mode == "2") {
+		set_old_markers_color(false);
+	}
 }
 
 function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
@@ -345,6 +455,7 @@ function get_markers_for_modification(element, projection, map)
 							icon : icon
 						}
 				);
+				marker_list.push(marker);
 				google.maps.event.addListener
 				(
 					marker, 'click', function()
@@ -473,6 +584,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			plugins : [ "themes", "search", "xml_data", "ui", "checkbox", "languages" ],
 			html_titles : true
 		}).bind("uncheck_node.jstree", function(event, data) {
+			//console.log("uncheck_node " + data.args[0]);
 			var rm_arrpos = [];
 			var f = function(index, element)
 			{
@@ -497,8 +609,12 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 				}
 			};
 			/*try*/ {
-				$(this).jstree("get_unchecked",data.args[0], true).filter(filter).each(f);
-				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				$(this).jstree("get_unchecked", data.args[0], true).filter(filter).each(f);
+				if (data.args[0].parentNode) {
+					$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				} else {
+					console.log("parent is null");
+				}
 				if (overlay && rm_arrpos.length) {
 					overlay.remove(rm_arrpos);
 					overlay.draw();
@@ -509,6 +625,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 		/*}).bind("before.jstree", function(event, data) {
 			console.log("before.jstree: " + data.func + " " + data.args[0]);*/
 		}).bind("check_node.jstree", function(event, data) {
+			//console.log("check_node " + data + " " + data.args[0]);
 			if (check_node_inhibit) {
 				return;
 			}
@@ -560,14 +677,17 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			
 			/*try*/ {
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
-				$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				if (data.args[0].parentNode) {
+					$(data.args[0].parentNode.parentNode).filter(filter).each(f);
+				}
 			} /*catch(f) {
 				console.log("get_checked error: " + f);
 			}*/
 			//				jtree.jstree("get_checked", data.args[0], true).each(f);
 			//				$(data.args[0].parentNode.parentNode).each(f);
-			if (!bounds.isEmpty())
+			if (!bounds.isEmpty()) {
 				map.panToBounds(bounds);
+			}
 			check_node_inhibit = false;
 			if (overlay) {
 				overlay.draw();

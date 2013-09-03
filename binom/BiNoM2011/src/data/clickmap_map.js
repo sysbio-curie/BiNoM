@@ -19,7 +19,13 @@
  */
 
 var filter = ".navicell";
+var old_marker_mode = "1";
 
+var medium_icon;
+var small_icon;
+var big_icon;
+
+/*
 var jtree;
 var map;
 var projection;
@@ -29,15 +35,11 @@ var maps;
 
 var new_markers;
 
-var medium_icon;
-var small_icon;
-var big_icon;
-
 var marker_list = [];
+var checked_elements = {};
 
 var refreshing = false;
-var old_marker_mode = "1";
-var check_elements = {};
+*/
 
 function setup_icons()
 {
@@ -213,7 +215,7 @@ function show_markers_ref(markers, ref)
 //					alert("show_markers_ref lookup " + this + " for " + id);
 					get_markers_for_modification(this, projection, map);
 					if (navicell.dataset) {
-						var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, this.id);
+						var gene_info = navicell.dataset.getGeneInfoByModifId(window.document.navicell_module_name, this.id);
 						if (gene_info) {
 							array_push_all(overlay.arrpos, gene_info[1]);
 						}
@@ -278,12 +280,17 @@ function jstree_refresh(partial)
 		}
 
 		overlay.reset();
-		for (var element_id in check_elements) {
-			var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element_id);
-			if (gene_info) {
-				array_push_all(overlay.arrpos, gene_info[1]);
+		var cnt = 0;
+		for (var element_id in checked_elements) {
+			if (checked_elements[element_id]) {
+				var gene_info = navicell.dataset.getGeneInfoByModifId(window.document.navicell_module_name, element_id);
+				if (gene_info) {
+					array_push_all(overlay.arrpos, gene_info[1]);
+				}
+				cnt++;
 			}
 		}
+		console.log("cnt: " + cnt);
 		overlay.draw();
 		return;
 	}
@@ -593,9 +600,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			{
 				if (navicell.dataset) {
 					if (element.id) {
-						check_elements[element.id] = false;
+						checked_elements[element.id] = false;
 					}
-					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
+					var gene_info = navicell.dataset.getGeneInfoByModifId(window.document.navicell_module_name, element.id);
 					if (gene_info) {
 						array_push_all(rm_arrpos, gene_info[1]);
 					}
@@ -653,9 +660,9 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 				
 				if (navicell.dataset) {
 					if (element.id) {
-						check_elements[element.id] = true;
+						checked_elements[element.id] = true;
 					}
-					var gene_info = navicell.dataset.getGeneInfoByModifId(navicell_module_name, element.id);
+					var gene_info = navicell.dataset.getGeneInfoByModifId(window.document.navicell_module_name, element.id);
 					if (gene_info) {
 						array_push_all(overlay.arrpos, gene_info[1]);
 					}

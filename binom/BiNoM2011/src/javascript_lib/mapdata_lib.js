@@ -274,12 +274,12 @@ Dataset.prototype = {
 		return true;
 	},
 
-	drawDLO: function(context, scale, gene_name, topx, topy) {
+	drawDLO: function(overlay, context, scale, gene_name, topx, topy) {
 		var size = 2;
 		console.log("Drawing " + gene_name);
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
 		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
-		draw_heatmap(context, scale, gene_name, topx, topy);
+		draw_heatmap(overlay, context, scale, gene_name, topx, topy);
 		//var gene = this.getGeneByName(gene_name);
 	},
 
@@ -313,11 +313,113 @@ function is_empty_value(value) {
 function step_color_count_change(id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
-		var value = $("#step_color_count_" + id).val();
+		var value = $("#step_config_count_" + id).val();
 		console.log("value: " + value);
 		datatable.displayStepConfig.setStepCount(value);
 	}
 }
+
+function DisplayDiscreteConfig(datatable) {
+	this.datatable = datatable;
+	this.values = [];
+	for (var value in datatable.getDiscreteValues()) {
+		this.values.push(value);
+	}
+	this.buildDiv();
+	this.buildValues();
+}
+
+DisplayDiscreteConfig.prototype = {
+	
+	buildDiv: function() {
+
+		var id = this.datatable.getId();
+		var div_id = "discrete_config_" + id;
+		var html = "<div class='discrete-config' id='" + div_id + "'>\n";
+		html += "<h3 id='discrete_config_title_" + id + "'></h3>";
+		html += "<table class='discrete-config-table' id='discrete_config_table_" + id + "'>";
+		html += "</table>";
+
+		html += "</div>";
+		this.div_id = div_id;
+		$('body').append(html);
+	},
+
+	buildValues: function() {
+		var size = this.values.length;
+		this.colors = new Array(size);
+		this.sizes = new Array(size);
+		this.shapes = new Array(size);
+		this.update();
+	},
+
+	getValueAt: function(idx) {
+		return this.values[idx];
+	},
+
+	getColorAt: function(idx) {
+		return this.colors[idx];
+	},
+
+	getSizeAt: function(idx) {
+		return this.sizes[idx];
+	},
+
+	getShapeAt: function(idx) {
+		return this.shapes[idx];
+	},
+
+	getColor: function(value) {
+		return this.colors[this.getStepIndex(value)];
+	},
+
+	update: function() {
+		var id = this.datatable.getId();
+		var table = $("#discrete_config_table_" + id);
+		table.children().remove();
+		var html = "<thead>";
+		html += "<th>Values</th>";
+		html += "<th>Color</th>";
+		html += "<th>Size</th>";
+		html += "<th>Shape</th>";
+		html += "</thead><tbody>";
+		var step_cnt = this.values.length;
+		for (var idx = 0; idx < step_cnt; idx++) {
+			html += "<tr>";
+			var value = this.getValueAt(idx);
+			if (value == '') {
+				value = "<span style='font-style: italic;'>empty</span>";
+			}
+			html += "<td>" + value + "</td>";
+			html += "<td><input id='discrete_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
+			html += "<td><select id='discrete_size_" + id + "_" + idx + "'>";
+			html += "<option value='_none_'>Choose a size</option>";
+			var selsize = this.getSizeAt(idx);
+			for (var size = 2; size < 7; size += 1) {
+				var size2 = 2*size;
+				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
+			}
+			html += "</select></td>";
+			html += "<td><select id='discrete_shape_" + id + "_" + idx + "'>";
+			html += "<option value='_none_'>Choose a shape</option>";
+			var selshape = this.getShapeAt(idx);
+			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shape + "</option>";
+			}
+			html += "</select></td>";
+			html += "</tr>\n";
+		}
+
+		html += "</tbody>";
+		table.append(html);
+
+		var title = $("#discrete_config_title_" + id);
+		title.html("Datatable " + this.datatable.name + ": Display Configuration (Discrete)");
+
+		jscolor.init();
+	}
+};
 
 function DisplayStepConfig(datatable) {
 	this.datatable = datatable;
@@ -435,7 +537,7 @@ DisplayStepConfig.prototype = {
 
 	update: function() {
 		var id = this.datatable.getId();
-		var table = $("#step_color_table_" + id);
+		var table = $("#step_config_table_" + id);
 		table.children().remove();
 		var html = "<thead>";
 		html += "<th>Less than</th>";
@@ -452,7 +554,7 @@ DisplayStepConfig.prototype = {
 			} else {
 				html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "'></input></td>";
 			}
-			html += "<td><input id='step_color_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			html += "<td><input id='step_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
 			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
 			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a size</option>";
@@ -475,72 +577,27 @@ DisplayStepConfig.prototype = {
 		html += "</tbody>";
 		table.append(html);
 
-		var count = $("#step_color_count_" + id);
+		var count = $("#step_config_count_" + id);
 
-		var title = $("#step_color_title_" + id);
-		title.html(this.datatable.name + " Preferences");
+		var title = $("#step_config_title_" + id);
+		title.html("Datatable " + this.datatable.name + ": Display Configuration (Continuous)");
 
 		jscolor.init();
 	},
 
 	buildDiv: function(step_cnt) {
 		var id = this.datatable.getId();
-		var div_id = "step_color_" + id;
-		var html = "<div class='step-color' id='" + div_id + "'>\n";
-		html += "<h3 id='step_color_title_" + id + "'></h3>";
-		html += "<table class='step-color-table' id='step_color_table_" + id + "'>";
-		/*
-		html += "<thead>";
-		html += "<th>Less than</th>";
-		html += "<th>Color</th>";
-		html += "<th>Size</th>";
-		html += "<th>Shape</th>";
-		html += "</thead><tbody>";
-		html += "<tr><td>Minimum " + this.datatable.minval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
-		for (var idx = 0; idx < step_cnt; idx++) {
-			html += "<tr>";
-			html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "'></input></td>";
-			//html += "<td><input id='step_color_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
-			html += "<td><input class='color' value='" + "000000" + "'></input></td>";
-			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
-			html += "<option value='_none_'>Choose a size</option>";
-			var selsize = this.getSizeAt(idx);
-			for (var size = 2; size < 7; size += 1) {
-				var size2 = 2*size;
-				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
-			}
-			html += "</select></td>";
-			html += "<td><select id='step_shape_" + id + "_" + idx + "'>";
-			html += "<option value='_none_'>Choose a shape</option>";
-			var selshape = this.getShapeAt(idx);
-			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shape + "</option>";
-			}
-			html += "</select></td>";
-			html += "</tr>\n";
-		}
-		html += "<tr><td>Maximum " + this.datatable.maxval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
-		html += "</tbody>";
-		*/
+		var div_id = "step_config_" + id;
+		var html = "<div class='step-config' id='" + div_id + "'>\n";
+		html += "<h3 id='step_config_title_" + id + "'></h3>";
+		html += "<table class='step-config-table' id='step_config_table_" + id + "'>";
 		html += "</table>";
 
-		html += "<BR/><BR/>Step Count <select id='step_color_count_" + id + "' onchange='step_color_count_change(" + id + ")'>";
+		html += "<BR/><BR/>Step Count <select id='step_config_count_" + id + "' onchange='step_color_count_change(" + id + ")'>";
 		for (var step = 3; step < 12; ++step) {
 			html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
 		}
 		html += "</select>";
-
-		/*
-		html += "<div class='buttonpane'>";
-		html += "<table border='0'>";
-		html += "<tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td><td>";
-		html += make_button("Cancel", "step_cancel_" + id, "step_cancel(" + id + ")");
-		html += "</td><td>";
-		html += make_button("Apply", "step_apply_" + id, "step_apply(" + id + ")");
-		html += "</td></tr>";
-		html += "</table></div>";
-		*/
-
 		html += "</div>";
 
 		this.div_id = div_id;
@@ -561,6 +618,35 @@ HeatmapConfig.prototype = {
 	reset: function() {
 		this.datatables = [];
 		this.samples_or_groups = [];
+		this.setSize(4);
+		this.setScaleSize(4);
+	},
+
+	setSize: function(size) {
+		this.size = size*1.;
+	},
+
+	setScaleSize: function(scale_size) {
+		this.scale_size = scale_size*1;
+		console.log("setScaleSize: " + scale_size + " " + this.scale_size);
+	},
+
+	getSize: function() {
+		return this.size;
+	},
+
+	getScaleSize: function() {
+		return this.scale_size;
+	},
+
+	getScale: function(scale) {
+		if (this.scale_size == 0) {
+			return 1;
+		}
+		if (this.scale_size == 1) {
+			return scale*1;
+		}
+		return Math.sqrt(scale*1.)/(this.scale_size-1);
 	},
 
 	shrink: function() {
@@ -638,6 +724,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
+	this.discrete_values = {};
 
 	this.setName(name);
 
@@ -775,9 +862,13 @@ Datatable.prototype = {
 			this.displayDiscreteConfig = null;
 		} else {
 			this.displayStepConfig = null;
-			this.displayDiscreteConfig = null; // new DisplayDiscreteConfig(this);
+			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
 		}
 		this.makeGeneView();
+	},
+
+	getDiscreteValues: function() {
+		return this.discrete_values;
 	},
 
 	makeGeneView: function() {
@@ -920,7 +1011,42 @@ Datatable.prototype = {
 				}
 			}
 		}
+		if (!this.biotype.isContinuous()) {
+			this.discrete_values[value] = 1;
+		}
 		this.data[gene_nn][sample_nn] = value;
+	},
+
+	getSampleCount: function(gene_name) {
+		var gene_idx = this.gene_index[gene_name];
+		if (gene_idx == undefined) {
+			return -1;
+		}
+		var cnt = 0;
+		for (var sample_name in this.sample_index) {
+			var value = this.data[gene_idx][this.sample_index[sample_name]];
+			if (value != '') {
+				cnt++;
+			}
+		}
+		
+		return cnt;
+	},
+
+	getGeneCount: function(sample_name) {
+		var sample_idx = this.sample_index[sample_name];
+		if (sample_idx == undefined) {
+			return -1;
+		}
+		var cnt = 0;
+		for (var gene_name in this.gene_index) {
+			var value = this.data[this.gene_index[gene_name]][sample_idx];
+			if (value != '') {
+				cnt++;
+			}
+		}
+		
+		return cnt;
 	},
 
 	/*
@@ -952,8 +1078,9 @@ function DrawingConfig() {
 	this.display_markers = 1;
 	this.display_old_markers = 1;
 
-	this.display_charts = 0; // 1 for heatmap, 2 for barplot, 3 for piechart
+	this.display_charts = 1; // 1 for heatmap, 2 for barplot, 3 for piechart
 	this.heatmap_config = new HeatmapConfig();
+	this.editing_heatmap_config = new HeatmapConfig();
 	//this.barplot_config = new BarplotConfig();
 	//this.piechart_config = new PiechartConfig();
 

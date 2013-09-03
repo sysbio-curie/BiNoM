@@ -551,23 +551,46 @@ div.tablesorterPager input {
 }
 */
 
-.step-color {
+.step-config {
     font-size: 80%;
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
-.step-color h3 {
+.step-config h3 {
     margin-top: 20px;
     text-align: center;
 }
 
-.step-color-table thead {
+.step-config-table thead {
     background-color: rgb(0, 0, 60);
     color: white;
     text-align: center;
 }
 
-.step-color-table tbody {
+.step-config-table tbody {
+    /*    text-align: center; */
+    /*    background-color: rgb(200, 238, 0) */
+    background-color: white;
+    color: #222222;
+}
+
+.discrete-config {
+    font-size: 80%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+}
+
+.discrete-config h3 {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.discrete-config-table thead {
+    background-color: rgb(0, 0, 60);
+    color: white;
+    text-align: center;
+}
+
+.discrete-config-table tbody {
     /*    text-align: center; */
     /*    background-color: rgb(200, 238, 0) */
     background-color: white;
@@ -666,6 +689,9 @@ div.tablesorterPager input {
 }
 
 #gene_choice {
+    border-top: solid;
+    border-width: 1px;
+    border-color: gray;
     margin-top: 20px;
     padding-top: 20px;
     font-size: small;
@@ -676,10 +702,16 @@ div.tablesorterPager input {
     margin-bottom: 10px;
     padding-bottom: 10px;
     font-style: italic;
+    color: #CC6C00;
 }
 
 .tree-control {
     font-size: small;
     text-decoration: none;
     color: #FF8C00;
+}
+
+#heatmap_editor_size_div {
+    margin-top: 15px;
+    font-size: x-small;
 }

@@ -4827,6 +4827,7 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.position.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.resizable.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.button.js\"></script>");
+			out.println("<script type='text/javascript'>var glob1 = \"" + map_name + "\";</script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.dialog.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.tabs.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");
@@ -4840,12 +4841,28 @@ public class ProduceClickableMap
 		out.println("<script type='text/javascript'>");
 
 		if (NV2) {
-			out.println("  var navicell_module_name = \"" + map_name + "\";");
+			//out.println("  var navicell_module_name = \"" + map_name + "\";");
+			out.println("  window.document.navicell_module_name = \"" + map_name + "\";");
+			out.println("  var glob2 = \"" + map_name + "\";");
 		} else {
 			out.println("  var navicell = {};");
 			out.println("  var navicell_module_name = null;");
 		}
 		out.println("  var overlay;");
+		out.println("  var jtree;");
+		out.println("  var map;");
+		out.println("  var projection;");
+		out.println("  var to_open;");
+
+		out.println("  var maps;");
+
+		out.println("  var new_markers;");
+
+
+		out.println("  var marker_list = [];");
+
+		out.println("  var refreshing = false;");
+		out.println("  var checked_elements = {};");
 
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
 

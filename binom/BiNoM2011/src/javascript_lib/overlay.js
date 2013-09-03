@@ -173,7 +173,7 @@ USGSOverlay.prototype.draw = function() {
 //			this.context.fillRect(pix.x-div.left, pix.y-div.top, size*scale, size*scale);
 			//this.context.fillRect(pix.x-div.left, pix.y-div.top, (size+2)*scale, size*scale);
 			*/
-			navicell.dataset.drawDLO(this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+			navicell.dataset.drawDLO(this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 		}
 		
 		/*

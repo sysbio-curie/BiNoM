@@ -228,6 +228,8 @@ $(function() {
 			"Apply": function() {
 				// heatmap_editor
 				heatmap_editor_apply(navicell.drawing_config.heatmap_config);
+				// ??
+				heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
 				/*
 				var sample_cnt = mapSize(navicell.dataset.samples);
 				var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -648,11 +650,9 @@ function update_datatable_status_table(doc, params) {
 		}
 		str += "<td>" + mapSize(datatable.gene_index) + "</td>";
 		str += "<td>" + mapSize(datatable.sample_index) + "</td>";
-		/*
 		if (!update) {
-			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='navicell.getDatatableById(" + datatable.getId() + ").showDisplayConfig()'>preferences</a></td>";
+			str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='navicell.getDatatableById(" + datatable.getId() + ").showDisplayConfig()'>display configuration</a></td>";
 		}
-		*/
 		str += "</tr>";
 	}
 	table.append(str);
@@ -757,27 +757,11 @@ Datatable.prototype.showDisplayConfig = function() {
 				"Apply": function() {
 					var datatable = navicell.getDatatableById(datatable_id);
 					var displayStepConfig = datatable.displayStepConfig;
-					
-					var prev_value = datatable.minval;
-					var error = 0;
-					var step_cnt = displayStepConfig.getStepCount();
-					for (var idx = 0; idx < step_cnt; ++idx) {
-						var value;
-						if (idx == step_cnt-1) {
-							value = datatable.maxval;
-						} else {
-							value = $("#step_value_" + datatable_id + "_" + idx).val();
-						}
-						value *= 1.;
-						if (value <= prev_value) {
-							// should pop an error dialog
-							error = 1;
-							break;
-						}
-						prev_value = value;
-					}
-					
-					if (!error) {
+					var displayDiscreteConfig = datatable.displayDiscreteConfig;
+					if (displayStepConfig) {
+						var prev_value = datatable.minval;
+						var error = 0;
+						var step_cnt = displayStepConfig.getStepCount();
 						for (var idx = 0; idx < step_cnt; ++idx) {
 							var value;
 							if (idx == step_cnt-1) {
@@ -785,22 +769,51 @@ Datatable.prototype.showDisplayConfig = function() {
 							} else {
 								value = $("#step_value_" + datatable_id + "_" + idx).val();
 							}
-							var color = $("#step_config_" + datatable_id + "_" + idx).val();
-							var size = $("#step_size_" + datatable_id + "_" + idx).val();
-							var shape = $("#step_shape_" + datatable_id + "_" + idx).val();
-							displayStepConfig.setStepInfo(idx, value, color, size, shape);
+							value *= 1.;
+							if (value <= prev_value) {
+								// should pop an error dialog
+								error = 1;
+								break;
+							}
+							prev_value = value;
 						}
-						datatable.refresh();
-						update_status_tables();
-						//update_heatmap_editor(); // ??
-						jstree_refresh(true);
+						
+						if (!error) {
+							for (var idx = 0; idx < step_cnt; ++idx) {
+								var value;
+								if (idx == step_cnt-1) {
+									value = datatable.maxval;
+								} else {
+									value = $("#step_value_" + datatable_id + "_" + idx).val();
+								}
+								var color = $("#step_config_" + datatable_id + "_" + idx).val();
+								var size = $("#step_size_" + datatable_id + "_" + idx).val();
+								var shape = $("#step_shape_" + datatable_id + "_" + idx).val();
+								displayStepConfig.setStepInfo(idx, value, color, size, shape);
+							}
+						}
 					}
+					if (displayDiscreteConfig) {
+						var value_cnt = displayDiscreteConfig.getValueCount();
+						for (var idx = 0; idx < value_cnt; ++idx) {
+							var color = $("#discrete_config_" + datatable_id + "_" + idx).val();
+							var size = $("#discrete_size_" + datatable_id + "_" + idx).val();
+							var shape = $("#discrete_shape_" + datatable_id + "_" + idx).val();
+							displayDiscreteConfig.setValueInfo(idx, color, size, shape);
+						}
+					}
+					datatable.refresh();
+					update_status_tables();
+					//update_heatmap_editor(); // ??
+					jstree_refresh(true);
 				},
 
 				"Cancel": function() {
 					var datatable = navicell.getDatatableById(datatable_id);
-					var displayStepConfig = datatable.displayStepConfig;
-					displayStepConfig.update();
+					var displayConfig = datatable.getDisplayConfig();
+					if (displayConfig) {
+						displayConfig.update();
+					}
 				}
 			}
 		});
@@ -820,7 +833,7 @@ function heatmap_editor_set_editing(val, idx) {
 	//$("#gene_choice").css("visibility", val ? "hidden" : "visible");
 	if (val) {
 		if (true) {
-			navicell.drawing_config.editing_heatmap_config.reset();
+			//navicell.drawing_config.editing_heatmap_config.reset();
 			heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
 			//update_heatmap_editor(window.document, null, heatmap_config);
 			update_heatmap_editor(null, null, navicell.drawing_config.editing_heatmap_config);
@@ -880,7 +893,8 @@ function step_display_config(idx) {
 
 function update_heatmap_editor(doc, params, heatmapConfig) {
 	if (!heatmapConfig) {
-		heatmapConfig = navicell.drawing_config.heatmap_config;
+		//heatmapConfig = navicell.drawing_config.heatmap_config;
+		heatmapConfig = navicell.drawing_config.editing_heatmap_config;
 	}
 	var table = $("#heatmap_editor_table", doc);
 	var sel_gene_id = $("#select_gene", doc).val();
@@ -1007,7 +1021,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	html == "</tr>";
 
 	var scale_size = heatmapConfig.getScaleSize();
-	console.log("size: " + size + " " + scale_size + " " + (scale_size == 4));
+	//console.log("size: " + size + " " + scale_size + " " + (scale_size == 4));
 	html += "<tr><td>&nbsp;</td>";
 	html += "<td><select id='heatmap_editor_scale_size' onchange='heatmap_editor_set_editing(true)'>\n";
 	html += "<option value='0'" + (scale_size == 0 ? " selected" : "") +">Do not depend on scale</option>\n";
@@ -1019,7 +1033,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	html += "</select><td>";
 	html += "</tr></table>";
 
-	console.log("HTML [" + html + "]");
+	//console.log("HTML [" + html + "]");
 	$("#heatmap_editor_size_div", doc).html(html);
 
 	html = "Apply this configuration to gene:&nbsp;";
@@ -1053,7 +1067,7 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 	//console.log("sample_group_cnt: " + sample_group_cnt + " scale:" + scale);
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
-		if (datatable.displayStepConfig) {
+		/*if (datatable.displayStepConfig)*/ {
 			datatable_cnt++;
 		}
 	}
@@ -1073,11 +1087,12 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 	topy -= cell_h * datatable_cnt + 4;
 	var start_y = topy;
 
+	console.log("datatable_cnt: " + datatable_cnt);
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var start_x = topx;
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		if (!sel_datatable) {
-			//console.log("no line");
+			console.log("no line");
 			continue;
 		}
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
@@ -1087,6 +1102,7 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 				var value = sel_datatable.getValue(sel_sample.name, gene_name);
 				//var style = sel_datatable.getStyle(value);
 				var bg = sel_datatable.getBG(value);
+				console.log("value: " + value + " " + bg);
 				if (bg) {
 					var fg = getFG_from_BG(bg);
 					//console.log("value: " + value + " bg:" + bg + " fg: " + fg);

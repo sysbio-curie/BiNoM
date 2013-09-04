@@ -270,6 +270,8 @@ Dataset.prototype = {
 		this.datatables[new_datatable_name] = datatable;
 		if (datatable.displayStepConfig) {
 			datatable.displayStepConfig.update();
+		} else if (datatable.displayDiscreteConfig) {
+			datatable.displayDiscreteConfig.update();
 		}
 		return true;
 	},
@@ -322,11 +324,18 @@ function step_color_count_change(id) {
 function DisplayDiscreteConfig(datatable) {
 	this.datatable = datatable;
 	this.values = [];
+	this.values_idx = {};
 	for (var value in datatable.getDiscreteValues()) {
 		this.values.push(value);
 	}
+	this.values.sort();
+	for (var idx = 0; idx < this.values.length; ++idx) {
+		var value = this.values[idx];
+		this.values_idx[value] = idx;
+	}
 	this.buildDiv();
 	this.buildValues();
+	this.setDefaults();
 }
 
 DisplayDiscreteConfig.prototype = {
@@ -357,6 +366,28 @@ DisplayDiscreteConfig.prototype = {
 		return this.values[idx];
 	},
 
+	getValueCount: function() {
+		return this.values.length;
+	},
+
+	setValueInfo: function(idx, color, size, shape) {
+		if (idx < this.colors.length) {
+			console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
+			this.colors[idx] = color;
+			this.sizes[idx] = size;
+			this.shapes[idx] = shape;
+		}
+	},
+
+	setDefaults: function() {
+		this.setValueInfo(0, "F7FF19", 4, 0);
+		this.setValueInfo(1, "D6ECFF", 6, 1);
+		this.setValueInfo(2, "19FF57", 8, 2);
+		this.setValueInfo(3, "6421FF", 10, 3);
+		this.setValueInfo(4, "E64515", 12, 4);
+		this.update();
+	},
+
 	getColorAt: function(idx) {
 		return this.colors[idx];
 	},
@@ -370,7 +401,11 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	getColor: function(value) {
-		return this.colors[this.getStepIndex(value)];
+		var idx = this.values_idx[value];
+		if (idx != undefined) {
+			return this.colors[idx];
+		}
+		return '';
 	},
 
 	update: function() {
@@ -901,9 +936,17 @@ Datatable.prototype = {
 		}
 	},
 
-	getBG: function(value) {
+	getDisplayConfig: function() {
 		if (this.displayStepConfig) {
-			return this.displayStepConfig.getColor(value);
+			return this.displayStepConfig;
+		}
+		return this.displayDiscreteConfig;
+	},
+
+	getBG: function(value) {
+		var displayConfig = this.getDisplayConfig();
+		if (displayConfig) {
+			return displayConfig.getColor(value);
 		}
 		return '';
 	},
@@ -967,14 +1010,8 @@ Datatable.prototype = {
 		var sample_idx = this.sample_index[sample_name];
 		if (gene_idx != undefined && sample_idx != undefined) {
 			return this.data[gene_idx][sample_idx];
-			/*
-			var gene_data = this.data[gene_idx];
-			if (gene_data) {
-				return gene_data[sample_idx];
-			}
-			*/
 		}
-		return null;
+		return '';
 	},
 
 	makeDataTable_samples: function() {

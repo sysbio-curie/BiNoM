@@ -62,6 +62,27 @@ USGSOverlay.prototype.onAdd = function() {
 
 	// ....
 
+	google.maps.event.addListener(this.getMap(), 'mousemove', function(e, e2) {
+		var x = e.pixel.x;
+		var y = e.pixel.y;
+		var found = false;
+		for (var nn = 0; nn < overlay.boundBoxes.length; ++nn) {
+			var box = overlay.boundBoxes[nn][0];
+			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
+				found = true;
+				break;
+			}
+		}
+		//console.log("mousedown: " + maps[overlay.map_.map_name].document.body.cursor + " " + found + " " + e.document);
+		var map_name = overlay.map_.map_name;
+		var cursor = found ? 'pointer' : 'default';
+		//console.log("mousedown: " + found + " " + cursor);
+		if (overlay.cursor != cursor) {
+			console.log("changing cursor");
+			overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
+			overlay.cursor = cursor;
+		}
+	});
 	this.setMap(this.map_);
 
 	var div = document.createElement('div');
@@ -135,7 +156,6 @@ USGSOverlay.prototype.draw = function() {
 	}
 	this.resize();
 
-	console.log("overlay.DRAW " + this.arrpos.length);
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 	this.boundBoxes = [];
 
@@ -194,7 +214,6 @@ USGSOverlay.prototype.draw = function() {
 }
 
 USGSOverlay.prototype.reset = function() {
-	console.log("resetting overlay");
 	this.arrpos = [];
 }
 

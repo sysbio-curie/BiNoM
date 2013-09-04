@@ -758,6 +758,8 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	new_markers = Array();
 
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
+	map.map.map_name = map_name;
+
 	var whenready = function(e, data)
 	{
 		console.log("when ready", to_open);

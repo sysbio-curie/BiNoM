@@ -82,9 +82,13 @@ $(function() {
 						status.html("");
 
 						datatable.ready.then(function() {
-							status.html("Import Successful<br/>Genes: " + mapSize(datatable.gene_index) + "<br/>" + "Samples: " + mapSize(datatable.sample_index));
-							navicell.annot_factory.sync();
-							update_status_tables();
+							if (datatable.error) {
+								error_message(datatable.error);
+							} else {
+								status.html("Import Successful<br/>Genes: " + mapSize(datatable.gene_index) + "<br/>" + "Samples: " + mapSize(datatable.sample_index));
+								navicell.annot_factory.sync();
+								update_status_tables();
+							}
 						});
 						
 						/*
@@ -228,45 +232,11 @@ $(function() {
 			"Apply": function() {
 				// heatmap_editor
 				heatmap_editor_apply(navicell.drawing_config.heatmap_config);
-				// ??
+				// instead of calling this function again, it
+				// should be better to copy heatmap_config to
+				// editing_heatmap_config
 				heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
-				/*
-				var sample_cnt = mapSize(navicell.dataset.samples);
-				var group_cnt = mapSize(navicell.group_factory.group_map);
-				var sample_group_cnt = sample_cnt + group_cnt;
-				if (sample_group_cnt > MAX_HEATMAP_X) {
-					sample_group_cnt = MAX_HEATMAP_X;
-				}
-				for (var idx = 0; idx < sample_group_cnt; ++idx) {
-					var val = $("#heatmap_editor_gs_" + idx).val();
-					if (val == "_none_") {
-						navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, undefined);
-					} else {
-						var prefix = val.substr(0, 2);
-						var id = val.substr(2);
-						if (prefix == 'g_') {
-							console.log("group selected " + id + " at index " + idx);
-							var group = navicell.group_factory.getGroupById(id);
-							navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, group);
-						} else {
-							console.log("group selected " + id + " at index " + idx);
-							var sample = navicell.dataset.getSampleById(id);
-							navicell.drawing_config.heatmap_config.setSampleOrGroupAt(idx, sample);
-						}
-					}
-				}
-				var datatable_cnt = mapSize(navicell.dataset.datatables);
-				for (var idx = 0; idx < datatable_cnt; ++idx) {
-					var val = $("#heatmap_editor_datatable_" + idx).val();
-					if (val && val != "_none_") {
-						console.log("datatable selected " + val + " at index " + idx);
-						var datatable = navicell.getDatatableById(val);
-						navicell.drawing_config.heatmap_config.setDatatableAt(idx, datatable);
-					}
-				}
-				*/
 				navicell.drawing_config.heatmap_config.shrink();
-				//update_heatmap_editor();
 				update_status_tables();
 				heatmap_editor_set_editing(false);
 				jstree_refresh(true);
@@ -274,13 +244,11 @@ $(function() {
 			
 			"Clear": function() {
 				navicell.drawing_config.heatmap_config.reset();
-				//update_heatmap_editor();
 				update_status_tables();
 				heatmap_editor_set_editing(true);
 			},
 
 			"Cancel": function() {
-				//update_heatmap_editor();
 				update_status_tables();
 				heatmap_editor_set_editing(false);
 			}
@@ -325,9 +293,7 @@ function heatmap_editor_apply(heatmap_config)
 		}
 	}
 	heatmap_config.setSize($("#heatmap_editor_size").val());
-	console.log("here");
 	heatmap_config.setScaleSize($("#heatmap_editor_scale_size").val());
-	console.log("after: " + heatmap_config.getSize() + " " + heatmap_config.getScaleSize());
 }
 
 function update_sample_status_table(doc, params) {
@@ -541,7 +507,6 @@ function in_module_gene_count(module_name) {
 function update_gene_status_table(doc, params) {
 	var table = $("#dt_gene_status_table", doc);
 	var module_name = doc ? doc.navicell_module_name : "";
-	console.log("glob1 " + glob1 + " " + glob2 + " " + module_name);
 	table.children().remove();
 	// should use a string buffer
 	var str = "<thead><tr><th>Genes&nbsp;(" + mapSize(navicell.dataset.genes) + ")</th>";
@@ -738,10 +703,16 @@ function cancel_datatables() {
 
 Datatable.prototype.showDisplayConfig = function() {
 	var div_id = undefined;
+	var displayConfig = this.getDisplayConfig();
+	/*
 	if (this.displayStepConfig) {
 		div_id = this.displayStepConfig.div_id;
 	} else if (this.displayDiscreteConfig) {
 		div_id = this.displayDiscreteConfig.div_id;
+	}
+	*/
+	if (displayConfig) {
+		div_id = displayConfig.div_id;
 	}
 	console.log("div_id " + div_id);
 	if (div_id) {
@@ -822,7 +793,6 @@ Datatable.prototype.showDisplayConfig = function() {
 }
 
 function drawing_config_chart() {
-	//$("#heatmap_config_div").dialog("open");
 	$("#heatmap_editor_div").dialog("open");
 }
 
@@ -832,47 +802,14 @@ function heatmap_editor_set_editing(val, idx) {
 	$("#heatmap_editing").html(val ? "configuration not saved..." : "");
 	//$("#gene_choice").css("visibility", val ? "hidden" : "visible");
 	if (val) {
-		if (true) {
-			//navicell.drawing_config.editing_heatmap_config.reset();
-			heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
-			//update_heatmap_editor(window.document, null, heatmap_config);
-			update_heatmap_editor(null, null, navicell.drawing_config.editing_heatmap_config);
-		} else {
-			$("#heatmap_editor_table td.heatmap_cell").attr('style', '');
-			$("#heatmap_editor_table td.heatmap_cell").html('&nbsp;');
-			// <=>
-			/*
-			  $("#heatmap_editor_table td.cell").each(function() {
-			  $(this).html('&nbsp;');
-			  });
-			*/
-		}
+		heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
+		update_heatmap_editor(null, null, navicell.drawing_config.editing_heatmap_config);
 	}
 	// ok
 	if (idx != undefined && $("#heatmap_editor_datatable_" + idx).val() != '_none_') {
 		$("#heatmap_editor_datatable_config_" + idx).removeClass("zz-hidden");	
 	} else {
 		$("#heatmap_editor_datatable_config_" + idx).addClass("zz-hidden");	
-	}
-
-	if (0) {
-		var buttons = $("#heatmap_editor_div").parent().find(".ui-button-text");
-		buttons.each(function() {
-			var button  = $(this);
-			var text = button.text();
-			if (text == "Cancel" ) {
-				if (val) {
-					//button.parent().removeClass("zz-hidden");
-					/*button.parent().removeAttr("disabled");*/
-					button.parent().removeClass(".ui-state-disabled");
-					button.removeClass(".ui-state-disabled");
-				} else {
-					/*button.parent().attr("disabled", "disabled");*/
-					button.parent().addClass(".ui-state-disabled");
-					button.addClass(".ui-state-disabled");
-				}
-			}
-		});
 	}
 }
 
@@ -935,13 +872,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 
 	html += "</tr>\n";
 
-	var datatable_cnt = 0;
-	for (var datatable_name in navicell.dataset.datatables) {
-		var datatable = navicell.dataset.datatables[datatable_name];
-		/*if (datatable.displayStepConfig)*/ { // 2013-09-03: to reconnect
-			datatable_cnt++;
-		}
-	}
+	var datatable_cnt = mapSize(navicell.dataset.datatables);
 
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
@@ -951,28 +882,21 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		html += "<option value='_none_'>Choose a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
-			/*if (datatable.displayStepConfig)*/ { // 2013-09-03: to reconnect
-				var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-				html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
-			}
+			var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
+			html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
 		if (sel_gene && sel_datatable) {
 			var gene_name = sel_gene.name;
-			console.log("this case " + gene_name);
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 				var sel_group = heatmapConfig.getGroupAt(idx2);
 				var sel_sample = heatmapConfig.getSampleAt(idx2);
 				if (sel_sample) {
-					console.log("sel_sample at " + idx2 + " " + sel_sample.name);
-				}
-				if (sel_sample) {
 					var value = sel_datatable.getValue(sel_sample.name, gene_name);
 					var style = sel_datatable.getStyle(value);
-					console.log("value: " + value + " style:" + style);
-					/*html += "<td " + style + ">&nbsp;</td>";*/
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
 				} else if (sel_group) {
+					// TBD: will be replaced by sel_group.getValue(datatable, gene_name)
 					var total_value = 0;
 					var cnt = 0;
 					for (var sample_name in sel_group.samples) {
@@ -1021,7 +945,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	html == "</tr>";
 
 	var scale_size = heatmapConfig.getScaleSize();
-	//console.log("size: " + size + " " + scale_size + " " + (scale_size == 4));
 	html += "<tr><td>&nbsp;</td>";
 	html += "<td><select id='heatmap_editor_scale_size' onchange='heatmap_editor_set_editing(true)'>\n";
 	html += "<option value='0'" + (scale_size == 0 ? " selected" : "") +">Do not depend on scale</option>\n";
@@ -1033,7 +956,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	html += "</select><td>";
 	html += "</tr></table>";
 
-	//console.log("HTML [" + html + "]");
 	$("#heatmap_editor_size_div", doc).html(html);
 
 	html = "Apply this configuration to gene:&nbsp;";
@@ -1046,10 +968,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
 	}
 	html += "</select>";
-	//console.log("SELECT GENE [" + html + "]");
 	$("#gene_choice", doc).html(html);
-	//console.log("SELECT GENE2: " + $("#dt_import_type_select").length);
-	//$("#select_gene").html(html);
 }
 
 function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
@@ -1062,22 +981,9 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 	if (sample_group_cnt > MAX_HEATMAP_X) {
 		sample_group_cnt = MAX_HEATMAP_X;
 	}
-	var datatable_cnt = 0;
 
-	//console.log("sample_group_cnt: " + sample_group_cnt + " scale:" + scale);
-	for (var datatable_name in navicell.dataset.datatables) {
-		var datatable = navicell.dataset.datatables[datatable_name];
-		/*if (datatable.displayStepConfig)*/ {
-			datatable_cnt++;
-		}
-	}
+	var datatable_cnt = mapSize(navicell.dataset.datatables);
 
-	/*
-	var scale2 = Math.sqrt(scale*1.) / 3.;
-	console.log("scale: " + scale + " " + scale2);
-	var cell_w = 4*scale2; // does not depend on scale
-	var cell_h = 4*scale2;
-	*/
 	var scale2 = heatmapConfig.getScale(scale);
 	var size = heatmapConfig.getSize();
 	var cell_w = size*scale2;
@@ -1087,12 +993,10 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 	topy -= cell_h * datatable_cnt + 4;
 	var start_y = topy;
 
-	console.log("datatable_cnt: " + datatable_cnt);
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var start_x = topx;
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		if (!sel_datatable) {
-			console.log("no line");
 			continue;
 		}
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
@@ -1109,10 +1013,9 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 					context.fillStyle = "#" + bg;
 					context.fillRect(start_x, start_y, cell_w, cell_h);
 					start_x += cell_w;
-				} else {
-					//console.log("no value");
 				}
 			} else if (sel_group) {
+				// TBD: will be replaced by sel_group.getValue(datatable, gene_name)
 				var total_value = 0;
 				var cnt = 0;
 				for (var sample_name in sel_group.samples) {
@@ -1124,18 +1027,15 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 					}
 				}
 				if (cnt) {
-					//console.log("total_value: " + total_value + " " + cnt);
 					total_value = total_value/cnt;
+					/*
 					var bg = sel_datatable.getBG(value);
 					if (bg) {
 						var fg = getFG_from_BG(bg);
 						//console.log("value: " + total_value + " bg:" + bg + " fg: " + fg);
 					}
-				} else {
-					//console.log("no col");
+					*/
 				}
-			} else {
-				//console.log("no col2");
 			}
 		}
 		start_y += cell_h;

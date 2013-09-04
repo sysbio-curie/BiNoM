@@ -132,10 +132,13 @@ Dataset.prototype = {
 	},
 
 	readDatatable: function(biotype_name, name, file) {
-		var datatable =  new Datatable(this, biotype_name, name, file, this.datatable_id++);
-		if (!datatable.error) {
-			this.addDatatable(datatable);
-		}
+		var datatable = new Datatable(this, biotype_name, name, file, this.datatable_id++);
+		var dataset = this;
+		datatable.ready.then(function() {
+			if (!datatable.error) {
+				dataset.addDatatable(datatable);
+			}
+		});
 		return datatable;
 	},
 
@@ -496,6 +499,12 @@ DisplayStepConfig.prototype = {
 		this.shapes = new Array(step_cnt);
 		this.update();
 		this.datatable.refresh();
+		
+		var avg = (this.datatable.minval + this.datatable.maxval)/2;
+		var dt_values = this.datatable.getValues();
+		var posthr = getPositiveThreshold(dt_values, avg);
+		var negthr = getNegativeThreshold(dt_values, avg);
+		console.log("avg: " + avg + " " + posthr + " " + negthr);
 	},
 
 	setStepInfo: function(idx, value, color, size, shape) {
@@ -749,8 +758,11 @@ HeatmapConfig.prototype = {
 
 // TBD datatable id management
 function Datatable(dataset, biotype_name, name, file, datatable_id) {
+	var reader = new FileReader();
+	var ready = this.ready = $.Deferred(reader.onload);
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
+		ready.resolve();
 		return;
 	}
 	this.minval = Number.MAX_NUMBER;
@@ -777,12 +789,10 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.switch_button.css('background', 'white');
 	this.switch_button.css('color', 'darkblue');
 
-	var reader = new FileReader();
 	reader.readAsBinaryString(file);
 
 	var datatable = this;
 
-	var ready = this.ready = $.Deferred(reader.onload);
 	reader.onload = function() { 
 		var dataset = datatable.dataset;
 
@@ -793,10 +803,13 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 
 		var line = lines[0].split("\t");
 		var sample_cnt = line.length-1;
+		var samples_to_add = [];
+		var genes_to_add = [];
 		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
 			var sample_name = line[sample_nn+1];
 			if (sample_name.length > 1) {
-				dataset.addSample(sample_name);
+				//dataset.addSample(sample_name);
+				samples_to_add.push(sample_name);
 				datatable.sample_index[sample_name] = sample_nn;
 				//console.log("adding sample [" + sample_name + "] " + sample_name.length);
 			}
@@ -808,16 +821,33 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 			if (!navicell.mapdata.hugo_map[gene_name]) {
 				continue;
 			}
-			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
+			//dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
+			genes_to_add.push(gene_name);
 
 			datatable.gene_index[gene_name] = gene_nn;
 			datatable.data[gene_nn] = [];
 			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
 				var value = line[sample_nn+1];
 				//datatable.data[gene_nn][sample_nn] = value;
-				datatable.setData(gene_nn, sample_nn, value);
+				var err = datatable.setData(gene_nn, sample_nn, value);
+				if (err) {
+					console.log("data error");
+					datatable.error = "datatable " + name + " invalid data: " + err;
+					ready.resolve();
+					return;
+				}
 			}
 			++gene_nn;
+		}
+
+		// no error, so adding genes
+		for (var nn = 0; nn < samples_to_add.length; ++nn) {
+			dataset.addSample(samples_to_add[nn]);
+		}
+
+		for (var nn = 0; nn < genes_to_add.length; ++nn) {
+			var gene_name = genes_to_add[nn];
+			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
 		}
 
 		datatable.epilogue();
@@ -828,6 +858,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	reader.onerror = function(e) {  // If anything goes wrong
 		this.error = e.toString();
 		console.log("Error", e);    // Just log it
+		ready.resolve();
 	}
 }
 
@@ -966,23 +997,6 @@ Datatable.prototype = {
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
 		}
 		return '';
-
-/*
-		if (this.displayStepConfig) {
-			var color = this.displayStepConfig.getColor(value);
-			if (color) {
-				var rgb1 = color.substring(0, 2);
-				var rgb2 = color.substring(2, 4);
-				var rgb3 = color.substring(4, 6);
-				rgb1 = parseInt("0x" + rgb1)/256.;
-				rgb2 = parseInt("0x" + rgb2)/256.;
-				rgb3 = parseInt("0x" + rgb3)/256.;
-				var fg = 0.213 * rgb1 +	0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? '#FFF' : '#000';
-				return " style='background: #" + color + "; color: " + fg + "; text-align: center;'";
-			}
-		}
-		return '';
-*/
 	},
 
 	makeDataTable_genes: function() {
@@ -1034,24 +1048,39 @@ Datatable.prototype = {
 		return str;
 	},
 
+	getValues: function() {
+		var values = [];
+		for (var sample_name in this.sample_index) {
+			for (var gene_name in this.gene_index) {
+				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+				values.push(value);
+			}
+		}
+		return values;
+	},
+
 	setData: function(gene_nn, sample_nn, value) {
 		if (is_empty_value(value)) {
 			value = '';
 		} else {
 			var ivalue = parseFloat(value);
-			if (ivalue !== NaN) {
+			if (!isNaN(ivalue)) {
+				//console.log("ivalue: " + ivalue + " " + value);
 				if (ivalue < this.minval) {
 					this.minval = ivalue;
 				}
 				if (ivalue > this.maxval) {
 					this.maxval = ivalue;
 				}
+			} else if (this.biotype.isContinuous()) {
+				return "expected numeric value, got '" + value + "'";
 			}
 		}
 		if (!this.biotype.isContinuous()) {
 			this.discrete_values[value] = 1;
 		}
 		this.data[gene_nn][sample_nn] = value;
+		return '';
 	},
 
 	getSampleCount: function(gene_name) {
@@ -1085,28 +1114,6 @@ Datatable.prototype = {
 		
 		return cnt;
 	},
-
-	/*
-	showDisplayConfig: function() {
-		var div_id = undefined;
-		if (this.displayStepConfig) {
-			div_id = this.displayStepConfig.div_id;
-		} else if (this.displayDiscretConfig) {
-			div_id = this.displayDiscreteConfig.div_id;
-		}
-		console.log("div_id " + div_id);
-		if (div_id) {
-			var div = $("#" + div_id);
-			div.dialog({
-				autoOpen: false,
-				height: 550,
-				width: 700,
-				modal: false
-			});
-			div.dialog("open");
-		}
-	},
-	*/
 
 	getClass: function() {return "Datatable";}
 };
@@ -1421,6 +1428,24 @@ Group.prototype = {
 		return this.id;
 	},
 
+	getValue: function(datatable, gene_name) {
+		// TBD: computation method will depend on datatable also
+		var total_value = 0;
+		var cnt = 0;
+		for (var sample_name in this.samples) {
+			var value = datatable.getValue(sample_name, gene_name);
+			value *= 1.;
+			if (value) {
+				total_value += value;
+				cnt++;
+			}
+		}
+		if (cnt) {
+			return total_value/cnt;
+		}
+		return 0;
+	},
+
 	getClass: function() {return "Group";}
 };
 
@@ -1542,41 +1567,6 @@ BiotypeFactory.prototype = {
 		return this.biotypes[biotype_name];
 	}
 };
-
-/*
-function SampleFactory() {
-}
-
-SampleFactory.prototype = {
-	sample_map: {},
-
-	getSample: function(sample_name) {
-		if (!sample_map[sample_name]) {
-			sample_map[sample_name] = new Sample(sample_name);
-		}
-		return sample_map[sample_name];
-	},
-
-	getClass: function() {return "SampleFactory";}
-};
-
-function GeneFactory() {
-}
-
-GeneFactory.prototype = {
-	gene_map: {},
-
-	getGene: function(gene_name, entity_map) {
-		if (!gene_map[gene_name]) {
-			gene_map[gene_name] = new Gene(gene_name, entity_map);
-		}
-		return gene_map[gene_name];
-	},
-
-	getClass: function() {return "GeneFactory";}
-};
-*/
-
 
 //
 // Session class
@@ -1745,6 +1735,51 @@ function jquery_to_dom(obj) {
 }
 */
 
+function stddev(f) {
+	var x = 0;
+	var x2 = 0;
+	for (var i=0; i < f.length; i++){
+		x += f[i];
+		x2 += f[i]*f[i];
+	}
+	x /= f.length;
+	x2 /= f.length;
+	return Math.sqrt((x2-x*x)*f.length/(f.length-1));
+}
+
+function getPositiveThreshold(numbers, avg) {
+	var thresh = 1;
+	var positives = [];
+	for (var i=0; i < numbers.length; i++) {
+		var num = parseFloat(numbers[i]);
+		if (!isNaN(num)) {
+			if (num > avg) {
+				positives.push(num);
+				//positives.push(2*avg - num);
+				//positives.push(-num);
+			}
+		}
+	}
+
+	return avg + stddev(positives);
+}	
+
+function getNegativeThreshold(numbers, avg) {
+	var thresh = 1;
+	var negatives = [];
+	for (var i=0; i < numbers.length; i++) {
+		var num = parseFloat(numbers[i]);
+		if (!isNaN(num)) {
+			if (num < avg) {
+				//negatives.push(-num);
+				negatives.push(num);
+				//negatives.push(2*avg - num);
+			}
+		}
+	}
+	return avg - stddev(negatives);
+}
+	
 function getFG_from_BG(color) {
 	var rgb1 = color.substring(0, 2);
 	var rgb2 = color.substring(2, 4);

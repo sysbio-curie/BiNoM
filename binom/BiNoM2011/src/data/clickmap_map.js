@@ -290,7 +290,6 @@ function jstree_refresh(partial)
 				cnt++;
 			}
 		}
-		console.log("cnt: " + cnt);
 		overlay.draw();
 		return;
 	}

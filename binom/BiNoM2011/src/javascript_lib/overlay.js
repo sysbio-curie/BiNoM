@@ -51,7 +51,7 @@ USGSOverlay.prototype.onAdd = function() {
 			var box = overlay.boundBoxes[nn][0];
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
 				var gene_name = overlay.boundBoxes[nn][1];
-				console.log("click on: " + gene_name);
+				//console.log("click on: " + gene_name);
 				$("#select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
 				update_heatmap_editor();
 				$("#heatmap_editor_div").dialog("open");
@@ -73,12 +73,9 @@ USGSOverlay.prototype.onAdd = function() {
 				break;
 			}
 		}
-		//console.log("mousedown: " + maps[overlay.map_.map_name].document.body.cursor + " " + found + " " + e.document);
 		var map_name = overlay.map_.map_name;
 		var cursor = found ? 'pointer' : 'default';
-		//console.log("mousedown: " + found + " " + cursor);
 		if (overlay.cursor != cursor) {
-			console.log("changing cursor");
 			overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
 			overlay.cursor = cursor;
 		}
@@ -169,30 +166,12 @@ USGSOverlay.prototype.draw = function() {
 		var mapProjection = this.map_.getProjection();
 		var scale = Math.pow(2, this.map_.zoom);
 
-		//this.context.fillStyle = 'rgba(100, 30, 100, 1)';
-
 		//console.log("drawing " + arrpos.length + " points");
 		for (var nn = 0; nn < arrpos.length; ++nn) {
 			//var latlng = map.getProjection().fromPointToLatLng(arrpos[nn].p);
-			console.log("drawing: " + arrpos[nn].gene_name + " " + arrpos[nn].p.x + " " + arrpos[nn].p.y);
+			//console.log("drawing: " + arrpos[nn].gene_name + " " + arrpos[nn].p.x + " " + arrpos[nn].p.y);
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			
-			/*
-			//var mod3 = (nn % 3);
-			var mod3 = 2;
-			var size = mod3+1;
-			if (mod3 == 0) {
-				this.context.fillStyle = 'rgba(100, 30, 100, 1)';
-			} else if (mod3 == 1) {
-				this.context.fillStyle = 'rgba(200, 200, 50, 1)';
-			} else {
-				this.context.fillStyle = 'rgba(100, 200, 100, 1)';
-			}
-			console.log("Drawing " + arrpos[nn].gene_name);
-//			this.context.fillRect(pix.x-div.left, pix.y-div.top, size*scale, size*scale);
-			//this.context.fillRect(pix.x-div.left, pix.y-div.top, (size+2)*scale, size*scale);
-			*/
 			navicell.dataset.drawDLO(this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 		}
 		

@@ -157,7 +157,6 @@ Dataset.prototype = {
 
 	removeDatatable: function(datatable) {
 		if (this.datatables[datatable.name] == datatable) {
-			console.log("should remove " + datatable.name);
 			for (var sample_name in datatable.sample_index) {
 				var sample = this.samples[sample_name];
 				if (!--sample.refcnt) {
@@ -183,7 +182,7 @@ Dataset.prototype = {
 	},
 
 	syncModifs: function() {
-		console.log("syncModifs starting " + mapSize(this.genes));
+		//console.log("syncModifs starting " + mapSize(this.genes));
 		this.modifs_id = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
 			var module_name = navicell.module_names[jj];
@@ -209,7 +208,7 @@ Dataset.prototype = {
 					}
 				}
 			}
-			console.log("syncModifs " + module_name + " " + mapSize(this.modifs_id[module_name]));
+			//console.log("syncModifs " + module_name + " " + mapSize(this.modifs_id[module_name]));
 		}
 	},
 
@@ -281,7 +280,7 @@ Dataset.prototype = {
 
 	drawDLO: function(overlay, context, scale, gene_name, topx, topy) {
 		var size = 2;
-		console.log("Drawing " + gene_name);
+		//console.log("Drawing " + gene_name);
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
 		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
 		draw_heatmap(overlay, context, scale, gene_name, topx, topy);
@@ -319,7 +318,7 @@ function step_color_count_change(id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
 		var value = $("#step_config_count_" + id).val();
-		console.log("value: " + value);
+		//console.log("value: " + value);
 		datatable.displayStepConfig.setStepCount(value);
 	}
 }
@@ -375,7 +374,7 @@ DisplayDiscreteConfig.prototype = {
 
 	setValueInfo: function(idx, color, size, shape) {
 		if (idx < this.colors.length) {
-			console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
+			//console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
 			this.colors[idx] = color;
 			this.sizes[idx] = size;
 			this.shapes[idx] = shape;
@@ -483,7 +482,7 @@ DisplayStepConfig.prototype = {
 		this.values = [];
 		this.values.push(this.datatable.minval);
 		var step = (this.datatable.maxval - this.datatable.minval)/(step_cnt+1);
-		console.log("step_cnt: " + step_cnt + " step: " + step + " " + this.datatable.minval + " " + this.datatable.maxval);
+		//console.log("step_cnt: " + step_cnt + " step: " + step + " " + this.datatable.minval + " " + this.datatable.maxval);
 		//var step_cnt_1 = step_cnt-1;
 		for (var nn = 0; nn < step_cnt-1; ++nn) {
 			var value = this.datatable.minval + (nn+1)*step;
@@ -491,24 +490,27 @@ DisplayStepConfig.prototype = {
 			this.values.push(value);
 		}
 		this.values.push(this.datatable.maxval);
+		/*
 		for (var nn = 0; nn < this.values.length; ++nn) {
 			console.log("values[" + nn + "] = " + this.values[nn]);
 		}
+		*/
 		this.colors = new Array(step_cnt);
 		this.sizes = new Array(step_cnt);
 		this.shapes = new Array(step_cnt);
 		this.update();
 		this.datatable.refresh();
 		
+		// AZ code
 		var avg = (this.datatable.minval + this.datatable.maxval)/2;
 		var dt_values = this.datatable.getValues();
 		var posthr = getPositiveThreshold(dt_values, avg);
 		var negthr = getNegativeThreshold(dt_values, avg);
-		console.log("avg: " + avg + " " + posthr + " " + negthr);
+		//console.log("avg: " + avg + " " + posthr + " " + negthr);
 	},
 
 	setStepInfo: function(idx, value, color, size, shape) {
-		console.log("setting at " + idx + " " + value + " (== " + this.values[idx+1] + ") " + color + " " + size + " " + shape);
+		//console.log("setting at " + idx + " " + value + " (== " + this.values[idx+1] + ") " + color + " " + size + " " + shape);
 		if (value != Number.MIN_NUMBER) {
 			this.values[idx+1] = value;
 		}
@@ -672,7 +674,6 @@ HeatmapConfig.prototype = {
 
 	setScaleSize: function(scale_size) {
 		this.scale_size = scale_size*1;
-		console.log("setScaleSize: " + scale_size + " " + this.scale_size);
 	},
 
 	getSize: function() {
@@ -779,7 +780,10 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.sample_index = {};
 	this.data = [];
 
+	navicell.DTStatusMustUpdate = true;
+
 	var tab_body = $("#dt_datatable_tabs");
+
 	tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 	this.data_div = $("#dt_datatable_id" + this.id);
 	this.data_table = $("#dt_datatable_table_id" + this.id);
@@ -841,8 +845,10 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 		}
 
 		// no error, so adding genes
+		var has_new_samples;
 		for (var nn = 0; nn < samples_to_add.length; ++nn) {
-			dataset.addSample(samples_to_add[nn]);
+			var sample = dataset.addSample(samples_to_add[nn]);
+			has_new_samples = sample.refcnt == 1;
 		}
 
 		for (var nn = 0; nn < genes_to_add.length; ++nn) {
@@ -850,6 +856,9 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
 		}
 
+		if (has_new_samples) {
+			navicell.group_factory.buildGroups();
+		}
 		datatable.epilogue();
 		ready.resolve();
 		dataset.syncModifs();
@@ -883,7 +892,7 @@ Datatable.prototype = {
 	// an id but scanning the fill array => a map indexed by id (mind:
 	// multiple id per gene) is missing.
 	display_markers: function(module_name, _window) {
-		console.log("display_markers: " + module_name);
+		//console.log("display_markers: " + module_name);
 		var id_arr = [];
 		var arrpos = [];
 		for (var gene_name in this.gene_index) {
@@ -1399,11 +1408,16 @@ function Group(annots, values, id) {
 	this.samples = {};
 	this.id = id;
 	this.name = navicell.group_factory.buildName(annots, values);
+	this.methods = navicell.group_factory.getSavedMethods(this.name);
 	this.html_name = "";
 	for (var nn = 0; nn < annots.length; ++nn) {
 		this.html_name += (this.html_name.length > 0 ? "<br>" : "") + '<span class="group_name">' + annots[nn].replace(/ /g, '&nbsp;') + ':</span>&nbsp;<span class="group_value">' + values[nn].replace(/ /g, '&nbsp;')  + '</span>';
 	}
 }
+
+Group.CONTINUOUS_AVERAGE = "1";
+Group.CONTINUOUS_MINVAL = "2";
+Group.CONTINUOUS_MAXVAL = "3";
 
 Group.prototype = {
 	annots: [],
@@ -1428,22 +1442,83 @@ Group.prototype = {
 		return this.id;
 	},
 
+	setMethod: function(datatable, method) {
+		this.methods[datatable.getId()] = method;
+		update_status_tables();
+	},
+
+	getMethod: function(datatable) {
+		var method = this.methods[datatable.getId()];
+		if (method == undefined) {
+			if (datatable.biotype.isContinuous()) {
+				method = Group.CONTINUOUS_AVERAGE;
+			} else {
+				var values = datatable.getDiscreteValues();
+				var first_value;
+				for (first_value in values) {
+					break;
+				}
+				method = first_value + '+';
+			}
+			this.methods[datatable.getId()] = method;
+		}
+		return method;
+	},
+
 	getValue: function(datatable, gene_name) {
-		// TBD: computation method will depend on datatable also
-		var total_value = 0;
-		var cnt = 0;
+		var method = this.getMethod(datatable);
+		if (datatable.biotype.isContinuous()) {
+			if (method == Group.CONTINUOUS_AVERAGE) {
+				var total_value = 0;
+				var cnt = 0;
+				for (var sample_name in this.samples) {
+					var value = datatable.getValue(sample_name, gene_name);
+					value *= 1.;
+					if (value) {
+						total_value += value;
+						cnt++;
+					}
+				}
+				if (cnt) {
+					return total_value/cnt;
+				}
+				return undefined;
+			}
+			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL) {
+				var min = Number.MAX_NUMBER;
+				var max = Number.MIN_NUMBER;
+
+				for (var sample_name in this.samples) {
+					var value = datatable.getValue(sample_name, gene_name);
+					value *= 1.;
+					if (value < min) {
+						min = value;
+					}
+					if (value > max) {
+						max = value;
+					}
+				}
+				return method == Group.CONTINUOUS_MINVAL ? min : max;
+			}
+			return undefined;
+		}
+		var method_len = method.length;
+		var method_value = method.substring(0, method_len-1);
+		var all = method.substring(method_len-1, method_len) == '@';
+		var value_cnt = 0;
+		var sample_cnt = 0;
 		for (var sample_name in this.samples) {
 			var value = datatable.getValue(sample_name, gene_name);
-			value *= 1.;
-			if (value) {
-				total_value += value;
-				cnt++;
+			if (value == method_value) {
+				value_cnt++;
 			}
+			sample_cnt++;
 		}
-		if (cnt) {
-			return total_value/cnt;
+
+		if ((value_cnt > 0 && !all) || sample_cnt == value_cnt) {
+			return method_value;
 		}
-		return 0;
+		return undefined;
 	},
 
 	getClass: function() {return "Group";}
@@ -1456,6 +1531,7 @@ Group.prototype = {
 
 function GroupFactory() {
 	this.group_id = 1;
+	this.saved_methods = {};
 }
 
 GroupFactory.prototype = {
@@ -1493,7 +1569,17 @@ GroupFactory.prototype = {
 		return this.id;
 	},
 
+	getSavedMethods: function(group_name) {
+		var methods = this.saved_methods[group_name];
+		return methods ? methods : {};
+	},
+
 	buildGroups: function() {
+		this.saved_methods = {};
+		for (var group_name in this.group_map) {
+			var group = this.group_map[group_name];
+			this.saved_methods[group_name] = group.methods;
+		}
 		this.group_map = {};
 		for (var sample_name in navicell.dataset.samples) {
 			var sample = navicell.dataset.samples[sample_name];
@@ -1695,9 +1781,11 @@ function navicell_init() {
 	_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
 
 	_navicell.getDatatableById = function(id) {
+		/*
 		console.log("this.dataset: " + this.dataset.getClass() + " " + id);
 		console.log("-> datatable: " + this.dataset.getDatatableById(id));
 		console.log("-> datatable class: " + this.dataset.getDatatableById(id).getClass());
+		*/
 		return this.dataset.getDatatableById(id);
 	}
 

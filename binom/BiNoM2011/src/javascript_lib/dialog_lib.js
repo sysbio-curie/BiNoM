@@ -273,11 +273,11 @@ function heatmap_editor_apply(heatmap_config)
 			var prefix = val.substr(0, 2);
 			var id = val.substr(2);
 			if (prefix == 'g_') {
-				console.log("group selected " + id + " at index " + idx);
+				//console.log("group selected " + id + " at index " + idx);
 				var group = navicell.group_factory.getGroupById(id);
 				heatmap_config.setSampleOrGroupAt(idx, group);
 			} else {
-				console.log("group selected " + id + " at index " + idx);
+				//console.log("group selected " + id + " at index " + idx);
 				var sample = navicell.dataset.getSampleById(id);
 				heatmap_config.setSampleOrGroupAt(idx, sample);
 			}
@@ -287,7 +287,7 @@ function heatmap_editor_apply(heatmap_config)
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var val = $("#heatmap_editor_datatable_" + idx).val();
 		if (val && val != "_none_") {
-			console.log("datatable selected " + val + " at index " + idx);
+			//console.log("datatable selected " + val + " at index " + idx);
 			var datatable = navicell.getDatatableById(val);
 			heatmap_config.setDatatableAt(idx, datatable);
 		}
@@ -338,6 +338,10 @@ function annot_set_group(annot_id, doc) {
 	var annot = navicell.annot_factory.getAnnotationPerId(annot_id);
 
 	annot.setIsGroup(checked);
+
+	// 2013-09-06: moved from update_status_tables() : good idea ?
+	// groups could be rebuilt on demand: if samples have been added for instance
+	navicell.group_factory.buildGroups();
 	update_status_tables(doc, {style_only: true, annot_id: annot_id, checked: checked});
 
 	//update_sample_annot_table_group(annot_id, checked, doc);
@@ -425,13 +429,21 @@ function update_sample_annot_table(doc, params) {
 	table.tablesorter();
 }
 
+function set_group_method(datatable_id, group_id) {
+	var obj = $("#group_method_" + datatable_id + "_" + group_id);
+	var group = navicell.group_factory.getGroupById(group_id);
+	var datatable = navicell.getDatatableById(datatable_id);
+
+	group.setMethod(datatable, obj.val());
+}
+
 function update_group_status_table(doc, params) {
 	var table = $("#dt_group_status_table", doc);
 	table.children().remove();
 	var str = "<thead><tr><th>Groups&nbsp;(" + mapSize(navicell.group_factory.group_map) + ")</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
-		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
+		str += "<th colspan='2'>&nbsp;" + datatable.html_name + "&nbsp;</th>";
 	}
 	str += "</thead>";
 	str += "<tbody>";
@@ -454,7 +466,31 @@ function update_group_status_table(doc, params) {
 				}
 			}
 			str += cnt + "</td>";
+
+			str += "<td><select id='group_method_" + datatable.getId() + "_" + group.getId() + "' onchange='set_group_method(" + datatable.getId() + "," + group.getId() + ")'>\n";
+			var method = group.getMethod(datatable);
+			var selected;
+			if (datatable.biotype.isContinuous()) {
+				selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
+				selected = (method == Group.CONTINUOUS_MINVAL) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_MINVAL + "'" + selected + ">Min Value</option>\n";
+
+				selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
+			} else {
+				var values = datatable.getDiscreteValues();
+				for (var value in values) {
+					var label = value == '' ? 'empty' : value;
+					selected = (method == value+'+') ? " selected" : "";
+					str += "<option value='" + value + "+'" + selected + ">At least one " + label + "</option>";
+					selected = (method == value+'@') ? " selected" : "";
+					str += "<option value='" + value + "@'" + selected + ">All are " + label + "</option>";
+				}
+			}
+			str += "</select></td>";
 		}
+
 		str += "</tr>";
 	}
 	str += "</tbody>";
@@ -548,6 +584,9 @@ function update_gene_status_table(doc, params) {
 }
 
 function update_datatable_status_table(doc, params) {
+	if (!navicell.DTStatusMustUpdate) {
+		return;
+	}
 	//console.log("update_datatable_status_table");
 	var table = $("#dt_datatable_status_table", doc);
 	var update_label = $("#dt_datatable_status_update_label", doc);
@@ -582,8 +621,9 @@ function update_datatable_status_table(doc, params) {
 	update_label.text(update ? "Uncheck to lock edition" : "Check to edit datatables");
 	table.children().remove();
 
-	var tab_header = $("#dt_datatable_tabs ul");
 	var tab_body = $("#dt_datatable_tabs");
+	//console.log("rebuilding tabs");
+	var tab_header = $("#dt_datatable_tabs ul");
 	tab_header.children().remove();
 	tab_header.append('<li><a class="ui-button-text" href="#dt_datatable_status">General</a></li>');
 
@@ -624,11 +664,12 @@ function update_datatable_status_table(doc, params) {
 	table.tablesorter();
 
 	tab_body.tabs("refresh");
+	navicell.DTStatusMustUpdate = false;
 }
 
 function update_status_tables(params) {
 //	navicell.annot_factory.sync();
-	navicell.group_factory.buildGroups();
+	//navicell.group_factory.buildGroups();
 	for (var map_name in maps) {
 		var doc = maps[map_name].document;
 		update_sample_status_table(doc, params);
@@ -704,17 +745,9 @@ function cancel_datatables() {
 Datatable.prototype.showDisplayConfig = function() {
 	var div_id = undefined;
 	var displayConfig = this.getDisplayConfig();
-	/*
-	if (this.displayStepConfig) {
-		div_id = this.displayStepConfig.div_id;
-	} else if (this.displayDiscreteConfig) {
-		div_id = this.displayDiscreteConfig.div_id;
-	}
-	*/
 	if (displayConfig) {
 		div_id = displayConfig.div_id;
 	}
-	console.log("div_id " + div_id);
 	if (div_id) {
 		var div = $("#" + div_id);
 		var datatable_id = this.getId();
@@ -842,7 +875,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var group_cnt = mapSize(navicell.group_factory.group_map);
 	var sample_group_cnt = sample_cnt + group_cnt;
 
-	console.log("update_heatmap_editor: " + sel_gene);
+	//console.log("update_heatmap_editor: " + sel_gene);
 	if (sample_group_cnt > MAX_HEATMAP_X) {
 		sample_group_cnt = MAX_HEATMAP_X;
 	}
@@ -896,25 +929,14 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 					var style = sel_datatable.getStyle(value);
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
 				} else if (sel_group) {
-					// TBD: will be replaced by sel_group.getValue(datatable, gene_name)
-					var total_value = 0;
-					var cnt = 0;
-					for (var sample_name in sel_group.samples) {
-						var value = sel_datatable.getValue(sample_name, gene_name);
-						value *= 1.;
-						if (value) {
-							total_value += value;
-							cnt++;
-						}
+					var value = sel_group.getValue(sel_datatable, gene_name);
+					//console.log("sel_group.getValue() -> " + value);
+					if (value != undefined) {
+						var style = sel_datatable.getStyle(value);
+						html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
+					} else {
+						html += "<td class='heatmap_cell'>&nbsp;</td>";
 					}
-					if (cnt) {
-						console.log("total_value: " + total_value + " " + cnt);
-						total_value = total_value/cnt;
-						var style = sel_datatable.getStyle(total_value);
-						console.log("value: " + total_value + " style:" + style);
-						html += "<td class='heatmap_cell' " + style + ">" + total_value + "</td>";
-					}
-						
 				} else {
 					html += "<td class='heatmap_cell'>&nbsp;</td>";
 				}
@@ -1006,7 +1028,6 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 				var value = sel_datatable.getValue(sel_sample.name, gene_name);
 				//var style = sel_datatable.getStyle(value);
 				var bg = sel_datatable.getBG(value);
-				console.log("value: " + value + " " + bg);
 				if (bg) {
 					var fg = getFG_from_BG(bg);
 					//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
@@ -1015,27 +1036,17 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 					start_x += cell_w;
 				}
 			} else if (sel_group) {
-				// TBD: will be replaced by sel_group.getValue(datatable, gene_name)
-				var total_value = 0;
-				var cnt = 0;
-				for (var sample_name in sel_group.samples) {
-					var value = sel_datatable.getValue(sample_name, gene_name);
-					value *= 1.;
-					if (value) {
-						total_value += value;
-						cnt++;
-					}
-				}
-				if (cnt) {
-					total_value = total_value/cnt;
-					/*
+				var value = sel_group.getValue(sel_datatable, gene_name);
+				if (value != undefined) {
 					var bg = sel_datatable.getBG(value);
+					//console.log("group value: " + value + " " + bg);
 					if (bg) {
 						var fg = getFG_from_BG(bg);
-						//console.log("value: " + total_value + " bg:" + bg + " fg: " + fg);
+						context.fillStyle = "#" + bg;
+						context.fillRect(start_x, start_y, cell_w, cell_h);
 					}
-					*/
 				}
+				start_x += cell_w;
 			}
 		}
 		start_y += cell_h;

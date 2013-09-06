@@ -861,6 +861,8 @@ function step_display_config(idx) {
 	}
 }
 
+var BARPLOT_TEST = true;
+
 function update_heatmap_editor(doc, params, heatmapConfig) {
 	if (!heatmapConfig) {
 		//heatmapConfig = navicell.drawing_config.heatmap_config;
@@ -927,7 +929,24 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 				if (sel_sample) {
 					var value = sel_datatable.getValue(sel_sample.name, gene_name);
 					var style = sel_datatable.getStyle(value);
+					var go = 0;
+					if (BARPLOT_TEST) {
+						if (sel_datatable.biotype.isContinuous()) {
+							var ivalue = parseFloat(value);
+							if (!isNaN(ivalue)) {
+								height = "height: " + (100. * (ivalue-sel_datatable.minval) / (sel_datatable.maxval - sel_datatable.minval)) + "px;";
+								style += height;
+								style += "width: 100%;";
+								html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
+								go = 1;
+								value = '';
+							}
+						}
+					}
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
+					if (go) {
+						html += "</tr></table></td>";
+					}
 				} else if (sel_group) {
 					var value = sel_group.getValue(sel_datatable, gene_name);
 					//console.log("sel_group.getValue() -> " + value);

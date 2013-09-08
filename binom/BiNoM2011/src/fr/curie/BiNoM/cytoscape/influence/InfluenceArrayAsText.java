@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 import cytoscape.Cytoscape;
 import fr.curie.BiNoM.cytoscape.utils.*;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * Display Influence Array for Visualizing 2 options
  * 1: as text, not connected: nc, 3 digits after point

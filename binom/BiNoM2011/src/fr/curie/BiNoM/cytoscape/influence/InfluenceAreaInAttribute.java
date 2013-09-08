@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.HashSet;
 
 import cytoscape.Cytoscape;
-import fr.curie.BiNoM.cytoscape.utils.ComputingByBFS;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * Empty attribute with influence computed as in influence area
  * Avoid to crash attribute of previous computing

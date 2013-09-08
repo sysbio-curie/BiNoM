@@ -5,8 +5,8 @@ Copyright (C) 2010-2013 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE
 */
 import java.awt.event.ActionEvent;
 import cytoscape.Cytoscape;
-import fr.curie.BiNoM.cytoscape.utils.ComputingByBFS;
 import fr.curie.BiNoM.cytoscape.utils.TextBox;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * Display Influence Area from start nodes
  * in text box

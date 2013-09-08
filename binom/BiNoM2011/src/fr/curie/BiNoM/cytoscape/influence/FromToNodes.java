@@ -12,6 +12,7 @@ import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.util.CytoscapeAction;
 import fr.curie.BiNoM.cytoscape.utils.*;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * In menu, this class selects nodes and edges between 2 lists of nodes
  * by intersection of 2 sets made get by descending and ascending the graph

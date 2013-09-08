@@ -8,8 +8,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import cytoscape.Cytoscape;
-import fr.curie.BiNoM.cytoscape.utils.ComputingByBFS;
 import fr.curie.BiNoM.cytoscape.utils.TextBox;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * Display the Network  size and Parameter Features as min and max influence
  * 

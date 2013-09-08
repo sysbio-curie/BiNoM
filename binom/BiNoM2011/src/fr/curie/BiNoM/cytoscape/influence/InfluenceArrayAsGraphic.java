@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 
 import cytoscape.Cytoscape;
 import fr.curie.BiNoM.cytoscape.utils.*;
+import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
 /**
  * Display Influence Array as Paved Window using paving window dialog
  * 

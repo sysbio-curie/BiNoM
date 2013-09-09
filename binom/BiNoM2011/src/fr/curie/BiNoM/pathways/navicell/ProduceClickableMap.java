@@ -4907,6 +4907,7 @@ public class ProduceClickableMap
 		if (NV2) {
 			out.println("    update_status_tables();");
 			out.println("    heatmap_editor_set_editing(true);");
+			out.println("    barplot_editor_set_editing(true);");
 			out.println("    overlay_init(map);");
 		}
 		out.println("  });\n");

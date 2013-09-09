@@ -51,10 +51,17 @@ USGSOverlay.prototype.onAdd = function() {
 			var box = overlay.boundBoxes[nn][0];
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
 				var gene_name = overlay.boundBoxes[nn][1];
-				//console.log("click on: " + gene_name);
-				$("#select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
-				update_heatmap_editor();
-				$("#heatmap_editor_div").dialog("open");
+				var type = overlay.boundBoxes[nn][2];
+				console.log("click on: " + gene_name + " " + navicell.dataset.getGeneByName(gene_name).id + " " + type);
+				if (type == "heatmap") {
+					$("#heatmap_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#heatmap_editor_div").dialog("open");
+					update_heatmap_editor();
+				} else if (type == "barplot") {
+					$("#barplot_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#barplot_editor_div").dialog("open");
+					update_barplot_editor();
+				}
 				break;
 			}
 		}
@@ -196,8 +203,8 @@ USGSOverlay.prototype.reset = function() {
 	this.arrpos = [];
 }
 
-USGSOverlay.prototype.addBoundBox = function(box, gene_name) {
-	this.boundBoxes.push([box, gene_name]);
+USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type) {
+	this.boundBoxes.push([box, gene_name, chart_type]);
 }
 
 USGSOverlay.prototype.remove = function(rm_arrpos) {

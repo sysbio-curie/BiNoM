@@ -208,6 +208,7 @@ $(function() {
 	//
 	update_sample_annot_table(window.document);
 
+	/*
 	$("#heatmap_config_div" ).dialog({
 		autoOpen: false,
 		width: 720,
@@ -222,7 +223,7 @@ $(function() {
 			}
 		}
 	});
-
+	*/
 	$("#heatmap_editor_div" ).dialog({
 		autoOpen: false,
 		width: 750,
@@ -237,6 +238,7 @@ $(function() {
 				// editing_heatmap_config
 				heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
 				navicell.drawing_config.heatmap_config.shrink();
+				navicell.drawing_config.editing_heatmap_config.shrink();
 				update_status_tables();
 				heatmap_editor_set_editing(false);
 				jstree_refresh(true);
@@ -249,8 +251,43 @@ $(function() {
 			},
 
 			"Cancel": function() {
+				navicell.drawing_config.editing_heatmap_config.cloneFrom(navicell.drawing_config.heatmap_config);
 				update_status_tables();
 				heatmap_editor_set_editing(false);
+			}
+		}
+	});
+
+	$("#barplot_editor_div" ).dialog({
+		autoOpen: false,
+		width: 750,
+		height: 500,
+		modal: false,
+		buttons: {
+			"Apply": function() {
+				// barplot_editor
+				barplot_editor_apply(navicell.drawing_config.barplot_config);
+				// instead of calling this function again, it
+				// should be better to copy barplot_config to
+				// editing_barplot_config
+				barplot_editor_apply(navicell.drawing_config.editing_barplot_config);
+				navicell.drawing_config.barplot_config.shrink();
+				navicell.drawing_config.editing_barplot_config.shrink();
+				update_status_tables();
+				barplot_editor_set_editing(false);
+				jstree_refresh(true);
+			},
+			
+			"Clear": function() {
+				navicell.drawing_config.barplot_config.reset();
+				update_status_tables();
+				barplot_editor_set_editing(true);
+			},
+
+			"Cancel": function() {
+				navicell.drawing_config.editing_barplot_config.cloneFrom(navicell.drawing_config.barplot_config);
+				update_status_tables();
+				barplot_editor_set_editing(false);
 			}
 		}
 	});
@@ -294,6 +331,49 @@ function heatmap_editor_apply(heatmap_config)
 	}
 	heatmap_config.setSize($("#heatmap_editor_size").val());
 	heatmap_config.setScaleSize($("#heatmap_editor_scale_size").val());
+}
+
+var MAX_HEATMAP_X = 15;
+var MAX_BARPLOT_X = 15;
+
+function barplot_editor_apply(barplot_config)
+{
+	var sample_cnt = mapSize(navicell.dataset.samples);
+	var group_cnt = mapSize(navicell.group_factory.group_map);
+	var sample_group_cnt = sample_cnt + group_cnt;
+	if (sample_group_cnt > MAX_BARPLOT_X) {
+		sample_group_cnt = MAX_BARPLOT_X;
+	}
+	for (var idx = 0; idx < sample_group_cnt; ++idx) {
+		var val = $("#barplot_editor_gs_" + idx).val();
+		if (val == "_none_") {
+			barplot_config.setSampleOrGroupAt(idx, undefined);
+		} else {
+			var prefix = val.substr(0, 2);
+			var id = val.substr(2);
+			if (prefix == 'g_') {
+				//console.log("group selected " + id + " at index " + idx);
+				var group = navicell.group_factory.getGroupById(id);
+				barplot_config.setSampleOrGroupAt(idx, group);
+			} else {
+				//console.log("group selected " + id + " at index " + idx);
+				var sample = navicell.dataset.getSampleById(id);
+				barplot_config.setSampleOrGroupAt(idx, sample);
+			}
+		}
+	}
+	var datatable_cnt = mapSize(navicell.dataset.datatables);
+	for (var idx = 0; idx < datatable_cnt; ++idx) {
+		var val = $("#barplot_editor_datatable_" + idx).val();
+		if (val && val != "_none_") {
+			//console.log("datatable selected " + val + " at index " + idx);
+			var datatable = navicell.getDatatableById(val);
+			barplot_config.setDatatableAt(idx, datatable);
+		}
+	}
+	barplot_config.setHeight($("#barplot_editor_height").val());
+	barplot_config.setWidth($("#barplot_editor_width").val());
+	barplot_config.setScaleSize($("#barplot_editor_scale_size").val());
 }
 
 function update_sample_status_table(doc, params) {
@@ -668,7 +748,7 @@ function update_datatable_status_table(doc, params) {
 }
 
 function update_status_tables(params) {
-//	navicell.annot_factory.sync();
+	//navicell.annot_factory.sync();
 	//navicell.group_factory.buildGroups();
 	for (var map_name in maps) {
 		var doc = maps[map_name].document;
@@ -679,8 +759,9 @@ function update_status_tables(params) {
 		update_datatable_status_table(doc, params);
 		update_sample_annot_table(doc, params);
 		update_heatmap_editor(doc, params);
+		update_barplot_editor(doc, params);
 	}
-//	navicell_session.write();
+	//navicell_session.write();
 }
 
 function get_biotype_select(id, include_none, value) {
@@ -808,7 +889,6 @@ Datatable.prototype.showDisplayConfig = function() {
 					}
 					datatable.refresh();
 					update_status_tables();
-					//update_heatmap_editor(); // ??
 					jstree_refresh(true);
 				},
 
@@ -826,10 +906,13 @@ Datatable.prototype.showDisplayConfig = function() {
 }
 
 function drawing_config_chart() {
-	$("#heatmap_editor_div").dialog("open");
+	var val = $("#drawing_config_chart_type").val();
+	if (val == "Heatmap") {
+		$("#heatmap_editor_div").dialog("open");
+	} else if (val == "Barplot") {
+		$("#barplot_editor_div").dialog("open");
+	}
 }
-
-var MAX_HEATMAP_X = 15;
 
 function heatmap_editor_set_editing(val, idx) {
 	$("#heatmap_editing").html(val ? "configuration not saved..." : "");
@@ -851,7 +934,7 @@ function heatmap_editor_set_editing(val, idx) {
 // to give the doc_idx and get the doc value from an associative array.
 // => should maintain an associative array: doc_idx -> doc
 // + attribute doc.doc_idx
-function step_display_config(idx) {
+function heatmap_step_display_config(idx) {
 	var val = $("#heatmap_editor_datatable_" + idx).val();
 	if (val != '_none_') {
 		var datatable = navicell.getDatatableById(val);
@@ -861,17 +944,19 @@ function step_display_config(idx) {
 	}
 }
 
-var BARPLOT_TEST = true;
-
 function update_heatmap_editor(doc, params, heatmapConfig) {
 	if (!heatmapConfig) {
 		//heatmapConfig = navicell.drawing_config.heatmap_config;
 		heatmapConfig = navicell.drawing_config.editing_heatmap_config;
 	}
+	var div = $("#heatmap_editor_div");
+	var topdiv = div.parent().parent();
+	var empty_cell_style = "background: " + topdiv.css("background") + "; border: none;";
 	var table = $("#heatmap_editor_table", doc);
-	var sel_gene_id = $("#select_gene", doc).val();
+	var sel_gene_id = $("#heatmap_select_gene", doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
 
+	console.log("updating heatmap_editor " + sel_gene_id + " " + (sel_gene ? sel_gene.name : "NULL"));
 	//var datatable_cnt = mapSize(navicell.dataset.datatables);
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -884,7 +969,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	table.children().remove();
 	var html = "";
 	html += "<tbody>";
-	html += "<tr><td>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
+	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
 		html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_editor_set_editing(true)'>\n";
 		html += "<option value='_none_'>Choose a group or sample</option>\n";
@@ -912,7 +997,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		html += "<tr>";
-		html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='step_display_config(" + idx + ")'><span id='heatmap_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
+		html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='heatmap_step_display_config(" + idx + ")'><span id='heatmap_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
 		html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_editor_set_editing(true," + idx + ")'>\n";
 		html += "<option value='_none_'>Choose a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
@@ -929,24 +1014,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 				if (sel_sample) {
 					var value = sel_datatable.getValue(sel_sample.name, gene_name);
 					var style = sel_datatable.getStyle(value);
-					var go = 0;
-					if (BARPLOT_TEST) {
-						if (sel_datatable.biotype.isContinuous()) {
-							var ivalue = parseFloat(value);
-							if (!isNaN(ivalue)) {
-								height = "height: " + (100. * (ivalue-sel_datatable.minval) / (sel_datatable.maxval - sel_datatable.minval)) + "px;";
-								style += height;
-								style += "width: 100%;";
-								html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
-								go = 1;
-								value = '';
-							}
-						}
-					}
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
-					if (go) {
-						html += "</tr></table></td>";
-					}
 				} else if (sel_group) {
 					var value = sel_group.getValue(sel_datatable, gene_name);
 					//console.log("sel_group.getValue() -> " + value);
@@ -1000,8 +1068,8 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	$("#heatmap_editor_size_div", doc).html(html);
 
 	html = "Apply this configuration to gene:&nbsp;";
-	html += "<select id='select_gene' onchange='update_heatmap_editor(null, null, navicell.drawing_config.editing_heatmap_config)'>\n";
-	/*html += "<select id='select_gene'>\n";*/
+	html += "<select id='heatmap_select_gene' onchange='update_heatmap_editor(null, null, navicell.drawing_config.editing_heatmap_config)'>\n";
+	/*html += "<select id='heatmap_select_gene'>\n";*/
 	html += "<option value='_none_'></option>\n";
 	for (var gene_name in navicell.dataset.genes) {
 		var gene = navicell.dataset.genes[gene_name];
@@ -1009,7 +1077,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
 	}
 	html += "</select>";
-	$("#gene_choice", doc).html(html);
+	$("#heatmap_gene_choice", doc).html(html);
 }
 
 function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
@@ -1070,8 +1138,307 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 		}
 		start_y += cell_h;
 	}
-	overlay.addBoundBox([topx, topy, start_x-topx, start_y-topy], gene_name);
+	overlay.addBoundBox([topx, topy, start_x-topx, start_y-topy], gene_name, "heatmap");
 }
+
+function barplot_editor_set_editing(val, idx) {
+	$("#barplot_editing").html(val ? "configuration not saved..." : "");
+	//$("#gene_choice").css("visibility", val ? "hidden" : "visible");
+	if (val) {
+		barplot_editor_apply(navicell.drawing_config.editing_barplot_config);
+		update_barplot_editor(null, null, navicell.drawing_config.editing_barplot_config);
+	}
+	// ok
+	if (idx != undefined && $("#barplot_editor_datatable_" + idx).val() != '_none_') {
+		$("#barplot_editor_datatable_config_" + idx).removeClass("zz-hidden");	
+	} else {
+		$("#barplot_editor_datatable_config_" + idx).addClass("zz-hidden");	
+	}
+}
+
+// 2013-09-03 TBD: must add a doc argument: but as this function is called
+// from a string evaluation (onchange='step_display_config(...)'), I propose
+// to give the doc_idx and get the doc value from an associative array.
+// => should maintain an associative array: doc_idx -> doc
+// + attribute doc.doc_idx
+function barplot_step_display_config(idx) {
+	var val = $("#barplot_editor_datatable_" + idx).val();
+	if (val != '_none_') {
+		var datatable = navicell.getDatatableById(val);
+		if (datatable) {
+			datatable.showDisplayConfig();
+		}
+	}
+}
+
+function update_barplot_editor(doc, params, barplotConfig) {
+	console.log("updating barplot_editor");
+	if (!barplotConfig) {
+		barplotConfig = navicell.drawing_config.editing_barplot_config;
+	}
+	var div = $("#barplot_editor_div");
+	var topdiv = div.parent().parent();
+	var empty_cell_style = "background: " + topdiv.css("background") + "; border: none;";
+	var table = $("#barplot_editor_table", doc);
+	var sel_gene_id = $("#barplot_select_gene", doc).val();
+	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+
+	//var datatable_cnt = mapSize(navicell.dataset.datatables);
+	var sample_cnt = mapSize(navicell.dataset.samples);
+	var group_cnt = mapSize(navicell.group_factory.group_map);
+	var sample_group_cnt = sample_cnt + group_cnt;
+
+	//console.log("update_barplot_editor: " + sel_gene);
+	if (sample_group_cnt > MAX_BARPLOT_X) {
+		sample_group_cnt = MAX_BARPLOT_X;
+	}
+	table.children().remove();
+	var html = "";
+	html += "<tbody>";
+
+	// -----
+	var idx = 0;
+	var sel_datatable = barplotConfig.getDatatableAt(idx);
+	html += "<tr>";
+	// ----
+	// ----
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
+	if (sel_gene && sel_datatable) {
+		var gene_name = sel_gene.name;
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			var sel_group = barplotConfig.getGroupAt(idx2);
+			var sel_sample = barplotConfig.getSampleAt(idx2);
+			if (sel_sample) {
+				var value = sel_datatable.getValue(sel_sample.name, gene_name);
+				var style = sel_datatable.getStyle(value);
+				var go = 0;
+				if (sel_datatable.biotype.isContinuous()) {
+					var ivalue = parseFloat(value);
+					if (!isNaN(ivalue)) {
+						//height = "height: " + (100. * (ivalue-sel_datatable.minval) / (sel_datatable.maxval - sel_datatable.minval)) + "px;";
+						height = "height: " + sel_datatable.getBarplotHeight(value, 100.) + "px;";
+						style += height;
+						style += "width: 100%;";
+						html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
+						go = 1;
+						value = '';
+					}
+				}
+				html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
+				if (go) {
+					html += "</tr></table></td>";
+				}
+			} else if (sel_group) {
+				var value = sel_group.getValue(sel_datatable, gene_name);
+				//console.log("sel_group.getValue() -> " + value);
+				if (value != undefined) {
+					var style = sel_datatable.getStyle(value);
+					html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
+				} else {
+					html += "<td class='barplot_cell'>&nbsp;</td>";
+				}
+			} else {
+				html += "<td class='barplot_cell'>&nbsp;</td>";
+			}
+		}
+	} else {
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			html += "<td class='barplot_cell'>&nbsp;</td>";
+		}
+	}
+	html += "</tr>\n";
+	// ----
+
+	html += "<tr>\n";
+	html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='barplot_step_display_config(" + idx + ")'><span id='barplot_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
+
+	html += "<td><select id='barplot_editor_datatable_" + idx + "' onchange='barplot_editor_set_editing(true," + idx + ")'>\n";
+	html += "<option value='_none_'>Choose a datatable</option>\n";
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
+		html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
+	}
+	html += "</select></td>";
+
+	if (sel_gene && sel_datatable) {
+		var gene_name = sel_gene.name;
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			var sel_group = barplotConfig.getGroupAt(idx2);
+			var sel_sample = barplotConfig.getSampleAt(idx2);
+			if (sel_sample) {
+				var value = sel_datatable.getValue(sel_sample.name, gene_name);
+				//var style = sel_datatable.getStyle(value);
+				var style = "style='text-align: center;'";
+				html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
+			} else if (sel_group) {
+				var value = sel_group.getValue(sel_datatable, gene_name);
+				//console.log("sel_group.getValue() -> " + value);
+				if (value != undefined) {
+					//var style = sel_datatable.getStyle(value);
+					var style = "style='text-align: center;'";
+					html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
+				} else {
+					html += "<td class='barplot_cell'>&nbsp;</td>";
+				}
+			} else {
+				html += "<td class='barplot_cell'>&nbsp;</td>";
+			}
+		}
+	} else {
+		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+			html += "<td class='barplot_cell'>&nbsp;</td>";
+		}
+	}
+
+	html += "</tr>\n";
+	// ----
+
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
+	for (var idx = 0; idx < sample_group_cnt; ++idx) {
+		html += "<td style='border: 0px'><select id='barplot_editor_gs_" + idx + "' onchange='barplot_editor_set_editing(true)'>\n";
+		html += "<option value='_none_'>Choose a group or sample</option>\n";
+		var sel_group = barplotConfig.getGroupAt(idx);
+		var sel_sample = barplotConfig.getSampleAt(idx);
+		for (var group_name in navicell.group_factory.group_map) {
+			var group = navicell.group_factory.group_map[group_name];
+			var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
+			html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
+		}
+		var sel_sample = barplotConfig.getSampleAt(idx);
+		for (var sample_name in navicell.dataset.samples) {
+			var sample = navicell.dataset.samples[sample_name];
+			var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
+			html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample.name + "</option>";
+		}
+		html += "</select>";
+		html += "</td>";
+	}
+
+	html += "</tr>\n";
+
+	html += "</tbody>";
+
+	table.append(html);
+	table.tablesorter();
+
+	html = "<table cellspacing='5'><tr><td><span style='font-size: small; font-weight: bold'>Size</span></td>";
+	var height = barplotConfig.getHeight();
+
+	html += "<td><select id='barplot_editor_height' onchange='barplot_editor_set_editing(true)'>";
+	html += "<option value='1'" + (height == 1 ? " selected" : "") +">Tiny Height</option>";
+	html += "<option value='2'" + (height == 2 ? " selected" : "") +">Small Height</option>";
+	html += "<option value='4'" + (height == 4 ? " selected" : "") +">Medium Height</option>";
+	html += "<option value='6'" + (height == 6 ? " selected" : "") +">Large Height</option>";
+	html += "<option value='8' " + (height == 8 ? " selected" : "") +">Very Large Height</option>";
+	html += "</select><td>";
+	html += "</tr>";
+
+	var width = barplotConfig.getWidth();
+
+	html += "<tr><td>&nbsp;</td>";
+	html += "<td><select id='barplot_editor_width' onchange='barplot_editor_set_editing(true)'>";
+	html += "<option value='1'" + (width == 1 ? " selected" : "") +">Tiny Width</option>";
+	html += "<option value='2'" + (width == 2 ? " selected" : "") +">Small Width</option>";
+	html += "<option value='4'" + (width == 4 ? " selected" : "") +">Medium Width</option>";
+	html += "<option value='6'" + (width == 6 ? " selected" : "") +">Large Width</option>";
+	html += "<option value='8' " + (width == 8 ? " selected" : "") +">Very Large Width</option>";
+	html += "</select><td>";
+	html += "</tr>";
+
+	var scale_size = barplotConfig.getScaleSize();
+	html += "<tr><td>&nbsp;</td>";
+	html += "<td><select id='barplot_editor_scale_size' onchange='barplot_editor_set_editing(true)'>\n";
+	html += "<option value='0'" + (scale_size == 0 ? " selected" : "") +">Do not depend on scale</option>\n";
+	html += "<option value='1'" + (scale_size == 1 ? " selected" : "") +">Depend on scale</option>\n";
+	html += "<option value='2'" + (scale_size == 2 ? " selected" : "") +">Depend on sqrt(scale)</option>\n";
+	html += "<option value='3'" + (scale_size == 3 ? " selected" : "") +">Depend on sqrt(scale)/2</option>\n";
+	html += "<option value='4'" + (scale_size == 4 ? " selected" : "") +">Depend on sqrt(scale)/3</option>\n";
+	html += "<option value='5'" + (scale_size == 5 ? " selected" : "") +">Depend on sqrt(scale)/4</option>\n";
+	html += "</select><td>";
+	html += "</tr></table>";
+
+	$("#barplot_editor_size_div", doc).html(html);
+
+	html = "Apply this configuration to gene:&nbsp;";
+	html += "<select id='barplot_select_gene' onchange='update_barplot_editor(null, null, navicell.drawing_config.editing_barplot_config)'>\n";
+	/*html += "<select id='barplot_select_gene'>\n";*/
+	html += "<option value='_none_'></option>\n";
+	for (var gene_name in navicell.dataset.genes) {
+		var gene = navicell.dataset.genes[gene_name];
+		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+	}
+	html += "</select>";
+	$("#barplot_gene_choice", doc).html(html);
+}
+
+function draw_barplot(overlay, context, scale, gene_name, topx, topy)
+{
+	console.log("drawing barplot");
+	var barplotConfig = navicell.drawing_config.barplot_config;
+	var sample_cnt = mapSize(navicell.dataset.samples);
+	var group_cnt = mapSize(navicell.group_factory.group_map);
+	var sample_group_cnt = sample_cnt + group_cnt;
+
+	if (sample_group_cnt > MAX_BARPLOT_X) {
+		sample_group_cnt = MAX_BARPLOT_X;
+	}
+
+	var datatable_cnt = mapSize(navicell.dataset.datatables);
+
+	var scale2 = barplotConfig.getScale(scale);
+	var width = barplotConfig.getWidth();
+	var height = barplotConfig.getHeight();
+	var cell_w = width*scale2;
+	var cell_h = height*scale2;
+
+	topx += 12; // does not depend on scale
+	//topy -= cell_h * datatable_cnt + 4;
+	var maxy = cell_h*4;
+	var start_y = topy - maxy - cell_h;
+	var start_x = topx;
+	var idx = 0;
+	var sel_datatable = barplotConfig.getDatatableAt(idx);
+	if (!sel_datatable) {
+		return;
+	}
+	for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
+		var sel_group = barplotConfig.getGroupAt(idx2);
+		var sel_sample = barplotConfig.getSampleAt(idx2);
+		if (sel_sample) {
+			var value = sel_datatable.getValue(sel_sample.name, gene_name);
+			//var style = sel_datatable.getStyle(value);
+			var bg = sel_datatable.getBG(value);
+			if (bg) {
+				var fg = getFG_from_BG(bg);
+				//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
+				context.fillStyle = "#" + bg;
+
+				var height = sel_datatable.getBarplotHeight(value, maxy);
+				context.fillRect(start_x, start_y+maxy-height, cell_w, height);
+				start_x += cell_w;
+			}
+		} else if (sel_group) {
+			var value = sel_group.getValue(sel_datatable, gene_name);
+			if (value != undefined) {
+				var bg = sel_datatable.getBG(value);
+				//console.log("group value: " + value + " " + bg);
+				if (bg) {
+					var fg = getFG_from_BG(bg);
+					context.fillStyle = "#" + bg;
+					context.fillRect(start_x, start_y, cell_w, cell_h);
+				}
+			}
+			start_x += cell_w;
+		}
+	}
+
+	overlay.addBoundBox([topx, start_y, start_x-topx, maxy], gene_name, "barplot");
+}
+
 
 //
 // -------------------------------------------------------------------------------

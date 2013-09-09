@@ -621,44 +621,44 @@ div.tablesorterPager input {
     color: darkblue;
 }
 
-#heatmap_config_div {
+#heatmap_config_div, #barplot_config_div {
     font-size: small;
 }
 
-#heatmap_config_div h3 {
+#heatmap_config_div h3, #barplot_config_div h3 {
     text-align: center;
     font-size: larger;
 }
 
-#heatmap_config_datatable_list, #heatmap_config_sample_list, #heatmap_config_group_list {
+#heatmap_config_datatable_list, #heatmap_config_sample_list, #heatmap_config_group_list, #barplot_config_datatable_list, #barplot_config_sample_list, #barplot_config_group_list {
     background: white;
 /*    width: 100%;
     height: 100%;
 */
 }
 
-#heatmap_config_datatable_list thead, #heatmap_config_sample_list thead, #heatmap_config_group_list thead {
+#heatmap_config_datatable_list thead, #heatmap_config_sample_list thead, #heatmap_config_group_list thead, #barplot_config_datatable_list, #barplot_config_sample_list, #barplot_config_group_list {
     text-align: center;
     background-color: rgb(160, 138, 189);
 }
 
-.heatmap_config_head {
+.heatmap_config_head, .barplot_config_head {
     text-align: center;
     font-weight: bold;
     font-size: larger;
 }
 
 
-#heatmap_editor_div {
+#heatmap_editor_div, #barplot_editor_div {
 /*    font-size: small; */
 }
 
-#heatmap_editor_div h3 {
+#heatmap_editor_div h3, #barplot_editor_div h3 {
     text-align: center;
 /*    font-size: larger; */
 }
 
-#heatmap_editor_table {
+#heatmap_editor_table, #barplot_editor_table {
 /*    background: lightyellow;  */
 /*    border: 1px solid lightgray; */
 /*    border-spacing: 3px; */
@@ -667,7 +667,7 @@ div.tablesorterPager input {
 /*    padding-right: 20px; */
 }
 
-#heatmap_editor_table td {
+#heatmap_editor_table td, #barplot_editor_table td {
     background: white;
     border: 1px solid;
     border-top: 1px solid;
@@ -675,8 +675,30 @@ div.tablesorterPager input {
     font-size: x-small;
 }
 
-#heatmap_editor_table tbody {
+#heatmap_editor_table tbody, #barplot_editor_table tbody {
 /*    border: 1px solid; */
+}
+
+#heatmap_editing, #barplot_editing {
+    font-size: small;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    font-style: italic;
+    color: #CC6C00;
+}
+
+#heatmap_editor_size_div, #barplot_editor_size_div {
+    margin-top: 15px;
+    font-size: x-small;
+}
+
+#heatmap_gene_choice, #barplot_gene_choice {
+    border-top: solid;
+    border-width: 1px;
+    border-color: gray;
+    margin-top: 20px;
+    padding-top: 20px;
+    font-size: small;
 }
 
 #confirm_dialog {
@@ -688,16 +710,61 @@ div.tablesorterPager input {
     font-weight: bold;
 }
 
-#gene_choice {
-    border-top: solid;
-    border-width: 1px;
-    border-color: gray;
-    margin-top: 20px;
-    padding-top: 20px;
+.tree-control {
+    font-size: small;
+    text-decoration: none;
+    color: #FF8C00;
+}
+
+/*
+#barplot_config_div {
     font-size: small;
 }
 
-#heatmap_editing {
+#barplot_config_div h3 {
+    text-align: center;
+    font-size: larger;
+}
+
+#barplot_config_datatable_list, #barplot_config_sample_list, #barplot_config_group_list {
+    background: white;
+}
+
+#barplot_config_datatable_list thead, #barplot_config_sample_list thead, #barplot_config_group_list thead {
+    text-align: center;
+    background-color: rgb(160, 138, 189);
+}
+
+.barplot_config_head {
+    text-align: center;
+    font-weight: bold;
+    font-size: larger;
+}
+
+
+#barplot_editor_div {
+}
+
+#barplot_editor_div h3 {
+    text-align: center;
+}
+
+#barplot_editor_table {
+    padding: 3px;
+}
+
+#barplot_editor_table td {
+    background: white;
+    border: 1px solid;
+    border-top: 1px solid;
+    border-color: lightgray;
+    font-size: x-small;
+}
+
+#barplot_editor_table tbody {
+}
+
+#barplot_editing {
     font-size: small;
     margin-bottom: 10px;
     padding-bottom: 10px;
@@ -705,13 +772,17 @@ div.tablesorterPager input {
     color: #CC6C00;
 }
 
-.tree-control {
-    font-size: small;
-    text-decoration: none;
-    color: #FF8C00;
-}
-
-#heatmap_editor_size_div {
+#barplot_editor_size_div {
     margin-top: 15px;
     font-size: x-small;
 }
+
+#barplot_gene_choice {
+    border-top: solid;
+    border-width: 1px;
+    border-color: gray;
+    margin-top: 20px;
+    padding-top: 20px;
+    font-size: small;
+}
+*/

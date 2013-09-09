@@ -283,7 +283,12 @@ Dataset.prototype = {
 		//console.log("Drawing " + gene_name);
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
 		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
-		draw_heatmap(overlay, context, scale, gene_name, topx, topy);
+		if (navicell.drawing_config.displayHeatmaps()) {
+			draw_heatmap(overlay, context, scale, gene_name, topx, topy);
+		}
+		if (navicell.drawing_config.displayBarplots()) {
+			draw_barplot(overlay, context, scale, gene_name, topx, topy);
+		}
 		//var gene = this.getGeneByName(gene_name);
 	},
 
@@ -668,6 +673,18 @@ HeatmapConfig.prototype = {
 		this.setScaleSize(4);
 	},
 
+	cloneFrom: function(heatmap_config) {
+		this.reset();
+		for (var nn = 0; nn < heatmap_config.datatables.length; ++nn) {
+			this.datatables.push(heatmap_config.datatables[nn]);
+		}
+		for (var nn = 0; nn < heatmap_config.samples_or_groups.length; ++nn) {
+			this.samples_or_groups.push(heatmap_config.samples_or_groups[nn]);
+		}
+		this.setSize(heatmap_config.getSize());
+		this.setScaleSize(heatmap_config.getScaleSize());
+	},
+
 	setSize: function(size) {
 		this.size = size*1.;
 	},
@@ -678,6 +695,134 @@ HeatmapConfig.prototype = {
 
 	getSize: function() {
 		return this.size;
+	},
+
+	getScaleSize: function() {
+		return this.scale_size;
+	},
+
+	getScale: function(scale) {
+		if (this.scale_size == 0) {
+			return 1;
+		}
+		if (this.scale_size == 1) {
+			return scale*1;
+		}
+		return Math.sqrt(scale*1.)/(this.scale_size-1);
+	},
+
+	shrink: function() {
+		var new_samples_or_groups = []
+		var samples_or_groups_map = {};
+		for (var idx = 0; idx < this.samples_or_groups.length; idx++) {
+			var sample_or_group = this.samples_or_groups[idx];
+			if (sample_or_group && !samples_or_groups_map[sample_or_group.getId()]) {
+				new_samples_or_groups.push(sample_or_group);
+				samples_or_groups_map[sample_or_group.getId()] = true;
+			}
+		}
+		this.samples_or_groups = new_samples_or_groups;
+
+		var new_datatables = []
+		var datatables_map = []
+		for (var idx = 0; idx < this.datatables.length; idx++) {
+			var datatable = this.datatables[idx];
+			if (datatable && !datatables_map[datatable.getId()]) {
+				new_datatables.push(datatable);
+				datatables_map[datatable.getId()] = true;
+			}
+		}
+		this.datatables = new_datatables;
+	},
+
+	setDatatableAt: function(idx, datatable) {
+		if (idx >= this.datatables.length) {
+			this.datatables.length = idx+1;
+		}
+		this.datatables[idx] = datatable;
+	},
+
+	getDatatableAt: function(idx) {
+		if (idx >= this.datatables.length) {
+			return undefined;
+		}
+		return this.datatables[idx];
+	},
+
+	setSampleOrGroupAt: function(idx, sample_or_group) {
+		if (idx >= this.samples_or_groups.length) {
+			this.samples_or_groups.length = idx+1;
+		}
+		this.samples_or_groups[idx] = sample_or_group;
+	},
+
+	getSampleOrGroupAt: function(idx) {
+		if (idx >= this.samples_or_groups.length) {
+			return undefined;
+		}
+		return this.samples_or_groups[idx];
+	},
+
+	getGroupAt: function(idx) {
+		var sample_or_group = this.getSampleOrGroupAt(idx);
+		return sample_or_group && sample_or_group.isGroup() ? sample_or_group : undefined;
+	},
+
+	getSampleAt: function(idx) {
+		var sample_or_group = this.getSampleOrGroupAt(idx);
+		return sample_or_group && sample_or_group.isSample() ? sample_or_group : undefined;
+	}
+};
+
+//
+// TBD: MUST factorize with HeatmapConfig (probably inheritance)
+//
+
+function BarplotConfig() {
+	this.reset();
+}
+
+BarplotConfig.prototype = {
+
+	reset: function() {
+		this.datatables = [];
+		this.samples_or_groups = [];
+		this.setHeight(4);
+		this.setWidth(4);
+		this.setScaleSize(4);
+	},
+
+	cloneFrom: function(barplot_config) {
+		this.reset();
+		for (var nn = 0; nn < barplot_config.datatables.length; ++nn) {
+			this.datatables.push(barplot_config.datatables[nn]);
+		}
+		for (var nn = 0; nn < barplot_config.samples_or_groups.length; ++nn) {
+			this.samples_or_groups.push(barplot_config.samples_or_groups[nn]);
+		}
+		this.setHeight(barplot_config.getHeight());
+		this.setWidth(barplot_config.getWidth());
+		this.setScaleSize(barplot_config.getScaleSize());
+	},
+
+	setWidth: function(width) {
+		this.width = width*1.;
+	},
+
+	setHeight: function(height) {
+		this.height = height*1.;
+	},
+
+	setScaleSize: function(scale_size) {
+		this.scale_size = scale_size*1;
+	},
+
+	getWidth: function() {
+		return this.width;
+	},
+
+	getHeight: function() {
+		return this.height;
 	},
 
 	getScaleSize: function() {
@@ -1028,6 +1173,19 @@ Datatable.prototype = {
 		return str;
 	},
 
+	getBarplotHeight: function(value, max) {
+		var ivalue = parseFloat(value);
+		if (!isNaN(ivalue)) {
+			if (this.biotype.isContinuous()) {
+				var ivalue = parseFloat(value);
+				if (!isNaN(ivalue)) {
+					return max * (ivalue-this.minval) / (this.maxval - this.minval);
+				}
+			}
+		}
+		return 0.;
+	},
+
 	getValue: function(sample_name, gene_name) {
 		var gene_idx = this.gene_index[gene_name];
 		var sample_idx = this.sample_index[sample_name];
@@ -1134,7 +1292,9 @@ function DrawingConfig() {
 	this.display_charts = 1; // 1 for heatmap, 2 for barplot, 3 for piechart
 	this.heatmap_config = new HeatmapConfig();
 	this.editing_heatmap_config = new HeatmapConfig();
-	//this.barplot_config = new BarplotConfig();
+	this.barplot_config = new BarplotConfig();
+	this.editing_barplot_config = new BarplotConfig();
+
 	//this.piechart_config = new PiechartConfig();
 
 	this.display_glyphs = 0;
@@ -1174,6 +1334,10 @@ DrawingConfig.prototype = {
 
 	displayHeatmaps: function() {
 		return this.display_charts == "Heatmap";
+	},
+
+	displayBarplots: function() {
+		return this.display_charts == "Barplot";
 	},
 
 	displayDLOs: function() {

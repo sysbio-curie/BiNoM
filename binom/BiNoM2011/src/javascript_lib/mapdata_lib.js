@@ -387,11 +387,12 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	setDefaults: function() {
-		this.setValueInfo(0, "F7FF19", 4, 0);
-		this.setValueInfo(1, "D6ECFF", 6, 1);
-		this.setValueInfo(2, "19FF57", 8, 2);
-		this.setValueInfo(3, "6421FF", 10, 3);
-		this.setValueInfo(4, "E64515", 12, 4);
+		this.setValueInfo(0, "F7FF19", 1, 0);
+		this.setValueInfo(1, "D6ECFF", 2, 1);
+		this.setValueInfo(2, "19FF57", 3, 2);
+		this.setValueInfo(3, "6421FF", 4, 3);
+		this.setValueInfo(4, "E64515", 5, 4);
+		this.setValueInfo(5, "FF0000", 6, 5);
 		this.update();
 	},
 
@@ -411,6 +412,22 @@ DisplayDiscreteConfig.prototype = {
 		var idx = this.values_idx[value];
 		if (idx != undefined) {
 			return this.colors[idx];
+		}
+		return '';
+	},
+
+	getSize: function(value) {
+		var idx = this.values_idx[value];
+		if (idx != undefined) {
+			return this.sizes[idx];
+		}
+		return '';
+	},
+
+	getShape: function(value) {
+		var idx = this.values_idx[value];
+		if (idx != undefined) {
+			return this.shapes[idx];
 		}
 		return '';
 	},
@@ -438,16 +455,20 @@ DisplayDiscreteConfig.prototype = {
 			html += "<td><select id='discrete_size_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
-			for (var size = 2; size < 7; size += 1) {
-				var size2 = 2*size;
+			//var maxsize = DISCRETE_MAX_SIZE/2;
+			var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
+			for (var size = 0; size < maxsize; size += 1) {
+				var size2 = DISCRETE_SIZE_COEF*(size+1);
 				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
 			html += "</select></td>";
 			html += "<td><select id='discrete_shape_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
-			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shape + "</option>";
+			// shapes will be factorized
+			var shapes = ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"];
+			for (var shape in shapes) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shapes[shape] + "</option>";
 			}
 			html += "</select></td>";
 			html += "</tr>\n";
@@ -470,6 +491,9 @@ function DisplayStepConfig(datatable) {
 	this.setStepCount(step_cnt);
 	this.setDefaults(step_cnt);
 }
+
+var STEP_MAX_SIZE = 14.;
+var DISCRETE_SIZE_COEF = 1.;
 
 DisplayStepConfig.prototype = {
 	datatable: null,
@@ -610,7 +634,8 @@ DisplayStepConfig.prototype = {
 			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
-			for (var size = 2; size < 7; size += 1) {
+			var maxsize = STEP_MAX_SIZE/2;
+			for (var size = 2; size < maxsize; size += 1) {
 				var size2 = 2*size;
 				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
@@ -618,8 +643,10 @@ DisplayStepConfig.prototype = {
 			html += "<td><select id='step_shape_" + id + "_" + idx + "'>";
 			html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
-			for (var shape in ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"]) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shape + "</option>";
+			// shapes will be factorized
+			var shapes = ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"];
+			for (var shape in shapes) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shapes[shape] + "</option>";
 			}
 			html += "</select></td>";
 			html += "</tr>\n";
@@ -1078,6 +1105,8 @@ Datatable.prototype = {
 
 	epilogue: function() {
 		if (this.biotype.isContinuous()) {
+			// TBD: wrong: not suitable for tab sharing !
+			// must have a different div per doc
 			this.displayStepConfig = new DisplayStepConfig(this);
 			this.displayDiscreteConfig = null;
 		} else {
@@ -1174,14 +1203,19 @@ Datatable.prototype = {
 	},
 
 	getBarplotHeight: function(value, max) {
-		var ivalue = parseFloat(value);
-		if (!isNaN(ivalue)) {
-			if (this.biotype.isContinuous()) {
+		if (this.biotype.isContinuous()) {
+			var ivalue = parseFloat(value);
+			if (!isNaN(ivalue)) {
 				var ivalue = parseFloat(value);
 				if (!isNaN(ivalue)) {
 					return max * (ivalue-this.minval) / (this.maxval - this.minval);
 				}
 			}
+		} else {
+			var displayConfig = this.getDisplayConfig();
+			var size = displayConfig.getSize(value);
+			//return max*(size/DISCRETE_MAX_SIZE);
+			return max*(size/(displayConfig.getValueCount()*DISCRETE_SIZE_COEF));
 		}
 		return 0.;
 	},
@@ -1289,7 +1323,7 @@ function DrawingConfig() {
 	this.display_markers = 1;
 	this.display_old_markers = 1;
 
-	this.display_charts = 1; // 1 for heatmap, 2 for barplot, 3 for piechart
+	this.display_charts = "Heatmap";
 	this.heatmap_config = new HeatmapConfig();
 	this.editing_heatmap_config = new HeatmapConfig();
 	this.barplot_config = new BarplotConfig();
@@ -1357,6 +1391,24 @@ DrawingConfig.prototype = {
 			this.display_charts = 0;
 		} else {
 			this.display_charts = chart_type;
+		}
+	},
+
+	sync: function() {
+		for (var map_name in maps) {
+			var doc = maps[map_name].document;
+			if (doc == window.document) {
+				//continue;
+			}
+			console.log("this.display_charts: " + this.display_charts);
+			if (!this.display_charts) {
+				$("#drawing_config_chart_display", doc).attr("checked", false);
+			} else {
+				$("#drawing_config_chart_display", doc).attr("checked", true);
+				$("#drawing_config_chart_type", doc).val(this.display_charts);
+			}
+			$("#drawing_config_marker_display", doc).attr("checked", this.display_markers);
+			$("#drawing_config_old_marker", doc).val(this.display_old_markers);
 		}
 	}
 };
@@ -1609,6 +1661,7 @@ Group.prototype = {
 	setMethod: function(datatable, method) {
 		this.methods[datatable.getId()] = method;
 		update_status_tables();
+		jstree_refresh(true);
 	},
 
 	getMethod: function(datatable) {
@@ -1936,7 +1989,7 @@ function navicell_init() {
 	_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Copy number data mRNA, microRNA", _navicell.CONTINUOUS));
+	_navicell.biotype_factory.addBiotype(new Biotype("Copy number data", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));

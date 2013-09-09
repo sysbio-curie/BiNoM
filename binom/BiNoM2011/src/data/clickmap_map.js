@@ -753,7 +753,8 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		maps = Object();
 	}
 	maps[map_name] = window;
-	
+	window.document.map_name = map_name;
+
 	new_markers = Array();
 
 	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
@@ -843,6 +844,7 @@ function show_map_and_markers(map_name, ids)
 		map.to_open = ids;
 		map.maps = maps;
 		map.navicell = navicell;
+		map.document.map_name = map_name;
 		maps[map_name] = map;
 	}
 }

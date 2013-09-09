@@ -679,7 +679,7 @@ div.tablesorterPager input {
 /*    border: 1px solid; */
 }
 
-#heatmap_editing, #barplot_editing {
+#heatmap_editing, #barplot_editing, #drawing_editing {
     font-size: small;
     margin-bottom: 10px;
     padding-bottom: 10px;

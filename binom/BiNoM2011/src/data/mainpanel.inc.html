@@ -106,7 +106,7 @@
       <br/>
       <br/>
       <label id="dt_datatable_status_update_label" for="unlock_datatables" class="update-checkbox"></label>
-      <input type="checkbox" id="dt_datatable_status_update" name="unlock_datatables" onchange='update_datatable_status_table(window.document);'></input>
+      <input type="checkbox" id="dt_datatable_status_update" name="unlock_datatables" onchange='update_datatable_status_table(window.document, {force: true});'></input>
      <div id="dt_datatable_buttonpane">
        <table border='0'>
 	 <tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td>
@@ -141,16 +141,17 @@
 
 <div id="drawing_config_div">
   <h3>Drawing Configuration</h3>
+  <div id="drawing_editing"></div>
   <h4>Markers</h4>
   <div class='drawing_config_box'>
     <table>
       <tr>
-	<td>Display</td><td><input id="drawing_config_marker_display" type="checkbox" checked="checked"></input></td>
+	<td>Display</td><td><input id="drawing_config_marker_display" type="checkbox" checked="checked" onchange='drawing_editing(true)'></input></td>
       </tr>
       <tr>
 	<td>&nbsp;</td>
 	<td>
-	  <select id="drawing_config_old_marker">
+	  <select id="drawing_config_old_marker" onchange='drawing_editing(true)'>
 	    <option value="1">Keep old markers with a different color</option>
 	    <option value="2">Keep old markers with the same color</option>
 	    <option value="0">Don't keep old markers</option>
@@ -163,14 +164,14 @@
   <div class='drawing_config_box'>
     <table style=''>
       <tr>
-	<td>Display</td><td><input id="drawing_config_chart_display" type="checkbox" checked="checked"></input></td>
+	<td>Display</td><td><input id="drawing_config_chart_display" type="checkbox" checked="checked" onchange='drawing_editing(true)'></input></td>
       </tr>
       <tr>
 	<td>
 	  Chart Type
 	</td>
 	<td>
-	  <select id="drawing_config_chart_type">
+	  <select id="drawing_config_chart_type" onchange='drawing_editing(true)'>
 	    <option value="Heatmap">Heatmap</option>
 	    <option value="Barplot">Barplot</option>
 	    <option value="Piechart">Piechart</option>
@@ -188,7 +189,7 @@
   <div class='drawing_config_box'>
     <table>
       <tr>
-	<td>Display</td><td><input id="drawing_config_glyph_display" type="checkbox"></input></td>
+	<td>Display</td><td><input id="drawing_config_glyph_display" type="checkbox" onchange='drawing_editing(true)'></input></td>
 	</tr>
       <tr>
 	<td>&nbsp;</td>
@@ -201,7 +202,7 @@
   <div class='drawing_config_box'>
     <table>
       <tr>
-	<td>Display</td><td><input id="drawing_config_label_display" type="checkbox"></input></td>
+	<td>Display</td><td><input id="drawing_config_label_display" type="checkbox" onchange='drawing_editing(true)'></input></td>
       </tr>
       <tr>
 	<td>&nbsp;</td>

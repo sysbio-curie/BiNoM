@@ -2045,6 +2045,9 @@ public class ProduceClickableMap
 
 	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
 	{
+		System.out.println("generate_json_entity: " + ent.getName());
+
+		/*
 		outjson.print("\"id\" : \"" + ent.getId() + "\",");
 		outjson.print("\"name\" : \"" + ent.getName() + "\",");
 		Vector<String> hugoNames = ent.getHugoNames();
@@ -2052,6 +2055,7 @@ public class ProduceClickableMap
 		outjson.print("\"hugo\" : [");
 		for (int nn = 0; nn < hugo_size; ++nn) {
 			outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
+			System.out.println("-----> : " + hugoNames.get(nn));
 		}
 		outjson.print("],");
 		outjson.print("\"postid\" : \"" + ent.getPostId() + "\",");
@@ -2063,6 +2067,7 @@ public class ProduceClickableMap
 				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
 			}
 		}
+		*/
 
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
 
@@ -2076,6 +2081,8 @@ public class ProduceClickableMap
 
 		boolean first = true;
 		outjson.print("\"modifs\" : [");
+		System.out.println("modifs size: " + modifs.size());
+		int not_associated = 0;
 		for (final Modif q : modifs)
 		{
 			final Modification m = q.m;
@@ -2087,6 +2094,7 @@ public class ProduceClickableMap
 			outjson.print("{");
 			outjson.print("\"name\" : \"" + m.getName() + "\",");
 			outjson.print("\"id\" : \"" + m.getId() + "\",");
+			System.out.println("associated: " + q.associated);
 			if (q.associated)
 			{
 				outjson.print("\"associated\" : true");
@@ -2094,10 +2102,33 @@ public class ProduceClickableMap
 			else
 			{
 				generate_json_entity_modification(outjson, m, speciesAliases, placeMap, scales);
+				not_associated++;
 			}
 			outjson.print("}");
 		}
+
 		outjson.print("]");
+		if (not_associated > 0) {
+			outjson.print(", \"id\" : \"" + ent.getId() + "\",");
+			outjson.print("\"name\" : \"" + ent.getName() + "\",");
+			Vector<String> hugoNames = ent.getHugoNames();
+			int hugo_size = hugoNames.size();
+			outjson.print("\"hugo\" : [");
+			for (int nn = 0; nn < hugo_size; ++nn) {
+				outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
+				System.out.println("-----> : " + hugoNames.get(nn));
+			}
+			outjson.print("],");
+			outjson.print("\"postid\" : \"" + ent.getPostId() + "\"");
+			if (ent.getComment() != null) {
+				if (USE_JSON) {
+					//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
+					outjson.print(",\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\"");
+				} else {
+					//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
+				}
+			}
+		}
 	}
 
 	static private String generate_mapdata(final String map, final PrintStream outmapdata, final PrintStream outjson, final Map<String, EntityBase> entityIDToEntityMap,
@@ -2259,9 +2290,11 @@ public class ProduceClickableMap
 				return r != 0 ? r : (o1.associated == o2.associated ? 0 : o1.associated ? -1 : 1);
 			}});
 		
+		System.out.println("add_modifications_to_right: " + ent.getName() + " modifs: " + modifs.size() + " " + ent.getComment());
 		for (final Modif q : modifs)
 		{
 			final Modification m = q.m;
+			System.out.println("add_modifications_to_right: associated: " + q.associated);
 			if (q.associated)
 			{
 				// may be used for element.peers optimization like this:
@@ -2288,12 +2321,13 @@ public class ProduceClickableMap
 			}
 			else
 			{
-				if(ent!=null)if(ent.getPost()!=null){
-					String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
-					modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
-				}else{
-					Utils.eclipseErrorln("ERROR: no Post for "+ent.getId());
-				}
+				if(ent!=null)
+					if(ent.getPost()!=null) {
+						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
+						modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
+					}else{
+						Utils.eclipseErrorln("ERROR: no Post for "+ent.getId());
+					}
 			}
 		}
 		
@@ -4962,7 +4996,8 @@ public class ProduceClickableMap
 		final Div right_div = new Div(my_splitter, "id='" + "right_panel" + "'");
 		if (NV2) {
 			final Div tree_control_div = new Div(right_div, "id='" + "tree_control" + "'");
-			out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'><span class='tree-control'>clear</span></a>");
+			//out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'><span class='tree-control'>clear</span></a>");
+			out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'></a>");
 			tree_control_div.close();
 		}
 		final Div marker_div = new Div(right_div, "id='" + marker_div_name + "'");

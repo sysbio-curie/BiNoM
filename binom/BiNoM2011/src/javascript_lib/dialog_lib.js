@@ -133,6 +133,7 @@ $(function() {
 				//jtree.jstree("check_all");
 				//jtree.jstree("uncheck_node", $("li.navicell"));
 				//jtree.jstree("uncheck_node", $(".jstree-checked"));
+				navicell.drawing_config.setDisplayGlyphs($("#drawing_config_glyph_display").attr("checked"));
 				navicell.drawing_config.sync();
 				set_old_marker_mode($("#drawing_config_old_marker").val());
 				jstree_refresh(true);
@@ -265,7 +266,7 @@ $(function() {
 	$("#barplot_editor_div" ).dialog({
 		autoOpen: false,
 		width: 750,
-		height: 500,
+		height: 600,
 		modal: false,
 		buttons: {
 			"Apply": function() {
@@ -292,6 +293,39 @@ $(function() {
 				navicell.drawing_config.editing_barplot_config.cloneFrom(navicell.drawing_config.barplot_config);
 				update_status_tables();
 				barplot_editor_set_editing(false);
+			}
+		}
+	});
+
+
+	$("#glyph_editor_div" ).dialog({
+		autoOpen: false,
+		width: 750,
+		height: 660,
+		modal: false,
+		buttons: {
+			"Apply": function() {
+				// glyph_editor
+				glyph_editor_apply(navicell.drawing_config.glyph_config);
+				// instead of calling this function again, it
+				// should be better to copy glyph_config to
+				// editing_glyph_config
+				glyph_editor_apply(navicell.drawing_config.editing_glyph_config);
+				update_status_tables();
+				glyph_editor_set_editing(false);
+				jstree_refresh(true);
+			},
+			
+			"Clear": function() {
+				navicell.drawing_config.glyph_config.reset();
+				update_status_tables();
+				glyph_editor_set_editing(true);
+			},
+
+			"Cancel": function() {
+				navicell.drawing_config.editing_glyph_config.cloneFrom(navicell.drawing_config.glyph_config);
+				update_status_tables();
+				glyph_editor_set_editing(false);
 			}
 		}
 	});
@@ -327,7 +361,9 @@ function heatmap_editor_apply(heatmap_config)
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var val = $("#heatmap_editor_datatable_" + idx).val();
-		if (val && val != "_none_") {
+		if (val == "_none_") {
+			heatmap_config.setDatatableAt(idx, undefined);
+		} else {
 			//console.log("datatable selected " + val + " at index " + idx);
 			var datatable = navicell.getDatatableById(val);
 			heatmap_config.setDatatableAt(idx, datatable);
@@ -369,7 +405,9 @@ function barplot_editor_apply(barplot_config)
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 	for (var idx = 0; idx < datatable_cnt; ++idx) {
 		var val = $("#barplot_editor_datatable_" + idx).val();
-		if (val && val != "_none_") {
+		if (val == "_none_") {
+			barplot_config.setDatatableAt(idx, undefined);
+		} else {
 			//console.log("datatable selected " + val + " at index " + idx);
 			var datatable = navicell.getDatatableById(val);
 			barplot_config.setDatatableAt(idx, datatable);
@@ -380,11 +418,60 @@ function barplot_editor_apply(barplot_config)
 	barplot_config.setScaleSize($("#barplot_editor_scale_size").val());
 }
 
+function glyph_editor_apply(glyph_config)
+{
+	var val = $("#glyph_editor_gs").val();
+	if (val == "_none_") {
+		glyph_config.setSampleOrGroup(undefined);
+	} else {
+		var prefix = val.substr(0, 2);
+		var id = val.substr(2);
+		if (prefix == 'g_') {
+			//console.log("group selected " + id + " at index " + idx);
+			var group = navicell.group_factory.getGroupById(id);
+			glyph_config.setSampleOrGroup(group);
+		} else {
+			//console.log("group selected " + id + " at index " + idx);
+			var sample = navicell.dataset.getSampleById(id);
+			glyph_config.setSampleOrGroup(sample);
+		}
+	}
+
+	val = $("#glyph_editor_datatable_shape").val();
+	if (val == "_none_") {
+		glyph_config.setShapeDatatable(undefined);
+	} else {
+		var datatable = navicell.getDatatableById(val);
+		glyph_config.setShapeDatatable(datatable);
+	}
+
+	val = $("#glyph_editor_datatable_color").val();
+	if (val == "_none_") {
+		glyph_config.setColorDatatable(undefined);
+	} else {
+		var datatable = navicell.getDatatableById(val);
+		glyph_config.setColorDatatable(datatable);
+	}
+
+	val = $("#glyph_editor_datatable_size").val();
+	if (val == "_none_") {
+		glyph_config.setSizeDatatable(undefined);
+	} else {
+		var datatable = navicell.getDatatableById(val);
+		glyph_config.setSizeDatatable(datatable);
+	}
+
+	glyph_config.setSize($("#glyph_editor_size").val());
+	glyph_config.setScaleSize($("#glyph_editor_scale_size").val());
+}
+
 function update_sample_status_table(doc, params) {
 	var table = $("#dt_sample_status_table", doc);
 	table.children().remove();
 	// should use a string buffer
-	var str = "<thead><tr><th>Samples&nbsp;(" + mapSize(navicell.dataset.samples) + ")</th>";
+	var str = "<thead>";
+	str += "<tr><td>&nbsp</td><td colspan='" + mapSize(navicell.dataset.datatables) + "'>&nbsp;#Genes&nbsp;in&nbsp;</td</tr>";
+	str += "<tr><th>Samples&nbsp;(" + mapSize(navicell.dataset.samples) + ")</th>";
 
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
@@ -527,8 +614,13 @@ function update_group_status_table(doc, params) {
 	var str = "<thead><tr><th>Groups&nbsp;(" + mapSize(navicell.group_factory.group_map) + ")</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
-		str += "<th colspan='2'>&nbsp;" + datatable.html_name + "&nbsp;</th>";
+		str += "<td colspan='2'>&nbsp;" + datatable.html_name + "&nbsp;</td>";
 	}
+	str += "<tr><td>&nbsp;</td>";
+	for (var datatable_name in navicell.dataset.datatables) {
+		str += "<th>&nbsp;#Samples&nbsp;</th><td>Method</td>";
+	}
+	str += "</tr>";
 	str += "</thead>";
 	str += "<tbody>";
 	for (var group_name in navicell.group_factory.group_map) {
@@ -585,7 +677,9 @@ function update_group_status_table(doc, params) {
 function update_module_status_table(doc, params) {
 	var table = $("#dt_module_status_table", doc);
 	table.children().remove();
-	var str = "<thead><tr><th>Module</th>";
+	var str = "<thead>";
+	str += "<tr><td>&nbsp</td><td colspan='" + mapSize(navicell.dataset.datatables) + "'>&nbsp;#Genes&nbsp;in&nbsp;</td</tr>";
+	str += "<tr><th>Module</th>";
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		str += "<th>&nbsp;" + datatable.html_name + "&nbsp;</th>";
@@ -629,7 +723,9 @@ function update_gene_status_table(doc, params) {
 	var module_name = doc ? doc.navicell_module_name : "";
 	table.children().remove();
 	// should use a string buffer
-	var str = "<thead><tr><th>Genes&nbsp;(" + mapSize(navicell.dataset.genes) + ")</th>";
+	var str = "<thead>";
+	str += "<tr><td>&nbsp</td><td>&nbsp</td><td colspan='" + mapSize(navicell.dataset.datatables) + "'>&nbsp;#Samples&nbsp;in&nbsp;</td</tr>";
+	str += "<tr><th>Genes&nbsp;(" + mapSize(navicell.dataset.genes) + ")</th>";
 	str += "<th>In&nbsp;" + module_name + "&nbsp;(" + in_module_gene_count(module_name) + ")</th>";
 
 	for (var dt_name in navicell.dataset.datatables) {
@@ -764,6 +860,7 @@ function update_status_tables(params) {
 		update_sample_annot_table(doc, params);
 		update_heatmap_editor(doc, params);
 		update_barplot_editor(doc, params);
+		update_glyph_editor(doc, params);
 	}
 	//navicell_session.write();
 }
@@ -816,15 +913,13 @@ function update_datatables() {
 		var update = $("#dt_datatable_status_update");
 		update.attr('checked', false);
 		update.text('Unlock Datatables');
+		update_datatable_status_table(null, {force: true});
 		update_status_tables();
 	}
 }
 
 function cancel_datatables() {
-	for (var dt_name in navicell.dataset.datatables) {
-		var datatable = navicell.dataset.datatables[dt_name];
-		$("#dt_name_" + datatable.getId()).val(dt_name);
-	}
+	update_datatable_status_table(null, {force: true});
 }
 
 Datatable.prototype.showDisplayConfig = function(doc) {
@@ -882,6 +977,7 @@ Datatable.prototype.showDisplayConfig = function(doc) {
 								var shape = $("#step_shape_" + datatable_id + "_" + idx, doc).val();
 								displayStepConfig.setStepInfo(idx, value, color, size, shape);
 							}
+							display_step_config_set_editing(datatable_id, false);
 						}
 					}
 					if (displayDiscreteConfig) {
@@ -890,8 +986,10 @@ Datatable.prototype.showDisplayConfig = function(doc) {
 							var color = $("#discrete_config_" + datatable_id + "_" + idx, doc).val();
 							var size = $("#discrete_size_" + datatable_id + "_" + idx, doc).val();
 							var shape = $("#discrete_shape_" + datatable_id + "_" + idx, doc).val();
+							console.log("shape: " + shape);
 							displayDiscreteConfig.setValueInfo(idx, color, size, shape);
 						}
+						display_discrete_config_set_editing(datatable_id, false);
 					}
 					datatable.refresh();
 					update_status_tables();
@@ -900,15 +998,32 @@ Datatable.prototype.showDisplayConfig = function(doc) {
 
 				"Cancel": function() {
 					var datatable = navicell.getDatatableById(datatable_id);
-					var displayConfig = datatable.getDisplayConfig();
-					if (displayConfig) {
-						displayConfig.update();
+					var displayStepConfig = datatable.displayStepConfig;
+					var displayDiscreteConfig = datatable.displayDiscreteConfig;
+					if (displayStepConfig) {
+						displayStepConfig.update();
+						display_step_config_set_editing(datatable_id, false);
+					}
+					if (displayDiscreteConfig) {
+						displayDiscreteConfig.update();
+						display_discrete_config_set_editing(datatable_id, false);
 					}
 				}
 			}
 		});
 		div.dialog("open");
 	}
+}
+
+var EDITING_CONFIGURATION = "configuration not saved...";
+
+function display_step_config_set_editing(datatable_id, val) {
+	console.log("display_step_config_set_editing(" + val + ") " + $("#step_config_editing_" + datatable_id).length);
+	$("#step_config_editing_" + datatable_id).html(val ? EDITING_CONFIGURATION : "");
+}
+
+function display_discrete_config_set_editing(datatable_id, val) {
+	$("#discrete_config_editing_" + datatable_id).html(val ? EDITING_CONFIGURATION : "");
 }
 
 function drawing_config_chart() {
@@ -920,15 +1035,18 @@ function drawing_config_chart() {
 	}
 }
 
+function drawing_config_glyph() {
+	$("#glyph_editor_div").dialog("open");
+}
+
 function drawing_editing(val) {
-	$("#drawing_editing").html(val ? "configuration not saved..." : "");
+	$("#drawing_editing").html(val ? EDITING_CONFIGURATION : "");
 }
 
 function heatmap_editor_set_editing(val, idx, map_name) {
 	console.log("heatmap_editor_set_editing: " + map_name);
 	var doc = (map_name && maps ? maps[map_name].document : null);
-	$("#heatmap_editing").html(val ? "configuration not saved..." : "");
-	//$("#gene_choice").css("visibility", val ? "hidden" : "visible");
+	$("#heatmap_editing").html(val ? EDITING_CONFIGURATION : "");
 	if (val) {
 		heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
 		update_heatmap_editor(doc, null, navicell.drawing_config.editing_heatmap_config);
@@ -1054,7 +1172,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	html += "</tbody>";
 
 	table.append(html);
-	table.tablesorter();
+	//table.tablesorter();
 
 	html = "<table cellspacing='5'><tr><td><span style='font-size: small; font-weight: bold'>Size</span></td>";
 	var size = heatmapConfig.getSize();
@@ -1109,7 +1227,7 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 
 	var scale2 = heatmapConfig.getScale(scale);
-	var size = heatmapConfig.getSize();
+	var size = heatmapConfig.getSize()*2;
 	var cell_w = size*scale2;
 	var cell_h = size*scale2;
 
@@ -1135,6 +1253,21 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 					//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
 					context.fillStyle = "#" + bg;
 					context.fillRect(start_x, start_y, cell_w, cell_h);
+					context.lineWidth = 1;
+					context.strokeRect(start_x, start_y, cell_w, cell_h);
+					/*
+					context.fillStyle = "#000000";
+					context.lineWidth = 1;
+					context.strokeWidth = 1;
+					context.strokeStyle = "#000000";
+					context.beginPath();
+					context.moveTo(start_x, start_y);
+					context.lineTo(start_x+cell_w, start_y);
+					context.lineTo(start_x+cell_w, start_y+cell_h);
+					context.lineTo(start_x, start_y+cell_h);
+					context.closePath();
+					context.stroke();
+					*/
 					start_x += cell_w;
 				}
 			} else if (sel_group) {
@@ -1157,7 +1290,7 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 }
 
 function barplot_editor_set_editing(val, idx) {
-	$("#barplot_editing").html(val ? "configuration not saved..." : "");
+	$("#barplot_editing").html(val ? EDITING_CONFIGURATION : "");
 	//$("#gene_choice").css("visibility", val ? "hidden" : "visible");
 	if (val) {
 		barplot_editor_apply(navicell.drawing_config.editing_barplot_config);
@@ -1339,7 +1472,7 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "</tbody>";
 
 	table.append(html);
-	table.tablesorter();
+	//table.tablesorter();
 
 	html = "<table cellspacing='5'><tr><td><span style='font-size: small; font-weight: bold'>Size</span></td>";
 	var height = barplotConfig.getHeight();
@@ -1407,8 +1540,8 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 	var datatable_cnt = mapSize(navicell.dataset.datatables);
 
 	var scale2 = barplotConfig.getScale(scale);
-	var width = barplotConfig.getWidth();
-	var height = barplotConfig.getHeight();
+	var width = barplotConfig.getWidth()*2;
+	var height = barplotConfig.getHeight()*2;
 	var cell_w = width*scale2;
 	var cell_h = height*scale2;
 
@@ -1436,6 +1569,20 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 
 				var height = sel_datatable.getBarplotHeight(value, maxy);
 				context.fillRect(start_x, start_y+maxy-height, cell_w, height);
+				context.strokeRect(start_x, start_y+maxy-height, cell_w, height);
+				/*
+				context.fillStyle = "#000000";
+				context.lineWidth = 1;
+				context.strokeWidth = 1;
+				context.strokeStyle = "#000000";
+				context.beginPath();
+				context.moveTo(start_x, start_y+maxy-height);
+				context.lineTo(start_x+cell_w, start_y+maxy-height);
+				context.lineTo(start_x+cell_w, start_y+maxy);
+				context.lineTo(start_x, start_y+maxy);
+				context.closePath();
+				context.stroke();
+				*/
 				start_x += cell_w;
 			}
 		} else if (sel_group) {
@@ -1458,7 +1605,344 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 	overlay.addBoundBox([topx, start_y, start_x-topx, maxy], gene_name, "barplot");
 }
 
+function datatable_select(id, onchange, sel_datatable) {
+	var html = "<select id='" + id + "' onchange='" + onchange + "'>";
 
+	html += "<option value='_none_'>Choose a datatable</option>\n";
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
+		html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>\n";
+	}
+	return html + "</select>";
+}
+
+function sample_or_group_select(id, onchange, sel_group, sel_sample) {
+	var html = "<select id='" + id + "' onchange='" + onchange + "'>";
+	html += "<option value='_none_'>Choose a group or sample</option>\n";
+	for (var group_name in navicell.group_factory.group_map) {
+		var group = navicell.group_factory.group_map[group_name];
+		var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
+		html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>\n";
+	}
+	for (var sample_name in navicell.dataset.samples) {
+		var sample = navicell.dataset.samples[sample_name];
+		var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
+		html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample.name + "</option>\n";
+	}
+	return html + "</select>";
+}
+
+function glyph_editor_set_editing(val, what) {
+	$("#glyph_editing").html(val ? EDITING_CONFIGURATION : "");
+	if (val) {
+		glyph_editor_apply(navicell.drawing_config.editing_glyph_config);
+		update_glyph_editor(null, null, navicell.drawing_config.editing_glyph_config);
+	}
+	console.log("glyph_editor_set_editing: " + val + " " + what);
+	// ok
+	if (what != undefined && $("#glyph_editor_datatable_" + what).val() != '_none_') {
+		$("#glyph_editor_datatable_config_" + what).removeClass("zz-hidden");	
+	} else {
+		$("#glyph_editor_datatable_config_" + what).addClass("zz-hidden");	
+	}
+}
+
+function glyph_step_display_config(what) {
+	var val = $("#glyph_editor_datatable_" + what).val();
+	if (val != '_none_') {
+		var datatable = navicell.getDatatableById(val);
+		if (datatable) {
+			datatable.showDisplayConfig();
+		}
+	}
+}
+
+function update_glyph_editor(doc, params, glyphConfig) {
+	console.log("updating glyph_editor");
+	if (!glyphConfig) {
+		glyphConfig = navicell.drawing_config.editing_glyph_config;
+	}
+	var map_name = doc ? doc.map_name : "";
+	var div = $("#glyph_editor_div");
+	var topdiv = div.parent().parent();
+	var empty_cell_style = "background: " + topdiv.css("background") + "; border: none;";
+	var table = $("#glyph_editor_table", doc);
+	var sel_gene_id = $("#glyph_select_gene", doc).val();
+	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+
+	table.children().remove();
+	var html = "";
+	html += "<tbody>";
+
+	html += "<table><tr><td style='" + empty_cell_style + "'>";
+
+	html += "<table cellpadding='6'><tr>";
+	html += "<td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Sample or Group</span></td>";
+	html += "<td colspan='2' style='" + empty_cell_style + "'>";
+	var sel_group = glyphConfig.getGroup();
+	var sel_sample = glyphConfig.getSample();
+	html += sample_or_group_select("glyph_editor_gs", 'glyph_editor_set_editing(true, "sample", "' + map_name + '")', sel_group, sel_sample);
+	html += "</td>";
+	html += "</tr>";
+	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td></td>";
+
+	html += "<tr><td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Shape</span></td>";
+
+	html += "<td style='" + empty_cell_style + "'>";
+	var sel_shape_datatable = glyphConfig.getShapeDatatable();
+	html += datatable_select("glyph_editor_datatable_shape", 'glyph_editor_set_editing(true, "shape", "' + map_name + '")', sel_shape_datatable);
+	html += "</td>";
+
+	html += "<td style='border: none; text-decoration: underline; font-size: 9px; text-align: left;" + empty_cell_style + "'><a href='#' onclick='glyph_step_display_config(\"shape\", \"" + map_name + "\")'><span id='glyph_editor_datatable_config_shape' class='" + (sel_shape_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
+	html += "</tr>";
+
+	html += "<tr><td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Color</span></td>";
+
+	html += "<td style='" + empty_cell_style + "'>";
+	var sel_color_datatable = glyphConfig.getColorDatatable();
+	html += datatable_select("glyph_editor_datatable_color", 'glyph_editor_set_editing(true, "color", "' + map_name + '")', sel_color_datatable);
+	html += "</td>";
+
+	html += "<td style='border: none; text-decoration: underline; font-size: 9px; text-align: left;" + empty_cell_style + "'><a href='#' onclick='glyph_step_display_config(\"color\", \"" + map_name + "\")'><span id='glyph_editor_datatable_config_color' class='" + (sel_color_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
+
+	html += "</tr>";
+
+	html += "<tr><td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Size</span></td>";
+	html += "<td style='" + empty_cell_style + "'>";
+	var sel_size_datatable = glyphConfig.getSizeDatatable();
+	html += datatable_select("glyph_editor_datatable_size", 'glyph_editor_set_editing(true, "size", "' + map_name + '")', sel_size_datatable);
+	html += "</td>";
+
+	html += "<td style='border: none; text-decoration: underline; font-size: 9px; text-align: left;" + empty_cell_style + "'><a href='#' onclick='glyph_step_display_config(\"size\", \"" + map_name + "\")'><span id='glyph_editor_datatable_config_size' class='" + (sel_size_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
+	html += "</tr>";
+
+	html += "</table>";
+	html += "</td>";
+	var CANVAS_W = 250;
+	var CANVAS_H = 250;
+	html += "<td style='width: " + CANVAS_W + "px; height: " + CANVAS_H + "px' id='glyph_editor_td_canvas' style='background: white;'></td>";
+	html += "</tr></table>";
+
+	html += "</tbody>";
+
+	table.append(html);
+
+	var draw_canvas = document.createElement('canvas');
+	draw_canvas.style.left = '0px';
+	draw_canvas.style.top = '0px';
+
+	draw_canvas.width = CANVAS_W;
+	draw_canvas.height = CANVAS_H;
+	draw_canvas.style.width = draw_canvas.width + 'px';
+	draw_canvas.style.height = draw_canvas.height + 'px';
+
+	draw_canvas.style.position = 'relative';
+	var context = null;
+	var td = $("#glyph_editor_td_canvas").get(0);
+	if (td) {
+		td.appendChild(draw_canvas);
+		context = draw_canvas.getContext('2d');
+
+		context.clearRect(0, 0, CANVAS_W, CANVAS_H);
+	}
+
+	if (sel_gene && sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
+		var shape_value;
+		var shape;
+		var color_value;
+		var color;
+		var size_value;
+		var size;
+		if (sel_sample) {
+			shape_value = sel_shape_datatable.getValue(sel_sample.name, sel_gene.name);
+			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
+			color_value = sel_color_datatable.getValue(sel_sample.name, sel_gene.name);
+			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
+			size_value = sel_size_datatable.getValue(sel_sample.name, sel_gene.name);
+			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+		} else {
+			shape_value = sel_group.getValue(sel_shape_datatable, sel_gene.name);
+			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
+			color_value = sel_group.getValue(sel_color_datatable, sel_gene.name);
+			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
+			size_value = sel_group.getValue(sel_size_datatable, sel_gene.name);
+			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+		}
+
+		console.log("shape: " + shape_value + " " + navicell.shapes[shape]);
+		console.log("color: " + color_value + " " + color);
+		console.log("size: " + size_value + " " + size);
+		draw_glyph_perform(context, CANVAS_W/2, CANVAS_H/2, shape, color, size, 8);
+	} else if (context) {
+		context.clearRect(0, 0, CANVAS_W, CANVAS_H);
+	}
+
+	html = "<table cellspacing='5'><tr><td><span style='font-size: small; font-weight: bold'>Size on Map</span></td>";
+	var size = glyphConfig.getSize();
+
+	html += "<tr><td>&nbsp;</td>";
+	html += "<td><select id='glyph_editor_size' onchange='glyph_editor_set_editing(true)'>";
+	html += "<option value='1'" + (size == 1 ? " selected" : "") +">Tiny</option>";
+	html += "<option value='2'" + (size == 2 ? " selected" : "") +">Small</option>";
+	html += "<option value='4'" + (size == 4 ? " selected" : "") +">Medium</option>";
+	html += "<option value='6'" + (size == 6 ? " selected" : "") +">Large</option>";
+	html += "<option value='8' " + (size == 8 ? " selected" : "") +">Very Large</option>";
+	html += "</select><td>";
+	html += "</tr>";
+
+	var scale_size = glyphConfig.getScaleSize();
+	html += "<tr><td>&nbsp;</td>";
+	html += "<td><select id='glyph_editor_scale_size' onchange='glyph_editor_set_editing(true)'>\n";
+	html += "<option value='0'" + (scale_size == 0 ? " selected" : "") +">Do not depend on scale</option>\n";
+	html += "<option value='1'" + (scale_size == 1 ? " selected" : "") +">Depend on scale</option>\n";
+	html += "<option value='2'" + (scale_size == 2 ? " selected" : "") +">Depend on sqrt(scale)</option>\n";
+	html += "<option value='3'" + (scale_size == 3 ? " selected" : "") +">Depend on sqrt(scale)/2</option>\n";
+	html += "<option value='4'" + (scale_size == 4 ? " selected" : "") +">Depend on sqrt(scale)/3</option>\n";
+	html += "<option value='5'" + (scale_size == 5 ? " selected" : "") +">Depend on sqrt(scale)/4</option>\n";
+	html += "</select><td>";
+	html += "</tr></table>";
+
+	$("#glyph_editor_size_div", doc).html(html);
+
+	html = "Apply this configuration to gene:&nbsp;";
+	html += "<select id='glyph_select_gene' onchange='update_glyph_editor(null, null, navicell.drawing_config.editing_glyph_config)'>\n";
+	html += "<option value='_none_'></option>\n";
+	for (var gene_name in navicell.dataset.genes) {
+		var gene = navicell.dataset.genes[gene_name];
+		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+	}
+	html += "</select>";
+	$("#glyph_gene_choice", doc).html(html);
+}
+
+
+function draw_glyph(overlay, context, scale, gene_name, topx, topy)
+{
+	console.log("drawing glyph");
+	var glyphConfig = navicell.drawing_config.glyph_config;
+
+	topy -= 2;
+	var scale2 = glyphConfig.getScale(scale);
+	var g_size = glyphConfig.getSize()*scale2;
+	topx += 8;
+
+	//var start_y = topy - scale2*g_size;
+	//var start_x = topx;
+
+	var sel_group = glyphConfig.getGroup();
+	var sel_sample = glyphConfig.getSample();
+	var sel_shape_datatable = glyphConfig.getShapeDatatable();
+	var sel_color_datatable = glyphConfig.getColorDatatable();
+	var sel_size_datatable = glyphConfig.getSizeDatatable();
+
+	var bound = null;
+	if (sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
+		var shape_value;
+		var shape;
+		var color_value;
+		var color;
+		var size_value;
+		var size;
+		if (sel_sample) {
+			shape_value = sel_shape_datatable.getValue(sel_sample.name, gene_name);
+			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
+			color_value = sel_color_datatable.getValue(sel_sample.name, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
+			size_value = sel_size_datatable.getValue(sel_sample.name, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+		} else {
+			shape_value = sel_group.getValue(sel_shape_datatable, gene_name);
+			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
+			color_value = sel_group.getValue(sel_color_datatable, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
+			size_value = sel_group.getValue(sel_size_datatable, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+		}
+
+		console.log("shape: " + shape_value + " " + navicell.shapes[shape]);
+		console.log("color: " + color_value + " " + color);
+		console.log("size: " + size_value + " " + size);
+		var start_x = topx + (size*g_size)/8; // must depends on scale2 also
+		var start_y = topy - (size*g_size)/8; // must depends on scale2 also
+		bound = draw_glyph_perform(context, start_x, start_y, shape, color, (size*g_size)/4, 1);
+	}
+	if (bound) {
+		console.log("bound: " + bound[0] + " " + bound[1] + " " + bound[2] + " " + bound[3]);
+		overlay.addBoundBox(bound, gene_name, "glyph");
+	}
+	return bound;
+}
+
+function draw_glyph_perform(context, pos_x, pos_y, shape, color, size, scale) {
+	if (!context) {
+		return;
+	}
+
+	size *= 2.;
+	shape = navicell.shapes[shape];
+
+	context.fillStyle = "#" + color;
+	context.strokeSyle = "#000000";
+	context.lineWidth = 1;
+
+	var dim = size*scale*1.;
+	var dim2 = dim/2.;
+	if (shape == 'Square') {
+		context.fillRect(pos_x-dim2, pos_y-dim2, dim, dim);
+		context.strokeRect(pos_x-dim2, pos_y-dim2, dim, dim);
+		return [pos_x-dim2, pos_y-dim2, dim, dim];
+	} else if (shape == 'Rectangle') {
+		var dim_w = 2*size*scale;
+		var dim_h = size*scale;
+		context.fillRect(pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h);
+		context.strokeRect(pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h);
+		return [pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h];
+	} else if (shape == 'Diamond') {
+		context.beginPath();
+		context.moveTo(pos_x-dim2, pos_y);
+		context.lineTo(pos_x, pos_y-dim2);
+		context.lineTo(pos_x+dim2, pos_y);
+		context.lineTo(pos_x, pos_y+dim2);
+		context.closePath();
+		context.fill();
+		context.stroke();
+		return [pos_x-dim2, pos_y-dim2, dim, dim];
+	} else if (shape == 'Circle') {
+		context.beginPath();
+		context.arc(pos_x, pos_y, dim2, 0., Math.PI*2);
+		context.closePath();
+		context.fill();
+		context.stroke();
+		return [pos_x-dim2, pos_y-dim2, dim, dim];
+	} else if (shape == 'Triangle') {
+		var side = dim/Math.sqrt(3.);
+		context.beginPath();
+		context.moveTo(pos_x-side, pos_y+dim2);
+		context.lineTo(pos_x, pos_y-dim2);
+		context.lineTo(pos_x+side, pos_y+dim2);
+		context.closePath();
+		context.fill();
+		context.stroke();
+		return [pos_x-dim2, pos_y-dim2, dim, dim];
+	} else if (shape == 'Hexagon') {
+		var side = dim2/2;
+		context.beginPath();
+		context.moveTo(pos_x-dim2, pos_y);
+		context.lineTo(pos_x-dim2+side, pos_y-dim2);
+		context.lineTo(pos_x+dim2-side, pos_y-dim2);
+		context.lineTo(pos_x+dim2, pos_y);
+		context.lineTo(pos_x+dim2-side, pos_y+dim2);
+		context.lineTo(pos_x-dim2+side, pos_y+dim2);
+		context.closePath();
+		context.fill();
+		context.stroke();
+		return [pos_x-dim2, pos_y-dim2, dim, dim];
+	}
+	return null;
+}
+ 
 //
 // -------------------------------------------------------------------------------
 //

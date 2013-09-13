@@ -61,6 +61,10 @@ USGSOverlay.prototype.onAdd = function() {
 					$("#barplot_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
 					$("#barplot_editor_div").dialog("open");
 					update_barplot_editor();
+				} else if (type == "glyph") {
+					$("#glyph_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#glyph_editor_div").dialog("open");
+					update_glyph_editor();
 				}
 				break;
 			}

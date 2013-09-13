@@ -72,7 +72,7 @@ Mapdata.prototype = {
 			for (var jj = 0; jj < entities.length; ++jj) {
 				var entity_map = entities[jj];
 				var hugo_arr = entity_map['hugo'];
-				if (hugo_arr.length > 0) {
+				if (hugo_arr && hugo_arr.length > 0) {
 					for (var kk = 0; kk < hugo_arr.length; ++kk) {
 						var hugo = hugo_arr[kk];
 						if (!this.hugo_map[hugo]) {
@@ -283,6 +283,14 @@ Dataset.prototype = {
 		//console.log("Drawing " + gene_name);
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
 		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
+		var bound = null;
+		if (navicell.drawing_config.displayGlyphs()) {
+			bound = draw_glyph(overlay, context, scale, gene_name, topx, topy);
+		}
+		if (bound) {
+			//topx += (bound[0] - topx + bound[2] + 2);
+			topx = bound[0] + bound[2] - 6;
+		}
 		if (navicell.drawing_config.displayHeatmaps()) {
 			draw_heatmap(overlay, context, scale, gene_name, topx, topy);
 		}
@@ -348,11 +356,12 @@ function DisplayDiscreteConfig(datatable) {
 DisplayDiscreteConfig.prototype = {
 	
 	buildDiv: function() {
-
 		var id = this.datatable.getId();
+		var div_editing_id = "discrete_config_editing_" + id;
 		var div_id = "discrete_config_" + id;
 		var html = "<div class='discrete-config' id='" + div_id + "'>\n";
 		html += "<h3 id='discrete_config_title_" + id + "'></h3>";
+		html += "<div id='" + div_editing_id + "' class='discrete-config-editing'>\n</div>";
 		html += "<table class='discrete-config-table' id='discrete_config_table_" + id + "'>";
 		html += "</table>";
 
@@ -379,7 +388,7 @@ DisplayDiscreteConfig.prototype = {
 
 	setValueInfo: function(idx, color, size, shape) {
 		if (idx < this.colors.length) {
-			//console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
+			console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
 			this.colors[idx] = color;
 			this.sizes[idx] = size;
 			this.shapes[idx] = shape;
@@ -387,12 +396,16 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	setDefaults: function() {
-		this.setValueInfo(0, "F7FF19", 1, 0);
-		this.setValueInfo(1, "D6ECFF", 2, 1);
-		this.setValueInfo(2, "19FF57", 3, 2);
-		this.setValueInfo(3, "6421FF", 4, 3);
-		this.setValueInfo(4, "E64515", 5, 4);
-		this.setValueInfo(5, "FF0000", 6, 5);
+		//this.setValueInfo(0, "F7FF19", 4, 0);
+		this.setValueInfo(0, "FFE4B5", 4, 0);
+		this.setValueInfo(1, "D6ECFF", 6, 1);
+		//this.setValueInfo(2, "19FF57", 8, 2);
+		this.setValueInfo(2, "B3FF4F", 8, 2);
+		//this.setValueInfo(3, "6421FF", 10, 3);
+		this.setValueInfo(3, "8F57FF", 10, 3);
+		//this.setValueInfo(4, "E64515", 12, 4);
+		this.setValueInfo(4, "E65EC2", 12, 4);
+		this.setValueInfo(5, "CC0044", 14, 5);
 		this.update();
 	},
 
@@ -450,25 +463,23 @@ DisplayDiscreteConfig.prototype = {
 				value = "<span style='font-style: italic;'>empty</span>";
 			}
 			html += "<td>" + value + "</td>";
-			html += "<td><input id='discrete_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
+			html += "<td><input id='discrete_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_discrete_config_set_editing(" + id + ", true)'></input></td>";
 			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
-			html += "<td><select id='discrete_size_" + id + "_" + idx + "'>";
+			html += "<td><select id='discrete_size_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)'>";
 			html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
 			//var maxsize = DISCRETE_MAX_SIZE/2;
 			var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
 			for (var size = 0; size < maxsize; size += 1) {
-				var size2 = DISCRETE_SIZE_COEF*(size+1);
+				var size2 = DISCRETE_SIZE_COEF*(size+2);
 				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
 			html += "</select></td>";
-			html += "<td><select id='discrete_shape_" + id + "_" + idx + "'>";
+			html += "<td><select id='discrete_shape_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)''>";
 			html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
-			// shapes will be factorized
-			var shapes = ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"];
-			for (var shape in shapes) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shapes[shape] + "</option>";
+			for (var shape in navicell.shapes) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + navicell.shapes[shape] + "</option>";
 			}
 			html += "</select></td>";
 			html += "</tr>\n";
@@ -493,7 +504,7 @@ function DisplayStepConfig(datatable) {
 }
 
 var STEP_MAX_SIZE = 14.;
-var DISCRETE_SIZE_COEF = 1.;
+var DISCRETE_SIZE_COEF = 2.;
 
 DisplayStepConfig.prototype = {
 	datatable: null,
@@ -550,11 +561,15 @@ DisplayStepConfig.prototype = {
 
 	setDefaults: function(step_cnt) {
 		if (step_cnt == 5) {
-			this.setStepInfo(0, Number.MIN_NUMBER, "F7FF19", 4, 0);
+			//this.setStepInfo(0, Number.MIN_NUMBER, "F7FF19", 4, 0);
+			this.setStepInfo(0, Number.MIN_NUMBER, "FFE4B5", 4, 0);
 			this.setStepInfo(1, Number.MIN_NUMBER, "D6ECFF", 6, 1);
-			this.setStepInfo(2, Number.MIN_NUMBER, "19FF57", 8, 2);
-			this.setStepInfo(3, Number.MIN_NUMBER, "6421FF", 10, 3);
-			this.setStepInfo(4, Number.MIN_NUMBER, "E64515", 12, 4);
+			//this.setStepInfo(2, Number.MIN_NUMBER, "19FF57", 8, 2);
+			this.setStepInfo(2, Number.MIN_NUMBER, "B3FF4F", 8, 2);
+			//this.setStepInfo(3, Number.MIN_NUMBER, "6421FF", 10, 3);
+			this.setStepInfo(3, Number.MIN_NUMBER, "8F57FF", 10, 3);
+			//this.setStepInfo(4, Number.MIN_NUMBER, "E64515", 12, 4);
+			this.setStepInfo(4, Number.MIN_NUMBER, "E65EC2", 12, 4);
 			this.update();
 		}
 	},
@@ -627,11 +642,10 @@ DisplayStepConfig.prototype = {
 			if (idx == step_cnt-1) {
 				html += "<td>" + this.datatable.maxval + " (maximum)</td>";
 			} else {
-				html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "'></input></td>";
+				html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "' onchange='display_step_config_set_editing(" + id + ", true)'></input></td>";
 			}
-			html += "<td><input id='step_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color'></input></td>";
-			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
-			html += "<td><select id='step_size_" + id + "_" + idx + "'>";
+			html += "<td><input id='step_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_step_config_set_editing(" + id + ", true)'></input></td>";
+			html += "<td><select id='step_size_" + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true)'>";
 			html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
 			var maxsize = STEP_MAX_SIZE/2;
@@ -640,13 +654,11 @@ DisplayStepConfig.prototype = {
 				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
 			html += "</select></td>";
-			html += "<td><select id='step_shape_" + id + "_" + idx + "'>";
+			html += "<td><select id='step_shape_" + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true)''>";
 			html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
-			// shapes will be factorized
-			var shapes = ["Square", "Rectangle", "Triangle", "Circle", "Hexagon"];
-			for (var shape in shapes) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + shapes[shape] + "</option>";
+			for (var shape in navicell.shapes) {
+				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + navicell.shapes[shape] + "</option>";
 			}
 			html += "</select></td>";
 			html += "</tr>\n";
@@ -665,9 +677,11 @@ DisplayStepConfig.prototype = {
 
 	buildDiv: function(step_cnt) {
 		var id = this.datatable.getId();
+		var div_editing_id = "step_config_editing_" + id;
 		var div_id = "step_config_" + id;
 		var html = "<div class='step-config' id='" + div_id + "'>\n";
 		html += "<h3 id='step_config_title_" + id + "'></h3>";
+		html += "<div id='" + div_editing_id + "' class='step-config-editing'></div>\n";
 		html += "<table class='step-config-table' id='step_config_table_" + id + "'>";
 		html += "</table>";
 
@@ -858,10 +872,10 @@ BarplotConfig.prototype = {
 
 	getScale: function(scale) {
 		if (this.scale_size == 0) {
-			return 1;
+			return 1.;
 		}
 		if (this.scale_size == 1) {
-			return scale*1;
+			return scale*1.;
 		}
 		return Math.sqrt(scale*1.)/(this.scale_size-1);
 	},
@@ -927,6 +941,91 @@ BarplotConfig.prototype = {
 		var sample_or_group = this.getSampleOrGroupAt(idx);
 		return sample_or_group && sample_or_group.isSample() ? sample_or_group : undefined;
 	}
+};
+
+function GlyphConfig() {
+	this.reset();
+}
+
+GlyphConfig.prototype = {
+
+	reset: function() {
+		this.sample_or_group = null;
+		this.shape_datatable = null;
+		this.color_datatable = null;
+		this.size_datatable = null;
+		this.setSize(4);
+		this.setScaleSize(4);
+	},
+
+	setSize: function(size) {
+		this.size = size*1.;
+	},
+
+	setScaleSize: function(scale_size) {
+		this.scale_size = scale_size*1;
+	},
+
+	getSize: function() {
+		return this.size;
+	},
+
+	getScaleSize: function() {
+		return this.scale_size;
+	},
+
+	getScale: function(scale) {
+		if (this.scale_size == 0) {
+			return 1;
+		}
+		if (this.scale_size == 1) {
+			return scale*1;
+		}
+		return Math.sqrt(scale*1.)/(this.scale_size-1);
+	},
+
+	setSampleOrGroup: function(sample_or_group) {
+		this.sample_or_group = sample_or_group;
+	},
+
+	getSampleOrGroup: function() {
+		return this.sample_or_group;
+	},
+
+	getGroup: function() {
+		var sample_or_group = this.getSampleOrGroup();
+		return this.sample_or_group && sample_or_group.isGroup() ? sample_or_group : undefined;
+	},
+
+	getSample: function() {
+		var sample_or_group = this.getSampleOrGroup();
+		return sample_or_group && sample_or_group.isSample() ? sample_or_group : undefined;
+	},
+
+	setShapeDatatable: function(datatable) {
+		this.shape_datatable = datatable;
+	},
+
+	getShapeDatatable: function() {
+		return this.shape_datatable;
+	},
+
+	setColorDatatable: function(datatable) {
+		this.color_datatable = datatable;
+	},
+
+	getColorDatatable: function() {
+		return this.color_datatable;
+	},
+
+	setSizeDatatable: function(datatable) {
+		this.size_datatable = datatable;
+	},
+
+	getSizeDatatable: function() {
+		return this.size_datatable;
+	}
+
 };
 
 // TBD datatable id management
@@ -1328,11 +1427,12 @@ function DrawingConfig() {
 	this.editing_heatmap_config = new HeatmapConfig();
 	this.barplot_config = new BarplotConfig();
 	this.editing_barplot_config = new BarplotConfig();
-
 	//this.piechart_config = new PiechartConfig();
 
+	this.glyph_config = new GlyphConfig();
+	this.editing_glyph_config = new GlyphConfig();
+
 	this.display_glyphs = 0;
-	//this.glyph_config = new GlyphConfig();
 	this.display_labels = 0;
 }
 
@@ -1384,6 +1484,10 @@ DrawingConfig.prototype = {
 
 	setDisplayOldMarkers: function(val) {
 		this.display_old_markers = val;
+	},
+
+	setDisplayGlyphs: function(val) {
+		this.display_glyphs = val;
 	},
 
 	setDisplayCharts: function(val, chart_type) {
@@ -2005,6 +2109,8 @@ function navicell_init() {
 		*/
 		return this.dataset.getDatatableById(id);
 	}
+
+	_navicell.shapes = ["Square", "Rectangle", "Triangle", "Diamond", "Hexagon", "Circle"];
 
 	return _navicell;
 }

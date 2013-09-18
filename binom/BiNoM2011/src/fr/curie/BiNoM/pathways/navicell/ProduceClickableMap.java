@@ -463,6 +463,7 @@ public class ProduceClickableMap
 		boolean make_tiles = true;
 		boolean only_tiles = false;
 		boolean provide_sources = false;
+		boolean nv2 = false;
 
 		String project_name = null;
 		
@@ -494,7 +495,7 @@ public class ProduceClickableMap
 			else if ((b = options.booleanOption("notile", "do not force tile creation")) != null)
 				make_tiles = !b.booleanValue();
 			else if ((b = options.booleanOption("nv2", "Navicell2 file generation")) != null)
-				NV2 = b.booleanValue();
+				nv2 = b.booleanValue();
 			else if ((b = options.booleanOption("onlytile", "only create tiles")) != null)
 				only_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("provide_sources", "provide sources")) != null)
@@ -573,7 +574,7 @@ public class ProduceClickableMap
 		try
 		{
 			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
-			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_ssl, wordpress_xmlrpc_patched, root, provide_sources);
+			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_ssl, wordpress_xmlrpc_patched, root, provide_sources, nv2);
 		}
 		catch (NaviCellException e)
 		{
@@ -610,9 +611,12 @@ public class ProduceClickableMap
 		final boolean wordpress_ssl,
 		final boolean wordpress_xmlrpc_patched,
 		final File root,
-		final boolean provide_sources
+		final boolean provide_sources,
+		final boolean nv2
 	 ) throws NaviCellException, IOException
 	{
+		NV2 = nv2;
+
 		if (xrefs == null) {
 			BufferedReader xref_stream = open_local_file(default_xref_file);
 			xrefs = load_xrefs(xref_stream, default_xref_file);

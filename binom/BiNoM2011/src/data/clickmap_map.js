@@ -250,7 +250,7 @@ function show_markers_ref(markers, ref)
 	}
 
 	if (overlay) {
-		overlay.draw();
+		overlay.draw(window.document.navicell_module_name);
 	}
 	check_node_inhibit = o_check_node_inhibit;
 }
@@ -267,7 +267,7 @@ function jstree_uncheck_all()
 	//jtree.jstree("uncheck_node", jquery_to_dom($(".jstree-checked")));
 	jtree.jstree("uncheck_all");
 	overlay.reset();
-	overlay.draw();
+	overlay.draw(window.document.navicell_module_name);
 }
 
 function jstree_refresh(partial)
@@ -290,7 +290,7 @@ function jstree_refresh(partial)
 				cnt++;
 			}
 		}
-		overlay.draw();
+		overlay.draw(window.document.navicell_module_name);
 		return;
 	}
 	
@@ -629,7 +629,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 				}
 				if (overlay && rm_arrpos.length) {
 					overlay.remove(rm_arrpos);
-					overlay.draw();
+					overlay.draw(window.document.navicell_module_name);
 				}
 			} /*catch(f) {
 				console.log("get_unchecked error: " + f);
@@ -705,7 +705,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			}
 			check_node_inhibit = false;
 			if (overlay) {
-				overlay.draw();
+				overlay.draw(window.document.navicell_module_name);
 			}
 		}).bind("search.jstree", function (e, data) {
 //			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");

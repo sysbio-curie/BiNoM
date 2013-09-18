@@ -110,6 +110,8 @@ function Dataset(name) {
 	this.samples_id = {};
 
 	this.modifs_id = {};
+
+	this.module_arrpos = {};
 }
 
 Dataset.prototype = {
@@ -210,6 +212,21 @@ Dataset.prototype = {
 			}
 			//console.log("syncModifs " + module_name + " " + mapSize(this.modifs_id[module_name]));
 		}
+
+		this.module_arrpos = {};
+		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
+			var module_name = navicell.module_names[jj];
+			var arrpos = [];
+			for (var modif_id in this.modifs_id[module_name]) {
+				var gene_info = this.modifs_id[module_name][modif_id];
+				array_push_all(arrpos, gene_info[1]);
+			}
+			this.module_arrpos[module_name] = arrpos;
+		}
+	},
+
+	getArrayPos: function(module_name) {
+		return this.module_arrpos[module_name];
 	},
 
 	getSample: function(sample_name) {
@@ -325,6 +342,13 @@ function is_empty_value(value) {
 	}
 	var tvalue = value.trim().toUpperCase();
 	return tvalue == '' || tvalue == '_' || tvalue == '-' || tvalue == 'NA' || tvalue == 'N/A';
+}
+
+function force_datatable_display(id) {
+	var datatable = navicell.dataset.datatables_id[id];
+	if (datatable) {
+		datatable.forceDisplay();
+	}
 }
 
 function step_color_count_change(id) {
@@ -707,11 +731,31 @@ function HeatmapConfig() {
 
 HeatmapConfig.prototype = {
 
-	reset: function() {
-		this.datatables = [];
+	reset: function(reset_sample_only) {
 		this.samples_or_groups = [];
-		this.setSize(4);
-		this.setScaleSize(4);
+		if (!reset_sample_only) {
+			this.datatables = [];
+			this.setSize(4);
+			this.setScaleSize(4);
+		}
+	},
+
+	setAllSamples: function() {
+		this.shrink();
+		for (var sample_name in navicell.dataset.samples) {
+			var sample = navicell.dataset.samples[sample_name];
+			this.samples_or_groups.push(sample);
+		}
+		return this.samples_or_groups.length;
+	},
+
+	setAllGroups: function() {
+		this.shrink();
+		for (var group_name in navicell.group_factory.group_map) {
+			var group = navicell.group_factory.group_map[group_name];
+			this.samples_or_groups.push(group);
+		}
+		return this.samples_or_groups.length;
 	},
 
 	cloneFrom: function(heatmap_config) {
@@ -825,12 +869,32 @@ function BarplotConfig() {
 
 BarplotConfig.prototype = {
 
-	reset: function() {
-		this.datatables = [];
+	reset: function(reset_sample_only) {
 		this.samples_or_groups = [];
-		this.setHeight(4);
-		this.setWidth(4);
-		this.setScaleSize(4);
+		if (!reset_sample_only) {
+			this.datatables = [];
+			this.setHeight(4);
+			this.setWidth(4);
+			this.setScaleSize(4);
+		}
+	},
+
+	setAllSamples: function() {
+		this.shrink();
+		for (var sample_name in navicell.dataset.samples) {
+			var sample = navicell.dataset.samples[sample_name];
+			this.samples_or_groups.push(sample);
+		}
+		return this.samples_or_groups.length;
+	},
+
+	setAllGroups: function() {
+		this.shrink();
+		for (var group_name in navicell.group_factory.group_map) {
+			var group = navicell.group_factory.group_map[group_name];
+			this.samples_or_groups.push(group);
+		}
+		return this.samples_or_groups.length;
 	},
 
 	cloneFrom: function(barplot_config) {
@@ -1053,6 +1117,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 
 	navicell.DTStatusMustUpdate = true;
 
+	/*
 	var tab_body = $("#dt_datatable_tabs");
 
 	tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
@@ -1063,6 +1128,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.switch_button.css('font-size', '10px');
 	this.switch_button.css('background', 'white');
 	this.switch_button.css('color', 'darkblue');
+	*/
 
 	reader.readAsBinaryString(file);
 
@@ -1142,6 +1208,8 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	}
 }
 
+var MAX_MATRIX_SIZE = 8000;
+
 Datatable.prototype = {
 	dataset: null,
 	biotype: null,
@@ -1202,7 +1270,47 @@ Datatable.prototype = {
 
 	getId: function() {return this.id;},
 
+	forceDisplay: function() {
+		$("#dt_datatable_notice_id" + this.id).remove();
+		this.force_display = true;
+		var tab_body = $("#dt_datatable_tabs");
+		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+		this.data_div = $("#dt_datatable_id" + this.id);
+		this.data_table = $("#dt_datatable_table_id" + this.id);
+		this.switch_button = $("#switch_view_" + this.id);
+		this.switch_button.css('font-size', '10px');
+		this.switch_button.css('background', 'white');
+		this.switch_button.css('color', 'darkblue');
+
+		this.refresh();
+		for (var map_name in maps) {
+			var doc = maps[map_name].document;
+			update_datatable_status_table(doc, {force: true});
+		}
+		tab_body.tabs("option", "active", this.tabnum);
+		//this.makeGeneView();
+	},
+
+	setTabNum: function(tabnum) {
+		this.tabnum = tabnum;
+	},
+
 	epilogue: function() {
+		var tab_body = $("#dt_datatable_tabs");
+		if (!this.isLarge()) {
+			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+			this.data_div = $("#dt_datatable_id" + this.id);
+			this.data_table = $("#dt_datatable_table_id" + this.id);
+			this.switch_button = $("#switch_view_" + this.id);
+			//this.switch_button.addClass('switch-button');
+			this.switch_button.css('font-size', '10px');
+			this.switch_button.css('background', 'white');
+			this.switch_button.css('color', 'darkblue');
+		} else {
+			tab_body.append("<div id='dt_datatable_notice_id" + this.id + "'><div class='datatable-too-large'>Notice: datatable " + this.name + " is too large (" + mapSize(this.gene_index) + "x" + mapSize(this.sample_index) + " matrix) for whole data displaying<br/><br/>" + make_button("Force displaying", "force_datatable_display_" + this.id, "force_datatable_display(" + this.id + ")") + "</div></div>");
+			this.data_div = $("#dt_datatable_notice_id" + this.id);
+		}
+
 		if (this.biotype.isContinuous()) {
 			// TBD: wrong: not suitable for tab sharing !
 			// must have a different div per doc
@@ -1211,6 +1319,7 @@ Datatable.prototype = {
 		} else {
 			this.displayStepConfig = null;
 			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
+			
 		}
 		this.makeGeneView();
 	},
@@ -1219,7 +1328,14 @@ Datatable.prototype = {
 		return this.discrete_values;
 	},
 
+	isLarge: function() {
+		return !this.force_display && mapSize(this.sample_index) * mapSize(this.gene_index) > MAX_MATRIX_SIZE;
+	},
+
 	makeGeneView: function() {
+		if (this.isLarge()) {
+			return;
+		}
 		this.current_view = "gene";
 		this.data_table.children().remove();
 		this.data_table.append(this.makeDataTable_genes());
@@ -1227,6 +1343,9 @@ Datatable.prototype = {
 	},
 
 	makeSampleView: function() {
+		if (this.isLarge()) {
+			return;
+		}
 		this.current_view = "sample";
 		this.data_table.children().remove();
 		this.data_table.append(this.makeDataTable_samples());
@@ -1434,6 +1553,8 @@ function DrawingConfig() {
 
 	this.display_glyphs = 0;
 	this.display_labels = 0;
+
+	this.display_DLOs_on_all_genes = 1;
 }
 
 DrawingConfig.prototype = {
@@ -1476,6 +1597,14 @@ DrawingConfig.prototype = {
 
 	displayDLOs: function() {
 		return this.displayCharts() || this.displayGlyphs() || this.displayLabels();
+	},
+
+	displayDLOsOnAllGenes: function() {
+		return this.display_DLOs_on_all_genes;
+	},
+
+	setDisplayDLOsOnAllGenes: function(val) {
+		this.display_DLOs_on_all_genes = val;
 	},
 
 	setDisplayMarkers: function(val) {

@@ -157,7 +157,7 @@ USGSOverlay.prototype.resize = function() {
 	}
 }
 
-USGSOverlay.prototype.draw = function() {
+USGSOverlay.prototype.draw = function(module_name) {
 
 	if (this.div_ == null) {
 		return;
@@ -169,6 +169,10 @@ USGSOverlay.prototype.draw = function() {
 
 	if (!navicell.drawing_config.displayDLOs()) {
 		return;
+	}
+	// may add another condition, such as navicell.drawing_config.blablabla
+	if (module_name && navicell.drawing_config.displayDLOsOnAllGenes()) {
+		this.arrpos = navicell.dataset.getArrayPos(module_name);
 	}
 	var arrpos = this.arrpos;
 	if (arrpos.length) {

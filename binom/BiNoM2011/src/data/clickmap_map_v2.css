@@ -312,7 +312,11 @@ label {font-size: 12px; vertical-align: middle;}
     text-align: center;
 }
 
-.error_message {
+.status-message {
+    color: #CC6C00;
+}
+
+.error-message {
     color: red;
 }
 
@@ -327,12 +331,18 @@ label {font-size: 12px; vertical-align: middle;}
     background-color: white;
     color: #222222;
 }
-
 #dt_datatable_status_table thead {
     background-color: rgb(0, 0, 60);
     color: white;
     text-align: center;
     padding: 30px;
+}
+
+.datatable-too-large {
+    font-size: large;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
 }
 
 #dt_datatable_status_table tbody {

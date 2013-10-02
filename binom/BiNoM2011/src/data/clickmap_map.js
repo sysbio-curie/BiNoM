@@ -41,6 +41,13 @@ var checked_elements = {};
 var refreshing = false;
 */
 
+function panMapToBounds(map, bounds)
+{
+	if (!bounds.isEmpty() && !map.getBounds().intersects(bounds)) {
+		map.panToBounds(bounds);
+	}
+}
+
 function setup_icons()
 {
 	var normal_marker_colour = "FE7569";	
@@ -245,10 +252,7 @@ function show_markers_ref(markers, ref)
 			);
 		}
 	);
-	if (!bounds.isEmpty()) {
-		map.panToBounds(bounds);
-	}
-
+	panMapToBounds(map, bounds);
 	if (overlay) {
 		overlay.draw(window.document.navicell_module_name);
 	}
@@ -700,9 +704,7 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 			}*/
 			//				jtree.jstree("get_checked", data.args[0], true).each(f);
 			//				$(data.args[0].parentNode.parentNode).each(f);
-			if (!bounds.isEmpty()) {
-				map.panToBounds(bounds);
-			}
+			panMapToBounds(map, bounds);
 			check_node_inhibit = false;
 			if (overlay) {
 				overlay.draw(window.document.navicell_module_name);

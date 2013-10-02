@@ -617,6 +617,7 @@ public class ProduceClickableMap
 	{
 		NV2 = nv2;
 
+		System.out.println("ProduceClickableMap: NV2: " + nv2);
 		if (xrefs == null) {
 			BufferedReader xref_stream = open_local_file(default_xref_file);
 			xrefs = load_xrefs(xref_stream, default_xref_file);
@@ -1212,6 +1213,7 @@ public class ProduceClickableMap
 
 	private void copy_files(final String source, final File destination) throws IOException
 	{
+		System.out.println("copy_files: " + source + " " + destination);
 		for (final String suffix : new String[]{"js", "css"}) {
 			for (final String base : new String[]{ included_blog_base, included_map_base }) {
 				copy_file_between_directories(source, destination, base + "." + suffix);
@@ -2049,7 +2051,7 @@ public class ProduceClickableMap
 
 	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
 	{
-		System.out.println("generate_json_entity: " + ent.getName());
+		//System.out.println("generate_json_entity: " + ent.getName());
 
 		/*
 		outjson.print("\"id\" : \"" + ent.getId() + "\",");
@@ -2085,7 +2087,7 @@ public class ProduceClickableMap
 
 		boolean first = true;
 		outjson.print("\"modifs\" : [");
-		System.out.println("modifs size: " + modifs.size());
+		//System.out.println("modifs size: " + modifs.size());
 		int not_associated = 0;
 		for (final Modif q : modifs)
 		{
@@ -2098,7 +2100,7 @@ public class ProduceClickableMap
 			outjson.print("{");
 			outjson.print("\"name\" : \"" + m.getName() + "\",");
 			outjson.print("\"id\" : \"" + m.getId() + "\",");
-			System.out.println("associated: " + q.associated);
+			//System.out.println("associated: " + q.associated);
 			if (q.associated)
 			{
 				outjson.print("\"associated\" : true");
@@ -2120,7 +2122,7 @@ public class ProduceClickableMap
 			outjson.print("\"hugo\" : [");
 			for (int nn = 0; nn < hugo_size; ++nn) {
 				outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
-				System.out.println("-----> : " + hugoNames.get(nn));
+				//System.out.println("-----> : " + hugoNames.get(nn));
 			}
 			outjson.print("],");
 			outjson.print("\"postid\" : \"" + ent.getPostId() + "\"");
@@ -2294,11 +2296,11 @@ public class ProduceClickableMap
 				return r != 0 ? r : (o1.associated == o2.associated ? 0 : o1.associated ? -1 : 1);
 			}});
 		
-		System.out.println("add_modifications_to_right: " + ent.getName() + " modifs: " + modifs.size() + " " + ent.getComment());
+		//System.out.println("add_modifications_to_right: " + ent.getName() + " modifs: " + modifs.size() + " " + ent.getComment());
 		for (final Modif q : modifs)
 		{
 			final Modification m = q.m;
-			System.out.println("add_modifications_to_right: associated: " + q.associated);
+			//System.out.println("add_modifications_to_right: associated: " + q.associated);
 			if (q.associated)
 			{
 				// may be used for element.peers optimization like this:
@@ -4813,6 +4815,7 @@ public class ProduceClickableMap
 		BlogCreator.Post module_post,
 					    final BlogCreator wp, AtlasInfo atlasInfo, String firstEntityName, boolean provide_sources) throws FileNotFoundException
 	{
+		System.out.println("make_index_html " + title + " " + map_name + " " + this_map_directory);
 		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
 		
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");

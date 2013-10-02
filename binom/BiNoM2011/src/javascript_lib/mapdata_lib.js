@@ -78,7 +78,11 @@ Mapdata.prototype = {
 						if (!this.hugo_map[hugo]) {
 							this.hugo_map[hugo] = {};
 						}
-						this.hugo_map[hugo][module_name] = entity_map;
+						if (!this.hugo_map[hugo][module_name]) {
+							this.hugo_map[hugo][module_name] = [];
+						}
+						//this.hugo_map[hugo][module_name] = entity_map;
+						this.hugo_map[hugo][module_name].push(entity_map);
 					}
 				}
 			}
@@ -191,10 +195,15 @@ Dataset.prototype = {
 			this.modifs_id[module_name] = {};
 			for (var gene_name in this.genes) {
 				var gene = this.genes[gene_name];
-				var entity_map = this.genes[gene_name].entity_map;
-				var entity = entity_map[module_name];
-				if (entity) {
-					var modif_arr = entity.modifs;
+				var hugo_module_map = this.genes[gene_name].hugo_module_map;
+				var entity_map_arr = hugo_module_map[module_name];
+				if (!entity_map_arr) {
+					continue;
+				}
+				for (var ii = 0; ii < entity_map_arr.length; ++ii) {
+					var entity_map = entity_map_arr[ii];
+					//if (entity) {
+					var modif_arr = entity_map.modifs;
 					if (modif_arr) {
 						for (var nn = 0; nn < modif_arr.length; ++nn) {
 							var modif = modif_arr[nn];
@@ -258,9 +267,9 @@ Dataset.prototype = {
 	},
 	
 	// behaves as a gene factory
-	addGene: function(gene_name, entity_map) {
+	addGene: function(gene_name, hugo_module_map) {
 		if (!this.genes[gene_name]) {
-			var gene = new Gene(gene_name, entity_map, this.gene_id++);
+			var gene = new Gene(gene_name, hugo_module_map, this.gene_id++);
 			this.genes[gene_name] = gene;
 			this.genes_id[gene.getId()] = gene;
 		} else {
@@ -1235,10 +1244,16 @@ Datatable.prototype = {
 		var id_arr = [];
 		var arrpos = [];
 		for (var gene_name in this.gene_index) {
-			var entity_map = this.dataset.genes[gene_name].entity_map;
-			var entity = entity_map[module_name];
-			if (entity) {
-				var modif_arr = entity.modifs;
+			var hugo_module_map = this.dataset.genes[gene_name].hugo_module_map;
+			var entity_map_arr = hugo_module_map[module_name];
+			if (!entity_map_arr) {
+				continue;
+			}
+			for (var ii = 0; ii < entity_map_arr.length; ++ii) {
+				var entity_map = entity_map_arr[ii];
+				//var entity = entity_map[module_name];
+				//if (entity) {
+				var modif_arr = entity_map.modifs;
 				if (modif_arr) {
 					for (var nn = 0; nn < modif_arr.length; ++nn) {
 						var modif = modif_arr[nn];
@@ -1829,16 +1844,16 @@ Sample.prototype = {
 // Gene class
 //
 
-function Gene(name, entity_map, id) {
+function Gene(name, hugo_module_map, id) {
 	this.name = name;
-	this.entity_map = entity_map;
+	this.hugo_module_map = hugo_module_map;
 	this.refcnt = 1;
 	this.id = id;
 }
 
 Gene.prototype = {
 	name: "",
-	entity_map: {},
+	hugo_module_map: {},
 
 	getId: function() {
 		return this.id;

@@ -20,11 +20,18 @@
 
 function JXTree(datatree, div) {
 	this.label_map = {};
-	this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
-	this.buildNodes(this.root, datatree.children);
-	console.log("nodes built");
-	this.root.buildHTML(div);
-	console.log("html built");
+	this.node_cnt = 0;
+	this.state_changed = null;
+	this.open_changed = null;
+	if (datatree) {
+		this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
+		this.buildNodes(this.root, datatree.children);
+		console.log("nodes built");
+		this.root.buildHTML(div);
+		console.log("html built");
+	} else {
+		this.root = null;
+	}
 }
 
 JXTree.UNCHECKED = 0;
@@ -43,12 +50,27 @@ JXTree.prototype = {
 		}
 	},
 
+	newNode: function() {
+		this.node_cnt++;
+	},
+
+	getNodeCount: function() {
+		return this.node_cnt;
+	},
+
+	onStateChange: function(action) {
+		this.state_changed = action;
+	},
+
+	onOpenChange: function(action) {
+		this.open_changed = action;
+	},
+
 	search: function(pattern, action) {
 		var regex = new RegExp(pattern, "i");
 		var nodes = [];
 		for (var label in this.label_map) {
 			if (label.match(regex)) {
-				//this.label_map[label].setChecked(true);
 				nodes.push(this.label_map[label]);
 			}
 		}
@@ -66,8 +88,10 @@ JXTree.prototype = {
 			this.root.uncheckSubtree();
 			for (var nn = 0; nn < nodes.length; ++nn) {
 				var node = nodes[nn];
-				node.checkSubtree(true);
+				node.check();
 			}
+		}
+		if (action == 'subtree') {
 		}
 		return nodes.length;
 	}
@@ -91,9 +115,15 @@ function JXTreeNode(jxtree, label, left_label, right_label, parent, user_data) {
 	this.elem_node = null;
 	this.elem_checkbox = null;
 	this.elem_label = null;
+
+	this.jxtree.newNode();
 }
 
 JXTreeNode.prototype = {
+
+	clone: function(jxtree) {
+		return new JXTreeNode(jxtree, this.label, this.left_label, this_right_label, (this.parent ? this.parent.clone(jxtree) : null), this.user_data);
+	},
 
 	addChild: function(node) {
 		this.children.push(node);
@@ -105,6 +135,12 @@ JXTreeNode.prototype = {
 
 	setState: function(state) {
 		if (state != this.state) {
+			if (this.jxtree.state_changed) {
+				var nstate = this.jxtree.state_changed(this, state);
+				if (nstate) {
+					state = nstate;
+				}
+			}
 			this.state = state;
 			this.setCheckboxClass();
 		}
@@ -212,6 +248,22 @@ JXTreeNode.prototype = {
 		container.appendChild(ul);
 	},
 
+	check: function() {
+		this.setState(JXTree.CHECKED);
+
+		if (this.parent) {
+			this.parent.updateSupertreeState();
+		}
+	},
+
+	uncheck: function() {
+		this.setState(JXTree.UNCHECKED);
+
+		if (this.parent) {
+			this.parent.updateSupertreeState();
+		}
+	},
+
 	checkSubtree: function() {
 		this.setSubtreeState(JXTree.CHECKED);
 
@@ -284,16 +336,6 @@ JXTreeNode.prototype = {
 
 		ins_cb_obj.click(function() {
 			console.log("[check/uncheck " + node.label + "] " + node.children.length);
-			/*
-			if (node.isChecked()) {
-				node.setSubtreeState(JXTree.UNCHECKED);
-			} else {
-				node.setSubtreeState(JXTree.CHECKED);
-			}
-			if (node.parent) {
-				node.parent.updateSupertreeState();
-			}
-			*/
 			if (node.isChecked()) {
 				node.uncheckSubtree();
 			} else {

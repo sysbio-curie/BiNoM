@@ -47,7 +47,15 @@ if (!Number.MIN_NUMBER) {
 // Encapsulate all module entities, including map positions
 //
 
-function Mapdata() {
+function Mapdata(to_load_count) {
+	this.to_load_count = to_load_count;
+
+	this.is_ready = false;
+	this.ready = new $.Deferred();
+	var mapdata = this;
+	this.ready.then(function() {
+		mapdata.is_ready = true;
+	});
 }
 
 Mapdata.prototype = {
@@ -56,6 +64,30 @@ Mapdata.prototype = {
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
+
+	isReady: function() {
+		return this.is_ready;
+	},
+
+	whenReady: function(f) {
+		this.ready.then(f);
+	},
+
+	buildEntityTreeWhenReady: function(window, module_name) {
+		if (this.isReady()) {
+			this.buildEntityTree(window, module_name);
+		} else {
+			var mapdata = this;
+			this.whenReady(function() {
+				mapdata.buildEntityTree(window, module_name);
+			});
+		}
+	},
+
+	buildEntityTree: function(window, module_name) {
+		var module_map = this.module_mapdata[module_name];
+		window.console.log("building tree for " + module_name);
+	},
 
 	// Returns the size of the hugo map
 	entityCount: function() {
@@ -81,16 +113,74 @@ Mapdata.prototype = {
 						if (!this.hugo_map[hugo][module_name]) {
 							this.hugo_map[hugo][module_name] = [];
 						}
-						//this.hugo_map[hugo][module_name] = entity_map;
 						this.hugo_map[hugo][module_name].push(entity_map);
 					}
 				}
 			}
 		}
+
+		return !--this.to_load_count;
+	},
+
+	load: function(url, module_name) {
+		var mapdata = this;
+		navicell.module_names.push(module_name);
+		$.ajax(url,
+		       {
+			       async: true,
+			       dataType: 'json',
+			       
+			       success: function(data) {
+				       console.log("navicell: " + module_name + " data loaded");
+				       if (mapdata.addModuleMapdata(module_name, data)) {
+					       console.log("now is ready");
+					       mapdata.ready.resolve();
+				       }
+			       },
+			       
+			       error: function() {
+				       console.log("navicell: error loading " + module_name + " mapdata");
+			       }
+		       }
+		      );
 	},
 
 	getClass: function() {return "Mapdata";}
 };
+
+function mapdata_display_markers(module_name, _window, hugo_names)
+{
+	var id_arr = [];
+	var arrpos = [];
+	for (var nn = 0; nn < hugo_names.length; ++nn) {
+		var hugo_module_map = navicell.mapdata.hugo_map[hugo_names[nn]];
+		if (!hugo_module_map) {
+			console.log("gene " + hugo_names[nn] + " not found");
+			continue;
+		}
+		var entity_map_arr = hugo_module_map[module_name];
+		if (!entity_map_arr) {
+			console.log("gene " + hugo_names[nn] + " empty");
+			continue;
+		}
+		for (var ii = 0; ii < entity_map_arr.length; ++ii) {
+			var entity_map = entity_map_arr[ii];
+			var modif_arr = entity_map.modifs;
+			if (modif_arr) {
+				for (var kk = 0; kk < modif_arr.length; ++kk) {
+					var modif = modif_arr[kk];
+					// >> getting positions
+					var positions = modif.positions;
+					if (positions) {
+						id_arr.push(modif.id);
+					}
+					// << getting positions
+				}
+			}
+		}
+	}
+	_window.show_markers(id_arr);
+}
 
 //
 // Dataset class
@@ -1251,13 +1341,10 @@ Datatable.prototype = {
 			}
 			for (var ii = 0; ii < entity_map_arr.length; ++ii) {
 				var entity_map = entity_map_arr[ii];
-				//var entity = entity_map[module_name];
-				//if (entity) {
 				var modif_arr = entity_map.modifs;
 				if (modif_arr) {
 					for (var nn = 0; nn < modif_arr.length; ++nn) {
 						var modif = modif_arr[nn];
-						//id_arr.push(modif.id);
 						// >> getting positions
 						var positions = modif.positions;
 						if (positions) {
@@ -2188,7 +2275,7 @@ NavicellSession.prototype = {
 			console.log("session init3: " + data.dataset.genes);
 			console.log("session init3.2: " + data.biotype_factory);
 			console.log("session init3.3: " + mapSize(data.biotype_factory.biotypes));
-			console.log("session init4: " + mapSize(data.dataset.genes));
+<			console.log("session init4: " + mapSize(data.dataset.genes));
 			console.log("session init4: " + data.dataset.geneCount());
 			*/
 			return _navicell;
@@ -2197,24 +2284,6 @@ NavicellSession.prototype = {
 	}
 }
 
-function load_mapdata(url, module_name) {
-	navicell.module_names.push(module_name);
-	$.ajax(url,
-	       {
-		       async: true,
-		       dataType: 'json',
-
-		       success: function(mapdata) {
-			       navicell.mapdata.addModuleMapdata(module_name, mapdata);
-			       console.log("navicell: " + module_name + " mapdata loaded");
-		       },
-
-		       error: function() {
-			       console.log("navicell: error loading " + module_name + " mapdata");
-		       }
-	       }
-	      );
-}
 
 //var navicell_session = new NavicellSession("navicell");
 //navicell_session.reset();
@@ -2223,7 +2292,7 @@ function navicell_init() {
 	var _navicell = {}; // namespace
 
 	_navicell.module_names = [];
-	_navicell.mapdata = new Mapdata();
+	//_navicell.mapdata = new Mapdata();
 	_navicell.dataset = new Dataset("navicell");
 	_navicell.group_factory = new GroupFactory();
 	_navicell.biotype_factory = new BiotypeFactory();
@@ -2343,6 +2412,10 @@ function getFG_from_BG(color) {
 	rgb2 = parseInt("0x" + rgb2)/256.;
 	rgb3 = parseInt("0x" + rgb3)/256.;
 	return 0.213 * rgb1 + 0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? 'FFF' : '000';
+}
+
+function build_entity_tree_when_ready(_window, module_name) {
+	navicell.mapdata.buildEntityTreeWhenReady(_window, module_name);
 }
 
 var navicell;

@@ -647,6 +647,8 @@ public class ProduceClickableMap
 		PrintStream outjson;
 		if (USE_JSON) {
 			outmapdata = new PrintStream(mapdata_file);
+			outmapdata.println("if (!navicell.mapdata) {");
+			outmapdata.println("\tnavicell.mapdata = new Mapdata(" + (modules.size()+1) + ");");
 			outjson = null;
 		} else {
 			outmapdata = null;
@@ -699,6 +701,7 @@ public class ProduceClickableMap
 		}
 		
 		if (USE_JSON) {
+			outmapdata.println("}\n");
 			outmapdata.close();
 		} else {
 			outjson.close();
@@ -2129,7 +2132,7 @@ public class ProduceClickableMap
 			if (ent.getComment() != null) {
 				if (USE_JSON) {
 					//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
-					outjson.print(",\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\"");
+					//outjson.print(",\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\"");
 				} else {
 					//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
 				}
@@ -2200,7 +2203,7 @@ public class ProduceClickableMap
 		}
 		if (USE_JSON) {
 			outjson.println("]");
-			outmapdata.println("load_mapdata(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + map + "\");");
+			outmapdata.println("\tnavicell.mapdata.load(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + map + "\");");
 		} else {
 			outjson.println("]');\n");
 			outjson.println("navicell.mapdata.addModuleMapdata(\"" + map + "\", " + map + "_map);\n");
@@ -4950,6 +4953,8 @@ public class ProduceClickableMap
 			out.println("    heatmap_editor_set_editing(true, undefined, '" + map_name + "');");
 			out.println("    barplot_editor_set_editing(true, undefined, '" + map_name + "');");
 			out.println("    overlay_init(map);");
+			//out.println("    navicell.mapdata.buildEntityTreeWhenReady(window, \"" + map_name + "\");");
+			out.println("    build_entity_tree_when_ready(window, \"" + map_name + "\");");
 		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());

@@ -40,6 +40,7 @@ var checked_elements = {};
 
 var refreshing = false;
 */
+var bubble_list = [];
 
 function panMapToBounds(map, bounds)
 {
@@ -484,6 +485,7 @@ function get_markers_for_modification(element, projection, map)
 									maxWidth: 350
 								}
 							);
+							bubble_list.push(element.bubble);
 						}
 						element.bubble.open(map, marker);
 					}
@@ -856,6 +858,7 @@ function uncheck_all_entities()
 //	jQuery.jstree._reference(jtree).uncheck_all();
 	// Query.jstree._reference(jtree).uncheck_all() does not call the uncheck_node callback
 	
+/*
 	var ref = jQuery.jstree._reference(jtree);
 	var f = function(index, element)
 	{
@@ -873,4 +876,12 @@ function uncheck_all_entities()
 			$(this).filter(filter).each(f); // needed for reactions
 		}
 	);
+*/
+	$.each(marker_list, function() {
+		this.setVisible(false);
+	});
+
+	$.each(bubble_list, function() {
+		this.close();
+	});
 }

@@ -101,6 +101,12 @@ Mapdata.prototype = {
 
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var entities = module_mapdata[ii].entities;
+			if (!entities) {
+				if (!module_mapdata[ii].modules) {
+					console.log("no entities neither modules");
+				}
+				continue;
+			}
 			for (var jj = 0; jj < entities.length; ++jj) {
 				var entity_map = entities[jj];
 				var hugo_arr = entity_map['hugo'];

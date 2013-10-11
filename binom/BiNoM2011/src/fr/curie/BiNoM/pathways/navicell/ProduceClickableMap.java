@@ -86,6 +86,8 @@ public class ProduceClickableMap
 	private static File config = null;
 	private static boolean MAPS_MODULES_TOP = false;
 	private static boolean USE_JSON = true;
+	private static boolean USE_EXT_JSON = true;
+	private static boolean NO_BUBBLE = false;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -645,6 +647,7 @@ public class ProduceClickableMap
 		final File mapdata_file = new File(destination_common, mapdata_list);
 		final PrintStream outmapdata;
 		PrintStream outjson;
+		PrintStream master_outjson = null;
 		if (USE_JSON) {
 			outmapdata = new PrintStream(mapdata_file);
 			outmapdata.println("if (!navicell.mapdata) {");
@@ -658,11 +661,11 @@ public class ProduceClickableMap
 		try
 		{
 			if (USE_JSON) {
-				outjson = new PrintStream(new File(destination_common, "master_mapdata.json"));
+				master_outjson = new PrintStream(new File(destination_common, "master_mapdata.json"));
 			}
-			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, outjson, modules, atlasInfo, xrefs, provide_sources);
+			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, master_outjson, modules, atlasInfo, xrefs, provide_sources);
 			if (USE_JSON) {
-				outjson.close();
+				//master_outjson.close();
 			}
 		}
 		catch (IOException e)
@@ -710,7 +713,10 @@ public class ProduceClickableMap
 			if (MAPS_MODULES_TOP) {
 				close_right_panel_xml(master.right_panel);
 			} else {
-				finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format);
+				finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format, master_outjson);
+				if (USE_JSON) {
+					master_outjson.close();
+				}
 			}
 		}
 
@@ -1964,7 +1970,7 @@ public class ProduceClickableMap
 		return sb;
 	}
 	
-	private static StringBuffer make_right_hand_link_to_blog_with_name(StringBuffer sb, int postid, String name)
+	/*private*/ static StringBuffer make_right_hand_link_to_blog_with_name(StringBuffer sb, int postid, String name)
 	{
 		return make_right_hand_link_to_blog(sb, postid).append(" ").append(name);
 	}
@@ -1976,6 +1982,7 @@ public class ProduceClickableMap
 		ImagesInfo scales
 	)
 	{
+		// EXT_JSON_PANEL TAG #2
 		item_list_start(indent, m.getId(), right_hand_tag);
 		indent.getOutput().print(" position=\"");
 		boolean first = true;
@@ -2013,9 +2020,14 @@ public class ProduceClickableMap
 	}
 	*/
 	
-	private static void generate_json_entity_modification(final PrintStream outjson, Modification m,	Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, ImagesInfo scales
+	private static String tojson(String str) {
+		return str.replaceAll("\"", DQ_JSON).replaceAll("'", DQ_JSON).replaceAll("\\\t", TB_JSON); 
+	}
+
+	private static void generate_json_entity_modification(final PrintStream outjson, Modification m, Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, String bubble, ImagesInfo scales
 	)
 	{
+		// EXT_JSON_JSON TAG #2
 		outjson.print("\"positions\" : [");
 		boolean first = true;
 		for (final String shape_id : m.getShapeIds(speciesAliases))
@@ -2035,6 +2047,18 @@ public class ProduceClickableMap
 				outjson.print("}");
 		}
 		outjson.print("]");
+
+		if (USE_EXT_JSON) {
+			if (!NO_BUBBLE) {
+				String bb = tojson("<span class='bubble'>" + bubble + "</span>");
+				outjson.println(", \"bubble\" : \"" + bb + "\"");
+			}
+		}
+		/*
+		indent.getOutput().println("\">");
+		content_line(indent.add(), m.getName(), bubble);
+		indent.close();
+		*/
 	}
 	
 	private static class Modif
@@ -2052,9 +2076,16 @@ public class ProduceClickableMap
 	private static String DQ_JSON = java.util.regex.Matcher.quoteReplacement("\\\"");
 	private static String TB_JSON = java.util.regex.Matcher.quoteReplacement("\\t");
 
-	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
+	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, 
+						 final BlogCreator wp,
+						 final SbmlDocument cd,
+						 final String blog_name,
+						 ImagesInfo scales, final PrintStream outjson, final EntityBase ent)
 	{
-		//System.out.println("generate_json_entity: " + ent.getName());
+		//String left_info = make_right_hand_link_to_blog(null, ent.getPostId()).toString().replaceAll("\"", DQ_JSON).replaceAll("'", DQ_JSON);
+		String left_info = tojson(make_right_hand_link_to_blog(null, ent.getPostId()).toString());
+		outjson.print("\"left_info\" : \"" + left_info + "\",");
+//System.out.println("generate_json_entity: " + ent.getName());
 
 		/*
 		outjson.print("\"id\" : \"" + ent.getId() + "\",");
@@ -2088,6 +2119,7 @@ public class ProduceClickableMap
 			modifs.add(new Modif(m, true));
 		}
 
+		// EXT_JSON_JSON TAG #1
 		boolean first = true;
 		outjson.print("\"modifs\" : [");
 		//System.out.println("modifs size: " + modifs.size());
@@ -2106,11 +2138,21 @@ public class ProduceClickableMap
 			//System.out.println("associated: " + q.associated);
 			if (q.associated)
 			{
+				/*
+				ItemCloser modif = item_list_start(entity.add(), null, m.getId() + " " + right_hand_tag);
+				output.println(">");
+				content_line_data(modif.add(), m.getName());
+				modif.close();
+				*/
+				if (USE_EXT_JSON) {
+					//outjson.print("\"a_name\" : \"" + m.getName() + "\",");
+				}
 				outjson.print("\"associated\" : true");
 			}
 			else
 			{
-				generate_json_entity_modification(outjson, m, speciesAliases, placeMap, scales);
+				String bubble = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
+				generate_json_entity_modification(outjson, m, speciesAliases, placeMap, bubble, scales);
 				not_associated++;
 			}
 			outjson.print("}");
@@ -2144,6 +2186,9 @@ public class ProduceClickableMap
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
+					       final BlogCreator wp,
+					       final SbmlDocument cd,
+					       final String blog_name,
 		ImagesInfo scales) throws UnsupportedEncodingException, FileNotFoundException {
 		EntityBase firstEntity = null;
 		final String encoding = "UTF-8";
@@ -2175,7 +2220,11 @@ public class ProduceClickableMap
 				}
 			}
 
+			outjson.print("\"name\" : \"" + clsname + "\",");
 			outjson.print("\"class\" : \"" + clsname + "\",");
+			if (USE_EXT_JSON) {
+				outjson.print("\"right_info\" : \"<img border='0' src='" + entity_icons_directory + "/" + clsname + ".png'/>\",");
+			}
 			outjson.print("\"entity_size\" : \"" + entities.size() + "\",");
 
 			Collections.sort(entities); // EV 2013-06-19
@@ -2195,14 +2244,16 @@ public class ProduceClickableMap
 					outjson.print(",");
 				}
 				outjson.print("{");
-				generate_json_entity(speciesAliases, placeMap, format, scales, outjson, ent);
+				generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, ent);
 				outjson.print("}");
 			}
 			outjson.print("]");
 			outjson.print("}");
 		}
 		if (USE_JSON) {
-			outjson.println("]");
+			if (!map.equals("master")) {
+				outjson.println("]");
+			}
 			outmapdata.println("\tnavicell.mapdata.load(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + map + "\");");
 		} else {
 			outjson.println("]');\n");
@@ -2253,7 +2304,7 @@ public class ProduceClickableMap
 		output.println("<root>");
 		if (MAPS_MODULES_TOP) {
 			if (modules_set != null || (atlasInfo != null && atlasInfo.isAtlas())) {
-				finish_right_panel_xml(new ItemCloser(output), modules_set, atlasInfo, model, scales, blog_name, wp, format);
+				finish_right_panel_xml(new ItemCloser(output), modules_set, atlasInfo, model, scales, blog_name, wp, format, null);
 			}
 		}
 
@@ -2284,6 +2335,7 @@ public class ProduceClickableMap
 			final FormatProteinNotes format, final SbmlDocument cd, final String blog_name, ImagesInfo scales, final PrintWriter output,
 			final ItemCloser cls, final EntityBase ent, Linker wp)
 	{
+		// EXT_JSON_PANEL TAG #1
 		final ItemCloser entity = item_line(cls.add(), ent.getId(), null, make_right_hand_link_to_blog_with_name(null, ent.getPostId(), ent.getName()).toString(), null);
 		
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
@@ -2397,7 +2449,7 @@ public class ProduceClickableMap
 	
 	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set,
 						   AtlasInfo atlasInfo,	Model model, ImagesInfo scales, String blog_name,
-						   Linker wp, FormatProteinNotes notes_formatter)
+						   Linker wp, FormatProteinNotes notes_formatter, PrintStream outjson)
 	{
 		//final PrintWriter output = right_close_entities(right);
 		final PrintWriter output = MAPS_MODULES_TOP ? right.getOutput() : right_close_entities(right);
@@ -2425,93 +2477,181 @@ public class ProduceClickableMap
 			positions.put(name, null);
 		}
 	
+		/*
+		if (outjson != null) { // kludge
+			outjson.print("]");
+			outjson = null;
+		}
+
+		*/
+		if (outjson != null) {
+			outjson.print(", {");
+		}
 		boolean isAtlas = atlasInfo != null && atlasInfo.isAtlas();
 		if (!isAtlas && modules_set.size() > 1) {
+			boolean first = true;
+			if (outjson != null) {
+ 				outjson.print("\"class\" : \"Modules\",");
+ 				outjson.print("\"name\" : \"Modules\",");
+				outjson.print("\"module_size\" : " + modules_set.size() + ",");
+				outjson.print("\"modules\" : [");
+			}
 			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null, "state=\"open\"");
 			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
-				if (master_map_name.equals(k.getKey()))
+				if (master_map_name.equals(k.getKey())) {
 					;
-				else if (!positions.containsKey(k.getKey()))
+				} else if (!positions.containsKey(k.getKey())) {
 					Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
-				else
-					{
-						double[] position = positions.get(k.getKey());
-						if (position == null)
-							Utils.eclipseErrorln("no objects in layer for " + k.getKey() + " in master map");
-						else if (k.getValue() == null)
-							Utils.eclipseErrorln("no post of module " + k.getKey());
-						else
-							{
-								final int post_id = k.getValue().post_id;
-								ItemCloser indent = modules.add();
-								item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
-								indent.getOutput().print(" position=\"");
-								indent.getOutput().print(scales.getX(position[0]));
-								indent.getOutput().print(";");
-								indent.getOutput().print(scales.getY(position[1]));
-								indent.getOutput().println("\">");
-								content_line
-									(
-									 indent.add(),
-									 make_right_hand_module_entry(post_id, k.getKey()),
-									 make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
-									 );
-								indent.close();
+				} else {
+					double[] position = positions.get(k.getKey());
+					if (position == null)
+						Utils.eclipseErrorln("no objects in layer for " + k.getKey() + " in master map");
+					else if (k.getValue() == null)
+						Utils.eclipseErrorln("no post of module " + k.getKey());
+					else {
+						final int post_id = k.getValue().post_id;
+						ItemCloser indent = modules.add();
+						item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
+						indent.getOutput().print(" position=\"");
+						indent.getOutput().print(scales.getX(position[0]));
+						indent.getOutput().print(";");
+						indent.getOutput().print(scales.getY(position[1]));
+						indent.getOutput().println("\">");
+						content_line
+							(
+							 indent.add(),
+							 make_right_hand_module_entry(post_id, k.getKey()),
+							 make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
+							 );
+						indent.close();
+
+						if (outjson != null) {
+							if (!first) {
+								outjson.print(",");
+							} else {
+								first = false;
 							}
+							outjson.print("{\"name\" : \"" +  make_module_id(k.getKey()) + "\",");
+							outjson.print("\"position\" : {");
+							outjson.print("\"x\" : " + scales.getX(position[0]) + ",");
+							outjson.print("\"y\" : " + scales.getY(position[1]) + "},");
+							outjson.print("\"left_info\" : \"" + tojson(make_right_hand_module_entry(post_id, k.getKey())) + "\"");
+							if (!NO_BUBBLE) {
+								outjson.print(",\"bubble\" : \"" + tojson(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)) + "\"");
+							}
+							outjson.print("}");
+						}
 					}
+				}
 			}
 			modules.close();
+			if (outjson != null) {
+				outjson.print("]");
+			}
 		}
-		
+
 		if (isAtlas) {
 			final ItemCloser maps = item_line(new ItemCloser(output), "maps", null, "Maps", null, "state=\"open\"");
 			Vector<AtlasMapInfo> mapInfo_v = atlasInfo.mapInfo_v;
 			int size = mapInfo_v.size();
+			boolean first = true;
+			if (outjson != null) {
+				outjson.print("\"class\" : \"Maps\",");
+ 				outjson.print("\"name\" : \"Maps\",");
+				outjson.print("\"map_size\" : " + size + ",");
+				outjson.print("\"maps\" : [");
+			}
 			for (int nn = 0; nn < size; ++nn) {
 				AtlasMapInfo mapInfo = mapInfo_v.get(nn);
 				ItemCloser map_item  = maps.add();
 				double[] map_position = positions.get(mapInfo.id);
 				item_list_start(map_item, mapInfo.getName(), right_hand_tag);
+				if (outjson != null) {
+					if (!first) {
+						outjson.print(",");
+					} else {
+						first = false;
+					}
+					outjson.print("{\"name\" : \"" +  mapInfo.getName() + "\",");
+				}
 				if (map_position != null) {
 					map_item.getOutput().print(" position=\"");
 					map_item.getOutput().print(scales.getX(map_position[0]));
 					map_item.getOutput().print(";");
 					map_item.getOutput().print(scales.getY(map_position[1]));
 					map_item.getOutput().print("\"");
+					if (outjson != null) {
+						outjson.print("\"position\" : {");
+						outjson.print("\"x\" : " + scales.getX(map_position[0]) + ",");
+						outjson.print("\"y\" : " + scales.getY(map_position[1]) + "},");
+					}
 				}
 				map_item.getOutput().println(">");
-				//content_line(map_item.add(),  "&amp;nbsp;<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "'/> " + mapInfo.getName(), "");
 				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName(), "");
+				if (outjson != null) {
+					outjson.print("\"left_info\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName()) + "\",");
+					outjson.println("\"modules\" : [");
+				}
 
+				boolean first2 = true;
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
 					AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
 					double[] module_position = positions.get(moduleInfo.name);
 					ItemCloser module_item  = map_item.add();
 					item_list_start(module_item, moduleInfo.name, right_hand_tag + " module");
+
+					if (outjson != null) {
+						if (!first2) {
+							outjson.print(",");
+						} else {
+							first2 = false;
+						}
+						outjson.print("{\"name\" : \"" +  moduleInfo.name + "\",");
+					}
 					if (module_position != null) {
 						module_item.getOutput().print(" position=\"");
 						module_item.getOutput().print(scales.getX(module_position[0]));
 						module_item.getOutput().print(";");
 						module_item.getOutput().print(scales.getY(module_position[1]));
 						module_item.getOutput().print("\"");
+
+						if (outjson != null) {
+							outjson.print("\"position\" : {");
+							outjson.print("\"x\" : " + scales.getX(module_position[0]) + ",");
+							outjson.print("\"y\" : " + scales.getY(module_position[1]) + "},");
+						}
 					}
 					module_item.getOutput().println(">");
 					String bubble_txt = "<b>Module " + moduleInfo.name + "</b>";
 					StringBuffer fw = new StringBuffer();
-					//int post_id = 1;
-					//bubble_to_post_link_with_anchor(post_id, fw);
-					//System.out.println("MODULE " + moduleInfo.name + " " + moduleInfo.url);
-					//open_map_from_bubble(fw.append(" "), moduleInfo.name);
 					open_map_from_bubble(fw.append(" "), moduleInfo.url);
 					bubble_txt += fw.toString() + "<br>" +  moduleInfo.desc;
 					content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name, bubble_txt);
 
 					module_item.close();
+
+					if (outjson != null) {
+						outjson.print("\"left_info\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name) + "\"");
+						if (!NO_BUBBLE) {
+							outjson.print(",\"bubble\" : \"" + tojson(bubble_txt) + "\"");
+						}
+						outjson.print("}");
+					}
 				}
 				map_item.close();
+				if (outjson != null) {
+					outjson.print("]}");
+				}
 			}
 			maps.close();
+			if (outjson != null) {
+				outjson.print("]");
+			}
+		}
+
+		if (outjson != null) {
+			outjson.print("}]");
 		}
 		if (!MAPS_MODULES_TOP) {
 			right_close(output);
@@ -2561,7 +2701,7 @@ public class ProduceClickableMap
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, null, null, null);
 		//System.out.println("_generate_ module " + map + " json ?");
-		String firstEntityName = generate_mapdata(map, outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		String firstEntityName = generate_mapdata(map, outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		if (model.getListOfReactions() != null) {
 			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
@@ -2636,7 +2776,7 @@ public class ProduceClickableMap
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, modules_set, atlasInfo, model);
 
 		//System.out.println("_generate_ master json ?");
-		String firstEntityName = generate_mapdata("master", outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, scales);
+		String firstEntityName = generate_mapdata("master", outmapdata, outjson, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		// create master file (must move to a method)
 		/*final File master_map = new File("/tmp/alpha.js"); // for now
@@ -4647,7 +4787,7 @@ public class ProduceClickableMap
 			check_write("<markers>\n");
 		}
 
-		void create(String entity_class, String body, final String title, String shape_id, final int x, final int y)
+		void _create_(String entity_class, String body, final String title, String shape_id, final int x, final int y)
 		throws IOException
 		{
 			assert seen.add(shape_id) : "marker for " + shape_id + " created twice";

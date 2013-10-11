@@ -27,18 +27,16 @@ function JXTree(_document, datatree, div) {
 	this.document = _document;
 	this.label_map = {};
 	this.node_id = 0;
-	this.state_changed = null;
-	this.open_changed = null;
+	this.check_state_changed = null;
+	this.open_state_changed = null;
 	this.div = div;
 	this.node_map = {};
 	if (datatree) {
-		this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
+		this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.data);
 		this.buildNodes(this.root, datatree.children);
 		if (div) {
-			console.log("nodes built");
 			this.root.buildHTML(div);
 			this.root.show(true);
-			console.log("html built");
 		}
 	} else {
 		this.root = null;
@@ -58,7 +56,8 @@ JXTree.prototype = {
 		}
 		for (var nn = 0; nn < children_data.length; ++nn) {
 			var child_data = children_data[nn];
-			var child_node = new JXTreeNode(this, child_data.label, child_data.left_label, child_data.right_label, root_node, child_data.udata);
+			var child_node = new JXTreeNode(this, child_data.label, child_data.left_label, child_data.right_label, child_data.udata);
+			root_node.addChild(child_node);
 			this.buildNodes(child_node, child_data.children);
 		}
 	},
@@ -72,7 +71,7 @@ JXTree.prototype = {
 
 	complete: function(datatree, div) {
 		if (!this.root && datatree) {
-			this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
+			this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.udata);
 		}
 		if (!this.div) {
 			this.div = div;
@@ -85,6 +84,12 @@ JXTree.prototype = {
 		}
 	},
 
+	clone: function(node_map) {
+		var jxtree = new JXTree(this.document);
+		jxtree.root = this.root.cloneSubtree(jxtree, node_map);
+		return jxtree;
+	},
+
 	getRootNode: function() {
 		return this.root;
 	},
@@ -93,15 +98,15 @@ JXTree.prototype = {
 		return this.node_id;
 	},
 
-	stateChanged: function(action) {
-		this.state_changed = action;
+	checkStateChanged: function(action) {
+		this.check_state_changed = action;
 	},
 
-	openChanged: function(action) {
-		this.open_changed = action;
+	openStateChanged: function(action) {
+		this.open_state_changed = action;
 	},
 
-	search: function(pattern, action, div) {
+	find: function(pattern, action, div) {
 		var regex = new RegExp(pattern, "i");
 		var nodes = [];
 		for (var label in this.label_map) {
@@ -110,19 +115,9 @@ JXTree.prototype = {
 				nodes.push(node);
 			}
 		}
-		/*
-		this.root.hideSubtree();
-		for (var nn = 0; nn < nodes.length; ++nn) {
-			var node = nodes[nn];
-			node.show(true);
-			node.showSupertree(true);
-			node.setChecked(true);
-		}
-		*/
-		console.log("search: " + pattern + " " + nodes.length);
+		console.log("find [" + pattern + "] -> " + nodes.length);
 		if (nodes.length) {
 			if (action == 'select') {
-				//this.root.uncheckSubtree();
 				this.root.checkSubtree(true);
 				for (var nn = 0; nn < nodes.length; ++nn) {
 					var node = nodes[nn];
@@ -131,12 +126,11 @@ JXTree.prototype = {
 				}
 			}
 			if (action == 'subtree') {
-				var jxsubtree = new JXTree(this.document);
 				var node_map = {};
 				for (var nn = 0; nn < nodes.length; ++nn) {
 					node_map[nodes[nn].getId()] = true;
 				}
-				jxsubtree.root = this.root.cloneSubtree(jxsubtree, node_map);
+				var jxsubtree = this.clone(node_map);
 				if (div) {
 					jxsubtree.complete(null, div);
 					jxsubtree.root.openSubtree(JXTree.OPEN);
@@ -148,16 +142,12 @@ JXTree.prototype = {
 	}
 };
 
-function JXTreeNode(jxtree, label, left_label, right_label, parent, user_data) {
+function JXTreeNode(jxtree, label, left_label, right_label, user_data) {
 	this.jxtree = jxtree;
 	this.label = label;
 	this.jxtree.label_map[label] = this;
 	this.left_label = left_label;
 	this.right_label = right_label;
-	this.parent = parent;
-	if (parent) {
-		parent.addChild(this);
-	}
 	this.user_data = user_data;
 	this.children = [];
 	this.check_state = JXTree.UNCHECKED;
@@ -181,13 +171,12 @@ JXTreeNode.prototype = {
 	},
 
 	clone: function(jxtree) {
-//		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, (this.parent ? this.parent.clone(jxtree) : null), this.user_data);
 		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, null, this.user_data);
 	},
 
 	cloneSubtree: function(jxtree, node_map) {
 		if (this.isLeaf()) {
-			if (node_map[this.getId()]) {
+			if (node_map == null || node_map == undefined || node_map[this.getId()]) {
 				return this.clone(jxtree);
 			}
 			return null;
@@ -213,20 +202,6 @@ JXTreeNode.prototype = {
 		this.children.push(node);
 		node.parent = this;
 	},
-
-	/*
-	setOpenState: function(open) {
-		var open_state;
-		if (open == true) {
-			open_state = JXTree.OPEN;
-		} else if (open == false) {
-			open_state = JXTree.CLOSED;
-		} else {
-			open_state = open;
-		}
-		this.open_state = open_state;
-	},
-	*/
 
 	setOpenState: function(open) {
 		var open_state;
@@ -268,8 +243,8 @@ JXTreeNode.prototype = {
 		}
 
 		if (check_state != this.check_state) {
-			if (this.jxtree.state_changed) {
-				var check_state_new = this.jxtree.state_changed(this, check_state);
+			if (this.jxtree.check_state_changed) {
+				var check_state_new = this.jxtree.check_state_changed(this, check_state);
 				if (check_state_new) {
 					check_state = check_state_new;
 				}
@@ -330,22 +305,6 @@ JXTreeNode.prototype = {
 		}
 	},
 
-	/*
-	hideSubtree: function() {
-		this.showHide(false);
-		for (var nn = 0; nn < this.children.length; ++nn) {
-			this.children[nn].hideSubtree();
-		}
-	},
-
-	showSubtree: function() {
-		this.showHide(true);
-		for (var nn = 0; nn < this.children.length; ++nn) {
-			this.children[nn].showSubtree();
-		}
-	},
-	*/
-
 	showSupertree: function(show) {
 		if (this.parent) {
 			this.parent.show(show);
@@ -405,24 +364,6 @@ JXTreeNode.prototype = {
 		container.appendChild(ul);
 	},
 
-	/*
-	check: function() {
-		this.setCheckState(JXTree.CHECKED);
-
-		if (this.parent) {
-			this.parent.updateSupertreeState();
-		}
-	},
-
-	uncheck: function() {
-		this.setCheckState(JXTree.UNCHECKED);
-
-		if (this.parent) {
-			this.parent.updateSupertreeState();
-		}
-	},
-	*/
-
 	checkSubtree: function(check_state) {
 		this.setSubtreeState(check_state);
 
@@ -431,30 +372,12 @@ JXTreeNode.prototype = {
 		}
 	},
 
-	/*
-	checkSubtree: function() {
-		this.setSubtreeState(JXTree.CHECKED);
-
-		if (this.parent) {
-			this.parent.updateSupertreeState();
-		}
-	},
-
-	uncheckSubtree: function() {
-		this.setSubtreeState(JXTree.UNCHECKED);
-
-		if (this.parent) {
-			this.parent.updateSupertreeState();
-		}
-	},
-	*/
-
 	toggleOpen: function() {
 		//console.log("[open/close " + this.label + "] " + this.children.length);
 		var open_state = (this.open_state == JXTree.OPEN ? JXTree.CLOSED : JXTree.OPEN);
 
-		if (this.jxtree.open_changed) {
-			var open_state_new = this.jxtree.open_changed(this, open);
+		if (this.jxtree.open_state_changed) {
+			var open_state_new = this.jxtree.open_state_changed(this, open);
 			if (open_state_new) {
 				open_state = open_state_new;
 			}
@@ -464,15 +387,8 @@ JXTreeNode.prototype = {
 	},
 
 	toggleCheck: function() {
-		//console.log("[CHECK/UNCHECK " + this.label + "] " + this.children.length);
+		//console.log("[check/uncheck " + this.label + "] " + this.children.length);
 		this.checkSubtree(!this.isChecked());
-		/*
-		if (this.isChecked()) {
-			this.uncheckSubtree();
-		} else {
-			this.checkSubtree();
-		}
-		*/
 	},
 
 	eventListeners: function() {
@@ -543,9 +459,6 @@ JXTreeNode.prototype = {
 
 		this.open_state = JXTree.CLOSED;
 		this.show(false);
-		//this.open_state = JXTree.OPEN;
-		//$(this.nd_elem).css("display", "block");
-		//this.toggleOpen();
 
 		return this.nd_elem;
 	}

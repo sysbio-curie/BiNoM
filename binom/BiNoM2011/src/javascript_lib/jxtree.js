@@ -18,25 +18,38 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-function JXTree(datatree, div) {
+var jxtree_mute = true;
+
+function JXTree(_document, datatree, div) {
+	if (!_document) {
+		_document = document;
+	}
+	this.document = _document;
 	this.label_map = {};
-	this.node_cnt = 0;
+	this.node_id = 0;
 	this.state_changed = null;
 	this.open_changed = null;
+	this.div = div;
+	this.node_map = {};
 	if (datatree) {
 		this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
 		this.buildNodes(this.root, datatree.children);
-		console.log("nodes built");
-		this.root.buildHTML(div);
-		console.log("html built");
+		if (div) {
+			console.log("nodes built");
+			this.root.buildHTML(div);
+			this.root.show(true);
+			console.log("html built");
+		}
 	} else {
 		this.root = null;
 	}
 }
 
-JXTree.UNCHECKED = 0;
-JXTree.CHECKED = 1;
-JXTree.UNDETERMINED = 2;
+JXTree.UNCHECKED = 4;
+JXTree.CHECKED = 5;
+JXTree.UNDETERMINED = 6;
+JXTree.CLOSED = 10;
+JXTree.OPEN = 11;
 
 JXTree.prototype = {
 	buildNodes: function(root_node, children_data) {
@@ -50,48 +63,86 @@ JXTree.prototype = {
 		}
 	},
 
-	newNode: function() {
-		this.node_cnt++;
+	newNode: function(node) {
+		var node_id = ++this.node_id;
+		node.setId(node_id);
+		this.node_map[node_id] = node;
+		return node_id;
+	},
+
+	complete: function(datatree, div) {
+		if (!this.root && datatree) {
+			this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, null, datatree.udata);
+		}
+		if (!this.div) {
+			this.div = div;
+		}
+		if (this.root && !this.root.nd_elem) {
+			if (this.div) {
+				this.root.buildHTML(this.div);
+				this.root.show(true);
+			}
+		}
+	},
+
+	getRootNode: function() {
+		return this.root;
 	},
 
 	getNodeCount: function() {
-		return this.node_cnt;
+		return this.node_id;
 	},
 
-	onStateChange: function(action) {
+	stateChanged: function(action) {
 		this.state_changed = action;
 	},
 
-	onOpenChange: function(action) {
+	openChanged: function(action) {
 		this.open_changed = action;
 	},
 
-	search: function(pattern, action) {
+	search: function(pattern, action, div) {
 		var regex = new RegExp(pattern, "i");
 		var nodes = [];
 		for (var label in this.label_map) {
-			if (label.match(regex)) {
-				nodes.push(this.label_map[label]);
+			var node = this.label_map[label];
+			if (node.isLeaf() && label.match(regex)) {
+				nodes.push(node);
 			}
 		}
 		/*
 		this.root.hideSubtree();
 		for (var nn = 0; nn < nodes.length; ++nn) {
 			var node = nodes[nn];
-			node.setDisplay(true);
+			node.show(true);
 			node.showSupertree(true);
 			node.setChecked(true);
 		}
 		*/
 		console.log("search: " + pattern + " " + nodes.length);
-		if (action == 'select') {
-			this.root.uncheckSubtree();
-			for (var nn = 0; nn < nodes.length; ++nn) {
-				var node = nodes[nn];
-				node.check();
+		if (nodes.length) {
+			if (action == 'select') {
+				//this.root.uncheckSubtree();
+				this.root.checkSubtree(true);
+				for (var nn = 0; nn < nodes.length; ++nn) {
+					var node = nodes[nn];
+					node.checkSubtree(JXTree.CHECKED);
+					node.openSupertree(JXTree.OPEN);
+				}
 			}
-		}
-		if (action == 'subtree') {
+			if (action == 'subtree') {
+				var jxsubtree = new JXTree(this.document);
+				var node_map = {};
+				for (var nn = 0; nn < nodes.length; ++nn) {
+					node_map[nodes[nn].getId()] = true;
+				}
+				jxsubtree.root = this.root.cloneSubtree(jxsubtree, node_map);
+				if (div) {
+					jxsubtree.complete(null, div);
+					jxsubtree.root.openSubtree(JXTree.OPEN);
+				}
+				return jxsubtree;
+			}
 		}
 		return nodes.length;
 	}
@@ -109,89 +160,196 @@ function JXTreeNode(jxtree, label, left_label, right_label, parent, user_data) {
 	}
 	this.user_data = user_data;
 	this.children = [];
-	this.state = JXTree.UNCHECKED;
-	this.open = false;
+	this.check_state = JXTree.UNCHECKED;
+	this.open_state = JXTree.CLOSED;
 
-	this.elem_node = null;
-	this.elem_checkbox = null;
-	this.elem_label = null;
+	this.nd_elem = null; // li node
+	this.cb_elem = null; // checkbox
+	this.oc_elem = null; // open/close icon
 
-	this.jxtree.newNode();
+	this.jxtree.newNode(this);
 }
 
 JXTreeNode.prototype = {
 
+	getId: function() {
+		return this.id;
+	},
+
+	setId: function(id) {
+		this.id = id;
+	},
+
 	clone: function(jxtree) {
-		return new JXTreeNode(jxtree, this.label, this.left_label, this_right_label, (this.parent ? this.parent.clone(jxtree) : null), this.user_data);
+//		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, (this.parent ? this.parent.clone(jxtree) : null), this.user_data);
+		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, null, this.user_data);
+	},
+
+	cloneSubtree: function(jxtree, node_map) {
+		if (this.isLeaf()) {
+			if (node_map[this.getId()]) {
+				return this.clone(jxtree);
+			}
+			return null;
+		}
+		var children = [];
+		for (var nn = 0; nn < this.children.length; ++nn) {
+			var child = this.children[nn].cloneSubtree(jxtree, node_map);
+			if (child) {
+				children.push(child);
+			}
+		}
+		if (children.length) {
+			var clone = this.clone(jxtree);
+			for (var nn = 0; nn < children.length; ++nn) {
+				clone.addChild(children[nn]);
+			}
+			return clone;
+		}
+		return null;
 	},
 
 	addChild: function(node) {
 		this.children.push(node);
+		node.parent = this;
 	},
 
-	setOpen: function(open) {
-		this.open = open;
+	/*
+	setOpenState: function(open) {
+		var open_state;
+		if (open == true) {
+			open_state = JXTree.OPEN;
+		} else if (open == false) {
+			open_state = JXTree.CLOSED;
+		} else {
+			open_state = open;
+		}
+		this.open_state = open_state;
 	},
+	*/
 
-	setState: function(state) {
-		if (state != this.state) {
-			if (this.jxtree.state_changed) {
-				var nstate = this.jxtree.state_changed(this, state);
-				if (nstate) {
-					state = nstate;
+	setOpenState: function(open) {
+		var open_state;
+		if (open == true) {
+			open_state = JXTree.OPEN;
+		} else if (open == false) {
+			open_state = JXTree.CLOSED;
+		} else {
+			open_state = open;
+		}
+
+		if (this.open_state != open_state) {
+			this.open_state = open_state;
+			if (this.oc_elem) {
+				for (var nn = 0; nn < this.children.length; ++nn) {
+					this.children[nn].show(this.open_state == JXTree.OPEN);
+				}
+				if (!this.isLeaf()) {
+					if (this.open_state) {
+						this.oc_elem.removeClass("jxtree-closed");
+						this.oc_elem.addClass("jxtree-open");
+					} else {
+						this.oc_elem.removeClass("jxtree-open");
+						this.oc_elem.addClass("jxtree-closed");
+					}
 				}
 			}
-			this.state = state;
-			this.setCheckboxClass();
 		}
 	},
 
-	getState: function() {
-		return this.state;
+	setCheckState: function(checked) {
+		var check_state;
+		if (checked == true) {
+			check_state = JXTree.CHECKED;
+		} else if (checked == false) {
+			check_state = JXTree.UNCHECKED;
+		} else {
+			check_state = checked;
+		}
+
+		if (check_state != this.check_state) {
+			if (this.jxtree.state_changed) {
+				var check_state_new = this.jxtree.state_changed(this, check_state);
+				if (check_state_new) {
+					check_state = check_state_new;
+				}
+			}
+			if (check_state != this.check_state) {
+				this.check_state = check_state;
+				this.setCheckboxClass();
+			}
+		}
+	},
+
+	getCheckState: function() {
+		return this.check_state;
 	},
 
 	getUserData: function() {
 		return this.user_data;
 	},
 
-	isOpened: function() {
-		return this.open;
+	openSubtree: function(open_state) {
+		this.setOpenState(open_state);
+		for (var nn = 0; nn < this.children.length; ++nn) {
+			this.children[nn].openSubtree(open_state);
+		}
+	},
+
+	openSupertree: function(open_state) {
+		if (this.parent) {
+			this.parent.setOpenState(open_state);
+			this.parent.openSupertree(open_state);
+		}
+	},
+
+	isOpen: function() {
+		return this.open_state == JXTree.OPEN;
 	},
 
 	isChecked: function() {
-		return this.state == JXTree.CHECKED;
+		return this.check_state == JXTree.CHECKED;
 	},
 
 	isUnchecked: function() {
-		return this.state == JXTree.UNCHECKED;
+		return this.check_state == JXTree.UNCHECKED;
 	},
 
 	isUndetermined: function() {
-		return this.state == JXTree.UNDETERMINED;
+		return this.check_state == JXTree.UNDETERMINED;
 	},
 
-	setDisplay: function(display) {
-		$(this.elem_node).css("display", (display ? "block" : "none"));
+	show: function(show) {
+		$(this.nd_elem).css("display", (show ? "block" : "none"));
 	},
 
+	showSubtree: function(show) {
+		this.show(show);
+		for (var nn = 0; nn < this.children.length; ++nn) {
+			this.children[nn].showSubtree(show);
+		}
+	},
+
+	/*
 	hideSubtree: function() {
-		this.setDisplay(false);
+		this.showHide(false);
 		for (var nn = 0; nn < this.children.length; ++nn) {
 			this.children[nn].hideSubtree();
 		}
 	},
 
 	showSubtree: function() {
-		this.setDisplay(true);
+		this.showHide(true);
 		for (var nn = 0; nn < this.children.length; ++nn) {
 			this.children[nn].showSubtree();
 		}
 	},
+	*/
 
-	showSupertree: function() {
+	showSupertree: function(show) {
 		if (this.parent) {
-			this.parent.setDisplay(true);
-			this.parent.showSupertree();
+			this.parent.show(show);
+			this.parent.showSupertree(show);
 		}
 	},
 
@@ -200,40 +358,39 @@ JXTreeNode.prototype = {
 	},
 
 	setCheckboxClass: function() {
-		this.ins_cb_obj.removeClass("jxtree-checkbox-checked");
-		this.ins_cb_obj.removeClass("jxtree-checkbox-unchecked");
-		this.ins_cb_obj.removeClass("jxtree-checkbox-undetermined");
+		if (this.cb_elem) {
+			this.cb_elem.removeClass("jxtree-checkbox-checked");
+			this.cb_elem.removeClass("jxtree-checkbox-unchecked");
+			this.cb_elem.removeClass("jxtree-checkbox-undetermined");
 
-		if (this.isChecked()) {
-			this.ins_cb_obj.addClass("jxtree-checkbox-checked");
-		} else if (this.isUnchecked()) {
-			this.ins_cb_obj.addClass("jxtree-checkbox-unchecked");
-		} else if (this.isUndetermined()) {
-			this.ins_cb_obj.addClass("jxtree-checkbox-undetermined");
+			if (this.isChecked()) {
+				this.cb_elem.addClass("jxtree-checkbox-checked");
+			} else if (this.isUnchecked()) {
+				this.cb_elem.addClass("jxtree-checkbox-unchecked");
+			} else if (this.isUndetermined()) {
+				this.cb_elem.addClass("jxtree-checkbox-undetermined");
+			}
 		}
 	},
 
-	setSubtreeState: function(state) {
-		this.setState(state);
+	setSubtreeState: function(check_state) {
+		this.setCheckState(check_state);
 
 		for (var nn = 0; nn < this.children.length; ++nn) {
-			this.children[nn].setSubtreeState(state);
+			this.children[nn].setSubtreeState(check_state);
 		}
 	},
 
 	updateSupertreeState: function() {
 		if (this.children.length > 0) {
-			var state = this.children[0].getState();
+			var check_state = this.children[0].getCheckState();
 			for (var nn = 1; nn < this.children.length; ++nn) {
-				if (this.children[nn].getState() != state) {
-					this.setState(JXTree.UNDETERMINED);
-					state = null;
+				if (this.children[nn].getCheckState() != check_state) {
+					check_state = JXTree.UNDETERMINED;
 					break;
 				}
 			}
-			if (state != null) {
-				this.setState(state);
-			}
+			this.setCheckState(check_state);
 		}
 		if (this.parent) {
 			this.parent.updateSupertreeState();
@@ -241,15 +398,16 @@ JXTreeNode.prototype = {
 	},
 
 	buildHTML: function(container) {
-		var ul = document.createElement('ul');
+		var ul = this.jxtree.document.createElement('ul');
 		$(ul).css("padding-left", "0px");
 		$(ul).addClass("jxtree");
 		this.buildHTMLNodes(ul);
 		container.appendChild(ul);
 	},
 
+	/*
 	check: function() {
-		this.setState(JXTree.CHECKED);
+		this.setCheckState(JXTree.CHECKED);
 
 		if (this.parent) {
 			this.parent.updateSupertreeState();
@@ -257,13 +415,23 @@ JXTreeNode.prototype = {
 	},
 
 	uncheck: function() {
-		this.setState(JXTree.UNCHECKED);
+		this.setCheckState(JXTree.UNCHECKED);
+
+		if (this.parent) {
+			this.parent.updateSupertreeState();
+		}
+	},
+	*/
+
+	checkSubtree: function(check_state) {
+		this.setSubtreeState(check_state);
 
 		if (this.parent) {
 			this.parent.updateSupertreeState();
 		}
 	},
 
+	/*
 	checkSubtree: function() {
 		this.setSubtreeState(JXTree.CHECKED);
 
@@ -279,10 +447,49 @@ JXTreeNode.prototype = {
 			this.parent.updateSupertreeState();
 		}
 	},
+	*/
+
+	toggleOpen: function() {
+		//console.log("[open/close " + this.label + "] " + this.children.length);
+		var open_state = (this.open_state == JXTree.OPEN ? JXTree.CLOSED : JXTree.OPEN);
+
+		if (this.jxtree.open_changed) {
+			var open_state_new = this.jxtree.open_changed(this, open);
+			if (open_state_new) {
+				open_state = open_state_new;
+			}
+		}
+
+		this.setOpenState(open_state);
+	},
+
+	toggleCheck: function() {
+		//console.log("[CHECK/UNCHECK " + this.label + "] " + this.children.length);
+		this.checkSubtree(!this.isChecked());
+		/*
+		if (this.isChecked()) {
+			this.uncheckSubtree();
+		} else {
+			this.checkSubtree();
+		}
+		*/
+	},
+
+	eventListeners: function() {
+		var node = this;
+
+		this.oc_elem.click(function() {
+			node.toggleOpen();
+		});
+
+		this.cb_elem.click(function() {
+			node.toggleCheck();
+		});
+	},
 
 	buildHTMLNodes: function(container) {
-		var li = document.createElement('li');
-		var ins_oc = document.createElement('ins');
+		var li = this.jxtree.document.createElement('li');
+		var ins_oc = this.jxtree.document.createElement('ins');
 		li.appendChild(ins_oc);
 
 		var ins_oc_obj = $(ins_oc);
@@ -293,7 +500,7 @@ JXTreeNode.prototype = {
 			ins_oc_obj.addClass("jxtree-leaf");
 		}
 
-		var ins_cb = document.createElement('ins');
+		var ins_cb = this.jxtree.document.createElement('ins');
 		var ins_cb_obj = $(ins_cb);
 		ins_cb_obj.addClass("jxtree-default");
 		ins_cb_obj.addClass("jxtree-checkbox-unchecked");
@@ -301,52 +508,26 @@ JXTreeNode.prototype = {
 		li.appendChild(ins_cb);
 
 		if (this.left_label) {
-			var ins = document.createElement('ins');
+			var ins = this.jxtree.document.createElement('ins');
 			$(ins).html(this.left_label + "&nbsp;");
 			li.appendChild(ins);
 		}
 
-		var ins_label = document.createElement('ins');
+		var ins_label = this.jxtree.document.createElement('ins');
 		$(ins_label).html(this.label);
 		li.appendChild(ins_label);
 
 		if (this.right_label) {
-			var ins = document.createElement('ins');
+			var ins = this.jxtree.document.createElement('ins');
 			$(ins).html("&nbsp;" + this.right_label);
 			li.appendChild(ins);
 		}
 
 		var node = this;
-		ins_oc_obj.click(function() {
-			console.log("[open/close " + node.label + "] " + node.children.length);
-			node.open = !node.open;
-			for (var nn = 0; nn < node.children.length; ++nn) {
-				node.children[nn].setDisplay(node.open);
-			}
-			if (!node.isLeaf()) {
-				if (node.open) {
-					ins_oc_obj.removeClass("jxtree-closed");
-					ins_oc_obj.addClass("jxtree-open");
-				} else {
-					ins_oc_obj.removeClass("jxtree-open");
-					ins_oc_obj.addClass("jxtree-closed");
-				}
-			}
-		});
-
-		ins_cb_obj.click(function() {
-			console.log("[check/uncheck " + node.label + "] " + node.children.length);
-			if (node.isChecked()) {
-				node.uncheckSubtree();
-			} else {
-				node.checkSubtree();
-			}
-		});
-
 		container.appendChild(li);
 
 		if (this.children.length) {
-			var ul = document.createElement('ul');
+			var ul = this.jxtree.document.createElement('ul');
 			for (var nn = 0; nn < this.children.length; ++nn) {
 				var li_child = this.children[nn].buildHTMLNodes(ul);
 				ul.appendChild(li_child);
@@ -354,10 +535,18 @@ JXTreeNode.prototype = {
 			li.appendChild(ul);
 		}
 
-		this.open = true;
-		this.elem_node = li;
-		this.ins_cb_obj = ins_cb_obj;
-		$(this.elem_node).css("display", "block");
-		return this.elem_node;
+		this.oc_elem = ins_oc_obj;
+		this.cb_elem = ins_cb_obj;
+		this.nd_elem = li;
+
+		this.eventListeners();
+
+		this.open_state = JXTree.CLOSED;
+		this.show(false);
+		//this.open_state = JXTree.OPEN;
+		//$(this.nd_elem).css("display", "block");
+		//this.toggleOpen();
+
+		return this.nd_elem;
 	}
 };

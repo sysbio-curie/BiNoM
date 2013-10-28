@@ -1,10 +1,20 @@
 
 .jxtree {
+    font-size: 12px;
     vertical-align: top;
+    white-space: nowrap;
+
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.jxtree a {
+    text-decoration: none;
 }
 
 .jxtree ul {
     padding-left: 12px;
+
 }
 
 .jxtree ins {

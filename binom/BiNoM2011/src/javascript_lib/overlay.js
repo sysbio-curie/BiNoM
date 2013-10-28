@@ -175,6 +175,7 @@ USGSOverlay.prototype.draw = function(module_name) {
 		this.arrpos = navicell.dataset.getArrayPos(module_name);
 	}
 	var arrpos = this.arrpos;
+	//console.log("drawing " + arrpos.length);
 	if (arrpos && arrpos.length) {
 		var div = this.div_;
 		var overlayProjection = this.getProjection();

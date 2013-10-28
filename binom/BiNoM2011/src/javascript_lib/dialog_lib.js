@@ -94,14 +94,6 @@ $(function() {
 								update_status_tables();
 							}
 						});
-						
-						/*
-						if (display_markers.attr("checked")) {
-							datatable.ready.then(function() {
-								datatable.display_markers(navicell_module_name, window);
-							});
-						}
-						*/
 					}
 
 				}
@@ -141,7 +133,7 @@ $(function() {
 				navicell.drawing_config.setDisplayDLOsOnAllGenes($("#drawing_config_display_all").attr("checked"));
 				navicell.drawing_config.sync();
 				set_old_marker_mode($("#drawing_config_old_marker").val());
-				jstree_refresh(true);
+				clickmap_refresh(true);
 				drawing_editing(false);
 			},
 
@@ -218,22 +210,6 @@ $(function() {
 	//
 	update_sample_annot_table(window.document);
 
-	/*
-	$("#heatmap_config_div" ).dialog({
-		autoOpen: false,
-		width: 720,
-		height: 750,
-		modal: false,
-		buttons: {
-			"Apply": function() {
-				console.log("applying");
-			},
-			
-			"Cancel": function() {
-			}
-		}
-	});
-	*/
 	$("#heatmap_editor_div" ).dialog({
 		autoOpen: false,
 		width: 750,
@@ -252,7 +228,7 @@ $(function() {
 				navicell.drawing_config.editing_heatmap_config.shrink();
 				update_status_tables();
 				heatmap_editor_set_editing(false, undefined, document.map_name);
-				jstree_refresh(true);
+				clickmap_refresh(true);
 			},
 			
 			"Clear": function() {
@@ -287,7 +263,7 @@ $(function() {
 				navicell.drawing_config.editing_barplot_config.shrink();
 				update_status_tables();
 				barplot_editor_set_editing(false);
-				jstree_refresh(true);
+				clickmap_refresh(true);
 			},
 			
 			"Clear": function() {
@@ -321,7 +297,7 @@ $(function() {
 				glyph_editor_apply(navicell.drawing_config.editing_glyph_config);
 				update_status_tables();
 				glyph_editor_set_editing(false);
-				jstree_refresh(true);
+				clickmap_refresh(true);
 			},
 			
 			"Clear": function() {
@@ -1008,7 +984,7 @@ Datatable.prototype.showDisplayConfig = function(doc) {
 					}
 					datatable.refresh();
 					update_status_tables();
-					jstree_refresh(true);
+					clickmap_refresh(true);
 				},
 
 				"Cancel": function() {

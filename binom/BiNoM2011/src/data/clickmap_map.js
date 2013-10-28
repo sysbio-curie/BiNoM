@@ -24,6 +24,7 @@ var old_marker_mode = "1";
 var medium_icon;
 var small_icon;
 var big_icon;
+var use_jxtree;
 
 /*
 var jtree;
@@ -115,11 +116,9 @@ function make_marker_visible(marker)
 	if (!navicell.drawing_config || navicell.drawing_config.displayMarkers()) {
 		marker.setIcon(marker.getIcon().new_icon);
 		marker.setVisible(true);
-		marker.setAnimation(google.maps.Animation.DROP);
+		//marker.setAnimation(google.maps.Animation.DROP);
 		marker.type = "new";
-		/*if (!refreshing) */ {
-			new_markers.push(marker);
-		}
+		new_markers.push(marker);
 	}
 }
 
@@ -170,8 +169,7 @@ function make_new_markers_old()
 }
 
 // http://www.contentwithstyle.co.uk/content/make-sure-that-firebug-console-debug-doesnt-break-everything/index.html
-if(!window.console)
-{
+if (!window.console) {
 	window.console = new function()
 	{
 		this.log = function(str) {};
@@ -275,7 +273,7 @@ function jstree_uncheck_all()
 	overlay.draw(window.document.navicell_module_name);
 }
 
-function jstree_refresh(partial)
+function clickmap_refresh(partial)
 {
 	if (partial) {
 		if (navicell.drawing_config && !navicell.drawing_config.displayMarkers()) {
@@ -303,13 +301,16 @@ function jstree_refresh(partial)
 		var marker = marker_list[nn];
 		marker.keep_old = marker.type == "old";
 	}
-	refreshing = true;
-	var undets = $(".jstree-undetermined");
-//	var objs = $(".jstree-checked");
-	var objs = jquery_to_dom($(".jstree-checked"));
 
-	jtree.jstree("uncheck_node", objs);
-	jtree.jstree("check_node", objs);
+	if (!use_jxtree) {
+		refreshing = true;
+		var undets = $(".jstree-undetermined");
+		var objs = jquery_to_dom($(".jstree-checked"));
+
+		jtree.jstree("uncheck_node", objs);
+		jtree.jstree("check_node", objs);
+
+	}
 
 	for (var nn = 0; nn < marker_list.length; ++nn) {
 		var marker = marker_list[nn];
@@ -321,9 +322,11 @@ function jstree_refresh(partial)
 	}
 
 	refresh_old_markers();
-	refreshing = false;
-	undets.addClass("jstree-undetermined");
 
+	if (!use_jxtree) {
+		refreshing = false;
+		undets.addClass("jstree-undetermined");
+	}
 }
 
 function set_old_marker_mode(val) {
@@ -523,6 +526,7 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 	// normal jstree_contains search first (see jquery.jstree.js line 3403)
 	if ((a.textContent || "").toLowerCase().indexOf(m[3].toLowerCase()) >= 0)
 		return false;
+
 	if ((a.innerText || "").toLowerCase().indexOf(m[3].toLowerCase()) >= 0)
 		return false;
 		// custom search within title if nothing found
@@ -534,13 +538,46 @@ $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 
 function start_right_hand_panel(selector, source, map, projection, whenloaded, firstEntityName)
 {
+	if (use_jxtree) {
+		$(selector).html("<div id='loading-jxtree'><br/><br/><span class='loading-jstree-head-msg'>Loading all entities<br>(proteins, genes, RNAs...)</span><br/><br/>This action might take a few seconds when applied to the whole Atlas.<br/>If a pop-up message proposes you<br/>to kill or wait, choose wait.</div>");
+		build_jxtree(selector, map, projection, whenloaded, firstEntityName);
+	} else {
+		build_jstree(selector, source, map, projection, whenloaded, firstEntityName);
+	}
+}
+
+function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
+{
+	var search_field = $('#query_text');
+	var search_label = "\u2002Search (e.g. " + firstEntityName + ")\u00a0";
+	
+	//http://stackoverflow.com/questions/699065/submitting-a-form-on-enter-with-jquery
+	search_field.keypress(function(e) {
+		if (e.which == 13) {
+        		search_field.blur();
+    			var val = $(this).val();
+			if (use_jxtree) {
+				navicell.mapdata.findJXTree(window.document.navicell_module_name, val, 'select');
+			}
+			
+		}
+	});
+
+	search_field.val(search_label);
+	search_field.focus(function(e) {
+		// http://drupal.org/node/154137
+		if ($(this).val() == search_label)
+		{
+			$(this).val("");
+		}
+	});
+
+	build_entity_tree_when_ready(window, map, selector, projection, whenloaded);
+}
+
+function build_jstree(selector, source, map, projection, whenloaded, firstEntityName)
+{
 	console.log("search setup");
-//	$("#search").click(function () {
-//		var t = $("#query_text").val();
-//
-//		console.log("about to search", selector);
-//		$(selector).jstree("search", t);
-//	});
 	
 	var tree = $(selector);
 	var search_field = $('#query_text');
@@ -548,23 +585,21 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 	
 	//http://stackoverflow.com/questions/699065/submitting-a-form-on-enter-with-jquery
 	search_field.keypress(function(e) {
-        if(e.which == 13) {
- //           jQuery('#search').focus().click();
-        	search_field.blur();
-    		var t = $(this).val();
-    		tree.jstree("search", t);
-           
-        }
-    });
+		if (e.which == 13) {
+        		search_field.blur();
+    			var t = $(this).val();
+    			tree.jstree("search", t);
+			
+		}
+	});
 	search_field.val(search_label);
-	search_field.focus(function(e)
-	{
+	search_field.focus(function(e) {
 		// http://drupal.org/node/154137
 		if ($(this).val() == search_label)
 		{
 			$(this).val("");
 		}
-    });
+	});
 
 	jtree = tree
 		.bind("loaded.jstree", whenloaded)
@@ -751,6 +786,8 @@ function dbg_sleep(millis)
 
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, firstEntityName)
 {
+	use_jxtree = !source;
+
 	console.log("clickmap_start ... ", to_open, window.to_open);
 	if (!maps)
 	{
@@ -766,29 +803,38 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 	var whenready = function(e, data)
 	{
+		if (use_jxtree) {
+			$("#loading-jxtree").css("display", "none");
+		}
 		console.log("when ready", to_open);
 		if (to_open && to_open.length > 0)
 		{
-			// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
-			var e = $(panel_selector).find("#entities"); // $("#entities");
-			data.inst.open_all(e, false); // otherwise the tree is not checked
-			show_markers_ref(to_open, data.inst);
-//			data.inst.close_all(e, false); // -1 closes all nodes in the container
-//			data.inst.open_node(e, false, true);
-			var children = data.inst._get_children(e);
-			for (var i = 0; i < children.length; i++) {
-				data.inst.close_all(children[i], false);
+			if (use_jxtree) {
+				to_open.no_ext = true;
+				navicell.mapdata.findJXTree(window.document.navicell_module_name, to_open, 'select');
+			} else {
+				// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
+				var e = $(panel_selector).find("#entities"); // $("#entities");
+				data.inst.open_all(e, false); // otherwise the tree is not checked
+				show_markers_ref(to_open, data.inst);
+				//			data.inst.close_all(e, false); // -1 closes all nodes in the container
+				//			data.inst.open_node(e, false, true);
+				var children = data.inst._get_children(e);
+				for (var i = 0; i < children.length; i++) {
+					data.inst.close_all(children[i], false);
+				}
 			}
 		}
 		//dbg_sleep(3000);
 		//console.log("AFTER SLEEP ", (window.to_open ? window.to_open : []));
-		to_open = [];
+
+		//to_open = [];
 		$("img.blogfromright").click(open_blog_click);
 		$("img.mapmodulefromright").click(open_module_map_click);
-		console.log("to_open set", to_open, to_open.length);
+		//console.log("to_open set", to_open, to_open.length);
 		
 	};
-    start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
+        start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
 	var tell_opener = function()
 	{
 		var blog = maps[""];
@@ -855,33 +901,107 @@ function show_map_and_markers(map_name, ids)
 
 function uncheck_all_entities()
 {
-//	jQuery.jstree._reference(jtree).uncheck_all();
-	// Query.jstree._reference(jtree).uncheck_all() does not call the uncheck_node callback
-	
-/*
-	var ref = jQuery.jstree._reference(jtree);
-	var f = function(index, element)
-	{
-		if (element.markers) {
-			$.each(element.markers, function(key, i) { i.setVisible(false); });
+	if (use_jxtree) {
+		var jxtree = navicell.mapdata.getJXTree(window.document.navicell_module_name);
+		if (jxtree) {
+			$.each(jxtree.getRootNodes(), function() {
+				this.checkSubtree(false);
+			});
 		}
+	} else if (jQuery.jstree._reference(jtree)) {
+		jQuery.jstree._reference(jtree).uncheck_all();
 	}
-		
-	$.each
-	(
-		ref.get_checked(), 
-		function()
-		{
-			ref.uncheck_node(this);
-			$(this).filter(filter).each(f); // needed for reactions
-		}
-	);
-*/
+	
 	$.each(marker_list, function() {
 		this.setVisible(false);
 	});
-
+	
 	$.each(bubble_list, function() {
 		this.close();
+	});
+}
+
+function ClickmapTreeNode(map, id, cls, name, _positions, bubble)
+{
+	var icon = medium_icon;
+	if (cls == "REACTION") {
+		icon = small_icon;
+	} else if (cls == "MODULE") {
+		icon = big_icon;
+	} else {
+		icon = medium_icon;
+	}
+
+	var positions;
+	if (_positions.length) {
+		positions = _positions;
+	} else {
+		positions = [];
+		positions.push(_positions);
+	}
+
+	this.markers = [];
+	for (var nn = 0; nn < positions.length; ++nn) {
+		var p = new google.maps.Point(positions[nn].x, positions[nn].y);
+		var marker = new google.maps.Marker(
+			{
+				position: projection.fromPointToLatLng(p),
+				map: map,
+				title: name + " (" + id + ")",
+				visible: false,
+				icon: icon
+			}
+		);
+		if (bubble) {
+			google.maps.event.addListener
+			(
+				marker, 'click', function()
+				{
+					console.log("has clicked");
+					if (!this.bubble) {
+						this.bubble = new google.maps.InfoWindow
+						(
+							{
+								content: bubble,
+								maxWidth: 350
+							}
+						);
+						bubble_list.push(this.bubble);
+					}
+					this.bubble.open(map, marker);
+				}
+			);
+		}
+		this.markers.push(marker);
+		marker_list.push(marker);
+	}
+}
+
+function tree_node_click_before(tree_context, map, checked) {
+	if (!checked) {
+		tree_context.marker_bounds = new google.maps.LatLngBounds();
+		make_new_markers_old();
+	}
+}
+
+function tree_node_click_after(tree_context, map, checked) {
+	if (checked) {
+		panMapToBounds(map, tree_context.marker_bounds);
+	}
+}
+
+function tree_node_state_changed(tree_context, tree_node, checked) {
+	if (!tree_node) {
+		return;
+	}
+	$.each(tree_node.markers, function() {
+		if (checked) {
+			make_marker_visible(this);
+			if (tree_context.marker_bounds) {
+				extend(tree_context.marker_bounds, this);
+			}
+		} else {
+			this.setVisible(false);
+		}
 	});
 }

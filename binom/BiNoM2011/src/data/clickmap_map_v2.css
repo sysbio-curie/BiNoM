@@ -716,6 +716,15 @@ div.tablesorterPager input {
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
+#loading-jxtree {
+    margin: 12px;
+    font-size: small;
+}
+
+.loading-jxtree-head-msg {
+    font-weight: bold;
+}
+
 .loading-jstree-head-msg {
     font-weight: bold;
 }

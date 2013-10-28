@@ -41,52 +41,267 @@ if (!Number.MIN_NUMBER) {
 	Number.MIN_NUMBER = -4000000000; // not the correct value, but ok for our purposes
 }
 
+function load_info(url, module_name)
+{
+	navicell.mapdata.info_ready[module_name] = new $.Deferred();
+	$.ajax(url,
+	       {
+		       async: true,
+		       dataType: 'json',
+		       
+		       success: function(data) {
+			       console.log("navicell: info [" + url + "] loaded !");
+			       navicell.mapdata.addInfo(module_name, data);
+		       },
+			       
+		       error: function() {
+			       console.log("navicell: error loading [" + url + "] jxtree");
+		       }
+	       }
+	      );
+}
+
 //
 // Mapdata class
 //
 // Encapsulate all module entities, including map positions
 //
 
+var jxtree_mapfun_map = {};
+
+jxtree_mapfun_map['label'] = function(datanode) {
+	if (datanode.name) {
+		return datanode.name;
+	}
+	return datanode.label;
+}
+
+jxtree_mapfun_map['left_label'] = function(datanode) {
+	var left_label = datanode.left_label;
+	if (left_label) {
+		if (left_label.indexOf("blog:") == 0) {
+			var alt = left_label.substr(5);
+			left_label = "<a href='#'><img align=\"top\" class=\"blogfromright\" border=\"0\" src=\"../../../map_icons/misc/blog.png\" alt=\"" + alt + "\"/></a>";
+		}
+		return "<a href='#'>" + left_label + "</a>";
+	}
+	return left_label;
+}
+
+jxtree_mapfun_map['right_label'] = function(datanode) {
+	return datanode.right_label;
+}
+
+jxtree_mapfun_map['data'] = function(datanode) {
+	if (datanode.data) {
+		return datanode.data;
+	}
+	if (datanode.id) {
+		return {id: datanode.id, cls: datanode["class"]};
+	}
+	if (datanode.name) {
+		return {id: datanode.name, cls: datanode["class"]};
+	}
+	return null;
+}
+
+jxtree_mapfun_map['children'] = function(datanode) {
+	if (datanode.entities)  {
+		return datanode.entities;
+	}
+	if (datanode.modifs) {
+		return datanode.modifs;
+	}
+	if (datanode.modules) {
+		return datanode.modules;
+	}
+	if (datanode.maps) {
+		return datanode.maps;
+	}
+	return datanode.children;
+}
+
+function jxtree_mapfun(datanode, field) {
+	var mapfun = jxtree_mapfun_map[field];
+	return mapfun ? mapfun(datanode) : null;
+}
+
+function jxtree_get_node_class(node) {
+	var data = node.getUserData();
+	if (data && data.cls) {
+		return data.cls;
+	}
+	if (node.getParent()) {
+		return jxtree_get_node_class(node.getParent());
+	}
+	return null;
+}
+
+function jxtree_user_find(regex, node) {
+	var data = node.getUserData();
+	if (data && data.id) {
+		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
+		if (info) {
+			return info.match(regex);
+		}
+	}
+	return false;
+}
+
+function jxtree_user_find_id(regex, node) {
+	var data = node.getUserData();
+	if (data && data.id) {
+		return data.id.match(regex);
+	}
+	return false;
+}
+
 function Mapdata(to_load_count) {
 	this.to_load_count = to_load_count;
 
 	this.is_ready = false;
-	this.ready = new $.Deferred();
-	var mapdata = this;
-	this.ready.then(function() {
-		mapdata.is_ready = true;
-	});
+	this.ready = {};
+	this.is_ready = {};
+	this.straight_data = {};
+	this.info_ready = {};
 }
 
 Mapdata.prototype = {
 	// Mapdata for each module
 	module_mapdata: {},
+	module_mapdata_by_id: {},
+	module_info: {},
+	module_jxtree: {},
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
 
-	isReady: function() {
-		return this.is_ready;
+	getJXTree: function(module_name) {
+		return this.module_jxtree[module_name];
 	},
 
-	whenReady: function(f) {
-		this.ready.then(f);
+	useJXTreeSimpleFind: function(jxtree) {
+		var user_find = jxtree.user_find;
+		jxtree.userFind(jxtree_user_find_id);
+		return user_find;
 	},
 
-	buildEntityTreeWhenReady: function(window, module_name) {
-		if (this.isReady()) {
-			this.buildEntityTree(window, module_name);
+	restoreJXTreeFind: function(jxtree, user_find) {
+		jxtree.userFind(user_find);
+	},
+
+	findJXTree: function(module_name, to_find, action) {
+		var mapdata = this;
+		this.whenInfoReady(module_name, function() {
+			var jxtree = mapdata.module_jxtree[module_name];
+			if (to_find.no_ext) {
+				var to_find_str = "";
+				for (var nn = 0; nn < to_find.length; ++nn) {
+					if (to_find_str) {
+						to_find_str += '|';
+					}
+					to_find_str += to_find[nn];
+				}
+				var user_find = mapdata.useJXTreeSimpleFind(jxtree);
+				jxtree.find(to_find_str, action);
+				mapdata.restoreJXTreeFind(jxtree, user_find);
+			} else {
+				jxtree.find(to_find, action);
+			}
+		});
+	},
+
+	addInfo: function(module_name, info) {
+		this.module_info[module_name] = info;
+		this.info_ready[module_name].resolve();
+	},
+
+	getInfo: function(module_name, id) {
+		var info = this.module_info[module_name];
+		if (info) {
+			return info[id];
+		}
+		return null;
+	},
+
+	isReady: function(module_name) {
+		return this.is_ready[module_name];
+	},
+
+	whenReady: function(module_name, f) {
+		var ready = this.ready[module_name];
+		ready.then(f);
+	},
+
+	whenInfoReady: function(module_name, f) {
+		var ready = this.info_ready[module_name];
+		ready.then(f);
+	},
+
+	buildEntityTreeWhenReady: function(win, map, div_name, projection, whenloaded) {
+		var module_name = map.map_name;
+		win.console.log("buildEntityTreeWhenReady module_name: " + module_name);
+		if (this.isReady(module_name)) {
+			this.buildEntityTree(win, map, div_name, projection, whenloaded);
 		} else {
 			var mapdata = this;
-			this.whenReady(function() {
-				mapdata.buildEntityTree(window, module_name);
+			this.whenReady(module_name, function() {
+				mapdata.buildEntityTree(win, map, div_name, projection, whenloaded);
 			});
 		}
 	},
 
-	buildEntityTree: function(window, module_name) {
-		var module_map = this.module_mapdata[module_name];
-		window.console.log("building tree for " + module_name);
+	buildEntityTree: function(win, map, div_name, projection, whenloaded) {
+		//var module_map = this.module_mapdata[module_name];
+		var module_name = map.map_name;
+		var data = this.straight_data[module_name];
+		if (!this.maps_modules) {
+			this.maps_modules = data[data.length-1];
+			data.pop();
+		}
+		win.console.log("building tree for " + module_name + " " + div_name + " " + $(div_name, win.document).get(0));
+
+		var datatree;
+		if (module_name == "master") {
+			datatree = [this.maps_modules, {name: 'Entities', children: data}];
+		} else {
+			datatree = {name: 'Entities', children: data};
+		}
+
+		var jxtree = new JXTree(win.document, datatree, $(div_name, win.document).get(0), jxtree_mapfun);
+		$.each(jxtree.getRootNodes(), function() {
+			this.toggleOpen();
+		});
+
+		jxtree.userFind(jxtree_user_find);
+
+		jxtree.context = {};
+
+		jxtree.onClickBefore(function(node, checked) {
+			win.tree_node_click_before(jxtree.context, map, checked);
+		});
+
+		jxtree.onClickAfter(function(node, checked) {
+			win.tree_node_click_after(jxtree.context, map, checked);
+		});
+
+		jxtree.checkStateChanged(function(node, state) {
+			var data = node.getUserData();
+			//console.log("checking node: " + (data ? data.id : null));
+			if (data && data.id) {
+				if (!data.clickmap_tree_node) {
+					var info = navicell.mapdata.getMapdataById(module_name, data.id);
+					if (info && info.positions) {
+						//win.console.log("click: " + node.label + " " + data.id + " " + jxtree_get_node_class(node) + " " + map.map_name);
+						data.clickmap_tree_node = new win.ClickmapTreeNode(map, data.id, jxtree_get_node_class(node), node.label, info.positions, navicell.mapdata.getInfo(module_name, data.id));
+					}
+				}					
+				win.tree_node_state_changed(jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
+			}
+		});
+		jxtree.module_name = module_name;
+		this.module_jxtree[module_name] = jxtree;
+		whenloaded();
 	},
 
 	// Returns the size of the hugo map
@@ -94,58 +309,85 @@ Mapdata.prototype = {
 		return mapSize(this.hugo_map);
 	},
 
+	getMapdataById: function(module_name, modif_id) {
+		return this.module_mapdata_by_id[module_name][modif_id];
+	},
+
 	// Adds a module mapdata: fills the hugo_map hashmap
 	addModuleMapdata: function(module_name, module_mapdata) {
 
 		this.module_mapdata[module_name] = module_mapdata;
+		this.module_mapdata_by_id[module_name] = {};
 
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
+			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
-			if (!entities) {
-				if (!module_mapdata[ii].modules) {
-					console.log("no entities neither modules");
+			//console.log("modules " + modules + " " + entities + " " + module_mapdata[ii]["class"]);
+			//console.log(module_mapdata[ii]["class"]);
+			if (modules) {
+				console.log("FOUND modules: " + modules.length);
+				for (var jj = 0; jj < modules.length; ++jj) {
+					var module = modules[jj];
+					console.log("module.id " + module.id);
+					this.module_mapdata_by_id[module_name][module.id] = module;
 				}
-				continue;
-			}
-			for (var jj = 0; jj < entities.length; ++jj) {
-				var entity_map = entities[jj];
-				var hugo_arr = entity_map['hugo'];
-				if (hugo_arr && hugo_arr.length > 0) {
-					for (var kk = 0; kk < hugo_arr.length; ++kk) {
-						var hugo = hugo_arr[kk];
-						if (!this.hugo_map[hugo]) {
-							this.hugo_map[hugo] = {};
+			} else if (entities) {
+				for (var jj = 0; jj < entities.length; ++jj) {
+					var entity_map = entities[jj];
+					var hugo_arr = entity_map['hugo'];
+					if (hugo_arr && hugo_arr.length > 0) {
+						for (var kk = 0; kk < hugo_arr.length; ++kk) {
+							var hugo = hugo_arr[kk];
+							if (!this.hugo_map[hugo]) {
+								this.hugo_map[hugo] = {};
+							}
+							if (!this.hugo_map[hugo][module_name]) {
+								this.hugo_map[hugo][module_name] = [];
+							}
+							this.hugo_map[hugo][module_name].push(entity_map);
 						}
-						if (!this.hugo_map[hugo][module_name]) {
-							this.hugo_map[hugo][module_name] = [];
+					}
+					var modif_arr = entity_map.modifs;
+					if (modif_arr) {
+						for (var kk = 0; kk < modif_arr.length; ++kk) {
+							var modif = modif_arr[kk];
+							this.module_mapdata_by_id[module_name][modif.id] = modif;
 						}
-						this.hugo_map[hugo][module_name].push(entity_map);
 					}
 				}
+			} else {
+				console.log("no entities neither modules");
 			}
 		}
-
+	
 		return !--this.to_load_count;
 	},
 
-	load: function(url, module_name) {
-		var mapdata = this;
+	load_mapdata: function(url, module_name) {
+		this.ready[module_name] = new $.Deferred();
+		this.ready[module_name].then(function() {
+			mapdata.is_ready[module_name] = true;
+		});
+
 		navicell.module_names.push(module_name);
+		var mapdata = this;
 		$.ajax(url,
 		       {
 			       async: true,
 			       dataType: 'json',
 			       
 			       success: function(data) {
+				       mapdata.straight_data[module_name] = data;
 				       console.log("navicell: " + module_name + " data loaded");
 				       if (mapdata.addModuleMapdata(module_name, data)) {
-					       console.log("now is ready");
-					       mapdata.ready.resolve();
+					       console.log("now all is ready");
+					       //mapdata.ready.resolve();
 				       }
+				       mapdata.ready[module_name].resolve();
 			       },
 			       
 			       error: function() {
-				       console.log("navicell: error loading " + module_name + " mapdata");
+				       console.log("navicell: error loading [" + url + "] mapdata");
 			       }
 		       }
 		      );
@@ -154,7 +396,8 @@ Mapdata.prototype = {
 	getClass: function() {return "Mapdata";}
 };
 
-function mapdata_display_markers(module_name, _window, hugo_names)
+// 2013-10-28: seems to be obsolete
+function mapdata_display_markers(module_name, win, hugo_names)
 {
 	var id_arr = [];
 	var arrpos = [];
@@ -185,7 +428,7 @@ function mapdata_display_markers(module_name, _window, hugo_names)
 			}
 		}
 	}
-	_window.show_markers(id_arr);
+	win.show_markers(id_arr);
 }
 
 //
@@ -1335,7 +1578,7 @@ Datatable.prototype = {
 	// In the following method, we get positions sucessfully, but not from
 	// an id but scanning the fill array => a map indexed by id (mind:
 	// multiple id per gene) is missing.
-	display_markers: function(module_name, _window) {
+	display_markers: function(module_name, win) {
 		//console.log("display_markers: " + module_name);
 		var id_arr = [];
 		var arrpos = [];
@@ -1365,7 +1608,7 @@ Datatable.prototype = {
 			}
 		}
 		//console.log("arrpos: " + arrpos.length);
-		_window.show_markers(id_arr);
+		win.show_markers(id_arr);
 
 		overlay.arrpos = arrpos;
 		overlay.draw();
@@ -2002,7 +2245,7 @@ Group.prototype = {
 	setMethod: function(datatable, method) {
 		this.methods[datatable.getId()] = method;
 		update_status_tables();
-		jstree_refresh(true);
+		clickmap_refresh(true);
 	},
 
 	getMethod: function(datatable) {
@@ -2420,8 +2663,8 @@ function getFG_from_BG(color) {
 	return 0.213 * rgb1 + 0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? 'FFF' : '000';
 }
 
-function build_entity_tree_when_ready(_window, module_name) {
-	navicell.mapdata.buildEntityTreeWhenReady(_window, module_name);
+function build_entity_tree_when_ready(win, map, div_name, projection, whenloaded) {
+	navicell.mapdata.buildEntityTreeWhenReady(win, map, div_name, projection, whenloaded);
 }
 
 var navicell;

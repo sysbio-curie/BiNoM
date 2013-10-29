@@ -27,25 +27,43 @@
 
       </div>
 
-<!--
       <h4>Display Options</h4>
 
       <div id="dt_import_display">
 	<table>
 	  <tr>
-	    <td><label for="display_markers">Display Gene Markers</label></td>
 	    <td><input type="checkbox" name="display_markers" id="dt_import_display_markers" class="ui-widget-content ui-corner-all" checked="checked"/></td>
+	    <td><label for="display_markers">Display Gene Markers</label></td>
 	    <td><div id="dt_import_marker_help"></div></td>
 	  </tr>
-
 	  <tr>
-	    <td><label for="heatmap">Display Heatmaps</label></td>
-	    <td><input type="checkbox" name="heatmap" id="dt_import_heatmap" class="ui-widget-content ui-corner-all"  value="on"/></td>
-	    <td><div id="dt_import_heatmap_help"></div></td>
+	    <td>&nbsp;</td>
+	  </tr>
+	  <tr>
+	    <td><input name="dt_import_display_graphics" id="dt_import_display_barplot" type="radio" checked></input></td>
+	    <td><label id='display_barplot'>Display Barplot</label></td>
+	  </tr>
+	  <tr>
+	  <tr>
+	    <td><input name="dt_import_display_graphics" id="dt_import_display_heatmap" type="radio"></input></td>
+	    <td><label id='display_heatmap'>Display Heatmap</label></td>
+	  </tr>
+	  <tr>
+	    <td><input name="dt_import_display_graphics" id="dt_import_no_display" type="radio"></input></td>
+	    <td><label id='display_heatmap'>No Display</label></td>
 	  </tr>
 	</table>
-      </div>
+
+<!--
+	  <tr>
+	    <td><label for="barplot">Display Barplot</label></td>
+	    <td><input type="checkbox" name="barplot" id="dt_import_barplot" class="ui-widget-content ui-corner-all" value="on"/></td>
+	    <td><div id="dt_import_barplot_help"></div></td>
+	  </tr>
 -->
+	</table>
+      </div>
+
     </fieldset>
   </form>
 

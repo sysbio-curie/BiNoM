@@ -133,14 +133,15 @@ JXTree.prototype = {
 			}
 		}
 		// WARNING: one should keep this, more or less
-		/*
-		if (this.roots && !this.root.nd_elem) {
-			if (this.div) {
-				this.root.buildHTML(this.div);
-				this.root.show(true);
+		if (this.roots && this.div) {
+			for (var nn = 0; nn < this.roots.length; ++nn) {
+				var root = this.roots[nn];
+				if (!root.nd_elem) {
+					root.buildHTML(this.div);
+					root.show(true);
+				}
 			}
 		}
-		*/
 	},
 
 	addRoot: function(root) {
@@ -157,8 +158,11 @@ JXTree.prototype = {
 		*/
 		var jxtree = this;
 		$.each(this.roots, function() {
-			var root = jxtree.roots[nn].cloneSubtree(cloned_jxtree, node_map);
-			cloned_jxtree.addRoot(root);
+			//var root = jxtree.roots[nn].cloneSubtree(cloned_jxtree, node_map);
+			var root = this.cloneSubtree(cloned_jxtree, node_map);
+			if (root) {
+				cloned_jxtree.addRoot(root);
+			}
 		});
 		return cloned_jxtree;
 	},
@@ -226,9 +230,18 @@ JXTree.prototype = {
 			}
 			var jxsubtree = this.clone(node_map);
 			if (div) {
+				$(div).html("");
 				jxsubtree.complete(null, div);
-				jxsubtree.root.openSubtree(JXTree.OPEN);
+				for (var nn = 0; nn < jxsubtree.roots.length; ++nn) {
+					jxsubtree.roots[nn].openSubtree(JXTree.OPEN);
+				}
 			}
+			jxsubtree.userFind(this.user_find);
+			jxsubtree.checkStateChanged(this.check_state_changed);
+			jxsubtree.openStateChanged(this.open_state_changed);
+			jxsubtree.onClickBefore(this.on_click_before);
+			jxsubtree.onClickAfter(this.on_click_after);
+			jxsubtree.found = nodes.length;
 			return jxsubtree;
 		}
 		return nodes.length;
@@ -264,7 +277,7 @@ JXTreeNode.prototype = {
 	},
 
 	clone: function(jxtree) {
-		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, null, this.user_data);
+		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, this.user_data);
 	},
 
 	cloneSubtree: function(jxtree, node_map) {
@@ -502,11 +515,11 @@ JXTreeNode.prototype = {
 
 		this.cb_elem.click(function() {
 			if (node.jxtree.on_click_before) {
-				node.jxtree.on_click_before(this, node.isChecked());
+				node.jxtree.on_click_before(node, node.isChecked());
 			}
 			node.toggleCheck();
 			if (node.jxtree.on_click_after) {
-				node.jxtree.on_click_after(this, node.isChecked());
+				node.jxtree.on_click_after(node, node.isChecked());
 			}
 		});
 	},

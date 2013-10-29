@@ -5057,7 +5057,7 @@ public class ProduceClickableMap
 		}
 
 		final String map_div_name = "map"; // see css
-		final String marker_div_name = "marker_checkboxes"; // see css
+		final String marker_div_name = "entity_tree"; // see css
 		
 		out.println("<script type='text/javascript'>");
 
@@ -5196,14 +5196,29 @@ public class ProduceClickableMap
 		left_content.close();
 		
 		final Div right_div = new Div(my_splitter, "id='" + "right_panel" + "'");
-		if (NV2) {
-			//final Div tree_control_div = new Div(right_div, "id='" + "tree_control" + "'");
-			//out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'><span class='tree-control'>clear</span></a>");
-			//out.println("<a href='#' class='tree-control' onclick='jstree_refresh()'><span class='tree-control' style='padding-left: 20px'>refresh</span></a>&nbsp;<a href='#' onclick='jstree_uncheck_all()' class='tree-control'></a>");
-			//tree_control_div.close();
+		if (NV2 && USE_JXTREE) {
+			out.println("<div id='right_tabs'>");
+			out.println("<ul style='display: inline-block'>");
+			out.println("<li><a class='right_tab' href='#" + marker_div_name + "'>Entities</a></li>");
+			//out.println("<li><a class='right_tab' href='#datatable_tree'>Datatables</a></li>"); // not yet!
+			out.println("<li><a class='right_tab' href='#result_tree'>Results</a></li>");
+			out.println("</ul>");
+			out.println("<div id='" + marker_div_name + "'>");
+			out.println("</div>");
+			out.println("<div id='datatable_tree'>");
+			out.println("</div>");
+			out.println("<div id='result_tree'>");
+			out.println("<div id='result_tree_header'>");
+			out.println("</div>");
+			out.println("<div id='result_tree_contents'>");
+			out.println("</div>");
+			out.println("</div>");
+			out.println("</div>");
+		} else {
+			final Div marker_div = new Div(right_div, "id='" + marker_div_name + "'");
+			marker_div.close();
 		}
-		final Div marker_div = new Div(right_div, "id='" + marker_div_name + "'");
-		marker_div.close();
+
 
 		if (NV2) {
 			out.println(file_contents(rightpanel_include_file, true));

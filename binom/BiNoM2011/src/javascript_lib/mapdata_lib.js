@@ -172,12 +172,17 @@ Mapdata.prototype = {
 	module_mapdata_by_id: {},
 	module_info: {},
 	module_jxtree: {},
+	module_res_jxtree: {},
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
 
 	getJXTree: function(module_name) {
 		return this.module_jxtree[module_name];
+	},
+
+	getResJXTree: function(module_name) {
+		return this.module_res_jxtree[module_name];
 	},
 
 	useJXTreeSimpleFind: function(jxtree) {
@@ -190,11 +195,12 @@ Mapdata.prototype = {
 		jxtree.userFind(user_find);
 	},
 
-	findJXTree: function(module_name, to_find, action) {
+	findJXTree: function(module_name, to_find, no_ext, action, hints) {
 		var mapdata = this;
 		this.whenInfoReady(module_name, function() {
 			var jxtree = mapdata.module_jxtree[module_name];
-			if (to_find.no_ext) {
+			var res_jxtree = null;
+			if (no_ext) {
 				var to_find_str = "";
 				for (var nn = 0; nn < to_find.length; ++nn) {
 					if (to_find_str) {
@@ -203,10 +209,29 @@ Mapdata.prototype = {
 					to_find_str += to_find[nn];
 				}
 				var user_find = mapdata.useJXTreeSimpleFind(jxtree);
-				jxtree.find(to_find_str, action);
+				res_jxtree = jxtree.find(to_find_str, action, hints);
 				mapdata.restoreJXTreeFind(jxtree, user_find);
 			} else {
-				jxtree.find(to_find, action);
+				res_jxtree = jxtree.find(to_find, action, hints);
+			}
+			if (action == 'subtree' && res_jxtree) {
+				/*
+				if (mapdata.module_res_jxtree[module_name]) {
+					$.each(mapdata.module_res_jxtree[module_name].getRootNodes(), function() {
+						this.checkSubtree(JXTree.UNCHECKED);
+					});
+				}
+				*/
+				uncheck_all_entities();
+				res_jxtree.context = {};
+				$.each(res_jxtree.getRootNodes(), function() {
+					this.checkSubtree(JXTree.CHECKED);
+					this.showSubtree(JXTree.OPEN);
+				});
+				//$("#right_tabs").tabs("option", "active", 2);
+				$("#right_tabs").tabs("option", "active", 1);
+				$("#result_tree_header").html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+				mapdata.module_res_jxtree[module_name] = res_jxtree;
 			}
 		});
 	},
@@ -278,16 +303,16 @@ Mapdata.prototype = {
 		jxtree.context = {};
 
 		jxtree.onClickBefore(function(node, checked) {
-			win.tree_node_click_before(jxtree.context, map, checked);
+			win.tree_node_click_before(node.jxtree.context, map, checked);
 		});
 
 		jxtree.onClickAfter(function(node, checked) {
-			win.tree_node_click_after(jxtree.context, map, checked);
+			win.tree_node_click_after(node.jxtree.context, map, checked);
 		});
 
 		jxtree.checkStateChanged(function(node, state) {
 			var data = node.getUserData();
-			//console.log("checking node: " + (data ? data.id : null));
+			console.log("checking node: " + (data ? data.id : null));
 			if (data && data.id) {
 				if (!data.clickmap_tree_node) {
 					var info = navicell.mapdata.getMapdataById(module_name, data.id);
@@ -296,7 +321,7 @@ Mapdata.prototype = {
 						data.clickmap_tree_node = new win.ClickmapTreeNode(map, data.id, jxtree_get_node_class(node), node.label, info.positions, navicell.mapdata.getInfo(module_name, data.id));
 					}
 				}					
-				win.tree_node_state_changed(jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
+				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
 			}
 		});
 		jxtree.module_name = module_name;
@@ -1578,7 +1603,10 @@ Datatable.prototype = {
 	// In the following method, we get positions sucessfully, but not from
 	// an id but scanning the fill array => a map indexed by id (mind:
 	// multiple id per gene) is missing.
-	display_markers: function(module_name, win) {
+	display: function(module_name, win, display_graphics, display_markers) {
+		if (!display_graphics && !display_markers) {
+			return;
+		}
 		//console.log("display_markers: " + module_name);
 		var id_arr = [];
 		var arrpos = [];
@@ -1608,9 +1636,17 @@ Datatable.prototype = {
 			}
 		}
 		//console.log("arrpos: " + arrpos.length);
-		win.show_markers(id_arr);
+		if (display_markers) {
+			if (navicell.mapdata.getJXTree(win.document.navicell_module_name)) {
+				navicell.mapdata.findJXTree(win.document.navicell_module_name, id_arr, true, 'select');
+			} else {
+				win.show_markers(id_arr);
+			}
+		}
 
-		overlay.arrpos = arrpos;
+		if (display_graphics) {
+			overlay.arrpos = arrpos;
+		}
 		overlay.draw();
 	},
 

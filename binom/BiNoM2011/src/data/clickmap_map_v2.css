@@ -82,9 +82,47 @@ html, body {
 
 #right_panel {
     min-width: 245px;
-    background-color: white;
+/*    background-color: white; */
+    background: white;
 }
 
+/* replace marker_checkboxes */
+#right_tabs {
+    top: 0.5%;
+/*    background-color: white; */
+    background: white;
+    position: absolute;
+    right: 0;
+    padding: 0;
+    width: 100%;
+    height: 59.5%;
+    border-bottom: solid;
+    border-left: solid;
+    border-width: 1px;
+    border-color: gray;
+    overflow: auto;
+}
+
+#result_tree {
+    margin: 0px;
+    padding-top: 5px;
+    padding-left: 0px;
+}
+
+#result_tree_header {
+    margin: 0px;
+    padding-left: 12px;
+    font-size: small;
+    font-weight: bold;
+}
+
+#entity_tree, #datatable_tree, #result_tree_contents {
+    padding-top: 10px;
+    padding-left: 5px;
+    background: white;
+}
+
+/*
 #marker_checkboxes {
     top: 0.5%;
     background-color: white;
@@ -100,6 +138,7 @@ html, body {
     margin-top: 15px;
     overflow: auto;
 }
+*/
 
 .jstree-default .jstree-search
 {
@@ -121,6 +160,7 @@ html, body {
     height: 99.9%;
     width: 99.9%;
     border: 0px solid #aaa;
+    background-color: white;
 }
 
 .vsplitbar {
@@ -307,7 +347,7 @@ label {font-size: 12px; vertical-align: middle;}
     color: #222222;
 }
 
-#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3, #dt_datatable_tabs h3, #dt_group_status h3, #dt_module_status h3 {
+#dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3, #dt_datatable_tabs h3, #dt_group_status h3, #dt_module_status h3, #right_tabs h3 {
     margin-top: 20px;
     text-align: center;
 }
@@ -805,3 +845,9 @@ div.tablesorterPager input {
     font-size: small;
 }
 */
+
+.right_tab {
+    font-size: x-small;
+    display: inline-block;
+    vertical-align: center;
+}

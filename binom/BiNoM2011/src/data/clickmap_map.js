@@ -557,7 +557,8 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
         		search_field.blur();
     			var val = $(this).val();
 			if (use_jxtree) {
-				navicell.mapdata.findJXTree(window.document.navicell_module_name, val, 'select');
+				//navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'select');
+				navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'subtree', $("#result_tree_contents").get(0));
 			}
 			
 		}
@@ -811,7 +812,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		{
 			if (use_jxtree) {
 				to_open.no_ext = true;
-				navicell.mapdata.findJXTree(window.document.navicell_module_name, to_open, 'select');
+				navicell.mapdata.findJXTree(window.document.navicell_module_name, to_open, true, 'select');
 			} else {
 				// http://stackoverflow.com/questions/3585527/why-doesnt-jstree-open-all-work-for-me
 				var e = $(panel_selector).find("#entities"); // $("#entities");
@@ -902,9 +903,16 @@ function show_map_and_markers(map_name, ids)
 function uncheck_all_entities()
 {
 	if (use_jxtree) {
+		// but... the uncheck could be per tree !
 		var jxtree = navicell.mapdata.getJXTree(window.document.navicell_module_name);
 		if (jxtree) {
 			$.each(jxtree.getRootNodes(), function() {
+				this.checkSubtree(false);
+			});
+		}
+		var res_jxtree = navicell.mapdata.getResJXTree(window.document.navicell_module_name);
+		if (res_jxtree) {
+			$.each(res_jxtree.getRootNodes(), function() {
 				this.checkSubtree(false);
 			});
 		}

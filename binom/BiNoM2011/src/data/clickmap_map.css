@@ -86,7 +86,8 @@ html, body {
     background-color: white;
 }
 
-#marker_checkboxes {
+/*#marker_checkboxes {*/
+#entity_tree {
     top: 0%;
     background-color: white;
     position: absolute;

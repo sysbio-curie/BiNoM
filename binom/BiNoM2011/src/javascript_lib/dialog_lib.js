@@ -20,6 +20,9 @@
 
 
 $(function() {
+	//$("#marker_checkboxes").tabs();
+	$("#right_tabs").tabs();
+
 	function build_datatable_import_dialog() {
 		var select = $("#dt_import_type_select");
 		select.html(get_biotype_select("dt_import_type", true));
@@ -31,8 +34,12 @@ $(function() {
 	var file = $("#dt_import_file");
 	var type = $("#dt_import_type");
 	var status = $("#dt_import_status");
-	var display_markers = $("#dt_import_display_markers");
+	var import_display_markers = $("#dt_import_display_markers");
+	var import_display_barplot = $("#dt_import_display_barplot");
+	var import_display_heatmap = $("#dt_import_display_heatmap");
 	var sample_file = $("#dt_sample_file");
+
+	var win = window;
 
 	function error_message(error) {
 		status.html("<span class=\"error-message\">" + error + "</span>");
@@ -45,7 +52,7 @@ $(function() {
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
 		width: 450,
-		height: 550,
+		height: 780,
 		modal: false,
 		buttons: {
 			"Import": function() {
@@ -77,9 +84,9 @@ $(function() {
 					// file_elem <=> document.getElementById("dt_import_file");
 					//var datatable = new Datatable(navicell.dataset, type.val(), name.val(), file_elem.files[0]);
 					var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0]);
-				// test
+					// test
 					//readfile(file_elem.files[0], all_maps);
-				// eo test
+					// eo test
 					if (datatable.error) {
 						error_message(datatable.error);
 					} else {
@@ -91,11 +98,47 @@ $(function() {
 							} else {
 								status_message("Import Successful<br/>Genes: " + mapSize(datatable.gene_index) + "<br/>" + "Samples: " + mapSize(datatable.sample_index));
 								navicell.annot_factory.sync();
+								var display_graphics;
+								if (import_display_barplot.attr('checked')) {
+									$("#drawing_config_chart_type").val('Barplot');
+									navicell.drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+									var barplotConfig = navicell.drawing_config.editing_barplot_config;
+									barplotConfig.setDatatableAt(0, datatable);
+									barplot_sample_action('allsamples');
+
+									barplot_editor_apply(navicell.drawing_config.barplot_config);
+									barplot_editor_apply(navicell.drawing_config.editing_barplot_config);
+									barplot_editor_set_editing(false);
+
+									display_graphics = true;
+								} else if (import_display_heatmap.attr('checked')) {
+									$("#drawing_config_chart_type").val('Heatmap');
+									navicell.drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+									var heatmapConfig = navicell.drawing_config.editing_heatmap_config;
+									var datatable_cnt = mapSize(navicell.dataset.datatables);
+									for (var idx = 0; idx < datatable_cnt; ++idx) {
+										if (!heatmapConfig.getDatatableAt(idx)) {
+											break;
+										}
+									}
+									heatmapConfig.setDatatableAt(idx, datatable);
+									heatmap_sample_action('allsamples');
+
+									heatmap_editor_apply(navicell.drawing_config.heatmap_config);
+									heatmap_editor_apply(navicell.drawing_config.editing_heatmap_config);
+									heatmap_editor_set_editing(false);
+									display_graphics = true;
+								} else {
+									display_graphics = false;
+								}
+								var display_markers = import_display_markers.attr('checked');
+								datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
+								drawing_editing(false);
 								update_status_tables();
 							}
 						});
 					}
-
+					
 				}
 			},
 

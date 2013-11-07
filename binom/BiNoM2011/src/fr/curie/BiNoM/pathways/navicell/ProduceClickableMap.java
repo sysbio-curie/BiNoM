@@ -899,6 +899,7 @@ public class ProduceClickableMap
 		}
 		double getX(double x) { return x / z + xshift_zoom0; }
 		double getY(double y) { return y / z + yshift_zoom0; }
+		double getL(double l) { return l / z; }
 	};
 	
 	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
@@ -2076,7 +2077,9 @@ public class ProduceClickableMap
 			
 				outjson.print("{");
 				outjson.print("\"x\" : " + scales.getX(place.x) + ", ");
-				outjson.print("\"y\" : " + scales.getY(place.y));
+				outjson.print("\"y\" : " + scales.getY(place.y) + ", ");
+				outjson.print("\"w\" : " + scales.getL(place.width) + ", ");
+				outjson.print("\"h\" : " + scales.getL(place.height));
 				outjson.print("}");
 		}
 		outjson.print("]");

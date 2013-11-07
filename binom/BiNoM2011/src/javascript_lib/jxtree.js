@@ -35,22 +35,10 @@ function JXTree(_document, datatree, div, mapfun) {
 	this.user_find = null;
 	this.div = div;
 	this.node_map = {};
+	this.node_user_map = {};
 	this.roots = [];
 	if (datatree) {
 		this.buildFromData(datatree, div);
-		/*
-		if (!mapfun) {
-			this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.data);
-			this.buildNodes(this.root, datatree.children);
-		} else {
-			this.root = new JXTreeNode(this, mapfun(datatree, 'label'), mapfun(datatree, 'left_label'), mapfun(datatree, 'right_label'), mapfun(datatree, 'data'));
-			this.buildNodes(this.root, mapfun(datatree, 'children'));
-		}
-		if (div) {
-			this.root.buildHTML(div);
-			this.root.show(true);
-		}
-		*/
 	}
 }
 
@@ -84,10 +72,10 @@ JXTree.prototype = {
 		var root = null;
 		var mapfun = this.mapfun;
 		if (!mapfun) {
-			root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.data);
+			root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.data, datatree.id);
 			this.buildNodes(root, datatree.children);
 		} else {
-			root = new JXTreeNode(this, mapfun(datatree, 'label'), mapfun(datatree, 'left_label'), mapfun(datatree, 'right_label'), mapfun(datatree, 'data'));
+			root = new JXTreeNode(this, mapfun(datatree, 'label'), mapfun(datatree, 'left_label'), mapfun(datatree, 'right_label'), mapfun(datatree, 'data'), mapfun(datatree, 'id'));
 			this.buildNodes(root, mapfun(datatree, 'children'));
 		}
 		if (div) {
@@ -106,9 +94,9 @@ JXTree.prototype = {
 			var child_node;
 			var mapfun = this.mapfun;
 			if (!mapfun) {
-				child_node = new JXTreeNode(this, child_data.label, child_data.left_label, child_data.right_label, child_data.data);
+				child_node = new JXTreeNode(this, child_data.label, child_data.left_label, child_data.right_label, child_data.data, child_data.id);
 			} else {
-				child_node = new JXTreeNode(this, mapfun(child_data, 'label'), mapfun(child_data, 'left_label'), mapfun(child_data, 'right_label'), mapfun(child_data, 'data'));
+				child_node = new JXTreeNode(this, mapfun(child_data, 'label'), mapfun(child_data, 'left_label'), mapfun(child_data, 'right_label'), mapfun(child_data, 'data'), mapfun(child_data, 'id'));
 			}
 			root_node.addChild(child_node);
 			this.buildNodes(child_node, mapfun(child_data, 'children'));
@@ -119,6 +107,9 @@ JXTree.prototype = {
 		var node_id = ++this.node_id;
 		node.setId(node_id);
 		this.node_map[node_id] = node;
+		if (node.user_id) {
+			this.node_user_map[node.user_id] = node;
+		}
 		return node_id;
 	},
 
@@ -128,7 +119,6 @@ JXTree.prototype = {
 		}
 		if (!this.roots) {
 			if (datatree) {
-				//this.root = new JXTreeNode(this, datatree.label, datatree.left_label, datatree.right_label, datatree.udata);
 				this.buildFromData(datatree, this.div);
 			}
 		}
@@ -195,20 +185,40 @@ JXTree.prototype = {
 		this.open_state_changed = action;
 	},
 
+	getNodeByUserId: function(user_id) {
+		return this.node_user_map[user_id];
+	},
+
+	// should replace action and div by a extensible map named 'hints'
 	find: function(pattern, action, div) {
 		pattern = pattern.trim();
 		var regex = new RegExp(pattern, "i");
 		var nodes = [];
 		if (pattern) {
+			var user_find = this.user_find;
+			/*
 			for (var label in this.label_map) {
 				var node = this.label_map[label];
+				*/
+			for (var id in this.node_map) {
+				var node = this.node_map[id];
 				if (node.isLeaf()) {
+					/*
+					var label = node.label;
 					if (label.match(regex)) {
 						nodes.push(node);
-					}
-					if (this.user_find && this.user_find(regex, node)) {
+					} else if (user_find && user_find(regex, node)) {
+						nodes.push(node);
+					} 
+					*/
+					if (node.matchRegex(regex)) {
 						nodes.push(node);
 					}
+						/*
+					} else if (node.parent && node.parent.matchRegex(regex)) { // according to hints
+						nodes.push(node);
+					}
+						*/
 				}
 			}
 		}
@@ -248,13 +258,14 @@ JXTree.prototype = {
 	}
 };
 
-function JXTreeNode(jxtree, label, left_label, right_label, user_data) {
+function JXTreeNode(jxtree, label, left_label, right_label, user_data, user_id) {
 	this.jxtree = jxtree;
 	this.label = label;
 	this.jxtree.label_map[label] = this;
 	this.left_label = left_label;
 	this.right_label = right_label;
 	this.user_data = user_data;
+	this.user_id = user_id;
 	this.children = [];
 	this.check_state = JXTree.UNCHECKED;
 	this.open_state = JXTree.CLOSED;
@@ -277,7 +288,18 @@ JXTreeNode.prototype = {
 	},
 
 	clone: function(jxtree) {
-		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, this.user_data);
+		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, this.user_data, this.user_id);
+	},
+
+	matchRegex: function(regex) {
+		var label = this.label;
+		if (label.match(regex)) {
+			return true;
+		} 
+		if (this.jxtree.user_find && this.jxtree.user_find(regex, this)) {
+			return true;
+		}
+		return false;
 	},
 
 	cloneSubtree: function(jxtree, node_map) {
@@ -294,7 +316,8 @@ JXTreeNode.prototype = {
 				children.push(child);
 			}
 		}
-		if (children.length) {
+		//if (children.length) {
+		if (children.length || node_map == null || node_map == undefined || node_map[this.getId()]) {
 			var clone = this.clone(jxtree);
 			for (var nn = 0; nn < children.length; ++nn) {
 				clone.addChild(children[nn]);

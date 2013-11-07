@@ -36,6 +36,74 @@ function USGSOverlay(map) {
 	this.arrpos = [];
 }
 
+function event_ckmap(e, e2, type) {
+	var button = window.event.button; // TBD: window is not correct, depends on tab
+	var x = e.pixel.x;
+	var y = e.pixel.y;
+
+	var overlayProjection = overlay.getProjection();
+	var mapProjection = overlay.map_.getProjection();
+	var scale = Math.pow(2, overlay.map_.zoom);
+	var div = overlay.div_;
+
+	var found = false;
+	for (var module_name in overlay.ckmap) {
+		//console.log("ckmap: " + module_name + " " + window.document.navicell_module_name);
+		if (module_name == window.document.navicell_module_name) { // TBD: not really ok
+			var jxtree = navicell.mapdata.getJXTree(module_name);
+			var ckmap = overlay.ckmap[module_name];
+			for (var id in ckmap) {
+				var boxes = ckmap[id];
+				for (var kk = 0; kk < boxes.length; ++kk) {
+					var box = boxes[kk];
+					if (!box.gpt) {
+						box.gpt = new google.maps.Point(box[0], box[2]);
+					}
+					var latlng = mapProjection.fromPointToLatLng(box.gpt);
+					var pix = overlayProjection.fromLatLngToDivPixel(latlng);
+					var bx = pix.x - div.left;
+					var by = pix.y - div.top;
+					var bw = box[1]*scale;
+					var bh = box[3]*scale;
+					if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
+						if (type == 'click') {
+							console.log("click ID " + id);
+							var node = jxtree.getNodeByUserId(id);
+							if (node) {
+								node.checkSubtree(JXTree.CHECKED);
+								node.openSupertree(JXTree.OPEN);
+							}
+							var clickmap_tree_node = node.getUserData().clickmap_tree_node;
+							if (clickmap_tree_node) {
+								$.each(clickmap_tree_node.markers, function() {
+									bubble_open(this);
+								});
+							}
+						} else if (type == 'mouseover') {
+							found = true;
+							break;
+						} else if (type == 'mouseup') {
+							if (button == 2) {
+								console.log("right button");
+							}
+						}
+					}
+				}
+				if (found) {
+					break;
+				}
+			}
+		}
+	}
+
+	var map_name = overlay.map_.map_name;
+	var cursor = found ? 'pointer' : 'default';
+	if (overlay.cursor != cursor) {
+		overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
+		overlay.cursor = cursor;
+	}
+}
+
 USGSOverlay.prototype.onAdd = function() {
 
 	function simpleBindShim(thisArg, func) {
@@ -44,9 +112,15 @@ USGSOverlay.prototype.onAdd = function() {
 
 //	google.maps.event.addListener(this.getMap(), 'bounds_changed', simpleBindShim(this, this.resize));
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
+
+	google.maps.event.addListener(this.getMap(), 'mouseup', function(e, e2) {
+		event_ckmap(e, e2, 'mouseup');
+	});
+
 	google.maps.event.addListener(this.getMap(), 'click', function(e, e2) {
 		var x = e.pixel.x;
 		var y = e.pixel.y;
+		//console.log("click on " + x + " " + y);
 		for (var nn = 0; nn < overlay.boundBoxes.length; ++nn) {
 			var box = overlay.boundBoxes[nn][0];
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
@@ -69,6 +143,7 @@ USGSOverlay.prototype.onAdd = function() {
 				break;
 			}
 		}
+		event_ckmap(e, e2, 'click');
 	});
 
 	// ....
@@ -89,6 +164,10 @@ USGSOverlay.prototype.onAdd = function() {
 		if (overlay.cursor != cursor) {
 			overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
 			overlay.cursor = cursor;
+		}
+
+		if (!found) {
+			event_ckmap(e, e2, 'mouseover');
 		}
 	});
 	this.setMap(this.map_);
@@ -167,7 +246,7 @@ USGSOverlay.prototype.draw = function(module_name) {
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 	this.boundBoxes = [];
 
-	console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
+	//console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
 	if (!navicell.drawing_config.displayDLOs()) {
 		return;
 	}
@@ -176,8 +255,8 @@ USGSOverlay.prototype.draw = function(module_name) {
 		this.arrpos = navicell.dataset.getArrayPos(module_name);
 	}
 	var arrpos = this.arrpos;
-	console.log("drawing " + arrpos.length);
 	if (arrpos && arrpos.length) {
+		//console.log("drawing " + arrpos.length);
 		var div = this.div_;
 		var overlayProjection = this.getProjection();
 		var mapProjection = this.map_.getProjection();
@@ -215,6 +294,14 @@ USGSOverlay.prototype.reset = function() {
 
 USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type) {
 	this.boundBoxes.push([box, gene_name, chart_type]);
+}
+
+USGSOverlay.prototype.addCKMap = function(module_name, ckmap) {
+	if (!this.ckmap) {
+		this.ckmap = {};
+	}
+	console.log("addCKMAP: " + module_name + " " + mapSize(ckmap));
+	this.ckmap[module_name] = ckmap;
 }
 
 USGSOverlay.prototype.remove = function(rm_arrpos) {

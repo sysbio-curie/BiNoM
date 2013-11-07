@@ -66,8 +66,11 @@ function setup_icons()
 			+ "|%E2%80%A2" // One or more lines of text, delimited by | characters
 			;
 		
+		// using an arbitrary icon for markers works, for instance:
+		//var url = "../../../map_icons/entity/PROTEIN.png";
+
 		return new google.maps.MarkerImage(url);
-		
+		/*
 		var url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|";
 		
 		// http://stackoverflow.com/questions/7842730/change-marker-size-in-google-maps-v3
@@ -83,6 +86,7 @@ function setup_icons()
 			new google.maps.Point(0, 0),
 			new google.maps.Point(anchor_x, anchor_y)
 		);
+		*/
 	}	
 	
 	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
@@ -929,7 +933,24 @@ function uncheck_all_entities()
 	});
 }
 
-function ClickmapTreeNode(map, id, cls, name, _positions, bubble)
+function bubble_open(marker)
+{
+	var context = marker.context;
+	if (!context.bubble) {
+		context.bubble = new google.maps.InfoWindow
+		(
+			{
+				content: "",
+				maxWidth: 350
+			}
+		);
+		context.mapdata.setBubbleContent(context.bubble, context.module_name, context.id);
+		bubble_list.push(context.bubble);
+	}
+	context.bubble.open(context.map, marker);
+}
+
+function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 {
 	var icon = medium_icon;
 	if (cls == "REACTION") {
@@ -950,7 +971,8 @@ function ClickmapTreeNode(map, id, cls, name, _positions, bubble)
 
 	this.markers = [];
 	for (var nn = 0; nn < positions.length; ++nn) {
-		var p = new google.maps.Point(positions[nn].x, positions[nn].y);
+		var pos = positions[nn];
+		var p = new google.maps.Point(pos.x, pos.y);
 		var marker = new google.maps.Marker(
 			{
 				position: projection.fromPointToLatLng(p),
@@ -960,26 +982,47 @@ function ClickmapTreeNode(map, id, cls, name, _positions, bubble)
 				icon: icon
 			}
 		);
-		if (bubble) {
-			google.maps.event.addListener
-			(
-				marker, 'click', function()
-				{
-					console.log("has clicked");
-					if (!this.bubble) {
-						this.bubble = new google.maps.InfoWindow
-						(
-							{
-								content: bubble,
-								maxWidth: 350
-							}
-						);
-						bubble_list.push(this.bubble);
-					}
-					this.bubble.open(map, marker);
-				}
+
+		if (false) { // test for bounding box
+			var p2 = new google.maps.Point(pos.x+pos.w, pos.y+pos.h);
+			var marker2 = new google.maps.Marker(
+			{
+				position: projection.fromPointToLatLng(p2),
+				map: map,
+				title: name + " (" + id + ")",
+				visible: false,
+				icon: small_icon
+			}
 			);
+			this.markers.push(marker2);
+			marker_list.push(marker2);
 		}
+
+		marker.context = {map: map, mapdata: mapdata, module_name: module_name, id: id, bubble: null};
+
+		google.maps.event.addListener
+		(
+			marker, 'click', function()
+			{
+				console.log("has clicked");
+				bubble_open(this);
+				/*
+				if (!this.bubble) {
+					this.bubble = new google.maps.InfoWindow
+					(
+						{
+							content: "",
+							maxWidth: 350
+						}
+					);
+					mapdata.setBubbleContent(this.bubble, module_name, id);
+					bubble_list.push(this.bubble);
+				}
+				this.bubble.open(map, marker);
+				*/
+			}
+		);
+
 		this.markers.push(marker);
 		marker_list.push(marker);
 	}

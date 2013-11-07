@@ -44,6 +44,21 @@ if (!Number.MIN_NUMBER) {
 function load_info(url, module_name)
 {
 	navicell.mapdata.info_ready[module_name] = new $.Deferred();
+	var SIMULATE_HEAVY_LOAD_INFO = false;
+	if (SIMULATE_HEAVY_LOAD_INFO) {
+		for (var nn = 0; nn < 15; ++nn) {
+			$.ajax(url,
+			       {
+				       async: true,
+				       dataType: 'json',
+				       cache: false,
+				       success: function(data) {
+					       console.log("navicell: info [" + url + "] loaded #" + nn);
+				       },
+			       });
+		}
+	}
+
 	$.ajax(url,
 	       {
 		       async: true,
@@ -97,10 +112,10 @@ jxtree_mapfun_map['data'] = function(datanode) {
 		return datanode.data;
 	}
 	if (datanode.id) {
-		return {id: datanode.id, cls: datanode["class"]};
+		return {id: datanode.id, cls: datanode["class"], modifs: datanode.modifs};
 	}
 	if (datanode.name) {
-		return {id: datanode.name, cls: datanode["class"]};
+		return {id: datanode.name, cls: datanode["class"], modifs: datanode.modifs};
 	}
 	return null;
 }
@@ -121,6 +136,10 @@ jxtree_mapfun_map['children'] = function(datanode) {
 	return datanode.children;
 }
 
+jxtree_mapfun_map['id'] = function(datanode) {
+	return datanode.id;
+}
+
 function jxtree_mapfun(datanode, field) {
 	var mapfun = jxtree_mapfun_map[field];
 	return mapfun ? mapfun(datanode) : null;
@@ -137,8 +156,19 @@ function jxtree_get_node_class(node) {
 	return null;
 }
 
+// TBD: 2013-10-29: find function to modify !
+// searching perharps not in the good place, and, at least, jxtree find is not correct with nodes
+// must compare to jstree searching !
 function jxtree_user_find(regex, node) {
 	var data = node.getUserData();
+	if (false) {
+		/*
+		if (data.modifs) {
+			console.log("data.modifs: [" + data.modifs + "]");
+		}
+		*/
+		return jxtree_user_find_id(regex, node);
+	}
 	if (data && data.id) {
 		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
 		if (info) {
@@ -151,7 +181,18 @@ function jxtree_user_find(regex, node) {
 function jxtree_user_find_id(regex, node) {
 	var data = node.getUserData();
 	if (data && data.id) {
-		return data.id.match(regex);
+		if (data.id.match(regex)) {
+			return true;
+		}
+		/*
+		if (data.modifs) {
+			for (var nn = 0; nn < data.modifs.length; nn++) {
+				if (data.modifs[nn].id && data.modifs[nn].id.match(regex)) {
+					return true;
+				}
+			}
+		}
+		*/
 	}
 	return false;
 }
@@ -164,6 +205,7 @@ function Mapdata(to_load_count) {
 	this.is_ready = {};
 	this.straight_data = {};
 	this.info_ready = {};
+	this.deferred_bubble_info = {};
 }
 
 Mapdata.prototype = {
@@ -310,15 +352,18 @@ Mapdata.prototype = {
 			win.tree_node_click_after(node.jxtree.context, map, checked);
 		});
 
+		this.deferred_bubble_info[module_name] = {};
+		var mapdata = this;
+
 		jxtree.checkStateChanged(function(node, state) {
 			var data = node.getUserData();
-			console.log("checking node: " + (data ? data.id : null));
+			//console.log("checking node: " + (data ? data.id : null));
 			if (data && data.id) {
 				if (!data.clickmap_tree_node) {
-					var info = navicell.mapdata.getMapdataById(module_name, data.id);
+					var info = mapdata.getMapdataById(module_name, data.id);
 					if (info && info.positions) {
-						//win.console.log("click: " + node.label + " " + data.id + " " + jxtree_get_node_class(node) + " " + map.map_name);
-						data.clickmap_tree_node = new win.ClickmapTreeNode(map, data.id, jxtree_get_node_class(node), node.label, info.positions, navicell.mapdata.getInfo(module_name, data.id));
+						//win.console.log("state changed: " + node.label + " " + data.id + " " + jxtree_get_node_class(node) + " " + map.map_name);
+						data.clickmap_tree_node = new win.ClickmapTreeNode(map, module_name, data.id, jxtree_get_node_class(node), node.label, info.positions, mapdata);
 					}
 				}					
 				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
@@ -326,7 +371,36 @@ Mapdata.prototype = {
 		});
 		jxtree.module_name = module_name;
 		this.module_jxtree[module_name] = jxtree;
+
 		whenloaded();
+
+		this.whenInfoReady(module_name, function() {
+			var deferred_bubble_info = mapdata.deferred_bubble_info[module_name];
+			for (var id in deferred_bubble_info) {
+				var bubble_list = deferred_bubble_info[id];
+				if (bubble_list) {
+					var bubble = mapdata.getInfo(module_name, id);
+					for (var nn = 0; nn < bubble_list.length; ++nn) {
+						bubble_list[nn].setContent(bubble);
+					}
+				}
+			}
+				
+		});
+	},
+
+
+	setBubbleContent: function(bubble, module_name, data_id) {
+		var bubble_content = this.getInfo(module_name, data_id);
+		if (bubble_content) {
+			bubble.setContent(bubble_content);
+		} else {
+			bubble.setContent("Loading data...");
+			if (!this.deferred_bubble_info[module_name][data_id]) {
+				this.deferred_bubble_info[module_name][data_id] = [];
+			}
+			this.deferred_bubble_info[module_name][data_id].push(bubble);
+		}
 	},
 
 	// Returns the size of the hugo map
@@ -344,6 +418,7 @@ Mapdata.prototype = {
 		this.module_mapdata[module_name] = module_mapdata;
 		this.module_mapdata_by_id[module_name] = {};
 
+		var ckmap = {};
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
@@ -377,6 +452,14 @@ Mapdata.prototype = {
 						for (var kk = 0; kk < modif_arr.length; ++kk) {
 							var modif = modif_arr[kk];
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
+							if (modif.positions) {
+								ckmap[modif.id] = [];
+								for (var ll = 0; ll < modif.positions.length; ++ll) {
+									var pos = modif.positions[ll];
+									var box = [pos.x, pos.w, pos.y, pos.h];
+									ckmap[modif.id].push(box);
+								}
+							}
 						}
 					}
 				}
@@ -385,6 +468,9 @@ Mapdata.prototype = {
 			}
 		}
 	
+		console.log("module map added " + module_name);
+		// warning, overlay is not a shared object => problems with several tabs
+		overlay.addCKMap(module_name, ckmap);
 		return !--this.to_load_count;
 	},
 
@@ -552,7 +638,7 @@ Dataset.prototype = {
 	},
 
 	syncModifs: function() {
-		//console.log("syncModifs starting " + mapSize(this.genes));
+		console.log("syncModifs starting " + mapSize(this.genes));
 		this.modifs_id = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
 			var module_name = navicell.module_names[jj];

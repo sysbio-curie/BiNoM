@@ -87,6 +87,8 @@ public class ProduceClickableMap
 	private static File config = null;
 	private static boolean USE_EXT_JSON = true;
 	private static boolean NO_BUBBLE = false;
+	private static boolean NEW_REACTION_MANAGEMENT = true;
+	private static boolean INCLUDE_REACTIONS = true;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -902,6 +904,19 @@ public class ProduceClickableMap
 		double getL(double l) { return l / z; }
 	};
 	
+	private static String toDouble(double d, int cnt) {
+		String[] arr = (new Double(d).toString()).split("\\.");
+		if (arr.length > 1) {
+			int len = arr[1].length();
+			return arr[0] + "." + arr[1].substring(0, len < cnt ? len : cnt);
+		}
+		return arr[0];
+	}
+
+	private static String toDouble(double d) {
+		return toDouble(d, 3);
+	}
+
 	private static ImagesInfo make_tiles(File source_directory, String root, File outdir) throws IOException
 	{
 		int[] shifts = new int[2];
@@ -2028,9 +2043,9 @@ public class ProduceClickableMap
 			else
 				indent.getOutput().print(" ");
 			
-			indent.getOutput().print(scales.getX(place.x));
+			indent.getOutput().print(toDouble(scales.getX(place.x)));
 			indent.getOutput().print(";");
-			indent.getOutput().print(scales.getY(place.y));
+			indent.getOutput().print(toDouble(scales.getY(place.y)));
 		}
 		indent.getOutput().println("\">");
 		content_line(indent.add(), m.getName(), bubble);
@@ -2055,7 +2070,7 @@ public class ProduceClickableMap
 	private static String tojson(String str) {
 		//return str.replaceAll("\"", DQ_JSON).replaceAll("'", DQ_JSON).replaceAll("\\\t", TB_JSON); 
 		//return str.replaceAll("\"", DDQ_JSON).replaceAll("'", DQ_JSON).replaceAll("\\\t", TB_JSON); 
-		return str.replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON); 
+		return str.replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON).replaceAll("\n", NL_JSON);
 	}
 
 	private static void generate_json_entity_modification(final PrintStream outjson, JSONInfo outinfo_json, Modification m, Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, String bubble, ImagesInfo scales
@@ -2076,10 +2091,10 @@ public class ProduceClickableMap
 			}
 			
 				outjson.print("{");
-				outjson.print("\"x\" : " + scales.getX(place.x) + ", ");
-				outjson.print("\"y\" : " + scales.getY(place.y) + ", ");
-				outjson.print("\"w\" : " + scales.getL(place.width) + ", ");
-				outjson.print("\"h\" : " + scales.getL(place.height));
+				outjson.print("\"x\" : " + toDouble(scales.getX(place.x)) + ", ");
+				outjson.print("\"y\" : " + toDouble(scales.getY(place.y)) + ", ");
+				outjson.print("\"w\" : " + toDouble(scales.getL(place.width)) + ", ");
+				outjson.print("\"h\" : " + toDouble(scales.getL(place.height)));
 				outjson.print("}");
 		}
 		outjson.print("]");
@@ -2187,7 +2202,7 @@ public class ProduceClickableMap
 				if (USE_EXT_JSON) {
 					//outjson.print("\"a_name\" : \"" + m.getName() + "\",");
 				}
-				outjson.print("\"asso\" : true");
+				outjson.print("\"a\" : 1");
 			}
 			else
 			{
@@ -2199,27 +2214,24 @@ public class ProduceClickableMap
 		}
 
 		outjson.print("]");
-		if (true) {
-		//if (not_associated > 0) {
-			outjson.print(", \"id\" : \"" + ent.getId() + "\",");
-			outjson.print("\"name\" : \"" + ent.getName() + "\",");
-			Vector<String> hugoNames = ent.getHugoNames();
-			int hugo_size = hugoNames.size();
-			outjson.print("\"hugo\" : [");
-			for (int nn = 0; nn < hugo_size; ++nn) {
-				outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
-				//System.out.println("-----> : " + hugoNames.get(nn));
-			}
-			outjson.print("],");
-			outjson.print("\"postid\" : \"" + ent.getPostId() + "\"");
-			if (ent.getComment() != null) {
-				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
-				//outjson.print(",\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\"");
-			}
+		outjson.print(", \"id\" : \"" + ent.getId() + "\",");
+		outjson.print("\"name\" : \"" + ent.getName() + "\",");
+		Vector<String> hugoNames = ent.getHugoNames();
+		int hugo_size = hugoNames.size();
+		outjson.print("\"hugo\" : [");
+		for (int nn = 0; nn < hugo_size; ++nn) {
+			outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
+			//System.out.println("-----> : " + hugoNames.get(nn));
+		}
+		outjson.print("],");
+		outjson.print("\"postid\" : \"" + ent.getPostId() + "\"");
+		if (ent.getComment() != null) {
+			//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
+			//outjson.print(",\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\"");
 		}
 	}
 
-	static private String generate_mapdata(final String map, final PrintStream outmapdata, final PrintStream outjson, final JSONInfo outinfo_json, final Map<String, EntityBase> entityIDToEntityMap,
+	private String generate_mapdata(final Model model, final String map, final PrintStream outmapdata, final PrintStream outjson, final JSONInfo outinfo_json, final Map<String, EntityBase> entityIDToEntityMap,
 		final Map<String, Vector<String>> speciesAliases,
 		final Map<String, Vector<Place>> placeMap,
 		final FormatProteinNotes format,
@@ -2235,10 +2247,11 @@ public class ProduceClickableMap
 		for (final String[] s : class_name_to_human_name)
 		{
 			String clsname = s[0];
+			/*
 			if (clsname.equals(REACTION_CLASS_NAME)) {
 				break;
-			}
-
+				}
+			*/
 			if (first) {
 				first = false;
 			} else {
@@ -2258,29 +2271,76 @@ public class ProduceClickableMap
 			if (USE_EXT_JSON) {
 				outjson.print("\"right_label\" : \"<img border='0' src='" + entity_icons_directory + "/" + clsname + ".png'/>\",");
 			}
-			outjson.print("\"entity_size\" : \"" + entities.size() + "\",");
-
-			Collections.sort(entities); // EV 2013-06-19
-
-			outjson.print("\"entities\" : [");
 			boolean first2 = true;
-			for (final EntityBase ent : entities) {
-				if (firstEntity == null) {
-					char cc = ent.getName().charAt(0);
-					if (!(cc >= '0' && cc <= '9')) {
-						firstEntity = ent;
+			if (clsname.equals(REACTION_CLASS_NAME)) {
+				int entity_size = 0;
+				outjson.print("\"entities\" : [");
+				if (INCLUDE_REACTIONS) {
+					if (model.getListOfReactions() != null) {
+						for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray()) {
+							final BlogCreator.Post post = wp.lookup(r.getId());
+				
+							//System.out.println("r.id: " + r.getId() + " ||||| " + post);
+							if (post != null) {
+								final Pair position = findCentralPlaceForReaction(r);
+								final float x = (Float)position.o1;
+								final float y = (Float)position.o2;
+								if (first2) {
+									first2 = false;
+								} else {
+									outjson.print(",");
+								}
+								String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+								outinfo_json.addInfo(r.getId(), "<span class='bubble'>" + bubble + "</span>");
+								outjson.print("{");
+								outjson.print("\"id\" : \"" + r.getId() + "\",");
+								outjson.print("\"name\" : \"" + r.getId() + "\",");
+								outjson.print("\"left_label\" : \"blog:" + post.getPostId() + "\",");
+								outjson.print("\"hugo\" : [],");
+								outjson.print("\"postid\" : \"" + post.getPostId() + "\",");
+								outjson.print("\"modifs\" : [{"); // kludge
+								//outjson.print("\"children\" : [{"); // better kludge, but does not work
+								outjson.print("\"id\" : \"" + r.getId() + "\","); // kludge
+								outjson.print("\"name\" : \"" + r.getId() + "\",");// kludge
+								outjson.print("\"positions\" : [{");
+								outjson.print("\"x\" : " + toDouble(scales.getX(x)) + ", ");
+								outjson.print("\"y\" : " + toDouble(scales.getY(y)) + ", ");
+								outjson.print("\"w\" : " + toDouble(scales.getL(0)) + ", ");
+								outjson.print("\"h\" : " + toDouble(scales.getL(0)));
+								outjson.print("}]"); // same kludge
+								outjson.print("}]");
+								outjson.print("}");
+								entity_size++;
+							}
+						}
 					}
 				}
-				if (first2) {
-					first2 = false;
-				} else {
-					outjson.print(",");
+				outjson.print("],");
+				outjson.print("\"entity_size\" : \"" + entity_size + "\"");
+			} else {
+				//outjson.print("\"entity_size\" : \"" + entities.size() + "\",");
+			
+				Collections.sort(entities); // EV 2013-06-19
+				outjson.print("\"entities\" : [");
+				for (final EntityBase ent : entities) {
+					if (firstEntity == null) {
+						char cc = ent.getName().charAt(0);
+						if (!(cc >= '0' && cc <= '9')) {
+							firstEntity = ent;
+						}
+					}
+					if (first2) {
+						first2 = false;
+					} else {
+						outjson.print(",");
+					}
+					outjson.print("{");
+					generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, outinfo_json, ent);
+					outjson.print("}");
 				}
-				outjson.print("{");
-				generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, outinfo_json, ent);
-				outjson.print("}");
+				outjson.print("],");
+				outjson.print("\"entity_size\" : \"" + entities.size() + "\"");
 			}
-			outjson.print("]");
 			outjson.print("}");
 		}
 
@@ -2538,9 +2598,9 @@ public class ProduceClickableMap
 						ItemCloser indent = modules.add();
 						item_list_start(indent, make_module_id(k.getKey()), right_hand_tag);
 						indent.getOutput().print(" position=\"");
-						indent.getOutput().print(scales.getX(position[0]));
+						indent.getOutput().print(toDouble(scales.getX(position[0])));
 						indent.getOutput().print(";");
-						indent.getOutput().print(scales.getY(position[1]));
+						indent.getOutput().print(toDouble(scales.getY(position[1])));
 						indent.getOutput().println("\">");
 						content_line
 							(
@@ -2560,8 +2620,8 @@ public class ProduceClickableMap
 							outjson.print("{\"name\" : \"" +  k.getKey() + "\","); // EV changed 2013-10-17
 							outjson.print("\"id\" : \"" +  k.getKey() + "\",");
 							outjson.print("\"positions\" : {");
-							outjson.print("\"x\" : " + scales.getX(position[0]) + ",");
-							outjson.print("\"y\" : " + scales.getY(position[1]) + "},");
+							outjson.print("\"x\" : " + toDouble(scales.getX(position[0])) + ",");
+							outjson.print("\"y\" : " + toDouble(scales.getY(position[1])) + "},");
 							outjson.print("\"left_label\" : \"" + tojson(make_right_hand_module_entry(post_id, k.getKey(), null)) + "\"");
 
 							if (!NO_BUBBLE) {
@@ -2609,14 +2669,14 @@ public class ProduceClickableMap
 				}
 				if (map_position != null) {
 					map_item.getOutput().print(" position=\"");
-					map_item.getOutput().print(scales.getX(map_position[0]));
+					map_item.getOutput().print(toDouble(scales.getX(map_position[0])));
 					map_item.getOutput().print(";");
-					map_item.getOutput().print(scales.getY(map_position[1]));
+					map_item.getOutput().print(toDouble(scales.getY(map_position[1])));
 					map_item.getOutput().print("\"");
 					if (outjson != null) {
 						outjson.print("\"positions\" : {");
-						outjson.print("\"x\" : " + scales.getX(map_position[0]) + ",");
-						outjson.print("\"y\" : " + scales.getY(map_position[1]) + "},");
+						outjson.print("\"x\" : " + toDouble(scales.getX(map_position[0])) + ",");
+						outjson.print("\"y\" : " + toDouble(scales.getY(map_position[1])) + "},");
 					}
 				}
 				map_item.getOutput().println(">");
@@ -2645,15 +2705,15 @@ public class ProduceClickableMap
 					}
 					if (module_position != null) {
 						module_item.getOutput().print(" position=\"");
-						module_item.getOutput().print(scales.getX(module_position[0]));
+						module_item.getOutput().print(toDouble(scales.getX(module_position[0])));
 						module_item.getOutput().print(";");
-						module_item.getOutput().print(scales.getY(module_position[1]));
+						module_item.getOutput().print(toDouble(scales.getY(module_position[1])));
 						module_item.getOutput().print("\"");
 
 						if (outjson != null) {
 							outjson.print("\"positions\" : {");
-							outjson.print("\"x\" : " + scales.getX(module_position[0]) + ",");
-							outjson.print("\"y\" : " + scales.getY(module_position[1]) + "},");
+							outjson.print("\"x\" : " + toDouble(scales.getX(module_position[0])) + ",");
+							outjson.print("\"y\" : " + toDouble(scales.getY(module_position[1])) + "},");
 						}
 					}
 					module_item.getOutput().println(">");
@@ -2717,9 +2777,9 @@ public class ProduceClickableMap
 		final float y = (Float)position.o2;
 		item_list_start(indent, r.getId(), right_hand_tag);
 		indent.getOutput().print(" position=\"");
-		indent.getOutput().print(scales.getX(x));
+		indent.getOutput().print(toDouble(scales.getX(x)));
 		indent.getOutput().print(";");
-		indent.getOutput().print(scales.getY(y));
+		indent.getOutput().print(toDouble(scales.getY(y)));
 		indent.getOutput().println("\">");
 		content_line(indent.add(), make_right_hand_link_to_blog_with_name(null, post_id, r.getId()).toString(), bubble);
 		indent.close();
@@ -2738,7 +2798,7 @@ public class ProduceClickableMap
 		
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, null, null, null);
 		//System.out.println("_generate_ module " + map + " json ?");
-		String firstEntityName = generate_mapdata(map, outmapdata, outjson, outinfo_json, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
+		String firstEntityName = generate_mapdata(model, map, outmapdata, outjson, outinfo_json, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		if (model.getListOfReactions() != null) {
 			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
@@ -2810,10 +2870,23 @@ public class ProduceClickableMap
 			}
 		}
 
+		final List<String> modules = new ArrayList<String>();
+		if (NEW_REACTION_MANAGEMENT) {
+			if (model.getListOfReactions() != null) {
+				for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray()) {
+					modules.clear();
+					final String title = r.getId();
+					final String body = createReactionBody(r, format, wp);
+					//Utils.eclipsePrintln("reaction setpost");
+					wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
+				}
+			}
+		}
+
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, modules_set, atlasInfo, model);
 
 		//System.out.println("_generate_ master json ?");
-		String firstEntityName = generate_mapdata("master", outmapdata, outjson, outinfo_json, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
+		String firstEntityName = generate_mapdata(model, "master", outmapdata, outjson, outinfo_json, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales);
 
 		// create master file (must move to a method)
 		/*final File master_map = new File("/tmp/alpha.js"); // for now
@@ -2824,25 +2897,41 @@ public class ProduceClickableMap
 		}
 		outmaster_map.close();
 		*/
-		final List<String> modules = new ArrayList<String>();
-		if (model.getListOfReactions() != null) {
-			for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
-			{
-				modules.clear();
-				final String title = r.getId();
-				final String body = createReactionBody(r, format, wp);
-				//Utils.eclipsePrintln("reaction setpost");
-				final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
+
+		if (NEW_REACTION_MANAGEMENT) {
+			if (model.getListOfReactions() != null) {
+				for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+					{
+						final BlogCreator.Post post = wp.lookup(r.getId());
 				
-				if (post != null) {
-					final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
-					reaction_line(right.add(), r, bubble, scales, post.getPostId());
+						if(post!=null){
+							final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+							reaction_line(right.add(), r, bubble, scales, post.getPostId());
+						}else{
+							Utils.eclipseErrorln("ERROR: No post for "+r.getId());
+						}
+					}
+			}
+		} else {
+			if (model.getListOfReactions() != null) {
+				for (final ReactionDocument.Reaction r : model.getListOfReactions().getReactionArray())
+					{
+						modules.clear();
+						final String title = r.getId();
+						final String body = createReactionBody(r, format, wp);
+						//Utils.eclipsePrintln("reaction setpost");
+						final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
 				
-					wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
-				}
+						if (post != null) {
+							final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
+							reaction_line(right.add(), r, bubble, scales, post.getPostId());
+				
+							wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
+						}
+					}
 			}
 		}
-		
+
 		for (final EntityBase ent : entityIDToEntityMap.values())
 		{
 			modules.clear();

@@ -127,6 +127,9 @@ jxtree_mapfun_map['children'] = function(datanode) {
 	if (datanode.modifs) {
 		return datanode.modifs;
 	}
+	if (datanode.children) {
+		return datanode.children;
+	}
 	if (datanode.modules) {
 		return datanode.modules;
 	}
@@ -159,16 +162,9 @@ function jxtree_get_node_class(node) {
 // TBD: 2013-10-29: find function to modify !
 // searching perharps not in the good place, and, at least, jxtree find is not correct with nodes
 // must compare to jstree searching !
+/*
 function jxtree_user_find(regex, node) {
 	var data = node.getUserData();
-	if (false) {
-		/*
-		if (data.modifs) {
-			console.log("data.modifs: [" + data.modifs + "]");
-		}
-		*/
-		return jxtree_user_find_id(regex, node);
-	}
 	if (data && data.id) {
 		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
 		if (info) {
@@ -177,24 +173,27 @@ function jxtree_user_find(regex, node) {
 	}
 	return false;
 }
+*/
 
-function jxtree_user_find_id(regex, node) {
+function jxtree_user_find(matcher, node) {
 	var data = node.getUserData();
 	if (data && data.id) {
-		if (data.id.match(regex)) {
-			return true;
+		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
+		if (info) {
+			return matcher.match(info);
 		}
-		/*
-		if (data.modifs) {
-			for (var nn = 0; nn < data.modifs.length; nn++) {
-				if (data.modifs[nn].id && data.modifs[nn].id.match(regex)) {
-					return true;
-				}
-			}
-		}
-		*/
 	}
 	return false;
+}
+
+function jxtree_user_find_id(matcher, node) {
+        var data = node.getUserData();
+        if (data && data.id) {
+                if (matcher.match(data.id)) {
+                        return true;
+                }
+        }
+        return false;
 }
 
 function Mapdata(to_load_count) {
@@ -205,16 +204,20 @@ function Mapdata(to_load_count) {
 	this.is_ready = {};
 	this.straight_data = {};
 	this.info_ready = {};
-	this.deferred_bubble_info = {};
+	this.deferred_module_bubble = {};
 }
+
+var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>", "g");
 
 Mapdata.prototype = {
 	// Mapdata for each module
 	module_mapdata: {},
 	module_mapdata_by_id: {},
 	module_info: {},
+	module_bubble: {},
 	module_jxtree: {},
 	module_res_jxtree: {},
+	module_classes: {},
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
@@ -243,13 +246,19 @@ Mapdata.prototype = {
 			var jxtree = mapdata.module_jxtree[module_name];
 			var res_jxtree = null;
 			if (no_ext) {
-				var to_find_str = "";
+				var to_find_str = "^(";
 				for (var nn = 0; nn < to_find.length; ++nn) {
-					if (to_find_str) {
+					if (nn) {
 						to_find_str += '|';
 					}
 					to_find_str += to_find[nn];
 				}
+				to_find_str += ")$";
+				console.log("to_find_str [" + to_find_str + "]");
+				if (!hints) {
+					hints = {};
+				}
+				hints.case_sensitive = true;
 				var user_find = mapdata.useJXTreeSimpleFind(jxtree);
 				res_jxtree = jxtree.find(to_find_str, action, hints);
 				mapdata.restoreJXTreeFind(jxtree, user_find);
@@ -265,11 +274,16 @@ Mapdata.prototype = {
 				}
 				*/
 				uncheck_all_entities();
+
 				res_jxtree.context = {};
+				tree_context_prologue(res_jxtree.context);
 				$.each(res_jxtree.getRootNodes(), function() {
 					this.checkSubtree(JXTree.CHECKED);
 					this.showSubtree(JXTree.OPEN);
 				});
+				tree_context_epilogue(res_jxtree.context);
+
+
 				//$("#right_tabs").tabs("option", "active", 2);
 				$("#right_tabs").tabs("option", "active", 1);
 				$("#result_tree_header").html(res_jxtree.found + " elements matching \"" + to_find + "\"");
@@ -279,7 +293,13 @@ Mapdata.prototype = {
 	},
 
 	addInfo: function(module_name, info) {
-		this.module_info[module_name] = info;
+		this.module_bubble[module_name] = info;
+		var info_map = {};
+		for (var id in info) {
+			info_map[id] = info[id].replace(CLEAN_HTML_REGEX, "");
+			//console.log("info: " + id + " " + info_map[id]);
+		}
+		this.module_info[module_name] = info_map;
 		this.info_ready[module_name].resolve();
 	},
 
@@ -287,6 +307,22 @@ Mapdata.prototype = {
 		var info = this.module_info[module_name];
 		if (info) {
 			return info[id];
+		}
+		return null;
+	},
+
+	getClass: function(module_name, id) {
+		var classes = this.module_classes[module_name];
+		if (classes) {
+			return classes[id];
+		}
+		return null;
+	},
+
+	getBubble: function(module_name, id) {
+		var bubble = this.module_bubble[module_name];
+		if (bubble) {
+			return bubble[id];
 		}
 		return null;
 	},
@@ -322,14 +358,14 @@ Mapdata.prototype = {
 		//var module_map = this.module_mapdata[module_name];
 		var module_name = map.map_name;
 		var data = this.straight_data[module_name];
-		if (!this.maps_modules) {
-			this.maps_modules = data[data.length-1];
-			data.pop();
-		}
 		win.console.log("building tree for " + module_name + " " + div_name + " " + $(div_name, win.document).get(0));
 
 		var datatree;
 		if (module_name == "master") {
+			if (!this.maps_modules) {
+				this.maps_modules = data[data.length-1];
+				data.pop();
+			}
 			datatree = [this.maps_modules, {name: 'Entities', children: data}];
 		} else {
 			datatree = {name: 'Entities', children: data};
@@ -352,7 +388,8 @@ Mapdata.prototype = {
 			win.tree_node_click_after(node.jxtree.context, map, checked);
 		});
 
-		this.deferred_bubble_info[module_name] = {};
+		this.deferred_module_bubble[module_name] = {};
+		this.module_classes[module_name] = {};
 		var mapdata = this;
 
 		jxtree.checkStateChanged(function(node, state) {
@@ -363,7 +400,9 @@ Mapdata.prototype = {
 					var info = mapdata.getMapdataById(module_name, data.id);
 					if (info && info.positions) {
 						//win.console.log("state changed: " + node.label + " " + data.id + " " + jxtree_get_node_class(node) + " " + map.map_name);
-						data.clickmap_tree_node = new win.ClickmapTreeNode(map, module_name, data.id, jxtree_get_node_class(node), node.label, info.positions, mapdata);
+						var cls = jxtree_get_node_class(node);
+						data.clickmap_tree_node = new win.ClickmapTreeNode(map, module_name, data.id, cls, node.label, info.positions, mapdata);
+						mapdata.module_classes[module_name][data.id] = cls;
 					}
 				}					
 				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
@@ -375,11 +414,11 @@ Mapdata.prototype = {
 		whenloaded();
 
 		this.whenInfoReady(module_name, function() {
-			var deferred_bubble_info = mapdata.deferred_bubble_info[module_name];
-			for (var id in deferred_bubble_info) {
-				var bubble_list = deferred_bubble_info[id];
+			var deferred_module_bubble = mapdata.deferred_module_bubble[module_name];
+			for (var id in deferred_module_bubble) {
+				var bubble_list = deferred_module_bubble[id];
 				if (bubble_list) {
-					var bubble = mapdata.getInfo(module_name, id);
+					var bubble = mapdata.getBubble(module_name, id);
 					for (var nn = 0; nn < bubble_list.length; ++nn) {
 						bubble_list[nn].setContent(bubble);
 					}
@@ -391,15 +430,15 @@ Mapdata.prototype = {
 
 
 	setBubbleContent: function(bubble, module_name, data_id) {
-		var bubble_content = this.getInfo(module_name, data_id);
+		var bubble_content = this.getBubble(module_name, data_id);
 		if (bubble_content) {
 			bubble.setContent(bubble_content);
 		} else {
 			bubble.setContent("Loading data...");
-			if (!this.deferred_bubble_info[module_name][data_id]) {
-				this.deferred_bubble_info[module_name][data_id] = [];
+			if (!this.deferred_module_bubble[module_name][data_id]) {
+				this.deferred_module_bubble[module_name][data_id] = [];
 			}
-			this.deferred_bubble_info[module_name][data_id].push(bubble);
+			this.deferred_module_bubble[module_name][data_id].push(bubble);
 		}
 	},
 
@@ -470,7 +509,9 @@ Mapdata.prototype = {
 	
 		console.log("module map added " + module_name);
 		// warning, overlay is not a shared object => problems with several tabs
-		overlay.addCKMap(module_name, ckmap);
+		if (typeof overlay != 'undefined') {
+			overlay.addCKMap(module_name, ckmap);
+		}
 		return !--this.to_load_count;
 	},
 

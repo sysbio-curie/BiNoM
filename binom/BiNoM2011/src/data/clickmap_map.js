@@ -26,6 +26,23 @@ var small_icon;
 var big_icon;
 var use_jxtree;
 
+var ICON_SMALL_W = 0.32;
+var ICON_SMALL_H = 14;
+var ICON_SMALL_ANCHOR_X = 4;
+var ICON_SMALL_ANCHOR_Y = 14;
+
+var ICON_MEDIUM_W = 0.5;
+var ICON_MEDIUM_H = 34;
+var ICON_MEDIUM_ANCHOR_X = 10;
+var ICON_MEDIUM_ANCHOR_Y = 34;
+
+var ICON_BIG_W = 0.75;
+var ICON_BIG_H = 68;
+var ICON_BIG_ANCHOR_X = 20;
+var ICON_BIG_ANCHOR_Y = 68
+
+var icon_map = {};
+
 /*
 var jtree;
 var map;
@@ -43,6 +60,26 @@ var refreshing = false;
 */
 var bubble_list = [];
 
+function CHECK_NO_JXTREE() {
+	if (use_jxtree) {
+		console.log("this function should NOT be used with jxtree");
+		dummy_function();
+	}
+}
+
+function panMapToBounds_jxtree(map, bounds)
+{
+	if (bounds && bounds.length > 0) {
+		var map_bound = map.getBounds();
+		for (var nn = 0; nn < bounds.length; ++nn) {
+			if (map_bound.intersects(bounds[nn])) {
+				return;
+			}
+		}
+		map.panToBounds(bounds[0]);
+	}
+}
+
 function panMapToBounds(map, bounds)
 {
 	if (!bounds.isEmpty() && !map.getBounds().intersects(bounds)) {
@@ -55,7 +92,7 @@ function setup_icons()
 	var normal_marker_colour = "FE7569";	
 	var new_marker_colour = "5555FF";
 	
-	var simple_icon = function(colour, scale, w, h, anchor_x, anchor_y)
+	function simple_icon(colour, scale, w, h, anchor_x, anchor_y)
 	{
 		var url = "http://chart.apis.google.com/chart?chst=d_map_spin&chld="
 			+ scale // scale_factor
@@ -66,48 +103,69 @@ function setup_icons()
 			+ "|%E2%80%A2" // One or more lines of text, delimited by | characters
 			;
 		
-		// using an arbitrary icon for markers works, for instance:
-		//var url = "../../../map_icons/entity/PROTEIN.png";
-
 		return new google.maps.MarkerImage(url);
-		/*
-		var url = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|";
-		
-		// http://stackoverflow.com/questions/7842730/change-marker-size-in-google-maps-v3
-		return n = new google.maps.MarkerImage(url + colour,
-				null,
-				null,
-				null,
-				new google.maps.Size(w, h)
-			);
-		
-		return n = new google.maps.MarkerImage(url + colour,
-			new google.maps.Size(w, h),
-			new google.maps.Point(0, 0),
-			new google.maps.Point(anchor_x, anchor_y)
-		);
-		*/
-	}	
-	
+	}
+
+ 	function custom_icon(url) {
+		return new google.maps.MarkerImage(url);
+	}
+
 	// http://stackoverflow.com/questions/7095574/google-maps-api-3-custom-marker-color-for-default-dot-marker/7686977#7686977
-	var icon = function(w, h, anchor_x, anchor_y)
+	function make_icon(old_icon, new_icon) {
+		old_icon.type = "normal";
+		new_icon.type = "new";
+		old_icon.new_icon = new_icon;
+		old_icon.old_icon = old_icon;
+		new_icon.new_icon = new_icon;
+		new_icon.old_icon = old_icon;
+		return old_icon;
+	}
+
+	function icon(w, h, anchor_x, anchor_y)
 	{
-//		var normal_icon1 = simple_icon("FE7569", w, h, anchor_x, anchor_y);
-		var normal_icon1 = simple_icon("EEEEEE", w, h, anchor_x, anchor_y);
-		var new_icon1 = simple_icon("5555FF", w, h, anchor_x, anchor_y);
-		normal_icon1.type = "normal";
-		new_icon1.type = "new";
-		normal_icon1.new_icon = new_icon1;
-		normal_icon1.normal_icon = normal_icon1;
-		new_icon1.new_icon = new_icon1;
-		new_icon1.normal_icon = normal_icon1;
-		return normal_icon1;
+		var old_icon = simple_icon("EEEEEE", w, h, anchor_x, anchor_y);
+		var new_icon = simple_icon("5555FF", w, h, anchor_x, anchor_y);
+		old_icon.type = "normal";
+		new_icon.type = "new";
+		old_icon.new_icon = new_icon;
+		old_icon.old_icon = old_icon;
+		new_icon.new_icon = new_icon;
+		new_icon.old_icon = old_icon;
+		return old_icon;
 	}
 	
 	small_icon = icon(0.4, 17, 5, 17);	
 	medium_icon = icon(0.5, 34, 10, 34);
 	big_icon = icon(0.75, 68, 20, 68);	
-	
+
+	function colored_icon(rgb, w, h, anchor_x, anchor_y)
+	{
+		var new_icon = simple_icon(rgb, w, h, anchor_x, anchor_y);
+		//var old_icon = simple_icon("EEEEEE", w, h, anchor_x, anchor_y);
+		var old_icon = new_icon;
+		return make_icon(old_icon, new_icon);
+	}
+
+	icon_map["PROTEIN"] = colored_icon("D8FACC", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["GENE"] = colored_icon("FFF86F", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["RNA"] = colored_icon("66FF66", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["ANTISENSE_RNA"] = colored_icon("EC7470", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["SIMPLE_MOLECULE"] = colored_icon("DAF66B", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["ION"] = colored_icon("94A2FC", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["DRUG"] = colored_icon("E55FFF", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["PHENOTYPE"] = colored_icon("C0A5FE", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["UNKNOWN"] = colored_icon("E55FFF", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["REACTION"] = colored_icon("00AA00", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
+	icon_map["MODULE"] = colored_icon("5555FF", ICON_BIG_W, ICON_BIG_H, ICON_BIG_ANCHOR_X, ICON_BIG_ANCHOR_Y);
+
+		/*
+	var complex_new_icon = custom_icon("../../../map_icons/entity/COMPLEX2.png");
+	var complex_old_icon = custom_icon("../../../map_icons/entity/COMPLEX2_O.png");
+	icon_map["COMPLEX"] = make_icon(complex_old_icon, complex_new_icon);
+	*/
+	//icon_map["COMPLEX"] = colored_icon("D8FACC", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+	icon_map["COMPLEX"] = colored_icon("D6AAaa", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
+
 	/*
 	icon_shadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
 	        new google.maps.Size(40, 37),
@@ -115,10 +173,19 @@ function setup_icons()
 	        new google.maps.Point(12, 35));	*/
 }
 
+function get_icon(cls) {
+	if (icon_map[cls]) {
+		return icon_map[cls];
+	}
+	return medium_icon;
+}
+
 function make_marker_visible(marker)
 {
 	if (!navicell.drawing_config || navicell.drawing_config.displayMarkers()) {
-		marker.setIcon(marker.getIcon().new_icon);
+		if (!use_jxtree) {
+			marker.setIcon(marker.getIcon().new_icon);
+		}
 		marker.setVisible(true);
 		//marker.setAnimation(google.maps.Animation.DROP);
 		marker.type = "new";
@@ -150,7 +217,7 @@ function set_old_markers_color(val)
 		var marker = marker_list[nn];
 		if (marker.type == "old") {
 			//console.log("found an old marker");
-			marker.setIcon(val ? marker.getIcon().normal_icon : marker.getIcon().new_icon);
+			marker.setIcon(val ? marker.getIcon().old_icon : marker.getIcon().new_icon);
 			//marker.setVisible(true); // bad idea to make them visible back
 		}
 	}
@@ -167,7 +234,7 @@ function make_new_markers_old()
 		if (!keep) {
 			i.setVisible(false);
 		} else if (diffcol) {
-			i.setIcon(i.getIcon().normal_icon);
+			i.setIcon(i.getIcon().old_icon);
 		}
 	}
 }
@@ -204,6 +271,7 @@ var check_node_inhibit = false;
 
 function show_markers_ref(markers, ref)
 {
+	CHECK_NO_JXTREE();
 	console.log("show_markers_ref: " + markers.length);
 	var o_check_node_inhibit = check_node_inhibit;
 	check_node_inhibit = true;
@@ -270,6 +338,7 @@ function show_markers(markers)
 
 function jstree_uncheck_all()
 {
+	CHECK_NO_JXTREE();
 	hide_all_markers();
 	//jtree.jstree("uncheck_node", jquery_to_dom($(".jstree-checked")));
 	jtree.jstree("uncheck_all");
@@ -314,20 +383,18 @@ function clickmap_refresh(partial)
 		jtree.jstree("uncheck_node", objs);
 		jtree.jstree("check_node", objs);
 
-	}
 
-	for (var nn = 0; nn < marker_list.length; ++nn) {
-		var marker = marker_list[nn];
-		if (marker.keep_old) {
-			marker.type = "old";
-		} else {
-			new_markers.push(marker);
+		for (var nn = 0; nn < marker_list.length; ++nn) {
+			var marker = marker_list[nn];
+			if (marker.keep_old) {
+				marker.type = "old";
+			} else {
+				new_markers.push(marker);
+			}
 		}
-	}
 
-	refresh_old_markers();
+		refresh_old_markers();
 
-	if (!use_jxtree) {
 		refreshing = false;
 		undets.addClass("jstree-undetermined");
 	}
@@ -425,6 +492,8 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 
 function get_markers_for_modification(element, projection, map)
 {
+	CHECK_NO_JXTREE();
+
 	if (element.markers == null)
 	{
 		var position = $(element).attr("position");
@@ -520,6 +589,7 @@ function get_markers_for_modification(element, projection, map)
 
 $.expr[':'].jstree_contains_plusTitle = function (a, i, m)
 {
+	CHECK_NO_JXTREE();
 	var s = m[3].toLowerCase();
 	// http://stackoverflow.com/questions/1018855/finding-elements-with-text-using-jquery
 	var r = $(a).filter("a").parent().children().filter("a").filter(function(index) {
@@ -562,7 +632,7 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
     			var val = $(this).val();
 			if (use_jxtree) {
 				//navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'select');
-				navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'subtree', $("#result_tree_contents").get(0));
+				navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'subtree', {div: $("#result_tree_contents").get(0), win: window});
 			}
 			
 		}
@@ -582,6 +652,7 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 
 function build_jstree(selector, source, map, projection, whenloaded, firstEntityName)
 {
+	CHECK_NO_JXTREE();
 	console.log("search setup");
 	
 	var tree = $(selector);
@@ -952,6 +1023,8 @@ function bubble_open(marker)
 
 function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 {
+	var icon = get_icon(cls);
+	/*
 	var icon = medium_icon;
 	if (cls == "REACTION") {
 		icon = small_icon;
@@ -960,7 +1033,7 @@ function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 	} else {
 		icon = medium_icon;
 	}
-
+	*/
 	var positions;
 	if (_positions.length) {
 		positions = _positions;
@@ -1028,16 +1101,25 @@ function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 	}
 }
 
+function tree_context_prologue(tree_context) {
+	tree_context.marker_bounds = [];
+}
+
+function tree_context_epilogue(tree_context) {
+	panMapToBounds_jxtree(map, tree_context.marker_bounds);
+}
+
 function tree_node_click_before(tree_context, map, checked) {
 	if (!checked) {
-		tree_context.marker_bounds = new google.maps.LatLngBounds();
-		make_new_markers_old();
+		tree_context_prologue(tree_context);
+		//make_new_markers_old();
+		new_markers = Array();
 	}
 }
 
 function tree_node_click_after(tree_context, map, checked) {
 	if (checked) {
-		panMapToBounds(map, tree_context.marker_bounds);
+		tree_context_epilogue(tree_context);
 	}
 }
 
@@ -1049,7 +1131,9 @@ function tree_node_state_changed(tree_context, tree_node, checked) {
 		if (checked) {
 			make_marker_visible(this);
 			if (tree_context.marker_bounds) {
-				extend(tree_context.marker_bounds, this);
+				var marker_bound = new google.maps.LatLngBounds();
+				extend(marker_bound, this);
+				tree_context.marker_bounds.push(marker_bound);
 			}
 		} else {
 			this.setVisible(false);

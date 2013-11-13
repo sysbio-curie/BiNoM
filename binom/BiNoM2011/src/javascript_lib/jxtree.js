@@ -18,6 +18,60 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+function JXTreeMatcher(pattern, hints) {
+	pattern = pattern.trim();
+
+	if (!hints) {
+		hints = {};
+	}
+	this.hints = hints;
+	this.search_user_find = !hints.no_search_user_find;
+	this.search_label = !hints.no_search_label;
+	this.case_sensitive = !hints.case_sensitive ? "i" : "";
+
+	var cls_patterns = pattern.split("/");
+	if (cls_patterns.length == 2) {
+		pattern = cls_patterns[0].trim();
+		this.cls_only = cls_patterns[1].trim().toUpperCase().split("|");
+	}
+
+	var patterns = pattern.split(",");
+	if (patterns.length > 1) {
+		this.and_search = false;
+		this.or_search = true;
+	} else {
+		patterns = pattern.split(/[ \t]+/);
+		this.and_search = true;
+		this.or_search = false;
+	}
+
+	this.regex_arr = [];
+	for (var nn = 0; nn < patterns.length; ++nn) {
+		this.regex_arr.push(new RegExp(patterns[nn].trim(), this.case_sensitive));
+	}
+	//console.log("AND: " + this.and_search + " OR: " + this.or_search);
+}
+
+JXTreeMatcher.prototype = {
+	
+	match: function(str) {
+		var match_cnt = 0;
+		for (var nn = 0; nn < this.regex_arr.length; ++nn) {
+			if (str.match(this.regex_arr[nn])) {
+				match_cnt++;
+				if (this.or_search) {
+					return true;
+				}
+			} else {
+				if (this.and_search) {
+					return false;
+				}
+			}
+		}
+		return match_cnt > 0;
+	}
+};
+
 var jxtree_mute = true;
 
 function JXTree(_document, datatree, div, mapfun) {
@@ -190,35 +244,20 @@ JXTree.prototype = {
 	},
 
 	// should replace action and div by a extensible map named 'hints'
-	find: function(pattern, action, div) {
+	find: function(pattern, action, hints) {
 		pattern = pattern.trim();
-		var regex = new RegExp(pattern, "i");
+		//var regex = new RegExp(pattern, "i");
+		var matcher = new JXTreeMatcher(pattern, hints);
 		var nodes = [];
 		if (pattern) {
 			var user_find = this.user_find;
-			/*
-			for (var label in this.label_map) {
-				var node = this.label_map[label];
-				*/
 			for (var id in this.node_map) {
 				var node = this.node_map[id];
 				if (node.isLeaf()) {
-					/*
-					var label = node.label;
-					if (label.match(regex)) {
-						nodes.push(node);
-					} else if (user_find && user_find(regex, node)) {
-						nodes.push(node);
-					} 
-					*/
-					if (node.matchRegex(regex)) {
+					//if (node.matchRegex(regex)) {
+					if (node.match(matcher)) {
 						nodes.push(node);
 					}
-						/*
-					} else if (node.parent && node.parent.matchRegex(regex)) { // according to hints
-						nodes.push(node);
-					}
-						*/
 				}
 			}
 		}
@@ -239,9 +278,9 @@ JXTree.prototype = {
 				node_map[nodes[nn].getId()] = true;
 			}
 			var jxsubtree = this.clone(node_map);
-			if (div) {
-				$(div).html("");
-				jxsubtree.complete(null, div);
+			if (hints && hints.div) {
+				$(hints.div).html("");
+				jxsubtree.complete(null, hints.div);
 				for (var nn = 0; nn < jxsubtree.roots.length; ++nn) {
 					jxsubtree.roots[nn].openSubtree(JXTree.OPEN);
 				}
@@ -289,6 +328,36 @@ JXTreeNode.prototype = {
 
 	clone: function(jxtree) {
 		return new JXTreeNode(jxtree, this.label, this.left_label, this.right_label, this.user_data, this.user_id);
+	},
+
+	match: function(matcher) {
+		if (matcher.cls_only) {
+			var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
+			var found = false;
+			for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
+				if (node_cls == matcher.cls_only[nn]) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				return false;
+			}
+		}
+
+		if (matcher.search_label) {
+			if (matcher.match(this.label)) {
+				return true;
+			} 
+		}
+
+		if (matcher.search_user_find) {
+			if (this.jxtree.user_find && this.jxtree.user_find(matcher, this)) {
+				return true;
+			}
+		}
+		return false;
+
 	},
 
 	matchRegex: function(regex) {

@@ -285,6 +285,22 @@ lr.close();
 return list;
 }
 
+public static Vector<String> loadStringListFromText(String text){
+Vector<String> list = new Vector<String>(); 
+try{
+LineNumberReader lr = new LineNumberReader(new StringReader(text));
+String s = null;
+while((s=lr.readLine())!=null){
+  list.add(s.trim());
+}
+lr.close();
+}catch(Exception e){
+  e.printStackTrace();
+}
+return list;
+}
+
+
 /**
  * Converts InputStream into String
  * @param is
@@ -439,12 +455,15 @@ public static String correctName(String name){
 	name =  name.replaceAll("[^\\p{ASCII}]", "");
 
 	name = Utils.replaceString(name," ","_");
+	name = Utils.replaceString(name,":","_");	
 	name = Utils.replaceString(name,"/","_");
 	name = Utils.replaceString(name,"|","_");
 	name = Utils.replaceString(name,"*","_");
 	name = Utils.replaceString(name,"-","_");
 	name = Utils.replaceString(name,"[","_");
 	name = Utils.replaceString(name,"]","_");
+	name = Utils.replaceString(name,"(","_");
+	name = Utils.replaceString(name,")","_");
 	name = Utils.replaceString(name,"__","_");
 	name = Utils.replaceString(name,"__","_");
 	//name = Utils.replaceString(name,":","_");
@@ -1292,6 +1311,27 @@ public static String replaceByList(String text, HashMap<String, String> map){
 	String res = new String(ctextnew,0,in);
 	return res;
 }
+
+
+public static boolean checkIfInsideRectangle(float x, float y, float w, float h, float rx, float ry, float rw, float rh, float gap){
+	boolean inside = false;
+
+	if((x>rx+gap)&&(x+w+gap<rx+rw)&&(y>ry+gap)&&(y+h+gap<ry+rh)) inside = true;
+	
+	return inside;
+}
+
+public static boolean checkIfOutsideRectangle(float x, float y, float w, float h, float rx, float ry, float rw, float rh, float gap){
+	boolean outside = false;
+
+	if(x+w<rx-gap) outside = true;
+	if(x>rx+rw+gap) outside = true;
+	if(y+h<ry-gap) outside = true;
+	if(y>ry+rh+gap) outside = true;
+	
+	return outside;
+}
+
 
 
 

@@ -37,6 +37,11 @@ public class SubnetworkProperties {
 	public static int SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS = 2;
 	public static int ADD_FIRST_NEIGHBOURS = 3;
 	public static int CONNECT_BY_SHORTEST_PATHS = 4;
+	
+	public static int SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED = 5;
+	public static int SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_UPSTREAM = 6;
+	public static int SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM = 7;
+	
 	public int modeOfSubNetworkConstruction = ADD_FIRST_NEIGHBOURS;
 
 	/**
@@ -46,6 +51,21 @@ public class SubnetworkProperties {
 		try{
 			
 			int numberOfSamples = 100;
+			
+			/*SubnetworkProperties snp = new SubnetworkProperties();
+			snp.path = "c:/datas/binomtest/";
+			snp.loadNetwork(snp.path+"M-Phase2.xgmml");
+			Vector<String> lst = new Vector<String>();
+			lst.add("Cdc2");
+			lst.add("Cdc13");
+			lst.add("Cdc13_Cdc2");
+			snp.selectNodesFromList(lst);
+			snp.network.assignEdgeIds();
+			
+			snp.addFirstNeighbours(snp.subnetwork, snp.network, true, SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM);
+			XGMML.saveToXGMML(snp.subnetwork, snp.path+"M-phase2_sel.xgmml");
+			System.exit(0);*/
+			
 			
 			
 			//String path = "c:/datas/hprd9/";
@@ -688,6 +708,10 @@ public class SubnetworkProperties {
 	}
 	
 	public static void addFirstNeighbours(Graph subgraph, Graph network, boolean onlyConnecting){
+		addFirstNeighbours(subgraph, network, onlyConnecting, SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS);
+	}
+	
+	public static void addFirstNeighbours(Graph subgraph, Graph network, boolean onlyConnecting, int connectionOption){
 		network.calcNodesInOut();
 		Vector<Node> vn = new Vector<Node>(); 
 		for(int i=0;i<subgraph.Nodes.size();i++){
@@ -700,22 +724,61 @@ public class SubnetworkProperties {
 			for(int j=0;j<n.incomingEdges.size();j++){
 				Edge e = (Edge)n.incomingEdges.get(j);
 				Vector<Node> neigh = getNeighbours(network,e.Node1);
-				boolean found = false;
+				Node found = null;
 				for(int k=0;k<neigh.size();k++)
-					if((vn.indexOf(neigh.get(k))>=0)&&(!neigh.get(k).Id.equals(e.Node2.Id))&&(vnneigh.indexOf(neigh.get(k))<0))
-						found = true;
-				if(found||!onlyConnecting)
-					subgraph.addNode(e.Node1);
+					if((vn.indexOf(neigh.get(k))>=0)&&(!neigh.get(k).Id.equals(e.Node2.Id))&&(vnneigh.indexOf(neigh.get(k))<0)){
+						found = neigh.get(k);
+							if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS)
+								subgraph.addNode(e.Node1);
+							if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED){
+								boolean check = false;
+								for(Edge e1in: e.Node1.incomingEdges)
+									if(found.Id.equals(e1in.Node1.Id))
+										check = true;
+								if(check)
+									subgraph.addNode(e.Node1);
+							}
+							if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_UPSTREAM){
+								boolean check = false;
+								for(Edge e1in: e.Node1.outcomingEdges)
+									if(found.Id.equals(e1in.Node2.Id))
+										check = true;
+								if(check)
+									subgraph.addNode(e.Node1);
+							}
+						if(!onlyConnecting){
+							subgraph.addNode(e.Node1);
+						}
+					}
 			}
 			for(int j=0;j<n.outcomingEdges.size();j++){
 				Edge e = (Edge)n.outcomingEdges.get(j);
 				Vector<Node> neigh = getNeighbours(network,e.Node2);
-				boolean found = false;
+				Node found = null;
 				for(int k=0;k<neigh.size();k++)
-					if((vn.indexOf(neigh.get(k))>=0)&&(!neigh.get(k).Id.equals(e.Node1.Id))&&(vnneigh.indexOf(neigh.get(k))<0))
-						found = true;
-				if(found||!onlyConnecting)
-					subgraph.addNode(e.Node2);
+					if((vn.indexOf(neigh.get(k))>=0)&&(!neigh.get(k).Id.equals(e.Node1.Id))&&(vnneigh.indexOf(neigh.get(k))<0)){
+						found = neigh.get(k);
+						if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS)
+							subgraph.addNode(e.Node2);
+						if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED){
+							boolean check = false;
+							for(Edge e1in: e.Node2.outcomingEdges)
+								if(found.Id.equals(e1in.Node2.Id))
+									check = true;
+							if(check)
+								subgraph.addNode(e.Node2);
+						}
+						if(connectionOption==SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM){
+							boolean check = false;
+							for(Edge e1in: e.Node2.incomingEdges)
+								if(found.Id.equals(e1in.Node1.Id))
+									check = true;
+							if(check)
+								subgraph.addNode(e.Node2);
+						}
+						if(!onlyConnecting)
+							subgraph.addNode(e.Node2);
+					}
 			}
 		}
 		subgraph.addConnections(network);

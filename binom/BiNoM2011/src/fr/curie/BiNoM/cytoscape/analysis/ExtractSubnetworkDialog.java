@@ -86,6 +86,9 @@ public class ExtractSubnetworkDialog extends JDialog {
     private JRadioButton FirstOrderConnection;
     private JRadioButton FirstOrderConnectionsWithComplexes;
     private JRadioButton SecondOrderConnections;
+    private JRadioButton SecondOrderConnectionsDirected;
+    private JRadioButton SecondOrderConnectionsUpstream;
+    private JRadioButton SecondOrderConnectionsDownstream;
     private JRadioButton AddFirstNeighbours;
     private JRadioButton ConnectByShortestPath;    
     private JCheckBox TestComponentSignificance;    
@@ -212,13 +215,13 @@ public class ExtractSubnetworkDialog extends JDialog {
 	c.gridy = y;
 	c.anchor = GridBagConstraints.WEST;
 	panel.add(FirstOrderConnection, c);
-	y++;
+	//y++;
 	
 	FirstOrderConnectionsWithComplexes = new JRadioButton();
 	FirstOrderConnectionsWithComplexes.setText("First order connections with 'NODE_TYPE=COMPLEX'");
 	FirstOrderConnectionsWithComplexes.setSelected(false);
 	c = new GridBagConstraints();
-	c.gridx = 0;
+	c.gridx = 1;
 	c.gridy = y;
 	c.anchor = GridBagConstraints.WEST;
 	panel.add(FirstOrderConnectionsWithComplexes, c);
@@ -232,7 +235,38 @@ public class ExtractSubnetworkDialog extends JDialog {
 	c.gridy = y;
 	c.anchor = GridBagConstraints.WEST;
 	panel.add(SecondOrderConnections, c);
+	//y++;
+
+    SecondOrderConnectionsDirected = new JRadioButton();
+    SecondOrderConnectionsDirected.setText("Second order, directed");
+    SecondOrderConnectionsDirected.setSelected(false);	
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.WEST;
+	panel.add(SecondOrderConnectionsDirected, c);
 	y++;
+	
+	SecondOrderConnectionsUpstream = new JRadioButton();
+	SecondOrderConnectionsUpstream.setText("Second order, directed, upstream");
+	SecondOrderConnectionsUpstream.setSelected(false);	
+	c = new GridBagConstraints();
+	c.gridx = 0;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.WEST;
+	panel.add(SecondOrderConnectionsUpstream, c);
+	//y++;
+
+	SecondOrderConnectionsDownstream = new JRadioButton();
+	SecondOrderConnectionsDownstream.setText("Second order, directed, downstream");
+	SecondOrderConnectionsDownstream.setSelected(false);	
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.WEST;
+	panel.add(SecondOrderConnectionsDownstream, c);
+	y++;
+
 	
 	AddFirstNeighbours = new JRadioButton();
 	AddFirstNeighbours.setText("Add first neighbours");
@@ -242,14 +276,14 @@ public class ExtractSubnetworkDialog extends JDialog {
 	c.gridy = y;
 	c.anchor = GridBagConstraints.WEST;
 	panel.add(AddFirstNeighbours, c);
-	y++;
+	//y++;
 	
 	
 	ConnectByShortestPath = new JRadioButton();
 	ConnectByShortestPath.setText("Connect by shortest paths");
 	ConnectByShortestPath.setSelected(false);	
 	c = new GridBagConstraints();
-	c.gridx = 0;
+	c.gridx = 1;
 	c.gridy = y;
 	c.anchor = GridBagConstraints.WEST;
 	panel.add(ConnectByShortestPath, c);
@@ -259,6 +293,9 @@ public class ExtractSubnetworkDialog extends JDialog {
 	group.add(FirstOrderConnection);
 	group.add(FirstOrderConnectionsWithComplexes);
 	group.add(SecondOrderConnections);	
+	group.add(SecondOrderConnectionsDirected);
+	group.add(SecondOrderConnectionsUpstream);
+	group.add(SecondOrderConnectionsDownstream);
 	group.add(AddFirstNeighbours);
 	group.add(ConnectByShortestPath);
 
@@ -404,6 +441,9 @@ public class ExtractSubnetworkDialog extends JDialog {
 			if(FirstOrderConnection.isSelected()) 				options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT; 
 			if(FirstOrderConnectionsWithComplexes.isSelected()) options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT_WITH_COMPLEX_NODES;
 			if(SecondOrderConnections.isSelected()) 			options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS;
+			if(SecondOrderConnectionsDirected.isSelected()) 			options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED;
+			if(SecondOrderConnectionsUpstream.isSelected()) 			options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_UPSTREAM;
+			if(SecondOrderConnectionsDownstream.isSelected()) 			options.methodOfSubnetworkExtraction = SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM;			
 			if(AddFirstNeighbours.isSelected()) 				options.methodOfSubnetworkExtraction = SubnetworkProperties.ADD_FIRST_NEIGHBOURS;
 			if(ConnectByShortestPath.isSelected()) 				options.methodOfSubnetworkExtraction = SubnetworkProperties.CONNECT_BY_SHORTEST_PATHS;
 			options.checkComponentSignificance = TestComponentSignificance.isSelected();

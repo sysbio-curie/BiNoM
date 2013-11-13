@@ -7,16 +7,18 @@ import com.ibm.icu.util.StringTokenizer;
 public class SpeciesStructure {
 	
 public static void main(String args[]){
-	String s = "(a|pho:b|Thr5_pho)|active@compartment";
+	String s = "APC_fragment_(1_777)@cytosol";
 	System.out.println(decodeStructuredString(s).toString());
 }
 
 	
 public class SpeciesStructureComponent{
-	public String name = "";
+	public String name = "unknown_name";
+	public String labelname = "";
+	public String entityType = "PROTEIN";	
 	public Vector<SpeciesStructureComponentModification> modifications = new Vector<SpeciesStructureComponentModification>();
 	public String toString(){
-		String s = name;
+		String s = name.trim();
 		for(int i=0;i<modifications.size();i++){
 			s+="|"+modifications.get(i).toString();
 		}
@@ -25,6 +27,7 @@ public class SpeciesStructureComponent{
 }
 
 public class SpeciesStructureComponentModification{
+	public String id = "";
 	public String name = "";
 	public String modification_type = "";
 	
@@ -37,11 +40,13 @@ public class SpeciesStructureComponentModification{
 }
 
 public Vector<SpeciesStructureComponent> components = new Vector<SpeciesStructure.SpeciesStructureComponent>(); 
-public String compartment = null;
+public String compartment = "default";
 public String globalModifier = "";
+
 
 public static SpeciesStructure decodeStructuredString(String structuredString){
 	SpeciesStructure ss = new SpeciesStructure();
+	try{
 	StringTokenizer st = new StringTokenizer(structuredString,"@");
 	structuredString = st.nextToken();
 	if(st.hasMoreTokens())
@@ -58,6 +63,43 @@ public static SpeciesStructure decodeStructuredString(String structuredString){
 		StringTokenizer st1 = new StringTokenizer(s,"|");
 		String name = st1.nextToken();
 		sc.name = name;
+		sc.labelname = name;
+		
+		// Check name for containing the information about type
+		if(name.length()>1){
+			String let1 = name.substring(0, 1);
+			String let2 = name.substring(1, 2);
+			if(let1.equals("r"))if(let2.toUpperCase().equals(let2)){
+				sc.entityType = "RNA";
+				sc.labelname = name.substring(1, name.length());
+			}
+			if(let1.equals("g"))if(let2.toUpperCase().equals(let2)){
+				sc.entityType = "GENE";
+				sc.labelname = name.substring(1, name.length());
+			}
+		}
+		if(name.length()>2){
+			String let1 = name.substring(0, 2);
+			String let2 = name.substring(2, 3);
+			if(let1.equals("ar"))if(let2.toUpperCase().equals(let2)){
+				sc.entityType = "ANTISENSE_RNA";
+				sc.labelname = name.substring(2, name.length());
+			}
+			if(let1.equals("ph"))if(let2.toUpperCase().equals(let2)){
+				sc.entityType = "PHENOTYPE";
+				sc.labelname = name.substring(2, name.length());
+			}
+		}
+		if(name.startsWith("null")){
+			sc.entityType = "DEGRADED";
+			sc.labelname = "null";
+		}
+		
+		// remove "'" signs
+		if(sc.name.endsWith("'")) sc.name = sc.name.substring(0, sc.name.length()-1);
+		if(sc.labelname.endsWith("'")) sc.labelname = sc.labelname.substring(0, sc.labelname.length()-1);		
+		
+		
 		while(st1.hasMoreTokens()){
 			SpeciesStructureComponentModification sm = (new SpeciesStructure()).new SpeciesStructureComponentModification();
 			sc.modifications.add(sm);
@@ -74,6 +116,8 @@ public static SpeciesStructure decodeStructuredString(String structuredString){
 				sm.name = mod_name;
 				sm.modification_type = mod_type;
 		}
+	}}catch(Exception e){
+		System.out.println("ERROR: can not decode "+structuredString);
 	}
 	return ss;
 }
@@ -83,6 +127,10 @@ public boolean isComplexSpecies(){
 }
 
 public String toString(){
+	return toString(true);
+}
+
+public String toString(boolean addCompartmentName){
 	String s = "";
 	for(int i=0;i<components.size();i++){
 		s+=components.get(i).toString()+":";
@@ -90,8 +138,9 @@ public String toString(){
 	if(s.endsWith(":")) s=s.substring(0, s.length()-1);
 	if(!this.globalModifier.equals(""))
 		s = "("+s+")|"+this.globalModifier;
-	if(!this.compartment.equals(""))
-		s = s+"@"+this.compartment;
+	if(addCompartmentName)
+		if(!this.compartment.equals(""))
+			s = s.trim()+"@"+this.compartment;
 	return s; 
 }
 

@@ -484,7 +484,8 @@ public class Graph {
       Edge e = (Edge)gr.Edges.elementAt(k);
       //int k1 = this.getNodeIndex(e.Node1.Id);
       //int k2 = this.getNodeIndex(e.Node2.Id);
-      //System.out.println(e.Node1.Id+"->"+e.Node2.Id);
+      //if(e.Node1.Id.equals("Cdc2"))
+      //	  System.out.println(e.Node1.Id+"->"+e.Node2.Id);
       Node n1 = this.getNode(e.Node1.Id);
       Node n2 = this.getNode(e.Node2.Id);
       //if((k1>=0)&&(k2>=0)){

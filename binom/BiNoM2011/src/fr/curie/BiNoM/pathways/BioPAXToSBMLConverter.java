@@ -791,6 +791,7 @@ public class BioPAXToSBMLConverter {
     		TemplateReaction tr = (TemplateReaction)inter;
     		Vector<String> products = Utils.getPropertyURIs(tr, "product");
     		String template = Utils.getPropertyURI(tr, "template");
+    		if(template!=null){
     		BioPAXSpecies part = (BioPAXSpecies)independentSpecies.get(Utils.cutUri(template));
     		if(part!=null){
     			SpeciesReferenceDocument.SpeciesReference spr = lreactr.addNewSpeciesReference();
@@ -808,7 +809,7 @@ public class BioPAXToSBMLConverter {
         			System.out.println("ERROR: BioPAXSpecies NOT FOUND: Product "+product+" in "+inter.uri());
         		}
     		}
-    	}
+    	}}
     }
 
     public void addModifierToReaction(String reaction_id, BioPAXSpecies part){

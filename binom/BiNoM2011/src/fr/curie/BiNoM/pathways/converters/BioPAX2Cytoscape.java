@@ -74,7 +74,7 @@ public class BioPAX2Cytoscape extends BioPAX2SBML {
 			//String prefix = "c:/datas/binomtest/BioPAX3/simplest";
 			//String prefix = "c:/datas/binomtest/BioPAX3/Apoptosome";
 			//String prefix = "c:/datas/binomtest/BioPAX3/6examples/biopax3-template-reaction1";
-			String prefix = "c:/datas/binomtest/BioPAXtest/test";
+			String prefix = "c:/datas/reactome/pathway100";
 
 			if (args.length>0) {
 				prefix = args[0];

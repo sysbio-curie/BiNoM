@@ -487,6 +487,7 @@ public class BioPAX {
 	 */
 	public void loadBioPAXFromString(String text) throws Exception{
 		model = ModelFactory.createDefaultModel();
+		
 		//System.out.print("replacing biopax level... ");
 		//String bps = Utils.replaceString(text,"biopax-level1","biopax-level2");
 		//System.out.print("replacing name capitals... ");
@@ -543,6 +544,24 @@ public class BioPAX {
 			count++;
 		System.out.println(count+" occurences of bp:displayName replaced.");
 		ret = m.replaceAll("bp:name");
+		
+		// Quick and dirty fix for the problem of not understanding xmlns prefixes
+		HashMap<String, String> prefixMap = new HashMap<String, String>();
+		StringTokenizer st = new StringTokenizer(ret," :\"=");
+		while(st.hasMoreTokens()){
+			String s = st.nextToken();
+			if(s.equals("xmlns")){
+				String prefix = st.nextToken();
+				String url = st.nextToken();
+				url = st.nextToken();
+				prefixMap.put(prefix,"http:"+url);
+			}
+		}
+		for(String prefix: prefixMap.keySet())if(!prefix.contains("http")){
+			ret = Utils.replaceString(ret, "\""+prefix+":","\""+prefixMap.get(prefix));
+		}
+		//System.out.println(ret);
+		
 		return(ret);
 	}
 }

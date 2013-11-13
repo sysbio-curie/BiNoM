@@ -560,6 +560,8 @@ public class BioPAXNamingService {
 			//if(((Protein) pe).getEntityReference()!=null)if(!listOfComplexComponents.containsKey(pe.uri())){
 			if(((Protein) pe).getEntityReference()!=null){
 				name = getShortestName(((Protein) pe).getEntityReference().getName());
+				if(name.equals(""))
+					name = getShortestName(pe.getName());
 			}else{
 				name = getShortestName(pe.getName());
 			}
@@ -585,7 +587,11 @@ public class BioPAXNamingService {
 			}
 		}
 		else if (pe instanceof SmallMolecule) {
-			name = getShortestName(pe.getName());
+			if(((SmallMolecule) pe).getEntityReference()!=null){
+				name = getShortestName(((SmallMolecule) pe).getEntityReference().getName());
+			}else{
+				name = getShortestName(pe.getName());
+			}
 			name = addCellularCompartmentName(name, ((SmallMolecule) pe).getCellularLocation());
 		}
 		else if (pe instanceof Rna){
@@ -886,6 +892,7 @@ public class BioPAXNamingService {
 		int len = 100000;
 		while(it.hasNext()) {
 			String n = (String) it.next();
+			if(n.length()!=0)
 			if (n.length() < len) {
 				len = n.length();
 				ret = n;

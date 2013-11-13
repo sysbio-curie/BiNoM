@@ -60,7 +60,7 @@ public class CellDesigner2Cytoscape {
 	    //String prefix = "c:/datas/calamar/rb_reduced";
 	    //String prefix = "c:/datas/binomtest/components40";
 	    //String prefix = "c:/datas/calamar/testEditPoints";
-	    //String prefix = "c:/datas/binomtest/M-Phase2";
+	    String prefix = "c:/datas/binomtest/M-Phase2";
 	    //String prefix = "c:/datas/simon/100526_fixed";
 	    //String prefix = "c:/datas/basal/PARPCaseStudy/CC_DNArepair_10_06_2010_SynthLethality";
 	    //String prefix = "c:/datas/binomtest/NCI_example";
@@ -71,7 +71,7 @@ public class CellDesigner2Cytoscape {
 	    //String prefix = "C:/Datas/OCSANA/egfr";
 	    //String prefix = "C:/Datas/ClickableMap/2011_10_05_Model/2011_10_05_Model_Mistakes/2011_10_05_Model_master_mistakes_OVAL";
 	     //String prefix = "c:/datas/binomtest/BIOMD0000000001";
-	    String prefix = "C:/Datas/NaviCell/test/testmap1_src/test1_master";
+	    //String prefix = "C:/Datas/NaviCell2/maps/mtor_src/master";
 	    //String prefix = "c:/datas/acsn/acsn_only/acsn_src/acsn_master";
 
 	    if(args.length>0){

@@ -32,6 +32,7 @@ import cytoscape.view.CyNetworkView;
 import cytoscape.view.CytoscapeDesktop;
 import cytoscape.visual.VisualStyle;
 import fr.curie.BiNoM.biopax.propedit.BioPAXToggleNamingService;
+import fr.curie.BiNoM.cytoscape.brf.*;
 import fr.curie.BiNoM.cytoscape.ain.ImportFromSimpleTextInfluenceFile;
 import fr.curie.BiNoM.cytoscape.analysis.CalcCentrality;
 import fr.curie.BiNoM.cytoscape.analysis.ClusterNetworks;
@@ -212,6 +213,12 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		("Import influence network from AIN file...");
 		binomIOMenu.add(menuItem);
 		menuItem.addActionListener(new ImportFromSimpleTextInfluenceFile());
+		
+		menuItem = new JMenuItem
+		("Import network from BiNoM reaction format file ...");
+		binomIOMenu.add(menuItem);
+		menuItem.addActionListener(new ImportFromBRFFile());
+		
 
 		binomIOMenu.addSeparator();
 
@@ -223,10 +230,20 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomIOMenu.add(exportCellDesignerMenuItem);
 		exportCellDesignerMenuItem.addActionListener(new CellDesignerExportToFile());
 
+		menuItem = new JMenuItem("Create CellDesigner file from the current network...");
+		binomIOMenu.add(menuItem);
+		menuItem.addActionListener(new CreateCellDesignerFileThroughBRF());
+		
 		exportSBMLMenuItem = new JMenuItem("Export current network to SBML...");
 		binomIOMenu.add(exportSBMLMenuItem);
 		exportSBMLMenuItem.addActionListener(new SBMLExportToFile());
 
+		menuItem = new JMenuItem("Export current network to BiNoM reaction format...");
+		binomIOMenu.add(menuItem);
+		menuItem.addActionListener(new ExportToBRFFile());
+
+		
+		
 
 		binomIOMenu.addSeparator();        
 
@@ -367,6 +384,71 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem = new JMenuItem("Path Influence Quantification analysis...");
 		menuItem.addActionListener(new PathConsistencyAnalyzer());
 		structAnaMenu.add(menuItem);
+		
+		// Fade
+		
+		/*
+		 * Fade Model menu
+		 */
+	    JMenu binomInfluenceMenu = new JMenu("Fade signal propagation model");
+	    structAnaMenu.add(binomInfluenceMenu);
+		
+		menuItem=new JMenuItem(FromToNodes.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new FromToNodes());
+		
+		binomInfluenceMenu.addSeparator();
+
+		menuItem=new JMenuItem(UpdateInfluenceAttrib.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  UpdateInfluenceAttrib());
+				
+		menuItem=new JMenuItem(InputReachParameter.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InputReachParameter());
+				
+		menuItem=new JMenuItem(InfluenceFeatures.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceFeatures());
+		
+		binomInfluenceMenu.addSeparator();
+		
+		JMenu textMenu=new JMenu(InfluenceArrayAsText.title);
+		binomInfluenceMenu.add(textMenu);
+
+		menuItem = new JMenuItem(InfluenceArrayAsText.titleV);
+		menuItem.addActionListener(new InfluenceArrayAsText("0.000"));
+		textMenu.add(menuItem);
+
+		menuItem = new JMenuItem(InfluenceArrayAsText.titleC);
+		menuItem.addActionListener(new InfluenceArrayAsText(null));
+		textMenu.add(menuItem);
+				
+		JMenu graphicMenu=new JMenu(InfluenceArrayAsGraphic.title);
+		binomInfluenceMenu.add(graphicMenu);
+
+		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleF);
+		menuItem.addActionListener(new InfluenceArrayAsGraphic(false));
+		graphicMenu.add(menuItem);
+
+		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleT);
+		menuItem.addActionListener(new InfluenceArrayAsGraphic(true));
+		graphicMenu.add(menuItem);
+		
+		menuItem=new JMenuItem(InfluenceByAttribute.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceByAttribute());
+	
+		binomInfluenceMenu.addSeparator();
+		
+		menuItem=new JMenuItem(InfluenceAreaInArray.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceAreaInArray());
+		
+		menuItem=new JMenuItem(InfluenceAreaInAttribute.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceAreaInAttribute());
+		
 
 		structAnaMenu.addSeparator();
 		menuItem = new JMenuItem("OCSANA analysis...");
@@ -438,67 +520,6 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomNestManagerMenu.add(menuItem);
 		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
 		
-		/*
-		 * Fade Model menu
-		 */
-	    JMenu binomInfluenceMenu = new JMenu("BiNoM Fade Model");
-	    binomMainMenu.add(binomInfluenceMenu);
-		
-		menuItem=new JMenuItem(FromToNodes.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new FromToNodes());
-		
-		binomInfluenceMenu.addSeparator();
-
-		menuItem=new JMenuItem(UpdateInfluenceAttrib.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  UpdateInfluenceAttrib());
-				
-		menuItem=new JMenuItem(InputReachParameter.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  InputReachParameter());
-				
-		menuItem=new JMenuItem(InfluenceFeatures.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  InfluenceFeatures());
-		
-		binomInfluenceMenu.addSeparator();
-		
-		JMenu textMenu=new JMenu(InfluenceArrayAsText.title);
-		binomInfluenceMenu.add(textMenu);
-
-		menuItem = new JMenuItem(InfluenceArrayAsText.titleV);
-		menuItem.addActionListener(new InfluenceArrayAsText("0.000"));
-		textMenu.add(menuItem);
-
-		menuItem = new JMenuItem(InfluenceArrayAsText.titleC);
-		menuItem.addActionListener(new InfluenceArrayAsText(null));
-		textMenu.add(menuItem);
-				
-		JMenu graphicMenu=new JMenu(InfluenceArrayAsGraphic.title);
-		binomInfluenceMenu.add(graphicMenu);
-
-		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleF);
-		menuItem.addActionListener(new InfluenceArrayAsGraphic(false));
-		graphicMenu.add(menuItem);
-
-		menuItem = new JMenuItem(InfluenceArrayAsGraphic.titleT);
-		menuItem.addActionListener(new InfluenceArrayAsGraphic(true));
-		graphicMenu.add(menuItem);
-		
-		menuItem=new JMenuItem(InfluenceByAttribute.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  InfluenceByAttribute());
-	
-		binomInfluenceMenu.addSeparator();
-		
-		menuItem=new JMenuItem(InfluenceAreaInArray.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  InfluenceAreaInArray());
-		
-		menuItem=new JMenuItem(InfluenceAreaInAttribute.title);
-		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  InfluenceAreaInAttribute());
 
 		/*
 		 * BioPAX 3 utils menu

@@ -140,6 +140,19 @@ public class ExtractSubnetworkTask implements Task {
 			snp.subnetwork.addConnections(snp.network);
 			snp.addFirstNeighbours(snp.subnetwork,snp.network,true);
 		}
+		if(snp.modeOfSubNetworkConstruction == snp.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED){
+			snp.subnetwork.addConnections(snp.network);
+			snp.addFirstNeighbours(snp.subnetwork,snp.network,true,SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED);
+		}
+		if(snp.modeOfSubNetworkConstruction == snp.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_UPSTREAM){
+			snp.subnetwork.addConnections(snp.network);
+			snp.addFirstNeighbours(snp.subnetwork,snp.network,true,SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_UPSTREAM);
+		}
+		if(snp.modeOfSubNetworkConstruction == snp.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM){
+			snp.subnetwork.addConnections(snp.network);
+			snp.addFirstNeighbours(snp.subnetwork,snp.network,true,SubnetworkProperties.SIMPLY_CONNECT_WITH_SECOND_ORDER_CONNECTIONS_DIRECTED_DOWNSTREAM);
+		}
+		
 		
 		if(snp.modeOfSubNetworkConstruction == snp.SIMPLY_CONNECT_WITH_COMPLEX_NODES){
 			System.out.println("In subnetwork: "+snp.subnetwork.Nodes.size()+" nodes, "+snp.subnetwork.Edges.size()+" edges");

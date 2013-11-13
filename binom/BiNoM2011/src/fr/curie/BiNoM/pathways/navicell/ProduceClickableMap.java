@@ -33,6 +33,9 @@ import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
+import fr.curie.BiNoM.pathways.analysis.structure.Edge;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.utils.Pair;
 import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.*;
@@ -61,6 +64,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerProteinReferenceDocument.Celld
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument.CelldesignerRNA;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRnaReferenceDocument.CelldesignerRnaReference;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity;
 import org.sbml.x2001.ns.celldesigner.ListOfModifiersDocument;
@@ -358,6 +362,7 @@ public class ProduceClickableMap
 		entityIDToEntityMap = Collections.unmodifiableMap(_entityIDToEntityMap);
 		
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd.getSbml());
+		
 		findAllPlacesInCellDesigner();
 //		updateStandardNames();
 
@@ -419,6 +424,16 @@ public class ProduceClickableMap
 
 	public static void main(String args[])
 	{
+		
+		// Here is an example of extracting information about complex components,
+		// and modification (shape) "neighbors"
+		
+		ProduceClickableMap pm = new ProduceClickableMap("", new File("c:/datas/binomtest/M-Phase2.xml"));
+		pm.exampleCode();
+		System.exit(1);
+
+		
+		
 		/*
 			if (false)	ProduceClickableMap clMap = new ProduceClickableMap();
 			// position of reaction
@@ -5408,6 +5423,61 @@ public class ProduceClickableMap
 			System.exit(1);
 			return null;
 		}
+	}
+	
+	public void exampleCode(){
+		// All complex components positions
+		Vector<String> ids = new Vector<String>();
+		for(CelldesignerSpeciesDocument.CelldesignerSpecies cs: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
+			ids.add(cs.getId());
+		for(CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()){
+			if(ids.contains(csa.getSpecies())){
+				System.out.println(csa.getCelldesignerBounds().getX());
+				System.out.println(csa.getCelldesignerBounds().getY());
+				System.out.println(csa.getCelldesignerBounds().getW());
+				System.out.println(csa.getCelldesignerBounds().getH());
+			}
+		}
+		// This conversion and mapping should be done only once
+		Graph graph = XGMML.convertXGMMLToGraph(CellDesignerToCytoscapeConverter.getXGMMLGraph("", cd.getSbml()));
+		HashMap<String, String> id2name = new HashMap<String, String>();
+		HashMap<String, String> name2id = new HashMap<String, String>();
+		for(Node n: graph.Nodes){
+			if(n.getFirstAttributeValue("CELLDESIGNER_SPECIES")!=null){
+				String spid = n.getFirstAttributeValue("CELLDESIGNER_SPECIES");
+				if(!spid.equals("")){
+					id2name.put(spid, n.Id);
+					name2id.put(n.Id, spid);
+				}
+			}
+			if(n.getFirstAttributeValue("CELLDESIGNER_REACTION")!=null){
+				String rid = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
+				if(!rid.equals("")){
+					id2name.put(rid, n.Id);
+					name2id.put(n.Id, rid);
+				}
+			}
+		}
+		graph.calcNodesInOut();
+		
+		// Example: for a species, get all reaction ids in which it participates
+		String spid = "s19"; 
+		Node n = graph.getNode(id2name.get(spid));
+		for(Edge e: n.incomingEdges)
+			System.out.println(name2id.get(e.Node1.Id));
+		for(Edge e: n.outcomingEdges)
+			System.out.println(name2id.get(e.Node2.Id));
+		
+		// Example: for a reaction, get all participating species ids 
+		String rid = "re3"; 
+		n = graph.getNode(id2name.get(rid));
+		for(Edge e: n.incomingEdges)
+			System.out.println(name2id.get(e.Node1.Id));
+		for(Edge e: n.outcomingEdges)
+			System.out.println(name2id.get(e.Node2.Id));
+		
+		
+		
 	}
 	
 }

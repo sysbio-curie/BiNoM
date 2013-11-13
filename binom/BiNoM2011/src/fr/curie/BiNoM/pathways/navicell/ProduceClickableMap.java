@@ -428,9 +428,9 @@ public class ProduceClickableMap
 		// Here is an example of extracting information about complex components,
 		// and modification (shape) "neighbors"
 		
-		ProduceClickableMap pm = new ProduceClickableMap("", new File("c:/datas/binomtest/M-Phase2.xml"));
-		pm.exampleCode();
-		System.exit(1);
+		//ProduceClickableMap pm = new ProduceClickableMap("", new File("c:/datas/binomtest/M-Phase2.xml"));
+		//pm.exampleCode();
+		//System.exit(1);
 
 		
 		

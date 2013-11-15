@@ -87,7 +87,7 @@ import fr.curie.BiNoM.pathways.utils.OptionParser;
 public class ProduceClickableMap
 {
 	private static boolean NV2 = false;
-	private static boolean USE_JXTREE = false;
+	private static boolean USE_JXTREE = true;
 	private static File config = null;
 	private static boolean USE_EXT_JSON = true;
 	private static boolean NO_BUBBLE = false;
@@ -199,6 +199,9 @@ public class ProduceClickableMap
 			this.url = url;
 			this.desc = desc != null ? desc : "Module " + name;
 		}
+		String getName() {
+			return name;
+		}
 	}
 
 	static class AtlasMapInfo {
@@ -221,6 +224,10 @@ public class ProduceClickableMap
 
 		String getName() {
 			return name != null ? name : id;
+		}
+
+		String getId() {
+			return id;
 		}
 
 		AtlasModuleInfo getModuleInfo(String name) {
@@ -355,6 +362,8 @@ public class ProduceClickableMap
 		module_name = input.getName().substring(0, input.getName().length() - celldesigner_suffix.length());
 
 		loadCellDesigner(input.getPath());
+		buildComplexSpecies();
+
 		final Map<String, EntityBase> _entityIDToEntityMap = new HashMap<String, EntityBase>();
 		final Map<String, Modification> _speciesIDToModificationMap = new HashMap<String, Modification>();
 		makeAllEntities(cd, _entityIDToEntityMap, _speciesIDToModificationMap);
@@ -516,6 +525,8 @@ public class ProduceClickableMap
 				nv2 = b.booleanValue();
 			else if ((b = options.booleanOption("jxtree", "Use jxtree")) != null)
 				USE_JXTREE = b.booleanValue();
+			else if ((b = options.booleanOption("nojxtree", "Use jxtree")) != null)
+				USE_JXTREE = !b.booleanValue();
 			else if ((b = options.booleanOption("onlytile", "only create tiles")) != null)
 				only_tiles = b.booleanValue();
 			else if ((b = options.booleanOption("provide_sources", "provide sources")) != null)
@@ -613,6 +624,7 @@ public class ProduceClickableMap
 	static final String rightpanel_include_file = data_directory + "/rightpanel.inc.html";
 	static final String mainpanel_include_file = data_directory + "/mainpanel.inc.html";
 	static final String default_xref_file = data_directory + "/xrefs_default.txt";
+	static String directory_suffix = "";
 
 	public static void run
 	(
@@ -637,7 +649,10 @@ public class ProduceClickableMap
 	{
 		NV2 = nv2;
 
-		System.out.println("ProduceClickableMap: NV2: " + nv2);
+		System.out.println("ProduceClickableMap: NV2: " + nv2 + " " + root);
+		if (root.toString().endsWith("_light")) {
+			directory_suffix = "_light";
+		}
 		if (xrefs == null) {
 			BufferedReader xref_stream = open_local_file(default_xref_file);
 			xrefs = load_xrefs(xref_stream, default_xref_file);
@@ -669,7 +684,7 @@ public class ProduceClickableMap
 
 		outmapdata = new PrintStream(mapdata_file);
 		outmapdata.println("if (!navicell.mapdata) {");
-		outmapdata.println("\tnavicell.mapdata = new Mapdata(" + (modules.size()+1) + ");");
+		outmapdata.println("\tnavicell.mapdata = new Mapdata(" + (modules.size() + (atlasInfo != null && atlasInfo.isAtlas() ? atlasInfo.mapInfo_v.size() : 0) + 1) + ");");
 
 		final ProduceClickableMap master;
 		try
@@ -715,16 +730,16 @@ public class ProduceClickableMap
 			}
 		}
 		
-		outmapdata.println("}\n");
-
-		outmapdata.close();
-
-		if (master!=null) {
-			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format, master_outjson, master_outinfo_json);
+		if (master != null) {
+			finish_right_panel_xml(master.right_panel, modules, atlasInfo, master.cd.getSbml().getModel(), master.scales, project_name, (Linker)wp, master.master_format, master_outjson, master_outinfo_json, outmapdata);
 			master_outjson.close();
 			//master_outinfo_json.print("}");
 			master_outinfo_json.close();
 		}
+
+		outmapdata.println("}\n");
+
+		outmapdata.close();
 
 		wp.remove_old_posts(atlasInfo);
 	}
@@ -1631,12 +1646,14 @@ public class ProduceClickableMap
 							final EntityBase e = map.get(id);
 							assert e != null : id + " " +species_id + " " + Utils.getValue(sp.getName());
 
-							if(e==null)
+							if(e==null) {
 								Utils.eclipseErrorln("ERROR: entity "+id+" is not found for included species "+included.getId()+" in complex "+complex_id);
+							}
 
 							((Entity)e).addAssociated(modification);
-							if (empty)
+							if (empty) {
 								complex.addComponent(e);
+							}
 
 						}
 						//complex.addModification(new Modification(sp, complex));
@@ -1757,8 +1774,9 @@ public class ProduceClickableMap
 			final Map<String, ArrayList<CelldesignerSpecies>> complexToIncludedSpeciesMap, final Map<String, Complex> complexes,
 			final Map<String, String> includedSpeciesToSpeciesMap)
 	{
-		for (final Complex s : complexes.values())
+		for (final Complex s : complexes.values()) {
 			s.fixId(includedSpeciesToSpeciesMap, complexToIncludedSpeciesMap, entities);
+		}
 		final Complex[] array = new Complex[complexes.size()];
 		complexes.values().toArray(array);
 		final Comparator<? super Complex> sort_by_id = new Comparator<Complex>()
@@ -1772,7 +1790,7 @@ public class ProduceClickableMap
 		Arrays.sort(array, sort_by_id);
 		String id = null;
 		Complex good = null;
-		for (final Complex c : array)
+		for (final Complex c : array) {
 			if (!c.getId().equals(id))
 			{
 				id = c.getId();
@@ -1780,10 +1798,14 @@ public class ProduceClickableMap
 				final EntityBase put = entities.put(id, c);
 				assert put == null : id;
 			}
-			else
+			else {
 				c.setGood(good);
-		for (final Modification m : modifications.values())
+			}
+		}
+
+		for (final Modification m : modifications.values()) {
 			m.updateIfNotGood();
+		}
 		completeComplexes(cd, entities, includedSpeciesToSpeciesMap, complexToIncludedSpeciesMap);
 	}
 
@@ -2088,7 +2110,7 @@ public class ProduceClickableMap
 		return str.replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON).replaceAll("\n", NL_JSON);
 	}
 
-	private static void generate_json_entity_modification(final PrintStream outjson, JSONInfo outinfo_json, Modification m, Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, String bubble, ImagesInfo scales
+	private void generate_json_entity_modification(final PrintStream outjson, JSONInfo outinfo_json, Modification m, Map<String, Vector<String>> speciesAliases, Map<String, Vector<Place>> placeMap, String bubble, ImagesInfo scales
 	)
 	{
 		// EXT_JSON_JSON TAG #2
@@ -2145,7 +2167,7 @@ public class ProduceClickableMap
 	private static String TB_JSON = java.util.regex.Matcher.quoteReplacement("\\t");
 	private static String DDQ_JSON = java.util.regex.Matcher.quoteReplacement("\\\\\\\"");
 
-	private static void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, 
+	private void generate_json_entity(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap, final FormatProteinNotes format, 
 						 final BlogCreator wp,
 						 final SbmlDocument cd,
 						 final String blog_name,
@@ -2204,7 +2226,6 @@ public class ProduceClickableMap
 			}
 			outjson.print("{");
 			outjson.print("\"name\" : \"" + m.getName() + "\",");
-			outjson.print("\"id\" : \"" + m.getId() + "\",");
 			//System.out.println("associated: " + q.associated);
 			if (q.associated)
 			{
@@ -2217,11 +2238,45 @@ public class ProduceClickableMap
 				if (USE_EXT_JSON) {
 					//outjson.print("\"a_name\" : \"" + m.getName() + "\",");
 				}
+				IncludedSpecies includedSpecies = getIncludedSpeciesByComplexId(m.getId(), ent.getId());
+				if (includedSpecies == null) {
+					includedSpecies = getIncludedSpeciesByComplexId(m.getId(), ent.getName());
+					/*
+					if (includedSpecies != null) {
+						System.out.println("GO REF BY NAME " + m.getName());
+					}
+					*/
+				}
+				if (includedSpecies != null) {
+					outjson.print("\"id\" : \"" + includedSpecies.getId() + "\",");
+					outjson.print("\"positions\" : [");
+					outjson.print("{");
+					outjson.print("\"x\" : " + toDouble(scales.getX(includedSpecies.getX())) + ", ");
+					outjson.print("\"y\" : " + toDouble(scales.getY(includedSpecies.getY())) + ", ");
+					outjson.print("\"w\" : " + toDouble(scales.getL(includedSpecies.getW())) + ", ");
+					outjson.print("\"h\" : " + toDouble(scales.getL(includedSpecies.getH())));
+					outjson.print("}],");
+					String bubble;
+					if (ent.getPost() != null) {
+						bubble = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp, includedSpecies.getNotes());
+					} else {
+						System.err.println("ERROR (included): no bubble for " + m.getId() + " " + ent.getName());
+						bubble = "";
+					}
+					outinfo_json.addInfo(includedSpecies.getId(), "<span class='bubble'>" + bubble + "</span>,");
+				}
 				outjson.print("\"a\" : 1");
 			}
 			else
 			{
-				String bubble = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
+				outjson.print("\"id\" : \"" + m.getId() + "\",");
+				String bubble;
+				if (ent.getPost() != null) {
+					bubble = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
+				} else {
+					System.err.println("ERROR: no bubble for " + m.getId() + " " + ent.getName());
+					bubble = "";
+				}
 				generate_json_entity_modification(outjson, outinfo_json, m, speciesAliases, placeMap, bubble, scales);
 				not_associated++;
 			}
@@ -2362,7 +2417,7 @@ public class ProduceClickableMap
 		if (!map.equals("master")) {
 			outjson.println("]");
 		}
-		outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + map + "\");");
+		outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + common_directory_url + "/" + map + "_mapdata.json\", \"" + blog_name + ":" + map + "\");");
 
 		/*
 		if (true) {
@@ -2383,7 +2438,7 @@ public class ProduceClickableMap
 		return name;
 	}
 
-	static private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
+	private ItemCloser generate_right_panel_xml(final File output_file, final Map<String, EntityBase> entityIDToEntityMap,
 							   final Map<String, Vector<String>> speciesAliases,
 							   final Map<String, Vector<Place>> placeMap,
 							   final FormatProteinNotes format,
@@ -2430,7 +2485,7 @@ public class ProduceClickableMap
 		
 	}
 
-	private static void add_modifications_to_right(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap,
+	private void add_modifications_to_right(final Map<String, Vector<String>> speciesAliases, final Map<String, Vector<Place>> placeMap,
 			final FormatProteinNotes format, final SbmlDocument cd, final String blog_name, ImagesInfo scales, final PrintWriter output,
 			final ItemCloser cls, final EntityBase ent, Linker wp)
 	{
@@ -2550,7 +2605,7 @@ public class ProduceClickableMap
 	
 	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set,
 						   AtlasInfo atlasInfo,	Model model, ImagesInfo scales, String blog_name,
-						   Linker wp, FormatProteinNotes notes_formatter, PrintStream outjson, JSONInfo outinfo_json)
+						   Linker wp, FormatProteinNotes notes_formatter, PrintStream outjson, JSONInfo outinfo_json, PrintStream outmapdata)
 	{
 		final PrintWriter output = right_close_entities(right);
 		
@@ -2670,6 +2725,7 @@ public class ProduceClickableMap
 			}
 			for (int nn = 0; nn < size; ++nn) {
 				AtlasMapInfo mapInfo = mapInfo_v.get(nn);
+				outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + "../../" + mapInfo.getId() + directory_suffix + "/_common/" + "master_mapdata.json\", \"" + mapInfo.getId() + ":master" + "\");");
 				ItemCloser map_item  = maps.add();
 				double[] map_position = positions.get(mapInfo.id);
 				item_list_start(map_item, mapInfo.getName(), right_hand_tag);
@@ -2705,6 +2761,7 @@ public class ProduceClickableMap
 				int size2 = mapInfo.moduleInfo_v.size();
 				for (int jj = 0; jj < size2; ++jj) {
 					AtlasModuleInfo moduleInfo = mapInfo.moduleInfo_v.get(jj);
+					outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + "../../" + mapInfo.getId() + directory_suffix + "/_common/" + moduleInfo.name + "_mapdata.json\", \"" + mapInfo.getId() + ":" + moduleInfo.name + "\");");
 					double[] module_position = positions.get(moduleInfo.name);
 					ItemCloser module_item  = map_item.add();
 					item_list_start(module_item, moduleInfo.name, right_hand_tag + " module");
@@ -2898,6 +2955,8 @@ public class ProduceClickableMap
 			}
 		}
 
+		//exampleCode(outjson);
+
 		final ItemCloser right = generate_right_panel_xml(rpanel_index, entityIDToEntityMap, speciesAliases, placeMap, format, wp, cd, blog_name, scales, modules_set, atlasInfo, model);
 
 		//System.out.println("_generate_ master json ?");
@@ -2980,6 +3039,28 @@ public class ProduceClickableMap
 			if (!marker_map.containsKey(sp.getId())) {
 				markers.add(sp.getId());
 				marker_map.put(sp.getId(), true);
+				//System.out.println("oups for key " + sp.getId());
+			}
+		}
+		return Collections.unmodifiableList(markers);
+	}
+	
+	static List<String> extract_ids(final ProduceClickableMap clickableMap, final EntityBase ent)
+	{
+		final List<Modification> sps = ent.getModifications();
+		String ent_id = ent.getId();
+		String ent_name = ent.getName();
+		final List<String> markers = new ArrayList<String>();
+		final HashMap<String, Boolean> marker_map = new HashMap<String, Boolean>();
+		for (final Modification sp : sps) {
+			IncludedSpecies includedSpecies = clickableMap.getIncludedSpeciesByComplexId(sp.getId(), ent_id);
+			if (includedSpecies == null) {
+				includedSpecies = clickableMap.getIncludedSpeciesByComplexId(sp.getId(), ent_name);
+			}
+			String m_id = includedSpecies != null ? includedSpecies.getId() : sp.getId();
+			if (!marker_map.containsKey(m_id)) {
+				markers.add(m_id);
+				marker_map.put(m_id, true);
 				//System.out.println("oups for key " + sp.getId());
 			}
 		}
@@ -3439,13 +3520,12 @@ public class ProduceClickableMap
 
 	private static final String js_show_markers = onclick_before + "show_markers(";
 	
-	static private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw)
+	private StringBuffer split_complex_for_marker(final Modification modification, final String name, final StringBuffer fw)
 	{
 		final Complex complex = modification.getComplex();
-		if (complex == null)
+		if (complex == null) {
 			fw.append(name);
-		else
-		{
+		} else {
 			boolean first = true;
 			final String csep = ":";
 			composants : for (final String s : name.split(csep))
@@ -3459,10 +3539,12 @@ public class ProduceClickableMap
 				for (final Entity m : complex.getComponents())
 					if (m.getName().trim().replace("(", "").replace(")","").equals(t[0].trim().replace("(", "").replace(")","")))
 					{
-						show_markers_from_map(m, fw);
-//						fw.append('[').append(t[0]).append(']');
-						if (t.length == 2)
+						show_included_markers_from_map(m, fw);
+						//show_markers_from_map(m, fw);
+						//fw.append('[').append(t[0]).append(']');
+						if (t.length == 2) {
 							fw.append(sep).append(t[1]);
+						}
 						continue composants;
 					}
 				Utils.eclipseError("for " + name + " " + complex.getId() + " did not find \"" + t[0] + "\" in");
@@ -3476,7 +3558,12 @@ public class ProduceClickableMap
 		return fw;
 	}
 	
-	private static String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name, Linker wp)
+	private String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name, Linker wp)
+	{
+		return create_entity_bubble(modification, format, post_id, ent, cd, blog_name, wp, "");
+	}
+
+	private String create_entity_bubble(final Modification modification, FormatProteinNotes format, int post_id, EntityBase ent, SbmlDocument cd, String blog_name, Linker wp, String extra_notes)
 	{
 		final ArrayList<Modification> one_mod = new ArrayList<Modification>(1);
 		one_mod.add(null);
@@ -3500,14 +3587,19 @@ public class ProduceClickableMap
 		visible_debug(body_buf, modification.getId());
 		body_buf.append("<br>");
 		final int pos = modification.getName().lastIndexOf('@');
-		if (pos <= 0)
+		if (pos <= 0) {
 			split_complex_for_marker(modification, modification.getName(), body_buf);
-		else
+		} else {
 			split_complex_for_marker(modification, modification.getName().substring(0, pos), body_buf).append("<br>in ").append(modification.getName().substring(pos + 1));
+		}
 		body_buf.append("<br>");
 	
-		format.bubble(body_buf, modification.getNotes(), Arrays.asList(modification), cd, wp);
+		format.bubble(body_buf, modification.getNotes() + extra_notes, Arrays.asList(modification), cd, wp);
 		return body_buf.toString();
+	}
+
+	private void show_included_markers_from_map(EntityBase ent, final StringBuffer fw) {
+		show_markers_from_map(ent.getName(), extract_ids(this, ent), fw);
 	}
 
 	static private void show_markers_from_map(EntityBase ent, final StringBuffer fw)
@@ -5170,7 +5262,7 @@ public class ProduceClickableMap
 
 		if (NV2) {
 			//out.println("  var navicell_module_name = \"" + map_name + "\";");
-			out.println("  window.document.navicell_module_name = \"" + map_name + "\";");
+			out.println("  window.document.navicell_module_name = \"" + blog_name + ":" + map_name + "\";");
 			/*
 			if (USE_JXTREE) {
 				out.println("  load_jxtree(\"" + common_directory_url + "/" + map_name + "_info.json\", \"" + map_name + "\");");
@@ -5214,13 +5306,14 @@ public class ProduceClickableMap
 		
 		if (NV2) {
 			if (USE_JXTREE) {
-				out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", \"" + map_name + "\");");
-				//out.println("    build_entity_tree_when_ready(window, \"" + map_name + "\", \"#" + marker_div_name + "\");");
+				//out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", \"" + map_name + "\");");
+				out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", window.document.navicell_module_name);");
 			}
 		}
 		out.print("    clickmap_start(");
 		out.print(html_quote(blog_name));
-		out.print(html_quote(new StringBuffer(","), map_name).toString());
+		//out.print(html_quote(new StringBuffer(","), map_name).toString());
+		out.print(", window.document.navicell_module_name");
 		out.print(", '#" + marker_div_name + "'");
 		out.print(", '" + map_div_name + "'");
 		if (USE_JXTREE) {
@@ -5249,8 +5342,8 @@ public class ProduceClickableMap
 		out.print(");\n");
 		if (NV2) {
 			out.println("    update_status_tables();");
-			out.println("    heatmap_editor_set_editing(true, undefined, '" + map_name + "');");
-			out.println("    barplot_editor_set_editing(true, undefined, '" + map_name + "');");
+			out.println("    heatmap_editor_set_editing(true, undefined, window.document.navicell_module_name);");
+			out.println("    barplot_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    overlay_init(map);");
 		}
 		out.println("  });\n");
@@ -5425,29 +5518,218 @@ public class ProduceClickableMap
 		}
 	}
 	
-	public void exampleCode(){
+	// IncludedSpecies management
+	HashMap<String, IncludedSpecies> includedSpeciesMap = new HashMap();
+	HashMap<String, ComplexSpecies> complexSpeciesMap = new HashMap();
+
+	class IncludedSpecies {
+		private String id;
+		private String cls;
+		private String ref;
+		private String notes;
+		private double x, y, w, h;
+		private ComplexSpecies complexSpecies;
+
+		public IncludedSpecies(String id, String cls, String ref, String notes) {
+			this.id = id;
+			this.cls = cls;
+			this.ref = ref;
+			this.notes = notes;
+			includedSpeciesMap.put(id, this);
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getRef() {
+			return ref;
+		}
+
+		public double getX() {
+			return this.x;
+		}
+
+		public double getY() {
+			return this.y;
+		}
+
+		public double getW() {
+			return this.w;
+		}
+
+		public double getH() {
+			return this.h;
+		}
+
+		public String getNotes() {
+			return this.notes;
+		}
+
+		public void setPosition(double x, double y, double w, double h) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
+
+		// perharps: not needed
+		public void setComplexSpecies(ComplexSpecies complexSpecies) {
+			this.complexSpecies = complexSpecies;
+		}
+	}
+
+	class ComplexSpecies {
+		private String id;
+		private Vector<IncludedSpecies> includedSpecies = new Vector();
+
+		public ComplexSpecies(String id) {
+			this.id = id;
+		}
+
+		public void addIncludedSpecies(IncludedSpecies species) {
+			includedSpecies.add(species);
+			species.setComplexSpecies(this);
+		}
+
+		public Vector<IncludedSpecies> getIncludedSpecies() {
+			return includedSpecies;
+		} 
+	};
+
+	IncludedSpecies getIncludedSpecies(String id) {
+		return includedSpeciesMap.get(id);
+	}
+
+	IncludedSpecies getIncludedSpeciesByComplexId(String complex_id, String ref) {
+		ComplexSpecies complexSpecies = getComplexSpecies(complex_id);
+		//System.out.println("LOOKING FOR INCLUDED SPECIES " + complex_id + " " + ref);
+		if (complexSpecies != null) {
+			for (IncludedSpecies includedSpecies : complexSpecies.getIncludedSpecies()) {
+				if (includedSpecies.getRef().equals(ref)) {
+					//System.out.println("FOUND !");
+					return includedSpecies;
+				}
+			}
+		}
+		return null;
+	}
+
+	ComplexSpecies getComplexSpecies(String id) {
+		ComplexSpecies complexSpecies = complexSpeciesMap.get(id);
+		if (complexSpecies == null) {
+			complexSpecies = new ComplexSpecies(id);
+			complexSpeciesMap.put(id, complexSpecies);
+		}
+		return complexSpecies;
+	}
+
+	static String getRef(CelldesignerSpeciesIdentity speciesIdentity) {
+		String id = Utils.getValue(speciesIdentity.getCelldesignerProteinReference());
+		if (id != null && id.trim().length() > 0) {
+			return id;
+		}
+		id = Utils.getValue(speciesIdentity.getCelldesignerGeneReference());
+		if (id != null && id.trim().length() > 0) {
+			return id;
+		}
+
+		id = Utils.getValue(speciesIdentity.getCelldesignerRnaReference());
+		if (id != null && id.trim().length() > 0) {
+			return id;
+		}
+		id = Utils.getValue(speciesIdentity.getCelldesignerAntisensernaReference());
+		if (id != null && id.trim().length() > 0) {
+			return id;
+		}
+		id = Utils.getValue(speciesIdentity.getCelldesignerName()); // name not reference
+		if (id != null && id.trim().length() > 0) {
+			return id;
+		}
+		// etc.
+		return "<UNKNOWN>";
+	}
+
+	/*
+	IncludedSpecies makeIncludedSpecies(String id, String cls, String refid, String notes) {
+		IncludedSpecies includedSpecies = new IncludedSpecies(id, cls, refid, notes);
+		includedSpeciesMap.put(id, includedSpecies);
+		return includedSpecies;
+	}
+	*/
+
+	public void buildComplexSpecies() {
+		final Model model = cd.getSbml().getModel();
+		if (model.getAnnotation().getCelldesignerListOfIncludedSpecies() == null) {
+			return;
+		}
+		System.out.println("model4: " + (model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray() == null ? "null" : "ok"));
+		for (CelldesignerSpeciesDocument.CelldesignerSpecies cs : model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
+			ComplexSpecies complexSpecies = getComplexSpecies(Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerComplexSpecies()));
+			complexSpecies.addIncludedSpecies(new IncludedSpecies
+							  (cs.getId(), 
+							   Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()),
+							   getRef(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity()),
+							   Utils.getValue(cs.getCelldesignerNotes()).trim()));
+			/*
+			ids.add(cs.getId());
+			out.println("species: " + cs.getId() + " complex id: " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerComplexSpecies()));
+			out.println("-> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
+			out.println(" notes -> " + Utils.getValue(cs.getCelldesignerNotes()).trim());
+			out.println(" protein -> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()));
+			out.println(" gene -> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()));
+			*/
+		}
+
+		for (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa : model.getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()) {
+			IncludedSpecies includedSpecies = getIncludedSpecies(csa.getSpecies());
+			if (includedSpecies != null) {
+				includedSpecies.setPosition(Double.parseDouble(csa.getCelldesignerBounds().getX()),
+							    Double.parseDouble(csa.getCelldesignerBounds().getY()),
+							    Double.parseDouble(csa.getCelldesignerBounds().getW()),
+							    Double.parseDouble(csa.getCelldesignerBounds().getH()));
+			}
+		}
+	}
+
+	public void exampleCode(PrintStream out){
 		// All complex components positions
 		Vector<String> ids = new Vector<String>();
-		for(CelldesignerSpeciesDocument.CelldesignerSpecies cs: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray())
+		for (CelldesignerSpeciesDocument.CelldesignerSpecies cs: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
 			ids.add(cs.getId());
-		for(CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()){
-			if(ids.contains(csa.getSpecies())){
-				System.out.println(csa.getCelldesignerBounds().getX());
-				System.out.println(csa.getCelldesignerBounds().getY());
-				System.out.println(csa.getCelldesignerBounds().getW());
-				System.out.println(csa.getCelldesignerBounds().getH());
+			out.println("species: " + cs.getId() + " complex id: " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerComplexSpecies()));
+			out.println("-> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()));
+			out.println(" notes -> " + Utils.getValue(cs.getCelldesignerNotes()).trim());
+			out.println(" protein -> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference()));
+			out.println(" gene -> " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference()));
+		}
+		out.println("species length: " + ids.size());
+		for (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa: cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()) {
+			out.println("csa.getSpecies: [" + csa.getSpecies() + "] " + csa.getId() + " " +  csa.getComplexSpeciesAlias());
+			if (ids.contains(csa.getSpecies())) {
+				out.println("contained in ids");
+				//System.out.println(csa.getCelldesignerBounds().getX());
+				//System.out.println(csa.getCelldesignerBounds().getY());
+				//System.out.println(csa.getCelldesignerBounds().getW());
+				//System.out.println(csa.getCelldesignerBounds().getH());
 			}
 		}
 		// This conversion and mapping should be done only once
 		Graph graph = XGMML.convertXGMMLToGraph(CellDesignerToCytoscapeConverter.getXGMMLGraph("", cd.getSbml()));
 		HashMap<String, String> id2name = new HashMap<String, String>();
 		HashMap<String, String> name2id = new HashMap<String, String>();
+		Vector<String> spids = new Vector<String>();
+		Vector<String> rids = new Vector<String>();
+		int sp_cnt = 0, re_cnt = 0;
 		for(Node n: graph.Nodes){
 			if(n.getFirstAttributeValue("CELLDESIGNER_SPECIES")!=null){
 				String spid = n.getFirstAttributeValue("CELLDESIGNER_SPECIES");
 				if(!spid.equals("")){
 					id2name.put(spid, n.Id);
 					name2id.put(n.Id, spid);
+					out.println("PS: " + spid + " -> " + n.Id);
+					spids.add(spid);
+					sp_cnt++;
 				}
 			}
 			if(n.getFirstAttributeValue("CELLDESIGNER_REACTION")!=null){
@@ -5455,29 +5737,49 @@ public class ProduceClickableMap
 				if(!rid.equals("")){
 					id2name.put(rid, n.Id);
 					name2id.put(n.Id, rid);
+					//out.println("RE: " + rid + " -> " + n.Id);
+					rids.add(rid);
+					re_cnt++;
 				}
 			}
 		}
+		out.println("SP: " + sp_cnt + ", RE: " + re_cnt);
 		graph.calcNodesInOut();
 		
 		// Example: for a species, get all reaction ids in which it participates
-		String spid = "s19"; 
-		Node n = graph.getNode(id2name.get(spid));
-		for(Edge e: n.incomingEdges)
-			System.out.println(name2id.get(e.Node1.Id));
-		for(Edge e: n.outcomingEdges)
-			System.out.println(name2id.get(e.Node2.Id));
-		
+		//String spid = "s19"; 
+		//String spids[] = {"s1668", "s396", "s3245", "s399", "s3034", "s1682"};
+		Node n = null;
+		for (String spid : spids) {
+			n = graph.getNode(id2name.get(spid));
+			out.println("reactions in which " + spid + " participates");
+			if (n != null) {
+				out.println("incoming");
+				for(Edge e: n.incomingEdges) {
+					out.println(name2id.get(e.Node1.Id));
+				}
+				out.println("outcoming");
+				for(Edge e: n.outcomingEdges) {
+					out.println(name2id.get(e.Node2.Id));
+				}
+			}
+		}
 		// Example: for a reaction, get all participating species ids 
-		String rid = "re3"; 
-		n = graph.getNode(id2name.get(rid));
-		for(Edge e: n.incomingEdges)
-			System.out.println(name2id.get(e.Node1.Id));
-		for(Edge e: n.outcomingEdges)
-			System.out.println(name2id.get(e.Node2.Id));
-		
-		
-		
+		//String rids[] = {"re13", "re175", "re518", "re481"};
+		for (String rid : rids) {
+			n = graph.getNode(id2name.get(rid));
+			out.println("participants in reaction " + rid);
+			if (n != null) {
+				out.println("incoming");
+				for (Edge e: n.incomingEdges) {
+					out.println(name2id.get(e.Node1.Id));
+				}
+				out.println("outcoming");
+				for (Edge e: n.outcomingEdges) {
+					out.println(name2id.get(e.Node2.Id));
+				}
+			}
+		}
 	}
 	
 }

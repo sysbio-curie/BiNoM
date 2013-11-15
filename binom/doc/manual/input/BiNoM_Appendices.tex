@@ -20,10 +20,23 @@ BiNoM has two built-in visual mappers supporting the visualization of the whole 
 \end{figure}
 
 \subsection{BiNoM Naming Service}\label{BiNoM_Naming_Service}
-When importing pathway information, BiNoM tries to generate meaningful, unique and short names for index entities. This function of the plugin is performed via BiNoM Naming Service. For proteins and other entities, the shortest available synonym is used. For genes, a ‘g’ symbol is added at the beginning of the name, and for RNAs, a ‘r’ symbol is added in order to avoid mixing genes and mRNAs with their products. If this leads to an ambiguity, it is resolved by adding a suffix specifying a unique id of the entity.\\\\
-A chemical species in BiNoM is defined as a physical entity (such as protein) with some cellular localization and some (post-translational) modification (possibly none). The general template of the species label is the following:\\
-Entity1\_name\textbar Modification1\textbar Modification2\textbar…: Entity2\_name\textbar Modifications...[\_active\textbar \_hmN]@compartment\\
-Here, the colon symbol ‘:’ delimitates the different components of a complex if the species has several components. Optional suffixes ‘active’ or ‘hm’ describe active state of the chemical species or N-homodimer state, respectively.\\\\ Several examples of naming chemical species are presented:
+When importing pathway information, BiNoM tries to generate meaningful, unique
+and short names for index entities. This function of the plugin is performed via
+BiNoM Naming Service. For proteins and other entities, the shortest available
+synonym is used. For genes, a ‘g’ symbol is added at the beginning of the name,
+and for RNAs, a ‘r’ symbol is added in order to avoid mixing genes and mRNAs
+with their products. If this leads to an ambiguity, it is resolved by adding a
+suffix specifying a unique id of the entity.\\\\
+A chemical species in BiNoM is defined as a physical entity (such as protein)
+with some cellular localization and some (post-translational) modification
+(possibly none). The general template of the species label is the following:\\
+\begin{tiny}
+Entity1\_name\textbar Modification1\textbar Modification2\textbar…:Entity2\_name\textbar Modifications...[\_active\textbar \_hmN]@compartment\\
+\end{tiny}
+Here, the colon symbol ‘:’ delimitates the different components of a complex if
+the species has several components. Optional suffixes ‘active’ or ‘hm’ describe
+active state of the chemical species or N-homodimer state, respectively.\\\\
+Several examples of naming chemical species are presented:
 \begin{itemize}
 \item Naming chemical species shown in Systems Biology Graphical Notation standard figure~\ref{Names_in_SBGN_standard}
 \item A conversion from CellDesigner figure~\ref{From_CellDesigner_to_Cytoscape}.

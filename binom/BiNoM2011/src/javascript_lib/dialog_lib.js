@@ -19,8 +19,15 @@
  */
 
 
+function nv1() {
+	$("#datatable_input").css("display", "none");
+	$("#right_tabs").css("height", "100%");
+}
+
 $(function() {
-	//$("#marker_checkboxes").tabs();
+	// call nv1() to hide navicell 2 features
+	nv1();
+
 	$("#right_tabs").tabs();
 
 	function build_datatable_import_dialog() {
@@ -2165,3 +2172,4 @@ function update_heatmap_config(doc, params) {
 //
 // -------------------------------------------------------------------------------
 //
+

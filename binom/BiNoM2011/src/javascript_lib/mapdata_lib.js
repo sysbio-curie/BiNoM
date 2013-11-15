@@ -88,6 +88,13 @@ jxtree_mapfun_map['label'] = function(datanode) {
 	if (datanode.name) {
 		return datanode.name;
 	}
+	if (!datanode.label) {
+		console.log("NULL LABEL " + datanode + " " + mapSize(datanode));
+		for (var key in datanode) {
+			console.log(key + " -> " + datanode[key].length);
+		}
+		return datanode["class"];
+	}
 	return datanode.label;
 }
 
@@ -112,10 +119,10 @@ jxtree_mapfun_map['data'] = function(datanode) {
 		return datanode.data;
 	}
 	if (datanode.id) {
-		return {id: datanode.id, cls: datanode["class"], modifs: datanode.modifs};
+		return {id: datanode.id, cls: datanode["class"], modifs: datanode.modifs, included: datanode.a};
 	}
 	if (datanode.name) {
-		return {id: datanode.name, cls: datanode["class"], modifs: datanode.modifs};
+		return {id: datanode.name, cls: datanode["class"], modifs: datanode.modifs, included: datanode.a};
 	}
 	return null;
 }
@@ -148,13 +155,13 @@ function jxtree_mapfun(datanode, field) {
 	return mapfun ? mapfun(datanode) : null;
 }
 
-function jxtree_get_node_class(node) {
+function jxtree_get_node_class(node, included) {
 	var data = node.getUserData();
 	if (data && data.cls) {
-		return data.cls;
+		return data.cls + (included ? ":INCLUDED" : "");
 	}
 	if (node.getParent()) {
-		return jxtree_get_node_class(node.getParent());
+		return jxtree_get_node_class(node.getParent(), included || data.included);
 	}
 	return null;
 }
@@ -208,6 +215,7 @@ function Mapdata(to_load_count) {
 }
 
 var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>", "g");
+var time_cnt = 0;
 
 Mapdata.prototype = {
 	// Mapdata for each module
@@ -218,6 +226,7 @@ Mapdata.prototype = {
 	module_jxtree: {},
 	module_res_jxtree: {},
 	module_classes: {},
+	module_ckmap: {},
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
@@ -240,7 +249,8 @@ Mapdata.prototype = {
 		jxtree.userFind(user_find);
 	},
 
-	findJXTree: function(module_name, to_find, no_ext, action, hints) {
+	findJXTree: function(win, to_find, no_ext, action, hints) {
+		var module_name = win.document.navicell_module_name;
 		var mapdata = this;
 		this.whenInfoReady(module_name, function() {
 			var jxtree = mapdata.module_jxtree[module_name];
@@ -284,9 +294,11 @@ Mapdata.prototype = {
 				tree_context_epilogue(res_jxtree.context);
 
 
-				//$("#right_tabs").tabs("option", "active", 2);
-				$("#right_tabs").tabs("option", "active", 1);
-				$("#result_tree_header").html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+				if (win == window) { // kludge because bug
+					$("#right_tabs", win.document).tabs("option", "active", 1);
+				}
+				time_cnt++;
 				mapdata.module_res_jxtree[module_name] = res_jxtree;
 			}
 		});
@@ -333,6 +345,9 @@ Mapdata.prototype = {
 
 	whenReady: function(module_name, f) {
 		var ready = this.ready[module_name];
+		if (!ready) {
+			console.log("ARG for [" + module_name + "]");
+		}
 		ready.then(f);
 	},
 
@@ -361,12 +376,23 @@ Mapdata.prototype = {
 		win.console.log("building tree for " + module_name + " " + div_name + " " + $(div_name, win.document).get(0));
 
 		var datatree;
-		if (module_name == "master") {
-			if (!this.maps_modules) {
-				this.maps_modules = data[data.length-1];
+		//if (module_name == "master") {
+		win.console.log("children: " + mapSize(data));
+		if (module_name.match(/master$/)) {
+			//if (!this.maps_modules) {
+			//this.maps_modules = data[data.length-1];
+			//data.pop();
+			//}
+			//datatree = [this.maps_modules, {name: 'Entities', children: data}];
+			// warning: I think this leads to a bug...
+			var maps_modules = data[data.length-1];
+			var cls = maps_modules["class"];
+			if (cls == "MAP" || cls == "MODULE") {
 				data.pop();
+				datatree = [maps_modules, {name: 'Entities', children: data}];
+			} else {
+				datatree = {name: 'Entities', children: data};
 			}
-			datatree = [this.maps_modules, {name: 'Entities', children: data}];
 		} else {
 			datatree = {name: 'Entities', children: data};
 		}
@@ -377,6 +403,7 @@ Mapdata.prototype = {
 		});
 
 		jxtree.userFind(jxtree_user_find);
+		win.console.log("JXTREE count: " + jxtree.getNodeCount());
 
 		jxtree.context = {};
 
@@ -427,7 +454,6 @@ Mapdata.prototype = {
 				
 		});
 	},
-
 
 	setBubbleContent: function(bubble, module_name, data_id) {
 		var bubble_content = this.getBubble(module_name, data_id);
@@ -490,13 +516,21 @@ Mapdata.prototype = {
 					if (modif_arr) {
 						for (var kk = 0; kk < modif_arr.length; ++kk) {
 							var modif = modif_arr[kk];
+							var o_modif = this.module_mapdata_by_id[module_name][modif.id];
+							/*
+							if (modif.positions && o_modif && o_modif.positions) {
+								console.log("WARNING: should compare positions " + ckmap[modif.id] + " " + modif.positions[0].x + " " + o_modif.positions[0].x);
+							}
+							*/
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
 							if (modif.positions) {
 								ckmap[modif.id] = [];
 								for (var ll = 0; ll < modif.positions.length; ++ll) {
 									var pos = modif.positions[ll];
-									var box = [pos.x, pos.w, pos.y, pos.h];
-									ckmap[modif.id].push(box);
+									if (pos.w && pos.h) {
+										var box = [pos.x, pos.w, pos.y, pos.h];
+										ckmap[modif.id].push(box);
+									}
 								}
 							}
 						}
@@ -508,11 +542,12 @@ Mapdata.prototype = {
 		}
 	
 		console.log("module map added " + module_name);
-		// warning, overlay is not a shared object => problems with several tabs
-		if (typeof overlay != 'undefined') {
-			overlay.addCKMap(module_name, ckmap);
-		}
+		this.module_ckmap[module_name] = ckmap;
 		return !--this.to_load_count;
+	},
+
+	getCKMap: function(module_name) {
+		return this.module_ckmap[module_name];
 	},
 
 	load_mapdata: function(url, module_name) {
@@ -1765,7 +1800,7 @@ Datatable.prototype = {
 		//console.log("arrpos: " + arrpos.length);
 		if (display_markers) {
 			if (navicell.mapdata.getJXTree(win.document.navicell_module_name)) {
-				navicell.mapdata.findJXTree(win.document.navicell_module_name, id_arr, true, 'select');
+				navicell.mapdata.findJXTree(win, id_arr, true, 'select');
 			} else {
 				win.show_markers(id_arr);
 			}

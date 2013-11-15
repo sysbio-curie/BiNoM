@@ -32,7 +32,14 @@ function JXTreeMatcher(pattern, hints) {
 	var cls_patterns = pattern.split("/");
 	if (cls_patterns.length == 2) {
 		pattern = cls_patterns[0].trim();
-		this.cls_only = cls_patterns[1].trim().toUpperCase().split("|");
+		var cls_only_pattern = cls_patterns[1].trim().toUpperCase();
+		if (cls_only_pattern[0] == '!') {
+			this.cls_only_is_not = true;
+			cls_only_pattern = cls_only_pattern.substr(1);
+			this.cls_only = cls_only_pattern.split("&");
+		} else {
+			this.cls_only = cls_only_pattern.split("|");
+		}
 	}
 
 	var patterns = pattern.split(",");
@@ -333,15 +340,26 @@ JXTreeNode.prototype = {
 	match: function(matcher) {
 		if (matcher.cls_only) {
 			var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
-			var found = false;
-			for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
-				if (node_cls == matcher.cls_only[nn]) {
-					found = true;
-					break;
+			console.log("is_not: " + matcher.cls_only_is_not);
+			if (matcher.cls_only_is_not) {
+				for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
+					var cls_only = matcher.cls_only[nn].trim();
+					if (node_cls == cls_only) {
+						return false;
+					}
 				}
-			}
-			if (!found) {
-				return false;
+			} else {
+				var found = false;
+				for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
+					var cls_only = matcher.cls_only[nn].trim();
+					if (node_cls == cls_only) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					return false;
+				}
 			}
 		}
 

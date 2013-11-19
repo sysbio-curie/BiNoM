@@ -41,8 +41,7 @@ function is_included(box, clicked_boundbox) {
 		box[1] >= clicked_boundbox[1] && box[1]+box[3] <= clicked_boundbox[1]+clicked_boundbox[3];
 }
 
-function event_ckmap(e, e2, type) {
-	var button = window.event.button; // TBD: window is not correct, depends on tab
+function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
 
@@ -112,6 +111,7 @@ function event_ckmap(e, e2, type) {
 					found = true;
 					break;
 				} else if (type == 'mouseup') {
+					var button = (window.event ? window.event : overlay.event.button);
 					if (button == 2) {
 						console.log("right button");
 					}
@@ -163,8 +163,13 @@ USGSOverlay.prototype.onAdd = function() {
 //	google.maps.event.addListener(this.getMap(), 'bounds_changed', simpleBindShim(this, this.resize));
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
 
+	var overlay = this;
+	this.getMap().getDiv().onclick = function(event) {
+		overlay.event = event;
+	}
+
 	google.maps.event.addListener(this.getMap(), 'mouseup', function(e, e2) {
-		event_ckmap(e, e2, 'mouseup');
+		event_ckmap(e, e2, 'mouseup', overlay);
 	});
 
 	google.maps.event.addListener(this.getMap(), 'click', function(e, e2) {
@@ -193,7 +198,7 @@ USGSOverlay.prototype.onAdd = function() {
 				break;
 			}
 		}
-		event_ckmap(e, e2, 'click');
+		event_ckmap(e, e2, 'click', overlay);
 	});
 
 	// ....
@@ -217,7 +222,7 @@ USGSOverlay.prototype.onAdd = function() {
 		}
 
 		if (!found) {
-			event_ckmap(e, e2, 'mouseover');
+			event_ckmap(e, e2, 'mouseover', overlay);
 		}
 	});
 	this.setMap(this.map_);
@@ -380,3 +385,4 @@ USGSOverlay.prototype.onRemove = function() {
 	this.div_.parentNode.removeChild(this.div_);
 	this.div_ = null;
 }
+

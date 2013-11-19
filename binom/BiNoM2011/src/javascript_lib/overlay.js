@@ -22,6 +22,7 @@
 //var MAX_SCREEN_HEIGHT = 1200;
 var MAX_SCREEN_WIDTH = 2500;
 var MAX_SCREEN_HEIGHT = 2000;
+var ESP_LATLNG = 0.01;
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
@@ -30,6 +31,7 @@ function overlay_init(map) {
 }
 
 function USGSOverlay(map) {
+	this.win = window;
 	this.map_ = map;
 	this.div_ = null;
 	this.setMap(map);
@@ -52,6 +54,7 @@ function event_ckmap(e, e2, type, overlay) {
 
 	var found = false;
 	var module_name = window.document.navicell_module_name;
+	//console.log("module_name: " + module_name + " vs. " + overlay.win.document.navicell_module_name);
 	var jxtree = navicell.mapdata.getJXTree(module_name);
 	var ckmap = navicell.mapdata.getCKMap(module_name);
 	var clicked_node = null;
@@ -81,37 +84,13 @@ function event_ckmap(e, e2, type, overlay) {
 						}
 						clicked_boundbox = box;
 						clicked_node = node;
-						/*
-						var is_checked = node.isChecked();
-						if (is_checked) {
-							node.checkSubtree(JXTree.UNCHECKED);
-						} else {
-							node.checkSubtree(JXTree.CHECKED);
-							node.openSupertree(JXTree.OPEN);
-						}
-						is_checked = node.isChecked();
-						var clickmap_tree_node = node.getUserData().clickmap_tree_node;
-						if (clickmap_tree_node) {
-							$.each(clickmap_tree_node.markers, function() {
-								console.log("clicking: " + this.context.id + " vs. " + id);
-								if (this.context.id == id) {
-									if (is_checked) {
-										bubble_open(this);
-									} else {
-										bubble_close(this);
-									}
-								}
-							});
-						}
-						//found = true;
-						//break;
-						*/
 					}
 				} else if (type == 'mouseover') {
 					found = true;
 					break;
 				} else if (type == 'mouseup') {
-					var button = (window.event ? window.event : overlay.event.button);
+					//var button = (window.event ? window.event : overlay.event.button);
+					var button = overlay.event ? overlay.event.button : 0;
 					if (button == 2) {
 						console.log("right button");
 					}
@@ -134,13 +113,21 @@ function event_ckmap(e, e2, type, overlay) {
 		}
 		is_checked = node.isChecked();
 		var clickmap_tree_node = node.getUserData().clickmap_tree_node;
+		var latlng = mapProjection.fromPointToLatLng(clicked_boundbox.gpt);
 		if (clickmap_tree_node) {
 			$.each(clickmap_tree_node.markers, function() {
-				//console.log("clicking: " + this.context.id + " vs. " + id);
-				if (is_checked) {
-					bubble_open(this);
+				var diff_lat = Math.abs(latlng.lat() - this.getPosition().lat());
+				var diff_lng = Math.abs(latlng.lng() - this.getPosition().lng());
+				
+				if (diff_lat <= ESP_LATLNG && diff_lng <= ESP_LATLNG) {
+					//console.log("included");
+					if (is_checked) {
+						bubble_open(this);
+					} else {
+						bubble_close(this);
+					}
 				} else {
-					bubble_close(this);
+					//console.log("NOT included");
 				}
 			});
 		}

@@ -676,10 +676,16 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
     			var val = $(this).val().trim();
 			if (use_jxtree) {
 				//navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'select');
-				if (val != "/?") {
-					$("#right_tabs", window.document).tabs("option", "active", 1);
+				if (val == '@nv2') {
+					nv2();
+				} else if (val == '@nv1') {
+					nv1();
+				} else {
+					if (val != "/?") {
+						$("#right_tabs", window.document).tabs("option", "active", 1);
+					}
+					navicell.mapdata.findJXTree(window, val, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});
 				}
-				navicell.mapdata.findJXTree(window, val, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});
 			}
 			
 		}

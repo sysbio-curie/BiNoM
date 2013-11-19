@@ -24,6 +24,11 @@ function nv1() {
 	$("#right_tabs").css("height", "100%");
 }
 
+function nv2() {
+	$("#datatable_input").css("display", "block");
+	$("#right_tabs").css("height", "59.5%");
+}
+
 $(function() {
 	var OPEN_DRAWING_EDITOR = true;
 	// call nv1() to hide navicell 2 features

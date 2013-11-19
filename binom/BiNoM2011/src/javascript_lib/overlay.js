@@ -72,7 +72,7 @@ function event_ckmap(e, e2, type) {
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
 				if (type == 'click') {
-					console.log("click ID " + id);
+					//console.log("click ID " + id);
 					var node = jxtree.getNodeByUserId(id);
 					if (node) {
 						if (clicked_boundbox) {
@@ -136,7 +136,7 @@ function event_ckmap(e, e2, type) {
 		var clickmap_tree_node = node.getUserData().clickmap_tree_node;
 		if (clickmap_tree_node) {
 			$.each(clickmap_tree_node.markers, function() {
-				console.log("clicking: " + this.context.id + " vs. " + id);
+				//console.log("clicking: " + this.context.id + " vs. " + id);
 				if (is_checked) {
 					bubble_open(this);
 				} else {

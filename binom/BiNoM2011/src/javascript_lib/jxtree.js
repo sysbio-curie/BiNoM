@@ -18,27 +18,113 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=name\nin=annot\nin=all\nop=eq\nop=neq\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=name\nxp rbx /in=name;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=name;class=protein,gene\n";
+
 function JXTreeMatcher(pattern, hints) {
 	pattern = pattern.trim();
+
+	if (pattern == "/?") {
+		this.help = JXTREE_HELP;
+		return null;
+	}
 
 	if (!hints) {
 		hints = {};
 	}
+
 	this.hints = hints;
 	this.search_user_find = !hints.no_search_user_find;
 	this.search_label = !hints.no_search_label;
 	this.case_sensitive = !hints.case_sensitive ? "i" : "";
+	this.search_not = hints.search_not;
 
-	var cls_patterns = pattern.split("/");
-	if (cls_patterns.length == 2) {
-		pattern = cls_patterns[0].trim();
-		var cls_only_pattern = cls_patterns[1].trim().toUpperCase();
-		if (cls_only_pattern[0] == '!') {
-			this.cls_only_is_not = true;
-			cls_only_pattern = cls_only_pattern.substr(1);
-			this.cls_only = cls_only_pattern.split("&");
-		} else {
-			this.cls_only = cls_only_pattern.split("|");
+	var tokens = pattern.split("/");
+	this.class_filters = [];
+	this.error = "";
+	if (tokens.length == 2) {
+		pattern = tokens[0].trim();
+		var ori_mod_pattern = tokens[1].trim();
+		if (ori_mod_pattern == "?") {
+			this.help = JXTREE_HELP;
+			return null;
+		}
+		var mod_pattern = ori_mod_pattern.toUpperCase();
+		var mod_pattern_items = mod_pattern.split(";");
+		for (var nn = 0; nn < mod_pattern_items.length; ++nn) {
+			var mod_pattern_item = mod_pattern_items[nn].trim();
+			if (!mod_pattern_item) {
+				continue;
+			}
+			var mm = mod_pattern_item.split("=");
+			if (mm.length != 2) {
+				this.error = "\"/" + ori_mod_pattern + "\"";
+				break;
+			}
+			var mod = mm[0].trim();
+			var what = mm[1].trim();
+			if (mod == "OP") {
+				if (what == "NEQ") {
+					this.search_not = true;
+				} else if (what == "EQ") {
+					this.search_not = false;
+				} else {
+					this.error = "\"/" + ori_mod_pattern + "\" : expected eq or neq after op=, got " + what;
+					break;
+				}
+			} else if (mod == "IN" || mod == "@") {
+				if (what == "NAME") {
+					this.search_label = true;
+					this.search_user_find = false;
+				} else if (what == "ANNOT") {
+					this.search_label = false;
+					this.search_user_find = true;
+				} else if (what == "ALL") {
+					this.search_user_find = true;
+					this.search_label = true;
+				} else {
+					this.error = "\"/" + ori_mod_pattern + "\" : expected name, annot or all after in=, got " + what;
+					break;
+				}
+			} else {
+				if (mod == "CLASS" || mod == "CLASS!") {
+					var class_filter = {};
+					class_filter.is_not = mod[mod.length-1] == "!";
+					class_filter.classes = what.split(",");
+					// should check class names
+					this.class_filters.push(class_filter);
+					if (hints.class_list) {
+						for (var kk = 0; kk < class_filter.classes.length; ++kk) {
+							var cls = class_filter.classes[kk];
+							if (cls == "ALL") {
+								continue;
+							}
+							var found = false;
+							for (var cls2 in hints.class_list) {
+								if (cls == cls2) {
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								this.error = "Invalid modificator \"/" + ori_mod_pattern + "\" : unknown class \"" + cls + "\"\n\n";
+								this.error += "Valid classes are:\n"
+								for (var cls2 in hints.class_list) {
+									this.error += cls2 + "\n";
+								}
+								return null;
+							}
+						}
+					}
+				} else {
+					this.error = "\"/" + ori_mod_pattern + "\" : expected name, annot or all after in=, got " + what;
+					break;
+				}
+			}
+		}
+		if (this.error) {
+			this.error = "Invalid modificator: " + this.error + "\n\n";
+			this.error += JXTREE_HELP;
+			return;
 		}
 	}
 
@@ -255,6 +341,13 @@ JXTree.prototype = {
 		pattern = pattern.trim();
 		//var regex = new RegExp(pattern, "i");
 		var matcher = new JXTreeMatcher(pattern, hints);
+		if (matcher.error || matcher.help) {
+			if (hints) {
+				hints.error = matcher.error;
+				hints.help = matcher.help;
+			}
+			return null;
+		}
 		var nodes = [];
 		if (pattern) {
 			var user_find = this.user_find;
@@ -285,12 +378,23 @@ JXTree.prototype = {
 				node_map[nodes[nn].getId()] = true;
 			}
 			var jxsubtree = this.clone(node_map);
+			console.log("jxtree cloned [" + $(hints.div).attr("id") + "]");
 			if (hints && hints.div) {
-				$(hints.div).html("");
+				if (true) {
+					$(hints.div).empty();
+					console.log("tree is empty");
+				} else {
+					var div_id = $(hints.div).attr("id");
+					var parent = $(hints.div).parent();
+					$(hints.div).remove();
+					parent.append("<div id='" + div_id + "'></div>");
+					hints.div = $("#" + div_id).get(0);
+				}
 				jxsubtree.complete(null, hints.div);
 				for (var nn = 0; nn < jxsubtree.roots.length; ++nn) {
 					jxsubtree.roots[nn].openSubtree(JXTree.OPEN);
 				}
+				console.log("subtree is opened");
 			}
 			jxsubtree.userFind(this.user_find);
 			jxsubtree.checkStateChanged(this.check_state_changed);
@@ -338,43 +442,48 @@ JXTreeNode.prototype = {
 	},
 
 	match: function(matcher) {
-		if (matcher.cls_only) {
-			var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
-			console.log("is_not: " + matcher.cls_only_is_not);
-			if (matcher.cls_only_is_not) {
-				for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
-					var cls_only = matcher.cls_only[nn].trim();
-					if (node_cls == cls_only) {
+		if (matcher.class_filters.length) {
+			for (var jj = 0; jj < matcher.class_filters.length; ++jj) {
+				var class_filter = matcher.class_filters[jj];
+				var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
+				if (node_cls.match(/:INCLUDED/, "i")) {
+					node_cls = node_cls.replace(/:INCLUDED/, "");
+				}
+				if (class_filter.is_not) {
+					for (var nn = 0; nn < class_filter.classes.length; ++nn) {
+						var cls = class_filter.classes[nn].trim();						
+						if (cls == "ALL" || node_cls == cls) {
+							return false;
+						}
+					}
+				} else {
+					var found = false;
+					for (var nn = 0; nn < class_filter.classes.length; ++nn) {
+						var cls = class_filter.classes[nn].trim();						
+						if (cls == "ALL" || node_cls == cls) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
 						return false;
 					}
-				}
-			} else {
-				var found = false;
-				for (var nn = 0; nn < matcher.cls_only.length; ++nn) {
-					var cls_only = matcher.cls_only[nn].trim();
-					if (node_cls == cls_only) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					return false;
 				}
 			}
 		}
 
 		if (matcher.search_label) {
 			if (matcher.match(this.label)) {
-				return true;
+				return matcher.search_not ? false : true;
 			} 
 		}
 
 		if (matcher.search_user_find) {
 			if (this.jxtree.user_find && this.jxtree.user_find(matcher, this)) {
-				return true;
+				return matcher.search_not ? false : true;
 			}
 		}
-		return false;
+		return matcher.search_not ? true : false;
 
 	},
 

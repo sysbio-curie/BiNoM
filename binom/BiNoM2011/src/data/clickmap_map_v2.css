@@ -751,9 +751,13 @@ div.tablesorterPager input {
     font-size: small;
 }
 
-#confirm_dialog {
+#confirm_dialog, #info_dialog {
     font-size: 80%;
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+}
+
+#info_dialog h3 {
+    text-align: center;
 }
 
 #loading-jxtree {

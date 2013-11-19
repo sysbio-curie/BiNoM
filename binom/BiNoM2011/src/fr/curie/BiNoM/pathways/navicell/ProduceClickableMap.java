@@ -5385,7 +5385,7 @@ public class ProduceClickableMap
 		out.print("&nbsp;");
 		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\" title=\"help\"/>");
 
-		out.println("&nbsp;<input type='text' size='24' id='query_text' style='font-size: small'/>");
+		out.println("&nbsp;<input type='text' size='32' id='query_text' style='font-size: small'/>");
 		header_right.close();
 		header.close();
 
@@ -5433,6 +5433,8 @@ public class ProduceClickableMap
 		}
 		
 		out.println("<div id='confirm_dialog' title='Warning'>");
+		out.println("</div>");
+		out.println("<div id='info_dialog' title=''>");
 		out.println("</div>");
 		out.println("</body>");
 		out.println("</html>");

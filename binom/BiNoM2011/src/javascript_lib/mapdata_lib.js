@@ -227,6 +227,7 @@ Mapdata.prototype = {
 	module_res_jxtree: {},
 	module_classes: {},
 	module_ckmap: {},
+	class_list: {},
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
@@ -249,12 +250,88 @@ Mapdata.prototype = {
 		jxtree.userFind(user_find);
 	},
 
+	// no effect... should fixed that
+	searchFor: function(win, what, div) {
+		if (what.trim() == "/?") {
+			return;
+		}
+		$("#result_tree_header", win.document).html("Searching for \"" + what + "\"...");
+		if (div) {
+			$(div, win.document).css("display", "none");
+		}
+	},
+
+	//findJXTreeContinue: function(jxtree, to_find, no_ext, win, action, hints, module_name) {
+	findJXTreeContinue: function(win, to_find, no_ext, action, hints) {
+		var module_name = win.document.navicell_module_name;
+		var mapdata = this;
+		var jxtree = mapdata.module_jxtree[module_name];
+
+		if (no_ext) {
+			var user_find = mapdata.useJXTreeSimpleFind(jxtree);
+			res_jxtree = jxtree.find(to_find, action, hints);
+			mapdata.restoreJXTreeFind(jxtree, user_find);
+		} else {
+			res_jxtree = jxtree.find(to_find, action, hints);
+		}
+
+		if (res_jxtree == null) {
+			if (hints.error || hints.help) {
+				var dialog = $("#info_dialog", win.document);
+				var msg = hints.error ? hints.error : hints.help;
+				var title = hints.error ? "Searching Error" : "Search Help";
+				dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
+				dialog.dialog({
+					resizable: true,
+					width: 430,
+					height: 660,
+					modal: true,
+					title: title,
+					buttons: {
+						"OK": function() {
+							$(this).dialog("close");
+						}
+					}
+				});
+			}
+			return;
+		}
+
+		if (action == 'subtree' && res_jxtree) {
+			console.log("here");
+			$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+
+			uncheck_all_entities(win);
+
+			res_jxtree.context = {win: win};
+
+			tree_context_prologue(res_jxtree.context);
+			$.each(res_jxtree.getRootNodes(), function() {
+				this.checkSubtree(JXTree.CHECKED);
+				this.showSubtree(JXTree.OPEN);
+			});
+			tree_context_epilogue(res_jxtree.context);
+
+			if (hints.div) {
+				$(hints.div, win.document).css("display", "block");
+			}
+
+			time_cnt++;
+			mapdata.module_res_jxtree[module_name] = res_jxtree;
+		}
+	},
+
 	findJXTree: function(win, to_find, no_ext, action, hints) {
 		var module_name = win.document.navicell_module_name;
 		var mapdata = this;
+		if (!hints) {
+			hints = {};
+		}
+		hints.class_list = this.class_list;
 		this.whenInfoReady(module_name, function() {
 			var jxtree = mapdata.module_jxtree[module_name];
 			var res_jxtree = null;
+			// so ?
 			if (no_ext) {
 				var to_find_str = "^(";
 				for (var nn = 0; nn < to_find.length; ++nn) {
@@ -265,27 +342,59 @@ Mapdata.prototype = {
 				}
 				to_find_str += ")$";
 				console.log("to_find_str [" + to_find_str + "]");
-				if (!hints) {
-					hints = {};
-				}
 				hints.case_sensitive = true;
+				mapdata.searchFor(win, to_find_str, hints.div);
+				//mapdata.findJXTreeContinue(jxtree, to_find_str, no_ext, win, action, hints, module_name);
+				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints);
+				/*
 				var user_find = mapdata.useJXTreeSimpleFind(jxtree);
 				res_jxtree = jxtree.find(to_find_str, action, hints);
 				mapdata.restoreJXTreeFind(jxtree, user_find);
+				*/
 			} else {
-				res_jxtree = jxtree.find(to_find, action, hints);
-			}
-			if (action == 'subtree' && res_jxtree) {
+				mapdata.searchFor(win, to_find, hints.div);
+				setTimeout(function() {
+					//mapdata.findJXTreeContinue(jxtree, to_find, no_ext, win, action, hints, module_name);
+					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
+				}, 20);
 				/*
-				if (mapdata.module_res_jxtree[module_name]) {
-					$.each(mapdata.module_res_jxtree[module_name].getRootNodes(), function() {
-						this.checkSubtree(JXTree.UNCHECKED);
+				  res_jxtree = jxtree.find(to_find, action, hints);
+				*/
+			}
+
+			return;
+
+			/*
+			if (res_jxtree == null) {
+				if (hints.error || hints.help) {
+					var dialog = $("#info_dialog", win.document);
+					var msg = hints.error ? hints.error : hints.help;
+					var title = hints.error ? "Searching Error" : "Search Help";
+					dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
+					dialog.dialog({
+						resizable: true,
+						width: 430,
+						height: 660,
+						modal: true,
+						title: title,
+						buttons: {
+							"OK": function() {
+								$(this).dialog("close");
+							}
+						}
 					});
 				}
-				*/
+				return;
+			}
+
+			if (action == 'subtree' && res_jxtree) {
+				console.log("here");
+				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+
 				uncheck_all_entities();
 
 				res_jxtree.context = {};
+
 				tree_context_prologue(res_jxtree.context);
 				$.each(res_jxtree.getRootNodes(), function() {
 					this.checkSubtree(JXTree.CHECKED);
@@ -293,14 +402,10 @@ Mapdata.prototype = {
 				});
 				tree_context_epilogue(res_jxtree.context);
 
-
-				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
-				if (win == window) { // kludge because bug
-					$("#right_tabs", win.document).tabs("option", "active", 1);
-				}
 				time_cnt++;
 				mapdata.module_res_jxtree[module_name] = res_jxtree;
 			}
+			*/
 		});
 	},
 
@@ -356,21 +461,23 @@ Mapdata.prototype = {
 		ready.then(f);
 	},
 
-	buildEntityTreeWhenReady: function(win, map, div_name, projection, whenloaded) {
+	buildEntityTreeWhenReady: function(win, div_name, projection, whenloaded) {
+		var map = win.map;
 		var module_name = map.map_name;
 		win.console.log("buildEntityTreeWhenReady module_name: " + module_name);
 		if (this.isReady(module_name)) {
-			this.buildEntityTree(win, map, div_name, projection, whenloaded);
+			this.buildEntityTree(win, div_name, projection, whenloaded);
 		} else {
 			var mapdata = this;
 			this.whenReady(module_name, function() {
-				mapdata.buildEntityTree(win, map, div_name, projection, whenloaded);
+				mapdata.buildEntityTree(win, div_name, projection, whenloaded);
 			});
 		}
 	},
 
-	buildEntityTree: function(win, map, div_name, projection, whenloaded) {
+	buildEntityTree: function(win, div_name, projection, whenloaded) {
 		//var module_map = this.module_mapdata[module_name];
+		var map = win.map;
 		var module_name = map.map_name;
 		var data = this.straight_data[module_name];
 		win.console.log("building tree for " + module_name + " " + div_name + " " + $(div_name, win.document).get(0));
@@ -405,14 +512,14 @@ Mapdata.prototype = {
 		jxtree.userFind(jxtree_user_find);
 		win.console.log("JXTREE count: " + jxtree.getNodeCount());
 
-		jxtree.context = {};
+		jxtree.context = {win: win};
 
 		jxtree.onClickBefore(function(node, checked) {
-			win.tree_node_click_before(node.jxtree.context, map, checked);
+			win.tree_node_click_before(node.jxtree.context, checked);
 		});
 
 		jxtree.onClickAfter(function(node, checked) {
-			win.tree_node_click_after(node.jxtree.context, map, checked);
+			win.tree_node_click_after(node.jxtree.context, checked);
 		});
 
 		this.deferred_module_bubble[module_name] = {};
@@ -487,6 +594,9 @@ Mapdata.prototype = {
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
+			if (module_mapdata[ii]["class"]) {
+				this.class_list[module_mapdata[ii]["class"]] = true;
+			}
 			//console.log("modules " + modules + " " + entities + " " + module_mapdata[ii]["class"]);
 			//console.log(module_mapdata[ii]["class"]);
 			if (modules) {
@@ -1355,6 +1465,14 @@ HeatmapConfig.prototype = {
 		this.datatables = new_datatables;
 	},
 
+	getDatatableCount: function() {
+		return this.datatables.length;
+	},
+
+	getSampleOrGroupCount: function() {
+		return this.samples_or_groups.length;
+	},
+
 	setDatatableAt: function(idx, datatable) {
 		if (idx >= this.datatables.length) {
 			this.datatables.length = idx+1;
@@ -1846,7 +1964,8 @@ Datatable.prototype = {
 
 	epilogue: function() {
 		var tab_body = $("#dt_datatable_tabs");
-		if (!this.isLarge()) {
+		if (true) {
+		} else if (!this.isLarge()) {
 			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 			this.data_div = $("#dt_datatable_id" + this.id);
 			this.data_table = $("#dt_datatable_table_id" + this.id);
@@ -1878,6 +1997,8 @@ Datatable.prototype = {
 	},
 
 	isLarge: function() {
+		return true;
+
 		return !this.force_display && mapSize(this.sample_index) * mapSize(this.gene_index) > MAX_MATRIX_SIZE;
 	},
 
@@ -1950,6 +2071,7 @@ Datatable.prototype = {
 	},
 
 	makeDataTable_genes: function() {
+		console.log("makedatatable !");
 		this.switch_button.val("Switch to Samples / Genes");
 		var str = "<thead><th>Genes</th>";
 		for (var sample_name in this.sample_index) {
@@ -1997,6 +2119,7 @@ Datatable.prototype = {
 	},
 
 	makeDataTable_samples: function() {
+		console.log("makedatatable !");
 		this.switch_button.val("Switch to Genes / Samples");
 		var str = "<thead><th>Samples</th>";
 		for (var gene_name in this.gene_index) {
@@ -2861,8 +2984,8 @@ function getFG_from_BG(color) {
 	return 0.213 * rgb1 + 0.715 * rgb2 + 0.072 * rgb3 < 0.5 ? 'FFF' : '000';
 }
 
-function build_entity_tree_when_ready(win, map, div_name, projection, whenloaded) {
-	navicell.mapdata.buildEntityTreeWhenReady(win, map, div_name, projection, whenloaded);
+function build_entity_tree_when_ready(win, div_name, projection, whenloaded) {
+	navicell.mapdata.buildEntityTreeWhenReady(win, div_name, projection, whenloaded);
 }
 
 var navicell;

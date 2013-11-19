@@ -71,11 +71,15 @@ function panMapToBounds_jxtree(map, bounds)
 {
 	if (bounds && bounds.length > 0) {
 		var map_bound = map.getBounds();
+		//console.log("map_bounds: " + map_bound);
 		for (var nn = 0; nn < bounds.length; ++nn) {
+			//console.log("bounds[" + nn + "]" + bounds[nn]);
 			if (map_bound.intersects(bounds[nn])) {
 				return;
 			}
 		}
+
+		//console.log("panToBounds: " + bounds[0]);
 		map.panToBounds(bounds[0]);
 	}
 }
@@ -497,6 +501,8 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 	});
 
 	map.setOptions({draggableCursor:'default', draggingCursor: 'move'});
+
+	window.map = map;
 //	console.log(width + " " +  height);
 	
 	var map_type = new google.maps.ImageMapType({
@@ -661,15 +667,18 @@ function start_right_hand_panel(selector, source, map, projection, whenloaded, f
 function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 {
 	var search_field = $('#query_text');
-	var search_label = "\u2002Search (e.g. " + firstEntityName + ")\u00a0";
+	var search_label = "\u2002Search (e.g. " + firstEntityName + ")\u00a0 /? for help";
 	
 	//http://stackoverflow.com/questions/699065/submitting-a-form-on-enter-with-jquery
 	search_field.keypress(function(e) {
 		if (e.which == 13) {
         		search_field.blur();
-    			var val = $(this).val();
+    			var val = $(this).val().trim();
 			if (use_jxtree) {
 				//navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'select');
+				if (val != "/?") {
+					$("#right_tabs", window.document).tabs("option", "active", 1);
+				}
 				navicell.mapdata.findJXTree(window, val, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});
 			}
 			
@@ -685,7 +694,7 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 		}
 	});
 
-	build_entity_tree_when_ready(window, map, selector, projection, whenloaded);
+	build_entity_tree_when_ready(window, selector, projection, whenloaded);
 }
 
 function build_jstree(selector, source, map, projection, whenloaded, firstEntityName)
@@ -1013,17 +1022,22 @@ function show_map_and_markers(map_name, ids)
 	}
 }
 
-function uncheck_all_entities()
+function uncheck_all_entities(win)
 {
+	if (!win) {
+		win = window;
+	}
+
 	if (use_jxtree) {
 		// but... the uncheck could be per tree !
-		var jxtree = navicell.mapdata.getJXTree(window.document.navicell_module_name);
+		console.log("MODULE_NAME: " + win.document.navicell_module_name);
+		var jxtree = navicell.mapdata.getJXTree(win.document.navicell_module_name);
 		if (jxtree) {
 			$.each(jxtree.getRootNodes(), function() {
 				this.checkSubtree(false);
 			});
 		}
-		var res_jxtree = navicell.mapdata.getResJXTree(window.document.navicell_module_name);
+		var res_jxtree = navicell.mapdata.getResJXTree(win.document.navicell_module_name);
 		if (res_jxtree) {
 			$.each(res_jxtree.getRootNodes(), function() {
 				this.checkSubtree(false);
@@ -1033,11 +1047,11 @@ function uncheck_all_entities()
 		jQuery.jstree._reference(jtree).uncheck_all();
 	}
 	
-	$.each(marker_list, function() {
+	$.each(win.marker_list, function() {
 		this.setVisible(false);
 	});
 	
-	$.each(bubble_list, function() {
+	$.each(win.bubble_list, function() {
 		this.close();
 	});
 }
@@ -1141,10 +1155,10 @@ function tree_context_prologue(tree_context) {
 }
 
 function tree_context_epilogue(tree_context) {
-	panMapToBounds_jxtree(map, tree_context.marker_bounds);
+	panMapToBounds_jxtree(tree_context.win.map, tree_context.marker_bounds);
 }
 
-function tree_node_click_before(tree_context, map, checked) {
+function tree_node_click_before(tree_context, checked) {
 	if (!checked) {
 		tree_context_prologue(tree_context);
 		//make_new_markers_old();
@@ -1152,7 +1166,7 @@ function tree_node_click_before(tree_context, map, checked) {
 	}
 }
 
-function tree_node_click_after(tree_context, map, checked) {
+function tree_node_click_after(tree_context, checked) {
 	if (checked) {
 		tree_context_epilogue(tree_context);
 	}

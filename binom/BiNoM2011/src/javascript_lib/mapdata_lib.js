@@ -169,25 +169,27 @@ function jxtree_get_node_class(node, included) {
 // TBD: 2013-10-29: find function to modify !
 // searching perharps not in the good place, and, at least, jxtree find is not correct with nodes
 // must compare to jstree searching !
-/*
-function jxtree_user_find(regex, node) {
-	var data = node.getUserData();
-	if (data && data.id) {
-		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
-		if (info) {
-			return info.match(regex);
-		}
-	}
-	return false;
-}
-*/
 
 function jxtree_user_find(matcher, node) {
 	var data = node.getUserData();
 	if (data && data.id) {
-		var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
-		if (info) {
-			return matcher.match(info);
+		if ((matcher.search_in & JXTreeMatcher.IN_ANNOT) != 0) {
+			var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
+			if (info) {
+				if (matcher.match(info)) {
+					return true;
+				}
+			}
+		}
+		if ((matcher.search_in & JXTreeMatcher.IN_TAG) != 0) {
+			var tag_map = navicell.mapdata.getTagMap(node.jxtree.module_name, data.id);
+			if (tag_map) {
+				for (var tag in tag_map) {
+					if (matcher.match(tag)) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 	return false;
@@ -215,6 +217,7 @@ function Mapdata(to_load_count) {
 }
 
 var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>", "g");
+var TAG_REGEX = new RegExp("\\w+:\\w+", "g");
 var time_cnt = 0;
 
 Mapdata.prototype = {
@@ -222,6 +225,7 @@ Mapdata.prototype = {
 	module_mapdata: {},
 	module_mapdata_by_id: {},
 	module_info: {},
+	module_tag_map: {},
 	module_bubble: {},
 	module_jxtree: {},
 	module_res_jxtree: {},
@@ -284,7 +288,7 @@ Mapdata.prototype = {
 				dialog.dialog({
 					resizable: true,
 					width: 430,
-					height: 660,
+					height: 710,
 					modal: true,
 					title: title,
 					buttons: {
@@ -412,11 +416,22 @@ Mapdata.prototype = {
 	addInfo: function(module_name, info) {
 		this.module_bubble[module_name] = info;
 		var info_map = {};
+		var tag_map = {};
 		for (var id in info) {
-			info_map[id] = info[id].replace(CLEAN_HTML_REGEX, "");
+			//info_map[id] = info[id].replace(CLEAN_HTML_REGEX, "");
+			info_map[id] = info[id].replace(CLEAN_HTML_REGEX, " ");
 			//console.log("info: " + id + " " + info_map[id]);
+			var arr = info_map[id].match(TAG_REGEX);
+			if (arr && arr.length) {
+				var tmap = {};
+				for (var nn = 0; nn < arr.length; ++nn) {
+					tmap[arr[nn]] = 1;
+				}
+				tag_map[id] = tmap;
+			}
 		}
 		this.module_info[module_name] = info_map;
+		this.module_tag_map[module_name] = tag_map;
 		this.info_ready[module_name].resolve();
 	},
 
@@ -424,6 +439,14 @@ Mapdata.prototype = {
 		var info = this.module_info[module_name];
 		if (info) {
 			return info[id];
+		}
+		return null;
+	},
+
+	getTagMap: function(module_name, id) {
+		var tag_map = this.module_tag_map[module_name];
+		if (tag_map) {
+			return tag_map[id];
 		}
 		return null;
 	},

@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=name\nin=annot\nin=all\nop=eq\nop=neq\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=name\nxp rbx /in=name;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=name;class=protein,gene\n";
+var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=label\nin=tag\nin=annot\nin=all\ntoken=word\ntoken=regex\nop=eq\nop=neq\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=label\nxp rbx /in=label;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=label;class=protein,gene\nxp rxb /token=regex;in=all";
 
 function JXTreeMatcher(pattern, hints) {
 	pattern = pattern.trim();
@@ -33,14 +33,19 @@ function JXTreeMatcher(pattern, hints) {
 	}
 
 	this.hints = hints;
-	this.search_user_find = !hints.no_search_user_find;
-	this.search_label = !hints.no_search_label;
+	/*
 	this.case_sensitive = !hints.case_sensitive ? "i" : "";
-	this.search_not = hints.search_not;
+	*/
+	this.search_cs = "i";
+	this.search_token = 0;
+	this.search_in = 0;
+	this.search_not = false;
+	this.search_user_find = false;
 
 	var tokens = pattern.split("/");
 	this.class_filters = [];
 	this.error = "";
+
 	if (tokens.length == 2) {
 		pattern = tokens[0].trim();
 		var ori_mod_pattern = tokens[1].trim();
@@ -71,16 +76,24 @@ function JXTreeMatcher(pattern, hints) {
 					this.error = "\"/" + ori_mod_pattern + "\" : expected eq or neq after op=, got " + what;
 					break;
 				}
+			} else if (mod == "TOKEN") {
+				if (what == "WORD") {
+					this.search_token = JXTreeMatcher.TOKEN_WORD;
+				} else if (what == "REGEX") {
+					this.search_token = JXTreeMatcher.TOKEN_REGEX;
+				} else {
+					this.error = "\"/" + ori_mod_pattern + "\" : expected regex, word or substr after token=, got " + what;
+					break;
+				}
 			} else if (mod == "IN" || mod == "@") {
-				if (what == "NAME") {
-					this.search_label = true;
-					this.search_user_find = false;
+				if (what == "LABEL") {
+					this.search_in |= JXTreeMatcher.IN_LABEL;
 				} else if (what == "ANNOT") {
-					this.search_label = false;
-					this.search_user_find = true;
+					this.search_in |= JXTreeMatcher.IN_ANNOT;
+				} else if (what == "TAG") {
+					this.search_in |= JXTreeMatcher.IN_TAG;
 				} else if (what == "ALL") {
-					this.search_user_find = true;
-					this.search_label = true;
+					this.search_in |= JXTreeMatcher.IN_ALL;
 				} else {
 					this.error = "\"/" + ori_mod_pattern + "\" : expected name, annot or all after in=, got " + what;
 					break;
@@ -128,6 +141,17 @@ function JXTreeMatcher(pattern, hints) {
 		}
 	}
 
+	if (!this.search_in) {
+		this.search_in = JXTreeMatcher.IN_LABEL|JXTreeMatcher.IN_TAG;
+		//this.search_in = JXTreeMatcher.IN_LABEL;
+	}
+	if ((this.search_in & (JXTreeMatcher.IN_TAG|JXTreeMatcher.IN_ANNOT)) != 0) {
+		this.search_user_find = true;
+	}
+	if (!this.search_token) {
+		this.search_token = JXTreeMatcher.TOKEN_WORD;
+	}
+
 	var patterns = pattern.split(",");
 	if (patterns.length > 1) {
 		this.and_search = false;
@@ -139,11 +163,41 @@ function JXTreeMatcher(pattern, hints) {
 	}
 
 	this.regex_arr = [];
-	for (var nn = 0; nn < patterns.length; ++nn) {
-		this.regex_arr.push(new RegExp(patterns[nn].trim(), this.case_sensitive));
+	this.patterns = [];
+	if (this.search_token == JXTreeMatcher.TOKEN_REGEX) {
+		for (var nn = 0; nn < patterns.length; ++nn) {
+			var pattern = patterns[nn].trim();
+			if (pattern) {
+				if (pattern[0] != '^') {
+					pattern = "\\w*" + pattern;
+				}
+				if (pattern[pattern.length-1] != '$') {
+					pattern = pattern + "\\w*";
+				}
+				console.log("regex pattern [" + pattern + "]");
+				this.regex_arr.push(new RegExp("\\b" + pattern + "\\b", this.search_cs));
+			}
+		}
+	} else if (this.search_token == JXTreeMatcher.TOKEN_WORD) {
+		var re = new RegExp("\\*", "g");
+		for (var nn = 0; nn < patterns.length; ++nn) {
+			var pattern = patterns[nn].trim().replace(re, ".*");;
+			if (pattern) {
+				console.log("word pattern [" + patterns[nn].trim() + "] [" + pattern + "]");
+				this.regex_arr.push(new RegExp("\\b" + pattern + "\\b", this.search_cs));
+			}
+		}
 	}
 	//console.log("AND: " + this.and_search + " OR: " + this.or_search);
 }
+
+JXTreeMatcher.TOKEN_WORD = 1;
+JXTreeMatcher.TOKEN_REGEX = 2;
+
+JXTreeMatcher.IN_LABEL = 1;
+JXTreeMatcher.IN_TAG = 2;
+JXTreeMatcher.IN_ANNOT = 4;
+JXTreeMatcher.IN_ALL = (JXTreeMatcher.IN_LABEL|JXTreeMatcher.IN_TAG|JXTreeMatcher.IN_ANNOT);
 
 JXTreeMatcher.prototype = {
 	
@@ -472,7 +526,7 @@ JXTreeNode.prototype = {
 			}
 		}
 
-		if (matcher.search_label) {
+		if ((matcher.search_in & JXTreeMatcher.IN_LABEL) != 0) {
 			if (matcher.match(this.label)) {
 				return matcher.search_not ? false : true;
 			} 

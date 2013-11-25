@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=label\nin=tag\nin=annot\nin=all\ntoken=word\ntoken=regex\nop=eq\nop=neq\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=label\nxp rbx /in=label;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=label;class=protein,gene\nxp rxb /token=regex;in=all";
+var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=label\nin=tag\nin=annot\nin=all\n\ntoken=word\ntoken=regex\n\nop=eq\nop=neq\n\nclass=all\nclass=all_included\nclass=all_but_included\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nDefault is: /in=label;in=tag;token=word;op=eq;class=all_but_included\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=label\nxp rbx /in=label;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=label;class=protein,gene\nxp rxb /token=regex;in=all";
 
 function JXTreeMatcher(pattern, hints) {
 	pattern = pattern.trim();
@@ -108,7 +108,7 @@ function JXTreeMatcher(pattern, hints) {
 					if (hints.class_list) {
 						for (var kk = 0; kk < class_filter.classes.length; ++kk) {
 							var cls = class_filter.classes[kk];
-							if (cls == "ALL") {
+							if (cls == "ALL" || cls == "ALL_INCLUDED" || cls == "ALL_BUT_INCLUDED") {
 								continue;
 							}
 							var found = false;
@@ -150,6 +150,13 @@ function JXTreeMatcher(pattern, hints) {
 	}
 	if (!this.search_token) {
 		this.search_token = JXTreeMatcher.TOKEN_WORD;
+	}
+
+	if (!this.class_filters.length) {
+		var class_filter = {};
+		class_filter.is_not = false;
+		class_filter.classes = ["ALL_BUT_INCLUDED"];
+		this.class_filters.push(class_filter);
 	}
 
 	var patterns = pattern.split(",");
@@ -201,6 +208,7 @@ JXTreeMatcher.IN_ALL = (JXTreeMatcher.IN_LABEL|JXTreeMatcher.IN_TAG|JXTreeMatche
 
 JXTreeMatcher.prototype = {
 	
+	/*
 	match: function(str) {
 		var match_cnt = 0;
 		for (var nn = 0; nn < this.regex_arr.length; ++nn) {
@@ -217,6 +225,7 @@ JXTreeMatcher.prototype = {
 		}
 		return match_cnt > 0;
 	}
+	*/
 };
 
 var jxtree_mute = true;
@@ -500,21 +509,38 @@ JXTreeNode.prototype = {
 			for (var jj = 0; jj < matcher.class_filters.length; ++jj) {
 				var class_filter = matcher.class_filters[jj];
 				var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
+				var cls_included = node_cls.match(/:INCLUDED/, "i");
+				/*
 				if (node_cls.match(/:INCLUDED/, "i")) {
 					node_cls = node_cls.replace(/:INCLUDED/, "");
 				}
+				*/
 				if (class_filter.is_not) {
 					for (var nn = 0; nn < class_filter.classes.length; ++nn) {
-						var cls = class_filter.classes[nn].trim();						
+						var cls = class_filter.classes[nn].trim();
 						if (cls == "ALL" || node_cls == cls) {
+							return false;
+						}
+						if (cls == "ALL_INCLUDED" && cls_included) {
+							return false;
+						}
+						if (cls == "ALL_BUT_INCLUDED" && !cls_included) {
 							return false;
 						}
 					}
 				} else {
 					var found = false;
 					for (var nn = 0; nn < class_filter.classes.length; ++nn) {
-						var cls = class_filter.classes[nn].trim();						
+						var cls = class_filter.classes[nn].trim();
 						if (cls == "ALL" || node_cls == cls) {
+							found = true;
+							break;
+						}
+						if (cls == "ALL_INCLUDED" && cls_included) {
+							found = true;
+							break;
+						}
+						if (cls == "ALL_BUT_INCLUDED" && !cls_included) {
 							found = true;
 							break;
 						}
@@ -526,6 +552,7 @@ JXTreeNode.prototype = {
 			}
 		}
 
+		/*
 		if ((matcher.search_in & JXTreeMatcher.IN_LABEL) != 0) {
 			if (matcher.match(this.label)) {
 				return matcher.search_not ? false : true;
@@ -538,7 +565,39 @@ JXTreeNode.prototype = {
 			}
 		}
 		return matcher.search_not ? true : false;
+		*/
 
+		var match_cnt = 0;
+		var search_in_label = (matcher.search_in & JXTreeMatcher.IN_LABEL) != 0;
+		var search_in_user_find = matcher.search_user_find && this.jxtree.user_find;
+
+		for (var nn = 0; nn < matcher.regex_arr.length; ++nn) {
+			var regex = matcher.regex_arr[nn];
+			var matches = false;
+			if (search_in_label) {
+				if (this.label.match(regex)) {
+					matches = true;
+				} 
+			}
+			if (!matches && search_in_user_find) {
+				if (this.jxtree.user_find(matcher, regex, this)) {
+					matches = true;
+				}
+			}
+			if (matches) {
+				match_cnt++;
+				if (matcher.or_search) {
+					return matcher.search_not ? false : true;
+					//return true;
+				}
+			} else {
+				if (matcher.and_search) {
+					return matcher.search_not ? true : false;
+					//return false;
+				}
+			}
+		}
+		return matcher.search_not ? (match_cnt == 0) : match_cnt > 0;
 	},
 
 	matchRegex: function(regex) {

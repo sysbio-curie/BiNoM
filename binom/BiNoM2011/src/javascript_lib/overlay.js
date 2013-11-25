@@ -36,6 +36,12 @@ function USGSOverlay(map) {
 	this.div_ = null;
 	this.setMap(map);
 	this.arrpos = [];
+
+	// test
+	// this.map_.getDiv().style.opacity = "0.4"; // this.map_.getDiv().style.filter  = 'alpha(opacity=60)' // for IE
+	// works but not ok for our purpose. Look at:
+	// google: javascript copy canvas to image
+	// google: opaque png
 }
 
 function is_included(box, clicked_boundbox) {

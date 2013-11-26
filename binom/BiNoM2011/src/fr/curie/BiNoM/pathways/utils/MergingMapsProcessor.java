@@ -1714,7 +1714,7 @@ public class MergingMapsProcessor {
 		int ct=0;
 		while((line = buf.readLine()) != null) {
 			line.trim();
-			if (line.length()>0) {
+			if (line.length()>0 && !line.startsWith("#")) {
 				String[] tk = line.split("\\t|\\s+");
 				if (ct==0) {
 					int sizeX = Integer.parseInt(tk[1]);
@@ -1734,8 +1734,8 @@ public class MergingMapsProcessor {
 						addMap(fn, coordX, coordY);
 					}
 				}
+				ct++;
 			}
-			ct++;
 		}
 	}
 	

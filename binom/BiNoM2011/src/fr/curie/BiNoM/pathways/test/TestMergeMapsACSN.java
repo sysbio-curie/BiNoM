@@ -7,9 +7,22 @@ import fr.curie.BiNoM.pathways.utils.MergingMapsProcessor;
 public class TestMergeMapsACSN {
 	
 	public static void main(String[] args) {
-		
+
 		MergingMapsProcessor mm = new MergingMapsProcessor();
-		mm.runScript();
+		try {
+			mm.loadConfigFile("/bioinfo/users/ebonnet/test_merge_maps/config.txt");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("config loaded.");
+		mm.prefixLength = 1;
+		String outputFileName = "/bioinfo/users/ebonnet/test_merge_maps/res.xml"; 
+		mm.mergeAll(outputFileName);
+		mm.postProcessAnnotations(outputFileName);
+		
+//		MergingMapsProcessor mm = new MergingMapsProcessor();
+//		mm.runScript();
 		
 //		try {
 //			mm.loadConfigFile("/bioinfo/users/ebonnet/test/test.txt");

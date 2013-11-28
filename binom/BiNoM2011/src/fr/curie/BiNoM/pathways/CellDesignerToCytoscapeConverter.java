@@ -79,6 +79,7 @@ public class CellDesignerToCytoscapeConverter {
      * containing majority of the species
      */
     public static boolean alwaysMentionCompartment = false;
+    public static boolean verbose = true;
     
     public static HashMap<String,SpeciesDocument.Species> speciesMap = null;
     public static HashMap<String,CelldesignerSpeciesDocument.CelldesignerSpecies> includedSpeciesMap = null;
@@ -157,8 +158,9 @@ public class CellDesignerToCytoscapeConverter {
         Vector aliases = findAllAliasesForSpecies(sbml,sp.getId());
         
         String lab = convertSpeciesToName(sbml,sp.getId(),true,true);
-        
-        System.out.println((i+1)+"/"+sbml.getModel().getListOfSpecies().getSpeciesArray().length+": "+lab+"\t"+sp.getId());
+       
+        if(verbose)
+        	System.out.println((i+1)+"/"+sbml.getModel().getListOfSpecies().getSpeciesArray().length+": "+lab+"\t"+sp.getId());
         
         if((lab!=null)&&(!lab.startsWith("null"))){
         	
@@ -292,7 +294,7 @@ public class CellDesignerToCytoscapeConverter {
       if(r.getAnnotation()!=null)
         if(r.getAnnotation().getCelldesignerReactionType()!=null)
           rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());;
-      System.out.println((i+1)+"/"+sbml.getModel().getListOfReactions().getReactionArray().length+": "+r.getId());
+      if(verbose) System.out.println((i+1)+"/"+sbml.getModel().getListOfReactions().getReactionArray().length+": "+r.getId());
       if(r.getListOfReactants()!=null)
       for(int j=0;j<r.getListOfReactants().getSpeciesReferenceArray().length;j++){
         String id = r.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
@@ -392,7 +394,7 @@ public class CellDesignerToCytoscapeConverter {
         CelldesignerModificationDocument.CelldesignerModification modif = r.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(k);
         String ids = modif.getModifiers();
         if(ids==null){
-        	if(!modif.getType().startsWith("BOOLEAN"))
+        	if(!modif.getType().startsWith("BOOLEAN"))if(verbose) 
         		System.out.println("ERROR: modifiers=null for modification "+(k+1)+" in reaction "+r.getId());
         }
         else
@@ -421,9 +423,9 @@ public class CellDesignerToCytoscapeConverter {
           n1.setName(nam);
 
           SpeciesDocument.Species sp = (SpeciesDocument.Species)species.get(id);
-          if(sp==null)
+          if(sp==null){
         	  System.out.println("ERROR: "+id+" species not found");
-          else{
+          }else{
           if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null)
             Utils.addAttribute(n1,"CELLDESIGNER_NODE_TYPE","CELLDESIGNER_NODE_TYPE",Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()),ObjectType.STRING);
           }
@@ -681,7 +683,7 @@ public class CellDesignerToCytoscapeConverter {
     }
 
     if(alias.equals("")){
-      System.out.println("Reaction "+r.getId()+" alias of "+id+" is empty");
+      if(verbose) System.out.println("Reaction "+r.getId()+" alias of "+id+" is empty");
       alias = id;
     }
     takenaliases.put(r.getId()+"_"+alias+"_"+role,r);

@@ -9,7 +9,11 @@ import cytoscape.Cytoscape;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotesDialog;
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
+import fr.curie.BiNoM.pathways.wrappers.XGMML;
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
+import fr.curie.BiNoM.pathways.analysis.structure.Edge;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.utils.*;
 
 import java.io.*;
@@ -42,8 +46,12 @@ public class ModifyCellDesignerNotes {
 	
 	public boolean generateReadableNamesForReactionsAndSpecies = true;
 	
+	public boolean spreadReactionRefsToSpecies = false;
+	
 	Vector<String> keys = new Vector<String>();
 	Vector<String> noteAdds = new Vector<String>();
+	HashMap<String,Vector<String>> species2ReactionIds = new HashMap<String,Vector<String>>(); 
+	HashMap<String,String> reactionId2Annotation = new HashMap<String,String>();
 	
 	ModifyCellDesignerNotes synchronizingObject = null;
 	
@@ -90,7 +98,10 @@ public class ModifyCellDesignerNotes {
 		//System.exit(0);
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
-		String nameCD = "C:/Datas/Binomtest/annotation/gmt/apoptosis_v1_names";
+		mn.spreadReactionRefsToSpecies = true;
+		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/mTOR_nucleus_zoom_3"; 
+		String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test";
+		//String nameCD = "C:/Datas/Binomtest/annotation/gmt/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
 		//String nameCD = "C:/Datas/NaviCell/test/merged/merged_master";
@@ -104,9 +115,9 @@ public class ModifyCellDesignerNotes {
 		//dialog.raise();
 		
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
-		mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/gmt/apoptosis_modules.gmt";
+		//mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/gmt/apoptosis_modules.gmt";
 		String s = mn.exportCellDesignerNotes();
-		//System.out.println(s);
+		System.out.println(s);
 		//mn.comments = Utils.loadString(nameCD+"_notes.txt");
 		//mn.ModifyCellDesignerNotes();
 		Utils.saveStringToFile(s, nameCD+"_notes.txt");
@@ -285,6 +296,9 @@ public class ModifyCellDesignerNotes {
 		StringBuffer annotations = new StringBuffer();
 		CellDesigner.entities = CellDesigner.getEntities(sbmlDoc);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(sbmlDoc.getSbml());
+		
+		if(spreadReactionRefsToSpecies)
+			createSpecies2ReactionIdsMap();
 
 		if(moduleGMTFileName!=null){
 			gmtFile = new GMTFile();
@@ -383,6 +397,7 @@ public class ModifyCellDesignerNotes {
 				annotations.append(annot+"\n\n");
 			}
 		}		
+		
 		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null){
 		System.out.println("Processing reactions ("+sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray()+")");
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
@@ -405,8 +420,10 @@ public class ModifyCellDesignerNotes {
 				if(formatAnnotation)
 					annot = processAnnotations(annot,null,r.getId(),reqsections,false);
 				annotations.append(annot+"\n\n");
+				reactionId2Annotation.put(r.getId(), annot);
 			}
 		}}
+		
 		System.out.println("Processing species ("+sbmlDoc.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray()+")");
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();i++){
 			SpeciesDocument.Species sp = sbmlDoc.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
@@ -416,9 +433,6 @@ public class ModifyCellDesignerNotes {
 			else{
 				if(annot.trim().equals("")) annotationEmpty = true;
 			}
-			
-			if(sp.getId().equals("tst1_s3326"))
-				System.out.println();
 			
 			StringBuffer nonannotated = new StringBuffer();
 			Vector<AnnotationSection> secs = new Vector<AnnotationSection>(); 
@@ -449,6 +463,8 @@ public class ModifyCellDesignerNotes {
 						degraded = true;
 				if(formatAnnotation)if(!degraded)
 					annot = processAnnotations(annot,Utils.getValue(sp.getName()),sp.getId(),reqsections, false, nonannotated, secs);
+				if(spreadReactionRefsToSpecies)
+					annot = spreadReactionReferencesToSpecies(sp.getId(),annot);
 				
 			
 			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
@@ -960,6 +976,10 @@ public class ModifyCellDesignerNotes {
 		}
 		if(overwriteModuleSection)
 			moduleSection.content = "";
+		else{
+			if(!moduleSection.content.endsWith("\n"))
+				moduleSection.content+="\n";
+		}
 		for(int i=0;i<moduleNames.size();i++) 
 			moduleSection.content += "MODULE:"+moduleNames.get(i)+"\n";
 		if(moduleSection.content.length()>0)
@@ -1008,6 +1028,92 @@ public class ModifyCellDesignerNotes {
 		}else{
 			System.out.println("WARNING: "+id+" is not found in the global map!");
 		}
+	}
+	
+	public void createSpecies2ReactionIdsMap(){
+		boolean temp = CellDesignerToCytoscapeConverter.verbose;
+		CellDesignerToCytoscapeConverter.verbose = false;
+		Graph graph = XGMML.convertXGMMLToGraph(CellDesignerToCytoscapeConverter.getXGMMLGraph("", sbmlDoc.getSbml()));
+		CellDesignerToCytoscapeConverter.verbose = temp;
+		graph.calcNodesInOut();
+		HashMap<String, String> id2name = new HashMap<String, String>();
+		HashMap<String, String> name2id = new HashMap<String, String>();
+		Vector<String> spids = new Vector<String>();
+		for(Node n: graph.Nodes){
+			if(n.getFirstAttributeValue("CELLDESIGNER_SPECIES")!=null){
+				String spid = n.getFirstAttributeValue("CELLDESIGNER_SPECIES");
+				if(!spid.equals("")){
+					id2name.put(spid, n.Id);
+					name2id.put(n.Id, spid);
+					spids.add(spid);
+				}
+			}
+			if(n.getFirstAttributeValue("CELLDESIGNER_REACTION")!=null){
+				String rid = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
+				if(!rid.equals("")){
+					id2name.put(rid, n.Id);
+					name2id.put(n.Id, rid);
+				}
+			}
+		}
+		
+		for (String spid : spids) {
+			Node n = graph.getNode(id2name.get(spid));
+			Vector<String> reids = new Vector<String>();
+			if (n != null) {
+				for(Edge e: n.incomingEdges) {
+					String reid = name2id.get(e.Node1.Id);
+					if(!reids.contains(reid))
+						reids.add(reid);
+				}
+				for(Edge e: n.outcomingEdges) {
+					String reid = name2id.get(e.Node2.Id);
+					if(!reids.contains(reid))
+						reids.add(reid);
+				}
+			species2ReactionIds.put(spid, reids);
+			}
+		}
+	}
+	
+	public String spreadReactionReferencesToSpecies(String id, String annot){
+		String newAnnot = "";
+		Vector<AnnotationSection> secs = divideInSections(annot);
+		if(secs.size()==0)
+			secs.add(new AnnotationSection());
+		AnnotationSection References = getSectionByName(secs,"References");
+		if(References==null){
+			References = new AnnotationSection();
+			References.content = "";
+			References.name = "References";
+			secs.add(References);
+		}
+		References.content = Utils.cutFirstLastNonVisibleSymbols(References.content);
+		Vector<String> reactions = species2ReactionIds.get(id);
+		if(reactions!=null){
+			for(String rid: reactions){
+				String reactionAnnotation = reactionId2Annotation.get(rid);
+				if(reactionAnnotation!=null){
+					Vector<AnnotationSection> reactionSecs = divideInSections(reactionAnnotation);
+					AnnotationSection ReactionReference = getSectionByName(reactionSecs,"References");
+					if(ReactionReference!=null){
+						String refText = Utils.cutFirstLastNonVisibleSymbols(ReactionReference.content);
+						if(!refText.equals("")){
+							if(!References.content.equals(""))
+								References.content+="\n";
+							if(refText.contains("\n"))
+								References.content+=rid+":\n"+refText;
+							else
+								References.content+=rid+": "+refText;
+						}
+					}
+				}
+			}
+		}
+		for(int i=1;i<secs.size();i++)
+			newAnnot+=secs.get(i).toString();
+		newAnnot+=secs.get(0).toString();
+		return newAnnot;
 	}
 	
 	

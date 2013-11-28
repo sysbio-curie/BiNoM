@@ -8,16 +8,22 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
 import org.apache.xmlbeans.XmlString;
+import org.sbml.x2001.ns.celldesigner.BodyDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationResidueDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerNameDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
+import org.sbml.x2001.ns.celldesigner.NotesDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
@@ -50,7 +56,8 @@ public class ACSNProcedures {
 			String name = "";
 			String fileIn = "";
 			String fileOut = "";
-			String folder = "";			
+			String folder = "";
+			String bibfile = "";
 			
 			boolean removeReactions = false;
 			boolean mergepngs = false;
@@ -61,6 +68,9 @@ public class ACSNProcedures {
 			boolean updateAnnotations = false;
 			boolean changeModelName = false;
 			boolean copyModelNotesToFile = false;
+			boolean makeBibliographyFromFile = false;
+			boolean addbibliographytonotes = false;
+			boolean spreadreactionrefs = false;
 			
 			
 			
@@ -92,6 +102,11 @@ public class ACSNProcedures {
 					changeModelName = true;
 				if(args[i].equals("--copymodelnotestofile"))
 					copyModelNotesToFile = true;
+				if(args[i].equals("--makebibliographyfromxml"))
+					makeBibliographyFromFile = true;
+				if(args[i].equals("--addbibliographytonotes"))
+					addbibliographytonotes = true;
+				
 				
 				
 				if(args[i].equals("--png1"))
@@ -122,10 +137,14 @@ public class ACSNProcedures {
 					modelnotes = args[i+1];
 				if(args[i].equals("--name"))
 					name = args[i+1];
+				if(args[i].equals("--biblfile"))
+					bibfile = args[i+1];
 				
 				
 				if(args[i].equals("--updatedbids"))
 					updateDBconnections = true;
+				if(args[i].equals("--spreadreactionrefs"))
+					spreadreactionrefs = true;
 				if(args[i].equals("--mergeconfig"))
 					mergeConfigFileName = args[i+1];
 				if(args[i].equals("--idfile"))
@@ -149,6 +168,9 @@ public class ACSNProcedures {
 			if(updateDBconnections)
 				updateLinks(mergeConfigFileName, tableOfIDsFileName);
 			
+			//if(spreadreactionrefs)
+			//	spreadReactionRefs(mergeConfigFileName);
+			
 			if(changeModelNotes)
 				changeModelNotes(modelnotes, xmlFileName);
 			
@@ -158,17 +180,25 @@ public class ACSNProcedures {
 			if(changeModelName)
 				changeModelName(xmlFileName, name);
 			
+			if(addbibliographytonotes)
+				addBibliographyToNotes(xmlFileName, bibfile);
+			
 			if(copyModelNotesToFile){
 				if(!folder.equals("")){
 					File f = new File(folder);
 					if(fileIn.equals(""))
-						copyModelNotesToFile(f, fileOut);
+						copyModelNotesToFile(f, fileOut, bibfile);
 					else	
-						copyModelNotesToFile(f, fileIn, fileOut);
+						copyModelNotesToFile(f, fileIn, fileOut, bibfile);
 				}else{
-					copyModelNotesToFile(xmlFileName, fileIn, fileOut);
+					copyModelNotesToFile(xmlFileName, fileIn, fileOut, bibfile);
 				}
 			}
+			
+			if(makeBibliographyFromFile){
+				makeBibliographyFromXml(xmlFileName, bibfile, false);
+			}
+				
 			
 			
 		}catch(Exception e){
@@ -335,6 +365,27 @@ public class ACSNProcedures {
       }
       
       
+      /*public static void spreadReactionRefs(String mergeConfigFile) throws Exception{
+    	System.out.println("Spreading reaction references to species...");
+      	Vector<String> mergeConfig = Utils.loadStringListFromFile(mergeConfigFile);
+      	Vector<String> listFiles = new Vector<String>();
+      	for(String s: mergeConfig){
+      		if(!s.contains("update")){
+      		String fn = s.split("\t")[0];
+      		if((new File(fn)).exists())
+      			listFiles.add(fn);
+      		}
+      	}
+      	for(String fn: listFiles){
+      		System.out.println("updating "+fn+"...");
+      		
+      	}
+      }*/
+      
+      
+      
+      
+      
       public static void changeModelNotes(String modelnotes, String xmlFileName){
     	  String s = Utils.loadString(modelnotes);
     	  SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
@@ -375,39 +426,42 @@ public class ACSNProcedures {
 		CellDesigner.saveCellDesigner(cdtarget, targetFileName);
       }
       
-      public static void copyModelNotesToFile(File folder, String fileIn, String fileOut){
+      public static void copyModelNotesToFile(File folder, String fileIn, String fileOut, String bibfile){
     	  String xmlFileName = "";
     	  for(File f: folder.listFiles()){
     		  String fn = f.getAbsolutePath();
     		  if(fn.endsWith(".xml"))
+    		  if(!fn.startsWith("."))
     		  if(!fn.contains("_master"))
     			  xmlFileName+=fn+";";
     	  }
     	  if(xmlFileName.length()>1)
     		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
-    	  copyModelNotesToFile(xmlFileName, fileIn, fileOut);
+    	  copyModelNotesToFile(xmlFileName, fileIn, fileOut, bibfile);
       }
       
-      public static void copyModelNotesToFile(File folder, String folderOut){
+      public static void copyModelNotesToFile(File folder, String folderOut, String bibfile){
     	  String xmlFileName = "";
     	  for(File f: folder.listFiles()){
     		  String fn = f.getAbsolutePath();
     		  if(fn.endsWith(".xml"))
+    		  if(!fn.startsWith("."))
     		  if(!fn.contains("_master"))
     			  xmlFileName+=fn+";";
     	  }
     	  if(xmlFileName.length()>1)
     		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
-    	  copyModelNotesToFile(xmlFileName, folderOut);
+    	  copyModelNotesToFile(xmlFileName, folderOut, bibfile);
       }
       
       
-      public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut){
+      public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut, String bibfile){
     	  String prefix = Utils.loadString(fileIn);
     	  String fns[] = xmlFileName.split(";");
     	  String s = "";    	  
     	  for(String fn: fns){
     		  SbmlDocument sbml = CellDesigner.loadCellDesigner(fn);
+    		  String fn_full = fn;
     		  fn = (new File(fn)).getName();
     		  fn = fn.substring(0,fn.length()-4);
     		  String parts[] = fn.split("_");
@@ -417,14 +471,20 @@ public class ACSNProcedures {
     		  if(s.length()>1)
     			  s = s.substring(0,s.length()-1)+"\n";
     		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
+    		  if(bibfile!=null){
+    			  String bib = makeBibliographyFromXmlUseTextFile(fn_full, bibfile, true);
+    			  String bibmodule = makeBibliographyFromText(s, true);
+    			  s+="\n======== References ========\n"+bibmodule+bib;
+    		  }
     	  }
     	  Utils.saveStringToFile(prefix+"\n\n"+s, fileOut);
       }
       
-      public static void copyModelNotesToFile(String xmlFileName, String folderOut){
+      public static void copyModelNotesToFile(String xmlFileName, String folderOut, String bibfile){
     	  String fns[] = xmlFileName.split(";");
     	  for(String fn: fns){
         	  String s = "";
+        	  String fn_full = fn;
     		  SbmlDocument sbml = CellDesigner.loadCellDesigner(fn);
     		  fn = (new File(fn)).getName();
     		  fn = fn.substring(0,fn.length()-4);
@@ -436,9 +496,134 @@ public class ACSNProcedures {
     			  s = s.substring(0,s.length()-1)+"\n";
     		  String moduleName = Utils.cutFirstLastNonVisibleSymbols(s);
     		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
+    		  if(bibfile!=null){
+    			  String bib = makeBibliographyFromXmlUseTextFile(fn_full, bibfile, true);
+    			  String bibmodule = makeBibliographyFromText(s, true);
+    			  s+="\n======== References ========\n"+bibmodule+bib;
+    		  }
         	  Utils.saveStringToFile(s,folderOut+moduleName+".txt");    		  
     	  }
       }
+      
+      
+      
+       public static void makeBibliographyFromXml(String xmlFileName, String textFileName, boolean addPMIDprefix){
+    	   String bib = makeBibliographyFromXml(xmlFileName, addPMIDprefix);
+    	   Utils.saveStringToFile(bib, textFileName);
+       }
+       
+       public static String makeBibliographyFromXml(String xmlFileName, boolean addPMIDprefix){
+    	   String bib = "";
+    	   Vector<String> pmids = getAllPMIDsFromCellDesigner(new File(xmlFileName));
+    	   int k=0;
+    	   for(String pmid: pmids){
+    		   ConnectionToDatabases.Citation cit = ConnectionToDatabases.convertPMIDtoCitation(pmid);
+    		   System.out.println((++k)+"\t"+cit.year+"\t"+cit.oneLineCitation());
+    		   if(addPMIDprefix)
+    			   bib+="PMID:"+pmid+"\t"+cit.oneLineCitation()+"\n";
+    		   else
+    			   bib+=pmid+"\t"+cit.oneLineCitation()+"\n";
+    	   }
+    	   return bib;
+       }
+
+       public static String makeBibliographyFromText(String text, boolean addPMIDprefix){
+    	   String bib = "";
+    	   Vector<String> pmids = getAllPMIDsFromCellDesigner(text);
+    	   for(String pmid: pmids){
+    		   ConnectionToDatabases.Citation cit = ConnectionToDatabases.convertPMIDtoCitation(pmid);
+    		   if(cit!=null){
+    		   if(addPMIDprefix)
+    			   bib+="PMID:"+pmid+"\t"+cit.oneLineCitation()+"\n";
+    		   else
+    			   bib+=pmid+"\t"+cit.oneLineCitation()+"\n";
+    		   }
+    	   }
+    	   return bib;
+       }
+       
+       
+       public static String makeBibliographyFromXmlUseTextFile(String xmlFileName, String bibliographyFileName, boolean addPMIDprefix){
+    	   String bib = "";
+    	   Vector<String> bibList = Utils.loadStringListFromFile(bibliographyFileName);
+    	   Vector<String> pmidList = new Vector<String>();
+    	   for(String s: bibList){
+    		   StringTokenizer st = new StringTokenizer(s,"\t");
+    		   pmidList.add(st.nextToken());
+    	   }
+    	   Vector<String> pmids = getAllPMIDsFromCellDesigner(new File(xmlFileName));
+    	   for(String pmid: pmids){
+    		   int k = pmidList.indexOf(pmid);
+    		   if(k!=-1){
+    			   if(addPMIDprefix)
+    				   bib+="PMID:"+bibList.get(k)+"\n";
+    			   else
+    				   bib+=bibList.get(k)+"\n";
+    		   }
+    	   }
+    	   return bib;
+       }
+       
+       public static Vector<String> getAllPMIDsFromCellDesigner(File file){
+    	   String text = "";
+    	   try{
+    		   text = Utils.loadString(file.getAbsolutePath());
+    	   }catch(Exception e){
+    		   e.printStackTrace();
+    	   }	
+    	   return getAllPMIDsFromCellDesigner(text);
+       }
+       
+       public static Vector<String> getAllPMIDsFromCellDesigner(String text){
+    	   Vector<String> pmids = new Vector<String>();
+    	   HashSet<String> set = new HashSet<String>();
+    	   try{
+    		   LineNumberReader lr = new LineNumberReader(new StringReader(text));
+    		   String s = null;
+    		   while((s=lr.readLine())!=null){
+    			   StringTokenizer st = new StringTokenizer(s,";,. \t<>()[]");
+    			   while(st.hasMoreTokens()){
+    				   String token = st.nextToken();
+    				   if(token.startsWith("PMID:")){
+    					   String pmid = Utils.cutFirstLastNonVisibleSymbols(token.substring(5, token.length()));
+    					   if(pmid.contains(":"))
+    						   pmid = pmid.substring(0, pmid.indexOf(":"));
+    					   if(!set.contains(pmid))
+    						   set.add(pmid);
+    				   }
+    			   }
+    		   }
+    	   }catch(Exception e){
+    		   e.printStackTrace();
+    	   }
+    	   for(String s: set) pmids.add(s);
+    	   Collections.sort(pmids);
+    	   return pmids;
+       }
+       
+       
+       public static void insertBibliographyIntoModelNotes(String xmlFileName){
+    	   SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
+    	   String notes = Utils.getValue(sbml.getSbml().getModel().getNotes());
+       }
+       
+       public static void addBibliographyToNotes(String xmlFileName, String bibfile){
+    	   String bib = makeBibliographyFromXmlUseTextFile(xmlFileName, bibfile, true);
+    	   SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
+    	   String notes = Utils.getValue(sbml.getSbml().getModel().getNotes());
+    	   
+    	   notes+="\n======== References ========\n"+bib;
+
+    	    sbml.getSbml().getModel().setNotes(null);
+			NotesDocument.Notes pnotes = sbml.getSbml().getModel().addNewNotes();
+			BodyDocument.Body b = pnotes.addNewHtml().addNewBody();
+			XmlString xs = XmlString.Factory.newInstance();
+			xs.setStringValue(notes);
+			b.set(xs);
+			
+			CellDesigner.saveCellDesigner(sbml, xmlFileName);
+       }
+       
       
       
 

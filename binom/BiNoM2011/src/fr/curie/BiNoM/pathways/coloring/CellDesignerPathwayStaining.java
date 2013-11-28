@@ -45,6 +45,8 @@ public class CellDesignerPathwayStaining {
 	public boolean useModuleDefinitionsFromCellDesignerFile = true;
 	public boolean useProteinNameIfHUGOisntFound = true;
 	
+	public boolean overrideModuleDefinitionsFromSpeciesNotes = true;
+	
 	public SimpleTable table = null;
 	
 	public BufferedImage staining = null;
@@ -71,12 +73,13 @@ public class CellDesignerPathwayStaining {
 	public static void main(String[] args) {
 		try{
 			
-			String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
+			//String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
+			String prefix = "C:/Datas/ColorMaps/test/";
 				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
-			cm.loadMap(prefix+"acsn_master.xml");
+			/*cm.loadMap(prefix+"acsn_master.xml");
 			HashMap<String, Vector<String>> gmt = cm.extractGMTFromCellDesigner("c:/datas/acsn/acsn.gmt");
-			System.exit(0);
+			System.exit(0);*/
 			
 			
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
@@ -87,7 +90,16 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", null, null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
-			cm.run(prefix+"dnarepair.xml", null, null, null);
+			cm.infradius = 0.01f;
+			cm.useProteinNameIfHUGOisntFound = true;
+			cm.useModuleDefinitionsFromCellDesignerFile = true;
+			cm.overrideModuleDefinitionsFromSpeciesNotes = true;
+			//cm.run(prefix+"test_annotations.xml", prefix+"test_annotations.png", null, prefix+"test.gmt");
+			//cm.run(prefix+"test_annotations.xml", prefix+"test_annotations.png", null, null);
+			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
+			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
+			cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", null);
+			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			System.exit(0);
 			
 			
@@ -204,6 +216,7 @@ public class CellDesignerPathwayStaining {
 			while((s=lr.readLine())!=null){
 				StringTokenizer st = new StringTokenizer(s,"\t");
 				String groupName = st.nextToken();
+				groupName = groupName.toUpperCase();
 				String colorString = st.nextToken();
 				Vector<String> proteins = new Vector<String>();
 				while((st.hasMoreTokens())){
@@ -248,10 +261,16 @@ public class CellDesignerPathwayStaining {
 			if(!spclass.equals("DEGRADED")){
 				System.out.print(alias.getId()+":");
 				Vector<String> hugos = getSpeciesHugos(alias);
+				String notes = Utils.getValue(((SpeciesDocument.Species)CellDesigner.entities.get(alias.getSpecies())).getNotes());
+				Vector<String> speciesGroups = getModuleNames(notes, true);
 				ColorPoint cp = new ColorPoint();
 				cp.x = Float.parseFloat(alias.getCelldesignerBounds().getX())+Float.parseFloat(alias.getCelldesignerBounds().getW())*0.5f;
 				cp.y = height - (Float.parseFloat(alias.getCelldesignerBounds().getY())+Float.parseFloat(alias.getCelldesignerBounds().getH())*0.5f);
-				addGroupToPoint(cp,hugos);
+				if((speciesGroups.size()==0)||!overrideModuleDefinitionsFromSpeciesNotes)
+					addGroupToPoint(cp,hugos);
+				else{
+					cp.groups = speciesGroups;
+				}
 				if(cp.groups.size()>0)
 					aliaspoints.add(cp);
 			}}}
@@ -259,15 +278,21 @@ public class CellDesignerPathwayStaining {
 			CelldesignerComplexSpeciesAlias calias = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 				System.out.print(calias.getId()+":");
 				Vector<String> hugos = getSpeciesHugos(calias);
+				String notes = Utils.getValue(((SpeciesDocument.Species)CellDesigner.entities.get(calias.getSpecies())).getNotes());
+				Vector<String> speciesGroups = getModuleNames(notes, true);
 				ColorPoint cp = new ColorPoint();
 				cp.x = Float.parseFloat(calias.getCelldesignerBounds().getX())+Float.parseFloat(calias.getCelldesignerBounds().getW())*0.5f;
 				cp.y = height - (Float.parseFloat(calias.getCelldesignerBounds().getY())+Float.parseFloat(calias.getCelldesignerBounds().getH())*0.5f);
-				addGroupToPoint(cp,hugos);
+				if((speciesGroups.size()==0)||!overrideModuleDefinitionsFromSpeciesNotes)
+					addGroupToPoint(cp,hugos);
+				else{
+					cp.groups = speciesGroups;
+				}
 				if(cp.groups.size()>0)
 					aliaspoints.add(cp);
 			}
 	}
-	
+ 	
 	public void addGroupToPoint(ColorPoint cp, Vector<String> hugos){
 		Vector<String> groups = new Vector<String>();
 		for(int j=0;j<hugos.size();j++){
@@ -499,13 +524,17 @@ public class CellDesignerPathwayStaining {
 			float cg = 0f;
 			float cb = 0f;
 			int num = 0;
-			for(int j=0;j<groups.size();j++)
-				if((groupColors.get(groups.get(j)).getRed()!=0)||(groupColors.get(groups.get(j)).getGreen()!=0)||(groupColors.get(groups.get(j)).getBlue()!=0)){
+			for(int j=0;j<groups.size();j++){
+				Color color = groupColors.get(groups.get(j)); 
+				if(color==null)
+					System.out.println("Color = null for "+groups.get(j));
+				else{
+				if((color.getRed()!=0)||(color.getGreen()!=0)||(color.getBlue()!=0)){
 				cr+=(float)groupColors.get(groups.get(j)).getRed()/256f;
 				cg+=(float)groupColors.get(groups.get(j)).getGreen()/256f;
 				cb+=(float)groupColors.get(groups.get(j)).getBlue()/256f;
-				num++;
-			}
+				num++;}
+			}}
 			points.get(i).color = new Color(cr/(float)num,cg/(float)num,cb/(float)num);
 		}
 	}
@@ -513,6 +542,9 @@ public class CellDesignerPathwayStaining {
 	  public void loadDataTable(String fn){
 			table = new SimpleTable();
 			table.LoadFromSimpleDatFile(fn, true, "\t");
+			//for(int i=0;i<table.rowCount;i++)
+			//	table.stringTable[i][0] = table.stringTable[i][0].toLowerCase();
+			table.makeUpperCaseInIndex = true;
 			table.createIndex(table.fieldNames[0]);
 	  }
 	
@@ -636,22 +668,12 @@ public class CellDesignerPathwayStaining {
 	
 	  public void processAnnotation(String name, String notes, HashMap<String, Vector<String>> groups){
 		  Vector<String> hugos = Utils.getTagValues(notes, "HUGO");
-		  Vector<String> cc_phase = Utils.getTagValues(notes, "CC_PHASE");		  
-		  Vector<String> layer = Utils.getTagValues(notes, "LAYER");		  
-		  Vector<String> pathway = Utils.getTagValues(notes, "PATHWAY");		  		  
-		  Vector<String> checkpoints = Utils.getTagValues(notes,"CHECKPOINT");
-		  Vector<String> modules = Utils.getTagValues(notes,"MODULE");
-		  Vector<String> module_names = new Vector<String>();
-		  module_names.addAll(cc_phase);
-		  module_names.addAll(pathway);
-		  module_names.addAll(layer);
-		  module_names.addAll(checkpoints);
-		  module_names.addAll(modules);		
 		  if(useProteinNameIfHUGOisntFound){
 			  if(hugos.size()==0)
 				  if(name!=null)
 					  hugos.add(name);
 		  }
+		  Vector<String> module_names = getModuleNames(notes, false);
 		  for(int i=0;i<module_names.size();i++){
 			  String module = module_names.get(i);
 			  Vector<String> names = groups.get(module);
@@ -659,5 +681,31 @@ public class CellDesignerPathwayStaining {
 			  for(int j=0;j<hugos.size();j++)if(!names.contains(hugos.get(j))) names.add(hugos.get(j));
 		  }
 	  }
-
+	  
+	  public Vector<String> getModuleNames(String notes, boolean checkIfTheGroupExists){
+		  Vector<String> module_names = new Vector<String>();
+		  if(notes!=null){
+		  Vector<String> cc_phase = Utils.getTagValues(notes, "CC_PHASE");		  
+		  Vector<String> layer = Utils.getTagValues(notes, "LAYER");		  
+		  Vector<String> pathway = Utils.getTagValues(notes, "PATHWAY");		  		  
+		  Vector<String> checkpoints = Utils.getTagValues(notes,"CHECKPOINT");
+		  Vector<String> modules = Utils.getTagValues(notes,"MODULE");
+		  module_names.addAll(cc_phase);
+		  module_names.addAll(pathway);
+		  module_names.addAll(layer);
+		  module_names.addAll(checkpoints);
+		  module_names.addAll(modules);
+		  for(int i=0;i<module_names.size();i++)
+			  module_names.set(i, module_names.get(i).toUpperCase());
+		  }
+		  Vector<String> mn = new Vector<String>();
+		  if(checkIfTheGroupExists){
+			for(String grName: module_names)
+				if(groupNameToProteinList.get(grName)!=null)
+					mn.add(grName);
+		  }else
+			  mn = module_names;
+		  return mn;
+	  }
+	  
 }

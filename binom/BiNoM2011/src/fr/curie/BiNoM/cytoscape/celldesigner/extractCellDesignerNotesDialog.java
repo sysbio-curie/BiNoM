@@ -89,6 +89,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
     private JCheckBox moveNonannotatedTextToReferenceSection = null;
     private JCheckBox useHUGOIdsForModuleIdentification = null;
     private JCheckBox insertMapsTagBeforeModules = null;
+    private JCheckBox overwriteModuleSection = null;
     
     private JTextField gmtFileField = null;
     private JButton browseGMTIndex = null;    
@@ -206,6 +207,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
 				useHUGOIdsForModuleIdentification.setEnabled(true);
 				browseGMTIndex.setEnabled(true);
 				insertMapsTagBeforeModules.setEnabled(true);
+				overwriteModuleSection.setEnabled(true);
 			}else{
 				allAnnotations.setEnabled(false);
 				guessIdentifiers.setEnabled(false);
@@ -216,6 +218,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
 				useHUGOIdsForModuleIdentification.setEnabled(false);
 				browseGMTIndex.setEnabled(false);
 				insertMapsTagBeforeModules.setEnabled(false);
+				overwriteModuleSection.setEnabled(false);
 			}
 		
 		}
@@ -322,6 +325,14 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.weightx = 1.0;
 	panel.add(insertMapsTagBeforeModules, c);
+
+	overwriteModuleSection = new JCheckBox("Replace Maps_Modules section from gmt");    
+	c = new GridBagConstraints();
+	c.gridx = 1;
+	c.gridy = y++;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 1.0;
+	panel.add(overwriteModuleSection, c);
 	
 	
 	extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(null,null);
@@ -335,6 +346,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
 	moveNonannotatedTextToReferenceSection.setSelected(options.moveNonannotatedTextToReferenceSection);
 	useHUGOIdsForModuleIdentification.setSelected(options.useHUGOIdsForModuleIdentification);
 	insertMapsTagBeforeModules.setSelected(options.insertMapsTagBeforeModules);
+	overwriteModuleSection.setSelected(options.overwriteModuleSection);
 	
 	JPanel buttonPanel = new JPanel();	
 
@@ -351,6 +363,7 @@ public class extractCellDesignerNotesDialog extends JFrame {
             options.moveNonannotatedTextToReferenceSection = moveNonannotatedTextToReferenceSection.isSelected();
             options.useHUGOIdsForModuleIdentification = useHUGOIdsForModuleIdentification.isSelected();
             options.insertMapsTagBeforeModules = insertMapsTagBeforeModules.isSelected();
+            options.overwriteModuleSection = overwriteModuleSection.isSelected();
             if(!gmtFileField.getText().trim().equals(""))
             	options.moduleGMTFileName = gmtFileField.getText();
 			extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(indexField.getText(),options);

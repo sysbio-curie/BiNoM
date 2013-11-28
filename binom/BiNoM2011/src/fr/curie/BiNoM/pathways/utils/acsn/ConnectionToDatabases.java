@@ -2,6 +2,7 @@ package fr.curie.BiNoM.pathways.utils.acsn;
 
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -14,15 +15,46 @@ public class ConnectionToDatabases {
 	/**
 	 * @param args
 	 */
+	
+	public class Citation{
+		public String pmid = "";
+		public String shortCitation = "";		
+		public String volume = "";		
+		public String title = "";
+		public String pages = "";
+		public String journal = "";
+		public String issue = "";
+		public int year = 0;
+		public String firstAuthorName = "";
+		public String allAuthors = "";
+		public String oneLineCitation(){
+			String res = "";
+			res+=allAuthors;
+			res+=" ("+year+") ";
+			res+=title+" ";
+			res+=journal+" ";
+			if(!issue.equals(""))
+				res+=volume+"("+issue+");";
+			else
+				res+=volume+";";
+			res+=pages+".";
+			return res;
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try{
 			
 			//findLinksToAtlasOfOncology("c:/datas/acsn/allnames.txt");
-			findLinksReactome("c:/datas/acsn/uniprots.txt");
+			//findLinksReactome("c:/datas/acsn/uniprots.txt");
 			//findKeggLinks("c:/datas/acsn/allnames.txt");
 			//makeIdentifiersTable("c:/datas/acsn/allnames.txt");
 			//makeIdentifiersTable("c:/datas/acsn/test1.txt");
+			
+			Citation cit = convertPMIDtoCitation("10021362");
+			System.out.println(cit.oneLineCitation());
 			
 			
 		}catch(Exception e){
@@ -171,6 +203,75 @@ public class ConnectionToDatabases {
   		  }
   		  for(int j=0;j<idm.length;j++) System.out.print(idm[j]+"\t"); System.out.println();
   	  }
+  }
+    
+    
+  public static Citation convertPMIDtoCitation(String pmid){
+	  Citation citation = new ConnectionToDatabases().new Citation();
+	  /*Random r = new Random();
+	  citation.year = 1990+(int)(r.nextFloat()*23);
+	  citation.firstAuthorName = "Author";
+	  citation.pmid = pmid;
+	  citation.oneLineCitation = "Author 1, Author 2. "+citation.year+". Science";*/
+	  
+	  String record = Utils.downloadURL("http://www.ncbi.nlm.nih.gov/pubmed/"+pmid+"?report=xml&format=text");
+	  record = record.replace("&lt;", "<");
+	  record = record.replace("&gt;", ">");
+	  try{
+	  if(record.length()<10) citation = null;
+	  else{
+		  LineNumberReader lr = new LineNumberReader(new StringReader(record));
+		  String s = null;
+		  Vector<String> authors = new Vector<String>();
+		  
+		  while((s=lr.readLine())!=null){
+			  s = Utils.cutFirstLastNonVisibleSymbols(s);
+			  //System.out.println(s);
+			  if(s.startsWith("<Year>"))
+				  citation.year = Integer.parseInt(s.substring(6, 10));
+			  if(s.startsWith("<ISOAbbreviation>"))
+				  citation.journal = cutBetweenTags(s,"ISOAbbreviation");
+			  if(s.startsWith("<Volume>"))
+				  citation.volume = cutBetweenTags(s,"Volume");
+			  if(s.startsWith("<Issue>"))
+				  citation.issue = cutBetweenTags(s,"Issue");
+			  citation.title = cutBetweenTags(record,"ArticleTitle");
+			  if(s.startsWith("<LastName>")){
+				  String lastname = cutBetweenTags(s,"LastName");
+				  authors.add(lastname);
+			  }
+			  if(s.startsWith("<Initials>")){
+				  String initials = cutBetweenTags(s,"Initials");
+				  String lastname = authors.get(authors.size()-1);
+				  authors.set(authors.size()-1, lastname+" "+initials);
+			  }
+			  if(s.startsWith("<MedlinePgn>")){
+				  citation.pages = cutBetweenTags(s,"MedlinePgn");
+			  }
+		  }
+		  
+		  if(authors.size()>0)
+			  citation.firstAuthorName = authors.get(0);
+		  for(String author: authors){
+			  citation.allAuthors+=author+", ";
+		  }
+		  if(citation.allAuthors.endsWith(", "))
+			  citation.allAuthors = citation.allAuthors.substring(0, citation.allAuthors.length()-2);
+		  
+	  }
+	  }catch(Exception e){
+		  e.printStackTrace();
+	  }
+	  return citation;
+  }
+  
+  public static String cutBetweenTags(String s, String tag){
+	  String res = "";
+	  int k1 = s.indexOf("<"+tag+">");
+	  int k2 = s.indexOf("</"+tag+">");
+	  if((k1>=0)&(k2>=0))
+		  res = s.substring(k1+tag.length()+2, k2);
+	  return res;
   }
     
 

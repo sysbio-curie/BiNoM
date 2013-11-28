@@ -1847,6 +1847,7 @@ public class MergingMapsProcessor {
 			String fileName = mapList.get(i).fileName;
 			System.out.println("---------- Map "+fileName);
 			// 1. Add MAP: tag before MODULE: tag
+			// 2. Spread reaction references to surrounding species
 			ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
 			mn.generateReadableNamesForReactionsAndSpecies = false;
 			mn.allannotations = true;
@@ -1857,6 +1858,7 @@ public class MergingMapsProcessor {
 			mn.removeEmptySections = true;
 			mn.removeInvalidTags = true;
 			mn.moveNonannotatedTextToReferenceSection = false;
+			mn.spreadReactionRefsToSpecies = true;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
 			mn.automaticallyProcessNotes();
 			System.out.println("Saving...");

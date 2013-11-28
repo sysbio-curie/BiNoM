@@ -58,6 +58,7 @@ public class extractCellDesignerNotesTask implements Task {
     	public String moduleGMTFileName = null;
     	public boolean useHUGOIdsForModuleIdentification = false;
     	public boolean insertMapsTagBeforeModules = false;
+    	public boolean overwriteModuleSection = false;
     }
     
     public void run() {
@@ -84,6 +85,7 @@ public class extractCellDesignerNotesTask implements Task {
     					mn.moduleGMTFileName = options.moduleGMTFileName;
     			mn.useHUGOIdsForModuleIdentification = options.useHUGOIdsForModuleIdentification;
     			mn.insertMapsTagBeforeModules = options.insertMapsTagBeforeModules;
+    			mn.overwriteModuleSection = options.overwriteModuleSection;
     			mn.comments = mn.exportCellDesignerNotes();
     			//mn.comments = Utils.loadString(nameCD+"_notes.txt");
     			//mn.ModifyCellDesignerNotes();

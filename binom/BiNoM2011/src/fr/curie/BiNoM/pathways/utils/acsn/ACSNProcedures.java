@@ -181,17 +181,17 @@ public class ACSNProcedures {
 				changeModelName(xmlFileName, name);
 			
 			if(addbibliographytonotes)
-				addBibliographyToNotes(xmlFileName, bibfile);
+				addBibliographyToNotes(xmlFileName, bibfile, mergeConfigFileName);
 			
 			if(copyModelNotesToFile){
 				if(!folder.equals("")){
 					File f = new File(folder);
 					if(fileIn.equals(""))
-						copyModelNotesToFile(f, fileOut, bibfile);
+						copyModelNotesToFile(f, fileOut);
 					else	
-						copyModelNotesToFile(f, fileIn, fileOut, bibfile);
+						copyModelNotesToFile(f, fileIn, fileOut);
 				}else{
-					copyModelNotesToFile(xmlFileName, fileIn, fileOut, bibfile);
+					copyModelNotesToFile(xmlFileName, fileIn, fileOut);
 				}
 			}
 			
@@ -426,7 +426,7 @@ public class ACSNProcedures {
 		CellDesigner.saveCellDesigner(cdtarget, targetFileName);
       }
       
-      public static void copyModelNotesToFile(File folder, String fileIn, String fileOut, String bibfile){
+      public static void copyModelNotesToFile(File folder, String fileIn, String fileOut){
     	  String xmlFileName = "";
     	  for(File f: folder.listFiles()){
     		  String fn = f.getAbsolutePath();
@@ -437,10 +437,10 @@ public class ACSNProcedures {
     	  }
     	  if(xmlFileName.length()>1)
     		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
-    	  copyModelNotesToFile(xmlFileName, fileIn, fileOut, bibfile);
+    	  copyModelNotesToFile(xmlFileName, fileIn, fileOut);
       }
       
-      public static void copyModelNotesToFile(File folder, String folderOut, String bibfile){
+      public static void copyModelNotesToFile(File folder, String folderOut){
     	  String xmlFileName = "";
     	  for(File f: folder.listFiles()){
     		  String fn = f.getAbsolutePath();
@@ -451,11 +451,11 @@ public class ACSNProcedures {
     	  }
     	  if(xmlFileName.length()>1)
     		  xmlFileName = xmlFileName.substring(0,xmlFileName.length()-1);
-    	  copyModelNotesToFile(xmlFileName, folderOut, bibfile);
+    	  copyModelNotesToFile(xmlFileName, folderOut);
       }
       
       
-      public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut, String bibfile){
+      public static void copyModelNotesToFile(String xmlFileName, String fileIn, String fileOut){
     	  String prefix = Utils.loadString(fileIn);
     	  String fns[] = xmlFileName.split(";");
     	  String s = "";    	  
@@ -471,16 +471,11 @@ public class ACSNProcedures {
     		  if(s.length()>1)
     			  s = s.substring(0,s.length()-1)+"\n";
     		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
-    		  if(bibfile!=null){
-    			  String bib = makeBibliographyFromXmlUseTextFile(fn_full, bibfile, true);
-    			  String bibmodule = makeBibliographyFromText(s, true);
-    			  s+="\n======== References ========\n"+bibmodule+bib;
-    		  }
     	  }
     	  Utils.saveStringToFile(prefix+"\n\n"+s, fileOut);
       }
       
-      public static void copyModelNotesToFile(String xmlFileName, String folderOut, String bibfile){
+      public static void copyModelNotesToFile(String xmlFileName, String folderOut){
     	  String fns[] = xmlFileName.split(";");
     	  for(String fn: fns){
         	  String s = "";
@@ -496,11 +491,6 @@ public class ACSNProcedures {
     			  s = s.substring(0,s.length()-1)+"\n";
     		  String moduleName = Utils.cutFirstLastNonVisibleSymbols(s);
     		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
-    		  if(bibfile!=null){
-    			  String bib = makeBibliographyFromXmlUseTextFile(fn_full, bibfile, true);
-    			  String bibmodule = makeBibliographyFromText(s, true);
-    			  s+="\n======== References ========\n"+bibmodule+bib;
-    		  }
         	  Utils.saveStringToFile(s,folderOut+moduleName+".txt");    		  
     	  }
       }
@@ -607,10 +597,20 @@ public class ACSNProcedures {
     	   String notes = Utils.getValue(sbml.getSbml().getModel().getNotes());
        }
        
+       public static void addBibliographyToNotes(String xmlFileName, String bibfile, String mergeConfig){
+    	   Vector<String> files = Utils.loadStringListFromFile(mergeConfig);
+    	   for(int i=1;i<files.size();i++){
+    		   StringTokenizer st = new StringTokenizer(files.get(i),"\t");
+    		   String fn = st.nextToken();
+    		   addBibliographyToNotes(fn,bibfile);
+    	   }
+       }
+       
        public static void addBibliographyToNotes(String xmlFileName, String bibfile){
     	   String bib = makeBibliographyFromXmlUseTextFile(xmlFileName, bibfile, true);
     	   SbmlDocument sbml = CellDesigner.loadCellDesigner(xmlFileName);
     	   String notes = Utils.getValue(sbml.getSbml().getModel().getNotes());
+    	   notes = Utils.cutFirstLastNonVisibleSymbols(notes);
     	   
     	   notes+="\n======== References ========\n"+bib;
 

@@ -19,6 +19,10 @@
  */
 
 
+if (typeof console == 'undefined') {
+	console = {log: function() {}};
+}
+
 function mapSize(map) {
 	var size = 0;
 	for (var obj in map) {
@@ -49,12 +53,15 @@ function load_info(url, module_name)
 		for (var nn = 0; nn < 15; ++nn) {
 			$.ajax(url,
 			       {
+
+
+
 				       async: true,
 				       dataType: 'json',
 				       cache: false,
 				       success: function(data) {
 					       console.log("navicell: info [" + url + "] loaded #" + nn);
-				       },
+				       }
 			       });
 		}
 	}
@@ -105,7 +112,6 @@ jxtree_mapfun_map['left_label'] = function(datanode) {
 			var alt = left_label.substr(5);
 			left_label = "<a href='#'><img align=\"top\" class=\"blogfromright\" border=\"0\" src=\"../../../map_icons/misc/blog.png\" alt=\"" + alt + "\"/></a>";
 		}
-		return "<a href='#'>" + left_label + "</a>";
 	}
 	return left_label;
 }
@@ -249,6 +255,8 @@ function Mapdata(to_load_count) {
 	this.straight_data = {};
 	this.info_ready = {};
 	this.deferred_module_bubble = {};
+	this.module_postid = {};
+//	this.reset();
 }
 
 //var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>", "g");
@@ -275,6 +283,17 @@ Mapdata.prototype = {
 
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
+
+	getPostModuleLink: function(postid) {
+		return this.module_postid[postid];
+		/*
+		var alt = this.module_postid[postid];
+		if (alt) {
+			return "<a href='#'><img align=\"top\" class=\"blogfromright\" border=\"0\" src=\"../../../map_icons/misc/blog.png\" alt=\"" + alt + "\"/></a>";
+		}
+		return null;
+		*/
+	},
 
 	getJXTree: function(module_name) {
 		return this.module_jxtree[module_name];
@@ -362,6 +381,8 @@ Mapdata.prototype = {
 
 			time_cnt++;
 			mapdata.module_res_jxtree[module_name] = res_jxtree;
+			$("img.blogfromright").click(open_blog_click);
+			$("img.mapmodulefromright").click(open_module_map_click);
 		}
 	},
 
@@ -538,6 +559,7 @@ Mapdata.prototype = {
 			var mapdata = this;
 			this.whenReady(module_name, function() {
 				mapdata.buildEntityTree(win, div_name, projection, whenloaded);
+				console.log("TREE is ready");
 			});
 		}
 	},
@@ -582,22 +604,24 @@ Mapdata.prototype = {
 
 		jxtree.context = {win: win};
 
+		var mapdata = this;
 		jxtree.onClickBefore(function(node, checked) {
 			win.tree_node_click_before(node.jxtree.context, checked);
 		});
 
 		jxtree.onClickAfter(function(node, checked) {
 			win.tree_node_click_after(node.jxtree.context, checked);
+			overlay.draw(module_name);
 		});
 
 		this.deferred_module_bubble[module_name] = {};
 		this.module_classes[module_name] = {};
-		var mapdata = this;
 
 		jxtree.checkStateChanged(function(node, state) {
 			var data = node.getUserData();
 			//console.log("checking node: " + (data ? data.id : null));
 			if (data && data.id) {
+				var checked = state == JXTree.CHECKED;
 				if (!data.clickmap_tree_node) {
 					var info = mapdata.getMapdataById(module_name, data.id);
 					if (info && info.positions) {
@@ -605,9 +629,12 @@ Mapdata.prototype = {
 						var cls = jxtree_get_node_class(node);
 						data.clickmap_tree_node = new win.ClickmapTreeNode(map, module_name, data.id, cls, node.label, info.positions, mapdata);
 						mapdata.module_classes[module_name][data.id] = cls;
+					} else {
+						//console.log("no info for [" + module_name + "][" + data.id + "]");
 					}
 				}					
-				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, state == JXTree.CHECKED)
+				//console.log((checked ? "checked " : "unchecked") + data.id);
+				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, checked);
 			}
 		});
 		jxtree.module_name = module_name;
@@ -622,7 +649,7 @@ Mapdata.prototype = {
 				if (bubble_list) {
 					var bubble = mapdata.getBubble(module_name, id);
 					for (var nn = 0; nn < bubble_list.length; ++nn) {
-						bubble_list[nn].setContent(bubble);
+						bubble_list[nn].setContent("<div class=\"info_window\">" + bubble + "</div>");
 					}
 				}
 			}
@@ -633,9 +660,10 @@ Mapdata.prototype = {
 	setBubbleContent: function(bubble, module_name, data_id) {
 		var bubble_content = this.getBubble(module_name, data_id);
 		if (bubble_content) {
-			bubble.setContent(bubble_content);
+			bubble.setContent("<div class=\"info_window\">" + bubble_content + "</div>");
 		} else {
 			bubble.setContent("Loading data...");
+			console.log("LOADING DATA [" + module_name + "][" + data_id + "]");
 			if (!this.deferred_module_bubble[module_name][data_id]) {
 				this.deferred_module_bubble[module_name][data_id] = [];
 			}
@@ -660,6 +688,7 @@ Mapdata.prototype = {
 
 		var ckmap = {};
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
+			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
 			if (module_mapdata[ii]["class"]) {
@@ -667,11 +696,33 @@ Mapdata.prototype = {
 			}
 			//console.log("modules " + modules + " " + entities + " " + module_mapdata[ii]["class"]);
 			//console.log(module_mapdata[ii]["class"]);
-			if (modules) {
-				console.log("FOUND modules: " + modules.length);
+			if (maps) {
+				//console.log("FOUND maps: " + maps.length);
+				for (var jj = 0; jj < maps.length; ++jj) {
+					var map = maps[jj];
+					//console.log("map.id " + map.id);
+					this.module_mapdata_by_id[module_name][map.id] = map;
+					var map_modules = map.modules;
+					if (map_modules) {
+						//console.log("  FOUND map_modules: " + map_modules.length);
+						for (var kk = 0; kk < map_modules.length; ++kk) {
+							var module = map_modules[kk];
+							//console.log("  module.id " + module.id);
+							this.module_mapdata_by_id[module_name][module.id] = module;
+							//console.log("setting info for [" + module_name + "][" + module.id + "]");
+						}
+					}
+				}
+			} else if (modules) {
+				//console.log("FOUND modules: " + modules.length);
 				for (var jj = 0; jj < modules.length; ++jj) {
 					var module = modules[jj];
-					console.log("module.id " + module.id);
+					//console.log("module.id " + module.id);
+					if (module.postinf) {
+						console.log("GOT post information: " + module.postinf);
+						var postinf = module.postinf.split(" ");
+						this.module_postid[postinf[0]] = postinf[1];
+					}
 					this.module_mapdata_by_id[module_name][module.id] = module;
 				}
 			} else if (entities) {
@@ -743,7 +794,7 @@ Mapdata.prototype = {
 			       
 			       success: function(data) {
 				       mapdata.straight_data[module_name] = data;
-				       console.log("navicell: " + module_name + " data loaded");
+				       //console.log("navicell: " + module_name + " data loaded");
 				       if (mapdata.addModuleMapdata(module_name, data)) {
 					       console.log("now all is ready");
 					       //mapdata.ready.resolve();
@@ -801,6 +852,30 @@ function mapdata_display_markers(module_name, win, hugo_names)
 //
 // Main object gathering all data information
 //
+
+function JXTreeScanner(module_name) {
+	this.module_name = module_name;
+	this.arrpos = [];
+}
+
+JXTreeScanner.prototype = {
+	scanNode: function(node) {
+		if (node.isChecked()) {
+			var data = node.getUserData();
+			if (data && data.id) {
+				var pos = navicell.dataset.getGeneInfoByModifId(this.module_name, data.id);
+				if (pos) {
+					array_push_all(this.arrpos, pos[1]);
+				}
+			}
+		}
+	},
+
+	getArrayPos: function() {
+		//console.log("jxtreescanner: " + this.arrpos.length);
+		return this.arrpos;
+	}
+};
 
 function Dataset(name) {
 	this.name = name;
@@ -942,6 +1017,13 @@ Dataset.prototype = {
 		return this.module_arrpos[module_name];
 	},
 
+	getSelectedArrayPos: function(module_name) {
+		var jxtree = navicell.mapdata.getJXTree(module_name);
+		var jxtreeScanner = new JXTreeScanner(module_name);
+		jxtree.scanTree(jxtreeScanner);
+		return jxtreeScanner.getArrayPos();
+	},
+	
 	getSample: function(sample_name) {
 		return this.samples[sample_name];
 	},
@@ -1983,19 +2065,20 @@ Datatable.prototype = {
 				}
 			}
 		}
-		//console.log("arrpos: " + arrpos.length);
+		console.log("display.arrpos: " + arrpos.length);
 		if (display_markers) {
 			if (navicell.mapdata.getJXTree(win.document.navicell_module_name)) {
 				navicell.mapdata.findJXTree(win, id_arr, true, 'select');
+				//array_push_all(overlay.arrpos, navicell.mapdata.checked_arrpos);
 			} else {
 				win.show_markers(id_arr);
 			}
 		}
 
 		if (display_graphics) {
-			overlay.arrpos = arrpos;
+			//overlay.arrpos = arrpos;
 		}
-		overlay.draw();
+		overlay.draw(module_name);
 	},
 
 	setName: function(name) {
@@ -2848,80 +2931,82 @@ BiotypeFactory.prototype = {
 // Session class
 //
 
-function Session(name) {
-	this.name = name;
-}
-
-Storage.prototype.setObject = function(key, value) {
-	console.log("JSON: " + JSON.stringify(value));
-    this.setItem(key, JSON.stringify(value));
-}
-
-Storage.prototype.getObject = function(key) {
-    var value = this.getItem(key);
-    return value && JSON.parse(value);
-}
-
-Session.prototype = {
-	name: "",
-	data: null,
-
-	setData: function(data) {
-		//jQuery.localStorage(this.name, data);
-		localStorage.setObject(this.name, data);
-	},
-
-	getData: function() {
-		//return jQuery.localStorage(this.name);
-		return localStorage.getObject(this.name);
-	},
-
-	exists: function() {
-		//return jQuery.localStorage(this.name) !== null;
-		return localStorage.getObject(this.name) !== null;
+if (typeof Storage != 'undefined') {
+	function Session(name) {
+		this.name = name;
 	}
-		
-};
 
-function NavicellSession(name) {
-	this.session = new Session(name);
-}
+	Storage.prototype.setObject = function(key, value) {
+		console.log("JSON: " + JSON.stringify(value));
+		this.setItem(key, JSON.stringify(value));
+	}
 
-NavicellSession.prototype = {
+	Storage.prototype.getObject = function(key) {
+		var value = this.getItem(key);
+		return value && JSON.parse(value);
+	}
 
-	reset: function() {
-		this.session.setData(null);
-	},
+	Session.prototype = {
+		name: "",
+		data: null,
 
-	read: function() {
-		navicell = this.session.getData();
-	},
+		setData: function(data) {
+			//jQuery.localStorage(this.name, data);
+			localStorage.setObject(this.name, data);
+		},
 
-	write: function() {
-		this.session.setData(navicell);
-	},
+		getData: function() {
+			//return jQuery.localStorage(this.name);
+			return localStorage.getObject(this.name);
+		},
 
-	init: function() {
-		var _navicell = this.session.getData();
-		//console.log("session init: " + _navicell);
-		if (_navicell) {
-			//data.dataset.prototype = Dataset.prototype;
-			_navicell.dataset.geneCount = Dataset.prototype.geneCount;
-			//_navicell.mapdata = Mapdata.prototype;
-			/*
-			console.log("session init2: " + data.dataset);
-			console.log("session init3: " + data.dataset.genes);
-			console.log("session init3.2: " + data.biotype_factory);
-			console.log("session init3.3: " + mapSize(data.biotype_factory.biotypes));
-<			console.log("session init4: " + mapSize(data.dataset.genes));
-			console.log("session init4: " + data.dataset.geneCount());
-			*/
-			return _navicell;
+		exists: function() {
+			//return jQuery.localStorage(this.name) !== null;
+			return localStorage.getObject(this.name) !== null;
 		}
-		return navicell_init();
-	}
-}
+		
+	};
 
+	function NavicellSession(name) {
+		this.session = new Session(name);
+	}
+
+	NavicellSession.prototype = {
+
+		reset: function() {
+			this.session.setData(null);
+		},
+
+		read: function() {
+			navicell = this.session.getData();
+		},
+
+		write: function() {
+			this.session.setData(navicell);
+		},
+
+		init: function() {
+			var _navicell = this.session.getData();
+			//console.log("session init: " + _navicell);
+			if (_navicell) {
+				//data.dataset.prototype = Dataset.prototype;
+				_navicell.dataset.geneCount = Dataset.prototype.geneCount;
+				//_navicell.mapdata = Mapdata.prototype;
+				/*
+				  console.log("session init2: " + data.dataset);
+				  console.log("session init3: " + data.dataset.genes);
+				  console.log("session init3.2: " + data.biotype_factory);
+				  console.log("session init3.3: " + mapSize(data.biotype_factory.biotypes));
+				  <			console.log("session init4: " + mapSize(data.dataset.genes));
+				  console.log("session init4: " + data.dataset.geneCount());
+				*/
+				return _navicell;
+			}
+			return navicell_init();
+		}
+	}
+
+}
 
 //var navicell_session = new NavicellSession("navicell");
 //navicell_session.reset();

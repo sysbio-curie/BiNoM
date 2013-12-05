@@ -145,6 +145,9 @@ function event_ckmap(e, e2, type, overlay) {
 		overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
 		overlay.cursor = cursor;
 	}
+	if (type == 'click' && !navicell.drawing_config.displayDLOsOnAllGenes()) {
+		overlay.draw(module_name); // new: warning to performance !
+	}
 }
 
 USGSOverlay.prototype.onAdd = function() {
@@ -245,8 +248,11 @@ USGSOverlay.prototype.onAdd = function() {
 	div.appendChild(draw_canvas);
 
 	this.div_ = div;
-	this.context = draw_canvas.getContext('2d');
-	this.context.save();
+
+	if (draw_canvas.getContext) {
+		this.context = draw_canvas.getContext('2d');
+		this.context.save();
+	}
 
 	var panes = this.getPanes();
 	panes.overlayLayer.appendChild(div);
@@ -289,19 +295,30 @@ USGSOverlay.prototype.draw = function(module_name) {
 	if (this.div_ == null) {
 		return;
 	}
+	if (!this.context) {
+		this.boundBoxes = [];
+		return;
+	}
 	this.resize();
 
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 	this.boundBoxes = [];
 
 	//console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
+//	console.log("arrpos early: " + this.arrpos.length + " " + navicell.drawing_config.displayDLOs());
 	if (!navicell.drawing_config.displayDLOs()) {
 		return;
 	}
 	// may add another condition, such as navicell.drawing_config.blablabla
-	if (module_name && navicell.drawing_config.displayDLOsOnAllGenes()) {
-		this.arrpos = navicell.dataset.getArrayPos(module_name);
+	var arrpos = null;
+	if (module_name) {
+		if (navicell.drawing_config.displayDLOsOnAllGenes()) {
+			this.arrpos = navicell.dataset.getArrayPos(module_name);
+		} else {
+			this.arrpos = navicell.dataset.getSelectedArrayPos(module_name);
+		}
 	}
+
 	var arrpos = this.arrpos;
 	if (arrpos && arrpos.length) {
 		//console.log("drawing " + arrpos.length);
@@ -344,7 +361,7 @@ USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type) {
 	this.boundBoxes.push([box, gene_name, chart_type]);
 }
 
-USGSOverlay.prototype.remove = function(rm_arrpos) {
+USGSOverlay.prototype.remove_old = function(rm_arrpos) {
 	//console.log("trying to remove: " + rm_arrpos.length + " " + this.arrpos.length);
 	if (!rm_arrpos.length) {
 		return;

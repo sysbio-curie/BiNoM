@@ -348,6 +348,12 @@ JXTree.prototype = {
 		this.roots.push(root);
 	},
 
+	scanTree: function(scanner) {
+		$.each(this.roots, function() {
+			this.scanNode(scanner);
+		});
+	},
+
 	clone: function(node_map) {
 		var cloned_jxtree = new JXTree(this.document);
 		/*
@@ -609,6 +615,16 @@ JXTreeNode.prototype = {
 			return true;
 		}
 		return false;
+	},
+
+	scanNode: function(scanner) {
+		scanner.scanNode(this);
+		if (this.isLeaf()) {
+			return;
+		}
+		$.each(this.children, function() {
+			this.scanNode(scanner);
+		});
 	},
 
 	cloneSubtree: function(jxtree, node_map) {

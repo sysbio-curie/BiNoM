@@ -2043,8 +2043,20 @@ public class ProduceClickableMap
 		return sb;
 	}
 	
+	private static StringBuffer make_right_hand_link_to_blog_with_title(StringBuffer sb, String postid, String name)
+	{
+		if (sb == null)
+			sb = new StringBuffer();
+		sb.append("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
+		sb.append(postid);
+		sb.append("' title='go to ").append(name + " blog'");
+		sb.append("/>");
+		return sb;
+	}
+
 	private static StringBuffer make_right_hand_link_to_blog_with_title(StringBuffer sb, int postid, String name)
 	{
+		// EV 2013-12-06: should call previous method for factorization
 		if (sb == null)
 			sb = new StringBuffer();
 		sb.append("<img align='top' class='blogfromright' border='0' src='" + blog_icon + "' alt='");
@@ -2567,7 +2579,9 @@ public class ProduceClickableMap
 		String[] parts = notes.split("\n", 2);
 		StringBuffer fw = new StringBuffer();
 		fw.append("<b>").append(parts[0]).append("</b>");
-		bubble_to_post_link_with_anchor(post_id, fw);
+		if (post_id >= 0) {
+			bubble_to_post_link_with_anchor(post_id, fw);
+		}
 		open_map_from_bubble(fw.append(" "), module_name);
 		if (parts.length > 1)
 		{
@@ -2603,6 +2617,14 @@ public class ProduceClickableMap
 		return sb.toString();
 	}
 	
+	static private String module_notes(String notes) {
+		int idx = notes.indexOf("====");
+		if (idx >= 0) {
+			return notes.substring(0, idx);
+		}
+		return notes;
+	}
+
 	static private void finish_right_panel_xml(final ItemCloser right, Map<String, ModuleInfo> modules_set,
 						   AtlasInfo atlasInfo,	Model model, ImagesInfo scales, String blog_name,
 						   Linker wp, FormatProteinNotes notes_formatter, PrintStream outjson, JSONInfo outinfo_json, PrintStream outmapdata)
@@ -2689,6 +2711,9 @@ public class ProduceClickableMap
 							//outjson.print("{\"name\" : \"" +  make_module_id(k.getKey()) + "\",");
 							outjson.print("{\"name\" : \"" +  k.getKey() + "\","); // EV changed 2013-10-17
 							outjson.print("\"id\" : \"" +  k.getKey() + "\",");
+							if (atlasInfo != null) {
+								outjson.print("\"postinf\" : \"" + blog_name + ":" + k.getKey() + " " + post_id + "\",");
+							}
 							outjson.print("\"positions\" : {");
 							outjson.print("\"x\" : " + toDouble(scales.getX(position[0])) + ",");
 							outjson.print("\"y\" : " + toDouble(scales.getY(position[1])) + "},");
@@ -2698,7 +2723,7 @@ public class ProduceClickableMap
 								//outjson.print(",\"bubble\" : \"" + tojson(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)) + "\"");
 								//int info_id = outinfo_json.addInfo(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter));
 								//outjson.print(",\"bubble\" : \"" + info_id + "\"");
-								outinfo_json.addInfo(k.getKey(), make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter));
+								outinfo_json.addInfo(k.getKey(), make_module_bubble(k.getKey(), module_notes(k.getValue().notes), post_id, wp, notes_formatter));
 								//outjson.print(",\"class\" : \"Module\"");
 							}
 							outjson.print("}");
@@ -2725,10 +2750,12 @@ public class ProduceClickableMap
 			}
 			for (int nn = 0; nn < size; ++nn) {
 				AtlasMapInfo mapInfo = mapInfo_v.get(nn);
-				outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + "../../" + mapInfo.getId() + directory_suffix + "/_common/" + "master_mapdata.json\", \"" + mapInfo.getId() + ":master" + "\");");
+				String map_key = mapInfo.getId() + ":master";
+				outmapdata.println("\tnavicell.mapdata.load_mapdata(\"" + "../../" + mapInfo.getId() + directory_suffix + "/_common/" + "master_mapdata.json\", \"" + map_key + "\");");
 				ItemCloser map_item  = maps.add();
 				double[] map_position = positions.get(mapInfo.id);
 				item_list_start(map_item, mapInfo.getName(), right_hand_tag);
+				
 				if (outjson != null) {
 					if (!first) {
 						outjson.print(",");
@@ -2736,7 +2763,8 @@ public class ProduceClickableMap
 						first = false;
 					}
 					outjson.print("{\"name\" : \"" +  mapInfo.getName() + "\",");
-					outjson.print("\"id\" : \"" +  mapInfo.getName() + "\",");
+					//outjson.print("\"id\" : \"" +  mapInfo.getName() + "\",");
+					outjson.print("\"id\" : \"" + map_key + "\",");
 				}
 				if (map_position != null) {
 					map_item.getOutput().print(" position=\"");
@@ -2753,7 +2781,10 @@ public class ProduceClickableMap
 				map_item.getOutput().println(">");
 				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName(), "");
 				if (outjson != null) {
-					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName()) + "\",");
+					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName()) + "\",");
+					String map_blog_lnk = make_right_hand_link_to_blog_with_title(null, map_key, mapInfo.getName()).toString();
+					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "\",");
+					outjson.print("\"left_label\" : \"" + tojson(map_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "\",");
 					outjson.println("\"modules\" : [");
 				}
 
@@ -2773,7 +2804,9 @@ public class ProduceClickableMap
 							first2 = false;
 						}
 						outjson.print("{\"name\" : \"" +  moduleInfo.name + "\",");
-						outjson.print("\"id\" : \"" +  moduleInfo.name + "\",");
+						//outjson.print("\"id\" : \"" +  moduleInfo.name + "\",");
+						outjson.print("\"id\" : \"" +  mapInfo.id + ":" + moduleInfo.name + "\",");
+						outjson.print("\"class\" : \"MODULE\",");
 					}
 					if (module_position != null) {
 						module_item.getOutput().print(" position=\"");
@@ -2798,14 +2831,23 @@ public class ProduceClickableMap
 					module_item.close();
 
 					if (outjson != null) {
-						outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name) + "\"");
+						//						outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name) + "\"");
+						String module_key = mapInfo.id + ":" + moduleInfo.name;
+						//outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/>") + "\"");
+						String module_blog_lnk = make_right_hand_link_to_blog_with_title(null, module_key, moduleInfo.name).toString();
+						outjson.print("\"left_label\" : \"" + tojson(module_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/>") + "\"");
 						if (!NO_BUBBLE) {
-							/*
-							int info_id = outinfo_json.addInfo(bubble_txt);
-							outjson.print(",\"bubble\" : \"" + info_id + "\"");
-							*/
-							outinfo_json.addInfo(moduleInfo.name, bubble_txt);
-							//outjson.print(",\"class\" : \"Module\"");
+							//outinfo_json.addInfo(mapInfo.id + ":" + moduleInfo.name, bubble_txt);
+							//outinfo_json.addInfo(key, make_module_bubble(moduleInfo.name, moduleInfo.desc, -1, wp, notes_formatter));
+							StringBuffer fw2 = new StringBuffer();
+							open_map_from_bubble(fw2, moduleInfo.url);
+							//System.out.println("MODULEINFO_DESC [" + moduleInfo.desc + "]");
+							String[] parts = moduleInfo.desc.split("\n", 3);
+							if (parts.length > 2) {
+								notes_formatter.module_bubble(fw2.append("<br>"), module_notes(parts[2]), wp);
+							}
+							String bubble_module_blog_lnk = onclick_before + "show_blog(\"" + module_key + "\");" + onclick_after + " title=\"go to blog\">" + module_blog_lnk + "</a>";
+							outinfo_json.addInfo(module_key, "<b>Module " + moduleInfo.name + "</b>&nbsp;" + bubble_module_blog_lnk + "&nbsp;" + fw2.toString());
 						}
 						outjson.print("}");
 					}

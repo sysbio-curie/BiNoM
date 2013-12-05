@@ -41,6 +41,11 @@ var ICON_BIG_H = 68;
 var ICON_BIG_ANCHOR_X = 20;
 var ICON_BIG_ANCHOR_Y = 68
 
+var ICON_VBIG_W = 0.80;
+var ICON_VBIG_H = 70;
+var ICON_VBIG_ANCHOR_X = 20;
+var ICON_VBIG_ANCHOR_Y = 68
+
 var icon_map = {};
 
 /*
@@ -181,7 +186,8 @@ function setup_icons()
 	icon_map["REACTION:INCLUDED"] = colored_icon("00AA00", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
 
 	icon_map["MODULE"] = colored_icon("5555FF", ICON_BIG_W, ICON_BIG_H, ICON_BIG_ANCHOR_X, ICON_BIG_ANCHOR_Y);
-	icon_map["MODULE:INCLUDED"] = colored_icon("5555FF", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
+	//icon_map["MODULE:INCLUDED"] = colored_icon("5555FF", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
+//	icon_map["MAP"] = colored_icon("5555FF", ICON_VBIG_W, ICON_VBIG_H, ICON_VBIG_ANCHOR_X, ICON_VBIG_ANCHOR_Y);
 
 		/*
 	var complex_new_icon = custom_icon("../../../map_icons/entity/COMPLEX2.png");
@@ -882,6 +888,7 @@ function build_jstree(selector, source, map, projection, whenloaded, firstEntity
 
 function open_blog_click(e)
 {
+	console.log("open_blog_click");
 	try
 	{
 		show_blog(e.currentTarget.alt);
@@ -983,6 +990,14 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 function show_blog(postid)
 {
+	console.log("show_blog " + postid);
+	if (parseInt(postid) != postid) {
+		console.log("SHOULD search for " + postid + " -> " + navicell.mapdata.getPostModuleLink(postid));
+		postid = navicell.mapdata.getPostModuleLink(postid);
+		if (!postid) {
+			return;
+		}
+	}
 	var blog = maps[""];
 	if (typeof blog !== 'undefined' && !blog.closed)
 	{
@@ -1048,6 +1063,9 @@ function uncheck_all_entities(win)
 			$.each(res_jxtree.getRootNodes(), function() {
 				this.checkSubtree(false);
 			});
+		}
+		if (overlay) {
+			overlay.draw(window.document.navicell_module_name);
 		}
 	} else if (jQuery.jstree._reference(jtree)) {
 		jQuery.jstree._reference(jtree).uncheck_all();

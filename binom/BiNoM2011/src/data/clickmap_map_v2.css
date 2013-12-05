@@ -855,3 +855,7 @@ div.tablesorterPager input {
     display: inline-block;
     vertical-align: center;
 }
+
+.info_window {
+    max-height: 500px;
+}

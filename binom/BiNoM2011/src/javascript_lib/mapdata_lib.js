@@ -385,8 +385,8 @@ Mapdata.prototype = {
 
 			time_cnt++;
 			mapdata.module_res_jxtree[module_name] = res_jxtree;
-			$("img.blogfromright").click(open_blog_click);
-			$("img.mapmodulefromright").click(open_module_map_click);
+			$("img.blogfromright", win.document).click(open_blog_click);
+			$("img.mapmodulefromright", win.document).click(open_module_map_click);
 		}
 	},
 

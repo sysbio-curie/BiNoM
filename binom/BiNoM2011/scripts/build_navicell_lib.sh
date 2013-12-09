@@ -13,8 +13,6 @@ dir=$(dirname $0)
 echo $dir | grep "^\." > /dev/null
 if [ $? = 0 ]; then dir=$(pwd)/$dir; fi
 
-echo dir: $dir
-
 tmpdir=/tmp/build_navicell_lib.$$
 trap "echo | rm -rf $tmpdir" 0 1 2 3
 

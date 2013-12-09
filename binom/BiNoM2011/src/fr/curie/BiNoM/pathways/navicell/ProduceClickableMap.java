@@ -2671,12 +2671,20 @@ public class ProduceClickableMap
  				outjson.print("\"class\" : \"MODULE\",");
  				outjson.print("\"name\" : \"Modules\",");
 				outjson.print("\"module_size\" : " + modules_set.size() + ",");
+				for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
+					if (master_map_name.equals(k.getKey())) {
+						if (atlasInfo != null) {
+							final int post_id = k.getValue().post_id;
+							outjson.print("\"postinf\" : \"" + blog_name + ":master" + " " + post_id + "\",");
+							break;
+						}
+					}
+				}
 				outjson.print("\"modules\" : [");
 			}
 			final ItemCloser modules = item_line(new ItemCloser(output), "modules", null, "Modules", null, "state=\"open\"");
 			for (Entry<String, ModuleInfo> k : modules_set.entrySet()) {
 				if (master_map_name.equals(k.getKey())) {
-					;
 				} else if (!positions.containsKey(k.getKey())) {
 					Utils.eclipseErrorln("no layer for " + k.getKey() + " in master map");
 				} else {
@@ -2717,7 +2725,7 @@ public class ProduceClickableMap
 							outjson.print("\"positions\" : {");
 							outjson.print("\"x\" : " + toDouble(scales.getX(position[0])) + ",");
 							outjson.print("\"y\" : " + toDouble(scales.getY(position[1])) + "},");
-							outjson.print("\"left_label\" : \"" + tojson(make_right_hand_module_entry(post_id, k.getKey(), null)) + "\"");
+							outjson.print("\"left_label\" : \"<a href='#'>" + tojson(make_right_hand_module_entry(post_id, k.getKey(), null)) + "</a>\"");
 
 							if (!NO_BUBBLE) {
 								//outjson.print(",\"bubble\" : \"" + tojson(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)) + "\"");
@@ -2784,7 +2792,7 @@ public class ProduceClickableMap
 					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName()) + "\",");
 					String map_blog_lnk = make_right_hand_link_to_blog_with_title(null, map_key, mapInfo.getName()).toString();
 					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "\",");
-					outjson.print("\"left_label\" : \"" + tojson(map_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "\",");
+					outjson.print("\"left_label\" : \"<a href='#'>" + tojson(map_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "</a>\",");
 					outjson.println("\"modules\" : [");
 				}
 
@@ -5163,7 +5171,7 @@ public class ProduceClickableMap
 		out.print(onclick_after);
 		out.print(" title='uncheck all entities'>");
 		//out.print("reset");
-		out.print("<img src=\""+reset_icon+"\" />");
+		out.print("<img border='0' src=\""+reset_icon+"\" />");
 		out.print("</a>");
 		out.println();
 		return out;
@@ -5420,12 +5428,12 @@ public class ProduceClickableMap
 		out.println(bubble_to_post_link_with_anchor(module_post.getPostId(), new StringBuffer()).toString());
 		create_reset_button(out);
 		//doc_in_new_window(out, "map_symbols", "map symbols");
-		doc_in_new_window(out, "map_symbols", "<img src=\""+mapsymbols_icon+"\" title=\"map legends\"/>");
+		doc_in_new_window(out, "map_symbols", "<img border='0' src=\""+mapsymbols_icon+"\" title=\"map legends\"/>");
 		if (provide_sources) {
-			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img src=\"" + sources_icon + "\" title=\"navicell sources\"/></a>");
+			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img border='0' src=\"" + sources_icon + "\" title=\"navicell sources\"/></a>");
 		}
 		out.print("&nbsp;");
-		doc_in_new_window(out, "map_help", "<img src=\""+help_icon+"\" title=\"help\"/>");
+		doc_in_new_window(out, "map_help", "<img border='0' src=\""+help_icon+"\" title=\"help\"/>");
 
 		out.println("&nbsp;<input type='text' size='32' id='query_text' style='font-size: small'/>");
 		header_right.close();

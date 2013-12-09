@@ -19,8 +19,12 @@
  */
 
 
-if (typeof console == 'undefined') {
-	console = {log: function() {}};
+if (!window.console) {
+	window.console = new function()
+	{
+		this.log = function(str) {};
+		this.dir = function(str) {};
+	};
 }
 
 function mapSize(map) {
@@ -691,8 +695,14 @@ Mapdata.prototype = {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
+			var postinf = module_mapdata[ii]["postinf"];
 			if (module_mapdata[ii]["class"]) {
 				this.class_list[module_mapdata[ii]["class"]] = true;
+			}
+			if (postinf) {
+				//console.log("GOT up level post information: " + postinf);
+				postinf = postinf.split(" ");
+				this.module_postid[postinf[0]] = postinf[1];
 			}
 			//console.log("modules " + modules + " " + entities + " " + module_mapdata[ii]["class"]);
 			//console.log(module_mapdata[ii]["class"]);
@@ -719,7 +729,7 @@ Mapdata.prototype = {
 					var module = modules[jj];
 					//console.log("module.id " + module.id);
 					if (module.postinf) {
-						console.log("GOT post information: " + module.postinf);
+						//console.log("GOT post information: " + module.postinf);
 						var postinf = module.postinf.split(" ");
 						this.module_postid[postinf[0]] = postinf[1];
 					}
@@ -794,9 +804,9 @@ Mapdata.prototype = {
 			       
 			       success: function(data) {
 				       mapdata.straight_data[module_name] = data;
-				       //console.log("navicell: " + module_name + " data loaded");
+				       console.log("navicell: " + module_name + " data loaded");
 				       if (mapdata.addModuleMapdata(module_name, data)) {
-					       console.log("now all is ready");
+					       //console.log("now all is ready");
 					       //mapdata.ready.resolve();
 				       }
 				       mapdata.ready[module_name].resolve();

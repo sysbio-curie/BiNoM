@@ -212,7 +212,7 @@ function get_icon(cls) {
 	if (icon_map[cls]) {
 		return icon_map[cls];
 	}
-	console.log("not found for [" + cls + "]");
+	//console.log("not found for [" + cls + "]");
 	return medium_icon;
 }
 
@@ -990,9 +990,10 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 function show_blog(postid)
 {
-	console.log("show_blog " + postid);
+	var ori_postid = postid;
+	//console.log("show_blog " + postid);
 	if (parseInt(postid) != postid) {
-		console.log("SHOULD search for " + postid + " -> " + navicell.mapdata.getPostModuleLink(postid));
+		//console.log("SHOULD search for " + postid + " -> " + navicell.mapdata.getPostModuleLink(postid));
 		postid = navicell.mapdata.getPostModuleLink(postid);
 		if (!postid) {
 			return;
@@ -1001,11 +1002,11 @@ function show_blog(postid)
 	var blog = maps[""];
 	if (typeof blog !== 'undefined' && !blog.closed)
 	{
-		blog.location = blog_link(postid);
+		blog.location = blog_link(postid, ori_postid);
 	}
 	else
 	{
-		blog = window.open(blog_link(postid));
+		blog = window.open(blog_link(postid, ori_postid));
 		maps[""] = blog;
 	}
 	blog.focus();
@@ -1051,7 +1052,7 @@ function uncheck_all_entities(win)
 
 	if (use_jxtree) {
 		// but... the uncheck could be per tree !
-		console.log("MODULE_NAME: " + win.document.navicell_module_name);
+		//console.log("MODULE_NAME: " + win.document.navicell_module_name);
 		var jxtree = navicell.mapdata.getJXTree(win.document.navicell_module_name);
 		if (jxtree) {
 			$.each(jxtree.getRootNodes(), function() {
@@ -1164,7 +1165,7 @@ function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 		(
 			marker, 'click', function()
 			{
-				console.log("has clicked");
+				//console.log("has clicked");
 				bubble_toggle(this);
 			}
 		);

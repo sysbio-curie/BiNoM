@@ -1,1 +1,0 @@
-/bioinfo/users/eviara/projects/navicell/mapdata_lib.js

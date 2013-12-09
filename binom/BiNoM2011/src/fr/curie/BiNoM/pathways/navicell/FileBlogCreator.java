@@ -145,7 +145,14 @@ class FileBlogCreator extends BlogCreator
 	@Override
 	public String getBlogLinker()
 	{
-		return "function blog_link(postid) { return '../" + blog_location + "/" + post_prefix + "' + postid + '" + post_suffix + "'; }";
+		return "function blog_link(postid, ori_postid) {\n" +
+			"    if (ori_postid && postid != ori_postid) {\n" +
+			"      var orimap = ori_postid.split(':');\n" +
+			"      return '../../' + orimap[0] + '" + ProduceClickableMap.directory_suffix + "' + " + "'/_blog/p' + postid + '.html';\n" +
+			"    }\n" + 
+			"    return '../_blog/p' + postid + '.html';\n" + 
+			"  }";
+		//return "function blog_link(postid) { return '../" + blog_location + "/" + post_prefix + "' + postid + '" + post_suffix + "'; }";
 	}
 	@Override
 	public String getMapIconURL()

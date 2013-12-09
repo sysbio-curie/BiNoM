@@ -59,8 +59,10 @@ function event_ckmap(e, e2, type, overlay) {
 	var div = overlay.div_;
 
 	var found = false;
-	var module_name = window.document.navicell_module_name;
+	//var module_name = window.document.navicell_module_name;
 	//console.log("module_name: " + module_name + " vs. " + overlay.win.document.navicell_module_name);
+	var module_name = overlay.win.document.navicell_module_name;
+
 	var jxtree = navicell.mapdata.getJXTree(module_name);
 	var ckmap = navicell.mapdata.getCKMap(module_name);
 	var clicked_node = null;
@@ -80,7 +82,7 @@ function event_ckmap(e, e2, type, overlay) {
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
 				if (type == 'click') {
-					//console.log("click ID " + id);
+					console.log("click ID " + id + " in " + module_name);
 					var node = jxtree.getNodeByUserId(id);
 					if (node) {
 						if (clicked_boundbox) {
@@ -108,6 +110,9 @@ function event_ckmap(e, e2, type, overlay) {
 		}
 	}
 
+	if (type == 'click') {
+		console.log("clicked_node: " + clicked_node);
+	}
 	if (clicked_node) {
 		var node = clicked_node;
 		var is_checked = node.isChecked();
@@ -120,6 +125,7 @@ function event_ckmap(e, e2, type, overlay) {
 		is_checked = node.isChecked();
 		var clickmap_tree_node = node.getUserData().clickmap_tree_node;
 		var latlng = mapProjection.fromPointToLatLng(clicked_boundbox.gpt);
+		console.log("clickmap_tree_node: " + clickmap_tree_node);
 		if (clickmap_tree_node) {
 			$.each(clickmap_tree_node.markers, function() {
 				var diff_lat = Math.abs(latlng.lat() - this.getPosition().lat());

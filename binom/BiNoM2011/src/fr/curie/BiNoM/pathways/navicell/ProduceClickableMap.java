@@ -2945,6 +2945,11 @@ public class ProduceClickableMap
 		return map_name + "__";
 	}
 	
+	static private String make_module_id(String project_name, String map_name)
+	{
+		return project_name + ":" + map_name + "__";
+	}
+	
 	static private BlogCreator.Post create_module_post(final String project_name, final BlogCreator wp, final String module_notes, final String map_name, final FormatProteinNotes notes_formatter, AtlasInfo atlasInfo)
 	{
 		final Hasher h = new Hasher();
@@ -2957,12 +2962,23 @@ public class ProduceClickableMap
 		if (parts.length > 1) {
 			notes_formatter.module_post(fw.append("<br>"), parts[1], wp);
 		}
+		/*
 		final String id = make_module_id(map_name);
 		String body = h.insert(fw, id).toString();
 		final BlogCreator.Post post = wp.updateBlogPostId(id, map_name, body, atlasInfo, true);
 		Utils.eclipsePrintln("create_module_post -> " + post.getPostId() + " " + isMapInAtlas(atlasInfo) + " " + map_name + " " + map_title);
 
 		wp.updateBlogPostIfRequired(post, map_name, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo, true);
+		//System.out.println("module: " + map_name + " " + post.getPostId());
+		*/
+
+		final String id = make_module_id(project_name, map_name); // changed
+		String title = project_name + " " + map_name; // new
+		String body = h.insert(fw, id).toString();
+		final BlogCreator.Post post = wp.updateBlogPostId(id, title /* map_name*/, body, atlasInfo, true); /* changed */
+		Utils.eclipsePrintln("create_module_post --> " + post.getPostId() + " " + isMapInAtlas(atlasInfo) + " " + id + " " + title);
+
+		wp.updateBlogPostIfRequired(post, title /*map_name*/, body, module_list_category_name, Collections.<String>emptyList(), atlasInfo, true);
 		//System.out.println("module: " + map_name + " " + post.getPostId());
 		return post;
 
@@ -5297,7 +5313,6 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.position.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.resizable.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.button.js\"></script>");
-			out.println("<script type='text/javascript'>var glob1 = \"" + map_name + "\";</script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.dialog.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.tabs.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");

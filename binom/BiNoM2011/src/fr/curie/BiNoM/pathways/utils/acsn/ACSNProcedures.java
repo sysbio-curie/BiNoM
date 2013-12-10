@@ -482,6 +482,7 @@ public class ACSNProcedures {
         	  String fn_full = fn;
     		  SbmlDocument sbml = CellDesigner.loadCellDesigner(fn);
     		  fn = (new File(fn)).getName();
+    		  if(!fn.startsWith(".")){
     		  fn = fn.substring(0,fn.length()-4);
     		  String parts[] = fn.split("_");
     		  if(parts.length>1)
@@ -491,7 +492,8 @@ public class ACSNProcedures {
     			  s = s.substring(0,s.length()-1)+"\n";
     		  String moduleName = Utils.cutFirstLastNonVisibleSymbols(s);
     		  s+=Utils.cutFirstLastNonVisibleSymbols(Utils.getValue(sbml.getSbml().getModel().getNotes()))+"\n\n";
-        	  Utils.saveStringToFile(s,folderOut+moduleName+".txt");    		  
+        	  Utils.saveStringToFile(s,folderOut+moduleName+".txt");
+    		  }
     	  }
       }
       
@@ -586,8 +588,18 @@ public class ACSNProcedures {
     	   }catch(Exception e){
     		   e.printStackTrace();
     	   }
-    	   for(String s: set) pmids.add(s);
-    	   Collections.sort(pmids);
+    	   Vector<Integer> ipmids = new Vector<Integer>(); 
+    	   for(String s: set){
+    		   try{
+    			   ipmids.add(Integer.parseInt(s));
+    		   }catch(Exception e){
+    			   
+    		   }
+    	   }
+    	   Collections.sort(ipmids);
+    	   pmids.clear();
+    	   for(int i: ipmids)
+    		   pmids.add(""+i);
     	   return pmids;
        }
        
@@ -612,7 +624,7 @@ public class ACSNProcedures {
     	   String notes = Utils.getValue(sbml.getSbml().getModel().getNotes());
     	   notes = Utils.cutFirstLastNonVisibleSymbols(notes);
     	   
-    	   notes+="\n======== References ========\n"+bib;
+    	   notes+="\n======== References ========\n"+Utils.correctIllegalCharacters(bib);
 
     	    sbml.getSbml().getModel().setNotes(null);
 			NotesDocument.Notes pnotes = sbml.getSbml().getModel().addNewNotes();

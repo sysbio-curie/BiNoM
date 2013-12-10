@@ -2,6 +2,7 @@ package fr.curie.BiNoM.pathways.utils.acsn;
 
 import java.io.FileWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -12,6 +13,8 @@ import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.Edge;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
+import fr.curie.BiNoM.pathways.biopax.PublicationXref;
+import fr.curie.BiNoM.pathways.biopax.biopax_DASH_level3_DOT_owlFactory;
 import fr.curie.BiNoM.pathways.utils.BioPAXGraphMappingService;
 import fr.curie.BiNoM.pathways.utils.GraphXGMMLParser;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
@@ -34,13 +37,32 @@ public class DatabaseComparison {
 			//String fileName = "c:/datas/binomtest/biopaxtest/dnarepair_master.owl";
 			//String fileName = "c:/datas/binomtest/biopaxtest/apoptosis_master.owl";
 			//String fileName = "c:/datas/binomtest/biopaxtest/emtcellmotility_master.owl";
-			String fileName = "c:/datas/binomtest/biopaxtest/survival_master.owl";
+			//String fileName = "c:/datas/binomtest/biopaxtest/survival_master.owl";
 			//String fileName = "c:/datas/binomtest/biopaxtest/acsn_master.owl";
-			//String fileName = "c:/datas/reactome/reactome_human.owl";
+			String fileName = "c:/datas/reactome/reactome_human.owl";
 			
 			DatabaseComparison dc = new DatabaseComparison();
 			BioPAX biopax = new BioPAX();
-			//biopax.loadBioPAX(fileName);
+			biopax.loadBioPAX(fileName);
+			
+			List xrefs = biopax_DASH_level3_DOT_owlFactory.getAllPublicationXref(biopax.model);
+			System.out.println(xrefs.size()+" found");
+			for(Object xref: xrefs){
+				PublicationXref xr = (PublicationXref)xref;
+				if(xr!=null){
+				if(xr.getYear()!=null){	
+				int year = xr.getYear();
+				String pmid = "null";
+				if(xr.getId()!=null){
+					pmid = xr.getId();
+				}
+				System.out.println(pmid+"\t"+year);
+				}}
+			}
+			
+			
+			System.exit(0);
+			
 			//Graph index = dc.createIndexForBioPAX(biopax);
 			//XGMML.saveToXGMML(index, fileName+".xgmml");
 			GraphXGMMLParser gp = new GraphXGMMLParser();

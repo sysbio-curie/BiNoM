@@ -2,6 +2,7 @@ package fr.curie.BiNoM.pathways.coloring;
 
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument.CelldesignerGene;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument.CelldesignerProtein;
@@ -34,16 +35,19 @@ public class CellDesignerPathwayStaining {
 	
 	public float width = 0;
 	public float height = 0;
-	public float gridStepX = 25;
-	public float gridStepY = 25;
+	public float gridStepX = 100;
+	public float gridStepY = 100;
 	float windowSizeX = 200;
 	float windowSizeT = 200;
 	
 	public float infradius = 0.01f;
 	public float thresholdGradient = 2f;
+	public float scaleImage = 1f;
 	public boolean normalizeColumnValues = true; 
 	public boolean useModuleDefinitionsFromCellDesignerFile = true;
 	public boolean useProteinNameIfHUGOisntFound = true;
+	
+	public boolean verbose = false;
 	
 	public boolean overrideModuleDefinitionsFromSpeciesNotes = true;
 	
@@ -56,7 +60,8 @@ public class CellDesignerPathwayStaining {
 	
 	HashMap<String, Vector<String>> groupNameToProteinList = new HashMap<String, Vector<String>>();
 	HashMap<String, Vector<String>> proteinToGroupList = new HashMap<String, Vector<String>>();
-
+	HashMap<String, Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>> complexId2IncludedSpecies = new HashMap<String, Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>>();  
+	
 	HashMap<String,Color> groupColors = new HashMap<String,Color>();
 	
 	SbmlDocument cd = null;
@@ -74,7 +79,8 @@ public class CellDesignerPathwayStaining {
 		try{
 			
 			//String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
-			String prefix = "C:/Datas/ColorMaps/test/";
+			//String prefix = "C:/Datas/ColorMaps/test/";
+			String prefix = "C:/Datas/ColorMaps/whole_acsn/";
 				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
 			/*cm.loadMap(prefix+"acsn_master.xml");
@@ -90,15 +96,20 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", null, null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
-			cm.infradius = 0.01f;
+			cm.infradius = 0.02f;
 			cm.useProteinNameIfHUGOisntFound = true;
-			cm.useModuleDefinitionsFromCellDesignerFile = true;
+			cm.useModuleDefinitionsFromCellDesignerFile = false;
 			cm.overrideModuleDefinitionsFromSpeciesNotes = true;
 			//cm.run(prefix+"test_annotations.xml", prefix+"test_annotations.png", null, prefix+"test.gmt");
 			//cm.run(prefix+"test_annotations.xml", prefix+"test_annotations.png", null, null);
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
-			cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", null);
+			//cm.scaleImage = 8f;
+			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f_scaled8.png", prefix+"data.txt", null);
+			cm.scaleImage = 16;
+			cm.infradius = 0.001f;
+			cm.run(prefix+"acsn_master.xml", prefix+"acsn_master--1_gs_edges.png", prefix+"ica_module_averages.txt", prefix+"acsn_master.gmt");
+			//cm.run(prefix+"acsn_master.xml", null, prefix+"ica_module_averages.txt", prefix+"acsn_master.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			System.exit(0);
 			
@@ -181,7 +192,20 @@ public class CellDesignerPathwayStaining {
 		cd = CellDesigner.loadCellDesigner(fn);
 		CellDesigner.entities = CellDesigner.getEntities(cd);
 		width = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeX());
-		height = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeY());		
+		height = Integer.parseInt(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeY());
+		
+		  if(cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
+			  for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray().length;i++){
+			    CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+			    String id = Utils.getValue(sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
+			    Vector<CelldesignerSpecies> v = complexId2IncludedSpecies.get(id);
+			    if(v==null){
+			    	v = new Vector<CelldesignerSpecies>();
+			    }
+			    v.add(sp);
+			    complexId2IncludedSpecies.put(id,v);
+			    
+			  }
 	}
 	
 	public void determineSizeOftheMap(){
@@ -202,7 +226,7 @@ public class CellDesignerPathwayStaining {
 			Collections.sort(allproteins);
 			System.out.println("TOTAL NUMBER OF PROTEINS = "+allproteins.size());
 			for(int i=0;i<allproteins.size();i++){
-				System.out.println(allproteins.get(i));
+				//System.out.println(allproteins.get(i));
 				Vector<String> v = new Vector<String>();
 				v.add(allproteins.get(i));
 				groupNameToProteinList.put(allproteins.get(i), v);
@@ -245,7 +269,7 @@ public class CellDesignerPathwayStaining {
 				Collections.sort(groups);
 				//System.out.println(protein+" PARTICIPATES IN "+groups.size()+" GROUPS");
 				proteinToGroupList.put(protein, groups);
-				System.out.println(protein+"\tna\t"+protein);
+				//System.out.println(protein+"\tna\t"+protein);
 			}
 			
 		}catch(Exception e){
@@ -254,12 +278,16 @@ public class CellDesignerPathwayStaining {
 	}
 	
 	public void createPoints(){
-		for(int i=0; i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+		int numAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();
+		System.out.print("Creating points ("+numAliases+")... ");
+		for(int i=0; i<numAliases;i++){
+			//if(i==1000*(int)(0.001f*i))
+			//	System.out.print(i+"\t");
 			CelldesignerSpeciesAlias alias = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 			if(!(CellDesigner.entities.get(alias.getSpecies())).getClass().getName().contains("CelldesignerSpeciesDocument")){
 			String spclass = Utils.getValue(((SpeciesDocument.Species)CellDesigner.entities.get(alias.getSpecies())).getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
 			if(!spclass.equals("DEGRADED")){
-				System.out.print(alias.getId()+":");
+				//System.out.print(alias.getId()+":");
 				Vector<String> hugos = getSpeciesHugos(alias);
 				String notes = Utils.getValue(((SpeciesDocument.Species)CellDesigner.entities.get(alias.getSpecies())).getNotes());
 				Vector<String> speciesGroups = getModuleNames(notes, true);
@@ -274,9 +302,14 @@ public class CellDesignerPathwayStaining {
 				if(cp.groups.size()>0)
 					aliaspoints.add(cp);
 			}}}
-		for(int i=0; i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+		System.out.println();
+		numAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();
+		System.out.print("Creating points ("+numAliases+")... ");
+		for(int i=0; i<numAliases;i++){
+			//if(i==1000*(int)(0.001f*i))
+			//	System.out.print(i+"\t");
 			CelldesignerComplexSpeciesAlias calias = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
-				System.out.print(calias.getId()+":");
+				//System.out.print(calias.getId()+":");
 				Vector<String> hugos = getSpeciesHugos(calias);
 				String notes = Utils.getValue(((SpeciesDocument.Species)CellDesigner.entities.get(calias.getSpecies())).getNotes());
 				Vector<String> speciesGroups = getModuleNames(notes, true);
@@ -291,6 +324,7 @@ public class CellDesignerPathwayStaining {
 				if(cp.groups.size()>0)
 					aliaspoints.add(cp);
 			}
+		System.out.println();
 	}
  	
 	public void addGroupToPoint(ColorPoint cp, Vector<String> hugos){
@@ -309,32 +343,34 @@ public class CellDesignerPathwayStaining {
 		}
 		Collections.sort(groups);
 		cp.groups = groups;
-		System.out.print("\tGROUP:");
+		/*System.out.print("\tGROUP:");
 		for(int j=0;j<groups.size();j++)
 			System.out.print(groups.get(j)+"\t");
-		System.out.println();
+		System.out.println();*/
 	}
 	
 	public Vector<String> getSpeciesHugos(CelldesignerSpeciesAlias alias){
 		Vector<String> hugos = new Vector<String>();
 		String spid = alias.getSpecies();
-		System.out.println(spid+"\t");
+		//System.out.println(spid+"\t");
 			SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
 			hugos = getHugosFromCellDesignerIdentity(sp.getAnnotation().getCelldesignerSpeciesIdentity());
-		System.out.print("HUGO: ");
+		/*System.out.print("HUGO: ");
 		for(int i=0;i<hugos.size();i++)
 			System.out.print(hugos.get(i)+"\t");
-		System.out.print("\n");
+		System.out.print("\n");*/
 		return hugos;
 	}
 	
 	public Vector<String> getSpeciesHugos(CelldesignerComplexSpeciesAlias calias){
 		Vector<String> hugos = new Vector<String>();
 		String spid = calias.getSpecies();
-		System.out.println(spid+"\tCOMPLEX");
+		//System.out.println(spid+"\tCOMPLEX");
 			SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(spid);
-			for(int i=0;i<cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
-				CelldesignerSpecies cis = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+			Vector<CelldesignerSpecies> v = complexId2IncludedSpecies.get(sp.getId());
+			if(v!=null)
+			for(int i=0;i<v.size();i++){
+				CelldesignerSpecies cis = v.get(i);
 				if(Utils.getValue(cis.getCelldesignerAnnotation().getCelldesignerComplexSpecies()).equals(sp.getId())){
 					Vector<String> hugos1 = getHugosFromCellDesignerIdentity(cis.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity());
 					for(int k=0;k<hugos1.size();k++)
@@ -343,10 +379,10 @@ public class CellDesignerPathwayStaining {
 				}
 			}
 		Collections.sort(hugos);
-		System.out.print("HUGO: ");
+		/*System.out.print("HUGO: ");
 		for(int i=0;i<hugos.size();i++)
 			System.out.print(hugos.get(i)+"\t");
-		System.out.print("\n");
+		System.out.print("\n");*/
 		return hugos;
 	}
 	
@@ -422,6 +458,9 @@ public class CellDesignerPathwayStaining {
 	
 	
 	public void makeRegularPoints(){
+		int numpoints = (int)(((float)width/(float)gridStepX)*((float)height/(float)gridStepY));
+		System.out.print("Making regular points (~"+numpoints+")...");
+		int k = 0;
 		for(float x=0;x<width;x+=gridStepX)
 			for(float y=0;y<height;y+=gridStepY){
 				int imin = -1;
@@ -442,7 +481,11 @@ public class CellDesignerPathwayStaining {
 					p.groups = aliaspoints.get(imin).groups;
 				}
 				regularpoints.add(p);
+				k++;
+				if(k==10000*(int)(0.0001f*k))
+					System.out.print(k+"\t");
 			}
+		System.out.println();
 	}
 	
 	public void assignRandomColorsToGroups(boolean redgreen){
@@ -471,6 +514,7 @@ public class CellDesignerPathwayStaining {
 		Color res = null;
 		Random r = new Random();	
 		res = new Color(r.nextFloat(),r.nextFloat(),r.nextFloat());		
+		if(!colorString.equals("na")){
 		//if(colorString.startsWith("[")&&colorString.endsWith("]")){
 			try{
 			StringTokenizer st  = new StringTokenizer(colorString,"([]) ;,");
@@ -481,6 +525,7 @@ public class CellDesignerPathwayStaining {
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+		}
 		//}
 		return res;
 	}
@@ -593,7 +638,7 @@ public class CellDesignerPathwayStaining {
 	  }
 	  
 	  public void paintStaining(String fn, String mappng_fn){
-		  staining = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_RGB);
+		  staining = new BufferedImage((int)(width/scaleImage), (int)(height/scaleImage), BufferedImage.TYPE_INT_RGB);
 		  Graphics2D g = staining.createGraphics();
 		    g.setBackground(new Color(1f,1f,1f));
 		    g.clearRect(0,0,staining.getWidth(),staining.getHeight());
@@ -603,7 +648,11 @@ public class CellDesignerPathwayStaining {
 			  ColorPoint point = regularpoints.get(i);
 			  if(!point.color.equals(black)){
 				  g.setColor(point.color);
-				  g.fillRect((int)(point.x-gridStepX/2f), (int)height-(int)(point.y+gridStepY/2f), (int)gridStepX, (int)gridStepY);
+				  int x = (int)((point.x-gridStepX/2f)/scaleImage);
+				  int y = (int)((height-(int)(point.y+gridStepY/2f))/scaleImage);
+				  int w = (int)(gridStepX/scaleImage);
+				  int h = (int)(gridStepY/scaleImage);
+				  g.fillRect(x-1, y-1, w+1, h+1);
 			  }
 		  }
 		  try{

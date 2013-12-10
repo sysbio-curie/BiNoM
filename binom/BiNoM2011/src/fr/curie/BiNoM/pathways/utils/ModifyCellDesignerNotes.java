@@ -48,6 +48,11 @@ public class ModifyCellDesignerNotes {
 	
 	public boolean spreadReactionRefsToSpecies = false;
 	
+	/*
+	 * Prefix to be used for ids if needed
+	 */
+	public String prefix = "";
+	
 	Vector<String> keys = new Vector<String>();
 	Vector<String> noteAdds = new Vector<String>();
 	HashMap<String,Vector<String>> species2ReactionIds = new HashMap<String,Vector<String>>(); 
@@ -100,7 +105,8 @@ public class ModifyCellDesignerNotes {
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
 		mn.spreadReactionRefsToSpecies = true;
 		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/mTOR_nucleus_zoom_3"; 
-		String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test";
+		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test";
+		String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test1_master";
 		//String nameCD = "C:/Datas/Binomtest/annotation/gmt/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
@@ -109,7 +115,7 @@ public class ModifyCellDesignerNotes {
 		//String nameCD = "C:/Datas/NaviCell/maps/egfr_src/master";
 	    //String nameCD = "C:/Datas/NaviCell/maps/dnarepair_src/master";
 		//String nameCD = "c:/datas/binomtest/test_master";
-		String nameNotes = "C:/Datas/Binomtest/annotation/comm_temp.txt";
+		//String nameNotes = "C:/Datas/Binomtest/annotation/comm_temp.txt";
 		
 		//extractCellDesignerNotesDialog dialog = new extractCellDesignerNotesDialog(); 
 		//dialog.raise();
@@ -463,8 +469,10 @@ public class ModifyCellDesignerNotes {
 						degraded = true;
 				if(formatAnnotation)if(!degraded)
 					annot = processAnnotations(annot,Utils.getValue(sp.getName()),sp.getId(),reqsections, false, nonannotated, secs);
-				if(spreadReactionRefsToSpecies)
+				if(spreadReactionRefsToSpecies){
 					annot = spreadReactionReferencesToSpecies(sp.getId(),annot);
+					secs = divideInSections(annot);
+				}
 				
 			
 			if(sp.getAnnotation()!=null)if(sp.getAnnotation().getCelldesignerSpeciesIdentity()!=null){
@@ -1098,18 +1106,29 @@ public class ModifyCellDesignerNotes {
 					AnnotationSection ReactionReference = getSectionByName(reactionSecs,"References");
 					if(ReactionReference!=null){
 						String refText = Utils.cutFirstLastNonVisibleSymbols(ReactionReference.content);
+						if(!References.content.contains(refText))
 						if(!refText.equals("")){
 							if(!References.content.equals(""))
 								References.content+="\n";
+							String mid = sbmlDoc.getSbml().getModel().getId();
 							if(refText.contains("\n"))
-								References.content+=rid+":\n"+refText;
+								References.content+=prefix+rid+"(MAP:"+mid+"):\n"+refText;
+								//References.content+="\n"+refText;
 							else
-								References.content+=rid+": "+refText;
+								References.content+=prefix+rid+":(MAP:"+mid+") "+refText;
+								//References.content+=refText;
+						
 						}
 					}
 				}
 			}
 		}
+		for(int i=1;i<secs.size();i++)
+			newAnnot+=secs.get(i).toString();
+		newAnnot+=secs.get(0).toString();
+		// make one more processing for removing possible repetitions
+		secs = divideInSections(newAnnot);
+		newAnnot = "";
 		for(int i=1;i<secs.size();i++)
 			newAnnot+=secs.get(i).toString();
 		newAnnot+=secs.get(0).toString();

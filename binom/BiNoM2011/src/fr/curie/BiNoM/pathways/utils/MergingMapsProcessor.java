@@ -1479,7 +1479,7 @@ public class MergingMapsProcessor {
 	 * @param text map XML text
 	 */
 	private void makePrefix(String text){
-		generateRandomPrefix();
+		//generateRandomPrefix();
 		StringTokenizer st = new StringTokenizer(text," =\"><"); 
 		while(st.hasMoreTokens()){
 			String s = st.nextToken();
@@ -1541,7 +1541,7 @@ public class MergingMapsProcessor {
 		cd1 = CellDesigner.loadCellDesigner(target);
 		cd2 = CellDesigner.loadCellDesigner(source);
 
-		// We create lists of species names to match them is ids are not found
+		// We create lists of species names to match them if ids are not found
 		HashMap<String, String> mapNameId1 = new HashMap<String, String>();
 		HashMap<String, String> mapNameId2 = new HashMap<String, String>();
 		HashMap<String, String> mapIdName1 = new HashMap<String, String>();
@@ -1845,6 +1845,8 @@ public class MergingMapsProcessor {
 		
 		for(int i=0;i<mapList.size();i++){
 			String fileName = mapList.get(i).fileName;
+			String text = Utils.loadString(fileName);
+			makePrefix(text);
 			System.out.println("---------- Map "+fileName);
 			// 1. Add MAP: tag before MODULE: tag
 			// 2. Spread reaction references to surrounding species
@@ -1859,6 +1861,7 @@ public class MergingMapsProcessor {
 			mn.removeInvalidTags = true;
 			mn.moveNonannotatedTextToReferenceSection = false;
 			mn.spreadReactionRefsToSpecies = true;
+			mn.prefix = prefix;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
 			mn.automaticallyProcessNotes();
 			System.out.println("Saving...");
@@ -1898,7 +1901,9 @@ public class MergingMapsProcessor {
 			mn.removeEmptySections = true;
 			mn.removeInvalidTags = true;
 			mn.moveNonannotatedTextToReferenceSection = false;
+			mn.spreadReactionRefsToSpecies = true;
 			mn.sbmlDoc = CellDesigner.loadCellDesigner(fileName);
+			//mn.automaticallyProcessNotes();
 			mn.synchronizeAnnotations(mcn);
 			System.out.println("Saving...");			
 			CellDesigner.saveCellDesigner(mn.sbmlDoc, fileName);			

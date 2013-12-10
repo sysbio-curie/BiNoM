@@ -65,6 +65,14 @@ import java.net.*;
 @SuppressWarnings("unchecked")
 public class Utils {
 	
+	public static void main(String args[]){
+		//for(int i=0;i<255;i++)
+		//	System.out.println(i+"\t"+(char)i);
+		String text = Utils.loadString("C:/Datas/acsn/assembly/acsn_src/acsn_bib.txt");
+		text = correctIllegalCharacters(text);
+	}
+	
+	
 	private static String eclipse(final String s, final int levels) {
 		final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		int level = 0;
@@ -1331,6 +1339,37 @@ public static boolean checkIfOutsideRectangle(float x, float y, float w, float h
 	
 	return outside;
 }
+
+public static String correctIllegalCharacters(String text){
+	char textc[] = text.toCharArray();
+	Vector<Integer> notgood = new Vector<Integer>();
+	for(int i=0;i<textc.length;i++){
+		char c = textc[i];
+		int ic = (int)c;
+		boolean good = false;
+		if((c>31)&&(c<127)||(c==9)||(c==10)||(c==11)||(c==12)||(c==13)) good = true;
+		switch(ic){
+			case 181: textc[i] = 'm'; good = true; break;
+			case 194: textc[i] = 'a'; good = true; break;
+			//case 195: good = true; break;
+			//case 196: good = true; break;
+			//case 197: good = true; break;
+			//case 206: good = true; break;
+			//case 226: good = true; break;
+		}
+		if(!good){
+			textc[i] = '-';
+			//boolean found = false;
+			//for(int k: notgood)if(k==(int)c) { found = true; break; }
+			//if(!found) notgood.add((int)c);
+		}
+			//System.out.println(c+"\t"+(int)c);
+	}
+	Collections.sort(notgood);
+	//for(int i: notgood) System.out.println(""+i+"\t"+(char)i);
+	return new String(textc);
+}
+
 
 
 

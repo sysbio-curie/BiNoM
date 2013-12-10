@@ -1,5 +1,4 @@
 /*
-   BiNoM Cytoscape Plugin
    Copyright (C) 2006-2007 Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
 
    BiNoM Cytoscape Plugin is free software; you can redistribute it and/or

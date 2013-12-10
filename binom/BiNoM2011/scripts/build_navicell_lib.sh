@@ -9,6 +9,9 @@ if [ $# != 1 ]; then echo "usage: $0 TARFILE"; exit 1; fi
 
 tarfile=$1
 
+echo $tarfile | grep "^/" > /dev/null
+if [ $? != 0 ]; then tarfile=$(pwd)/$tarfile; fi
+
 dir=$(dirname $0)
 echo $dir | grep "^\." > /dev/null
 if [ $? = 0 ]; then dir=$(pwd)/$dir; fi

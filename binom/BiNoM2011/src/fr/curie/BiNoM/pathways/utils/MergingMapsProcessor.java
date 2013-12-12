@@ -982,7 +982,7 @@ public class MergingMapsProcessor {
 		for (SpeciesDocument.Species sp : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
 			if (speciesNames.containsKey(name)) {
-				//System.out.println(">>>common:"+name);
+				System.out.println("common species: "+name+" id1: "+speciesNames.get(name)+" id2: "+sp.getId());
 				this.speciesMap.put(sp.getId(), speciesNames.get(name));
 				this.speciesIdList.add(sp.getId());
 				//System.out.println(">>>"+sp.getId());
@@ -1001,16 +1001,21 @@ public class MergingMapsProcessor {
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
 		XmlString xs = XmlString.Factory.newInstance();
-
 		
 		/*
 		 * Deal with species
 		 */
 		
-		boolean doMergeSpecies = false;
+		boolean doMergeSpecies = true;
 		if (doMergeSpecies) {
+			
+			System.out.println("merging species...");
+			
+			/*
+			 * Change redundant species in species aliases
+			 */
 			for (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias al : cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()) {
-				String al_id = al.getId();
+				//String al_id = al.getId();
 				String al_species_id = al.getSpecies();
 				//System.out.println("alias id="+al_id+" species id="+al_species_id);
 				String species_id1 = speciesMap.get(al_species_id); 
@@ -1018,7 +1023,11 @@ public class MergingMapsProcessor {
 					al.setSpecies(species_id1);
 				}
 			}
-
+			
+			/*
+			 * Loop over reactions, change redundant species in reactants, base reactants, products, base products
+			 * modifiers, base products. 
+			 */
 			for (ReactionDocument.Reaction re : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
 
 				for(int j=0;j<re.getListOfReactants().sizeOfSpeciesReferenceArray();j++){
@@ -1080,27 +1089,22 @@ public class MergingMapsProcessor {
 
 			}
 
-
-			//		for (CelldesignerSpeciesDocument.CelldesignerSpecies sp : cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
-			//			if (speciesMap.get(sp.getId()) != null) {
-			//				System.out.println(sp.getId());
-			//			}
-			//		}
-
-			// remove redundant species
+			/*
+			 *  remove redundant species from map 2
+			 */
 			int idx=0; 
 			int numberOfSpecies = cd1.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray(); 
 			while(idx<numberOfSpecies){
 				SpeciesDocument.Species sp = cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray(idx);
 				if(speciesIdList.indexOf(sp.getId())>=0){
 					numberOfSpecies--;
-					//System.out.println("Species "+sp.getId()+" removed ("+CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), Utils.getValue(sp.getName()), Utils.getValue(sp.getName()), sp.getCompartment(), true, false, "", cd.getSbml())+")");
 					cd1.getSbml().getModel().getListOfSpecies().removeSpecies(idx);        
 				}else{
 					idx++;
 				}
 			}
 		}
+		
 		/*
 		 *  Deal with redundant proteins, genes and rnas
 		 */

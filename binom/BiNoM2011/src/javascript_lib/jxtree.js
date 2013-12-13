@@ -181,7 +181,7 @@ function JXTreeMatcher(pattern, hints) {
 				if (pattern[pattern.length-1] != '$') {
 					pattern = pattern + "\\w*";
 				}
-				console.log("regex pattern [" + pattern + "]");
+				//console.log("regex pattern [" + pattern + "]");
 				this.regex_arr.push(new RegExp("\\b" + pattern + "\\b", this.search_cs));
 			}
 		}
@@ -190,7 +190,7 @@ function JXTreeMatcher(pattern, hints) {
 		for (var nn = 0; nn < patterns.length; ++nn) {
 			var pattern = patterns[nn].trim().replace(re, ".*");;
 			if (pattern) {
-				console.log("word pattern [" + patterns[nn].trim() + "] [" + pattern + "]");
+				//console.log("word pattern [" + patterns[nn].trim() + "] [" + pattern + "]");
 				this.regex_arr.push(new RegExp("\\b" + pattern + "\\b", this.search_cs));
 			}
 		}
@@ -430,7 +430,7 @@ JXTree.prototype = {
 				}
 			}
 		}
-		console.log("find [" + pattern + "] -> " + nodes.length + " (" + this.getNodeCount() + ")");
+		//console.log("find [" + pattern + "] -> " + nodes.length + " (" + this.getNodeCount() + ")");
 		if (action == 'select') {
 			for (var nn = 0; nn < this.roots.length; ++nn) {
 				this.roots[nn].checkSubtree(JXTree.UNCHECKED);
@@ -447,7 +447,7 @@ JXTree.prototype = {
 				node_map[nodes[nn].getId()] = true;
 			}
 			var jxsubtree = this.clone(node_map);
-			console.log("jxtree cloned [" + $(hints.div).attr("id") + "]");
+			//console.log("jxtree cloned [" + $(hints.div).attr("id") + "]");
 			if (hints && hints.div) {
 				if (true) {
 					$(hints.div).empty();

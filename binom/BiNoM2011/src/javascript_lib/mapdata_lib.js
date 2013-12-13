@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-
 if (!window.console) {
 	window.console = new function()
 	{
@@ -366,7 +365,9 @@ Mapdata.prototype = {
 		}
 
 		if (action == 'subtree' && res_jxtree) {
-			$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+			if (!no_ext) {
+				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+			}
 
 			uncheck_all_entities(win);
 
@@ -410,7 +411,7 @@ Mapdata.prototype = {
 					to_find_str += to_find[nn];
 				}
 				to_find_str += ")$";
-				console.log("to_find_str [" + to_find_str + "]");
+				//console.log("to_find_str [" + to_find_str + "]");
 				hints.case_sensitive = true;
 				mapdata.searchFor(win, to_find_str, hints.div);
 				//mapdata.findJXTreeContinue(jxtree, to_find_str, no_ext, win, action, hints, module_name);
@@ -2099,12 +2100,16 @@ Datatable.prototype = {
 	getId: function() {return this.id;},
 
 	forceDisplay: function() {
+		console.log("force display");
 		$("#dt_datatable_notice_id" + this.id).remove();
 		this.force_display = true;
 		var tab_body = $("#dt_datatable_tabs");
-		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+		//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 		this.data_div = $("#dt_datatable_id" + this.id);
-		this.data_table = $("#dt_datatable_table_id" + this.id);
+		//this.data_table = $("#dt_datatable_table_id" + this.id);
+		this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
+		this.data_table_sample = $("#dt_datatable_sample_table_id" + this.id);
 		this.switch_button = $("#switch_view_" + this.id);
 		this.switch_button.css('font-size', '10px');
 		this.switch_button.css('background', 'white');
@@ -2125,18 +2130,24 @@ Datatable.prototype = {
 
 	epilogue: function() {
 		var tab_body = $("#dt_datatable_tabs");
-		if (true) {
-		} else if (!this.isLarge()) {
-			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+		// BORN AGAIN datatable tabs
+		/*if (true) {
+		} else*/ if (!this.isLarge()) {
+			console.log("adding tab");
+			//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+//			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 			this.data_div = $("#dt_datatable_id" + this.id);
 			this.data_table = $("#dt_datatable_table_id" + this.id);
+			this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
+			this.data_table_sample = $("#dt_datatable_sample_table_id" + this.id);
 			this.switch_button = $("#switch_view_" + this.id);
 			//this.switch_button.addClass('switch-button');
 			this.switch_button.css('font-size', '10px');
 			this.switch_button.css('background', 'white');
 			this.switch_button.css('color', 'darkblue');
 		} else {
-			tab_body.append("<div id='dt_datatable_notice_id" + this.id + "'><div class='datatable-too-large'>Notice: datatable " + this.name + " is too large (" + mapSize(this.gene_index) + "x" + mapSize(this.sample_index) + " matrix) for whole data displaying<br/><br/>" + make_button("Force displaying", "force_datatable_display_" + this.id, "force_datatable_display(" + this.id + ")") + "</div></div>");
+			tab_body.append("<div id='dt_datatable_notice_id" + this.id + "'><div class='datatable-too-large'>Notice: datatable " + this.name + " is large - " + mapSize(this.gene_index) + " genes / " + mapSize(this.sample_index) + " samples -, whole data displaying may slow down NaviCell<br/><br/>" + make_button("Force data displaying", "force_datatable_display_" + this.id, "force_datatable_display(" + this.id + ")") + "</div></div>");
 			this.data_div = $("#dt_datatable_notice_id" + this.id);
 		}
 
@@ -2158,8 +2169,9 @@ Datatable.prototype = {
 	},
 
 	isLarge: function() {
-		return true;
-
+		// BORN AGAIN datatable tabs
+		// return true;
+		//return false;
 		return !this.force_display && mapSize(this.sample_index) * mapSize(this.gene_index) > MAX_MATRIX_SIZE;
 	},
 
@@ -2168,9 +2180,23 @@ Datatable.prototype = {
 			return;
 		}
 		this.current_view = "gene";
+		if (!this.data_table_gene.ok) {
+			console.log("building gene view " +  mapSize(this.gene_index) + "x" + mapSize(this.sample_index));
+			this.data_table_gene.children().remove();
+			this.data_table_gene.append(this.makeDataTable_genes());
+			this.data_table_gene.tablesorter();
+			this.data_table_gene.ok = true;
+		}
+		/*
 		this.data_table.children().remove();
 		this.data_table.append(this.makeDataTable_genes());
 		this.data_table.tablesorter();
+		*/
+		console.log("displaying genes..");
+		this.data_table_sample.css("display", "none");
+		this.data_table_gene.css("display", "block");
+		this.switch_button.val("Switch to Samples / Genes");
+		console.log("ok");
 	},
 
 	makeSampleView: function() {
@@ -2178,9 +2204,23 @@ Datatable.prototype = {
 			return;
 		}
 		this.current_view = "sample";
+		if (!this.data_table_sample.ok) {
+			console.log("building sample view " +  mapSize(this.gene_index) + "x" + mapSize(this.sample_index));
+			this.data_table_sample.children().remove();
+			this.data_table_sample.append(this.makeDataTable_samples());
+			this.data_table_sample.tablesorter();
+			this.data_table_sample.ok = true;
+		}
+		/*
 		this.data_table.children().remove();
 		this.data_table.append(this.makeDataTable_samples());
 		this.data_table.tablesorter();
+		*/
+		console.log("displaying samples..");
+		this.data_table_sample.css("display", "block");
+		this.data_table_gene.css("display", "none");
+		this.switch_button.val("Switch to Genes / Samples");
+		console.log("ok");
 	},
 
 	switchView: function() {
@@ -2242,9 +2282,16 @@ Datatable.prototype = {
 		str += "<tbody>";
 		for (var gene_name in this.gene_index) {
 			str += "<tr><td>" + gene_name + "</td>";
+			var limit = 0;
 			for (var sample_name in this.sample_index) {
+				/*
+				if (limit++ == 10) {
+					break;
+				}
+				*/
 				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
-				str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
+				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
+				str += "<td class='datacell'>" + value + "</td>";
 			}
 			str += "</tr>";
 		}
@@ -2290,9 +2337,16 @@ Datatable.prototype = {
 		str += "<tbody>";
 		for (var sample_name in this.sample_index) {
 			str += "<tr><td>" + sample_name + "</td>";
+			var limit = 0;
 			for (var gene_name in this.gene_index) {
+				/*
+				if (limit++ == 10) {
+					break;
+				}
+				*/
 				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
-				str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
+				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
+				str += "<td class='datacell'>" + value + "</td>";
 			}
 			str += "</tr>";
 		}
@@ -2480,10 +2534,12 @@ DrawingConfig.prototype = {
 };
 
 function switch_view(id) {
+	console.log("switch_view(" + id + ")");
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
 		datatable.switchView();
 	}
+	console.log("switch_view(" + id + ") -> ok");
 }
 
 //

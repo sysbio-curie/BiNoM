@@ -856,10 +856,11 @@ function update_gene_status_table(doc, params) {
 }
 
 function update_datatable_status_table(doc, params) {
+	console.log("update_datatable_status_table");
 	if (!navicell.DTStatusMustUpdate && (!params || !params.force)) {
 		return;
 	}
-	//console.log("update_datatable_status_table");
+	console.log("update_datatable_status_table here we go");
 	var table = $("#dt_datatable_status_table", doc);
 	var update_label = $("#dt_datatable_status_update_label", doc);
 	var update_checkbox = $("#dt_datatable_status_update", doc);
@@ -946,6 +947,7 @@ function update_status_tables(params) {
 	//navicell.annot_factory.sync();
 	//navicell.group_factory.buildGroups();
 	for (var map_name in maps) {
+		console.log("update_status_table " + map_name);
 		var doc = maps[map_name].document;
 		update_sample_status_table(doc, params);
 		update_gene_status_table(doc, params);

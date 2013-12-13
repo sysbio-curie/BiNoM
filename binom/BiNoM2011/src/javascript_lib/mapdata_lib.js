@@ -2199,6 +2199,7 @@ Datatable.prototype = {
 		console.log("ok");
 	},
 
+	// ...
 	makeSampleView: function() {
 		if (this.isLarge()) {
 			return;

@@ -1243,10 +1243,13 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  return entityNetwork;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[]){
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[], int order){
 	  Vector<Node> res = new Vector<Node>();
 	  reactionNetwork.calcNodesInOut();
 	  Node reactionNode = reactionNetwork.getNode(reid);
+	  
+	  if(reid.equals("re28"))
+		  System.out.println();
 	  
 	  if(reactionNode!=null){
 		  System.out.print(reid+":\t");
@@ -1259,11 +1262,32 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 					  if(typesOfRegulations[k].equals(interactionTypes.get(j)))
 						  typeFound = true;
 				  }
+				  // Experimentally, if order==2 then we also consider "LEFT" (to take into account regulation of complex assembly)
+				  if(order==2)
+					  if(interactionTypes.get(j).equals("LEFT"))
+						  typeFound = true;
 			  }
 			  if(typeFound){
+				  String nodeType = e.Node1.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE");
+				  if(!nodeType.equals("GENE"))
 				  if(!res.contains(e.Node1)){
-					  res.add(e.Node1);
 					  System.out.print(e.Node1.Id+"\t");
+					  Vector<Node> res2 = new Vector<Node>();
+					  if(order>1){
+						  if(!res.contains(e.Node1))
+						  for(int k=0;k<e.Node1.incomingEdges.size();k++){
+							  String reid2 = e.Node1.incomingEdges.get(k).Node1.getFirstAttributeValue("CELLDESIGNER_REACTION");
+							  Vector<Node> regs = findReactionRegulators(reactionNetwork, reid2, typesOfRegulations, order-1);
+							  for(Node n: regs)
+								  if(!res2.contains(n)){
+									  res2.add(n);
+								  }
+						  }
+					  }
+					  res.add(e.Node1);
+					  for(Node n:res2)
+						  if(!res.contains(n))
+							  res.add(n);
 				  }
 			  }
 		  }
@@ -1272,16 +1296,25 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  return res;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[]){
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[]){
+	  return findReactionRegulators(reactionNetwork, reid, typesOfRegulations, 1);
+  }
+  
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[], int order){
 	  Vector<Node> res = new Vector<Node>();
 	  Iterator<String> it = reactionIds.iterator();
 	  while(it.hasNext()){
-		  Vector<Node> regs = findReactionRegulators(reactionNetwork,it.next(),typesOfRegulations);
+		  String rid = it.next();
+		  Vector<Node> regs = findReactionRegulators(reactionNetwork,rid,typesOfRegulations, order);
 		  for(int j=0;j<regs.size();j++)
 			  if(!res.contains(regs.get(j)))
 				  res.add(regs.get(j));
 	  }
 	  return res;
+  }
+  
+  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[]){
+	  return findReactionRegulators(reactionNetwork, reactionIds, typesOfRegulations, 1);
   }
   
   

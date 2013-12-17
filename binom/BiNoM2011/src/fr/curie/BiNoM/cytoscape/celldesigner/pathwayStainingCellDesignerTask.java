@@ -62,6 +62,7 @@ public class pathwayStainingCellDesignerTask implements Task {
 		public float thresholdForComputingGradient = 2f;
 		public float gridSizeX = 20f;
 		public float gridSizeY = 20f;
+		public float scaleImage = 1f;
 	}
     
     public pathwayStainingCellDesignerTask(String cellDesignerFileName, String pngFileName, String dataTableFileName, String proteinGroupFileName, stainingOptions _options){
@@ -87,6 +88,7 @@ public class pathwayStainingCellDesignerTask implements Task {
     			cps.thresholdGradient = options.thresholdForComputingGradient;
     			cps.useModuleDefinitionsFromCellDesignerFile = options.useModuleDefinitionsFromCellDesignerFile;
     			cps.useProteinNameIfHUGOisntFound = options.useProteinNameIfHUGOisntFound;
+    			cps.scaleImage = options.scaleImage;
     			
     			cps.run(CellDesignerFileName, PngFileName, DataTableFileName, ProteinGroupFileName);    			
     		}else{

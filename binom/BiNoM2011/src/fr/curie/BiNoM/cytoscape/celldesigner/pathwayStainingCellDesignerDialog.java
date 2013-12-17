@@ -94,6 +94,8 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
     private JTextField gridSizeX = null;
     private JTextField gridSizeY = null;
     
+    private JTextField scaleImage = null;
+    
     private static final double COEF_X = 4, COEF_Y = 1.10;
 
     private pathwayStainingCellDesignerDialog() {
@@ -523,7 +525,34 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
 	c.anchor = GridBagConstraints.WEST;
 	c.fill = GridBagConstraints.NONE;
 	c.weightx = 0;
-	panel.add(gridSizeY,c);	
+	panel.add(gridSizeY,c);
+	
+	y++;
+	
+	lab2 = new JLabel("Scale Image  ");
+	x = 0;
+	c = new GridBagConstraints();
+	c.ipady = 20;	
+	c.gridx = x++;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.EAST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(lab2,c);
+	
+	
+	scaleImage = new JTextField(5);
+	scaleImage.setText(""+options.scaleImage);
+	x = 1;
+	c = new GridBagConstraints();
+	c.ipady = 20;	
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(scaleImage,c);	
+	
 	
 	
 	JPanel buttonPanel = new JPanel();
@@ -541,6 +570,7 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
             options.thresholdForComputingGradient = Float.parseFloat(thresholdForComputingGradient.getText());
             options.gridSizeX = Float.parseFloat(gridSizeX.getText());
             options.gridSizeY = Float.parseFloat(gridSizeY.getText());
+            options.scaleImage = Float.parseFloat(scaleImage.getText());
             }catch(Exception ee){
             	ee.printStackTrace();
             }
@@ -582,7 +612,7 @@ public class pathwayStainingCellDesignerDialog extends JFrame {
 	this.biopax = biopax;
 
 	Dimension size = getSize();
-	setSize(new Dimension(650, 640));
+	setSize(new Dimension(650, 680));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

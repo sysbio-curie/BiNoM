@@ -454,16 +454,16 @@ public class SetOverlapAnalysis {
 		
 		FileWriter fw = new FileWriter(fileNamePreifix+".minhitsets");
 
-		System.out.print("SIZE\t"); fw.write("SIZE\t");
-		for(int sz=1;sz<=maxFoundSize;sz++) { System.out.print("N"+sz+"\t"); fw.write("N"+sz+"\t"); } 
-		for(int sz=1;sz<=maxFoundSize;sz++) { System.out.print("SETS"+sz+"\t"); fw.write("SETS"+sz+"\t"); } 		
-		System.out.println(); fw.write("\n");
+		/*System.out.print("SIZE\t");*/ fw.write("SIZE\t");
+		for(int sz=1;sz<=maxFoundSize;sz++) { /*System.out.print("N"+sz+"\t");*/ fw.write("N"+sz+"\t"); } 
+		for(int sz=1;sz<=maxFoundSize;sz++) { /*System.out.print("SETS"+sz+"\t");*/ fw.write("SETS"+sz+"\t"); } 		
+		/*System.out.println();*/ fw.write("\n");
 		
 		
 		Iterator<String> it1 = oca.hitSetSizeOne.iterator();
 		while(it1.hasNext()){
 			String node = it1.next();
-			System.out.println("1\t"+node);
+			//System.out.println("1\t"+node);
 			fw.write("1\t"+node+"\n");
 		}
 
@@ -492,7 +492,7 @@ public class SetOverlapAnalysis {
 					fw.write(set.get(i)+"\t");
 				}
 			for(int i=set.size();i<=maxFoundSize;i++){
-				System.out.print("\t");
+				//System.out.print("\t");
 				fw.write("\t");
 			}
 			for(int i=0;i<set.size();i++){
@@ -501,10 +501,10 @@ public class SetOverlapAnalysis {
 				String s = "(";
 				for(int j=0;j<names.size();j++) if(j==names.size()-1) s+=names.get(j); else s+=names.get(j)+";";
 				s+=")";
-				System.out.print(s+"\t");
+				//System.out.print(s+"\t");
 				fw.write(s+"\t");
 			}
-			System.out.println();
+			//System.out.println();
 			fw.write("\n");
 			hitSetString.add(set);
 			}
@@ -513,21 +513,21 @@ public class SetOverlapAnalysis {
 		}
 		
 		FileWriter fw1 = new FileWriter(fileNamePreifix+".freqmhs");		
-		System.out.println();
-		System.out.print("NODE\tSETS\tNSETS\t"); fw1.write("NODE\tSETS\tNSETS\t");
-		for(int sz=2;sz<=maxFoundSize;sz++) { System.out.print("SZ"+sz+"\t"); fw1.write("SZ"+sz+"\t"); } System.out.println(); fw1.write("\n");
+		/*System.out.println();
+		System.out.print("NODE\tSETS\tNSETS\t");*/ fw1.write("NODE\tSETS\tNSETS\t");
+		for(int sz=2;sz<=maxFoundSize;sz++) { /*System.out.print("SZ"+sz+"\t");*/ fw1.write("SZ"+sz+"\t"); } /*System.out.println();*/ fw1.write("\n");
 		for(int i=0;i<allproteins.size();i++){
 			Vector<String> names = getListOfSets(allproteins.get(i));
 			String s = "(";
 			for(int j=0;j<names.size();j++) if(j==names.size()-1) s+=names.get(j); else s+=names.get(j)+";";
 			s+=")";
-			System.out.print(allproteins.get(i)+"\t"+s+"\t"+names.size()+"\t");
+			//System.out.print(allproteins.get(i)+"\t"+s+"\t"+names.size()+"\t");
 			fw1.write(allproteins.get(i)+"\t"+s+"\t"+names.size()+"\t");
 			for(int j=2;j<=maxFoundSize;j++){
-				System.out.print(frequencies.get(j-2).get(i).score+"\t");
+				//System.out.print(frequencies.get(j-2).get(i).score+"\t");
 				fw1.write(frequencies.get(j-2).get(i).score+"\t");
 			}
-			System.out.println(); fw1.write("\n");
+			/*System.out.println();*/ fw1.write("\n");
 		}
 		fw1.close();
 		
@@ -585,12 +585,12 @@ public class SetOverlapAnalysis {
 		fw.close();
 	}
 	
-	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfRegulations[]) throws Exception{
+	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfRegulations[], int order) throws Exception{
 		FileWriter fw = new FileWriter(prefix+".gmt");
 		Vector<String> reactions = new Vector<String>();
 		for(int i=0;i<setnames.size();i++){
 			fw.write(setnames.get(i)+"\tna\t");
-			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfRegulations);
+			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfRegulations, order);
 			for(String s:sets.get(i)){
 				if(!reactions.contains(s))
 					reactions.add(s);
@@ -608,10 +608,10 @@ public class SetOverlapAnalysis {
 		for(String re: reactions){
 			HashSet<String> set = new HashSet<String>();
 			set.add(re);
-			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, set, typesOfRegulations);
+			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, set, typesOfRegulations, order);
 			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
-			regnames.remove("G1 cell cycle phase");
-			regnames.remove("S cell cycle phase");
+			//regnames.remove("G1 cell cycle phase");
+			//regnames.remove("S cell cycle phase");
 			if(regnames.size()>0){
 			fw.write(re+"\tna\t");						
 			for(int j=0;j<regnames.size();j++){

@@ -319,7 +319,7 @@ public class CellDesignerGenerator {
 					if(speciesAliases.get(aliasid)!=null){
 						speciesAliases.get(aliasid).getCelldesignerBounds().setX(""+xf);
 						speciesAliases.get(aliasid).getCelldesignerBounds().setY(""+yf);
-						speciesAliases.get(aliasid).setCompartmentAlias(compname+"_alias");
+					    speciesAliases.get(aliasid).setCompartmentAlias(compname+"_alias");
 					}
 					if(complexSpeciesAliases.get(aliasid)!=null){
 						moveComplexSpeciesAliasTo(complexSpeciesAliases.get(aliasid), xf, yf);

@@ -119,12 +119,15 @@
 
   <div id="dt_datatable_status">
     <form>
+      <div id='dt_datatable_status_editing'></div>
       <table id="dt_datatable_status_table" class="tablesorter">
       </table>
       <br/>
       <br/>
+<!--
       <label id="dt_datatable_status_update_label" for="unlock_datatables" class="update-checkbox"></label>
       <input type="checkbox" id="dt_datatable_status_update" name="unlock_datatables" onchange='update_datatable_status_table(window.document, {force: true});'></input>
+-->
      <div id="dt_datatable_buttonpane">
        <table border='0'>
 	 <tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td>
@@ -141,7 +144,7 @@
 </div>
 
 <div id="dt_sample_annot">
-  <h3>Sample Annotations</h3>
+  <h3>Group Management</h3>
   <form>
     <fieldset>
       <div id="dt_sample_annot_table_div">
@@ -150,7 +153,7 @@
       </div>
       <br/>
       <br/>
-      <label for="file">Annotation File</label>
+      <label for="file">Sample annotations used to build groups:</label>
       <input type="file" name="file" id="dt_sample_file" value="" class="text ui-widget-content ui-corner-all" />
       <div id="dt_sample_annot_status"></div> 
     </fieldset>
@@ -203,16 +206,44 @@
     </table>
   </div>
 
-  <h4>Glyph</h4>
-  <div class='drawing_config_box'>
+  <h4>Glyphs</h4>
+  <div class='drawing_config_box' style='overflow: auto; max-height: 125px'>
     <table>
-      <tr>
-	<td>Display</td><td><input id="drawing_config_glyph_display" type="checkbox" onchange='drawing_editing(true)'></input></td>
-	</tr>
+      <tr><td style='text-align: center; font-weight: bold'>Glyph 1</td></tr>
       <tr>
 	<td>&nbsp;</td>
-	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph()'><span class='drawing_config_link'>configuration</span></a></td>
+	<td>Display</td><td><input id="drawing_config_glyph_display_1" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph(1)'><span class='drawing_config_link'>configuration</span></a></td>
       </tr>
+
+      <tr>
+      <tr><td style='text-align: center; font-weight: bold'>Glyph 2</td></tr>
+	<td>&nbsp;</td>
+	<td>Display</td><td><input id="drawing_config_glyph_display_2" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph(2)'><span class='drawing_config_link'>configuration</span></a></td>
+      </tr>
+
+      <tr><td style='text-align: center; font-weight: bold'>Glyph 3</td></tr>
+      <tr>
+	<td>&nbsp;</td>
+	<td>Display</td><td><input id="drawing_config_glyph_display_3" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph(3)'><span class='drawing_config_link'>configuration</span></a></td>
+      </tr>
+
+      <tr><td style='text-align: center; font-weight: bold'>Glyph 4</td></tr>
+      <tr>
+	<td>&nbsp;</td>
+	<td>Display</td><td><input id="drawing_config_glyph_display_4" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph(4)'><span class='drawing_config_link'>configuration</span></a></td>
+      </tr>
+
+      <tr><td style='text-align: center; font-weight: bold'>Glyph 5</td></tr>
+      <tr>
+	<td>&nbsp;</td>
+	<td>Display</td><td><input id="drawing_config_glyph_display_5" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_glyph(5)'><span class='drawing_config_link'>configuration</span></a></td>
+      </tr>
+
       </table>
   </div>
 
@@ -262,13 +293,49 @@
   <div id="barplot_gene_choice"></div>
 </div>
 
-<div id="glyph_editor_div">
-  <h3>Glyph Configuration Editor</h3>
-  <div id="glyph_editing"></div>
-  <table id='glyph_editor_table'>
+<div id="glyph_editor_div_1">
+  <h3>Glyph 1 Configuration Editor</h3>
+  <div id="glyph_editing_1"></div>
+  <table id='glyph_editor_table_1'>
   </table>
-  <div id="glyph_editor_size_div"></div>
-  <div id="glyph_gene_choice"></div>
+  <div id="glyph_editor_size_div_1"></div>
+  <div id="glyph_gene_choice_1"></div>
+</div>
+
+<div id="glyph_editor_div_2">
+  <h3>Glyph 2 Configuration Editor</h3>
+  <div id="glyph_editing_2"></div>
+  <table id='glyph_editor_table_2'>
+  </table>
+  <div id="glyph_editor_size_div_2"></div>
+  <div id="glyph_gene_choice_2"></div>
+</div>
+
+<div id="glyph_editor_div_3">
+  <h3>Glyph 3 Configuration Editor</h3>
+  <div id="glyph_editing_3"></div>
+  <table id='glyph_editor_table_3'>
+  </table>
+  <div id="glyph_editor_size_div_3"></div>
+  <div id="glyph_gene_choice_3"></div>
+</div>
+
+<div id="glyph_editor_div_4">
+  <h3>Glyph 4 Configuration Editor</h3>
+  <div id="glyph_editing_4"></div>
+  <table id='glyph_editor_table_4'>
+  </table>
+  <div id="glyph_editor_size_div_4"></div>
+  <div id="glyph_gene_choice_4"></div>
+</div>
+
+<div id="glyph_editor_div_5">
+  <h3>Glyph 5 Configuration Editor</h3>
+  <div id="glyph_editing_5"></div>
+  <table id='glyph_editor_table_5'>
+  </table>
+  <div id="glyph_editor_size_div_5"></div>
+  <div id="glyph_gene_choice_5"></div>
 </div>
 
 </body>

@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+var GLYPH_COUNT = 5;
+
 if (!window.console) {
 	window.console = new function()
 	{
@@ -28,10 +30,39 @@ if (!window.console) {
 
 function mapSize(map) {
 	var size = 0;
-	for (var obj in map) {
+	for (var key in map) {
 		size++;
 	}
 	return size;
+}
+
+function mapValues(map) {
+	var values = [];
+	for (var key in map) {
+		values.push(map[key]);
+	}
+	return values;
+}
+
+function mapKeys(map) {
+	var keys = [];
+	for (var key in map) {
+		keys.push(key);
+	}
+	return keys;
+}
+
+function mapDisplay(map, msg) {
+	if (!msg) {
+		msg = '';
+	} else {
+		msg += ' ';
+	}
+	console.log("Map " + msg + "{");
+	for (var key in map) {
+		console.log("  " + key + " => " + map[key]);
+	}
+	console.log("}");
 }
 
 function array_push_all(arr, to_append) {
@@ -91,6 +122,57 @@ function load_info(url, module_name)
 //
 // Encapsulate all module entities, including map positions
 //
+
+function RGBColor(red, green, blue) {
+	this.red = red;
+	this.green = green;
+	this.blue = blue;
+}
+
+RGBColor.prototype = {
+	setRGB: function(red, green, blue) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+	},
+
+	getRed: function() {
+		return this.red;
+	},
+
+	getGreen: function() {
+		return this.green;
+	},
+
+	getBlue: function() {
+		return this.blue;
+	},
+
+	toHex: function(cc) {
+		var str = cc.toString(16).substr(0, 2);
+		while (str.length < 2) {
+			str = "0" + str;
+		}
+		return str.toUpperCase();
+	},
+
+	getRGBValue: function() {
+		return this.toHex(this.red) + this.toHex(this.green) + this.toHex(this.blue);
+	}
+};
+
+function color_gradient(color1, color2, steps) {
+	var steps_1 = (steps > 1 ? steps*1. - 1 : 1);
+	var gradients = [];
+        for (ii = 0; ii < steps; ii++) {
+		var ratio = ii/steps_1;
+		var red = color2.getRed() * ratio + color1.getRed() * (1 - ratio);
+		var green = color2.getGreen() * ratio + color1.getGreen() * (1 - ratio);
+		var blue = color2.getBlue() * ratio + color1.getBlue() * (1 - ratio);
+		gradients.push(new RGBColor(red&255, green&255, blue&255));
+	}
+	return gradients;
+}
 
 var jxtree_mapfun_map = {};
 
@@ -894,6 +976,7 @@ function Dataset(name) {
 	this.genes = {};
 	this.genes_id = {};
 	this.gene_id = 1;
+	this.sorted_gene_names = [];
 
 	this.datatable_id = 1;
 	this.datatables = {};
@@ -927,8 +1010,8 @@ Dataset.prototype = {
 		return mapSize(this.datatables);
 	},
 
-	readDatatable: function(biotype_name, name, file) {
-		var datatable = new Datatable(this, biotype_name, name, file, this.datatable_id++);
+	readDatatable: function(biotype_name, name, file, win) {
+		var datatable = new Datatable(this, biotype_name, name, file, this.datatable_id++, win);
 		var dataset = this;
 		datatable.ready.then(function() {
 			if (!datatable.error) {
@@ -1063,12 +1146,18 @@ Dataset.prototype = {
 		return this.genes_id[gene_id];
 	},
 	
+	getSortedGeneNames: function() {
+		return this.sorted_gene_names;
+	},
+
 	// behaves as a gene factory
 	addGene: function(gene_name, hugo_module_map) {
 		if (!this.genes[gene_name]) {
 			var gene = new Gene(gene_name, hugo_module_map, this.gene_id++);
 			this.genes[gene_name] = gene;
 			this.genes_id[gene.getId()] = gene;
+			this.sorted_gene_names = mapKeys(this.genes);
+			this.sorted_gene_names.sort();
 		} else {
 			this.genes[gene_name].refcnt++;
 		}
@@ -1107,13 +1196,23 @@ Dataset.prototype = {
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
 		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
 		var bound = null;
-		if (navicell.drawing_config.displayGlyphs()) {
-			bound = draw_glyph(overlay, context, scale, gene_name, topx, topy);
+		for (var num = 1; num <= GLYPH_COUNT; ++num) {
+			if (navicell.drawing_config.displayGlyphs(num)) {
+				bound = draw_glyph(num, overlay, context, scale, gene_name, topx, topy);
+				if (bound) {
+//					topx = bound[0] + bound[2] - 6;
+					topx = bound[0] + bound[2] - 2;
+				}
+			}
 		}
 		if (bound) {
-			//topx += (bound[0] - topx + bound[2] + 2);
+			topx -= 6;
+		}
+		/*
+		if (bound) {
 			topx = bound[0] + bound[2] - 6;
 		}
+			*/
 		if (navicell.drawing_config.displayHeatmaps()) {
 			draw_heatmap(overlay, context, scale, gene_name, topx, topy);
 		}
@@ -1157,12 +1256,13 @@ function force_datatable_display(id) {
 	}
 }
 
-function step_color_count_change(id) {
+function step_color_count_change(config, id) {
 	var datatable = navicell.dataset.datatables_id[id];
+	console.log("step_color_count_change(" + config + ")");
 	if (datatable) {
-		var value = $("#step_config_count_" + id).val();
-		//console.log("value: " + value);
-		datatable.displayStepConfig.setStepCount(value);
+		var value = $("#step_config_count_" + config + '_' + id).val();
+		datatable.displayStepConfig.setStepCount_config(value, config);
+		display_step_config_set_editing(datatable.id, true, config);
 	}
 }
 
@@ -1200,6 +1300,10 @@ DisplayDiscreteConfig.prototype = {
 		$('body').append(html);
 	},
 
+	getDivId: function(what) { // what ignored for now
+		return this.div_id;
+	},
+
 	buildValues: function() {
 		var size = this.values.length;
 		this.colors = new Array(size);
@@ -1218,7 +1322,7 @@ DisplayDiscreteConfig.prototype = {
 
 	setValueInfo: function(idx, color, size, shape) {
 		if (idx < this.colors.length) {
-			console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
+			///console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
 			this.colors[idx] = color;
 			this.sizes[idx] = size;
 			this.shapes[idx] = shape;
@@ -1248,7 +1352,11 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	getShapeAt: function(idx) {
-		return this.shapes[idx];
+		var shape = this.shapes[idx];
+		if (!shape) {
+			return this.shapes[this.shapes.length-1];
+		}
+		return shape;
 	},
 
 	getColor: function(value) {
@@ -1290,26 +1398,30 @@ DisplayDiscreteConfig.prototype = {
 			html += "<tr>";
 			var value = this.getValueAt(idx);
 			if (value == '') {
-				value = "<span style='font-style: italic;'>empty</span>";
+				value = "<span style='text-align: center'>missing value</span>";
 			}
 			html += "<td>" + value + "</td>";
 			html += "<td><input id='discrete_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_discrete_config_set_editing(" + id + ", true)'></input></td>";
 			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
 			html += "<td><select id='discrete_size_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)'>";
-			html += "<option value='_none_'>Choose a size</option>";
+			//html += "<option value='_none_'>Choose a size</option>";
 			var selsize = this.getSizeAt(idx);
 			//var maxsize = DISCRETE_MAX_SIZE/2;
 			var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
-			for (var size = 0; size < maxsize; size += 1) {
+			for (var size = -2; size < maxsize; size += 1) {
 				var size2 = DISCRETE_SIZE_COEF*(size+2);
 				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
 			}
 			html += "</select></td>";
 			html += "<td><select id='discrete_shape_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)''>";
-			html += "<option value='_none_'>Choose a shape</option>";
+			//html += "<option value='_none_'>Choose a shape</option>";
 			var selshape = this.getShapeAt(idx);
-			for (var shape in navicell.shapes) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + navicell.shapes[shape] + "</option>";
+			if (selshape > navicell.shapes.length) {
+				selshape = navicell.shapes.length-1;
+			}
+			for (var shape_idx in navicell.shapes) {
+				var shape = navicell.shapes[shape_idx];
+				html += "<option value='" + shape + "' " + (shape_idx == selshape ? "selected" : "") + ">" + shape + "</option>";
 			}
 			html += "</select></td>";
 			html += "</tr>\n";
@@ -1327,49 +1439,67 @@ DisplayDiscreteConfig.prototype = {
 
 function DisplayStepConfig(datatable) {
 	this.datatable = datatable;
+	this.has_empty_values = datatable.hasEmptyValues();
 	var step_cnt = 5;
-	this.buildDiv(step_cnt);
+	this.buildDivs(step_cnt);
 	this.setStepCount(step_cnt);
-	this.setDefaults(step_cnt);
 }
 
-var STEP_MAX_SIZE = 14.;
+var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
 
 DisplayStepConfig.prototype = {
 	datatable: null,
-	values: [], // numeric step values
-	colors: [], // rgb values
-	sizes: [], // pixel values
-	shapes: [], // shape types
+	//values: {}, // numeric step values
+	//colors: {}, // rgb values
+	//sizes: {}, // pixel values
+	//shapes: {}, // shape types
 
 	setStepCount: function(step_cnt) {
-		//step_cnt++;
-		if (step_cnt+3 == this.values.length) {
+		this.values = {};
+		this.colors = {};
+		this.sizes = {};
+		this.shapes = {};
+
+		this.setStepCount_config(step_cnt, 'color');
+		this.setStepCount_config(step_cnt, 'shape');
+		this.setStepCount_config(step_cnt, 'size');
+		//this.update();
+		this.datatable.refresh();
+	},
+
+	setStepCount_config: function(step_cnt, config) {
+		if (this.values && this.values[config] && step_cnt+3 == this.values[config].length) {
 			return;
 		}
 		step_cnt *= 1.;
-		this.values = [];
-		this.values.push(this.datatable.minval);
+		this.values[config] = [];
+		var values = this.values[config];
+		values.push(this.datatable.minval);
 		var step = (this.datatable.maxval - this.datatable.minval)/(step_cnt+1);
 		//console.log("step_cnt: " + step_cnt + " step: " + step + " " + this.datatable.minval + " " + this.datatable.maxval);
 		//var step_cnt_1 = step_cnt-1;
+		if (this.has_empty_values) {
+			values.push(-1);
+			//step_cnt++;
+		}
 		for (var nn = 0; nn < step_cnt-1; ++nn) {
 			var value = this.datatable.minval + (nn+1)*step;
 			value = parseInt(value*100)/100;
-			this.values.push(value);
+			values.push(value);
 		}
-		this.values.push(this.datatable.maxval);
+		values.push(this.datatable.maxval);
 		/*
 		for (var nn = 0; nn < this.values.length; ++nn) {
 			console.log("values[" + nn + "] = " + this.values[nn]);
 		}
 		*/
-		this.colors = new Array(step_cnt);
-		this.sizes = new Array(step_cnt);
-		this.shapes = new Array(step_cnt);
-		this.update();
-		this.datatable.refresh();
+		if (this.has_empty_values) {
+			step_cnt++;
+		}
+		this.colors[config] = new Array(step_cnt);
+		this.sizes[config] = new Array(step_cnt);
+		this.shapes[config] = new Array(step_cnt);
 		
 		// AZ code
 		var avg = (this.datatable.minval + this.datatable.maxval)/2;
@@ -1377,153 +1507,221 @@ DisplayStepConfig.prototype = {
 		var posthr = getPositiveThreshold(dt_values, avg);
 		var negthr = getNegativeThreshold(dt_values, avg);
 		//console.log("avg: " + avg + " " + posthr + " " + negthr);
+		this.setDefaults(step_cnt, config);
 	},
 
-	setStepInfo: function(idx, value, color, size, shape) {
+	setStepInfo: function(config, idx, value, color, size, shape) {
 		//console.log("setting at " + idx + " " + value + " (== " + this.values[idx+1] + ") " + color + " " + size + " " + shape);
 		if (value != Number.MIN_NUMBER) {
-			this.values[idx+1] = value;
+			this.values[config][idx+1] = value;
 		}
-		this.colors[idx] = color;
-		this.sizes[idx] = size;
-		this.shapes[idx] = shape;
+		this.colors[config][idx] = color;
+		this.sizes[config][idx] = size;
+		this.shapes[config][idx] = shape;
 	},
 
-	setDefaults: function(step_cnt) {
-		if (step_cnt == 5) {
-			//this.setStepInfo(0, Number.MIN_NUMBER, "F7FF19", 4, 0);
-			this.setStepInfo(0, Number.MIN_NUMBER, "FFE4B5", 4, 0);
-			this.setStepInfo(1, Number.MIN_NUMBER, "D6ECFF", 6, 1);
-			//this.setStepInfo(2, Number.MIN_NUMBER, "19FF57", 8, 2);
-			this.setStepInfo(2, Number.MIN_NUMBER, "B3FF4F", 8, 2);
-			//this.setStepInfo(3, Number.MIN_NUMBER, "6421FF", 10, 3);
-			this.setStepInfo(3, Number.MIN_NUMBER, "8F57FF", 10, 3);
-			//this.setStepInfo(4, Number.MIN_NUMBER, "E64515", 12, 4);
-			this.setStepInfo(4, Number.MIN_NUMBER, "E65EC2", 12, 4);
-			this.update();
+	setDefaults: function(step_cnt, config) {
+		step_cnt += this.has_empty_values;
+		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt); 
+		for (var ii = 0; ii < step_cnt; ++ii) {
+			this.setStepInfo(config, ii, Number.MIN_NUMBER, colors[ii].getRGBValue(), 4+2*ii, ii);
 		}
+		this.update_config(config);
 	},
 
-	getStepIndex: function(value) {
+	getStepIndex: function(config, value) {
 		value *= 1.;
-		var len = this.values.length;
+		var values = this.values[config];
+		var len = values.length;
 		for (var nn = 1; nn < len; ++nn) {
-			if (value < this.values[nn]) {
+			if (value < values[nn]) {
 				return nn-1;
 			}
 		}
 		return len-1;
 	},
 
-	getStepCount: function() {
-		return this.values.length-1;
+	getStepCount: function(config) {
+		return this.values[config].length-this.has_empty_values-1;;
 	},
 
 	getMinValue: function() {
-		return this.values[0];
+		return this.values['color'][0];
 	},
 
 	getMaxValue: function() {
-		return this.values[this.values.length-1];
+		var values = this.values['color'];
+		return values[values.length-1];
 	},
 
-	getValueAt: function(idx) {
-		return this.values[idx+1];
+	getValueAt: function(config, idx) {
+		return this.values[config][idx+1];
 	},
 
-	getColorAt: function(idx) {
-		return this.colors[idx];
+	getColorAt: function(config, idx) {
+		return this.colors[config][idx];
 	},
 
-	getSizeAt: function(idx) {
-		return this.sizes[idx];
+	getSizeAt: function(config, idx) {
+		return this.sizes[config][idx];
 	},
 
-	getShapeAt: function(idx) {
-		return this.shapes[idx];
+	getShapeAt: function(config, idx) {
+		return this.shapes[config][idx];
 	},
 
 	getColor: function(value) {
-		return this.colors[this.getStepIndex(value)];
+		return this.colors['color'][this.getStepIndex('color', value)];
 	},
 
 	getSize: function(value) {
-		return this.sizes[this.getStepIndex(value)];
+		return this.sizes['size'][this.getStepIndex('size', value)];
 	},
 
 	getShape: function(value) {
-		return this.shapes[this.getStepIndex(value)];
+		return this.shapes['shape'][this.getStepIndex('shape', value)];
+	},
+
+	makeValueInput: function(id, config, idx) {
+		return "<td><input type='text' class='input-value' id='step_value_" + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, idx) + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
+	},
+
+	makeColorInput: function(id, config, idx) {
+		return "<td><input id='step_config_" + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, idx) + "' class='color input-value' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
+	},
+
+	makeSelectSize: function(id, config, idx) {
+		var selsize = this.getSizeAt(config, idx);
+		var html = "<td><select id='step_size_" + config + '_' + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'>";
+		var maxsize = STEP_MAX_SIZE/2;
+		for (var size = 0; size < maxsize; size += 1) {
+			var size2 = 2*size;
+			html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
+		}
+		html += "</select></td>";
+		return html;
+	},
+
+	makeSelectShape: function(id, config, idx) {
+		var selshape = this.getShapeAt(config, idx);
+		var html = "<td><select id='step_shape_" + config + '_' + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")''>";
+		if (selshape >= navicell.shapes.length) {
+			selshape = navicell.shapes.length-1;
+		}
+		for (var shape_idx in navicell.shapes) {
+			var shape = navicell.shapes[shape_idx];
+			html += "<option value='" + shape_idx + "' " + (shape_idx == selshape ? "selected" : "") + ">" + shape + "</option>";
+		}
+		html += "</select></td>";
+		return html;
 	},
 
 	update: function() {
+		this.update_config('color');
+		this.update_config('shape');
+		this.update_config('size');
+	},
+
+	update_config: function(config) {
+		var mod = config + '_';
 		var id = this.datatable.getId();
-		var table = $("#step_config_table_" + id);
+		var table = $("#step_config_table_" + mod + id);
 		table.children().remove();
 		var html = "<thead>";
-		html += "<th>Less than</th>";
-		html += "<th>Color</th>";
-		html += "<th>Size</th>";
-		html += "<th>Shape</th>";
+		html += "<th></th>";
+		html += "<th>Values</th>";
+		if (config == 'color') {
+			html += "<th>Color</th>";
+		}
+		if (config == 'size') {
+			html += "<th>Size</th>";
+		}
+		if (config == 'shape') {
+			html += "<th>Shape</th>";
+		}
 		html += "</thead><tbody>";
-		html += "<tr><td>" + this.datatable.minval + " (minimum)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
-		var step_cnt = this.getStepCount();
-		for (var idx = 0; idx < step_cnt; idx++) {
-			html += "<tr>";
-			if (idx == step_cnt-1) {
-				html += "<td>" + this.datatable.maxval + " (maximum)</td>";
-			} else {
-				html += "<td><input type='text' id='step_value_" + id + "_" + idx + "' value='" + this.getValueAt(idx) + "' onchange='display_step_config_set_editing(" + id + ", true)'></input></td>";
+		if (this.has_empty_values) {
+			//html += "<tr><td></td><td style='font-size: smaller; text-align: center;'>NA</td>";
+			html += "<tr><td></td><td style='font-size: smaller;'>NA</td>";
+			if (config == 'color') {
+				html += this.makeColorInput(id, config, 0);
 			}
-			html += "<td><input id='step_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_step_config_set_editing(" + id + ", true)'></input></td>";
-			html += "<td><select id='step_size_" + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true)'>";
-			html += "<option value='_none_'>Choose a size</option>";
-			var selsize = this.getSizeAt(idx);
-			var maxsize = STEP_MAX_SIZE/2;
-			for (var size = 2; size < maxsize; size += 1) {
-				var size2 = 2*size;
-				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
+			if (config == 'size') {
+				html += this.makeSelectSize(id, config, 0);
 			}
-			html += "</select></td>";
-			html += "<td><select id='step_shape_" + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true)''>";
-			html += "<option value='_none_'>Choose a shape</option>";
-			var selshape = this.getShapeAt(idx);
-			for (var shape in navicell.shapes) {
-				html += "<option value='" + shape + "' " + (shape == selshape ? "selected" : "") + ">" + navicell.shapes[shape] + "</option>";
+			if (config == 'shape') {
+				html += this.makeSelectShape(id, config, 0);
 			}
-			html += "</select></td>";
 			html += "</tr>\n";
 		}
-		//html += "<tr><td>Maximum " + this.datatable.maxval + "</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+		if (false) {
+			html += "<tr><td></td>";
+			html += "<td>" + this.datatable.minval + " (minimum)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
+			html += "</tr>\n";
+		}
+		var step_cnt = this.getStepCount(config);
+		for (var idx = 0; idx < step_cnt; idx++) {
+			html += "<tr><td><span class='less-than'>Less&nbsp;than</span></td>";
+			if (idx == step_cnt-1) {
+				html += "<td>" + this.datatable.maxval + "</td>";
+			} else {
+				html += this.makeValueInput(id, config, idx+this.has_empty_values);
+			}
+			if (config == 'color') {
+				html += this.makeColorInput(id, config, idx+this.has_empty_values);
+			}
+			if (config == 'size') {
+				html += this.makeSelectSize(id, config, idx+this.has_empty_values);
+			}
+			if (config == 'shape') {
+				html += this.makeSelectShape(id, config, idx+this.has_empty_values);
+			}
+			html += "</tr>\n";
+		}
 		html += "</tbody>";
 		table.append(html);
 
-		var count = $("#step_config_count_" + id);
+		var count = $("#step_config_count_" + mod + id);
 
-		var title = $("#step_config_title_" + id);
-		title.html("Datatable " + this.datatable.name + ": Display Configuration (Continuous)");
+		var title = $("#step_config_title_" + mod + id);
+		var Config = config.charAt(0).toUpperCase() + config.slice(1)
+		//title.html(this.datatable.name + " Datatable<br>" + Config + " Configuration (Continuous)");
+		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
 
 		jscolor.init();
 	},
 
-	buildDiv: function(step_cnt) {
+	buildDivs: function(step_cnt) {
+		this.div_ids = {};
+		this.buildDiv(step_cnt, 'color');
+		this.buildDiv(step_cnt, 'shape');
+		this.buildDiv(step_cnt, 'size');
+	},
+
+	buildDiv: function(step_cnt, config) {
+		var mod = config + '_';
 		var id = this.datatable.getId();
-		var div_editing_id = "step_config_editing_" + id;
-		var div_id = "step_config_" + id;
-		var html = "<div class='step-config' id='" + div_id + "'>\n";
-		html += "<h3 id='step_config_title_" + id + "'></h3>";
+		var div_editing_id = "step_config_editing_" + mod + id;
+		var div_id = "step_config_" + mod + id;
+		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
+		html += "<h3 id='step_config_title_" + mod + id + "'></h3>";
 		html += "<div id='" + div_editing_id + "' class='step-config-editing'></div>\n";
-		html += "<table class='step-config-table' id='step_config_table_" + id + "'>";
+		html += "<table class='step-config-table' id='step_config_table_" + mod + id + "'>";
 		html += "</table>";
 
-		html += "<BR/><BR/>Step Count <select id='step_config_count_" + id + "' onchange='step_color_count_change(" + id + ")'>";
-		for (var step = 3; step < 12; ++step) {
+		html += "<BR/><BR/>Step Count <select id='step_config_count_" + mod + id + "' onchange='step_color_count_change(\"" + config + "\", " + id + ")'>";
+		for (var step = 1; step <= 10; ++step) {
 			html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
 		}
 		html += "</select>";
 		html += "</div>";
 
-		this.div_id = div_id;
+		this.div_ids[config] = div_id;
 		$('body').append(html);
+	},
+
+	getDivId: function(what) {
+		return this.div_ids[what];
 	},
 
 	getClass: function() {
@@ -1902,12 +2100,22 @@ GlyphConfig.prototype = {
 
 	getSizeDatatable: function() {
 		return this.size_datatable;
-	}
+	},
 
+	cloneFrom: function(glyph_config) {
+		this.reset();
+
+		this.sample_or_group = glyph_config.sample_or_group;
+		this.size = glyph_config.size;
+		this.scale_size = glyph_config.scale_size;
+		this.shape_datatable = glyph_config.shape_datatable;
+		this.color_datatable = glyph_config.color_datatable;
+		this.size_datatable = glyph_config.size_datatable;
+	}
 };
 
 // TBD datatable id management
-function Datatable(dataset, biotype_name, name, file, datatable_id) {
+function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	var reader = new FileReader();
 	var ready = this.ready = $.Deferred(reader.onload);
 	if (dataset.datatables[name]) {
@@ -1922,6 +2130,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 	this.discrete_values = {};
+	this.empty_value_cnt = 0;
 
 	this.setName(name);
 
@@ -1930,19 +2139,6 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 	this.data = [];
 
 	navicell.DTStatusMustUpdate = true;
-
-	/*
-	var tab_body = $("#dt_datatable_tabs");
-
-	tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-	this.data_div = $("#dt_datatable_id" + this.id);
-	this.data_table = $("#dt_datatable_table_id" + this.id);
-	this.switch_button = $("#switch_view_" + this.id);
-	//this.switch_button.addClass('switch-button');
-	this.switch_button.css('font-size', '10px');
-	this.switch_button.css('background', 'white');
-	this.switch_button.css('color', 'darkblue');
-	*/
 
 	reader.readAsBinaryString(file);
 
@@ -2010,7 +2206,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 		if (has_new_samples) {
 			navicell.group_factory.buildGroups();
 		}
-		datatable.epilogue();
+		datatable.epilogue(win);
 		ready.resolve();
 		dataset.syncModifs();
 	}
@@ -2023,6 +2219,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id) {
 }
 
 var MAX_MATRIX_SIZE = 8000;
+var USE_DISPLAY = true;
 
 Datatable.prototype = {
 	dataset: null,
@@ -2100,12 +2297,12 @@ Datatable.prototype = {
 	getId: function() {return this.id;},
 
 	forceDisplay: function() {
-		console.log("force display");
+		console.log("force display " + map.map_name);
 		$("#dt_datatable_notice_id" + this.id).remove();
 		this.force_display = true;
 		var tab_body = $("#dt_datatable_tabs");
 		//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 		this.data_div = $("#dt_datatable_id" + this.id);
 		//this.data_table = $("#dt_datatable_table_id" + this.id);
 		this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
@@ -2124,19 +2321,24 @@ Datatable.prototype = {
 		//this.makeGeneView();
 	},
 
+	hasEmptyValues: function() {
+		return this.empty_value_cnt > 0;
+	},
+
 	setTabNum: function(tabnum) {
 		this.tabnum = tabnum;
 	},
 
-	epilogue: function() {
+	epilogue: function(win) {
 		var tab_body = $("#dt_datatable_tabs");
+		console.log("EPILOGUE " + win.document.map_name);
 		// BORN AGAIN datatable tabs
 		/*if (true) {
 		} else*/ if (!this.isLarge()) {
 			console.log("adding tab");
 			//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 //			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
+			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
 			this.data_div = $("#dt_datatable_id" + this.id);
 			this.data_table = $("#dt_datatable_table_id" + this.id);
 			this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
@@ -2181,22 +2383,20 @@ Datatable.prototype = {
 		}
 		this.current_view = "gene";
 		if (!this.data_table_gene.ok) {
-			console.log("building gene view " +  mapSize(this.gene_index) + "x" + mapSize(this.sample_index));
 			this.data_table_gene.children().remove();
 			this.data_table_gene.append(this.makeDataTable_genes());
 			this.data_table_gene.tablesorter();
 			this.data_table_gene.ok = true;
 		}
-		/*
-		this.data_table.children().remove();
-		this.data_table.append(this.makeDataTable_genes());
-		this.data_table.tablesorter();
-		*/
-		console.log("displaying genes..");
-		this.data_table_sample.css("display", "none");
-		this.data_table_gene.css("display", "block");
+		if (USE_DISPLAY) {
+			this.data_table_sample.css("display", "none");
+			this.data_table_gene.css("display", "block");
+		} else {
+			this.data_table_sample.css("visibility", "hidden");
+			this.data_table_gene.css("visibility", "visible");
+		}
+
 		this.switch_button.val("Switch to Samples / Genes");
-		console.log("ok");
 	},
 
 	// ...
@@ -2206,22 +2406,19 @@ Datatable.prototype = {
 		}
 		this.current_view = "sample";
 		if (!this.data_table_sample.ok) {
-			console.log("building sample view " +  mapSize(this.gene_index) + "x" + mapSize(this.sample_index));
 			this.data_table_sample.children().remove();
 			this.data_table_sample.append(this.makeDataTable_samples());
 			this.data_table_sample.tablesorter();
 			this.data_table_sample.ok = true;
 		}
-		/*
-		this.data_table.children().remove();
-		this.data_table.append(this.makeDataTable_samples());
-		this.data_table.tablesorter();
-		*/
-		console.log("displaying samples..");
-		this.data_table_sample.css("display", "block");
-		this.data_table_gene.css("display", "none");
+		if (USE_DISPLAY) {
+			this.data_table_sample.css("display", "block");
+			this.data_table_gene.css("display", "none");
+		} else {
+			this.data_table_sample.css("visibility", "visible");
+			this.data_table_gene.css("visibility", "hidden");
+		}
 		this.switch_button.val("Switch to Genes / Samples");
-		console.log("ok");
 	},
 
 	switchView: function() {
@@ -2273,7 +2470,6 @@ Datatable.prototype = {
 	},
 
 	makeDataTable_genes: function() {
-		console.log("makedatatable !");
 		this.switch_button.val("Switch to Samples / Genes");
 		var str = "<thead><th>Genes</th>";
 		for (var sample_name in this.sample_index) {
@@ -2292,7 +2488,8 @@ Datatable.prototype = {
 				*/
 				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
 				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
-				str += "<td class='datacell'>" + value + "</td>";
+				//str += "<td class='datacell'>" + value + "</td>";
+				str += "<td>" + value + "</td>";
 			}
 			str += "</tr>";
 		}
@@ -2328,7 +2525,6 @@ Datatable.prototype = {
 	},
 
 	makeDataTable_samples: function() {
-		console.log("makedatatable !");
 		this.switch_button.val("Switch to Genes / Samples");
 		var str = "<thead><th>Samples</th>";
 		for (var gene_name in this.gene_index) {
@@ -2347,7 +2543,8 @@ Datatable.prototype = {
 				*/
 				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
 				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
-				str += "<td class='datacell'>" + value + "</td>";
+				//str += "<td class='datacell'>" + value + "</td>";
+				str += "<td>" + value + "</td>";
 			}
 			str += "</tr>";
 		}
@@ -2368,6 +2565,7 @@ Datatable.prototype = {
 
 	setData: function(gene_nn, sample_nn, value) {
 		if (is_empty_value(value)) {
+			this.empty_value_cnt++;
 			value = '';
 		} else {
 			var ivalue = parseFloat(value);
@@ -2391,6 +2589,9 @@ Datatable.prototype = {
 	},
 
 	getSampleCount: function(gene_name) {
+		if (!gene_name) {
+			return mapSize(this.sample_index);
+		}
 		var gene_idx = this.gene_index[gene_name];
 		if (gene_idx == undefined) {
 			return -1;
@@ -2403,6 +2604,20 @@ Datatable.prototype = {
 			}
 		}
 		
+		return cnt;
+	},
+
+	getGeneCountPerModule: function(module_name) {
+		if (!module_name) {
+			return mapSize(this.gene_index);
+		}
+		var cnt = 0;
+		var hugo_map = navicell.mapdata.hugo_map;
+		for (var gene_name in this.gene_index) {
+			if (hugo_map[gene_name][module_name]) {
+				cnt++;
+			}
+		}
 		return cnt;
 	},
 
@@ -2436,16 +2651,29 @@ function DrawingConfig() {
 	this.editing_barplot_config = new BarplotConfig();
 	//this.piechart_config = new PiechartConfig();
 
-	this.glyph_config = new GlyphConfig();
-	this.editing_glyph_config = new GlyphConfig();
+	this.glyph_configs = [];
+	this.editing_glyph_configs = [];
+	this.display_glyphs = [];
+	for (var num = 1; num <= GLYPH_COUNT; ++num) {
+		this.glyph_configs.push(new GlyphConfig());
+		this.editing_glyph_configs.push(new GlyphConfig());
+		this.display_glyphs.push(0);
+	}
 
-	this.display_glyphs = 0;
 	this.display_labels = 0;
 
 	this.display_DLOs_on_all_genes = 1;
 }
 
 DrawingConfig.prototype = {
+
+	getGlyphConfig: function(num) {
+		return this.glyph_configs[num-1];
+	},
+
+	getEditingGlyphConfig: function(num) {
+		return this.editing_glyph_configs[num-1];
+	},
 
 	displayMarkers: function() {
 		return this.display_markers;
@@ -2467,8 +2695,17 @@ DrawingConfig.prototype = {
 		return this.display_charts;
 	},
 
-	displayGlyphs: function() {
-		return this.display_glyphs;
+	displayAnyGlyph: function() {
+		for (var num = 1; num <= GLYPH_COUNT; ++num) {
+			if (this.displayGlyphs(num)) {
+				return true;
+			}
+		}
+		return false;
+	},
+
+	displayGlyphs: function(num) {
+		return this.display_glyphs[num-1];
 	},
 
 	displayLabels: function() {
@@ -2484,7 +2721,7 @@ DrawingConfig.prototype = {
 	},
 
 	displayDLOs: function() {
-		return this.displayCharts() || this.displayGlyphs() || this.displayLabels();
+		return this.displayCharts() || this.displayAnyGlyph() || this.displayLabels();
 	},
 
 	displayDLOsOnAllGenes: function() {
@@ -2503,8 +2740,8 @@ DrawingConfig.prototype = {
 		this.display_old_markers = val;
 	},
 
-	setDisplayGlyphs: function(val) {
-		this.display_glyphs = val;
+	setDisplayGlyphs: function(num, val) {
+		this.display_glyphs[num-1] = val;
 	},
 
 	setDisplayCharts: function(val, chart_type) {
@@ -2521,7 +2758,6 @@ DrawingConfig.prototype = {
 			if (doc == window.document) {
 				//continue;
 			}
-			console.log("this.display_charts: " + this.display_charts);
 			if (!this.display_charts) {
 				$("#drawing_config_chart_display", doc).attr("checked", false);
 			} else {
@@ -2535,12 +2771,10 @@ DrawingConfig.prototype = {
 };
 
 function switch_view(id) {
-	console.log("switch_view(" + id + ")");
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
 		datatable.switchView();
 	}
-	console.log("switch_view(" + id + ") -> ok");
 }
 
 //
@@ -2608,7 +2842,7 @@ AnnotationFactory.prototype = {
 		return annotated;
 	},
 
-	readfile: function(file) {
+	readfile: function(file, error_trigger) {
 		var reader = new FileReader();
 		reader.readAsBinaryString(file);
 
@@ -2643,7 +2877,10 @@ AnnotationFactory.prototype = {
 			ready.resolve();
 		},
 		reader.onerror = function(e) {  // If anything goes wrong
-			console.log("Error", e);    // Just log it
+			if (error_trigger) {
+				error_trigger(file);
+			}
+			//console.log("Error", e);    // Just log it
 		}
 	},
 
@@ -3100,7 +3337,8 @@ function navicell_init() {
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));
-	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", _navicell.DISCRETE));
+	//_navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", _navicell.DISCRETE));
+	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data", _navicell.DISCRETE));
 	_navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
 	_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
 
@@ -3113,7 +3351,8 @@ function navicell_init() {
 		return this.dataset.getDatatableById(id);
 	}
 
-	_navicell.shapes = ["Square", "Rectangle", "Triangle", "Diamond", "Hexagon", "Circle"];
+//	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];
+	_navicell.shapes = ["Triangle", "Square", "Diamond", "Hexagon", "Circle"];
 
 	return _navicell;
 }

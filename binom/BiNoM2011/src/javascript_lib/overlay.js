@@ -183,6 +183,7 @@ USGSOverlay.prototype.onAdd = function() {
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
 				var gene_name = overlay.boundBoxes[nn][1];
 				var type = overlay.boundBoxes[nn][2];
+				var hint = overlay.boundBoxes[nn][3];
 				console.log("click on: " + gene_name + " " + navicell.dataset.getGeneByName(gene_name).id + " " + type);
 				if (type == "heatmap") {
 					$("#heatmap_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
@@ -193,9 +194,10 @@ USGSOverlay.prototype.onAdd = function() {
 					$("#barplot_editor_div").dialog("open");
 					update_barplot_editor();
 				} else if (type == "glyph") {
-					$("#glyph_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
-					$("#glyph_editor_div").dialog("open");
-					update_glyph_editor();
+					console.log("HINT " + hint);
+					$("#glyph_select_gene_" + hint).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#glyph_editor_div_" + hint).dialog("open");
+					update_glyph_editor(null, null, hint);
 				}
 				break;
 			}
@@ -363,8 +365,8 @@ USGSOverlay.prototype.reset = function() {
 	this.arrpos = [];
 }
 
-USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type) {
-	this.boundBoxes.push([box, gene_name, chart_type]);
+USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type, hint) {
+	this.boundBoxes.push([box, gene_name, chart_type, hint]);
 }
 
 USGSOverlay.prototype.remove_old = function(rm_arrpos) {

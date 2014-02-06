@@ -923,6 +923,7 @@ function dbg_sleep(millis)
 function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, firstEntityName)
 {
 	use_jxtree = !source;
+	document.win = window;
 
 	console.log("clickmap_start ... ", to_open, window.to_open);
 	if (!maps)

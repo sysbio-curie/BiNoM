@@ -335,13 +335,28 @@ USGSOverlay.prototype.draw = function(module_name) {
 		var mapProjection = this.map_.getProjection();
 		var scale = Math.pow(2, this.map_.zoom);
 
+		var MARGIN = 30;
+		var div_width = div.width;
+		var div_height = div.height+MARGIN;
 		//console.log("drawing " + arrpos.length + " points");
 		for (var nn = 0; nn < arrpos.length; ++nn) {
 			//var latlng = map.getProjection().fromPointToLatLng(arrpos[nn].p);
 			//console.log("drawing: " + arrpos[nn].gene_name + " " + arrpos[nn].p.x + " " + arrpos[nn].p.y);
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			navicell.dataset.drawDLO(this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+			/*
+			if (nn == 0) {
+				console.log("DLO: div.left=" + div.left + ", div.top=" + div.top + ", div.width=" + div.width + ", div.height=" + div.height + ", pix.x=" + pix.x + ", pix.y=" + pix.y + " WINDOW: xoffset=" + window.pageXOffset + ", yoffset=" + window.pageYOffset + ", innerWidth=" + window.innerWidth + ", innerHeight=" + window.innerHeight + " " + arrpos[nn].gene_name);
+			}
+			*/
+			var pos_x = pix.x - div.left;
+			var pos_y = pix.y - div.top;
+			if (pos_x > -MARGIN && pos_x < div_width &&
+			    pos_y >= 0 && pos_y < div_height) {
+				navicell.dataset.drawDLO(this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+			} else {
+				/*console.log(arrpos[nn].gene_name + " not drawn");*/
+			}
 		}
 		
 		/*

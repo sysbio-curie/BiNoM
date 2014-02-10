@@ -273,7 +273,7 @@ $(function() {
 		height: 750,
 		modal: false,
 		buttons: {
-			"Add Annotations": function() {
+			"Import file": function() {
 				var status = $("#dt_sample_annot_status");
 				var file_elem = sample_file.get()[0];
 				if (!$(file_elem).val()) {
@@ -281,10 +281,17 @@ $(function() {
 				} else {
 					navicell.annot_factory.readfile(file_elem.files[0], function(file) {status.html("<span class=\"error-message\">Cannot read file " + $(file_elem).val() + "</span>");});
 					navicell.annot_factory.ready.then(function() {
-						status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_read + " samples read<br/>" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+						if (navicell.annot_factory.sample_read > 0) {
+							status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_read + " samples read<br/>" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+						} else {
+							status.html("<span class=\"error-message\">Missing samples: " + navicell.annot_factory.missing + "<br>No samples annotated, may be something wrong in the file.</span>");
+						}
 						update_status_tables();
 					});
 				}
+			},
+			Cancel: function() {
+				$(this).dialog("close");
 			}
 		}
 	});
@@ -663,7 +670,7 @@ function annot_set_group(annot_id, doc) {
 	navicell.group_factory.buildGroups();
 	update_status_tables(doc, {style_only: true, annot_id: annot_id, checked: checked});
 
-	$("#dt_sample_annot_status").html("<span class=\"status-message\">" + mapSize(navicell.group_factory.group_map) + " groups built</span>");
+	$("#dt_sample_annot_status").html("<span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples have been built (groups are listed in Data Status / Groups tab) </span>");
 }
 
 function is_annot_group(annot_id) {
@@ -695,6 +702,9 @@ function update_sample_annot_table(doc, params) {
 	var str = "<thead>";
 	var annots = navicell.annot_factory.annots_per_name;
 	var annot_cnt = mapSize(annots);
+	if (annot_cnt) {
+		str += "<tr><td>&nbsp;</td><td colspan='" + annot_cnt + "' style='text-align: center; font-style: italic; font-weight: bold; font-size: smaller;'>Check boxes to build groups</td></tr>\n";
+	}
 	str += '<tr><td style="text-align: center; font-size: smaller; font-style: italic;">' + (annot_cnt ? 'Use as group' : '&nbsp;') + '</td>';
 	for (var annot_name in annots) {
 		var annot = navicell.annot_factory.getAnnotation(annot_name);
@@ -792,10 +802,16 @@ function update_group_status_table(doc, params) {
 
 				selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
 				str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
+				selected = (method == Group.CONTINUOUS_ABS_MAXVAL) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
 			} else {
 				var values = datatable.getDiscreteValues();
 				for (var value in values) {
 					var label = value == '' ? 'empty' : value;
+					if (value == '') {
+						selected = (method == value+'-') ? " selected" : "";
+						str += "<option value='" + value + "-'" + selected + ">At least one non " + label + "</option>";
+					}
 					selected = (method == value+'+') ? " selected" : "";
 					str += "<option value='" + value + "+'" + selected + ">At least one " + label + "</option>";
 					selected = (method == value+'@') ? " selected" : "";

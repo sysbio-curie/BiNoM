@@ -79,6 +79,8 @@ if (!Number.MIN_NUMBER) {
 	Number.MIN_NUMBER = -4000000000; // not the correct value, but ok for our purposes
 }
 
+var input_seps = ["\t", ",", " "];
+
 function load_info(url, module_name)
 {
 	navicell.mapdata.info_ready[module_name] = new $.Deferred();
@@ -87,9 +89,6 @@ function load_info(url, module_name)
 		for (var nn = 0; nn < 15; ++nn) {
 			$.ajax(url,
 			       {
-
-
-
 				       async: true,
 				       dataType: 'json',
 				       cache: false,
@@ -351,6 +350,9 @@ var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>|&nbsp;", "g");
 //var TAG_REGEX = new RegExp("\\w+:\\w+|/\\w+", "g");
 var TAG_REGEX = new RegExp(">\\w+:\\w+</a>|&nbsp;(\\w| )+&nbsp;", "g");
 var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
+//var LINE_BREAK_REGEX = /[\r\n]+/;
+var LINE_BREAK_REGEX = /\r\n?|\n/;
+
 var time_cnt = 0;
 
 Mapdata.prototype = {
@@ -498,66 +500,15 @@ Mapdata.prototype = {
 				mapdata.searchFor(win, to_find_str, hints.div);
 				//mapdata.findJXTreeContinue(jxtree, to_find_str, no_ext, win, action, hints, module_name);
 				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints);
-				/*
-				var user_find = mapdata.useJXTreeSimpleFind(jxtree);
-				res_jxtree = jxtree.find(to_find_str, action, hints);
-				mapdata.restoreJXTreeFind(jxtree, user_find);
-				*/
 			} else {
 				mapdata.searchFor(win, to_find, hints.div);
 				setTimeout(function() {
 					//mapdata.findJXTreeContinue(jxtree, to_find, no_ext, win, action, hints, module_name);
 					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
 				}, 20);
-				/*
-				  res_jxtree = jxtree.find(to_find, action, hints);
-				*/
 			}
 
 			return;
-
-			/*
-			if (res_jxtree == null) {
-				if (hints.error || hints.help) {
-					var dialog = $("#info_dialog", win.document);
-					var msg = hints.error ? hints.error : hints.help;
-					var title = hints.error ? "Searching Error" : "Search Help";
-					dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
-					dialog.dialog({
-						resizable: true,
-						width: 430,
-						height: 660,
-						modal: true,
-						title: title,
-						buttons: {
-							"OK": function() {
-								$(this).dialog("close");
-							}
-						}
-					});
-				}
-				return;
-			}
-
-			if (action == 'subtree' && res_jxtree) {
-				console.log("here");
-				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
-
-				uncheck_all_entities();
-
-				res_jxtree.context = {};
-
-				tree_context_prologue(res_jxtree.context);
-				$.each(res_jxtree.getRootNodes(), function() {
-					this.checkSubtree(JXTree.CHECKED);
-					this.showSubtree(JXTree.OPEN);
-				});
-				tree_context_epilogue(res_jxtree.context);
-
-				time_cnt++;
-				mapdata.module_res_jxtree[module_name] = res_jxtree;
-			}
-			*/
 		});
 	},
 
@@ -2126,6 +2077,7 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	this.minval = Number.MAX_NUMBER;
 	this.maxval = Number.MIN_NUMBER;
 	this.error = "";
+	this.warning = "";
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
@@ -2149,11 +2101,33 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 
 		var text = reader.result;
 
-		var lines = text.split("\n");
+//		var lines = text.split("\n");
+		//var lines = text.split(/[\r\n]+/);
+		var lines = text.split(LINE_BREAK_REGEX);
 		var gene_length = lines.length;
 
-		var line = lines[0].split("\t");
-		var sample_cnt = line.length-1;
+		var line;
+		var sample_cnt;
+		var sep = null;
+
+		for (var ii = 0; ii < input_seps.length; ++ii) {
+			sep = input_seps[ii];
+			line = lines[0].trim().split(sep);
+			sample_cnt = line.length-1;
+			if (!line[line.length-1]) {
+				--sample_cnt;
+			}
+			if (sample_cnt >= 1) {
+				break;
+			}
+		}
+
+		if (sample_cnt < 1) {
+			this.error = "invalid file format: tabular, comma or space separated file expected";
+			ready.resolve();
+			return;
+		}
+
 		var samples_to_add = [];
 		var genes_to_add = [];
 		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
@@ -2167,19 +2141,29 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 		}
 		
 		for (var gene_nn = 0, gene_jj = 1; gene_jj < gene_length; ++gene_jj) {
-			var line = lines[gene_jj].split("\t");
+			var line = lines[gene_jj].trim().split(sep);
+			var line_cnt = line.length-1;
+			if (!line[line.length-1]) {
+				--line_cnt;
+			}
+			if (line_cnt < sample_cnt) {
+				this.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
+			} else if (line_cnt > sample_cnt) {
+				this.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
+				ready.resolve();
+				return;
+
+			}
 			var gene_name = line[0];
 			if (!navicell.mapdata.hugo_map[gene_name]) {
 				continue;
 			}
-			//dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
 			genes_to_add.push(gene_name);
 
 			datatable.gene_index[gene_name] = gene_nn;
 			datatable.data[gene_nn] = [];
-			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
+			for (var sample_nn = 0; sample_nn < line_cnt; ++sample_nn) {
 				var value = line[sample_nn+1];
-				//datatable.data[gene_nn][sample_nn] = value;
 				var err = datatable.setData(gene_nn, sample_nn, value);
 				if (err) {
 					console.log("data error");
@@ -2358,6 +2342,7 @@ Datatable.prototype = {
 			// must have a different div per doc
 			this.displayStepConfig = new DisplayStepConfig(this);
 			this.displayDiscreteConfig = null;
+			this.discrete_values.sort();
 		} else {
 			this.displayStepConfig = null;
 			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
@@ -2852,27 +2837,87 @@ AnnotationFactory.prototype = {
 		var ready = this.ready = $.Deferred(reader.onload);
 		reader.onload = function() { 
 			var text = reader.result;
-			var lines = text.split("\n");
-			var header = lines[0].split("\t");
+			var lines = text.split(LINE_BREAK_REGEX);
+			var header;
+			var header_cnt;
+
+			var sep = null;
+			
+			for (var ii = 0; ii < input_seps.length; ++ii) {
+				sep = input_seps[ii];
+				header = lines[0].trim().split(sep);
+				header_cnt = header.length;
+				if (!header[header.length-1]) {
+					--header_cnt;
+				}
+				if (header_cnt > 1) {
+					break;
+				}
+			}
+
+			if (header_cnt < 2) {
+				this.error = "invalid file format";
+				console.log("ERROR: " + this.error);
+				ready.resolve();
+			}
+			/*
 			var annots = [];
-			for (var nn = 1; nn < header.length; ++nn) {
+			for (var nn = 1; nn < header_cnt; ++nn) {
 				annots.push(annot_factory.getAnnotation(header[nn]));
 			}
 			var annot_cnt = annots.length;
+			*/
+			var annot_cnt = header_cnt - 1;
 			var sample_cnt = lines.length-1;
+			var missing_cnt = 0;
+			annot_factory.missing = "";
+			console.log("TRACE #1 " + sample_cnt);
 			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
-				var line = lines[sample_nn+1].split("\t");
-				if (line.length < 2) {
+				var line = lines[sample_nn+1].trim().split(sep);
+				var line_cnt = line.length-1;
+				if (!line[line.length-1]) {
+					--line_cnt;
+				}
+				if (line_cnt < 2) {
 					continue;
 				}
+				if (line_cnt > annot_cnt) {
+					this.error = "line #" + (sample_nn) + ", expected " + annot_cnt + " annotations, got " + line_cnt;
+					console.log("ERROR2: " + this.error);
+					ready.resolve();
+					if (error_trigger) {
+						error_trigger(file);
+					}
+					return;
+				}
 				var sample_name = line[0];
-				for (var annot_nn = 0; annot_nn < annot_cnt; ++annot_nn) {
+				if (!navicell.dataset.getSample(sample_name)) {
+					if (missing_cnt < 10) {
+						if (annot_factory.missing) {
+							annot_factory.missing += ", ";
+						}
+						annot_factory.missing += sample_name;
+					} else if (missing_cnt == 10) {
+						annot_factory.missing += "..."
+					}
+					missing_cnt++;
+					continue;
+				}
+				for (var annot_nn = 0; annot_nn < line_cnt; ++annot_nn) {
 					var annot_value = line[annot_nn+1];
-					var annot_name = annots[annot_nn].name;
+					//var annot_name = annots[annot_nn].name;
+					var annot_name = header[annot_nn+1];
 					annot_factory.addAnnotValue(sample_name, annot_name, annot_value);
 				}
+				//console.log("sample_read: " + annot_factory.sample_read
 				annot_factory.sample_read++;
 			}
+			if (annot_factory.sample_read > 0) {
+				for (var nn = 1; nn < header_cnt; ++nn) {
+					annot_factory.getAnnotation(header[nn]);
+				}
+			}
+			console.log("done");
 			annot_factory.sample_annotated = annot_factory.sync();
 			ready.resolve();
 		},
@@ -2880,7 +2925,7 @@ AnnotationFactory.prototype = {
 			if (error_trigger) {
 				error_trigger(file);
 			}
-			//console.log("Error", e);    // Just log it
+			console.log("Error", e);    // Just log it
 		}
 	},
 
@@ -2994,6 +3039,7 @@ function Group(annots, values, id) {
 Group.CONTINUOUS_AVERAGE = "1";
 Group.CONTINUOUS_MINVAL = "2";
 Group.CONTINUOUS_MAXVAL = "3";
+Group.CONTINUOUS_ABS_MAXVAL = "4";
 
 Group.prototype = {
 	annots: [],
@@ -3030,12 +3076,16 @@ Group.prototype = {
 			if (datatable.biotype.isContinuous()) {
 				method = Group.CONTINUOUS_AVERAGE;
 			} else {
-				var values = datatable.getDiscreteValues();
-				var first_value;
-				for (first_value in values) {
-					break;
+				if (datatable.hasEmptyValues()) {
+					method = ' -';
+				} else {
+					var values = datatable.getDiscreteValues();
+					var first_value;
+					for (first_value in values) {
+						break;
+					}
+					method = first_value + '+';
 				}
-				method = first_value + '+';
 			}
 			this.methods[datatable.getId()] = method;
 		}
@@ -3061,27 +3111,40 @@ Group.prototype = {
 				}
 				return undefined;
 			}
-			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL) {
+			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
 				var min = Number.MAX_NUMBER;
 				var max = Number.MIN_NUMBER;
+				var absmax = Number.MIN_NUMBER;
 
 				for (var sample_name in this.samples) {
 					var value = datatable.getValue(sample_name, gene_name);
 					value *= 1.;
+					var absvalue = value >= 0 ? value : -value;
 					if (value < min) {
 						min = value;
 					}
 					if (value > max) {
 						max = value;
 					}
+					if (absvalue > absmax) {
+						absmax = absvalue;
+					}
 				}
-				return method == Group.CONTINUOUS_MINVAL ? min : max;
+				if (method == Group.CONTINUOUS_MINVAL) {
+					return min;
+				}
+				if (method == Group.CONTINUOUS_MAXVAL) {
+					return max;
+				}
+				return absmax;
 			}
 			return undefined;
 		}
 		var method_len = method.length;
 		var method_value = method.substring(0, method_len-1);
-		var all = method.substring(method_len-1, method_len) == '@';
+		var mod = method.substring(method_len-1, method_len);
+		var all = mod == '@';
+		var not = mod == '-';
 		var value_cnt = 0;
 		var sample_cnt = 0;
 		for (var sample_name in this.samples) {
@@ -3092,6 +3155,9 @@ Group.prototype = {
 			sample_cnt++;
 		}
 
+		if (not) {
+			return sample_cnt != value_cnt;
+		}
 		if ((value_cnt > 0 && !all) || sample_cnt == value_cnt) {
 			return method_value;
 		}

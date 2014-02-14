@@ -806,7 +806,8 @@ function update_group_status_table(doc, params) {
 				str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
 			} else {
 				var values = datatable.getDiscreteValues();
-				for (var value in values) {
+				for (var idx in values) {
+					var value = values[idx];
 					var label = value == '' ? 'empty' : value;
 					if (value == '') {
 						selected = (method == value+'-') ? " selected" : "";

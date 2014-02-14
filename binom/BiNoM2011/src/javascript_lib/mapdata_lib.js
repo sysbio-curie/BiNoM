@@ -79,7 +79,7 @@ if (!Number.MIN_NUMBER) {
 	Number.MIN_NUMBER = -4000000000; // not the correct value, but ok for our purposes
 }
 
-var input_seps = ["\t", ",", " "];
+var input_seps = ["\t", ";", ",", " "];
 
 function load_info(url, module_name)
 {
@@ -2081,7 +2081,8 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
-	this.discrete_values = {};
+	this.discrete_values_map = {};
+	this.discrete_values = [];
 	this.empty_value_cnt = 0;
 
 	this.setName(name);
@@ -2342,11 +2343,11 @@ Datatable.prototype = {
 			// must have a different div per doc
 			this.displayStepConfig = new DisplayStepConfig(this);
 			this.displayDiscreteConfig = null;
-			this.discrete_values.sort();
 		} else {
 			this.displayStepConfig = null;
 			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
-			
+			this.discrete_values = mapKeys(this.discrete_values_map);
+			this.discrete_values.sort();
 		}
 		this.makeGeneView();
 	},
@@ -2567,7 +2568,7 @@ Datatable.prototype = {
 			}
 		}
 		if (!this.biotype.isContinuous()) {
-			this.discrete_values[value] = 1;
+			this.discrete_values_map[value] = 1;
 		}
 		this.data[gene_nn][sample_nn] = value;
 		return '';

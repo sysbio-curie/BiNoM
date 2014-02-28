@@ -635,10 +635,13 @@ div.tablesorterPager input {
 }
 
 .step-config-table tbody {
-    /*    text-align: center; */
-    /*    background-color: rgb(200, 238, 0) */
     background-color: white;
     color: #222222;
+}
+
+.step-config table {
+    font-size: 80%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
 .discrete-config {
@@ -748,8 +751,8 @@ div.tablesorterPager input {
 
 #heatmap_editing, #barplot_editing, #drawing_editing, #dt_datatable_status_editing, .step-config-editing, .discrete-config-editing, #glyph_editing_1, #glyph_editing_2, #glyph_editing_3, #glyph_editing_4, #glyph_editing_5 {
     font-size: small;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+/*    margin-bottom: 10px;*/
+/*    padding-bottom: 10px;*/
     font-style: italic;
     color: #CC6C00;
 }
@@ -875,4 +878,16 @@ div.tablesorterPager input {
 
 .info_window {
     max-height: 500px;
+}
+
+.config-label {
+    font-size: 80%;
+    font-weight: bold;
+    background: #EEEEEE;
+}
+
+.config-small-label {
+    font-size: 60%;
+    font-weight: bold;
+    background: #EEEEEE;
 }

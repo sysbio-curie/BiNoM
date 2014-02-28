@@ -79,7 +79,9 @@ if (!Number.MIN_NUMBER) {
 	Number.MIN_NUMBER = -4000000000; // not the correct value, but ok for our purposes
 }
 
-var input_seps = ["\t", ";", ",", " "];
+var INPUT_SEPS = ["\t", ";", ",", " "];
+var COLOR_SIZE_CONFIG = "color_size";
+var EDITING_CONFIGURATION = "configuration not saved...";
 
 function load_info(url, module_name)
 {
@@ -1207,52 +1209,57 @@ function force_datatable_display(id) {
 	}
 }
 
-function step_color_count_change(config, id) {
-	var datatable = navicell.dataset.datatables_id[id];
-	console.log("step_color_count_change(" + config + ")");
-	if (datatable) {
-		var value = $("#step_config_count_" + config + '_' + id).val();
-		datatable.displayStepConfig.setStepCount_config(value, config);
-		display_step_config_set_editing(datatable.id, true, config);
-	}
-}
-
 function DisplayDiscreteConfig(datatable) {
 	this.datatable = datatable;
 	this.values = [];
 	this.values_idx = {};
-	for (var value in datatable.getDiscreteValues()) {
-		this.values.push(value);
+	var discrete_values = datatable.getDiscreteValues();
+	for (var value in discrete_values) {
+		this.values.push(discrete_values[value]);
 	}
 	this.values.sort();
 	for (var idx = 0; idx < this.values.length; ++idx) {
 		var value = this.values[idx];
 		this.values_idx[value] = idx;
 	}
-	this.buildDiv();
+	this.buildDivs();
 	this.buildValues();
 	this.setDefaults();
 }
 
 DisplayDiscreteConfig.prototype = {
 	
-	buildDiv: function() {
+	buildDivs: function() {
+		this.div_ids = {};
+		this.buildDiv('color');
+		this.buildDiv(COLOR_SIZE_CONFIG);
+		this.buildDiv('shape');
+		this.buildDiv('size');
+	},
+
+	buildDiv: function(config) {
+		var mod = config + '_';
 		var id = this.datatable.getId();
-		var div_editing_id = "discrete_config_editing_" + id;
-		var div_id = "discrete_config_" + id;
+		var div_editing_id = "discrete_config_editing_" + mod + id;
+		var div_id = "discrete_config_" + mod + id;
 		var html = "<div class='discrete-config' id='" + div_id + "'>\n";
-		html += "<h3 id='discrete_config_title_" + id + "'></h3>";
+		html += "<h3 id='discrete_config_title_" + mod + id + "'></h3>";
 		html += "<div id='" + div_editing_id + "' class='discrete-config-editing'>\n</div>";
-		html += "<table class='discrete-config-table' id='discrete_config_table_" + id + "'>";
+		html += "<table class='discrete-config-table' id='discrete_config_table_" + mod + id + "'>";
 		html += "</table>";
 
 		html += "</div>";
-		this.div_id = div_id;
+		this.div_ids[config] = div_id;
+//		this.div_id = div_id;
 		$('body').append(html);
 	},
 
-	getDivId: function(what) { // what ignored for now
-		return this.div_id;
+	getDatatableValue: function(config, value) {
+		return value;
+	},
+
+	getDivId: function(what) {
+		return this.div_ids[what];
 	},
 
 	buildValues: function() {
@@ -1281,16 +1288,11 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	setDefaults: function() {
-		//this.setValueInfo(0, "F7FF19", 4, 0);
-		this.setValueInfo(0, "FFE4B5", 4, 0);
-		this.setValueInfo(1, "D6ECFF", 6, 1);
-		//this.setValueInfo(2, "19FF57", 8, 2);
-		this.setValueInfo(2, "B3FF4F", 8, 2);
-		//this.setValueInfo(3, "6421FF", 10, 3);
-		this.setValueInfo(3, "8F57FF", 10, 3);
-		//this.setValueInfo(4, "E64515", 12, 4);
-		this.setValueInfo(4, "E65EC2", 12, 4);
-		this.setValueInfo(5, "CC0044", 14, 5);
+		var step_cnt = this.getValueCount();
+		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt);
+		for (var ii = 0; ii < step_cnt; ++ii) {
+			this.setValueInfo(ii, colors[ii].getRGBValue(), ii*2+4, ii);
+		}
 		this.update();
 	},
 
@@ -1323,7 +1325,7 @@ DisplayDiscreteConfig.prototype = {
 		if (idx != undefined) {
 			return this.sizes[idx];
 		}
-		return '';
+		return 0;
 	},
 
 	getShape: function(value) {
@@ -1335,54 +1337,75 @@ DisplayDiscreteConfig.prototype = {
 	},
 
 	update: function() {
+		this.update_config('color');
+		this.update_config(COLOR_SIZE_CONFIG);
+		this.update_config('shape');
+		this.update_config('size');
+	},
+
+	update_config: function(config) {
+		var mod = config + '_';
 		var id = this.datatable.getId();
-		var table = $("#discrete_config_table_" + id);
+		var table = $("#discrete_config_table_" + mod + id);
 		table.children().remove();
 		var html = "<thead>";
 		html += "<th>Values</th>";
-		html += "<th>Color</th>";
-		html += "<th>Size</th>";
-		html += "<th>Shape</th>";
+		if (config == 'color' || config == COLOR_SIZE_CONFIG) {
+			html += "<th>Color</th>";
+		}
+		if (config == 'size' || config == COLOR_SIZE_CONFIG) {
+			html += "<th>Size</th>";
+		}
+		if (config == 'shape') {
+			html += "<th>Shape</th>";
+		}
 		html += "</thead><tbody>";
 		var step_cnt = this.values.length;
 		for (var idx = 0; idx < step_cnt; idx++) {
 			html += "<tr>";
 			var value = this.getValueAt(idx);
 			if (value == '') {
-				value = "<span style='text-align: center'>missing value</span>";
+				value = "<span style='text-align: center'>NA</span>";
 			}
 			html += "<td>" + value + "</td>";
-			html += "<td><input id='discrete_config_" + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_discrete_config_set_editing(" + id + ", true)'></input></td>";
-			//html += "<td><input class='color' value='" + "000000" + "'></input></td>";
-			html += "<td><select id='discrete_size_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)'>";
-			//html += "<option value='_none_'>Choose a size</option>";
-			var selsize = this.getSizeAt(idx);
-			//var maxsize = DISCRETE_MAX_SIZE/2;
-			var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
-			for (var size = -2; size < maxsize; size += 1) {
-				var size2 = DISCRETE_SIZE_COEF*(size+2);
-				html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
+			if (config == 'color' || config == COLOR_SIZE_CONFIG) {
+				html += "<td><input id='discrete_config_" + mod + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
 			}
-			html += "</select></td>";
-			html += "<td><select id='discrete_shape_" + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true)''>";
-			//html += "<option value='_none_'>Choose a shape</option>";
-			var selshape = this.getShapeAt(idx);
-			if (selshape > navicell.shapes.length) {
-				selshape = navicell.shapes.length-1;
+			if (config == 'size' || config == COLOR_SIZE_CONFIG) {
+				html += "<td><select id='discrete_size_" + mod + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")'>";
+				var selsize = this.getSizeAt(idx);
+				var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
+				for (var size = -2; size < maxsize; size += 1) {
+					var size2 = DISCRETE_SIZE_COEF*(size+2);
+					html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
+				}
+				html += "</select></td>";
 			}
-			for (var shape_idx in navicell.shapes) {
-				var shape = navicell.shapes[shape_idx];
-				html += "<option value='" + shape + "' " + (shape_idx == selshape ? "selected" : "") + ">" + shape + "</option>";
+			if (config == 'shape') {
+				html += "<td><select id='discrete_shape_" + mod + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")''>";
+				var selshape = this.getShapeAt(idx);
+				if (selshape > navicell.shapes.length) {
+					selshape = navicell.shapes.length-1;
+				}
+				for (var shape_idx in navicell.shapes) {
+					var shape = navicell.shapes[shape_idx];
+					html += "<option value='" + shape + "' " + (shape_idx == selshape ? "selected" : "") + ">" + shape + "</option>";
+				}
+				html += "</select></td>";
 			}
-			html += "</select></td>";
 			html += "</tr>\n";
 		}
 
 		html += "</tbody>";
 		table.append(html);
 
-		var title = $("#discrete_config_title_" + id);
-		title.html("Datatable " + this.datatable.name + ": Display Configuration (Discrete)");
+		var title = $("#discrete_config_title_" + mod + id);
+		if (config == COLOR_SIZE_CONFIG) {
+			var Config = "Color/Size";
+		} else {
+			var Config = config.charAt(0).toUpperCase() + config.slice(1)
+		}
+		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
 
 		jscolor.init();
 	}
@@ -1391,6 +1414,15 @@ DisplayDiscreteConfig.prototype = {
 function DisplayStepConfig(datatable) {
 	this.datatable = datatable;
 	this.has_empty_values = datatable.hasEmptyValues();
+	this.use_absval = {};
+	for (var tab in DisplayStepConfig.tabnames) {
+		var tabname = DisplayStepConfig.tabnames[tab];
+		this.use_absval[tabname] = {};
+	}
+	this.group_method = {};
+	this.setGroupMethod('color', Group.CONTINUOUS_AVERAGE);
+	this.setGroupMethod('shape', Group.CONTINUOUS_AVERAGE);
+	this.setGroupMethod('size', Group.CONTINUOUS_AVERAGE);
 	var step_cnt = 5;
 	this.buildDivs(step_cnt);
 	this.setStepCount(step_cnt);
@@ -1400,11 +1432,6 @@ var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
 
 DisplayStepConfig.prototype = {
-	datatable: null,
-	//values: {}, // numeric step values
-	//colors: {}, // rgb values
-	//sizes: {}, // pixel values
-	//shapes: {}, // shape types
 
 	setStepCount: function(step_cnt) {
 		this.values = {};
@@ -1412,77 +1439,88 @@ DisplayStepConfig.prototype = {
 		this.sizes = {};
 		this.shapes = {};
 
-		this.setStepCount_config(step_cnt, 'color');
-		this.setStepCount_config(step_cnt, 'shape');
-		this.setStepCount_config(step_cnt, 'size');
-		//this.update();
+		for (var tab in DisplayStepConfig.tabnames) {
+			var tabname = DisplayStepConfig.tabnames[tab];
+			this.use_absval[tabname] = {};
+			this.values[tabname] = {};
+			this.colors[tabname] = {};
+			this.sizes[tabname] = {};
+			this.shapes[tabname] = {};
+			this.setStepCount_config(step_cnt, 'color', tabname);
+			this.setStepCount_config(step_cnt, 'shape', tabname);
+			this.setStepCount_config(step_cnt, 'size', tabname);
+		}
 		this.datatable.refresh();
 	},
 
-	setStepCount_config: function(step_cnt, config) {
-		if (this.values && this.values[config] && step_cnt+3 == this.values[config].length) {
-			return;
-		}
+	setStepCount_config: function(step_cnt, config, tabname) {
 		step_cnt *= 1.;
-		this.values[config] = [];
-		var values = this.values[config];
-		values.push(this.datatable.minval);
-		var step = (this.datatable.maxval - this.datatable.minval)/(step_cnt+1);
-		//console.log("step_cnt: " + step_cnt + " step: " + step + " " + this.datatable.minval + " " + this.datatable.maxval);
-		//var step_cnt_1 = step_cnt-1;
+		var keep = this.values[tabname][config] && step_cnt == this.getStepCount(config, tabname);
+		this.values[tabname][config] = [];
+		var values = this.values[tabname][config];
+		var minval = this.getDatatableMinval(config, tabname);
+		var maxval = this.getDatatableMaxval(config, tabname);
+		values.push(minval);
+		var step = (maxval - minval)/(step_cnt+1);
+//		console.log("step_cnt: " + step_cnt + " step: " + step + " " + minval + " " + this.datatable.maxval);
 		if (this.has_empty_values) {
-			values.push(-1);
-			//step_cnt++;
+			values.push(Number.MIN_NUMBER);
 		}
 		for (var nn = 0; nn < step_cnt-1; ++nn) {
-			var value = this.datatable.minval + (nn+1)*step;
+			var value = minval + (nn+1)*step;
 			value = parseInt(value*100)/100;
 			values.push(value);
 		}
 		values.push(this.datatable.maxval);
-		/*
-		for (var nn = 0; nn < this.values.length; ++nn) {
-			console.log("values[" + nn + "] = " + this.values[nn]);
-		}
-		*/
 		if (this.has_empty_values) {
 			step_cnt++;
 		}
-		this.colors[config] = new Array(step_cnt);
-		this.sizes[config] = new Array(step_cnt);
-		this.shapes[config] = new Array(step_cnt);
-		
+		if (!keep) {
+			this.colors[tabname][config] = new Array(step_cnt);
+			this.sizes[tabname][config] = new Array(step_cnt);
+			this.shapes[tabname][config] = new Array(step_cnt);
+			this.setDefaults(step_cnt, config, tabname);
+		}
+		this.update_config(config, tabname);
+		/*
 		// AZ code
-		var avg = (this.datatable.minval + this.datatable.maxval)/2;
+		var avg = (minval + maxval)/2;
 		var dt_values = this.datatable.getValues();
 		var posthr = getPositiveThreshold(dt_values, avg);
 		var negthr = getNegativeThreshold(dt_values, avg);
 		//console.log("avg: " + avg + " " + posthr + " " + negthr);
-		this.setDefaults(step_cnt, config);
+		*/
 	},
 
-	setStepInfo: function(config, idx, value, color, size, shape) {
-		//console.log("setting at " + idx + " " + value + " (== " + this.values[idx+1] + ") " + color + " " + size + " " + shape);
+
+	setStepInfo: function(config, tabname, idx, value, color, size, shape) {
+		//console.log("setting at " + idx + " " + value + " " + color + " " + size + " shape=" + shape);
 		if (value != Number.MIN_NUMBER) {
-			this.values[config][idx+1] = value;
+			this.values[tabname][config][idx+1] = value;
 		}
-		this.colors[config][idx] = color;
-		this.sizes[config][idx] = size;
-		this.shapes[config][idx] = shape;
+		this.colors[tabname][config][idx] = color;
+		this.sizes[tabname][config][idx] = size;
+		this.shapes[tabname][config][idx] = shape;
 	},
 
-	setDefaults: function(step_cnt, config) {
-		step_cnt += this.has_empty_values;
+	setUseAbsValue: function(config, use_absval) {
+		this.use_absval['sample'][config] = use_absval;
+	},
+
+	setDefaults: function(step_cnt, config, tabname) {
 		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt); 
 		for (var ii = 0; ii < step_cnt; ++ii) {
-			this.setStepInfo(config, ii, Number.MIN_NUMBER, colors[ii].getRGBValue(), 4+2*ii, ii);
+			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii].getRGBValue(), 4+2*ii, ii);
 		}
-		this.update_config(config);
+		this.displayShapes(tabname);
 	},
 
-	getStepIndex: function(config, value) {
+	getStepIndex: function(config, tabname, value) {
+		if (value == '') {
+			return 0;
+		}
 		value *= 1.;
-		var values = this.values[config];
+		var values = this.values[tabname][config];
 		var len = values.length;
 		for (var nn = 1; nn < len; ++nn) {
 			if (value < values[nn]) {
@@ -1492,58 +1530,140 @@ DisplayStepConfig.prototype = {
 		return len-1;
 	},
 
-	getStepCount: function(config) {
-		return this.values[config].length-this.has_empty_values-1;;
+	getStepCount: function(config, tabname) {
+		return this.values[tabname][config].length-this.has_empty_values-1;;
 	},
 
-	getMinValue: function() {
-		return this.values['color'][0];
+	getDatatableMinval: function(config, tabname) {
+		if (!this.use_absval[tabname][config]) {
+			return this.datatable.minval;
+		}
+		return this.datatable.minval_abs;
 	},
 
-	getMaxValue: function() {
-		var values = this.values['color'];
-		return values[values.length-1];
+	getDatatableMaxval: function(config, tabname) {
+		if (!this.use_absval[tabname][config]) {
+			return this.datatable.maxval;
+		}
+		return this.datatable.maxval_abs;
 	},
 
-	getValueAt: function(config, idx) {
-		return this.values[config][idx+1];
+	getDatatableValue: function(config, tabname, value) {
+		if (value == '') {
+			return value;
+		}
+		value *= 1.;
+		if (!this.use_absval[tabname][config]) {
+			return value;
+		}
+		return Math.abs(value);
 	},
 
-	getColorAt: function(config, idx) {
-		return this.colors[config][idx];
+	setGroupMethod: function(config, group_method) {
+		console.log("setting group method " + config + " " + group_method);
+		this.group_method[config] = group_method;
+		this.use_absval['group'][config] = 
+			group_method == Group.CONTINUOUS_ABS_AVERAGE ||
+			group_method == Group.CONTINUOUS_ABS_MINVAL ||
+			group_method == Group.CONTINUOUS_ABS_MAXVAL;
 	},
 
-	getSizeAt: function(config, idx) {
-		return this.sizes[config][idx];
+	getDatatableSampleValue: function(config, value) {
+		return this.getDatatableValue(config, 'sample', value);
 	},
 
-	getShapeAt: function(config, idx) {
-		return this.shapes[config][idx];
+	getDatatableGroupValue: function(config, value) {
+		return this.getDatatableValue(config, 'group', value);
 	},
 
-	getColor: function(value) {
-		return this.colors['color'][this.getStepIndex('color', value)];
+	getValueAt: function(config, tabname, idx) {
+		return this.values[tabname][config][idx+1];
 	},
 
-	getSize: function(value) {
-		return this.sizes['size'][this.getStepIndex('size', value)];
+	getColorAt: function(config, tabname, idx) {
+		return this.colors[tabname][config][idx];
 	},
 
-	getShape: function(value) {
-		return this.shapes['shape'][this.getStepIndex('shape', value)];
+	getSizeAt: function(config, tabname, idx) {
+		return this.sizes[tabname][config][idx];
 	},
 
-	makeValueInput: function(id, config, idx) {
-		return "<td><input type='text' class='input-value' id='step_value_" + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, idx) + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
+	getShapeAt: function(config, tabname, idx) {
+		return this.shapes[tabname][config][idx];
 	},
 
-	makeColorInput: function(id, config, idx) {
-		return "<td><input id='step_config_" + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, idx) + "' class='color input-value' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
+	getStyleSample: function(sample_name, gene_name) {
+		var color = this.getColorSample(sample_name, gene_name);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return '';
 	},
 
-	makeSelectSize: function(id, config, idx) {
-		var selsize = this.getSizeAt(config, idx);
-		var html = "<td><select id='step_size_" + config + '_' + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")'>";
+	getStyleGroup: function(group, gene_name) {
+		var color = this.getColorGroup(group, gene_name);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return '';
+	},
+
+	_getBarplotHeight: function(tabname, value, max) {
+		if (value) {
+			value *= 1.;
+			var minval = this.getDatatableMinval('color', tabname);
+			var maxval = this.getDatatableMaxval('color', tabname);
+			return max * (value-minval) / (maxval - minval);
+		}
+		return 0;
+	},
+
+	getBarplotSampleHeight: function(sample_name, gene_name, max) {
+		var value = this.getColorSampleValue(sample_name, gene_name);
+		return this._getBarplotHeight('sample', value, max);
+	},
+
+	getBarplotGroupHeight: function(group, gene_name, max) {
+		var value = group.getValue(this.datatable, gene_name, this.group_method['color']);
+		return this._getBarplotHeight('group', value, max);
+	},
+
+	_getColor: function(value, tabname) {
+		//value = this.getDatatableValue('color', value);
+		return this.colors[tabname]['color'][this.getStepIndex('color', tabname, value)];
+	},
+
+	_getSize: function(value, tabname) {
+		//value = this.getDatatableValue('size', value);
+		return this.sizes[tabname]['size'][this.getStepIndex('size', tabname, value)];
+	},
+
+	displayShapes: function(tabname) {
+		console.log("display shapes " + tabname);
+		var shapes = this.shapes[tabname]['shape'];
+		for (var idx in shapes) {
+			console.log("shape at " + idx + " " + shapes[idx]);
+		}
+	},
+
+	_getShape: function(value, tabname) {
+		//value = this.getDatatableValue('shape', value);
+		return this.shapes[tabname]['shape'][this.getStepIndex('shape', tabname, value)];
+	},
+
+	makeValueInput: function(id, config, tabname, idx) {
+		return "<td><input type='text' class='input-value' id='step_value_" + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayStepConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+	},
+
+	makeColorInput: function(id, config, tabname, idx) {
+		return "<td><input id='step_config_" + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, tabname, idx) + "' class='color input-value' onchange='DisplayStepConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+	},
+
+	makeSelectSize: function(id, config, tabname, idx) {
+		var selsize = this.getSizeAt(config, tabname, idx);
+		var html = "<td><select id='step_size_" + config + '_' + id + "_" + idx + "' onchange='DisplayStepConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
 		var maxsize = STEP_MAX_SIZE/2;
 		for (var size = 0; size < maxsize; size += 1) {
 			var size2 = 2*size;
@@ -1553,9 +1673,9 @@ DisplayStepConfig.prototype = {
 		return html;
 	},
 
-	makeSelectShape: function(id, config, idx) {
-		var selshape = this.getShapeAt(config, idx);
-		var html = "<td><select id='step_shape_" + config + '_' + id + "_" + idx + "' onchange='display_step_config_set_editing(" + id + ", true, \"" + config + "\")''>";
+	makeSelectShape: function(id, config, tabname, idx) {
+		var selshape = this.getShapeAt(config, tabname, idx);
+		var html = "<td><select id='step_shape_" + config + '_' + id + "_" + idx + "' onchange='DisplayStepConfig.setEditing(" + id + ", true, \"" + config + "\")''>";
 		if (selshape >= navicell.shapes.length) {
 			selshape = navicell.shapes.length-1;
 		}
@@ -1567,16 +1687,106 @@ DisplayStepConfig.prototype = {
 		return html;
 	},
 
-	update: function() {
-		this.update_config('color');
-		this.update_config('shape');
-		this.update_config('size');
+	makeSelectGroupMethod: function(config) {
+		var datatable = this.datatable;
+		var method = this.group_method[config];
+		var selected;
+		var str = "<select id='group_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayStepConfig.setGroupMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+		selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
+		selected = (method == Group.CONTINUOUS_MINVAL) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_MINVAL + "'" + selected + ">Min Value</option>\n";
+
+		selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
+
+		selected = (method == Group.CONTINUOUS_ABS_AVERAGE) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_ABS_AVERAGE + "'" + selected + ">Average Absolute</option>\n";
+
+		selected = (method == Group.CONTINUOUS_ABS_MINVAL) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_ABS_MINVAL + "'" + selected + ">Min Absolute Value</option>\n";
+
+		selected = (method == Group.CONTINUOUS_ABS_MAXVAL) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
+		str += "</select>";
+		return str;
 	},
 
-	update_config: function(config) {
+	getValue: function(config, tabname, sample_name, gene_name) {
+		var value = this.datatable.getValue(sample_name, gene_name);
+		return this.getDatatableValue(config, tabname, value);
+	},
+
+	getShapeSampleValue: function(sample_name, gene_name) {
+		return this.getValue('shape', 'sample', sample_name, gene_name);
+	},
+
+	getShapeGroupValue: function(group, gene_name) {
+		return group.getValue(this.datatable, gene_name, this.group_method['shape']);
+	},
+
+	getColorSampleValue: function(sample_name, gene_name) {
+		return this.getValue('color', 'sample', sample_name, gene_name);
+	},
+
+	getColorGroupValue: function(group, gene_name) {
+		return group.getValue(this.datatable, gene_name, this.group_method['color']);
+	},
+
+	getSizeSampleValue: function(sample_name, gene_name) {
+		return this.getValue('size', 'sample', sample_name, gene_name);
+	},
+
+	getSizeGroupValue: function(sample_name, gene_name) {
+		return group.getValue(this.datatable, gene_name, this.group_method['size']);
+	},
+
+	getShapeSample: function(sample_name, gene_name) {
+		var value = this.getShapeSampleValue(sample_name, gene_name);
+		return this._getShape(value, 'sample');
+	},
+
+	getShapeGroup: function(group, gene_name) {
+		var value = this.getShapeGroupValue(group, gene_name);
+		return this._getShape(value, 'group');
+	},
+
+	getColorSample: function(sample_name, gene_name) {
+		var value = this.getColorSampleValue(sample_name, gene_name);
+		return this._getColor(value, 'sample');
+	},
+
+	getColorGroup: function(group, gene_name) {
+		var value = this.getColorGroupValue(group, gene_name);
+		return this._getColor(value, 'group');
+	},
+
+	getSizeSample: function(sample_name, gene_name) {
+		var value = this.getSizeSampleValue(sample_name, gene_name);
+		return this._getSize(value, 'sample');
+	},
+
+	getSizeGroup: function(group, gene_name) {
+		var value = this.getShapeGroupValue(group, gene_name);
+		return this._getSize(value, 'group');
+	},
+
+	update: function() {
+		for (var tab in DisplayStepConfig.tabnames) {
+			var tabname = DisplayStepConfig.tabnames[tab];
+			this.update_config('color', tabname);
+			this.update_config('shape', tabname);
+			this.update_config('size', tabname);
+		}
+	},
+
+	update_config: function(config, tabname) {
+		var minval = this.getDatatableMinval(config, tabname);
+		var maxval = this.getDatatableMaxval(config, tabname);
 		var mod = config + '_';
 		var id = this.datatable.getId();
-		var table = $("#step_config_table_" + mod + id);
+		var id_suffix = tabname + '_' + mod + id 
+		var table = $("#step_config_table_" + id_suffix);
 		table.children().remove();
 		var html = "<thead>";
 		html += "<th></th>";
@@ -1595,48 +1805,79 @@ DisplayStepConfig.prototype = {
 			//html += "<tr><td></td><td style='font-size: smaller; text-align: center;'>NA</td>";
 			html += "<tr><td></td><td style='font-size: smaller;'>NA</td>";
 			if (config == 'color') {
-				html += this.makeColorInput(id, config, 0);
+				html += this.makeColorInput(id, config, tabname, 0);
 			}
 			if (config == 'size') {
-				html += this.makeSelectSize(id, config, 0);
+				html += this.makeSelectSize(id, config, tabname, 0);
 			}
 			if (config == 'shape') {
-				html += this.makeSelectShape(id, config, 0);
+				html += this.makeSelectShape(id, config, tabname, 0);
 			}
 			html += "</tr>\n";
 		}
 		if (false) {
 			html += "<tr><td></td>";
-			html += "<td>" + this.datatable.minval + " (minimum)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
+			html += "<td>" + minval + " (minimum)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
 			html += "</tr>\n";
 		}
-		var step_cnt = this.getStepCount(config);
+		var step_cnt = this.getStepCount(config, tabname);
 		for (var idx = 0; idx < step_cnt; idx++) {
 			html += "<tr><td><span class='less-than'>Less&nbsp;than</span></td>";
 			if (idx == step_cnt-1) {
-				html += "<td>" + this.datatable.maxval + "</td>";
+				html += "<td>" + maxval + "</td>";
 			} else {
-				html += this.makeValueInput(id, config, idx+this.has_empty_values);
+				html += this.makeValueInput(id, config, tabname, idx+this.has_empty_values);
 			}
 			if (config == 'color') {
-				html += this.makeColorInput(id, config, idx+this.has_empty_values);
+				html += this.makeColorInput(id, config, tabname, idx+this.has_empty_values);
 			}
 			if (config == 'size') {
-				html += this.makeSelectSize(id, config, idx+this.has_empty_values);
+				html += this.makeSelectSize(id, config, tabname, idx+this.has_empty_values);
 			}
 			if (config == 'shape') {
-				html += this.makeSelectShape(id, config, idx+this.has_empty_values);
+				html += this.makeSelectShape(id, config, tabname, idx+this.has_empty_values);
 			}
 			html += "</tr>\n";
 		}
 		html += "</tbody>";
 		table.append(html);
 
-		var count = $("#step_config_count_" + mod + id);
+		var table_info = $("#step_info_table_" + id_suffix);
+		table_info.children().remove();
+		var html = "<tbody>";
+		var use_absval = this.use_absval[tabname][config];
+		var min_label = (use_absval ? "Min&nbsp;Abs&nbsp;Value" : "Min&nbsp;Value");
+		var max_label = (use_absval ? "Max&nbsp;Abs&nbsp;Value" : "Max&nbsp;Value");
+		var width = (use_absval && tabname != 'group' ? '120px' : '150px');
+		html += "<tr><td style='background: #EEEEEE'>&nbsp;</td></tr>";
+		html += "<tr>";
+		html += "<td id='min_val_label_" + id_suffix + "'><span class='config-label'>" + min_label + "</span></td>";
+		html += "<td id='min_val_" + id_suffix + "'>" + minval + "</td>";
+		html += "<td width='10px'>&nbsp;</td>";
+		if (tabname == 'sample') {
+			if (this.datatable.minval < 0) {
+				html += "<td width='" + width + "'rowspan='2'><span class='config-label'>&nbsp;&nbsp;Use&nbsp;abs&nbsp;values&nbsp;</span><input id='step_config_absval_" + id_suffix + "' type='checkbox' onchange='DisplayStepConfig.setSampleAbsval(\"" + config + "\", \"" + id + "\")'" + (use_absval ? " checked" : "") + "></input></td>"
+			} else {
+				html += "<td width='" + width + "'>&nbsp;</td>";
+			}
+		} else {
+			html += "<td width='" + width + "' style='text-align: center'><span class='config-label' style='text-align: center'>Group&nbsp;Method</span></td>";
+		}
+		html += "</tr><tr>";
+		html += "<td id='max_val_label_" + id_suffix + "'><span class='config-label'>" + max_label + "</span></td>";
+		html += "<td id='max_val_" + id_suffix + "'>" + maxval + "</td>";
+		if (tabname == 'group') {
+			html += "<td width='10px'>&nbsp;</td>";
+			html += "<td>" + this.makeSelectGroupMethod(config) + "</td>";
+		}
+		html += "</tr>";
+		html += "</tbody>";
+		table_info.append(html);
+
+		var count = $("#step_config_count_" + id_suffix);
 
 		var title = $("#step_config_title_" + mod + id);
 		var Config = config.charAt(0).toUpperCase() + config.slice(1)
-		//title.html(this.datatable.name + " Datatable<br>" + Config + " Configuration (Continuous)");
 		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
 
 		jscolor.init();
@@ -1652,23 +1893,39 @@ DisplayStepConfig.prototype = {
 	buildDiv: function(step_cnt, config) {
 		var mod = config + '_';
 		var id = this.datatable.getId();
-		var div_editing_id = "step_config_editing_" + mod + id;
 		var div_id = "step_config_" + mod + id;
 		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
 		html += "<h3 id='step_config_title_" + mod + id + "'></h3>";
-		html += "<div id='" + div_editing_id + "' class='step-config-editing'></div>\n";
-		html += "<table class='step-config-table' id='step_config_table_" + mod + id + "'>";
-		html += "</table>";
+		html += "<ul>";
+		html += "<li><a class='ui-button-text' href='#step_config_sample_" + mod + id + "'>Samples</a></li>";
+		html += "<li><a class='ui-button-text' href='#step_config_group_" + mod + id + "'>Groups</a></li>";
+		html += "</ul>";
 
-		html += "<BR/><BR/>Step Count <select id='step_config_count_" + mod + id + "' onchange='step_color_count_change(\"" + config + "\", " + id + ")'>";
-		for (var step = 1; step <= 10; ++step) {
-			html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
+		for (var tab in DisplayStepConfig.tabnames) {
+			var tabname = DisplayStepConfig.tabnames[tab];
+			var id_suffix = tabname + '_' + mod + id 
+			var div_editing_id = "step_config_editing_" + id_suffix;
+			html += "<div id='step_config_" + id_suffix + "'>";
+			html += "<div style='text-align: left' id='" + div_editing_id + "' class='step-config-editing'></div>";
+			html += "<h4 style='font-size: 80%'>" + DisplayStepConfig.tablabels[tabname] + "</h4>";
+			html += "<table class='step-config-table' id='step_config_table_" + id_suffix + "'>";
+			html += "</table>";
+			html += "<table class='step-info-table' id='step_info_table_" + id_suffix + "'>";
+			html += "</table>";
+			
+			html += "<br/><span class='config-small-label'>Step Count</span>\n";
+			html += "<select style='font-size: 70%' id='step_config_count_" + id_suffix + "' onchange='DisplayStepConfig.stepCountChange(\"" + tabname + "\", \"" + config + "\", " + id + ")'>";
+			for (var step = 1; step <= 10; ++step) {
+				html += "<option value='" + step + "' " + (step == step_cnt ? "selected" : "") + ">" + step + "</option>";
+			}
+			html += "</select>";
+			html += "</div>";
 		}
-		html += "</select>";
-		html += "</div>";
 
+		html += "</div>";
 		this.div_ids[config] = div_id;
 		$('body').append(html);
+		$("#" + div_id).tabs();
 	},
 
 	getDivId: function(what) {
@@ -1679,6 +1936,56 @@ DisplayStepConfig.prototype = {
 		return "DisplayStepConfig";
 	}
 };
+
+DisplayStepConfig.stepCountChange = function(tabname, config, id) {
+	var datatable = navicell.dataset.datatables_id[id];
+	console.log("step_count_change(" + config + ")");
+	if (datatable) {
+		var value = $("#step_config_count_" + tabname + '_' + config + '_' + id).val();
+		datatable.displayStepConfig.setStepCount_config(value, config, tabname);
+		DisplayStepConfig.setEditing(datatable.id, true, config);
+	}
+}
+
+DisplayStepConfig.setSampleAbsval = function(config, id) {
+	var checked = $("#step_config_absval_sample_" + config + '_' + id).attr("checked");
+	var datatable = navicell.dataset.getDatatableById(id);
+	if (datatable) {
+		var displayStepConfig = datatable.displayStepConfig;
+		displayStepConfig.setUseAbsValue(config, checked == 'checked');
+		var step_cnt = displayStepConfig.getStepCount(config, 'sample');
+		displayStepConfig.setStepCount_config(step_cnt, config, 'sample');
+		DisplayStepConfig.setEditing(id, true, config);
+	}
+}
+
+DisplayStepConfig.setGroupMethod = function(config, id) {
+	var datatable = navicell.getDatatableById(id);
+	if (datatable) {
+		var obj = $("#group_method_" + config + '_' + id);
+		var displayStepConfig = datatable.displayStepConfig;
+		displayStepConfig.setGroupMethod(config, obj.val());
+		var step_cnt = displayStepConfig.getStepCount(config, 'group');
+		displayStepConfig.setStepCount_config(step_cnt, config, 'group');
+		DisplayStepConfig.setEditing(id, true, config);
+	}
+}
+
+DisplayStepConfig.setEditing = function(datatable_id, val, config) {
+	var datatable = navicell.getDatatableById(datatable_id);
+	var div_id = datatable.getDisplayConfig().getDivId(config);
+	if (div_id) {
+		var div = $("#" + div_id);
+		var active = div.tabs("option", "active");
+		var tabname = DisplayStepConfig.tabnames[active];
+		if (tabname) {
+			$("#step_config_editing_" + tabname + '_' + config + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
+		}
+	}
+}
+
+DisplayStepConfig.tabnames = ['sample', 'group'];
+DisplayStepConfig.tablabels = {'sample' : 'Sample Configuration', 'group' :'Group Configuration'};
 
 function HeatmapConfig() {
 	this.reset();
@@ -2076,6 +2383,8 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	}
 	this.minval = Number.MAX_NUMBER;
 	this.maxval = Number.MIN_NUMBER;
+	this.minval_abs = Number.MAX_NUMBER;
+	this.maxval_abs = Number.MIN_NUMBER;
 	this.error = "";
 	this.warning = "";
 	this.id = datatable_id;
@@ -2111,8 +2420,8 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 		var sample_cnt;
 		var sep = null;
 
-		for (var ii = 0; ii < input_seps.length; ++ii) {
-			sep = input_seps[ii];
+		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
+			sep = INPUT_SEPS[ii];
 			line = lines[0].trim().split(sep);
 			sample_cnt = line.length-1;
 			if (!line[line.length-1]) {
@@ -2345,9 +2654,9 @@ Datatable.prototype = {
 			this.displayDiscreteConfig = null;
 		} else {
 			this.displayStepConfig = null;
-			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
+			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
 		}
 		this.makeGeneView();
 	},
@@ -2483,23 +2792,27 @@ Datatable.prototype = {
 		return str;
 	},
 
+	/*
 	getBarplotHeight: function(value, max) {
+		var displayConfig = this.getDisplayConfig();
 		if (this.biotype.isContinuous()) {
 			var ivalue = parseFloat(value);
 			if (!isNaN(ivalue)) {
 				var ivalue = parseFloat(value);
 				if (!isNaN(ivalue)) {
+					if (displayConfig.use_absval['color']) {
+						return max * (Math.abs(ivalue)-this.minval_abs) / (this.maxval_abs - this.minval_abs);
+					}
 					return max * (ivalue-this.minval) / (this.maxval - this.minval);
 				}
 			}
 		} else {
-			var displayConfig = this.getDisplayConfig();
 			var size = displayConfig.getSize(value);
-			//return max*(size/DISCRETE_MAX_SIZE);
 			return max*(size/(displayConfig.getValueCount()*DISCRETE_SIZE_COEF));
 		}
 		return 0.;
 	},
+	*/
 
 	getValue: function(sample_name, gene_name) {
 		var gene_idx = this.gene_index[gene_name];
@@ -2555,13 +2868,20 @@ Datatable.prototype = {
 			value = '';
 		} else {
 			var ivalue = parseFloat(value);
+
 			if (!isNaN(ivalue)) {
-				//console.log("ivalue: " + ivalue + " " + value);
 				if (ivalue < this.minval) {
 					this.minval = ivalue;
 				}
 				if (ivalue > this.maxval) {
 					this.maxval = ivalue;
+				}
+				var ivalue_abs = Math.abs(ivalue);
+				if (ivalue_abs < this.minval_abs) {
+					this.minval_abs = ivalue_abs;
+				}
+				if (ivalue_abs > this.maxval_abs) {
+					this.maxval_abs = ivalue_abs;
 				}
 			} else if (this.biotype.isContinuous()) {
 				return "expected numeric value, got '" + value + "'";
@@ -2844,8 +3164,8 @@ AnnotationFactory.prototype = {
 
 			var sep = null;
 			
-			for (var ii = 0; ii < input_seps.length; ++ii) {
-				sep = input_seps[ii];
+			for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
+				sep = INPUT_SEPS[ii];
 				header = lines[0].trim().split(sep);
 				header_cnt = header.length;
 				if (!header[header.length-1]) {
@@ -3040,7 +3360,9 @@ function Group(annots, values, id) {
 Group.CONTINUOUS_AVERAGE = "1";
 Group.CONTINUOUS_MINVAL = "2";
 Group.CONTINUOUS_MAXVAL = "3";
-Group.CONTINUOUS_ABS_MAXVAL = "4";
+Group.CONTINUOUS_ABS_AVERAGE = "4";
+Group.CONTINUOUS_ABS_MINVAL = "5";
+Group.CONTINUOUS_ABS_MAXVAL = "6";
 
 Group.prototype = {
 	annots: [],
@@ -3093,39 +3415,48 @@ Group.prototype = {
 		return method;
 	},
 
-	getValue: function(datatable, gene_name) {
-		var method = this.getMethod(datatable);
+	getValue: function(datatable, gene_name, method) {
+		if (!method) {
+			method = this.getMethod(datatable);
+		}
 		if (datatable.biotype.isContinuous()) {
-			if (method == Group.CONTINUOUS_AVERAGE) {
+			if (method == Group.CONTINUOUS_AVERAGE || method == Group.CONTINUOUS_ABS_AVERAGE) {
 				var total_value = 0;
+				var total_absvalue = 0;
 				var cnt = 0;
 				for (var sample_name in this.samples) {
 					var value = datatable.getValue(sample_name, gene_name);
 					value *= 1.;
+					var absvalue = Math.abs(value);
 					if (value) {
 						total_value += value;
+						total_absvalue += absvalue;
 						cnt++;
 					}
 				}
 				if (cnt) {
-					return total_value/cnt;
+					return method == Group.CONTINUOUS_AVERAGE ? total_value/cnt : total_absvalue/cnt;
 				}
 				return undefined;
 			}
-			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
+			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MINVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
 				var min = Number.MAX_NUMBER;
 				var max = Number.MIN_NUMBER;
+				var absmin = Number.MAX_NUMBER;
 				var absmax = Number.MIN_NUMBER;
 
 				for (var sample_name in this.samples) {
 					var value = datatable.getValue(sample_name, gene_name);
 					value *= 1.;
-					var absvalue = value >= 0 ? value : -value;
+					var absvalue = Math.abs(value);
 					if (value < min) {
 						min = value;
 					}
 					if (value > max) {
 						max = value;
+					}
+					if (absvalue < absmin) {
+						absmin = absvalue;
 					}
 					if (absvalue > absmax) {
 						absmax = absvalue;
@@ -3137,7 +3468,13 @@ Group.prototype = {
 				if (method == Group.CONTINUOUS_MAXVAL) {
 					return max;
 				}
-				return absmax;
+				if (method == Group.CONTINUOUS_ABS_MINVAL) {
+					return absmin;
+				}
+				if (method == Group.CONTINUOUS_ABS_MAXVAL) {
+					return absmax;
+				}
+				return null;
 			}
 			return undefined;
 		}
@@ -3404,11 +3741,10 @@ function navicell_init() {
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
 	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));
-	//_navicell.biotype_factory.addBiotype(new Biotype("Mutation data: gene re-sequencing", _navicell.DISCRETE));
 	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data", _navicell.DISCRETE));
-	_navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
-	_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
-
+	// disconnected for now:
+	// _navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
+	//_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
 	_navicell.getDatatableById = function(id) {
 		/*
 		console.log("this.dataset: " + this.dataset.getClass() + " " + id);
@@ -3418,8 +3754,8 @@ function navicell_init() {
 		return this.dataset.getDatatableById(id);
 	}
 
-//	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];
-	_navicell.shapes = ["Triangle", "Square", "Diamond", "Hexagon", "Circle"];
+	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];
+//	_navicell.shapes = ["Triangle", "Square", "Diamond", "Hexagon", "Circle"];
 
 	return _navicell;
 }

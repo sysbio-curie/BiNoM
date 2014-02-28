@@ -802,13 +802,20 @@ function update_group_status_table(doc, params) {
 
 				selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
 				str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
+
+				selected = (method == Group.CONTINUOUS_ABS_AVERAGE) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_ABS_AVERAGE + "'" + selected + ">Average Absolute Values</option>\n";
+
+				selected = (method == Group.CONTINUOUS_ABS_MINVAL) ? " selected" : "";
+				str += "<option value='" + Group.CONTINUOUS_ABS_MINVAL + "'" + selected + ">Min Absolute Value</option>\n";
+
 				selected = (method == Group.CONTINUOUS_ABS_MAXVAL) ? " selected" : "";
 				str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
 			} else {
 				var values = datatable.getDiscreteValues();
 				for (var idx in values) {
 					var value = values[idx];
-					var label = value == '' ? 'empty' : value;
+					var label = value == '' ? 'NA' : value;
 					if (value == '') {
 						selected = (method == value+'-') ? " selected" : "";
 						str += "<option value='" + value + "-'" + selected + ">At least one non " + label + "</option>";
@@ -1089,11 +1096,6 @@ function update_datatables() {
 
 	}
 	if (update_cnt) {
-		/*
-		var update = $("#dt_datatable_status_update");
-		update.attr('checked', false);
-		update.text('Unlock Datatables');
-		*/
 		update_datatable_status_table(null, {force: true});
 		update_status_tables();
 	}
@@ -1118,17 +1120,19 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		var datatable_id = this.getId();
 		//console.log("div.length: " + div.length);
 		var width;
-		if (what == 'color') {
-			width = 360;
+		if (what == COLOR_SIZE_CONFIG) {
+			width = 450;
+		} else if (what == 'color') {
+			width = 400;
 		} else if (what == 'shape') {
-			width = 300;
+			width = 400;
 		} else {
-			width = 280;
+			width = 400;
 		}
 		div.dialog({
 			autoOpen: false,
 			width: width,
-			height: 550,
+			height: 670,
 			modal: false,
 
 			buttons: {
@@ -1136,10 +1140,15 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 					var datatable = navicell.getDatatableById(datatable_id);
 					var displayStepConfig = datatable.displayStepConfig;
 					var displayDiscreteConfig = datatable.displayDiscreteConfig;
+					var active = div.tabs("option", "active");
+					var tabname = DisplayStepConfig.tabnames[active];
 					if (displayStepConfig) {
 						var prev_value = datatable.minval;
 						var error = 0;
-						var step_cnt = displayStepConfig.getStepCount(what);
+						var step_cnt = displayStepConfig.getStepCount(what, tabname);
+						if (displayStepConfig.has_empty_values) {
+							step_cnt++;
+						}
 						for (var idx = 0; idx < step_cnt; ++idx) {
 							var value;
 							if (idx == step_cnt-1) {
@@ -1167,20 +1176,20 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 								var color = $("#step_config_" + what + '_' + datatable_id + "_" + idx, doc).val();
 								var size = $("#step_size_" + what + '_' + datatable_id + "_" + idx, doc).val();
 								var shape = $("#step_shape_" + what + '_' + datatable_id + "_" + idx, doc).val();
-								displayStepConfig.setStepInfo(what, idx, value, color, size, shape);
+								displayStepConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
 							}
-							display_step_config_set_editing(datatable_id, false, what);
+							DisplayStepConfig.setEditing(datatable_id, false, what);
 						}
 					}
 					if (displayDiscreteConfig) {
 						var value_cnt = displayDiscreteConfig.getValueCount();
 						for (var idx = 0; idx < value_cnt; ++idx) {
-							var color = $("#discrete_config_" + datatable_id + "_" + idx, doc).val();
-							var size = $("#discrete_size_" + datatable_id + "_" + idx, doc).val();
-							var shape = $("#discrete_shape_" + datatable_id + "_" + idx, doc).val();
+							var color = $("#discrete_config_" + what + '_' + datatable_id + "_" + idx, doc).val();
+							var size = $("#discrete_size_"  + what + '_' + datatable_id + "_" + idx, doc).val();
+							var shape = $("#discrete_shape_"  + what + '_' + datatable_id + "_" + idx, doc).val();
 							displayDiscreteConfig.setValueInfo(idx, color, size, shape);
 						}
-						display_discrete_config_set_editing(datatable_id, false, what);
+						display_discrete_config_set_editing(datatable_id, false, what, tabname);
 					}
 					datatable.refresh();
 					update_status_tables();
@@ -1191,13 +1200,15 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 					var datatable = navicell.getDatatableById(datatable_id);
 					var displayStepConfig = datatable.displayStepConfig;
 					var displayDiscreteConfig = datatable.displayDiscreteConfig;
+					var active = div.tabs("option", "active");
+					var tabname = DisplayStepConfig.tabnames[active];
 					if (displayStepConfig) {
 						displayStepConfig.update();
-						display_step_config_set_editing(datatable_id, false, what);
+						DisplayStepConfig.setEditing(datatable_id, false, what);
 					}
 					if (displayDiscreteConfig) {
 						displayDiscreteConfig.update();
-						display_discrete_config_set_editing(datatable_id, false, what);
+						display_discrete_config_set_editing(datatable_id, false, what, tabname);
 					}
 					$(this).dialog('close');
 				}
@@ -1207,19 +1218,14 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 	}
 }
 
-var EDITING_CONFIGURATION = "configuration not saved...";
-
 function datatable_management_set_editing(val) {
 	$("#dt_datatable_status_editing").html(val ? 'changes not saved...' : "");
 }
 
-function display_step_config_set_editing(datatable_id, val, what) {
-	//console.log("display_step_config_set_editing(" + val + ", " + what + ")");
-	$("#step_config_editing_" + what + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
-}
 
-function display_discrete_config_set_editing(datatable_id, val) {
-	$("#discrete_config_editing_" + datatable_id).html(val ? EDITING_CONFIGURATION : "");
+// TBD: should be a method DisplayDiscreteConfig
+function display_discrete_config_set_editing(datatable_id, val, what) {
+	$("#discrete_config_editing_" + what + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
 }
 
 function drawing_config_chart() {
@@ -1297,9 +1303,9 @@ function heatmap_sample_action(action, cnt) {
 	}
 }
 
+// TBD: class HeatmapEditor
 function update_heatmap_editor(doc, params, heatmapConfig) {
 	if (!heatmapConfig) {
-		//heatmapConfig = navicell.drawing_config.heatmap_config;
 		heatmapConfig = navicell.drawing_config.editing_heatmap_config;
 	}
 	var map_name = doc ? doc.map_name : "";
@@ -1329,13 +1335,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"allgroups\")") +  "</td>";
 	}
 	html += "</tr><tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td>";
-//	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>" + make_button("All samples", "heatmap_all_samples", "heatmap_all_samples()") + "</td></tr><tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td></tr>";
-
-	//html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
-//	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_clear_samples()") + "&nbsp;" + make_button("All samples", "heatmap_all_samples", "heatmap_all_samples()") + "</td>";
-
 	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
-	//html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>" + + "</td>";
 
 	var select_title = group_cnt ? 'Choose a group or sample' : 'Choose a sample';
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
@@ -1375,10 +1375,27 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		}
 		html += "</select></td>";
 		if (sel_gene && sel_datatable) {
+			var displayConfig = sel_datatable.getDisplayConfig();
 			var gene_name = sel_gene.name;
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 				var sel_group = heatmapConfig.getGroupAt(idx2);
 				var sel_sample = heatmapConfig.getSampleAt(idx2);
+				var style = undefined;
+				var value = undefined;
+				if (sel_sample) {
+					style = displayConfig.getStyleSample(sel_sample.name, gene_name);
+
+					value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+				} else if (sel_group) {
+					style = displayConfig.getStyleGroup(sel_group, gene_name);
+					value = displayConfig.getColorGroupValue(sel_group, gene_name);
+				}
+				if (style != undefined && value != undefined) {
+					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
+				} else {
+					html += "<td class='heatmap_cell'>&nbsp;</td>";
+				}
+				/*
 				if (sel_sample) {
 					var value = sel_datatable.getValue(sel_sample.name, gene_name);
 					var style = sel_datatable.getStyle(value);
@@ -1395,6 +1412,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 				} else {
 					html += "<td class='heatmap_cell'>&nbsp;</td>";
 				}
+				*/
 			}
 		} else {
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
@@ -1492,36 +1510,35 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 		if (!sel_datatable) {
 			continue;
 		}
+		var displayConfig = sel_datatable.getDisplayConfig();
 		start_x = topx;
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 			var sel_group = heatmapConfig.getGroupAt(idx2);
 			var sel_sample = heatmapConfig.getSampleAt(idx2);
+			var bg = undefined;
+			var value = undefined;
+			if (sel_sample) {
+				bg = displayConfig.getColorSample(sel_sample.name, gene_name);
+				value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+			} else if (sel_group) {
+				bg = displayConfig.getColorGroup(sel_group, gene_name);
+				value = displayConfig.getColorGroupValue(sel_group, gene_name);
+			}
+			if (bg != undefined && value != undefined) {
+				var fg = getFG_from_BG(bg);
+				context.fillStyle = "#" + bg;
+				fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
+			}
+			start_x += cell_w;
+
+			/*
 			if (sel_sample) {
 				var value = sel_datatable.getValue(sel_sample.name, gene_name);
-				//console.log("has a sample");
-				//var style = sel_datatable.getStyle(value);
 				var bg = sel_datatable.getBG(value);
 				if (bg) {
 					var fg = getFG_from_BG(bg);
-					//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
 					context.fillStyle = "#" + bg;
 					fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
-					//context.fillRect(start_x, start_y, cell_w, cell_h);
-					//context.lineWidth = 1;
-					//context.strokeRect(start_x, start_y, cell_w, cell_h);
-					/*
-					context.fillStyle = "#000000";
-					context.lineWidth = 1;
-					context.strokeWidth = 1;
-					context.strokeStyle = "#000000";
-					context.beginPath();
-					context.moveTo(start_x, start_y);
-					context.lineTo(start_x+cell_w, start_y);
-					context.lineTo(start_x+cell_w, start_y+cell_h);
-					context.lineTo(start_x, start_y+cell_h);
-					context.closePath();
-					context.stroke();
-					*/
 					start_x += cell_w;
 				}
 			} else if (sel_group) {
@@ -1537,6 +1554,7 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 				}
 				start_x += cell_w;
 			}
+			*/
 		}
 		start_y += cell_h;
 	}
@@ -1570,7 +1588,7 @@ function barplot_step_display_config(idx, map_name) {
 		var datatable = navicell.getDatatableById(val);
 		if (datatable) {
 			var doc = (map_name && maps ? maps[map_name].document : null);
-			datatable.showDisplayConfig(doc, datatable.biotype.isDiscrete() ? 'colsize' : 'color');
+			datatable.showDisplayConfig(doc, datatable.biotype.isDiscrete() ? COLOR_SIZE_CONFIG : 'color');
 		}
 	}
 }
@@ -1600,6 +1618,7 @@ function barplot_sample_action(action, cnt) {
 	}
 }
 
+// TBD: class BarplotEditor
 function update_barplot_editor(doc, params, barplotConfig) {
 	//console.log("updating barplot_editor");
 	if (!barplotConfig) {
@@ -1626,59 +1645,37 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	var html = "";
 	html += "<tbody>";
 
-	// ++++++
 	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
 	html += make_button("All samples", "barplot_all_samples", "barplot_sample_action(\"allsamples\")") + "</td>";
 	if (group_cnt) {
 		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "barplot_all_groups", "barplot_sample_action(\"allgroups\")") +  "</td>";
 	}
 	html += "</tr><tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td>";
-	// ++++++
-
-	// -----
 	var idx = 0;
 	var sel_datatable = barplotConfig.getDatatableAt(idx);
 	html += "<tr>";
-	// ----
-	// ----
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	var MAX_BARPLOT_HEIGHT = 100.;
 	if (sel_gene && sel_datatable) {
+		var displayConfig = sel_datatable.getDisplayConfig();
 		var gene_name = sel_gene.name;
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 			var sel_group = barplotConfig.getGroupAt(idx2);
 			var sel_sample = barplotConfig.getSampleAt(idx2);
+			var style = undefined, height = undefined;
 			if (sel_sample) {
-				var value = sel_datatable.getValue(sel_sample.name, gene_name);
-				var style = sel_datatable.getStyle(value);
-				//height = "height: " + (100. * (ivalue-sel_datatable.minval) / (sel_datatable.maxval - sel_datatable.minval)) + "px;";
-				var height = "height: " + sel_datatable.getBarplotHeight(value, MAX_BARPLOT_HEIGHT) + "px;";
-				if (height) {
-					style += height + "width: 100%;";
-					html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
-				}
-				html += "<td class='barplot_cell' " + style + ">&nbsp;</td>";
-				if (height) {
-					html += "</tr></table></td>";
-				}
+				style = displayConfig.getStyleSample(sel_sample.name, gene_name);
+				height = "height: " + displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
 			} else if (sel_group) {
-				var value = sel_group.getValue(sel_datatable, gene_name);
-				//console.log("sel_group.getValue() -> " + value);
-				if (value != undefined) {
-					var style = sel_datatable.getStyle(value);
-					var height = "height: " + sel_datatable.getBarplotHeight(value, MAX_BARPLOT_HEIGHT) + "px;";
-					if (height) {
-						style += height + "width: 100%;";
-						html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
-					}
-					html += "<td class='barplot_cell' " + style + ">&nbsp;</td>";
-					if (height) {
-						html += "</tr></table></td>";
-					}
-				} else {
-					html += "<td class='barplot_cell'>&nbsp;</td>";
-				}
+				style = displayConfig.getStyleGroup(sel_group, gene_name);
+				height = "height: " + displayConfig.getBarplotGroupHeight(sel_group, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
+			}
+			if (style != undefined) {
+				style += height + "width: 100%;";
+				html += "<td style='" + height + "width: 100%; vertical-align: bottom;'><table style='" + height + "width: 100%'><tr>";
+				html += "<td class='barplot_cell' " + style + ">&nbsp;</td>";
+				html += "</tr></table></td>";
 			} else {
 				html += "<td class='barplot_cell'>&nbsp;</td>";
 			}
@@ -1689,7 +1686,6 @@ function update_barplot_editor(doc, params, barplotConfig) {
 		}
 	}
 	html += "</tr>\n";
-	// ----
 
 	html += "<tr>\n";
 	html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='barplot_step_display_config(" + idx + ", \"" + map_name + "\")'><span id='barplot_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
@@ -1704,25 +1700,21 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "</select></td>";
 
 	if (sel_gene && sel_datatable) {
+		var config = sel_datatable.biotype.isDiscrete() ? COLOR_SIZE_CONFIG : 'color';
 		var gene_name = sel_gene.name;
+		var displayConfig = sel_datatable.getDisplayConfig();
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 			var sel_group = barplotConfig.getGroupAt(idx2);
 			var sel_sample = barplotConfig.getSampleAt(idx2);
+			var value = undefined;
 			if (sel_sample) {
-				var value = sel_datatable.getValue(sel_sample.name, gene_name);
-				//var style = sel_datatable.getStyle(value);
+				value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+			} else if (sel_group) {
+				value = displayConfig.getColorGroupValue(sel_group, gene_name);
+			}
+			if (value != undefined) {
 				var style = "style='text-align: center;'";
 				html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
-			} else if (sel_group) {
-				var value = sel_group.getValue(sel_datatable, gene_name);
-				//console.log("sel_group.getValue() -> " + value);
-				if (value != undefined) {
-					//var style = sel_datatable.getStyle(value);
-					var style = "style='text-align: center;'";
-					html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
-				} else {
-					html += "<td class='barplot_cell'>&nbsp;</td>";
-				}
 			} else {
 				html += "<td class='barplot_cell'>&nbsp;</td>";
 			}
@@ -1734,7 +1726,6 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	}
 
 	html += "</tr>\n";
-	// ----
 
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
@@ -1844,9 +1835,7 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 	var cell_h = height*scale2;
 
 	topx += 12; // does not depend on scale
-	//topy -= cell_h * datatable_cnt + 4;
 	var maxy = cell_h*4;
-	//var start_y = topy - maxy - cell_h;
 	var start_x = topx;
 	var start_y = topy - 3;
 	var idx = 0;
@@ -1854,54 +1843,25 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 	if (!sel_datatable) {
 		return;
 	}
+	var displayConfig = sel_datatable.getDisplayConfig();
 	for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 		var sel_group = barplotConfig.getGroupAt(idx2);
 		var sel_sample = barplotConfig.getSampleAt(idx2);
+		var bg = undefined;
+		var height = undefined;
 		if (sel_sample) {
-			var value = sel_datatable.getValue(sel_sample.name, gene_name);
-			//var style = sel_datatable.getStyle(value);
-			var bg = sel_datatable.getBG(value);
-			if (bg) {
-				var fg = getFG_from_BG(bg);
-				//console.log("value: " + value + " bg:" + bg + " fg: " + fg);
-				context.fillStyle = "#" + bg;
-
-				var height = sel_datatable.getBarplotHeight(value, maxy);
-				//fillStrokeRect(context, start_x, start_y+maxy-height, cell_w, height);
-				fillStrokeRect(context, start_x, start_y-height, cell_w, height);
-				//context.fillRect(start_x, start_y+maxy-height, cell_w, height);
-				//context.strokeRect(start_x, start_y+maxy-height, cell_w, height);
-				/*
-				context.fillStyle = "#000000";
-				context.lineWidth = 1;
-				context.strokeWidth = 1;
-				context.strokeStyle = "#000000";
-				context.beginPath();
-				context.moveTo(start_x, start_y+maxy-height);
-				context.lineTo(start_x+cell_w, start_y+maxy-height);
-				context.lineTo(start_x+cell_w, start_y+maxy);
-				context.lineTo(start_x, start_y+maxy);
-				context.closePath();
-				context.stroke();
-				*/
-				start_x += cell_w;
-			}
+			bg = displayConfig.getColorSample(sel_sample.name, gene_name);
+			height = displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, maxy);
 		} else if (sel_group) {
-			var value = sel_group.getValue(sel_datatable, gene_name);
-			if (value != undefined) {
-				var bg = sel_datatable.getBG(value);
-				//console.log("group value: " + value + " " + bg);
-				if (bg) {
-					var height = sel_datatable.getBarplotHeight(value, maxy);
-					var fg = getFG_from_BG(bg);
-					context.fillStyle = "#" + bg;
-					//context.fillRect(start_x, start_y, cell_w, cell_h);
-					//fillStrokeRect(context, start_x, start_y+maxy-height, cell_w, height);
-					fillStrokeRect(context, start_x, start_y-height, cell_w, height);
-				}
-			}
-			start_x += cell_w;
+			bg = displayConfig.getColorGroup(sel_group, gene_name);
+			height = displayConfig.getBarplotGroupHeight(sel_group, gene_name, maxy);
 		}
+		if (bg != undefined && height != undefined) {
+			var fg = getFG_from_BG(bg);
+			context.fillStyle = "#" + bg;
+			fillStrokeRect(context, start_x, start_y-height, cell_w, height);
+		}
+		start_x += cell_w;
 	}
 
 	overlay.addBoundBox([topx, start_y-maxy, start_x-topx, maxy], gene_name, "barplot");
@@ -2053,35 +2013,22 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	}
 
 	if (sel_gene && sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
-		var shape_value;
-		var shape;
-		var color_value;
-		var color;
-		var size_value;
-		var size;
+		var shape, color, size;
+		var sample_name = sel_sample.name;
+		var gene_name = sel_gene.name;
 		if (sel_sample) {
-			//console.log("sel_draw: " + sel_shape_datatable.id + " " + sel_sample.name + sel_color_datatable.id + " " + sel_size_datatable.id);
-			shape_value = sel_shape_datatable.getValue(sel_sample.name, sel_gene.name);
-			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
-			color_value = sel_color_datatable.getValue(sel_sample.name, sel_gene.name);
-			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
-			size_value = sel_size_datatable.getValue(sel_sample.name, sel_gene.name);
-			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
-			//console.log("shape: " + shape_value + " " + shape);
-			//console.log("color: " + color_value + " " + color);
-			//console.log("size: " + size_value + " " + size);
+			shape = sel_shape_datatable.getDisplayConfig().getShapeSample(sample_name, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColorSample(sample_name, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSizeSample(sample_name, gene_name);
 		} else {
-			shape_value = sel_group.getValue(sel_shape_datatable, sel_gene.name);
-			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
-			color_value = sel_group.getValue(sel_color_datatable, sel_gene.name);
-			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
-			size_value = sel_group.getValue(sel_size_datatable, sel_gene.name);
-			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+			shape = sel_shape_datatable.getDisplayConfig().getShapeGroup(sel_group, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColorGroup(sel_group, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSizeGroup(sel_group, gene_name);
 		}
 
-		//console.log("shape: " + shape_value + " " + navicell.shapes[shape]);
-		//console.log("color: " + color_value + " " + color);
-		//console.log("size: " + size_value + " " + size);
+		//console.log("#shape: " + shape + " " + navicell.shapes[shape]);
+		//console.log("#color: " + color);
+		//console.log("#size: " + size);
 		draw_glyph_perform(context, CANVAS_W/2, CANVAS_H/2, shape, color, size, 8, true);
 	} else if (context) {
 		context.clearRect(0, 0, CANVAS_W, CANVAS_H);
@@ -2149,31 +2096,19 @@ function draw_glyph(num, overlay, context, scale, gene_name, topx, topy)
 
 	var bound = null;
 	if (sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
-		var shape_value;
-		var shape;
-		var color_value;
-		var color;
-		var size_value;
-		var size;
+		var shape, color, size;
 		if (sel_sample) {
-			shape_value = sel_shape_datatable.getValue(sel_sample.name, gene_name);
-			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
-			color_value = sel_color_datatable.getValue(sel_sample.name, gene_name);
-			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
-			size_value = sel_size_datatable.getValue(sel_sample.name, gene_name);
-			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+			shape = sel_shape_datatable.getDisplayConfig().getShapeSample(sel_sample.name, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColorSample(sel_sample.name, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSizeSample(sel_sample.name, gene_name);
 		} else {
-			shape_value = sel_group.getValue(sel_shape_datatable, gene_name);
-			shape = sel_shape_datatable.getDisplayConfig().getShape(shape_value);
-			color_value = sel_group.getValue(sel_color_datatable, gene_name);
-			color = sel_color_datatable.getDisplayConfig().getColor(color_value);
-			size_value = sel_group.getValue(sel_size_datatable, gene_name);
-			size = sel_size_datatable.getDisplayConfig().getSize(size_value);
+			shape = sel_shape_datatable.getDisplayConfig().getShapeGroup(sel_group, gene_name);
+			color = sel_color_datatable.getDisplayConfig().getColorGroup(sel_group, gene_name);
+			size = sel_size_datatable.getDisplayConfig().getSizeGroup(sel_group, gene_name);
 		}
-
-		//console.log("shape: " + shape_value + " " + navicell.shapes[shape]);
-		//console.log("color: " + color_value + " " + color);
-		//console.log("size: " + size_value + " " + size);
+		//console.log("shape: " + shape + " " + navicell.shapes[shape]);
+		//console.log("color: " + color);
+		//console.log("size: " + size);
 		var start_x = topx + (size*g_size)/8; // must depends on scale2 also
 		//var start_y = topy - (size*g_size)/8; // must depends on scale2 also
 		var start_y = topy; // must depends on scale2 also
@@ -2190,6 +2125,9 @@ var LINE_SEPARATOR_STYLE = "#000000";
 var LINE_SEPARATOR_WIDTH = 1;
 
 function fillStrokeRect(context, x, y, w, h) {
+	if (!w || !h) {
+		return;
+	}
 	context.fillRect(x, y, w, h);
 
 	var o_strokeStyle = context.strokeStyle;
@@ -2236,13 +2174,11 @@ function draw_glyph_perform(context, pos_x, pos_y, shape, color, size, scale, is
 	}
 	if (shape == 'Square') {
 		fillStrokeRect(context, pos_x-dim2, pos_y-dim2, dim, dim);
-		//context.strokeRect(pos_x-dim2, pos_y-dim2, dim, dim);
 		return [pos_x-dim2, pos_y-dim2, dim, dim];
 	} else if (shape == 'Rectangle') {
 		var dim_w = 2*size*scale;
 		var dim_h = size*scale;
 		fillStrokeRect(context, pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h);
-		//context.strokeRect(pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h);
 		return [pos_x-dim_w/2, pos_y-dim_h/2, dim_w, dim_h];
 	} else if (shape == 'Diamond') {
 		context.beginPath();

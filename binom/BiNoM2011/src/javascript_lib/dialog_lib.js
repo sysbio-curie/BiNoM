@@ -670,7 +670,7 @@ function annot_set_group(annot_id, doc) {
 	navicell.group_factory.buildGroups();
 	update_status_tables(doc, {style_only: true, annot_id: annot_id, checked: checked});
 
-	$("#dt_sample_annot_status").html("<span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples have been built (groups are listed in Data Status / Groups tab) </span>");
+	$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples have been built (groups are listed in Data Status / Groups tab) </span>");
 }
 
 function is_annot_group(annot_id) {
@@ -748,6 +748,7 @@ function update_sample_annot_table(doc, params) {
 	table.tablesorter();
 }
 
+/*
 function set_group_method(datatable_id, group_id) {
 	var obj = $("#group_method_" + datatable_id + "_" + group_id);
 	var group = navicell.group_factory.getGroupById(group_id);
@@ -755,6 +756,7 @@ function set_group_method(datatable_id, group_id) {
 
 	group.setMethod(datatable, obj.val());
 }
+*/
 
 function update_group_status_table(doc, params) {
 	var table = $("#dt_group_status_table", doc);
@@ -766,7 +768,7 @@ function update_group_status_table(doc, params) {
 	}
 	str += "<tr><td>&nbsp;</td>";
 	for (var datatable_name in navicell.dataset.datatables) {
-		str += "<th>&nbsp;#Samples&nbsp;</th><td>Method</td>";
+		str += "<th>&nbsp;#Samples&nbsp;</th><th>Samples</th>";
 	}
 	str += "</tr>";
 	str += "</thead>";
@@ -777,13 +779,15 @@ function update_group_status_table(doc, params) {
 		str += "<td>" + group.html_name + "</td>";
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
-			str += "<td>";
+			str += "<td style='text-align: center'>";
 			var cnt = 0;
+			var sample_names = [];
 			for (var sample_name in navicell.dataset.samples) {
 				var sample = navicell.dataset.samples[sample_name];
 				if (datatable.sample_index[sample_name] != undefined) {
 					for (var sample_group_name in sample.groups) {
 						if (sample_group_name == group_name) {
+							sample_names.push(sample_name);
 							cnt++;
 						}
 					}
@@ -791,44 +795,14 @@ function update_group_status_table(doc, params) {
 			}
 			str += cnt + "</td>";
 
-			str += "<td><select id='group_method_" + datatable.getId() + "_" + group.getId() + "' onchange='set_group_method(" + datatable.getId() + "," + group.getId() + ")'>\n";
-			var method = group.getMethod(datatable);
-			var selected;
-			if (datatable.biotype.isContinuous()) {
-				selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
-				selected = (method == Group.CONTINUOUS_MINVAL) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_MINVAL + "'" + selected + ">Min Value</option>\n";
-
-				selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
-
-				selected = (method == Group.CONTINUOUS_ABS_AVERAGE) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_ABS_AVERAGE + "'" + selected + ">Average Absolute Values</option>\n";
-
-				selected = (method == Group.CONTINUOUS_ABS_MINVAL) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_ABS_MINVAL + "'" + selected + ">Min Absolute Value</option>\n";
-
-				selected = (method == Group.CONTINUOUS_ABS_MAXVAL) ? " selected" : "";
-				str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
-			} else {
-				var values = datatable.getDiscreteValues();
-				for (var idx in values) {
-					var value = values[idx];
-					var label = value == '' ? 'NA' : value;
-					if (value == '') {
-						selected = (method == value+'-') ? " selected" : "";
-						str += "<option value='" + value + "-'" + selected + ">At least one non " + label + "</option>";
-					}
-					selected = (method == value+'+') ? " selected" : "";
-					str += "<option value='" + value + "+'" + selected + ">At least one " + label + "</option>";
-					selected = (method == value+'@') ? " selected" : "";
-					str += "<option value='" + value + "@'" + selected + ">All are " + label + "</option>";
-				}
+			sample_names.sort();
+			str += "<td><div style='max-height: 200px; overflow: auto'>";
+			for (var sample_idx in sample_names) {
+				str += sample_names[sample_idx] + "</br>";
+				
 			}
-			str += "</select></td>";
+			str += "</div></td>";
 		}
-
 		str += "</tr>";
 	}
 	str += "</tbody>";
@@ -1121,9 +1095,9 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		//console.log("div.length: " + div.length);
 		var width;
 		if (what == COLOR_SIZE_CONFIG) {
-			width = 450;
+			width = 500;
 		} else if (what == 'color') {
-			width = 400;
+			width = 440;
 		} else if (what == 'shape') {
 			width = 400;
 		} else {
@@ -1171,11 +1145,11 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 								if (idx == step_cnt-1) {
 									value = datatable.maxval;
 								} else {
-									value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
+									value = $("#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								}
-								var color = $("#step_config_" + what + '_' + datatable_id + "_" + idx, doc).val();
-								var size = $("#step_size_" + what + '_' + datatable_id + "_" + idx, doc).val();
-								var shape = $("#step_shape_" + what + '_' + datatable_id + "_" + idx, doc).val();
+								var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								displayStepConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
 							}
 							DisplayStepConfig.setEditing(datatable_id, false, what);
@@ -1183,11 +1157,15 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 					}
 					if (displayDiscreteConfig) {
 						var value_cnt = displayDiscreteConfig.getValueCount();
+						if (tabname == 'group') {
+							value_cnt++;
+						}
 						for (var idx = 0; idx < value_cnt; ++idx) {
-							var color = $("#discrete_config_" + what + '_' + datatable_id + "_" + idx, doc).val();
-							var size = $("#discrete_size_"  + what + '_' + datatable_id + "_" + idx, doc).val();
-							var shape = $("#discrete_shape_"  + what + '_' + datatable_id + "_" + idx, doc).val();
-							displayDiscreteConfig.setValueInfo(idx, color, size, shape);
+							var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							displayDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
 						}
 						display_discrete_config_set_editing(datatable_id, false, what, tabname);
 					}
@@ -1224,8 +1202,8 @@ function datatable_management_set_editing(val) {
 
 
 // TBD: should be a method DisplayDiscreteConfig
-function display_discrete_config_set_editing(datatable_id, val, what) {
-	$("#discrete_config_editing_" + what + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
+function display_discrete_config_set_editing(datatable_id, val, what, tabname) {
+	$("#discrete_config_editing_" + tabname + '_' + what + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
 }
 
 function drawing_config_chart() {
@@ -1293,7 +1271,8 @@ function heatmap_sample_action(action, cnt) {
 	if (cnt) {
 		max_heatmap_sample_cnt = cnt;
 	}
-	//max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
+	// 2014-02-28: reconnect this
+	max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
 	if (false) {
 		update_status_tables();
 		heatmap_editor_set_editing(true, undefined, document.map_name);
@@ -1383,36 +1362,19 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 				var style = undefined;
 				var value = undefined;
 				if (sel_sample) {
-					style = displayConfig.getStyleSample(sel_sample.name, gene_name);
+					style = displayConfig.getHeatmapStyleSample(sel_sample.name, gene_name);
 
 					value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
 				} else if (sel_group) {
-					style = displayConfig.getStyleGroup(sel_group, gene_name);
+					style = displayConfig.getHeatmapStyleGroup(sel_group, gene_name);
 					value = displayConfig.getColorGroupValue(sel_group, gene_name);
 				}
 				if (style != undefined && value != undefined) {
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
 				} else {
-					html += "<td class='heatmap_cell'>&nbsp;</td>";
+					value = (sel_group || sel_sample ? 'undefined' : '&nbsp;');
+					html += "<td style='text-align: center;' class='heatmap_cell'>" + value + "</td>";
 				}
-				/*
-				if (sel_sample) {
-					var value = sel_datatable.getValue(sel_sample.name, gene_name);
-					var style = sel_datatable.getStyle(value);
-					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
-				} else if (sel_group) {
-					var value = sel_group.getValue(sel_datatable, gene_name);
-					//console.log("sel_group.getValue() -> " + value);
-					if (value != undefined) {
-						var style = sel_datatable.getStyle(value);
-						html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
-					} else {
-						html += "<td class='heatmap_cell'>&nbsp;</td>";
-					}
-				} else {
-					html += "<td class='heatmap_cell'>&nbsp;</td>";
-				}
-				*/
 			}
 		} else {
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
@@ -1530,31 +1492,6 @@ function draw_heatmap(overlay, context, scale, gene_name, topx, topy)
 				fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
 			}
 			start_x += cell_w;
-
-			/*
-			if (sel_sample) {
-				var value = sel_datatable.getValue(sel_sample.name, gene_name);
-				var bg = sel_datatable.getBG(value);
-				if (bg) {
-					var fg = getFG_from_BG(bg);
-					context.fillStyle = "#" + bg;
-					fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
-					start_x += cell_w;
-				}
-			} else if (sel_group) {
-				var value = sel_group.getValue(sel_datatable, gene_name);
-				if (value != undefined) {
-					var bg = sel_datatable.getBG(value);
-					//console.log("group value: " + value + " " + bg);
-					if (bg) {
-						var fg = getFG_from_BG(bg);
-						context.fillStyle = "#" + bg;
-						fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
-					}
-				}
-				start_x += cell_w;
-			}
-			*/
 		}
 		start_y += cell_h;
 	}
@@ -1607,7 +1544,8 @@ function barplot_sample_action(action, cnt) {
 	if (cnt) {
 		max_barplot_sample_cnt = cnt;
 	}
-	//max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
+	// 2014-02-28: reconnect this
+	max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
 
 	if (false) {
 		update_status_tables();
@@ -1665,10 +1603,10 @@ function update_barplot_editor(doc, params, barplotConfig) {
 			var sel_sample = barplotConfig.getSampleAt(idx2);
 			var style = undefined, height = undefined;
 			if (sel_sample) {
-				style = displayConfig.getStyleSample(sel_sample.name, gene_name);
+				style = displayConfig.getBarplotStyleSample(sel_sample.name, gene_name);
 				height = "height: " + displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
 			} else if (sel_group) {
-				style = displayConfig.getStyleGroup(sel_group, gene_name);
+				style = displayConfig.getBarplotStyleGroup(sel_group, gene_name);
 				height = "height: " + displayConfig.getBarplotGroupHeight(sel_group, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
 			}
 			if (style != undefined) {
@@ -1708,15 +1646,16 @@ function update_barplot_editor(doc, params, barplotConfig) {
 			var sel_sample = barplotConfig.getSampleAt(idx2);
 			var value = undefined;
 			if (sel_sample) {
-				value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+				value = displayConfig.getColorSizeSampleValue(sel_sample.name, gene_name);
 			} else if (sel_group) {
-				value = displayConfig.getColorGroupValue(sel_group, gene_name);
+				value = displayConfig.getColorSizeGroupValue(sel_group, gene_name);
 			}
 			if (value != undefined) {
 				var style = "style='text-align: center;'";
 				html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
 			} else {
-				html += "<td class='barplot_cell'>&nbsp;</td>";
+				value = (sel_group || sel_sample ? 'undefined' : '&nbsp;');
+				html += "<td style='text-align: center;' class='barplot_cell'>" + value + "</td>";
 			}
 		}
 	} else {
@@ -1850,10 +1789,10 @@ function draw_barplot(overlay, context, scale, gene_name, topx, topy)
 		var bg = undefined;
 		var height = undefined;
 		if (sel_sample) {
-			bg = displayConfig.getColorSample(sel_sample.name, gene_name);
+			bg = displayConfig.getColorSizeSample(sel_sample.name, gene_name);
 			height = displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, maxy);
 		} else if (sel_group) {
-			bg = displayConfig.getColorGroup(sel_group, gene_name);
+			bg = displayConfig.getColorSizeGroup(sel_group, gene_name);
 			height = displayConfig.getBarplotGroupHeight(sel_group, gene_name, maxy);
 		}
 		if (bg != undefined && height != undefined) {
@@ -2014,9 +1953,9 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 
 	if (sel_gene && sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
 		var shape, color, size;
-		var sample_name = sel_sample.name;
 		var gene_name = sel_gene.name;
 		if (sel_sample) {
+			var sample_name = sel_sample.name;
 			shape = sel_shape_datatable.getDisplayConfig().getShapeSample(sample_name, gene_name);
 			color = sel_color_datatable.getDisplayConfig().getColorSample(sample_name, gene_name);
 			size = sel_size_datatable.getDisplayConfig().getSizeSample(sample_name, gene_name);
@@ -2310,3 +2249,43 @@ function update_heatmap_config(doc, params) {
 // -------------------------------------------------------------------------------
 //
 
+/*
+			if (0) {
+				str += "<td><select id='group_method_" + datatable.getId() + "_" + group.getId() + "' onchange='set_group_method(" + datatable.getId() + "," + group.getId() + ")'>\n";
+				var method = group.getMethod(datatable);
+				var selected;
+				if (datatable.biotype.isContinuous()) {
+					selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
+					selected = (method == Group.CONTINUOUS_MINVAL) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_MINVAL + "'" + selected + ">Min Value</option>\n";
+
+					selected = (method == Group.CONTINUOUS_MAXVAL) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_MAXVAL + "'" + selected + ">Max Value</option>\n";
+
+					selected = (method == Group.CONTINUOUS_ABS_AVERAGE) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_ABS_AVERAGE + "'" + selected + ">Average Absolute Values</option>\n";
+
+					selected = (method == Group.CONTINUOUS_ABS_MINVAL) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_ABS_MINVAL + "'" + selected + ">Min Absolute Value</option>\n";
+
+					selected = (method == Group.CONTINUOUS_ABS_MAXVAL) ? " selected" : "";
+					str += "<option value='" + Group.CONTINUOUS_ABS_MAXVAL + "'" + selected + ">Max Absolute Value</option>\n";
+				} else {
+					var values = datatable.getDiscreteValues();
+					for (var idx in values) {
+						var value = values[idx];
+						var label = value == '' ? 'NA' : value;
+						if (value == '') {
+							selected = (method == value+'-') ? " selected" : "";
+							str += "<option value='" + value + "-'" + selected + ">At least one non " + label + "</option>";
+						}
+						selected = (method == value+'+') ? " selected" : "";
+						str += "<option value='" + value + "+'" + selected + ">At least one " + label + "</option>";
+						selected = (method == value+'@') ? " selected" : "";
+						str += "<option value='" + value + "@'" + selected + ">All are " + label + "</option>";
+					}
+				}
+				str += "</select></td>";
+			}
+*/

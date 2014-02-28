@@ -300,7 +300,7 @@ label {font-size: 12px; vertical-align: middle;}
 }
 
 #dt_sample_annot_status {
-    min-height: 80px;
+    min-height: 45px;
 }
 
 .less-than {
@@ -665,6 +665,11 @@ div.tablesorterPager input {
     /*    background-color: rgb(200, 238, 0) */
     background-color: white;
     color: #222222;
+}
+
+.discrete-config table {
+    font-size: 80%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
 #drawing_config_div {

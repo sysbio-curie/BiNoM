@@ -5,7 +5,7 @@ import java.io.*;
 
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.utils.*;
-import vdaoengine.data.*;
+import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.*;
 
 public class BioPAXIndex2Tables {

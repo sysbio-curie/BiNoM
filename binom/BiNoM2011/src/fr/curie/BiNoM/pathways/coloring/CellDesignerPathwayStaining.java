@@ -35,10 +35,10 @@ public class CellDesignerPathwayStaining {
 	
 	public float width = 0;
 	public float height = 0;
-	public float gridStepX = 100;
-	public float gridStepY = 100;
-	float windowSizeX = 200;
-	float windowSizeT = 200;
+	public float gridStepX = 20;
+	public float gridStepY = 20;
+	float windowSizeX = 20;
+	float windowSizeT = 20;
 	
 	public float infradius = 0.01f;
 	public float thresholdGradient = 2f;
@@ -80,7 +80,7 @@ public class CellDesignerPathwayStaining {
 			
 			//String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
 			//String prefix = "C:/Datas/ColorMaps/test/";
-			String prefix = "C:/Datas/ColorMaps/whole_acsn/";
+			String prefix = "C:/Datas/ColorMaps/Stained_ACSN/EMT/";
 				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
 			/*cm.loadMap(prefix+"acsn_master.xml");
@@ -96,7 +96,7 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", null, null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, prefix+"modules_proteins_c2_lc.gmt");
 			//cm.run(prefix+"M-Phase2.xml", prefix+"M-Phase2.png", null, null);
-			cm.infradius = 0.02f;
+			cm.infradius = 0.001f;
 			cm.useProteinNameIfHUGOisntFound = true;
 			cm.useModuleDefinitionsFromCellDesignerFile = false;
 			cm.overrideModuleDefinitionsFromSpeciesNotes = true;
@@ -106,9 +106,9 @@ public class CellDesignerPathwayStaining {
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", prefix+"data.txt", prefix+"modules_proteins_c2_lc.gmt");
 			//cm.scaleImage = 8f;
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f_scaled8.png", prefix+"data.txt", null);
-			cm.scaleImage = 16;
+			cm.scaleImage = 1;
 			cm.infradius = 0.001f;
-			cm.run(prefix+"acsn_master.xml", prefix+"acsn_master--1_gs_edges.png", prefix+"ica_module_averages.txt", prefix+"acsn_master.gmt");
+			cm.run(prefix+"emtcellmotility_master.xml", prefix+"emtcellmotility_master-3_gs_edges.png", prefix+"sum_exprs_data.txt", null);
 			//cm.run(prefix+"acsn_master.xml", null, prefix+"ica_module_averages.txt", prefix+"acsn_master.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			System.exit(0);

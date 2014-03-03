@@ -14,6 +14,7 @@ import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.analysis.structure.OmegaScoreData;
 import fr.curie.BiNoM.pathways.analysis.structure.OptimalCombinationAnalyzer;
+import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils.ReactionRegulator;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 import vdaoengine.utils.Utils;
@@ -22,8 +23,10 @@ public class SetOverlapAnalysis {
 
 
 	public Vector<Vector<String>> lists = new Vector<Vector<String>>();
+	public Vector<Vector<Float>> listsWeights = new Vector<Vector<Float>>();
 	public Vector<HashSet<String>> sets = null;
 	public Vector<String> setnames = null;
+	public Vector<String> setdescriptions = null;
 	public Vector<String> allproteins = null;
 	
 	/**
@@ -161,7 +164,10 @@ public class SetOverlapAnalysis {
 	public void LoadSetsFromGMT(String fn){
 		try{
 		sets = new Vector<HashSet<String>>();
+		lists = new Vector<Vector<String>>();
+		listsWeights = new Vector<Vector<Float>>();
 		setnames = new Vector<String>();
+		setdescriptions = new Vector<String>();
 		LineNumberReader lr = new LineNumberReader(new FileReader(fn));
 		String s = null;
 		allproteins = new Vector<String>();
@@ -170,16 +176,33 @@ public class SetOverlapAnalysis {
 			String groupName = st.nextToken().trim();
 			setnames.add(groupName);
 			String description = st.nextToken();
+			setdescriptions.add(description);
 			HashSet<String> proteins = new HashSet<String>();
+			Vector<String> proteins_ordered = new Vector<String>();
+			Vector<Float> proteins_ordered_weights = new Vector<Float>();
 			while((st.hasMoreTokens())){
 				String protein = st.nextToken();
-				if(!protein.trim().equals(""))
+				
+				Float w = Float.NaN;
+				// cut the weight
+				if(protein.contains("[")){
+					protein = protein.trim();
+					w = Float.parseFloat(protein.substring(protein.indexOf("[")+1,protein.indexOf("]")));
+					protein = protein.substring(0,protein.indexOf("["));
+				}
+				
+				if(!protein.trim().equals("")){
 					proteins.add(protein);
+					proteins_ordered.add(protein);
+					proteins_ordered_weights.add(w);
+				}
 				if(!protein.contains(":")) // this is for DNA repair map!!!
 				if(!allproteins.contains(protein))
-					allproteins.add(protein);	
+					allproteins.add(protein);
 			}
 			sets.add(proteins); //System.out.print(groupName+":"+proteins.size()+"\t");
+			lists.add(proteins_ordered);
+			listsWeights.add(proteins_ordered_weights);
 		}
 		System.out.println(fn+": totally "+allproteins.size()+" genes are found");
 		}catch(Exception e){
@@ -585,17 +608,37 @@ public class SetOverlapAnalysis {
 		fw.close();
 	}
 	
-	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfRegulations[], int order) throws Exception{
+	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order) throws Exception{
 		FileWriter fw = new FileWriter(prefix+".gmt");
 		Vector<String> reactions = new Vector<String>();
+		// filter everything which is not reactions
+		for(int i=0;i<sets.size();i++){
+			HashSet<String> set = sets.get(i);
+			Vector<String> names = new Vector<String>();
+			for(String s: set) names.add(s);
+			for(String s: names){
+				Node n = reactionGraph.getNode(s);
+				if(n==null){
+					set.remove(s);
+				}else{
+				String nodeType = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
+				if((nodeType==null)||(nodeType.trim().equals("")))
+					set.remove(s);
+				}
+			}
+		}
+		
 		for(int i=0;i<setnames.size();i++){
 			fw.write(setnames.get(i)+"\tna\t");
-			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfRegulations, order);
+			Vector<BiographUtils.ReactionRegulator> regulators = BiographUtils.findReactionRegulators(reactionGraph, sets.get(i), typesOfPositiveRegulations, typesOfNegativeRegulations, order);
 			for(String s:sets.get(i)){
 				if(!reactions.contains(s))
 					reactions.add(s);
 			}
-			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
+			Vector<Node> regulator_nodes = new Vector<Node>();
+			for(BiographUtils.ReactionRegulator reg: regulators)
+				regulator_nodes.add(reg.node);
+			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulator_nodes);
 			for(int j=0;j<regnames.size();j++){
 				fw.write(regnames.get(j)+"\t");
 			}
@@ -604,12 +647,20 @@ public class SetOverlapAnalysis {
 		fw.close();
 		Collections.sort(reactions);
 		// Make also gmt of reaction regulators per set
+		// Make also a table describing "reaction-regulator" relations		
 		fw = new FileWriter(prefix+"_re.gmt");
+		FileWriter fw1 = new FileWriter(prefix+"_reaction_regulator.txt");
+		fw1.write("REACTION\tPATHS\tPROTEIN\tSIGN\tLEVEL\tCELLDESIGNER_EDGE_TYPE\n");
+		HashMap<String, Vector<String>> proteinReactionMap = new HashMap<String, Vector<String>>();
+		HashMap<String, Vector<String>> proteinPathMap = new HashMap<String, Vector<String>>();
 		for(String re: reactions){
 			HashSet<String> set = new HashSet<String>();
 			set.add(re);
-			Vector<Node> regulators = BiographUtils.findReactionRegulators(reactionGraph, set, typesOfRegulations, order);
-			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulators);
+			Vector<BiographUtils.ReactionRegulator> regulators = BiographUtils.findReactionRegulators(reactionGraph, set, typesOfPositiveRegulations, typesOfNegativeRegulations, order);
+			Vector<Node> regulator_nodes = new Vector<Node>();
+			for(BiographUtils.ReactionRegulator reg: regulators)
+				regulator_nodes.add(reg.node);
+			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulator_nodes);
 			//regnames.remove("G1 cell cycle phase");
 			//regnames.remove("S cell cycle phase");
 			if(regnames.size()>0){
@@ -619,8 +670,134 @@ public class SetOverlapAnalysis {
 			}
 			fw.write("\n");		
 			}
+	    	regulators = BiographUtils.convertNodeRegulators2ProteinRegulators(regulators);    	
+	    	for(ReactionRegulator reg: regulators){
+	    		String tp = "CATALYSIS";
+	    		if(reg.sign<0)
+	    			tp = "INHIBITION";
+	    		String paths = "";
+	    		Vector<String> list = getListOfSets(re);
+	    		for(String s: list)
+	    			paths+=s+";";
+	    		if(paths.endsWith(";")) paths = paths.substring(0, paths.length()-1);
+	    		String protein = reg.addInfo;
+	    		fw1.write(re+"\t"+paths+"\t"+reg.addInfo+"\t"+reg.sign+"\t"+reg.level+"\t"+tp+"\n");
+	    		Vector<String> proteinReactions = proteinReactionMap.get(protein);
+	    		if(proteinReactions==null){
+	    			proteinReactions = new Vector<String>();
+	    			proteinReactionMap.put(protein, proteinReactions);
+	    		}
+	    		proteinReactions.add(re+"%"+reg.sign);
+	    		
+	    		Vector<String> path_list = getListOfSets(re);
+	    		for(String path: path_list){
+	    			Vector<String> proteinPaths = proteinPathMap.get(protein);
+	    				if(proteinPaths==null){
+	    					proteinPaths = new Vector<String>();
+	    					proteinPathMap.put(protein, proteinPaths);
+	    				}
+	    				boolean found = false;
+	    				for(int i=0;i<proteinPaths.size();i++)
+	    					if(proteinPaths.get(i).startsWith(path+"%")){
+	    						found = true;
+	    						int sgn = Integer.parseInt(proteinPaths.get(i).split("%")[1]);
+	    						if(sgn!=reg.sign)
+	    							System.out.println("WARNING: "+protein+" has dual role on "+path);
+	    					}
+	    				if(!found)
+	    					proteinPaths.add(path+"%"+reg.sign);
+	    			}
+	    		}
 		}
+		
 		fw.close();
+		fw1.close();
+
+		fw = new FileWriter(prefix+"_protein_reaction.txt");
+		fw1 = new FileWriter(prefix+"_protein_reaction.dat");
+		FileWriter fw2 = new FileWriter(prefix+"_protein_path.dat");
+		Vector<String> proteins = new Vector<String>();
+		for(String p: proteinReactionMap.keySet()) proteins.add(p);
+		Collections.sort(proteins);
+		fw.write("PROTEIN\t");
+		fw.write("TYPE\t");
+		for(String r: reactions) fw.write(r+"\t"); fw.write("\n");
+		
+		fw1.write((reactions.size()+3)+"\t"+proteins.size()+"\r\n");
+		fw1.write("NAME\tSTRING\r\n");
+		fw1.write("TYPE\tSTRING\r\n");
+		fw1.write("NRH\tFLOAT\r\n");
+		
+		fw2.write((setnames.size()+3)+"\t"+proteins.size()+"\r\n");
+		fw2.write("NAME\tSTRING\r\n");
+		fw2.write("TYPE\tSTRING\r\n");
+		fw2.write("NPH\tFLOAT\r\n");
+		
+		for(String r: reactions) fw1.write(r+"\tFLOAT\r\n"); 
+		for(String p: proteins){
+			String p1 = p.replaceAll(" ", "_");
+			fw.write(p+"\t");
+			fw1.write(p1+"\t");
+			String type = "PROTEIN";
+			for(Node n: reactionGraph.Nodes){
+				String name = n.Id.split("@")[0];
+				if(name.equals(p))
+					type = n.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE");
+			}
+			fw.write(type+"\t");
+			fw1.write(type+"\t");
+			Vector<String> rs = proteinReactionMap.get(p);
+			fw1.write(rs.size()+"\t");
+			for(int i=0;i<reactions.size();i++){
+				int k =-1;
+				int sign = 0;
+				for(int j=0;j<rs.size();j++){
+					String re = rs.get(j).split("%")[0];
+					if(reactions.get(i).equals(re)){
+						k = j;
+						sign = Integer.parseInt(rs.get(j).split("%")[1]);
+					}
+				}
+				fw.write(sign+"\t");
+				fw1.write(sign+"\t");
+			}
+			fw.write("\n");
+			fw1.write("\r\n");
+		}
+		
+		for(String r: setnames) fw2.write(r+"\tFLOAT\r\n"); 
+		for(String p: proteins){
+			String p1 = p.replaceAll(" ", "_");
+			fw2.write(p1+"\t");
+			String type = "PROTEIN";
+			for(Node n: reactionGraph.Nodes){
+				String name = n.Id.split("@")[0];
+				if(name.equals(p))
+					type = n.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE");
+			}
+			fw2.write(type+"\t");
+			Vector<String> rs = proteinPathMap.get(p);
+			fw2.write(rs.size()+"\t");
+			for(int i=0;i<setnames.size();i++){
+				int k =-1;
+				int sign = 0;
+				for(int j=0;j<rs.size();j++){
+					String re = rs.get(j).split("%")[0];
+					if(setnames.get(i).equals(re)){
+						k = j;
+						sign = Integer.parseInt(rs.get(j).split("%")[1]);
+					}
+				}
+				if(sign==-1) sign = 1;
+				fw2.write(sign+"\t");
+			}
+			fw2.write("\r\n");
+		}		
+		
+		
+		fw.close();
+		fw1.close();
+		fw2.close();
 	}
 	
 	public void listSetsIncludingSet(String fileName, String subset[]){
@@ -704,19 +881,31 @@ public class SetOverlapAnalysis {
 	
 	public void convertTableSetToGMT(String fnSetTable, String fnSetGMT, int maxSize) throws Exception{
 		loadSetsFromTable(fnSetTable);
-		saveSetsAsGMT(fnSetGMT,maxSize);
+		saveSetsAsGMT(fnSetGMT,maxSize, false);
 	}
 	
 	public void saveSetsAsGMT(String fnSetGMT, int maxSize) throws Exception{
+		saveSetsAsGMT(fnSetGMT, maxSize, false);
+	}
+	
+	public void saveSetsAsGMT(String fnSetGMT, int maxSize, boolean addDescriptions) throws Exception{
 		FileWriter fw = new FileWriter(fnSetGMT);
 		for(int i=0;i<setnames.size();i++)if((maxSize==-1)||(sets.get(i).size()<=maxSize)){
-			fw.write(setnames.get(i)+"\tna\t");
-				HashSet<String> hs = sets.get(i);
-				Iterator<String> its = hs.iterator();
-				while(its.hasNext()){
-					fw.write(its.next()+"\t");
-				}
-				fw.write("\n");
+			if(addDescriptions)
+				fw.write(setnames.get(i)+"\t"+setdescriptions.get(i)+"\t");
+			else
+				fw.write(setnames.get(i)+"\tna\t");
+			
+			Vector<String> list = lists.get(i);
+			Vector<Float>  weights = listsWeights.get(i);
+			for(int j=0;j<list.size();j++){
+				String s = list.get(j);
+				if(weights.get(j).isNaN())
+					fw.write(s+"\t");
+				else
+					fw.write(s+"["+weights.get(j)+"]"+"\t");
+			}
+			fw.write("\n");
 		}
 		fw.close();
 	}
@@ -771,9 +960,10 @@ public class SetOverlapAnalysis {
 			HashSet<String> set = sets.get(i);
 			Iterator<String> its = set.iterator();
 			Vector<String> items = new Vector<String>();
+			HashMap<String, Float> newWeights = new HashMap<String, Float>();  
 			while(its.hasNext())
 				items.add(its.next());
-			Vector<Vector<String>> tempItemsExpanded = new Vector<Vector<String>>();
+			//Vector<Vector<String>> tempItemsExpanded = new Vector<Vector<String>>();
 			for(int j=0;j<items.size();j++){
 				String item = items.get(j);
 				int k = expansionSets.setnames.indexOf(item);
@@ -781,12 +971,35 @@ public class SetOverlapAnalysis {
 					HashSet eset = expansionSets.sets.get(k);
 					Iterator<String> ite = eset.iterator();
 					set.remove(item);
-					while(ite.hasNext())
-						set.add(ite.next());
+					while(ite.hasNext()){
+						String s = ite.next();
+						set.add(s);
+					}
+					ite = eset.iterator();
+					while(ite.hasNext()){
+						String s = ite.next();
+						Float wf = newWeights.get(s);
+						if(wf==null)
+							wf = 0f;
+						wf+=listsWeights.get(i).get(lists.get(i).indexOf(item));
+						newWeights.put(s, wf);
+					}
+				}else{
+					set.remove(item);
 				}
 			}
+			
+		Vector<String> list = new Vector<String>(); for(String s: set) list.add(s);
+		Vector<Float> weights = new Vector<Float>(); 
+		
+		for(int j=0;j<list.size();j++)
+			weights.add(newWeights.get(list.get(j)));
+		
+		lists.set(i, list);
+		listsWeights.set(i, weights);
 		}
-		saveSetsAsGMT(fn,-1);
+		
+		saveSetsAsGMT(fn,-1, true);
 	}
 	
 	public void expandSetsOfLists_SplitSets(String setGMT, String expansionSetGMT, String fn) throws Exception{
@@ -1100,6 +1313,8 @@ public class SetOverlapAnalysis {
 			sonew.sets.add(pair);
 		}
 		sonew.saveSetsAsGMT(newFile, -1);
+	
+	
 	}
 
 }

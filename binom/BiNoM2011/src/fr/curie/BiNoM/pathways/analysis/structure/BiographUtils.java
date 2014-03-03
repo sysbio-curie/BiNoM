@@ -40,6 +40,21 @@ import fr.curie.BiNoM.pathways.wrappers.XGMML;
  *
  */
 public class BiographUtils extends Graph {
+	
+  public class ReactionRegulator{
+	  public String reactionId = null;
+	  public Node node = null;
+	  public String addInfo = null;
+	  public int level = 0;
+	  public int sign = 0;
+	  public boolean contains(ReactionRegulator r, Vector<ReactionRegulator> regs){
+		  boolean found = false;
+		  for(ReactionRegulator reg: regs)
+			  if(reg.node.Id.equals(r.node.Id))
+				  found = true;
+		  return found;
+	  }
+  }
 
   public static boolean mapSignOfConservationCoeffs = false;
 
@@ -50,12 +65,36 @@ public class BiographUtils extends Graph {
     BiographUtils biographUtils1 = new BiographUtils();
     
     try{
-    	String prefix = "c:/datas/binomtest/M-phase2";
+    	/*String prefix = "c:/datas/binomtest/M-phase2";
     	//String prefix = "C:/Datas/BinomTest/Reaction2EntityNetwork/mapk";
     	Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+".xgmml"));
     	graph = convertReactionNetworkIntoEntityNetwork(graph);
     	graph = StructureAnalysisUtils.removeReciprocalEdges(graph);
-    	XGMML.saveToXGMML(graph, prefix+"_entity.xgmml");
+    	XGMML.saveToXGMML(graph, prefix+"_entity.xgmml");*/
+    	
+    	
+    	String prefix = "C:/Datas/BinomTest/RegulatorExtraction/";
+    	//String file = "Influences_collapse_scheme_1";
+    	String file = "test1";
+    	String rid = "re327";    	
+    	//String prefix = "C:/Datas/DNARepairAnalysis/ver3/";
+    	//String file = "CHEK2_re17";
+    	//String rid = "re17";
+		String typesOfPositiveRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
+		String typesOfNegativeRegulations[] = new String[]{"INHIBITION","UNKNOWN_INHIBITION"};    	
+    	Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+file+".xgmml"));
+    	
+    	Vector<ReactionRegulator> regs = findReactionRegulators(graph,rid,typesOfPositiveRegulations,typesOfNegativeRegulations,3);
+    	System.out.println();
+    	regs = convertNodeRegulators2ProteinRegulators(regs);    	
+    	for(ReactionRegulator reg: regs){
+    		System.out.println(rid+"\t"+reg.addInfo+"\t"+reg.sign+"\t"+reg.level);
+    	}
+    	/*for(ReactionRegulator reg: regs){
+    		System.out.println(rid+"\t"+reg.node.Id+"\t"+reg.sign+"\t"+reg.level);
+    	}*/
+    	
+    	
     }catch(Exception e){
     	e.printStackTrace();
     }
@@ -1036,15 +1075,22 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
   
   public static Vector<String> extractProteinNamesFromNodeName(String id){
 	  Vector<String> names = new Vector<String>();
+	  if(!id.trim().equals("")){
 	  StringTokenizer st = new StringTokenizer(id,"@");
-	  String nameWithoutCompartment = st.nextToken();
+	  String nameWithoutCompartment = "";
+	  //try{
+	  nameWithoutCompartment = st.nextToken();
+	  //}catch(Exception e){
+	  //	System.out.println("ID="+id);
+	  //	System.exit(0);
+	  //}
 	  st = new StringTokenizer(nameWithoutCompartment,":");
 	  while(st.hasMoreTokens()){
 		  String part = st.nextToken();
 		  StringTokenizer st1 = new StringTokenizer(part,"(|)'");
 		  String proteinName = st1.nextToken();
 		  if((proteinName.startsWith("g"))||(proteinName.startsWith("r"))){
-			  System.out.println(proteinName);
+			  //System.out.println(proteinName);
 			  if(proteinName.substring(1, 2).equals(proteinName.substring(1, 2).toUpperCase())){
 			  	proteinName = proteinName.substring(1, proteinName.length());
 			  }
@@ -1052,7 +1098,7 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  }
 		  if(!names.contains(proteinName))
 			  names.add(proteinName);
-	  }
+	  }}
 	  return names;
   }
   
@@ -1243,69 +1289,173 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  return entityNetwork;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[], int order){
-	  Vector<Node> res = new Vector<Node>();
+  
+  
+  public static Vector<ReactionRegulator> findImmediateReactionRegulators(Graph reactionNetwork, String reid, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[]){
+	  Vector<ReactionRegulator> res = new Vector<ReactionRegulator>();
 	  reactionNetwork.calcNodesInOut();
 	  Node reactionNode = reactionNetwork.getNode(reid);
 	  
-	  if(reid.equals("re28"))
-		  System.out.println();
-	  
 	  if(reactionNode!=null){
-		  System.out.print(reid+":\t");
+		  //System.out.print(reid+":\t");
 		  for(int i=0;i<reactionNode.incomingEdges.size();i++){
 			  Edge e = reactionNode.incomingEdges.get(i);
-			  Vector<String> interactionTypes = e.getAttributeValues("interaction");
-			  boolean typeFound = false;
+			  Vector<String> interactionTypes = e.getAttributeValues("CELLDESIGNER_EDGE_TYPE");
+			  int typeFound = 0;
 			  for(int j=0;j<interactionTypes.size();j++){
-				  for(int k=0;k<typesOfRegulations.length;k++){
-					  if(typesOfRegulations[k].equals(interactionTypes.get(j)))
-						  typeFound = true;
+				  for(int k=0;k<typesOfPositiveRegulations.length;k++){
+					  if(typesOfPositiveRegulations[k].equals(interactionTypes.get(j)))
+						  typeFound = 1;
 				  }
-				  // Experimentally, if order==2 then we also consider "LEFT" (to take into account regulation of complex assembly)
-				  if(order==2)
-					  if(interactionTypes.get(j).equals("LEFT"))
-						  typeFound = true;
+				  for(int k=0;k<typesOfNegativeRegulations.length;k++){
+					  if(typesOfNegativeRegulations[k].equals(interactionTypes.get(j)))
+						  typeFound = -1;
+				  }				  
 			  }
-			  if(typeFound){
+			  if(typeFound!=0){
 				  String nodeType = e.Node1.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE");
 				  if(!nodeType.equals("GENE"))
 				  if(!res.contains(e.Node1)){
-					  System.out.print(e.Node1.Id+"\t");
-					  Vector<Node> res2 = new Vector<Node>();
-					  if(order>1){
-						  if(!res.contains(e.Node1))
-						  for(int k=0;k<e.Node1.incomingEdges.size();k++){
-							  String reid2 = e.Node1.incomingEdges.get(k).Node1.getFirstAttributeValue("CELLDESIGNER_REACTION");
-							  Vector<Node> regs = findReactionRegulators(reactionNetwork, reid2, typesOfRegulations, order-1);
-							  for(Node n: regs)
-								  if(!res2.contains(n)){
-									  res2.add(n);
-								  }
-						  }
-					  }
-					  res.add(e.Node1);
-					  for(Node n:res2)
-						  if(!res.contains(n))
-							  res.add(n);
+					  //System.out.print(e.Node1.Id+"\t");
+					  ReactionRegulator r = (new BiographUtils()).new ReactionRegulator();
+					  r.node = e.Node1;
+					  r.level = 1;
+					  r.sign = typeFound;
+					  res.add(r);
 				  }
+			  }else{
+				  String inttype = e.getFirstAttributeValue("interaction");
+				  if((!inttype.equals("LEFT"))&&(!inttype.equals("RIGHT")))
+					  System.out.println("ERROR: (findImmediateReactionRegulators) Edge "+e.Id+", "+e.getFirstAttributeValue("interaction")+" interaction type is not known");
 			  }
 		  }
-		  System.out.println();
+		  //System.out.println();
 	  }
 	  return res;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfRegulations[]){
-	  return findReactionRegulators(reactionNetwork, reid, typesOfRegulations, 1);
+  
+  public static Vector<ReactionRegulator> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order){
+	  Vector<ReactionRegulator> regs = findImmediateReactionRegulators(reactionNetwork, reid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+	  Vector<ReactionRegulator> regs2 = new Vector<ReactionRegulator>();
+	  Vector<ReactionRegulator> regs3 = new Vector<ReactionRegulator>();
+	  if(order>1){
+		  
+		  // Now, let us look at the reactions from which immediate regulators were produced
+		  reactionNetwork.calcNodesInOut();
+		  Vector<ReactionRegulator> regs2_in = new Vector<ReactionRegulator>();
+		  Vector<ReactionRegulator> regs2_out = new Vector<ReactionRegulator>();
+		  Vector<Node> reactants = new Vector<Node>();
+		  Vector<String> reactions2 = new Vector<String>();
+		  for(int i=0;i<regs.size();i++){
+			  ReactionRegulator reg = regs.get(i); 
+			  for(int j=0;j<reg.node.incomingEdges.size();j++){
+				  Edge e = reg.node.incomingEdges.get(j);
+				  String intType = e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
+				  if(intType.equals("RIGHT")){
+					  String rid = e.Node1.Id;
+					  regs2_in = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+					  for(Edge er: e.Node1.incomingEdges){
+						  intType = er.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
+						  if(intType.equals("LEFT")){
+							  er.Node1.link = reg;
+							  reactants.add(er.Node1);
+							  reactions2.add(er.Node2.Id);
+						  }
+					  }
+				  }
+			  }
+			  for(int j=0;j<reg.node.outcomingEdges.size();j++){
+				  Edge e = reg.node.outcomingEdges.get(j);
+				  String intType = e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
+				  if(intType.equals("LEFT")){
+					  String rid = e.Node2.Id;
+					  regs2_out = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+				  }
+			  }			  
+		  }
+
+		  for(ReactionRegulator r: regs2_in)
+			  if(!r.contains(r, regs2))
+				  if(!r.contains(r, regs)){
+					  r.level = 2;
+					  regs2.add(r);
+				  }
+		  for(ReactionRegulator r: regs2_out){
+			  r.sign *=-1;
+			  if(!r.contains(r, regs2))
+				  if(!r.contains(r, regs)){
+					  r.level = 2;
+					  regs2.add(r);
+				  }
+		  }
+		  
+		  if(order>2){
+			  // Now, let us look at the reactions which modifies the reactants from which the direct regulators are produced
+			  Vector<ReactionRegulator> regs3_in = new Vector<ReactionRegulator>();
+			  Vector<ReactionRegulator> regs3_out = new Vector<ReactionRegulator>();
+			  
+			  for(Node reactant: reactants){
+				  //System.out.println("Reactant: "+reactant.Id);
+				  for(int j=0; j<reactant.incomingEdges.size();j++){
+					  Edge e = reactant.incomingEdges.get(j);
+					  String intType = e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
+					  if(intType.equals("RIGHT")){
+						  String rid = e.Node1.Id;
+						  if(!reactions2.contains(rid)){
+						  regs3_in = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+						  for(ReactionRegulator reg3in: regs3_in)
+							  reg3in.sign *= ((ReactionRegulator)reactant.link).sign;
+						  }
+					  }
+				  }
+				  for(int j=0; j<reactant.outcomingEdges.size();j++){
+					  Edge e = reactant.outcomingEdges.get(j);
+					  String intType = e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
+					  if(intType.equals("LEFT")){
+						  String rid = e.Node2.Id;
+						  if(!reactions2.contains(rid)){
+						  regs3_out = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+						  for(ReactionRegulator reg3out: regs3_out)
+							  reg3out.sign *= -((ReactionRegulator)reactant.link).sign;
+						  }}
+					  }
+			  }
+			  
+			  for(ReactionRegulator r: regs3_in)
+				  if(!r.contains(r, regs3))
+					  if(!r.contains(r, regs)){
+						  r.level = 3;
+						  regs3.add(r);
+					  }
+			  for(ReactionRegulator r: regs3_out){
+				  if(!r.contains(r, regs3))
+					  if(!r.contains(r, regs)){
+						  r.level = 3;
+						  regs3.add(r);
+					  }
+			  }
+		  }
+	  }
+	  
+	  for(ReactionRegulator r: regs2)
+		  regs.add(r);
+	  for(ReactionRegulator r: regs3)
+		  regs.add(r);
+	  
+	  return regs;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[], int order){
-	  Vector<Node> res = new Vector<Node>();
+  public static Vector<ReactionRegulator> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[]){
+	  return findReactionRegulators(reactionNetwork, reid, typesOfPositiveRegulations, typesOfNegativeRegulations, 1);
+  }
+  
+  public static Vector<ReactionRegulator> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order){
+	  Vector<ReactionRegulator> res = new Vector<ReactionRegulator>();
 	  Iterator<String> it = reactionIds.iterator();
 	  while(it.hasNext()){
 		  String rid = it.next();
-		  Vector<Node> regs = findReactionRegulators(reactionNetwork,rid,typesOfRegulations, order);
+		  Vector<ReactionRegulator> regs = findReactionRegulators(reactionNetwork,rid,typesOfPositiveRegulations,typesOfNegativeRegulations,order);
 		  for(int j=0;j<regs.size();j++)
 			  if(!res.contains(regs.get(j)))
 				  res.add(regs.get(j));
@@ -1313,8 +1463,30 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  return res;
   }
   
-  public static Vector<Node> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfRegulations[]){
-	  return findReactionRegulators(reactionNetwork, reactionIds, typesOfRegulations, 1);
+  public static Vector<ReactionRegulator> findReactionRegulators(Graph reactionNetwork, Set<String> reactionIds, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[]){
+	  return findReactionRegulators(reactionNetwork, reactionIds, typesOfPositiveRegulations, typesOfNegativeRegulations, 1);
+  }
+  
+  public static Vector<ReactionRegulator> convertNodeRegulators2ProteinRegulators(Vector<ReactionRegulator> regs){
+	  Vector<ReactionRegulator> res = new Vector<ReactionRegulator>();
+	  Vector<String> proteinNameList = new Vector<String>();
+	  // Remark: if a protein is in the different levels, the priority is given in the order of the list
+	  
+	  for(ReactionRegulator r: regs){
+		  String s = r.node.Id;
+		  Vector<String> proteins = extractProteinNamesFromNodeName(s);
+		  for(String ps: proteins){
+			  if(!proteinNameList.contains(ps)){
+				  ReactionRegulator rn = (new BiographUtils()).new ReactionRegulator();
+				  rn.addInfo = ps;
+				  rn.level = r.level;
+				  rn.sign = r.sign;
+				  proteinNameList.add(ps);
+				  res.add(rn);
+			  }
+		  }
+	  }
+	  return res;
   }
   
   

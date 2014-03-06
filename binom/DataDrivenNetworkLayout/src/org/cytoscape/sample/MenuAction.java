@@ -1,13 +1,13 @@
-package org.cytoscape.sample;
-
 import java.awt.event.ActionEvent;
 
+import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
-import org.cytoscape.app.CyAppAdapter;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyTable;
+import org.cytoscape.io.write.* ;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
@@ -21,21 +21,27 @@ public class MenuAction extends AbstractCyAction {
             "network",
             adapter.getCyNetworkViewManager());
         this.adapter = adapter;
-        setPreferredMenu("Select");
+        setPreferredMenu("Layout");
     }
-
+    
     public void actionPerformed(ActionEvent e) {
         final CyApplicationManager manager = adapter.getCyApplicationManager();
         final CyNetworkView networkView = manager.getCurrentNetworkView();
         final CyNetwork network = networkView.getModel();
         
-        
+        CyNetwork mynetwork = manager.getCurrentNetwork();
+        CyTable mytable = mynetwork.getDefaultNetworkTable();
+        //Trying to export cytable into a file to look at it but having problem with CyFileFilter parameter
+        CyWriter file = CyTableWriterManager.getWriter(mytable, CyFileFilter txt,"Table"); 
+        int count = mytable.getRowCount();
+        System.out.println(count);
         for (CyNode node : network.getNodeList()) {
             if (network.getNeighborList(node, CyEdge.Type.ANY).isEmpty())
                 networkView.getNodeView(node).setVisualProperty(
                     BasicVisualLexicon.NODE_VISIBLE, false);
         }
 
-        networkView.updateView();    
+     
     }
+    
 }

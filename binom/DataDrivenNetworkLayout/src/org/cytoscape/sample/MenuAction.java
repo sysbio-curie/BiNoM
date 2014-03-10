@@ -35,7 +35,7 @@ public class MenuAction extends AbstractCyAction {
         //Trying to export cytable into a file to look at it but having problem with CyFileFilter parameter
        //CyWriter file = CyTableWriterManager.getWriter(mytable,CyFileFilter,"Table"); 
         //int count = mytable.getRowCount();
-        System.out.println(mytable);
+        System.out.print(mytable);
         for (CyNode node : network.getNodeList()) {
             if (network.getNeighborList(node, CyEdge.Type.ANY).isEmpty())
                 networkView.getNodeView(node).setVisualProperty(

@@ -10,7 +10,7 @@ import org.cytoscape.model.CyTable;
 import org.cytoscape.io.write.* ;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-
+import org.cytoscape.io.CyFileFilter;
 import java.awt.event.ActionEvent;
 
 public class MenuAction extends AbstractCyAction {
@@ -31,11 +31,10 @@ public class MenuAction extends AbstractCyAction {
         final CyNetwork network = networkView.getModel();
         
         CyNetwork mynetwork = manager.getCurrentNetwork();
-        CyTable mytable = mynetwork.getDefaultNetworkTable();
-        //Trying to export cytable into a file to look at it but having problem with CyFileFilter parameter
-       //CyWriter file = CyTableWriterManager.getWriter(mytable,CyFileFilter,"Table"); 
-        //int count = mytable.getRowCount();
-        System.out.print(mytable);
+        CyTable mytable = mynetwork.getDefaultNodeTable();
+        
+        int count = mytable.getRowCount();
+        System.out.print(count);
         for (CyNode node : network.getNodeList()) {
             if (network.getNeighborList(node, CyEdge.Type.ANY).isEmpty())
                 networkView.getNodeView(node).setVisualProperty(

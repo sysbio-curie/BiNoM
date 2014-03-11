@@ -17,7 +17,7 @@ public class MenuAction extends AbstractCyAction {
     private final CyAppAdapter adapter;
 
     public MenuAction(CyAppAdapter adapter) {
-        super("Hide unconnected nodes",
+        super("DataDrivenLayout",
             adapter.getCyApplicationManager(),
             "network",
             adapter.getCyNetworkViewManager());

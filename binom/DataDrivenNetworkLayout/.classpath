@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/bioinfo/users/uczerwin/cyworkspace/cytoscape-swing-app-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="/bioinfo/users/uczerwin/Téléchargements/ocap-api-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

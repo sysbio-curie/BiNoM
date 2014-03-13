@@ -13,12 +13,13 @@ import org.cytoscape.io.write.* ;
 import org.cytoscape.io.CyFileFilter;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-import java.util.*;
 
+import java.util.*;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MenuAction extends AbstractCyAction {
     private final CyAppAdapter adapter;
@@ -49,15 +50,20 @@ public class MenuAction extends AbstractCyAction {
         List<CyRow> mylistrows = mytable.getAllRows(); 
         Collection<CyColumn> mycolumns = mytable.getColumns();
         Map<String,Object> values = row.getAllValues();
-        //CyTable mycytable=row.getTable(); 
+        Set<String> keys = values.keySet(); //all colon names
+      
+        
+        
         System.out.println(count);
         System.out.println(mynode);
         System.out.println(name);
-        System.out.println(values);
-        for (CyNode node : network.getNodeList()) {
-            if (network.getNeighborList(node, CyEdge.Type.ANY).isEmpty())
-                networkView.getNodeView(node).setVisualProperty(
-                    BasicVisualLexicon.NODE_VISIBLE, false);
+        System.out.println(keys);
+        for (CyNode node : mynetwork.getNodeList()) {
+            //if (network.getNeighborList(node, CyEdge.Type.ANY).isEmpty())
+                //networkView.getNodeView(node).setVisualProperty(
+                    //BasicVisualLexicon.NODE_VISIBLE, false);
+        	String myname = mynetwork.getRow(node).get("name", String.class);
+        	System.out.println(myname);
         }
 
      

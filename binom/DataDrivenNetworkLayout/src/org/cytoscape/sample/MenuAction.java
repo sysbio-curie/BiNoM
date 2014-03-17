@@ -78,33 +78,33 @@ public class MenuAction extends AbstractCyAction {
 		}
 		Object [ ] [ ] matrix = new Object [mytable.getRowCount()] [set_attributes.size()] ; 
 		Map<String,Integer> map_index = new HashMap<String,Integer>();
-		int ct = 1;
+		int ct = 0;
 		for (String att : set_attributes){
 			map_index.put(att,ct);
 			ct++;
 		}
 		//System.out.println(map_index);
 		//System.out.println(set_attributes.size());
-		
-	
-        int ct2=0;
-        for (CyNode node : mynetwork.getNodeList()) {
-            ct2++;
-            //System.out.println(ct2);
-        	for (String col: values.keySet()){
-        		if (map_index.containsKey(col)){
-        		int index2=map_index.get(col);
-        		//System.out.println(index2);
-        		Object value = mynetwork.getRow(node).getAllValues().get(col);
-        		if (value != null){
-        		System.out.println(ct2);
-        		System.out.println(index2);
-        		//matrix[ct2][index2]=value; 
-        		System.out.println(value);}}
-        	}
-        	
-        }
-        //System.out.println(matrix);
-    }
-    
+
+		int ct2=0;
+		for (CyNode node : mynetwork.getNodeList()) {
+			ct2++;
+			//System.out.println(ct2);
+			for (String col: values.keySet()){
+				if (map_index.containsKey(col)){
+					int index2=map_index.get(col);
+					//System.out.println(index2);
+					Object value = mynetwork.getRow(node).getAllValues().get(col);
+					if (value == null){
+						value=0;
+					}
+					//System.out.println(ct2);
+					//System.out.println(index2);
+					matrix[ct2][index2]=value; 
+					//System.out.println(value);
+				}
+			}
+		}
+		//System.out.println(matrix);
+	}
 }

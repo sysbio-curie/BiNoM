@@ -61,10 +61,10 @@ function event_ckmap(e, e2, type, overlay) {
 	var found = false;
 	//var module_name = window.document.navicell_module_name;
 	//console.log("module_name: " + module_name + " vs. " + overlay.win.document.navicell_module_name);
-	var module_name = overlay.win.document.navicell_module_name;
+	var module = overlay.win.document.navicell_module_name;
 
-	var jxtree = navicell.mapdata.getJXTree(module_name);
-	var ckmap = navicell.mapdata.getCKMap(module_name);
+	var jxtree = navicell.mapdata.getJXTree(module);
+	var ckmap = navicell.mapdata.getCKMap(module);
 	var clicked_node = null;
 	var clicked_boundbox = null;
 	for (var id in ckmap) {
@@ -82,7 +82,7 @@ function event_ckmap(e, e2, type, overlay) {
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
 				if (type == 'click') {
-					console.log("click ID " + id + " in " + module_name);
+					console.log("click ID " + id + " in " + module);
 					var node = jxtree.getNodeByUserId(id);
 					if (node) {
 						if (clicked_boundbox) {
@@ -151,8 +151,8 @@ function event_ckmap(e, e2, type, overlay) {
 		overlay.map_.setOptions({draggableCursor: cursor, draggingCursor: 'move'});
 		overlay.cursor = cursor;
 	}
-	if (type == 'click' && !navicell.drawing_config.displayDLOsOnAllGenes()) {
-		overlay.draw(module_name); // new: warning to performance !
+	if (type == 'click' && !navicell.getDrawingConfig(module).displayDLOsOnAllGenes()) {
+		overlay.draw(module); // new: warning to performance !
 	}
 }
 
@@ -298,7 +298,7 @@ USGSOverlay.prototype.resize = function() {
 	}
 }
 
-USGSOverlay.prototype.draw = function(module_name) {
+USGSOverlay.prototype.draw = function(module) {
 
 	if (this.div_ == null) {
 		return;
@@ -314,17 +314,19 @@ USGSOverlay.prototype.draw = function(module_name) {
 
 	//console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
 //	console.log("arrpos early: " + this.arrpos.length + " " + navicell.drawing_config.displayDLOs());
-	if (!navicell.drawing_config.displayDLOs()) {
+	if (!module) {
+		module = get_module();
+	}
+	var drawing_config = navicell.getDrawingConfig(module);
+	if (!drawing_config.displayDLOs()) {
 		return;
 	}
-	// may add another condition, such as navicell.drawing_config.blablabla
+	// may add another condition, such as drawing_config.blablabla
 	var arrpos = null;
-	if (module_name) {
-		if (navicell.drawing_config.displayDLOsOnAllGenes()) {
-			this.arrpos = navicell.dataset.getArrayPos(module_name);
-		} else {
-			this.arrpos = navicell.dataset.getSelectedArrayPos(module_name);
-		}
+	if (drawing_config.displayDLOsOnAllGenes()) {
+		this.arrpos = navicell.dataset.getArrayPos(module);
+	} else {
+		this.arrpos = navicell.dataset.getSelectedArrayPos(module);
 	}
 
 	var arrpos = this.arrpos;
@@ -353,7 +355,7 @@ USGSOverlay.prototype.draw = function(module_name) {
 			var pos_y = pix.y - div.top;
 			if (pos_x > -MARGIN && pos_x < div_width &&
 			    pos_y >= 0 && pos_y < div_height) {
-				navicell.dataset.drawDLO(module_name, this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+				navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 			} else {
 				/*console.log(arrpos[nn].gene_name + " not drawn");*/
 			}

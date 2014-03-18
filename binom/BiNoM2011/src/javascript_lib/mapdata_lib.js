@@ -82,6 +82,11 @@ if (!Number.MIN_NUMBER) {
 var INPUT_SEPS = ["\t", ";", ",", " "];
 var COLOR_SIZE_CONFIG = "color_size";
 var EDITING_CONFIGURATION = "configuration not saved...";
+//var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[NO&nbsp;SAMPLE]</span>";
+var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[empty]</span>";
+//var GENE_SET = "<span style='font-style: italic; font-size: smaller'>[GENE]</span>";
+var GENE_SET = "[GENE]";
+var INVALID_VALUE = '* INVALID *';
 
 function load_info(url, module_name)
 {
@@ -1117,7 +1122,7 @@ Dataset.prototype = {
 		return this.genes[gene_name];
 	},
 
-	updateDatatable: function(datatable_name, new_datatable_name, new_datatable_type) {
+	updateDatatable: function(win, datatable_name, new_datatable_name, new_datatable_type) {
 		if (!this.datatables[datatable_name]) {
 			return true;
 		}
@@ -1135,15 +1140,16 @@ Dataset.prototype = {
 		datatable.setName(new_datatable_name);
 		datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
 		this.datatables[new_datatable_name] = datatable;
-		if (datatable.displayStepConfig) {
-			datatable.displayStepConfig.update();
-		} else if (datatable.displayDiscreteConfig) {
-			datatable.displayDiscreteConfig.update();
+		var module = get_module(win);
+		if (datatable.displayStepConfig[module]) {
+			datatable.displayStepConfig[module].update();
+		} else if (datatable.displayDiscreteConfig[module]) {
+			datatable.displayDiscreteConfig[module].update();
 		}
 		return true;
 	},
 
-	drawDLO: function(overlay, context, scale, gene_name, topx, topy) {
+	drawDLO: function(module, overlay, context, scale, gene_name, topx, topy) {
 		var size = 2;
 		//console.log("Drawing " + gene_name);
 		//context.fillStyle = 'rgba(100, 30, 100, 1)';
@@ -1151,7 +1157,7 @@ Dataset.prototype = {
 		var bound = null;
 		for (var num = 1; num <= GLYPH_COUNT; ++num) {
 			if (navicell.drawing_config.displayGlyphs(num)) {
-				bound = draw_glyph(num, overlay, context, scale, gene_name, topx, topy);
+				bound = draw_glyph(module, num, overlay, context, scale, gene_name, topx, topy);
 				if (bound) {
 //					topx = bound[0] + bound[2] - 6;
 					topx = bound[0] + bound[2] - 2;
@@ -1167,10 +1173,10 @@ Dataset.prototype = {
 		}
 			*/
 		if (navicell.drawing_config.displayHeatmaps()) {
-			draw_heatmap(overlay, context, scale, gene_name, topx, topy);
+			draw_heatmap(module, overlay, context, scale, gene_name, topx, topy);
 		}
 		if (navicell.drawing_config.displayBarplots()) {
-			draw_barplot(overlay, context, scale, gene_name, topx, topy);
+			draw_barplot(module, overlay, context, scale, gene_name, topx, topy);
 		}
 		//var gene = this.getGeneByName(gene_name);
 	},
@@ -1209,212 +1215,9 @@ function force_datatable_display(id) {
 	}
 }
 
-/*
-function DisplayDiscreteConfig_old(datatable) {
+function DisplayStepConfig(datatable, win) {
 	this.datatable = datatable;
-	this.values = [];
-	this.values_idx = {};
-	var discrete_values = datatable.getDiscreteValues();
-	for (var value in discrete_values) {
-		this.values.push(discrete_values[value]);
-	}
-	this.values.sort();
-	for (var idx = 0; idx < this.values.length; ++idx) {
-		var value = this.values[idx];
-		this.values_idx[value] = idx;
-	}
-	this.buildDivs();
-	this.buildValues();
-	this.setDefaults();
-}
-
-DisplayDiscreteConfig_old.prototype = {
-	
-	buildDivs: function() {
-		this.div_ids = {};
-		this.buildDiv('color');
-		this.buildDiv(COLOR_SIZE_CONFIG);
-		this.buildDiv('shape');
-		this.buildDiv('size');
-	},
-
-	buildDiv: function(config) {
-		var mod = config + '_';
-		var id = this.datatable.getId();
-		var div_editing_id = "discrete_config_editing_" + mod + id;
-		var div_id = "discrete_config_" + mod + id;
-		var html = "<div class='discrete-config' id='" + div_id + "'>\n";
-		html += "<h3 id='discrete_config_title_" + mod + id + "'></h3>";
-		html += "<div id='" + div_editing_id + "' class='discrete-config-editing'>\n</div>";
-		html += "<table class='discrete-config-table' id='discrete_config_table_" + mod + id + "'>";
-		html += "</table>";
-
-		html += "</div>";
-		this.div_ids[config] = div_id;
-//		this.div_id = div_id;
-		$('body').append(html);
-	},
-
-	getDatatableValue: function(config, value) {
-		return value;
-	},
-
-	getDivId: function(what) {
-		return this.div_ids[what];
-	},
-
-	buildValues: function() {
-		var size = this.values.length;
-		this.colors = new Array(size);
-		this.sizes = new Array(size);
-		this.shapes = new Array(size);
-		this.update();
-	},
-
-	getValueAt: function(idx) {
-		return this.values[idx];
-	},
-
-	getValueCount: function() {
-		return this.values.length;
-	},
-
-	setValueInfo: function(idx, color, size, shape) {
-		if (idx < this.colors.length) {
-			///console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
-			this.colors[idx] = color;
-			this.sizes[idx] = size;
-			this.shapes[idx] = shape;
-		}
-	},
-
-	setDefaults: function() {
-		var step_cnt = this.getValueCount();
-		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt);
-		for (var ii = 0; ii < step_cnt; ++ii) {
-			this.setValueInfo(ii, colors[ii].getRGBValue(), ii*2+4, ii);
-		}
-		this.update();
-	},
-
-	getColorAt: function(idx) {
-		return this.colors[idx];
-	},
-
-	getSizeAt: function(idx) {
-		return this.sizes[idx];
-	},
-
-	getShapeAt: function(idx) {
-		var shape = this.shapes[idx];
-		if (!shape) {
-			return this.shapes[this.shapes.length-1];
-		}
-		return shape;
-	},
-
-	getColor: function(value) {
-		var idx = this.values_idx[value];
-		if (idx != undefined) {
-			return this.colors[idx];
-		}
-		return '';
-	},
-
-	getSize: function(value) {
-		var idx = this.values_idx[value];
-		if (idx != undefined) {
-			return this.sizes[idx];
-		}
-		return 0;
-	},
-
-	getShape: function(value) {
-		var idx = this.values_idx[value];
-		if (idx != undefined) {
-			return this.shapes[idx];
-		}
-		return '';
-	},
-
-	update: function() {
-		this.update_config('color');
-		this.update_config(COLOR_SIZE_CONFIG);
-		this.update_config('shape');
-		this.update_config('size');
-	},
-
-	update_config: function(config) {
-		var mod = config + '_';
-		var id = this.datatable.getId();
-		var table = $("#discrete_config_table_" + mod + id);
-		table.children().remove();
-		var html = "<thead>";
-		html += "<th>Values</th>";
-		if (config == 'color' || config == COLOR_SIZE_CONFIG) {
-			html += "<th>Color</th>";
-		}
-		if (config == 'size' || config == COLOR_SIZE_CONFIG) {
-			html += "<th>Size</th>";
-		}
-		if (config == 'shape') {
-			html += "<th>Shape</th>";
-		}
-		html += "</thead><tbody>";
-		var step_cnt = this.values.length;
-		for (var idx = 0; idx < step_cnt; idx++) {
-			html += "<tr>";
-			var value = this.getValueAt(idx);
-			if (value == '') {
-				value = "<span style='text-align: center'>NA</span>";
-			}
-			html += "<td>" + value + "</td>";
-			if (config == 'color' || config == COLOR_SIZE_CONFIG) {
-				html += "<td><input id='discrete_config_" + mod + id + "_" + idx + "' value='" + this.getColorAt(idx) + "' class='color' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")'></input></td>";
-			}
-			if (config == 'size' || config == COLOR_SIZE_CONFIG) {
-				html += "<td><select id='discrete_size_" + mod + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")'>";
-				var selsize = this.getSizeAt(idx);
-				var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
-				for (var size = -2; size < maxsize; size += 1) {
-					var size2 = DISCRETE_SIZE_COEF*(size+2);
-					html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
-				}
-				html += "</select></td>";
-			}
-			if (config == 'shape') {
-				html += "<td><select id='discrete_shape_" + mod + id + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\")''>";
-				var selshape = this.getShapeAt(idx);
-				if (selshape > navicell.shapes.length) {
-					selshape = navicell.shapes.length-1;
-				}
-				for (var shape_idx in navicell.shapes) {
-					var shape = navicell.shapes[shape_idx];
-					html += "<option value='" + shape + "' " + (shape_idx == selshape ? "selected" : "") + ">" + shape + "</option>";
-				}
-				html += "</select></td>";
-			}
-			html += "</tr>\n";
-		}
-
-		html += "</tbody>";
-		table.append(html);
-
-		var title = $("#discrete_config_title_" + mod + id);
-		if (config == COLOR_SIZE_CONFIG) {
-			var Config = "Color/Size";
-		} else {
-			var Config = config.charAt(0).toUpperCase() + config.slice(1)
-		}
-		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
-
-		jscolor.init();
-	}
-};
-*/
-
-function DisplayStepConfig(datatable) {
-	this.datatable = datatable;
+	this.win = win;
 	this.has_empty_values = datatable.hasEmptyValues();
 	this.use_absval = {};
 	for (var tab in DisplayStepConfig.tabnames) {
@@ -1432,6 +1235,7 @@ function DisplayStepConfig(datatable) {
 
 var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
+var TABS_DIV_ID = 1;
 
 DisplayStepConfig.prototype = {
 
@@ -1452,7 +1256,7 @@ DisplayStepConfig.prototype = {
 			this.setStepCount_config(step_cnt, 'shape', tabname);
 			this.setStepCount_config(step_cnt, 'size', tabname);
 		}
-		this.datatable.refresh();
+		this.datatable.refresh(this.win);
 	},
 
 	setStepCount_config: function(step_cnt, config, tabname) {
@@ -1496,7 +1300,7 @@ DisplayStepConfig.prototype = {
 
 
 	setStepInfo: function(config, tabname, idx, value, color, size, shape) {
-		console.log("setting at " + idx + " " + value + " " + color + " " + size + " shape=" + shape);
+		//console.log("setting at " + idx + " " + value + " " + color + " " + size + " shape=" + shape);
 		if (value != Number.MIN_NUMBER) {
 			this.values[tabname][config][idx+1] = value;
 		}
@@ -1514,12 +1318,16 @@ DisplayStepConfig.prototype = {
 		for (var ii = 0; ii < step_cnt; ++ii) {
 			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii].getRGBValue(), 4+2*ii, ii);
 		}
-		this.displayShapes(tabname);
+		//this.displayShapes(tabname);
 	},
 
 	getStepIndex: function(config, tabname, value) {
 		if (value == '') {
 			return 0;
+		}
+		var ivalue = parseFloat(value);
+		if (isNaN(ivalue)) {
+			return -1;
 		}
 		value *= 1.;
 		var values = this.values[tabname][config];
@@ -1551,7 +1359,11 @@ DisplayStepConfig.prototype = {
 	},
 
 	getDatatableValue: function(config, tabname, value) {
-		if (value == '') {
+		if (value == undefined || value == '') {
+			return value;
+		}
+		var ivalue = parseFloat(value);
+		if (isNaN(ivalue)) {
 			return value;
 		}
 		value *= 1.;
@@ -1600,7 +1412,7 @@ DisplayStepConfig.prototype = {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
 		}
-		return '';
+		return " style='text-align: center'";
 	},
 
 	getHeatmapStyleGroup: function(group, gene_name) {
@@ -1609,7 +1421,7 @@ DisplayStepConfig.prototype = {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
 		}
-		return '';
+		return " style='text-align: center'";
 	},
 
 	getBarplotStyleSample: function(sample_name, gene_name) {
@@ -1641,13 +1453,27 @@ DisplayStepConfig.prototype = {
 	},
 
 	_getColor: function(value, tabname) {
-		//value = this.getDatatableValue('color', value);
-		return this.colors[tabname]['color'][this.getStepIndex('color', tabname, value)];
+		var idx = this.getStepIndex('color', tabname, value);
+		if (idx < 0) {
+			return undefined;
+		}
+		return this.colors[tabname]['color'][idx];
 	},
 
 	_getSize: function(value, tabname) {
-		//value = this.getDatatableValue('size', value);
-		return this.sizes[tabname]['size'][this.getStepIndex('size', tabname, value)];
+		var idx = this.getStepIndex('size', tabname, value);
+		if (idx < 0) {
+			return undefined;
+		}
+		return this.sizes[tabname]['size'][idx];
+	},
+
+	_getShape: function(value, tabname) {
+		var idx = this.getStepIndex('shape', tabname, value);
+		if (idx < 0) {
+			return undefined;
+		}
+		return this.shapes[tabname]['shape'][idx];
 	},
 
 	displayShapes: function(tabname) {
@@ -1656,11 +1482,6 @@ DisplayStepConfig.prototype = {
 		for (var idx in shapes) {
 			console.log("shape at " + idx + " " + shapes[idx]);
 		}
-	},
-
-	_getShape: function(value, tabname) {
-		//value = this.getDatatableValue('shape', value);
-		return this.shapes[tabname]['shape'][this.getStepIndex('shape', tabname, value)];
 	},
 
 	makeValueInput: function(id, config, tabname, idx) {
@@ -1812,7 +1633,8 @@ DisplayStepConfig.prototype = {
 		var mod = config + '_';
 		var id = this.datatable.getId();
 		var id_suffix = tabname + '_' + mod + id 
-		var table = $("#step_config_table_" + id_suffix);
+		var doc = this.win.document;
+		var table = $("#step_config_table_" + id_suffix, doc);
 		table.children().remove();
 		var html = "<thead>";
 		html += "<th></th>";
@@ -1868,7 +1690,7 @@ DisplayStepConfig.prototype = {
 		html += "</tbody>";
 		table.append(html);
 
-		var table_info = $("#step_info_table_" + id_suffix);
+		var table_info = $("#step_info_table_" + id_suffix, doc);
 		table_info.children().remove();
 		var html = "<tbody>";
 		var use_absval = this.use_absval[tabname][config];
@@ -1900,13 +1722,13 @@ DisplayStepConfig.prototype = {
 		html += "</tbody>";
 		table_info.append(html);
 
-		var count = $("#step_config_count_" + id_suffix);
+		var count = $("#step_config_count_" + id_suffix, doc);
 
-		var title = $("#step_config_title_" + mod + id);
+		var title = $("#step_config_title_" + mod + id, doc);
 		var Config = config.charAt(0).toUpperCase() + config.slice(1)
 		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
 
-		jscolor.init();
+		jscolor.init(this.win);
 	},
 
 	buildDivs: function(step_cnt) {
@@ -1917,6 +1739,7 @@ DisplayStepConfig.prototype = {
 	},
 
 	buildDiv: function(step_cnt, config) {
+		var doc = this.win.document;
 		var mod = config + '_';
 		var id = this.datatable.getId();
 		var div_id = "step_config_" + mod + id;
@@ -1950,8 +1773,9 @@ DisplayStepConfig.prototype = {
 
 		html += "</div>";
 		this.div_ids[config] = div_id;
-		$('body').append(html);
-		$("#" + div_id).tabs();
+		$('body', doc).append(html);
+		console.log("INIT_TAB " + div_id);
+		$("#" + div_id, doc).tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 	},
 
 	getDivId: function(what) {
@@ -1965,19 +1789,24 @@ DisplayStepConfig.prototype = {
 
 DisplayStepConfig.stepCountChange = function(tabname, config, id) {
 	var datatable = navicell.dataset.datatables_id[id];
-	console.log("step_count_change(" + config + ")");
+	var module = get_module();
+	var win = window;
+	console.log("step_count_change(" + config + ") " + module);
 	if (datatable) {
-		var value = $("#step_config_count_" + tabname + '_' + config + '_' + id).val();
-		datatable.displayStepConfig.setStepCount_config(value, config, tabname);
+		var value = $("#step_config_count_" + tabname + '_' + config + '_' + id, win.document).val();
+		datatable.getDisplayConfig(module).setStepCount_config(value, config, tabname);
 		DisplayStepConfig.setEditing(datatable.id, true, config);
 	}
 }
 
 DisplayStepConfig.setSampleAbsval = function(config, id) {
-	var checked = $("#step_config_absval_sample_" + config + '_' + id).attr("checked");
+	var win = window;
+	var checked = $("#step_config_absval_sample_" + config + '_' + id, win.document).attr("checked");
 	var datatable = navicell.dataset.getDatatableById(id);
+	var module = get_module();
+	console.log("set_sample_absval : " + module + " step_config_absval_sample_" + config + '_' + id + " " + checked);
 	if (datatable) {
-		var displayStepConfig = datatable.displayStepConfig;
+		var displayStepConfig = datatable.getDisplayConfig(module);
 		displayStepConfig.setUseAbsValue(config, checked == 'checked');
 		var step_cnt = displayStepConfig.getStepCount(config, 'sample');
 		displayStepConfig.setStepCount_config(step_cnt, config, 'sample');
@@ -1987,9 +1816,12 @@ DisplayStepConfig.setSampleAbsval = function(config, id) {
 
 DisplayStepConfig.setGroupMethod = function(config, id) {
 	var datatable = navicell.getDatatableById(id);
+	var win = window;
+	var module = get_module();
+	console.log("set_group_methodn : " + module);
 	if (datatable) {
-		var obj = $("#group_method_" + config + '_' + id);
-		var displayStepConfig = datatable.displayStepConfig;
+		var obj = $("#group_method_" + config + '_' + id, win.document);
+		var displayStepConfig = datatable.getDisplayConfig(module);
 		displayStepConfig.setGroupMethod(config, obj.val());
 		var step_cnt = displayStepConfig.getStepCount(config, 'group');
 		displayStepConfig.setStepCount_config(step_cnt, config, 'group');
@@ -1997,15 +1829,23 @@ DisplayStepConfig.setGroupMethod = function(config, id) {
 	}
 }
 
-DisplayStepConfig.setEditing = function(datatable_id, val, config) {
+DisplayStepConfig.setEditing = function(datatable_id, val, config, win) {
 	var datatable = navicell.getDatatableById(datatable_id);
-	var div_id = datatable.getDisplayConfig().getDivId(config);
+	if (!win) {
+		win = window;
+	}
+	var module = get_module();
+	console.log("setEditing : " + module);
+	var div_id = datatable.getDisplayConfig(module).getDivId(config);
 	if (div_id) {
-		var div = $("#" + div_id);
+		var div = $("#" + div_id, win.document);
+		// kludge !
+		// actually not.
+		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		var active = div.tabs("option", "active");
 		var tabname = DisplayStepConfig.tabnames[active];
 		if (tabname) {
-			$("#step_config_editing_" + tabname + '_' + config + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
+			$("#step_config_editing_" + tabname + '_' + config + '_' + datatable_id, win.document).html(val ? EDITING_CONFIGURATION : "");
 		}
 	}
 }
@@ -2013,8 +1853,9 @@ DisplayStepConfig.setEditing = function(datatable_id, val, config) {
 DisplayStepConfig.tabnames = ['sample', 'group'];
 DisplayStepConfig.tablabels = {'sample' : 'Sample Configuration', 'group' :'Group Configuration'};
 
-function DisplayDiscreteConfig(datatable) {
+function DisplayDiscreteConfig(datatable, win) {
 	this.datatable = datatable;
+	this.win = win;
 	this.values = [];
 	this.values_idx = {};
 	var discrete_values = datatable.getDiscreteValues();
@@ -2044,6 +1885,7 @@ DisplayDiscreteConfig.prototype = {
 
 	buildDiv: function(config) {
 		var mod = config + '_';
+		var doc = this.win.document;
 		var id = this.datatable.getId();
 		var div_id = "discrete_config_" + mod + id;
 		var html = "<div align='center' class='discrete-config' id='" + div_id + "'>\n";
@@ -2070,8 +1912,9 @@ DisplayDiscreteConfig.prototype = {
 		}
 		html += "</div>";
 		this.div_ids[config] = div_id;
-		$('body').append(html);
-		$("#" + div_id).tabs();
+		$('body', doc).append(html);
+		console.log("INIT_TAB " + div_id);
+		$("#" + div_id, doc).tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 	},
 
 	getDatatableValue: function(config, value) {
@@ -2118,7 +1961,6 @@ DisplayDiscreteConfig.prototype = {
 
 	setValueInfo: function(config, tabname, idx, color, size, shape, cond) {
 		if (idx < this.colors[tabname][config].length) {
-			//console.log("setting discrete at " + idx + " " + color + " " + size + " " + shape);
 			this.colors[tabname][config][idx] = color;
 			this.sizes[tabname][config][idx] = size;
 			this.shapes[tabname][config][idx] = shape;
@@ -2128,7 +1970,13 @@ DisplayDiscreteConfig.prototype = {
 
 	setDefaults: function(config, tabname) {
 		var step_cnt = this.getValueCount();
-		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt);
+		var colors;
+		var biotype_is_set = this.datatable.biotype.isSet();
+		if (biotype_is_set) {
+			colors = color_gradient(new RGBColor(0, 0, 120), new RGBColor(0, 0, 120), step_cnt);
+		} else {
+			colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt);
+		}
 		for (var ii = 0; ii < step_cnt; ++ii) {
 			this.setValueInfo(config, tabname, ii, colors[ii].getRGBValue(), ii*2+4, ii, ii == 0 ? Group.DISCRETE_IGNORE : Group.DISCRETE_GT_0);
 		}
@@ -2198,7 +2046,7 @@ DisplayDiscreteConfig.prototype = {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
 		}
-		return '';
+		return " style='text-align: center'";
 	},
 
 	getBarplotStyleSample: function(sample_name, gene_name) {
@@ -2207,7 +2055,7 @@ DisplayDiscreteConfig.prototype = {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
 		}
-		return '';
+		return " style='text-align: center'";
 	},
 
 	getBarplotSampleHeight: function(sample_name, gene_name, max) {
@@ -2220,13 +2068,19 @@ DisplayDiscreteConfig.prototype = {
 	//----
 	getAcceptedCondition: function(group, gene_name, config) {
 		var conds = this.conds['group'][config];
+		var id_suffix = 'group_' + config + '_' + this.datatable.getId();
+		var doc = this.win.document;
 		for (var idx in conds) {
 			if (conds[idx]) {
-				if (group.acceptCondition(this.datatable, gene_name, this.values[idx], conds[idx])) {
+				var idx2 = $("#discrete_value_" + id_suffix + "_" + idx. doc).val();
+				//console.log("getAcceptedCondition: " + idx + " -> " + idx2);
+				if (group.acceptCondition(this.datatable, gene_name, this.values[idx2], conds[idx])) {
+					//console.log("return one " + idx);
 					return idx;
 				}
 			}
 		}
+		//console.log("return else " + (conds.length-1));
 		return conds.length-1;
 	},
 
@@ -2356,7 +2210,8 @@ DisplayDiscreteConfig.prototype = {
 		var mod = config + '_';
 		var id = this.datatable.getId();
 		var id_suffix = tabname + '_' + mod + id 
-		var table = $("#discrete_config_table_" + id_suffix);
+		var doc = this.win.document;
+		var table = $("#discrete_config_table_" + id_suffix, doc);
 		var is_sample = tabname == 'sample';
 		table.children().remove();
 		var html = "<thead>";
@@ -2386,10 +2241,19 @@ DisplayDiscreteConfig.prototype = {
 				html += "<td style='text-align: center; font-style: italic' colspan='2'>no matching condition</td>";
 			} else {
 				var value = this.getValueAt(idx, config, tabname);
-				if (value == '') {
-					html += "<td><span style='text-align: center'>" + prefix + "NA</span></td>";
+				if (!is_sample) {
+					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller'>";
+					for (var idx2 = 0; idx2 < step_cnt; idx2++) {
+						var value2 = this.getValueAt(idx2, config, tabname);
+						html += "<option value='" + idx2 + "' " + (value2 == value ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>" + (value2 ? value2 : "NA") + "</span></option>";
+					}
+					html += "</select></td>";
 				} else {
-					html += "<td>" + prefix + value + "</td>";
+					if (value == '') {
+						html += "<td><span style='text-align: center'>" + prefix + "NA</span></td>";
+					} else {
+						html += "<td>" + prefix + value + "</td>";
+					}
 				}
 				if (!is_sample) {
 					var selcond = this.getConditionAt(idx, config);
@@ -2407,7 +2271,10 @@ DisplayDiscreteConfig.prototype = {
 			if (config == 'size' || config == COLOR_SIZE_CONFIG) {
 				html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='display_discrete_config_set_editing(" + id + ", true, \"" + config + "\", \"" + tabname + "\")'>";
 				var selsize = this.getSizeAt(idx, config, tabname);
-				var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF;
+				if (idx == step_cnt) {
+					selsize = 4;
+				}
+				var maxsize = this.getValueCount()*DISCRETE_SIZE_COEF+2;
 				for (var size = -2; size < maxsize; size += 1) {
 					var size2 = DISCRETE_SIZE_COEF*(size+2);
 					html += "<option value='" + size2 + "' " + (size2 == selsize ? "selected" : "") + ">" + size2 + "</option>";
@@ -2432,14 +2299,14 @@ DisplayDiscreteConfig.prototype = {
 		html += "</tbody>";
 		table.append(html);
 
-		var title = $("#discrete_config_title_" + mod + id);
+		var title = $("#discrete_config_title_" + mod + id, doc);
 		if (config == COLOR_SIZE_CONFIG) {
 			var Config = "Color/Size";
 		} else {
 			var Config = config.charAt(0).toUpperCase() + config.slice(1)
 		}
 		title.html("<span style='font-style: italic'>" + this.datatable.name + "</span> Datatable<br><span style='font-size: smaller'>" + Config + " Configuration</span>");
-		jscolor.init();
+		jscolor.init(this.win);
 	}
 };
 
@@ -2849,6 +2716,15 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	this.discrete_values_map = {};
 	this.discrete_values = [];
 	this.empty_value_cnt = 0;
+	this.windows = {}
+	this.dialogs = {}
+	this.data_table_gene = {};
+	this.data_table_sample = {};
+	this.switch_button = {};
+	this.data_matrix = {};
+	this.current_view = {};
+	this.displayStepConfig = {};
+	this.displayDiscreteConfig = {};
 
 	this.setName(name);
 
@@ -2867,20 +2743,18 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 
 		var text = reader.result;
 
-//		var lines = text.split("\n");
-		//var lines = text.split(/[\r\n]+/);
 		var lines = text.split(LINE_BREAK_REGEX);
 		var gene_length = lines.length;
 
-		var line;
-		var sample_cnt;
+		var firstline;
+		var sample_cnt = 0;
 		var sep = null;
 
 		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
 			sep = INPUT_SEPS[ii];
-			line = lines[0].trim().split(sep);
-			sample_cnt = line.length-1;
-			if (!line[line.length-1]) {
+			firstline = lines[0].trim().split(sep);
+			sample_cnt = firstline.length-1;
+			if (!firstline[firstline.length-1]) {
 				--sample_cnt;
 			}
 			if (sample_cnt >= 1) {
@@ -2888,21 +2762,30 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 			}
 		}
 
+		var biotype_is_set = datatable.biotype.isSet();
 		if (sample_cnt < 1) {
-			this.error = "invalid file format: tabular, comma or space separated file expected";
-			ready.resolve();
-			return;
+			if (!biotype_is_set) {
+				datatable.error = "invalid file format: tabular, comma or space separated file expected";
+				ready.resolve();
+				return;
+			}
+			firstline.push(NO_SAMPLE);
+			sample_cnt = 1;
+		} else {
+			if (biotype_is_set) {
+				datatable.error = "invalid file format: only one column expected";
+				ready.resolve();
+				return;
+			}
 		}
 
 		var samples_to_add = [];
 		var genes_to_add = [];
 		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
-			var sample_name = line[sample_nn+1];
+			var sample_name = firstline[sample_nn+1];
 			if (sample_name.length > 1) {
-				//dataset.addSample(sample_name);
 				samples_to_add.push(sample_name);
 				datatable.sample_index[sample_name] = sample_nn;
-				//console.log("adding sample [" + sample_name + "] " + sample_name.length);
 			}
 		}
 		
@@ -2912,10 +2795,13 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 			if (!line[line.length-1]) {
 				--line_cnt;
 			}
+			if (biotype_is_set) {
+				line_cnt++;
+			}
 			if (line_cnt < sample_cnt) {
-				this.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
+				datatable.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
 			} else if (line_cnt > sample_cnt) {
-				this.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
+				datatable.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
 				ready.resolve();
 				return;
 
@@ -2929,10 +2815,15 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 			datatable.gene_index[gene_name] = gene_nn;
 			datatable.data[gene_nn] = [];
 			for (var sample_nn = 0; sample_nn < line_cnt; ++sample_nn) {
-				var value = line[sample_nn+1];
+				var value;
+				if (biotype_is_set) {
+					value = GENE_SET;
+				} else {
+					value = line[sample_nn+1];
+				}
 				var err = datatable.setData(gene_nn, sample_nn, value);
 				if (err) {
-					console.log("data error");
+					console.log("data error " + err);
 					datatable.error = "datatable " + name + " invalid data: " + err;
 					ready.resolve();
 					return;
@@ -2962,14 +2853,15 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	}
 
 	reader.onerror = function(e) {  // If anything goes wrong
-		this.error = e.toString();
+		datatable.error = e.toString();
 		console.log("Error", e);    // Just log it
 		ready.resolve();
 	}
 }
 
 var MAX_MATRIX_SIZE = 8000;
-var USE_DISPLAY = true;
+
+var DATATABLE_HAS_TABS = 0;
 
 Datatable.prototype = {
 	dataset: null,
@@ -3046,31 +2938,6 @@ Datatable.prototype = {
 
 	getId: function() {return this.id;},
 
-	forceDisplay: function() {
-		console.log("force display " + map.map_name);
-		$("#dt_datatable_notice_id" + this.id).remove();
-		this.force_display = true;
-		var tab_body = $("#dt_datatable_tabs");
-		//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-		tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-		this.data_div = $("#dt_datatable_id" + this.id);
-		//this.data_table = $("#dt_datatable_table_id" + this.id);
-		this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
-		this.data_table_sample = $("#dt_datatable_sample_table_id" + this.id);
-		this.switch_button = $("#switch_view_" + this.id);
-		this.switch_button.css('font-size', '10px');
-		this.switch_button.css('background', 'white');
-		this.switch_button.css('color', 'darkblue');
-
-		this.refresh();
-		for (var map_name in maps) {
-			var doc = maps[map_name].document;
-			update_datatable_status_table(doc, {force: true});
-		}
-		tab_body.tabs("option", "active", this.tabnum);
-		//this.makeGeneView();
-	},
-
 	hasEmptyValues: function() {
 		return this.empty_value_cnt > 0;
 	},
@@ -3079,143 +2946,193 @@ Datatable.prototype = {
 		this.tabnum = tabnum;
 	},
 
-	epilogue: function(win) {
-		var tab_body = $("#dt_datatable_tabs");
-		console.log("EPILOGUE " + win.document.map_name);
-		// BORN AGAIN datatable tabs
-		/*if (true) {
-		} else*/ if (!this.isLarge()) {
-			console.log("adding tab");
-			//tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-//			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-			tab_body.append("<div id='dt_datatable_id" + this.id + "'><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div>");
-			this.data_div = $("#dt_datatable_id" + this.id);
-			this.data_table = $("#dt_datatable_table_id" + this.id);
-			this.data_table_gene = $("#dt_datatable_gene_table_id" + this.id);
-			this.data_table_sample = $("#dt_datatable_sample_table_id" + this.id);
-			this.switch_button = $("#switch_view_" + this.id);
-			//this.switch_button.addClass('switch-button');
-			this.switch_button.css('font-size', '10px');
-			this.switch_button.css('background', 'white');
-			this.switch_button.css('color', 'darkblue');
-		} else {
-			tab_body.append("<div id='dt_datatable_notice_id" + this.id + "'><div class='datatable-too-large'>Notice: datatable " + this.name + " is large - " + mapSize(this.gene_index) + " genes / " + mapSize(this.sample_index) + " samples -, whole data displaying may slow down NaviCell<br/><br/>" + make_button("Force data displaying", "force_datatable_display_" + this.id, "force_datatable_display(" + this.id + ")") + "</div></div>");
-			this.data_div = $("#dt_datatable_notice_id" + this.id);
+	declareWindow: function(win) {
+		var module = get_module(win);
+		if (!this.windows[module]) {
+			this.windows[module] = win;
 		}
+	},
+
+	makeDialogsForWindow: function(win) {
+		var module = get_module(win);
+		if (this.dialogs[module]) {
+			return;
+		}
+		win.console.log("DATATABLE " + this.name + " MAKE DIALOGS for " + module);
+		var doc = win.document;
+		var tab_body = $("#dt_datatable_tabs", doc);
+		$('body', doc).append("<div id='dt_data_dialog_" + this.id + "'><div id='dt_datatable_id" + this.id + "'><h3 style='text-align: center;'>Datatable " + this.name + "</h3><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div></div>");
+		this.data_div = $("#dt_datatable_id" + this.id, doc);
+		this.data_table = $("#dt_datatable_table_id" + this.id, doc);
+		this.data_table_gene[module] = $("#dt_datatable_gene_table_id" + this.id, doc);
+		this.data_table_sample[module] = $("#dt_datatable_sample_table_id" + this.id, doc);
+		this.switch_button[module] = $("#switch_view_" + this.id, doc);
+		this.switch_button[module].css('font-size', '10px');
+		this.switch_button[module].css('background', 'white');
+		this.switch_button[module].css('color', 'darkblue');
+
+		var width = this.biotype.isSet() ? 300: 900;
+
+		this.data_matrix[module] = $("#dt_data_dialog_" + this.id, doc);
+
+		this.data_matrix[module].dialog({
+			autoOpen: false,
+			width: width,
+			height: 700,
+			modal: false,
+			buttons: {
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			}
+		});
 
 		if (this.biotype.isContinuous()) {
-			// TBD: wrong: not suitable for tab sharing !
-			// must have a different div per doc
-			this.displayStepConfig = new DisplayStepConfig(this);
-			this.displayDiscreteConfig = null;
-		} else {
-			this.displayStepConfig = null;
+			this.displayStepConfig[module] = new DisplayStepConfig(this, win);
+			this.displayDiscreteConfig[module] = null;
+		} else if (this.biotype.isDiscrete()) {
+			this.displayStepConfig[module] = null;
+			this.displayDiscreteConfig[module] = new DisplayDiscreteConfig(this, win);
+		} else if (this.biotype.isSet()) { // duplicated code for now
+			this.displayStepConfig[module] = null;
+			this.displayDiscreteConfig[module] = new DisplayDiscreteConfig(this, win);
+		}
+		this.current_view[module] = "gene";
+		this.dialogs[module] = true;
+	},
+
+	epilogue: function(win) {
+		/*
+		for (var map_name in maps) {
+			var doc = maps[map_name].document;
+			this.makeDialogsForWindow(doc.win);
+		}
+		*/
+		this.declareWindow(win);
+		if (this.biotype.isDiscrete()) {
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
-			this.displayDiscreteConfig = new DisplayDiscreteConfig(this);
+		} else if (this.biotype.isSet()) { // duplicated code for now
+			this.discrete_values = mapKeys(this.discrete_values_map);
+			this.discrete_values.sort();
 		}
-		this.makeGeneView();
 	},
 
 	getDiscreteValues: function() {
 		return this.discrete_values;
 	},
 
-	isLarge: function() {
-		// BORN AGAIN datatable tabs
-		// return true;
-		//return false;
-		return !this.force_display && mapSize(this.sample_index) * mapSize(this.gene_index) > MAX_MATRIX_SIZE;
-	},
+	makeGeneView: function(module) {
+		this.current_view[module] = "gene";
+		console.log("makeGeneView: " + module);
+		if (!this.data_table_gene[module].ok) {
+			this.data_table_gene[module].children().remove();
+			this.data_table_gene[module].append(this.makeDataTable_genes(module));
+			this.data_table_gene[module].tablesorter();
+			this.data_table_gene[module].ok = true;
+		}
+		this.data_table_sample[module].css("display", "none");
+		this.data_table_gene[module].css("display", "block");
 
-	makeGeneView: function() {
-		if (this.isLarge()) {
-			return;
-		}
-		this.current_view = "gene";
-		if (!this.data_table_gene.ok) {
-			this.data_table_gene.children().remove();
-			this.data_table_gene.append(this.makeDataTable_genes());
-			this.data_table_gene.tablesorter();
-			this.data_table_gene.ok = true;
-		}
-		if (USE_DISPLAY) {
-			this.data_table_sample.css("display", "none");
-			this.data_table_gene.css("display", "block");
+		if (this.biotype.isSet()) {
+			this.switch_button[module].css("display", "none");
 		} else {
-			this.data_table_sample.css("visibility", "hidden");
-			this.data_table_gene.css("visibility", "visible");
+			this.switch_button[module].val("Switch to Samples / Genes");
 		}
-
-		this.switch_button.val("Switch to Samples / Genes");
 	},
 
 	// ...
-	makeSampleView: function() {
-		if (this.isLarge()) {
-			return;
+	makeSampleView: function(module) {
+		this.current_view[module] = "sample";
+		if (!this.data_table_sample[module].ok) {
+			this.data_table_sample[module].children().remove();
+			this.data_table_sample[module].append(this.makeDataTable_samples(module));
+			this.data_table_sample[module].tablesorter();
+			this.data_table_sample[module].ok = true;
 		}
-		this.current_view = "sample";
-		if (!this.data_table_sample.ok) {
-			this.data_table_sample.children().remove();
-			this.data_table_sample.append(this.makeDataTable_samples());
-			this.data_table_sample.tablesorter();
-			this.data_table_sample.ok = true;
-		}
-		if (USE_DISPLAY) {
-			this.data_table_sample.css("display", "block");
-			this.data_table_gene.css("display", "none");
+		this.data_table_sample[module].css("display", "block");
+		this.data_table_gene[module].css("display", "none");
+		if (this.biotype.isSet()) {
+			this.switch_button[module].css("display", "none");
 		} else {
-			this.data_table_sample.css("visibility", "visible");
-			this.data_table_gene.css("visibility", "hidden");
+			this.switch_button[module].val("Switch to Genes / Samples");
 		}
-		this.switch_button.val("Switch to Genes / Samples");
 	},
 
-	switchView: function() {
-		if (this.current_view == "gene") {
-			this.makeSampleView();
+	switchView: function(win) {
+		var module = get_module(win);
+		if (this.current_view[module] == "gene") {
+			this.makeSampleView(module);
 		} else {
-			this.makeGeneView();
+			this.makeGeneView(module);
 		}
 	},
 
-	refresh: function() {
-		if (this.current_view == "gene") {
-			this.makeGeneView();
+	refresh: function(win) {
+		var module = get_module(win);
+		if (this.current_view[module] == "gene") {
+			this.makeGeneView(module);
+		} else if (this.current_view[module] == "sample") {
+			this.makeSampleView(module);
+		}
+	},
+
+	getDataMatrixDiv: function(module) {
+		if (!this.dialogs[module] && this.windows[module]) {
+			this.makeDialogsForWindow(this.windows[module]);
+		}
+		return this.data_matrix[module];
+	},
+
+	/*
+	getDataDialogDivId: function(module) {
+		if (!this.dialogs[module] && this.windows[module]) {
+			this.makeDialogsForWindow(this.windows[module]);
+		}
+		return "dt_data_dialog_" + this.id;
+	},
+	*/
+	getDisplayConfig: function(module) {
+		console.log("getDisplayConfig: " + module + " " + this.dialogs[module] + " " + this.windows[module]);
+		if (!this.dialogs[module] && this.windows[module]) {
+			this.makeDialogsForWindow(this.windows[module]);
+		}
+		if (this.displayStepConfig[module]) {
+			return this.displayStepConfig[module];
+		}
+		return this.displayDiscreteConfig[module];
+	},
+
+	makeDataTable_genes: function(module) {
+		var biotype_is_set = this.biotype.isSet();
+		if (biotype_is_set) {
+			this.switch_button[module].val("");
 		} else {
-			this.makeSampleView();
+			this.switch_button[module].val("Switch to Samples / Genes");
 		}
-	},
-
-	getDisplayConfig: function() {
-		if (this.displayStepConfig) {
-			return this.displayStepConfig;
-		}
-		return this.displayDiscreteConfig;
-	},
-
-	makeDataTable_genes: function() {
-		this.switch_button.val("Switch to Samples / Genes");
 		var str = "<thead><th>Genes</th>";
-		for (var sample_name in this.sample_index) {
-			str += "<th>" + sample_name + "</th>";
+		if (!biotype_is_set) {
+			for (var sample_name in this.sample_index) {
+				str += "<th>" + sample_name + "</th>";
+			}
 		}
 		str += "</thead>";
 		str += "<tbody>";
 		for (var gene_name in this.gene_index) {
 			str += "<tr><td>" + gene_name + "</td>";
 			var limit = 0;
-			for (var sample_name in this.sample_index) {
-				/*
-				if (limit++ == 10) {
-					break;
+			if (!biotype_is_set) {
+				for (var sample_name in this.sample_index) {
+					/*
+					  if (limit++ == 10) {
+					  break;
+					  }
+					*/
+					var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+					//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
+					//str += "<td class='datacell'>" + value + "</td>";
+					str += "<td>" + value + "</td>";
 				}
-				*/
-				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
-				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
-				//str += "<td class='datacell'>" + value + "</td>";
-				str += "<td>" + value + "</td>";
 			}
 			str += "</tr>";
 		}
@@ -3229,11 +3146,15 @@ Datatable.prototype = {
 		if (gene_idx != undefined && sample_idx != undefined) {
 			return this.data[gene_idx][sample_idx];
 		}
-		return '';
+		if (sample_name == NO_SAMPLE) {
+			return INVALID_VALUE;
+		}
+		//return '';
+		return undefined;
 	},
 
-	makeDataTable_samples: function() {
-		this.switch_button.val("Switch to Genes / Samples");
+	makeDataTable_samples: function(module) {
+		this.switch_button[module].val("Switch to Genes / Samples");
 		var str = "<thead><th>Samples</th>";
 		for (var gene_name in this.gene_index) {
 			str += "<th>" + gene_name + "</th>";
@@ -3296,7 +3217,7 @@ Datatable.prototype = {
 				return "expected numeric value, got '" + value + "'";
 			}
 		}
-		if (!this.biotype.isContinuous()) {
+		if (this.biotype.isDiscrete() || this.biotype.isSet()) {
 			this.discrete_values_map[value] = 1;
 		}
 		this.data[gene_nn][sample_nn] = value;
@@ -3305,11 +3226,17 @@ Datatable.prototype = {
 
 	getSampleCount: function(gene_name) {
 		if (!gene_name) {
+			if (this.biotype.isSet()) {
+				return 0;
+			}
 			return mapSize(this.sample_index);
 		}
 		var gene_idx = this.gene_index[gene_name];
 		if (gene_idx == undefined) {
 			return -1;
+		}
+		if (this.biotype.isSet()) {
+			return 0;
 		}
 		var cnt = 0;
 		for (var sample_name in this.sample_index) {
@@ -3485,10 +3412,19 @@ DrawingConfig.prototype = {
 	}
 };
 
+function get_module(win) {
+	if (!win) {
+		win = window;
+	}
+	return win.document.navicell_module_name;
+}
+
 function switch_view(id) {
+	var module = get_module();
+	console.log("module: " + module);
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
-		datatable.switchView();
+		datatable.switchView(window);
 	}
 }
 
@@ -3520,6 +3456,7 @@ Annotation.prototype = {
 
 function AnnotationFactory() {
 	this.annot_id = 1;
+	this.all_line_read = [];
 }
 
 AnnotationFactory.prototype = {
@@ -3557,17 +3494,131 @@ AnnotationFactory.prototype = {
 		return annotated;
 	},
 
+	refresh: function() {
+		if (!this.readannots(null, null)) {
+			return;
+		}
+
+		var annots = this.annots_per_name;
+		var annot_cnt = mapSize(annots);
+		for (var annot_name in annots) {
+			var annot = this.getAnnotation(annot_name);
+			var annot_id = annot.id;
+			var checked = $("#cb_annot_" + annot_id).attr("checked");
+			annot.setIsGroup(checked);
+		}
+		navicell.group_factory.buildGroups();
+//		$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples have been built (groups are listed in Data Status / Groups tab) </span>");
+		// TBD: factorize message with annot_set_group in dialoglib.js
+		$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
+	},
+
+	readannots: function(ready, error_trigger) {
+		var lines = this.all_line_read;
+		if (!lines.length) {
+			return 0;
+		}
+		var header;
+		var header_cnt;
+
+		var sep = null;
+		
+		this.sample_read = 0;
+		this.sample_annotated = 0;
+
+		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
+			sep = INPUT_SEPS[ii];
+			header = lines[0].trim().split(sep);
+			header_cnt = header.length;
+			if (!header[header.length-1]) {
+				--header_cnt;
+			}
+			if (header_cnt > 1) {
+				break;
+			}
+		}
+
+		if (header_cnt < 2) {
+			this.error = "invalid file format";
+			console.log("ERROR: " + this.error);
+			if (ready) {
+				ready.resolve();
+			}
+		}
+		var annot_cnt = header_cnt - 1;
+		var sample_cnt = lines.length-1;
+		var missing_cnt = 0;
+		this.missing = "";
+		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
+			var line = lines[sample_nn+1].trim().split(sep);
+			var line_cnt = line.length-1;
+			if (!line[line.length-1]) {
+				--line_cnt;
+			}
+			if (line_cnt < 2) {
+				continue;
+			}
+			if (line_cnt > annot_cnt) {
+				this.error = "line #" + (sample_nn) + ", expected " + annot_cnt + " annotations, got " + line_cnt;
+				console.log("ERROR2: " + this.error);
+				if (ready) {
+					ready.resolve();
+				}
+				if (error_trigger) {
+					error_trigger(file);
+				}
+				return 0;
+			}
+			var sample_name = line[0];
+			if (!navicell.dataset.getSample(sample_name)) {
+				if (missing_cnt < 10) {
+					if (this.missing) {
+						this.missing += ", ";
+					}
+					this.missing += sample_name;
+				} else if (missing_cnt == 10) {
+					this.missing += "..."
+				}
+				missing_cnt++;
+				continue;
+			}
+			for (var annot_nn = 0; annot_nn < line_cnt; ++annot_nn) {
+				var annot_value = line[annot_nn+1];
+				var annot_name = header[annot_nn+1];
+				this.addAnnotValue(sample_name, annot_name, annot_value);
+			}
+			//console.log("sample_read: " + this.sample_read
+			this.sample_read++;
+		}
+		if (this.sample_read > 0) {
+			for (var nn = 1; nn < header_cnt; ++nn) {
+				this.getAnnotation(header[nn]);
+			}
+		}
+		console.log("done");
+		this.sample_annotated = this.sync();
+		if (ready) {
+			ready.resolve();
+		}
+		return 1;
+	},
+
 	readfile: function(file, error_trigger) {
 		var reader = new FileReader();
 		reader.readAsBinaryString(file);
 
 		var annot_factory = this;
+		/*
 		this.sample_read = 0;
 		this.sample_annotated = 0;
+		*/
 		var ready = this.ready = $.Deferred(reader.onload);
 		reader.onload = function() { 
 			var text = reader.result;
 			var lines = text.split(LINE_BREAK_REGEX);
+			array_push_all(annot_factory.all_line_read, lines);
+			annot_factory.readannots(ready, error_trigger);
+			/*
 			var header;
 			var header_cnt;
 
@@ -3590,18 +3641,10 @@ AnnotationFactory.prototype = {
 				console.log("ERROR: " + this.error);
 				ready.resolve();
 			}
-			/*
-			var annots = [];
-			for (var nn = 1; nn < header_cnt; ++nn) {
-				annots.push(annot_factory.getAnnotation(header[nn]));
-			}
-			var annot_cnt = annots.length;
-			*/
 			var annot_cnt = header_cnt - 1;
 			var sample_cnt = lines.length-1;
 			var missing_cnt = 0;
 			annot_factory.missing = "";
-			console.log("TRACE #1 " + sample_cnt);
 			for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
 				var line = lines[sample_nn+1].trim().split(sep);
 				var line_cnt = line.length-1;
@@ -3635,7 +3678,6 @@ AnnotationFactory.prototype = {
 				}
 				for (var annot_nn = 0; annot_nn < line_cnt; ++annot_nn) {
 					var annot_value = line[annot_nn+1];
-					//var annot_name = annots[annot_nn].name;
 					var annot_name = header[annot_nn+1];
 					annot_factory.addAnnotValue(sample_name, annot_name, annot_value);
 				}
@@ -3650,6 +3692,7 @@ AnnotationFactory.prototype = {
 			console.log("done");
 			annot_factory.sample_annotated = annot_factory.sync();
 			ready.resolve();
+			*/
 		},
 		reader.onerror = function(e) {  // If anything goes wrong
 			if (error_trigger) {
@@ -4023,9 +4066,45 @@ GroupFactory.prototype = {
 	getClass: function() {return "GroupFactory";}
 };
 
+function BiotypeType(type, subtype) {
+	this.type = type;
+	this.subtype = subtype;
+}
+
+BiotypeType.prototype = {
+
+	isExpression: function() {
+		return this.type == navicell.EXPRESSION;
+	},
+
+	isCopyNumber: function() {
+		return this.type == navicell.COPYNUMBER;
+	},
+
+	isMutation: function() {
+		return this.type == navicell.MUTATION;
+	},
+
+	isGeneList: function() {
+		return this.type == navicell.GENELIST;
+	},
+	
+	isContinuous: function() {
+		return this.subtype == navicell.CONTINUOUS;
+	},
+
+	isDiscrete: function() {
+		return this.subtype == navicell.DISCRETE;
+	},
+
+	isSet: function() {
+		return this.subtype == navicell.SET;
+	}
+};
+
 function Biotype(name, type) {
 	this.name = name;
-	this.type = type;
+	this.type = type; // BiotypeType
 }
 
 Biotype.prototype = {
@@ -4033,21 +4112,17 @@ Biotype.prototype = {
 	type: null,
 
 	isContinuous: function() {
-		return this.type == navicell.CONTINUOUS;
+		return this.type.isContinuous();
 	},
 
 	isDiscrete: function() {
-		return this.type == navicell.DISCRETE;
+		return this.type.isDiscrete();
 	},
 
 	isSet: function() {
-		return this.type == navicell.SET;
+		return this.type.isSet();
 	}
 };
-
-function BiotypeType(name) {
-	this.name = name;
-}
 
 function BiotypeFactory() {
 	this.biotypes = {};
@@ -4149,6 +4224,7 @@ if (typeof Storage != 'undefined') {
 //var navicell_session = new NavicellSession("navicell");
 //navicell_session.reset();
 
+var SIMPLIFY_TYPES = 1;
 function navicell_init() {
 	var _navicell = {}; // namespace
 
@@ -4159,22 +4235,39 @@ function navicell_init() {
 	_navicell.biotype_factory = new BiotypeFactory();
 	_navicell.annot_factory = new AnnotationFactory();
 	_navicell.drawing_config = new DrawingConfig();
+	_navicell.module_init = {};
 
-	_navicell.CONTINUOUS = new BiotypeType("continuous");
-	_navicell.DISCRETE = new BiotypeType("discrete");
-	_navicell.SET = new BiotypeType("set");
+	_navicell.EXPRESSION = 1;
+	_navicell.COPYNUMBER = 2;
+	_navicell.MUTATION = 3;
+	_navicell.GENELIST = 4;
 
-	_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Copy number data", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
-	_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));
-	_navicell.biotype_factory.addBiotype(new Biotype("Mutation data", _navicell.DISCRETE));
-	// disconnected for now:
-	// _navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
-	//_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
+	_navicell.CONTINUOUS = 10;
+	_navicell.DISCRETE = 20;
+	_navicell.SET = 30;
+
+	if (SIMPLIFY_TYPES) {
+		var biotypeExpr = new BiotypeType(_navicell.EXPRESSION, _navicell.CONTINUOUS);
+		//_navicell.biotype_factory.addBiotype(new Biotype("mRNA, microRNA or Protein Expression data", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", biotypeExpr));
+		_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", biotypeExpr));
+		_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", biotypeExpr));
+		_navicell.biotype_factory.addBiotype(new Biotype("Copy number data", new BiotypeType(_navicell.COPYNUMBER, _navicell.CONTINUOUS)));
+		_navicell.biotype_factory.addBiotype(new Biotype("Mutation data", new BiotypeType(_navicell.MUTATION, _navicell.DISCRETE)));
+		_navicell.biotype_factory.addBiotype(new Biotype("Gene list",  new BiotypeType(_navicell.GENELIST, _navicell.SET)));
+	} else {
+		_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("Copy number data", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: methylation profiles", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("Epigenic data: histone modifications", _navicell.CONTINUOUS));
+		_navicell.biotype_factory.addBiotype(new Biotype("Polymorphism data: SNPs", _navicell.DISCRETE));
+		_navicell.biotype_factory.addBiotype(new Biotype("Mutation data", _navicell.DISCRETE));
+		// disconnected for now:
+		// _navicell.biotype_factory.addBiotype(new Biotype("Interaction data", _navicell.SET));
+		//_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
+	}
 	_navicell.getDatatableById = function(id) {
 		/*
 		console.log("this.dataset: " + this.dataset.getClass() + " " + id);
@@ -4184,6 +4277,22 @@ function navicell_init() {
 		return this.dataset.getDatatableById(id);
 	}
 
+	_navicell.isModuleInit = function(module) {
+		return _navicell.module_init[module];
+	},
+
+	_navicell.setModuleInit = function(module) {
+		_navicell.module_init[module] = 1;
+	},
+
+	_navicell.declareWindow = function(win) {
+		var dataset = _navicell.dataset;
+		console.log("dataset: " + dataset);
+		for (var datatable_name in dataset.datatables) {
+			dataset.datatables[datatable_name].declareWindow(win);
+		}
+	},
+	
 	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];
 //	_navicell.shapes = ["Triangle", "Square", "Diamond", "Hexagon", "Circle"];
 

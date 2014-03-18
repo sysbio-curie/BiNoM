@@ -74,17 +74,41 @@
 </div>
 
 <div id="dt_status_tabs">
-  <h3>Data Status</h3>
+  <h3>My Data</h3>
 
   <ul>
+    <li><a class="ui-button-text" href="#dt_datatable_status">Datatables</a></li>
     <li><a class="ui-button-text" href="#dt_sample_status">Samples</a></li>
     <li><a class="ui-button-text" href="#dt_gene_status">Genes</a></li>
     <li><a class="ui-button-text" href="#dt_group_status">Groups</a></li>
     <li><a class="ui-button-text" href="#dt_module_status">Modules</a></li>
   </ul>
 
+  <div id="dt_datatable_status">
+    <h3>Datatables</h3>
+
+    <form>
+      <div id='dt_datatable_status_editing'></div>
+      <table id="dt_datatable_status_table" class="tablesorter">
+      </table>
+      <br/>
+      <br/>
+      <div id="dt_datatable_buttonpane">
+	<table border='0'>
+	  <tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td>
+	    <td>
+	      <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_update" value="Update" onclick='update_datatables()'></input>
+	    </td>
+	    <td>
+	      <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_cancel" value="Cancel" onclick='cancel_datatables()'></input>
+	  </td></tr>
+	</table>
+      </div>
+    </form>
+  </div>
+
   <div id="dt_sample_status">
-    <h3>Sample Status</h3>
+    <h3>Samples</h3>
     <form>
       <table id="dt_sample_status_table" class="tablesorter">
       </table>
@@ -93,54 +117,21 @@
   </div>
   
   <div id="dt_gene_status">
-    <h3>Gene Status</h3>
+    <h3>Genes</h3>
     <table id="dt_gene_status_table" class="tablesorter">
     </table>
   </div>
 
   <div id="dt_group_status">
-    <h3>Group Status</h3>
+    <h3>Groups</h3>
     <table id="dt_group_status_table" class="tablesorter">
     </table>
   </div>
 
   <div id="dt_module_status">
-    <h3>Module Status</h3>
+    <h3>Modules</h3>
     <table id="dt_module_status_table" class="tablesorter">
     </table>
-  </div>
-</div>
-
-<div id="dt_datatable_tabs">
-<h3>Datatable Management</h3>
-
-  <ul>
-    <li><a class="ui-button-text" href="#dt_datatable_status">General</a></li>
-  </ul>
-
-  <div id="dt_datatable_status">
-    <form>
-      <div id='dt_datatable_status_editing'></div>
-      <table id="dt_datatable_status_table" class="tablesorter">
-      </table>
-      <br/>
-      <br/>
-<!--
-      <label id="dt_datatable_status_update_label" for="unlock_datatables" class="update-checkbox"></label>
-      <input type="checkbox" id="dt_datatable_status_update" name="unlock_datatables" onchange='update_datatable_status_table(window.document, {force: true});'></input>
--->
-     <div id="dt_datatable_buttonpane">
-       <table border='0'>
-	 <tr><td style='width: 85%; cellspacing: 20px'>&nbsp;</td>
-	   <td>
-	    <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_update" value="Update" onclick='update_datatables()'></input>
-	</td>
-	<td>
-	    <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" id="dt_datatable_cancel" value="Cancel" onclick='cancel_datatables()'></input>
-	</td></tr>
-	</table>
-     </div>
-    </form>
   </div>
 </div>
 
@@ -153,8 +144,10 @@
 	</table>
       </div>
       <div id="dt_sample_annot_status"></div> 
+      <div align='right'>
       <label for="file"><span style='font-weight: bold'>Sample annotation file used to build groups:</span></label>
       <input type="file" name="file" id="dt_sample_file" value="" class="text ui-widget-content ui-corner-all" />
+      </div>
     </fieldset>
   </form>
 </div>
@@ -162,6 +155,7 @@
 <div id="drawing_config_div">
   <h3>Drawing Configuration</h3>
   <div id="drawing_editing"></div>
+<!--
   <h4>Markers</h4>
   <div class='drawing_config_box'>
     <table>
@@ -180,6 +174,7 @@
       </tr>
     </table>
   </div>
+-->
   <h4>Chart</h4>
   <div class='drawing_config_box'>
     <table style=''>
@@ -194,7 +189,7 @@
 	  <select id="drawing_config_chart_type" onchange='drawing_editing(true)'>
 	    <option value="Heatmap">Heatmap</option>
 	    <option value="Barplot">Barplot</option>
-	    <option value="Piechart">Piechart</option>
+<!--	    <option value="Piechart">Piechart</option> -->
 	  </select>
 	</td>
       </tr>
@@ -245,7 +240,7 @@
 
       </table>
   </div>
-
+<!--
   <h4>Label</h4>
   <div class='drawing_config_box'>
     <table>
@@ -258,7 +253,7 @@
       </tr>
     </table>
   </div>
-
+-->
   <h4>Display DLOs</h4>
   <div class='drawing_config_box'>
   <table>

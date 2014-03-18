@@ -353,7 +353,7 @@ USGSOverlay.prototype.draw = function(module_name) {
 			var pos_y = pix.y - div.top;
 			if (pos_x > -MARGIN && pos_x < div_width &&
 			    pos_y >= 0 && pos_y < div_height) {
-				navicell.dataset.drawDLO(this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+				navicell.dataset.drawDLO(module_name, this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 			} else {
 				/*console.log(arrpos[nn].gene_name + " not drawn");*/
 			}

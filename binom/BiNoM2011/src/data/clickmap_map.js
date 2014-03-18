@@ -987,6 +987,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	tell_opener();
 	setup_icons();
 	setInterval(tell_opener, 1000);
+	navicell.declareWindow(window);
 }
 
 function show_blog(postid)

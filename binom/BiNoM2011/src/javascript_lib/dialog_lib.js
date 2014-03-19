@@ -78,6 +78,88 @@ $(function() {
 		status.html("<span class=\"status-message\">" + message + "</span>");
 	}
 
+	$("#search_dialog").dialog({
+		autoOpen: false,
+		width: 450,
+		height: 840,
+		modal: false,
+		buttons: {
+			"Search": function() {
+				var patterns = $("#search_dialog_patterns").val();
+				var eq_all = $("#search_dialog_match_eq_all").attr("checked") == "checked";
+				var eq_any = $("#search_dialog_match_eq_any").attr("checked") == "checked";
+				var neq_any = $("#search_dialog_match_neq_any").attr("checked") == "checked";
+				var neq_all = $("#search_dialog_match_neq_all").attr("checked") == "checked";
+				var mode_word = $("#search_dialog_pattern_mode_word").attr("checked") == "checked";
+				var mode_regex = $("#search_dialog_pattern_mode_regex").attr("checked") == "checked";
+				var in_labels = $("#search_dialog_search_in_labels").attr("checked") == "checked";
+				var in_tags = $("#search_dialog_search_in_tags").attr("checked") == "checked";
+				var in_annots = $("#search_dialog_search_in_annots").attr("checked") == "checked";
+				var in_all = $("#search_dialog_search_in_all").attr("checked") == "checked";
+				var all_classes = $("#search_dialog_class_all").attr("checked") == "checked";
+				var all_classes_but_included = $("#search_dialog_class_all_but_included").attr("checked") == "checked";
+				var all_classes_included = $("#search_dialog_class_all_included").attr("checked") == "checked";
+				var select_classes = $("#search_dialog_class_select").attr("checked") == "checked";
+				/*
+				console.log("PATTERNS [" + patterns + "]");
+				console.log("eq_all [" + eq_all + "]");
+				console.log("eq_any [" + eq_any + "]");
+				console.log("neq_all [" + neq_all + "]");
+				console.log("mode_word [" + mode_word + "]");
+				console.log("mode_regex [" + mode_regex + "]");
+				console.log("in_labels [" + in_labels + "]");
+				console.log("in_tags [" + in_tags + "]");
+				console.log("in_annots [" + in_annots + "]");
+				console.log("in_all [" + in_all + "]");
+				console.log("all_classes [" + all_classes + "]");
+				console.log("all_classes_but [" + all_classes_but_included + "]");
+				console.log("all_classes_included [" + all_classes_included + "]");
+				console.log("select_classes [" + select_classes + "]");
+				*/
+				var search = "";
+				var op;
+				if (eq_any || neq_any) {
+					search = patterns.replace(new RegExp("[ \t\n]+", "g"), ","); 
+				} else if (eq_all || neq_all) {
+					search = patterns.replace(new RegExp("[\t\n]+", "g"), " "); 
+				}
+				search += " /";
+				if (eq_any || eq_all) {
+					search += "op=eq;";
+				} else {
+					search += "op=neq;";
+				}
+				if (mode_word) {
+					search += "token=word;"
+				} else {
+					search += "token=regex;"
+				}
+				$("#search_dialog_search_in :selected").each(function(i, selected) {
+					search += "in=" + $(selected).val() + ";";
+				});
+									    
+				if (all_classes) {
+					search += "class=all"
+				} else if (all_classes_but_included) {
+					search += "class=all_but_included"
+				} else if (all_classes_included) {
+					search += "class=all_included"
+				} else {
+					$("#search_dialog_class_choose :selected").each(function(i, selected) {
+						search += (i ? "," : "class=") + $(selected).val();
+					});
+				}
+				console.log("searchig for " + search);
+				$("#right_tabs", window.document).tabs("option", "active", 1);
+				navicell.mapdata.findJXTree(window, search, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});
+			},
+
+			"Cancel": function() {
+				$(this).dialog("close");
+			}
+		}
+	});
+
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
 		width: 450,
@@ -382,6 +464,7 @@ $(function() {
 				clickmap_refresh(true);
 			},
 			
+			/*
 			"Clear": function() {
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
@@ -390,6 +473,7 @@ $(function() {
 				update_status_tables();
 				heatmap_editor_set_editing(true, undefined, document.map_name);
 			},
+			*/
 
 			"Cancel": function() {
 				var module = get_module();
@@ -437,6 +521,7 @@ $(function() {
 				clickmap_refresh(true);
 			},
 			
+			/*
 			"Clear": function() {
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
@@ -445,6 +530,7 @@ $(function() {
 				update_status_tables();
 				barplot_editor_set_editing(true);
 			},
+			*/
 
 			"Cancel": function() {
 				var module = get_module();
@@ -1373,6 +1459,12 @@ function heatmap_sample_action(action, cnt) {
 		max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setAllSamples();
 	} else if (action == "allgroups") {
 		max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setAllGroups();
+	} else if (action == "from_barplot") {
+		var barplot_config = drawing_config.barplot_config;
+		var cnt = barplot_config.getSampleOrGroupCount();
+		if (cnt) {
+			max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setSamplesOrGroups(barplot_config.getSamplesOrGroups());
+		}
 	} else if (action == "pass") {
 	}
 
@@ -1439,26 +1531,26 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	table.children().remove();
 	var html = "";
 	html += "<tbody>";
-	var layout2 = true;
 	html += "<tr>";
-	if (!layout2) {
-		html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
-	}
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
-	if (layout2) {
-		html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
-	}
+	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
 
 	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"allsamples\")");
 	html += "&nbsp;&nbsp;";
-//	html += make_button("Samples from Barplot", "heatmap_samples_from_barplot", "heatmap_sample_action(\"samples_from_barplot\")");
 	//html += "</td>";
 	if (group_cnt) {
 		//html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"allgroups\")") +  "</td>";
 		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"allgroups\")");
-		html += "</td>";
 	}
-	html += "</tr><tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td>";
+	html += "</td>";
+	html += "</tr>";
+	if (drawing_config.barplot_config.getSampleOrGroupCount()) {
+		var label = (group_cnt ? "Samples and Groups" : "Samples") + " from Barplot";
+		html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>";
+		html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\")");
+		html += "</td></tr>";
+	}
+	html += "<tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td></tr>";
 	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='font-weight: bold; font-size: smaller; text-align: center'>Datatables</td>";
 
 	var select_title = group_cnt ? 'Choose a group or sample' : 'Choose a sample';
@@ -1702,6 +1794,12 @@ function barplot_sample_action(action, cnt) {
 		max_barplot_sample_cnt = drawing_config.editing_barplot_config.setAllSamples();
 	} else if (action == "allgroups") {
 		max_barplot_sample_cnt = drawing_config.editing_barplot_config.setAllGroups();
+	} else if (action == "from_heatmap") {
+		var heatmap_config = drawing_config.heatmap_config;
+		var cnt = heatmap_config.getSampleOrGroupCount();
+		if (cnt) {
+			max_barplot_sample_cnt = drawing_config.editing_barplot_config.setSamplesOrGroups(heatmap_config.getSamplesOrGroups());
+		}
 	}
 
 	if (cnt) {
@@ -1748,12 +1846,21 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	var html = "";
 	html += "<tbody>";
 
-	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
-	html += make_button("All samples", "barplot_all_samples", "barplot_sample_action(\"allsamples\")") + "</td>";
+//	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
+	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
+	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
+	html += make_button("All samples", "barplot_all_samples", "barplot_sample_action(\"allsamples\")") + "&nbsp;&nbsp;&nbsp;";
 	if (group_cnt) {
-		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "barplot_all_groups", "barplot_sample_action(\"allgroups\")") +  "</td>";
+		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "barplot_all_groups", "barplot_sample_action(\"allgroups\")");
 	}
-	html += "</tr><tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td>";
+	html += "</td></tr>";
+	if (drawing_config.heatmap_config.getSampleOrGroupCount()) {
+		var label = (group_cnt ? "Samples and Groups" : "Samples") + " from Heatmap";
+		html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>";
+		html += make_button(label, "barplot_from_heatmap", "barplot_sample_action(\"from_heatmap\")");
+		html += "</td></tr>";
+	}
+	html += "<tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td>";
 	var idx = 0;
 	var sel_datatable = barplotConfig.getDatatableAt(idx);
 	html += "<tr>";
@@ -2375,6 +2482,11 @@ function draw_glyph_perform(context, pos_x, pos_y, shape, color, size, scale, is
 	return null;
 }
  
+function show_search_dialog()
+{
+	$("#search_dialog").dialog("open");
+}
+
 //
 // -------------------------------------------------------------------------------
 //

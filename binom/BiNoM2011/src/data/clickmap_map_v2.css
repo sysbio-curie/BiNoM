@@ -236,12 +236,12 @@ html, body {
     font-size: 11px;
 }
 
-#dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_group_status, #dt_module_status, #dt_datatable_status, #dt_sample_annot, #drawing_config_div {
+#dt_import_dialog, #dt_sample_status, #dt_gene_status, #dt_group_status, #dt_module_status, #dt_datatable_status, #dt_sample_annot, #drawing_config_div, #search_dialog {
     font-size: 75%;
     font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
 }
 
-#dt_import_dialog h3, #dt_sample_annot h3 {
+#dt_import_dialog h3, #dt_sample_annot h3, #search_dialog h3 {
     margin-top: 20px;
     text-align: center;
 }
@@ -302,6 +302,7 @@ label {font-size: 12px; vertical-align: middle;}
 #dt_sample_annot_status {font-size: 12px; background-color: white;}
 #dt_import_dialog {overflow: auto;}
 #dt_sample_annot {overflow: auto;}
+#search_dialog {overflow: auto;}
 
 #dt_sample_status_table table, #dt_sample_status_table th, #dt_sample_status_table td, #dt_gene_status_table table, #dt_gene_status_table th, #dt_gene_status_table td, #dt_datatable_status_table table, #dt_datatable_status_table th, #dt_datatable_status_table td, #dt_group_status_table table, #dt_group_status_table th, #dt_group_status_table td, #dt_module_status_table table, #dt_module_status_table th, #dt_module_status_table td {
     border: 1px solid lightgray;
@@ -887,4 +888,8 @@ div.tablesorterPager input {
 
 .user-data {
     color: #331111;
+}
+
+.search-label {
+    font-weight: bold;
 }

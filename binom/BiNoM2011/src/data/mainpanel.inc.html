@@ -179,7 +179,7 @@
   <div class='drawing_config_box'>
     <table style=''>
       <tr>
-	<td>Display</td><td><input id="drawing_config_chart_display" type="checkbox" checked="checked" onchange='drawing_editing(true)'></input></td>
+	<td>Display</td><td><input id="drawing_config_chart_display" type="checkbox" onchange='drawing_editing(true)'></input></td>
       </tr>
       <tr>
 	<td>
@@ -330,6 +330,61 @@
   </table>
   <div id="glyph_editor_size_div_5"></div>
   <div id="glyph_gene_choice_5"></div>
+</div>
+
+<div id='search_dialog'>
+  <h3>Advanced Search</h3>
+  <table>
+    <tr><td class='search-label'>Patterns</td><td><textarea id="search_dialog_patterns" cols="40" rows="8"></textarea></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td class='search-label'>Match mode</td><td><input name='search_dialog_match' id='search_dialog_match_eq_all' type='radio' checked></input><label>Match all these patterns</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_eq_any' type='radio'></input><label>Match any pattern</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_neq_all' type='radio'></input><label>Does not match all patterns</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_neq_any' type='radio'></input><label>Does not match any pattern</label></td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td class='search-label'>Patterns are</td><td><input name='search_dialog_pattern_mode' id='search_dialog_pattern_mode_word' type='radio' checked></input><label>Words</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_pattern_mode' id='search_dialog_pattern_mode_regex' type='radio'></input><label>Substrings / Regular expressions</label></td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td class='search-label'>Search in</td>
+    <td>
+      <select id='search_dialog_search_in' size='4' multiple>
+	<option value='label' selected>Labels</option>
+	<option value='tag'>Tags</option>
+	<option value='annot'>Annotations</option>
+	<option value='all'>Everywhere</option>
+      </select>
+    </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td class='search-label'>Entity classes</td><td><input name='search_dialog_class' id='search_dialog_class_all' type='radio'></input><label>All classes</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_but_included' type='radio' checked></input><label>All classes but included</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_included' type='radio'></input><label>All classes included</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_select' type='radio'></input><label>Choose classes:</label></td></tr>
+    <tr><td>&nbsp;</td><td>
+      <select id='search_dialog_class_choose' size='6' multiple>
+	<option value='protein'>Protein</option>
+	<option value='gene'>Gene</option>
+	<option value='rna'>Rna</option>
+	<option value='antisense_rna'>Antisense rna</option>
+	<option value='simple_molecule'>Simple molecule</option>
+	<option value='ion'>Ion</option>
+	<option value='drug'>Drug</option>
+	<option value='phenotype'>Phenotype</option>
+	<option value='reaction'>Reaction</option>
+	<option value='unknown'>Unknown</option>
+	<option value='protein:included'>Protein Included</option>
+	<option value='gene:included'>Gene Included</option>
+	<option value='rna:included'>Rna Included</option>
+	<option value='antisense_rna:included'>Antisense rna Included</option>
+	<option value='simple_molecule:included'>Simple molecule Included</option>
+	<option value='ion:included'>Ion Included</option>
+	<option value='drug:included'>Drug Included</option>
+	<option value='phenotype:included'>Phenotype Included</option>
+	<option value='reaction:included'>Reaction Included</option>
+      </select>
+    </td>
+    </tr>
+  </table>
 </div>
 
 </body>

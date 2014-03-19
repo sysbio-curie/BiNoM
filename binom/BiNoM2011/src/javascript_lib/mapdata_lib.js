@@ -438,12 +438,14 @@ Mapdata.prototype = {
 				var dialog = $("#info_dialog", win.document);
 				var msg = hints.error ? hints.error : hints.help;
 				var title = hints.error ? "Searching Error" : "Search Help";
-				dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
+//				dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
+				dialog.html("<div style='text-align: vertical-center'>" + "<br/>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
 				dialog.dialog({
-					resizable: true,
+					autoOpen: false,
+					//resizable: true,
 					width: 430,
 					height: 750,
-					modal: true,
+					modal: false,
 					title: title,
 					buttons: {
 						"OK": function() {
@@ -451,6 +453,7 @@ Mapdata.prototype = {
 						}
 					}
 				});
+				dialog.dialog("open");
 			}
 			return;
 		}
@@ -1198,7 +1201,7 @@ if (!String.prototype.trim) {
 }
 
 function make_button(name, id, onclick) {
-	return "<input type='button' style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class='ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content' id='" + id + "' value='" + name + "' onclick='" + onclick + "'></input>";
+	return "<input type='button' style='-moz-border-radius: 4px; border-radius: 4px; font-size: x-small' class='ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content' id='" + id + "' value='" + name + "' onclick='" + onclick + "'></input>";
 }
 
 function is_empty_value(value) {
@@ -2435,6 +2438,15 @@ HeatmapConfig.prototype = {
 		return this.samples_or_groups.length;
 	},
 
+	getSamplesOrGroups: function() {
+		return this.samples_or_groups;
+	},
+	
+	setSamplesOrGroups: function(samples_or_groups) {
+		this.shrink();
+		this.samples_or_groups = samples_or_groups;
+	},
+	
 	setDatatableAt: function(idx, datatable) {
 		if (idx >= this.datatables.length) {
 			this.datatables.length = idx+1;
@@ -2597,6 +2609,10 @@ BarplotConfig.prototype = {
 		return this.datatables[idx];
 	},
 
+	getSampleOrGroupCount: function() {
+		return this.samples_or_groups.length;
+	},
+
 	setSampleOrGroupAt: function(idx, sample_or_group) {
 		if (idx >= this.samples_or_groups.length) {
 			this.samples_or_groups.length = idx+1;
@@ -2604,6 +2620,15 @@ BarplotConfig.prototype = {
 		this.samples_or_groups[idx] = sample_or_group;
 	},
 
+	getSamplesOrGroups: function() {
+		return this.samples_or_groups;
+	},
+	
+	setSamplesOrGroups: function(samples_or_groups) {
+		this.shrink();
+		this.samples_or_groups = samples_or_groups;
+	},
+	
 	getSampleOrGroupAt: function(idx) {
 		if (idx >= this.samples_or_groups.length) {
 			return undefined;
@@ -3442,6 +3467,9 @@ function get_module(win) {
 }
 
 function get_module_from_doc(doc) {
+	if (!doc) {
+		doc = window.document;
+	}
 	return doc.navicell_module_name;
 }
 

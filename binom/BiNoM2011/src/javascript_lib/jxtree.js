@@ -159,7 +159,7 @@ function JXTreeMatcher(pattern, hints) {
 		this.class_filters.push(class_filter);
 	}
 
-	var patterns = pattern.split(",");
+	var patterns = pattern.split(',');
 	if (patterns.length > 1) {
 		this.and_search = false;
 		this.or_search = true;

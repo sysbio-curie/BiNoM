@@ -130,6 +130,7 @@ public class ProduceClickableMap
 	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
 	private static final String sources_icon = icons_directory + "/sources.png";
 	private static final String help_icon = icons_directory + "/help.png";	
+	private static final String search_icon = icons_directory + "/search.jpeg";
 
 	private static final String blog_icon = icons_directory + "/misc/blog.png";
 	private static final String doc_directory = base_directory + "/doc";
@@ -5451,6 +5452,7 @@ public class ProduceClickableMap
 		doc_in_new_window(out, "map_help", "<img border='0' src=\""+help_icon+"\" title=\"help\"/>");
 
 		out.println("&nbsp;<input type='text' size='32' id='query_text' style='font-size: small'/>");
+		out.println("&nbsp;<img border='0' src='" + search_icon + "' width='16' height='16' onclick='show_search_dialog()' title='search'/>");
 		header_right.close();
 		header.close();
 

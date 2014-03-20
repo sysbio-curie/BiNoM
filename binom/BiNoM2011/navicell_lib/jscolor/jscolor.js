@@ -12,19 +12,25 @@
 
 var jscolor = {
 
-
 	dir : '', // location of jscolor directory (leave empty to autodetect)
 	bindClass : 'color', // class name
 	binding : true, // automatic binding via <input class="...">
 	preloading : true, // use image preloading?
-
+	
 
 	install : function() {
-		jscolor.addEvent(window, 'load', jscolor.init);
+		jscolor.addEvent(jscolor.win, 'load', jscolor.init);
 	},
 
 
-	init : function() {
+	init : function(win) {
+		/*
+		if (jscolor.win == win) {
+			return;
+		}
+		*/
+		jscolor.win = win;
+		//jscolor.win.console.log("jscolor.init " + jscolor.win.document.navicell_module_name);
 		if(jscolor.binding) {
 			jscolor.bind();
 		}
@@ -46,12 +52,12 @@ var jscolor = {
 	detectDir : function() {
 		var base = location.href;
 
-		var e = document.getElementsByTagName('base');
+		var e = jscolor.win.document.getElementsByTagName('base');
 		for(var i=0; i<e.length; i+=1) {
 			if(e[i].href) { base = e[i].href; }
 		}
 
-		var e = document.getElementsByTagName('script');
+		var e = jscolor.win.document.getElementsByTagName('script');
 		for(var i=0; i<e.length; i+=1) {
 			if(e[i].src && /(^|\/)jscolor\.js([?#].*)?$/i.test(e[i].src)) {
 				var src = new jscolor.URI(e[i].src);
@@ -68,7 +74,7 @@ var jscolor = {
 
 	bind : function() {
 		var matchClass = new RegExp('(^|\\s)('+jscolor.bindClass+')\\s*(\\{[^}]*\\})?', 'i');
-		var e = document.getElementsByTagName('input');
+		var e = jscolor.win.document.getElementsByTagName('input');
 		for(var i=0; i<e.length; i+=1) {
 			var m;
 			if(!e[i].color && e[i].className && (m = e[i].className.match(matchClass))) {
@@ -119,7 +125,7 @@ var jscolor = {
 
 
 	fetchElement : function(mixed) {
-		return typeof mixed === 'string' ? document.getElementById(mixed) : mixed;
+		return typeof mixed === 'string' ? jscolor.win.document.getElementById(mixed) : mixed;
 	},
 
 
@@ -136,12 +142,12 @@ var jscolor = {
 		if(!el) {
 			return;
 		}
-		if(document.createEvent) {
-			var ev = document.createEvent('HTMLEvents');
+		if(jscolor.win.document.createEvent) {
+			var ev = jscolor.win.document.createEvent('HTMLEvents');
 			ev.initEvent(evnt, true, true);
 			el.dispatchEvent(ev);
-		} else if(document.createEventObject) {
-			var ev = document.createEventObject();
+		} else if(jscolor.win.document.createEventObject) {
+			var ev = jscolor.win.document.createEventObject();
 			el.fireEvent('on'+evnt, ev);
 		} else if(el['on'+evnt]) { // alternatively use the traditional event model (IE5)
 			el['on'+evnt]();
@@ -173,7 +179,7 @@ var jscolor = {
 
 	getRelMousePos : function(e) {
 		var x = 0, y = 0;
-		if (!e) { e = window.event; }
+		if (!e) { e = jscolor.win.event; }
 		if (typeof e.offsetX === 'number') {
 			x = e.offsetX;
 			y = e.offsetY;
@@ -186,12 +192,12 @@ var jscolor = {
 
 
 	getViewPos : function() {
-		if(typeof window.pageYOffset === 'number') {
-			return [window.pageXOffset, window.pageYOffset];
-		} else if(document.body && (document.body.scrollLeft || document.body.scrollTop)) {
-			return [document.body.scrollLeft, document.body.scrollTop];
-		} else if(document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
-			return [document.documentElement.scrollLeft, document.documentElement.scrollTop];
+		if(typeof jscolor.win.pageYOffset === 'number') {
+			return [jscolor.win.pageXOffset, jscolor.win.pageYOffset];
+		} else if(jscolor.win.document.body && (jscolor.win.document.body.scrollLeft || jscolor.win.document.body.scrollTop)) {
+			return [jscolor.win.document.body.scrollLeft, jscolor.win.document.body.scrollTop];
+		} else if(jscolor.win.document.documentElement && (jscolor.win.document.documentElement.scrollLeft || jscolor.win.document.documentElement.scrollTop)) {
+			return [jscolor.win.document.documentElement.scrollLeft, jscolor.win.document.documentElement.scrollTop];
 		} else {
 			return [0, 0];
 		}
@@ -199,12 +205,12 @@ var jscolor = {
 
 
 	getViewSize : function() {
-		if(typeof window.innerWidth === 'number') {
-			return [window.innerWidth, window.innerHeight];
-		} else if(document.body && (document.body.clientWidth || document.body.clientHeight)) {
-			return [document.body.clientWidth, document.body.clientHeight];
-		} else if(document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
-			return [document.documentElement.clientWidth, document.documentElement.clientHeight];
+		if(typeof jscolor.win.innerWidth === 'number') {
+			return [jscolor.win.innerWidth, jscolor.win.innerHeight];
+		} else if(jscolor.win.document.body && (jscolor.win.document.body.clientWidth || jscolor.win.document.body.clientHeight)) {
+			return [jscolor.win.document.body.clientWidth, jscolor.win.document.body.clientHeight];
+		} else if(jscolor.win.document.documentElement && (jscolor.win.document.documentElement.clientWidth || jscolor.win.document.documentElement.clientHeight)) {
+			return [jscolor.win.document.documentElement.clientWidth, jscolor.win.document.documentElement.clientHeight];
 		} else {
 			return [0, 0];
 		}
@@ -571,27 +577,27 @@ var jscolor = {
 
 		function removePicker() {
 			delete jscolor.picker.owner;
-			document.getElementsByTagName('body')[0].removeChild(jscolor.picker.boxB);
+			jscolor.win.document.getElementsByTagName('body')[0].removeChild(jscolor.picker.boxB);
 		}
 
 
 		function drawPicker(x, y) {
 			if(!jscolor.picker) {
 				jscolor.picker = {
-					box : document.createElement('div'),
-					boxB : document.createElement('div'),
-					pad : document.createElement('div'),
-					padB : document.createElement('div'),
-					padM : document.createElement('div'),
-					sld : document.createElement('div'),
-					sldB : document.createElement('div'),
-					sldM : document.createElement('div'),
-					btn : document.createElement('div'),
-					btnS : document.createElement('span'),
-					btnT : document.createTextNode(THIS.pickerCloseText)
+					box : jscolor.win.document.createElement('div'),
+					boxB : jscolor.win.document.createElement('div'),
+					pad : jscolor.win.document.createElement('div'),
+					padB : jscolor.win.document.createElement('div'),
+					padM : jscolor.win.document.createElement('div'),
+					sld : jscolor.win.document.createElement('div'),
+					sldB : jscolor.win.document.createElement('div'),
+					sldM : jscolor.win.document.createElement('div'),
+					btn : jscolor.win.document.createElement('div'),
+					btnS : jscolor.win.document.createElement('span'),
+					btnT : jscolor.win.document.createTextNode(THIS.pickerCloseText)
 				};
 				for(var i=0,segSize=4; i<jscolor.images.sld[1]; i+=segSize) {
-					var seg = document.createElement('div');
+					var seg = jscolor.win.document.createElement('div');
 					seg.style.height = segSize+'px';
 					seg.style.fontSize = '1px';
 					seg.style.lineHeight = '0';
@@ -619,15 +625,15 @@ var jscolor = {
 				if (holdPad || holdSld) {
 					holdPad && setPad(e);
 					holdSld && setSld(e);
-					if (document.selection) {
-						document.selection.empty();
-					} else if (window.getSelection) {
-						window.getSelection().removeAllRanges();
+					if (jscolor.win.document.selection) {
+						jscolor.win.document.selection.empty();
+					} else if (jscolor.win.getSelection) {
+						jscolor.win.getSelection().removeAllRanges();
 					}
 					dispatchImmediateChange();
 				}
 			};
-			if('ontouchstart' in window) { // if touch device
+			if('ontouchstart' in jscolor.win) { // if touch device
 				p.box.addEventListener('touchmove', function(e) {
 					var event={
 						'offsetX': e.touches[0].pageX-touchOffset.X,
@@ -655,7 +661,7 @@ var jscolor = {
 				setPad(e);
 				dispatchImmediateChange();
 			};
-			if('ontouchstart' in window) {
+			if('ontouchstart' in jscolor.win) {
 				p.padM.addEventListener('touchstart', function(e) {
 					touchOffset={
 						'X': e.target.offsetParent.offsetLeft,
@@ -675,7 +681,7 @@ var jscolor = {
 				setSld(e);
 				dispatchImmediateChange();
 			};
-			if('ontouchstart' in window) {
+			if('ontouchstart' in jscolor.win) {
 				p.sldM.addEventListener('touchstart', function(e) {
 					touchOffset={
 						'X': e.target.offsetParent.offsetLeft,
@@ -793,7 +799,7 @@ var jscolor = {
 			redrawSld();
 
 			jscolor.picker.owner = THIS;
-			document.getElementsByTagName('body')[0].appendChild(p.boxB);
+			jscolor.win.document.getElementsByTagName('body')[0].appendChild(p.boxB);
 		}
 
 
@@ -951,7 +957,7 @@ var jscolor = {
 		});
 		jscolor.addEvent(target, 'blur', function() {
 			if(!abortBlur) {
-				window.setTimeout(function(){ abortBlur || blurTarget(); abortBlur=false; }, 0);
+				jscolor.win.setTimeout(function(){ abortBlur || blurTarget(); abortBlur=false; }, 0);
 			} else {
 				abortBlur = false;
 			}
@@ -992,4 +998,4 @@ var jscolor = {
 };
 
 
-jscolor.install();
+//jscolor.install();

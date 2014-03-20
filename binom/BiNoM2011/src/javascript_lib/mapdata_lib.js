@@ -3008,7 +3008,7 @@ Datatable.prototype = {
 		win.console.log("DATATABLE " + this.name + " MAKE DIALOGS for " + module);
 		var doc = win.document;
 		var tab_body = $("#dt_datatable_tabs", doc);
-		$('body', doc).append("<div id='dt_data_dialog_" + this.id + "'><div id='dt_datatable_id" + this.id + "'><h3 style='text-align: center;'>Datatable " + this.name + "</h3><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div></div>");
+		$('body', doc).append("<div id='dt_data_dialog_" + this.id + "'><div id='dt_datatable_id" + this.id + "'><h3 id='dt_data_dialog_title_" + this.id + "' style='text-align: center;'><span style='font-style: italic;'>" + this.name + "</span> Datatable</h3><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div></div>");
 		this.data_div = $("#dt_datatable_id" + this.id, doc);
 		this.data_table = $("#dt_datatable_table_id" + this.id, doc);
 		this.data_table_gene[module] = $("#dt_datatable_gene_table_id" + this.id, doc);

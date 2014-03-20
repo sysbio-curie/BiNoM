@@ -1045,26 +1045,7 @@ function show_datatable_data(id) {
 	console.log("show_datatable_data: " + id + " " + get_module());
 	var div = datatable.getDataMatrixDiv(get_module());
 	datatable.refresh(window);
-		/*
-	var div_id = datatable.getDataDialogDivId(get_module());
-//	var div = $("#dt_data_dialog_" + id);
-	var div = $("#" + div_id, window.document);
-	// kludge
-	var width = datatable.biotype.isSet() ? 300: 900;
-	div.dialog({
-		autoOpen: false,
-		width: width,
-		height: 700,
-		modal: false,
-		buttons: {
-			Cancel: function() {
-				$(this).dialog('close');
-			}
-		}
-	});
-	*/
-
-	console.log("div.length " + div.length);
+	//$("#dt_data_dialog_title_" + datatable.id).html("Datatable " + datatable.name);
 	div.dialog("open");
 }
 
@@ -1137,6 +1118,7 @@ function update_datatable_status_table(doc, params) {
 	var onchange = 'datatable_management_set_editing(true)';
 	for (var dt_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[dt_name];
+		$("#dt_data_dialog_title_" + datatable.id).html("<span style='font-style: italic;'>" + datatable.name + "</span> Datatable");
 		var data_div = datatable.data_div;
 		if (DATATABLE_HAS_TABS) {
 			if (data_div) {
@@ -1164,7 +1146,7 @@ function update_datatable_status_table(doc, params) {
 		}
 		*/
 		str += "<td style='border: none; text-decoration: underline; font-size: 11px'><a href='#' onclick='display_datatable_markers(" + datatable.getId() + ")'>gene&nbsp;markers</a><br/>";
-		str += "<a href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;matrix</a></td>";
+		str += "<a href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";
 //		str += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>show data</a></td>";
 		str += "</tr>";
 	}

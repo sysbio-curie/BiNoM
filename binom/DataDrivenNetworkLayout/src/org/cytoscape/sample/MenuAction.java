@@ -1,5 +1,6 @@
 package org.cytoscape.sample;
 import java.awt.event.ActionEvent;
+import java.lang.Object;
 
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
@@ -15,13 +16,14 @@ import org.cytoscape.io.CyFileFilter;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
+
 import java.util.*;
 
 public class MenuAction extends AbstractCyAction {
 	private final CyAppAdapter adapter;
 
 	public MenuAction(CyAppAdapter adapter) {
-		super("DDL",
+		super("Driven20",
 				adapter.getCyApplicationManager(),
 				"network",
 				adapter.getCyNetworkViewManager());
@@ -71,7 +73,7 @@ public class MenuAction extends AbstractCyAction {
 			//String myname = mynetwork.getRow(node).get("name", String.class);
 			//System.out.println(myname);
 		}
-		Object [ ] [ ] matrix = new Object [nodes.size()] [set_attributes.size()] ; 
+		float [][] matrix = new float [nodes.size()] [set_attributes.size()] ; 
 		Map<String,Integer> map_index = new HashMap<String,Integer>();
 		int ct = 0;
 		for (String att : set_attributes){
@@ -79,7 +81,7 @@ public class MenuAction extends AbstractCyAction {
 			ct++;
 		}
 		//System.out.println(map_index);
-		//System.out.println(set_attributes.size());
+		System.out.println(set_attributes);
 		
 		int ct2=0;
 		for (CyNode node : mynetwork.getNodeList()) {
@@ -92,15 +94,16 @@ public class MenuAction extends AbstractCyAction {
 				if (map_index.containsKey(col)){
 					int index2=map_index.get(col);
 					//System.out.println(index2);
+					
 					Object value = mynetwork.getRow(node).getAllValues().get(col);
-				
-					if (value != null){
+					Float fvalue = ((Double) value).floatValue();
+					if (fvalue != null){
 													
 					//System.out.print(ct2);
 					//System.out.print(index2);
 					//System.out.print(" ");
 					
-					matrix[ct2][index2]=value; }
+					matrix[ct2][index2]=fvalue; }
 					//System.out.println(value);
 					
 				}
@@ -108,11 +111,22 @@ public class MenuAction extends AbstractCyAction {
 			}
 		ct2++;
 		}
-		for (int i = 0; i < nodes.size(); i++) {
+		/*for (int i = 0; i < nodes.size(); i++) {
 		    for (int j = 0; j < set_attributes.size(); j++) {
 		        System.out.print(matrix[i][j] + " ");
 		    }
 		    System.out.print("\n");
-		}
+		}*/	
+		int numberOfPoints = nodes.size()*set_attributes.size();
+		PCALayout pca = new PCALayout();
+		pca.makeDataSet(matrix);
+		pca.computePCA();
+		System.out.println("POINT\tX\tY");
+		for(int i=0;i<numberOfPoints;i++)
+			System.out.println(i+"\t"+pca.geneProjections[i][0]+"\t"+pca.geneProjections[i][1]);
+		System.out.println("Variance explained by PC1 = "+pca.explainedVariation[0]);
+		System.out.println("Variance explained by PC2 = "+pca.explainedVariation[1]);
 	}
+
+	
 }

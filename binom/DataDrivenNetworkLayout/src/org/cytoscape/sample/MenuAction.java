@@ -117,7 +117,7 @@ public class MenuAction extends AbstractCyAction {
 		    }
 		    System.out.print("\n");
 		}*/	
-		int numberOfPoints = nodes.size()*set_attributes.size();
+		int numberOfPoints = nodes.size();
 		PCALayout pca = new PCALayout();
 		pca.makeDataSet(matrix);
 		pca.computePCA();

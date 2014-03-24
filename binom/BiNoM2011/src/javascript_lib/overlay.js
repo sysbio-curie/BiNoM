@@ -177,7 +177,9 @@ USGSOverlay.prototype.onAdd = function() {
 	google.maps.event.addListener(this.getMap(), 'click', function(e, e2) {
 		var x = e.pixel.x;
 		var y = e.pixel.y;
-		//console.log("click on " + x + " " + y);
+		var doc = overlay.win.document;
+		var module = overlay.win.document.navicell_module_name;
+		console.log("click on " + x + " " + y + " module " + module);
 		for (var nn = 0; nn < overlay.boundBoxes.length; ++nn) {
 			var box = overlay.boundBoxes[nn][0];
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
@@ -186,18 +188,18 @@ USGSOverlay.prototype.onAdd = function() {
 				var hint = overlay.boundBoxes[nn][3];
 				console.log("click on: " + gene_name + " " + navicell.dataset.getGeneByName(gene_name).id + " " + type);
 				if (type == "heatmap") {
-					$("#heatmap_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
-					$("#heatmap_editor_div").dialog("open");
-					update_heatmap_editor();
+					$("#heatmap_select_gene", doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#heatmap_editor_div", doc).dialog("open");
+					update_heatmap_editor(doc);
 				} else if (type == "barplot") {
-					$("#barplot_select_gene").val(navicell.dataset.getGeneByName(gene_name).id);
-					$("#barplot_editor_div").dialog("open");
-					update_barplot_editor();
+					$("#barplot_select_gene", doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#barplot_editor_div", doc).dialog("open");
+					update_barplot_editor(doc);
 				} else if (type == "glyph") {
 					console.log("HINT " + hint);
-					$("#glyph_select_gene_" + hint).val(navicell.dataset.getGeneByName(gene_name).id);
-					$("#glyph_editor_div_" + hint).dialog("open");
-					update_glyph_editor(null, null, hint);
+					$("#glyph_select_gene_" + hint, doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#glyph_editor_div_" + hint, doc).dialog("open");
+					update_glyph_editor(doc, null, hint);
 				}
 				break;
 			}

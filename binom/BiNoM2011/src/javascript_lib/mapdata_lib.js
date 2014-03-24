@@ -19,6 +19,7 @@
  */
 
 var GLYPH_COUNT = 5;
+var DISPLAY_TIMEOUT = 500;
 
 if (!window.console) {
 	window.console = new function()
@@ -31,7 +32,9 @@ if (!window.console) {
 function mapSize(map) {
 	var size = 0;
 	for (var key in map) {
-		size++;
+		if (typeof map[key] != 'function') {
+			size++;
+		}
 	}
 	return size;
 }
@@ -1240,6 +1243,7 @@ function DisplayStepConfig(datatable, win) {
 var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
 var TABS_DIV_ID = 1;
+var KSUFFIX = 1;
 
 DisplayStepConfig.prototype = {
 
@@ -1321,9 +1325,18 @@ DisplayStepConfig.prototype = {
 
 	setDefaults: function(step_cnt, config, tabname) {
 		//console.trace();
-		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt); 
-		for (var ii = 0; ii < step_cnt; ++ii) {
-			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii].getRGBValue(), 4+2*ii, ii);
+		var step_cnt_1, beg;
+		if (this.has_empty_values) {
+			this.setStepInfo(config, tabname, 0, Number.MIN_NUMBER, "FFFFFF", 4, 0);
+			step_cnt_1 = step_cnt-1;
+			beg = 1;
+		} else {
+			step_cnt_1 = step_cnt;
+			beg = 0;
+		}
+		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1); 
+		for (var ii = beg; ii < step_cnt; ++ii) {
+			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii-beg].getRGBValue(), 4+2*ii, ii);
 		}
 		//this.displayShapes(tabname);
 	},
@@ -1381,7 +1394,7 @@ DisplayStepConfig.prototype = {
 	},
 
 	setGroupMethod: function(config, group_method) {
-		console.log("setting group method " + config + " " + group_method);
+		//console.log("setting group method " + config + " " + group_method);
 		this.group_method[config] = group_method;
 		this.use_absval['group'][config] = 
 			group_method == Group.CONTINUOUS_ABS_AVERAGE ||
@@ -1749,17 +1762,19 @@ DisplayStepConfig.prototype = {
 		var doc = this.win.document;
 		var mod = config + '_';
 		var id = this.datatable.getId();
-		var div_id = "step_config_" + mod + id;
+		//var ksuffix = "_" + KSUFFIX++;
+		var ksuffix = "";
+		var div_id = "step_config_" + mod + id + ksuffix;
 		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
 		html += "<h3 id='step_config_title_" + mod + id + "'></h3>";
 		html += "<ul>";
-		html += "<li><a class='ui-button-text' href='#step_config_sample_" + mod + id + "'>Samples</a></li>";
-		html += "<li><a class='ui-button-text' href='#step_config_group_" + mod + id + "'>Groups</a></li>";
+		html += "<li><a class='ui-button-text' href='#step_config_sample_" + mod + id + ksuffix + "' onclick='DisplayStepConfig.switch_sample_tab(\"" + mod + id + "\")'>Samples</a></li>";
+		html += "<li><a class='ui-button-text' href='#step_config_group_" + mod + id + ksuffix + "' onclick='DisplayStepConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
 		html += "</ul>";
 
 		for (var tab in DisplayStepConfig.tabnames) {
 			var tabname = DisplayStepConfig.tabnames[tab];
-			var id_suffix = tabname + '_' + mod + id 
+			var id_suffix = tabname + '_' + mod + id + ksuffix
 			var div_editing_id = "step_config_editing_" + id_suffix;
 			html += "<div id='step_config_" + id_suffix + "'>";
 			html += "<div style='text-align: left' id='" + div_editing_id + "' class='step-config-editing'></div>";
@@ -1785,6 +1800,7 @@ DisplayStepConfig.prototype = {
 		this.divs[config] = div;
 		//$("#" + div_id, doc).tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
+		DisplayStepConfig.switch_sample_tab(mod + id, doc);
 	},
 
 	/*
@@ -1849,17 +1865,11 @@ DisplayStepConfig.setEditing = function(datatable_id, val, config, win) {
 	if (!win) {
 		win = window;
 	}
-	var module = get_module();
-	console.log("setEditing : " + module);
-	//var div_id = datatable.getDisplayConfig(module).getDivId(config);
+	var module = get_module(win);
+	console.log("setEditing : " + module + " " + datatable_id);
 	var div = datatable.getDisplayConfig(module).getDiv(config);
 
-	//if (div_id) {
 	if (div) {
-		//var div = $("#" + div_id, win.document);
-		// kludge !
-		// actually not.
-		//div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		var active = div.tabs("option", "active");
 		var tabname = DisplayStepConfig.tabnames[active];
 		if (tabname) {
@@ -1868,17 +1878,54 @@ DisplayStepConfig.setEditing = function(datatable_id, val, config, win) {
 	}
 }
 
+DisplayDiscreteConfig.setEditing = function(datatable_id, val, config, win) {
+	var datatable = navicell.getDatatableById(datatable_id);
+	if (!win) {
+		win = window;
+	}
+	var module = get_module(win);
+	console.log("setEditing : " + module + " " + datatable_id);
+	var div = datatable.getDisplayConfig(module).getDiv(config);
+
+	if (div) {
+		var active = div.tabs("option", "active");
+		var tabname = DisplayStepConfig.tabnames[active];
+		if (tabname) {
+			$("#discrete_config_editing_" + tabname + '_' + config + '_' + datatable_id, win.document).html(val ? EDITING_CONFIGURATION : "");
+		}
+	}
+}
+
+DisplayStepConfig.switch_sample_tab = function(suffix, doc) {
+	//console.log("switch_step_sample_tab " + suffix);
+	if (!doc) {
+		doc = window.document;
+	}
+	$("#step_config_sample_" + suffix, doc).css("display", "block");
+	$("#step_config_group_" + suffix, doc).css("display", "none");
+}
+
+DisplayStepConfig.switch_group_tab = function(suffix, doc) {
+	//console.log("switch_step_group_tab " + suffix);
+	if (!doc) {
+		doc = window.document;
+	}
+	$("#step_config_sample_" + suffix, doc).css("display", "none")
+	$("#step_config_group_" + suffix, doc).css("display", "block");
+}
+
 DisplayStepConfig.tabnames = ['sample', 'group'];
 DisplayStepConfig.tablabels = {'sample' : 'Sample Configuration', 'group' :'Group Configuration'};
 
 function DisplayDiscreteConfig(datatable, win) {
 	this.datatable = datatable;
 	this.win = win;
+	this.has_empty_values = datatable.hasEmptyValues();
 	this.values = [];
 	this.values_idx = {};
 	var discrete_values = datatable.getDiscreteValues();
 	for (var value in discrete_values) {
-		console.log("setting value [" + discrete_values[value] + "]");
+		//console.log("setting value [" + discrete_values[value] + "]");
 		this.values.push(discrete_values[value]);
 	}
 	this.values.sort();
@@ -1910,8 +1957,8 @@ DisplayDiscreteConfig.prototype = {
 
 		html += "<h3 id='discrete_config_title_" + mod + id + "'></h3>";
 		html += "<ul>";
-		html += "<li><a class='ui-button-text' href='#discrete_config_sample_" + mod + id + "'>Samples</a></li>";
-		html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "'>Groups</a></li>";
+		html += "<li><a class='ui-button-text' href='#discrete_config_sample_" + mod + id + "' onclick='DisplayDiscreteConfig.switch_sample_tab(\"" + mod + id + "\")'>Samples</a></li>";
+		html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "' onclick='DisplayDiscreteConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
 		html += "</ul>";
 
 		for (var tab in DisplayStepConfig.tabnames) {
@@ -1934,6 +1981,7 @@ DisplayDiscreteConfig.prototype = {
 		//this.div_ids[config] = div_id;
 		this.divs[config] = div;
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
+		DisplayDiscreteConfig.switch_sample_tab(mod + id, doc);
 	},
 
 	getDatatableValue: function(config, value) {
@@ -1947,7 +1995,7 @@ DisplayDiscreteConfig.prototype = {
 		*/
 
 	getDiv: function(what) {
-	  return this.divs[what];
+		return this.divs[what];
 	},
 
 	buildValues: function() {
@@ -1997,13 +2045,22 @@ DisplayDiscreteConfig.prototype = {
 		var step_cnt = this.getValueCount();
 		var colors;
 		var biotype_is_set = this.datatable.biotype.isSet();
-		if (biotype_is_set) {
-			colors = color_gradient(new RGBColor(0, 0, 120), new RGBColor(0, 0, 120), step_cnt);
+		var step_cnt_1, beg;
+		if (this.has_empty_values) {
+			this.setValueInfo(config, tabname, 0, "FFFFFF", 4, 0, Group.DISCRETE_IGNORE);
+			step_cnt_1 = step_cnt-1;
+			beg = 1;
 		} else {
-			colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt);
+			step_cnt_1 = step_cnt;
+			beg = 0;
 		}
-		for (var ii = 0; ii < step_cnt; ++ii) {
-			this.setValueInfo(config, tabname, ii, colors[ii].getRGBValue(), ii*2+4, ii, ii == 0 ? Group.DISCRETE_IGNORE : Group.DISCRETE_GT_0);
+		if (biotype_is_set) {
+			colors = color_gradient(new RGBColor(0, 0, 120), new RGBColor(0, 0, 120), step_cnt_1);
+		} else {
+			colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1);
+		}
+		for (var ii = beg; ii < step_cnt; ++ii) {
+			this.setValueInfo(config, tabname, ii, colors[ii-beg].getRGBValue(), ii*2+4, ii, ii == 0 ? Group.DISCRETE_IGNORE : Group.DISCRETE_GT_0);
 		}
 		if (tabname == 'group') {
 			this.setValueInfo(config, tabname, step_cnt, "FFFFFF", 0, 0, Group.DISCRETE_IGNORE);
@@ -2123,6 +2180,9 @@ DisplayDiscreteConfig.prototype = {
 		}
 		if (cond == Group.DISCRETE_EQ_ALL) {
 			return '= all';
+		}
+		if (cond == Group.DISCRETE_NEQ_ALL) {
+			return '!= all';
 		}
 		return '';
 	},
@@ -2270,7 +2330,7 @@ DisplayDiscreteConfig.prototype = {
 					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller'>";
 					for (var idx2 = 0; idx2 < step_cnt; idx2++) {
 						var value2 = this.getValueAt(idx2, config, tabname);
-						html += "<option value='" + idx2 + "' " + (value2 == value ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>" + (value2 ? value2 : "NA") + "</span></option>";
+						html += "<option value='" + idx2 + "' " + (value2 == value ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>#" + (value2 ? value2 : "NA") + "</span></option>";
 					}
 					html += "</select></td>";
 				} else {
@@ -2287,6 +2347,7 @@ DisplayDiscreteConfig.prototype = {
 					html += "<option value='" + Group.DISCRETE_EQ_0 + "' " + (selcond == Group.DISCRETE_EQ_0 ? "selected" : "") + ">= 0</option>";
 					html += "<option value='" + Group.DISCRETE_GT_0 + "' " + (selcond == Group.DISCRETE_GT_0 ? "selected" : "") + ">&gt; 0</option>";
 					html += "<option value='" + Group.DISCRETE_EQ_ALL + "' " + (selcond == Group.DISCRETE_EQ_ALL ? "selected" : "") + ">= all</option>";
+					html += "<option value='" + Group.DISCRETE_NEQ_ALL + "' " + (selcond == Group.DISCRETE_NEQ_ALL ? "selected" : "") + ">!= all</option>";
 					html += "</select></td>";
 				}
 			}
@@ -2334,6 +2395,24 @@ DisplayDiscreteConfig.prototype = {
 		jscolor.init(this.win);
 	}
 };
+
+DisplayDiscreteConfig.switch_sample_tab = function(suffix, doc) {
+	//console.log("switch_discrete_sample_tab " + suffix);
+	if (!doc) {
+		doc = window.document;
+	}
+	$("#discrete_config_sample_" + suffix, doc).css("display", "block");
+	$("#discrete_config_group_" + suffix, doc).css("display", "none");
+}
+
+DisplayDiscreteConfig.switch_group_tab = function(suffix, doc) {
+	//console.log("switch_discrete_group_tab " + suffix);
+	if (!doc) {
+		doc = window.document;
+	}
+	$("#discrete_config_sample_" + suffix, doc).css("display", "none")
+	$("#discrete_config_group_" + suffix, doc).css("display", "block");
+}
 
 function HeatmapConfig() {
 	this.reset();
@@ -2972,9 +3051,6 @@ Datatable.prototype = {
 			}
 		}
 
-		if (display_graphics) {
-			//overlay.arrpos = arrpos;
-		}
 		overlay.draw(module_name);
 	},
 
@@ -2998,6 +3074,19 @@ Datatable.prototype = {
 		if (!this.windows[module]) {
 			this.windows[module] = win;
 		}
+	},
+
+	showingDataIsHuge: function() {
+		if (this.biotype.isSet()) {
+			return false;
+		}
+		var size = mapSize(this.gene_index) * mapSize(this.sample_index);
+		console.log("showingDataIsHuge: " + size);
+		return size > 50000;
+	},
+
+	showingMarkersIsHuge: function() {
+		return mapSize(this.gene_index) > 1000;
 	},
 
 	makeDialogsForWindow: function(win) {
@@ -3049,13 +3138,11 @@ Datatable.prototype = {
 	},
 
 	epilogue: function(win) {
-		/*
 		for (var map_name in maps) {
 			var doc = maps[map_name].document;
-			this.makeDialogsForWindow(doc.win);
+			console.log("DECLARING DATATABLE in map " + map_name);
+			this.declareWindow(doc.win);
 		}
-		*/
-		this.declareWindow(win);
 		if (this.biotype.isDiscrete()) {
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
@@ -3131,14 +3218,6 @@ Datatable.prototype = {
 		return this.data_matrix[module];
 	},
 
-	/*
-	getDataDialogDivId: function(module) {
-		if (!this.dialogs[module] && this.windows[module]) {
-			this.makeDialogsForWindow(this.windows[module]);
-		}
-		return "dt_data_dialog_" + this.id;
-	},
-	*/
 	getDisplayConfig: function(module) {
 		//console.log("getDisplayConfig: " + module + " " + this.dialogs[module] + " " + this.windows[module]);
 		if (!this.dialogs[module] && this.windows[module]) {
@@ -3462,20 +3541,24 @@ DrawingConfig.prototype = {
 function get_module(win) {
 	if (!win) {
 		win = window;
+	} else {
 	}
+	//console.log("get_module : " + win.document.navicell_module_name);
 	return win.document.navicell_module_name;
 }
 
 function get_module_from_doc(doc) {
 	if (!doc) {
 		doc = window.document;
+	} else {
 	}
+	//console.log("get_module_from_doc : " + doc.navicell_module_name);
 	return doc.navicell_module_name;
 }
 
 function switch_view(id) {
 	var module = get_module();
-	console.log("module: " + module);
+	//console.log("module: " + module);
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
 		datatable.switchView(window);
@@ -3874,6 +3957,7 @@ Group.DISCRETE_IGNORE = 0;
 Group.DISCRETE_EQ_0 = 1;
 Group.DISCRETE_GT_0 = 2;
 Group.DISCRETE_EQ_ALL = 3;
+Group.DISCRETE_NEQ_ALL = 4;
 
 Group.prototype = {
 	annots: [],
@@ -3925,6 +4009,9 @@ Group.prototype = {
 		}
 		if (cond == Group.DISCRETE_EQ_ALL) {
 			return eq_cnt == this.samples.length;
+		}
+		if (cond == Group.DISCRETE_NEQ_ALL) {
+			return eq_cnt != this.samples.length;
 		}
 		return false;
 	},
@@ -4339,13 +4426,38 @@ function navicell_init() {
 		_navicell.module_init[module] = 1;
 	},
 
+	_navicell.syncWindows = function() {
+		console.log("syncWindows : " + mapSize(maps));
+		var beforeunload = mapSize(maps) > 1;
+		var todel = [];
+		for (var map_name in maps) {
+			var win = maps[map_name].document.win;
+			console.log("map_name: " + map_name);
+			if (beforeunload) {
+				$(win).bind("beforeunload", function(e) { 
+					console.log("binding beforeunload");
+					return "Warning: closing " + map_name + " tab will make NaviCell instable";
+				});
+				$(win).unload(function() {
+					console.log("closing tab " + win.document.map_name); 
+					delete maps[win.document.map_name];
+					_navicell.syncWindows();
+				});
+			} else {
+				console.log("unbinding beforeunload");
+				$(win).unbind("beforeunload");
+			}
+		}
+	},
+
 	_navicell.declareWindow = function(win) {
 		var dataset = _navicell.dataset;
 		var module = get_module(win);
 		for (var datatable_name in dataset.datatables) {
 			dataset.datatables[datatable_name].declareWindow(win);
 		}
-		navicell._drawing_config[module] = new DrawingConfig();
+		_navicell._drawing_config[module] = new DrawingConfig();
+		_navicell.syncWindows();
 	},
 	
 	_navicell.getDrawingConfig = function(module) {

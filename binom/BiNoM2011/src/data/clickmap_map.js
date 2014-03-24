@@ -1042,7 +1042,8 @@ function show_map_and_markers(map_name, ids)
 		map.maps = maps;
 		map.navicell = navicell;
 		map.document.map_name = map_name;
-		maps[map_name] = map;
+		// EV: 2014-03-24: WARNING: disconnected the following line
+		//maps[map_name] = map;
 	}
 }
 
@@ -1216,3 +1217,4 @@ function tree_node_state_changed(tree_context, tree_node, checked) {
 		}
 	});
 }
+

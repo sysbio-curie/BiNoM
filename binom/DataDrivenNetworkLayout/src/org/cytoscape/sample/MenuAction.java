@@ -14,8 +14,8 @@ import org.cytoscape.model.CyColumn;
 import org.cytoscape.io.write.* ;
 import org.cytoscape.io.CyFileFilter;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public class MenuAction extends AbstractCyAction {
 	private final CyAppAdapter adapter;
 
 	public MenuAction(CyAppAdapter adapter) {
-		super("Driven20",
+		super("Driven21",
 				adapter.getCyApplicationManager(),
 				"network",
 				adapter.getCyNetworkViewManager());
@@ -122,10 +122,30 @@ public class MenuAction extends AbstractCyAction {
 		pca.makeDataSet(matrix);
 		pca.computePCA();
 		System.out.println("POINT\tX\tY");
-		for(int i=0;i<numberOfPoints;i++)
-			System.out.println(i+"\t"+pca.geneProjections[i][0]+"\t"+pca.geneProjections[i][1]);
-		System.out.println("Variance explained by PC1 = "+pca.explainedVariation[0]);
-		System.out.println("Variance explained by PC2 = "+pca.explainedVariation[1]);
+		for(int i=0;i<numberOfPoints;i++){
+		System.out.println(i+"\t"+pca.geneProjections[i][0]+"\t"+pca.geneProjections[i][1]);
+		//System.out.println("Variance explained by PC1 = "+pca.explainedVariation[0]);
+		//System.out.println("Variance explained by PC2 = "+pca.explainedVariation[1]);
+		CyNode node = mynetwork.getNodeList().get(i);
+		View<CyNode> nodeView =  networkView.getNodeView(node) ;
+		
+		Double x3 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+		Double y3 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+		System.out.println("x="+x3 + "y="+ y3);
+		
+		double x = pca.geneProjections[i][0]*30;
+		double y = pca.geneProjections[i][1]*30;
+		nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
+		nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
+		
+		Double x2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+		Double y2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+		System.out.println("x="+x2 + "y="+ y2);
+
+		}
+	
+	
+	
 	}
 
 	

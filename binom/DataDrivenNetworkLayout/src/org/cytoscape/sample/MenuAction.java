@@ -39,6 +39,13 @@ public class MenuAction extends AbstractCyAction {
 		CyNetwork mynetwork = manager.getCurrentNetwork();
 		CyTable mytable = mynetwork.getDefaultNodeTable();
 
+		Double height = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_HEIGHT );
+		System.out.println("height= "+height);
+		Double width = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_WIDTH );
+		System.out.println("width= "+ width);
+		Double scale = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR );
+		System.out.println("scale= "+ scale);
+
 		int count = mytable.getRowCount();
 
 		List<CyNode> nodes = mynetwork.getNodeList();
@@ -133,8 +140,8 @@ public class MenuAction extends AbstractCyAction {
 		Double y3 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
 		System.out.println("x="+x3 + "y="+ y3);
 		
-		double x = pca.geneProjections[i][0]*30;
-		double y = pca.geneProjections[i][1]*30;
+		double x = pca.geneProjections[i][0];
+		double y = pca.geneProjections[i][1];
 		nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
 		nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
 		
@@ -144,9 +151,12 @@ public class MenuAction extends AbstractCyAction {
 
 		}
 	
-	
+		double scaleFactor = 130;
+		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR, scaleFactor);
+		networkView.updateView();
 	
 	}
 
 	
 }
+

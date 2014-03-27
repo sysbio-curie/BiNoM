@@ -16,6 +16,9 @@ import org.cytoscape.io.CyFileFilter;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.presentation.property.EdgeBendVisualProperty;
+import org.cytoscape.view.presentation.property.values.Bend;
+import org.cytoscape.view.presentation.property.values.LineType;
 
 import java.util.*;
 
@@ -38,7 +41,8 @@ public class MenuAction extends AbstractCyAction {
 
 		CyNetwork mynetwork = manager.getCurrentNetwork();
 		CyTable mytable = mynetwork.getDefaultNodeTable();
-
+	
+		
 		Double height = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_HEIGHT );
 		System.out.println("height= "+height);
 		Double width = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_WIDTH );
@@ -51,7 +55,7 @@ public class MenuAction extends AbstractCyAction {
 		Double centerY = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION);
 		System.out.println("centerY= "+centerY);
 		
-		
+				
 		int count = mytable.getRowCount();
 
 		List<CyNode> nodes = mynetwork.getNodeList();
@@ -108,9 +112,16 @@ public class MenuAction extends AbstractCyAction {
 					int index2=map_index.get(col);
 					//System.out.println(index2);
 					
+						
 					Object value = mynetwork.getRow(node).getAllValues().get(col);
+					//System.out.print(value);
+					if (value == null){
+						value=0.0;
+					
+						}
 					Float fvalue = ((Double) value).floatValue();
-					if (fvalue != null){
+					//System.out.print(fvalue);
+					
 													
 					//System.out.print(ct2);
 					//System.out.print(index2);
@@ -120,17 +131,26 @@ public class MenuAction extends AbstractCyAction {
 					//System.out.println(value);
 					
 				}
-			
+			ct2++;
 			}
-		ct2++;
-		}
+		
+	
 		/*for (int i = 0; i < nodes.size(); i++) {
 		    for (int j = 0; j < set_attributes.size(); j++) {
 		        System.out.print(matrix[i][j] + " ");
 		    }
 		    System.out.print("\n");
 		}*/	
+		
 		int numberOfPoints = nodes.size();
+		
+		
+		
+		Matrix newmatrix = new Matrix(matrix);
+		System.out.println(newmatrix);
+		newmatrix.removeRowsWithValue();
+    	System.out.println(newmatrix);
+		
 		PCALayout pca = new PCALayout();
 		pca.makeDataSet(matrix);
 		pca.computePCA();
@@ -206,6 +226,8 @@ public class MenuAction extends AbstractCyAction {
 		//double scaleFactor = 130;
 		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION, 0.0);
 		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION, 0.0);
+		
+		//networkView.setVisualProperty(BasicVisualLexicon.EDGE_BEND,EdgeBendVisualProperty.DEFAULT_EDGE_BEND);
 		networkView.updateView();
 	
 	}

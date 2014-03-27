@@ -137,6 +137,7 @@
 
 <div id="dt_sample_annot">
   <h3>Group Management</h3>
+  <div id="group_editing"></div>
   <form>
     <fieldset>
       <div id="dt_sample_annot_table_div">
@@ -144,9 +145,10 @@
 	</table>
       </div>
       <div id="dt_sample_annot_status"></div> 
-      <div align='right'>
+      <div align='left'>
       <label for="file"><span style='font-weight: bold'>Sample annotation file:</span></label>
       <input type="file" name="file" id="dt_sample_file" value="" class="text ui-widget-content ui-corner-all" />
+      <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" value="Import File" onclick='import_annot_file()'></input>
       </div>
     </fieldset>
   </form>
@@ -259,11 +261,11 @@
   <table>
     <tr>
       <td>For all genes</td>
-      <td><input name="drawing_config_display" id="drawing_config_display_all" type="radio" checked></input></td>
+      <td><input name="drawing_config_display" id="drawing_config_display_all" type="radio" checked onchange='drawing_editing(true)'></input></td>
     </tr>
     <tr>
       <td>For selected genes</td>
-      <td><input name="drawing_config_display" id="drawing_config_display_selected" type="radio"></input></td>
+      <td><input name="drawing_config_display" id="drawing_config_display_selected" type="radio" onchange='drawing_editing(true)'></input></td>
     </tr>
     </table>
   </div>

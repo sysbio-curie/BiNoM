@@ -743,7 +743,7 @@ div.tablesorterPager input {
 /*    border: 1px solid; */
 }
 
-#heatmap_editing, #barplot_editing, #drawing_editing, #dt_datatable_status_editing, .step-config-editing, .discrete-config-editing, #glyph_editing_1, #glyph_editing_2, #glyph_editing_3, #glyph_editing_4, #glyph_editing_5 {
+#heatmap_editing, #barplot_editing, #drawing_editing, #group_editing, #dt_datatable_status_editing, .step-config-editing, .discrete-config-editing, #glyph_editing_1, #glyph_editing_2, #glyph_editing_3, #glyph_editing_4, #glyph_editing_5 {
     font-size: small;
 /*    margin-bottom: 10px;*/
 /*    padding-bottom: 10px;*/

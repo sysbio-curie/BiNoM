@@ -84,7 +84,7 @@ if (!Number.MIN_NUMBER) {
 
 var INPUT_SEPS = ["\t", ";", ",", " "];
 var COLOR_SIZE_CONFIG = "color_size";
-var EDITING_CONFIGURATION = "configuration not saved...";
+var EDITING_CONFIGURATION = "configuration not applied...";
 //var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[NO&nbsp;SAMPLE]</span>";
 var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[empty]</span>";
 //var GENE_SET = "<span style='font-style: italic; font-size: smaller'>[GENE]</span>";
@@ -3412,7 +3412,8 @@ function DrawingConfig() {
 	this.display_markers = 1;
 	this.display_old_markers = 1;
 
-	this.display_charts = "Heatmap";
+	//this.display_charts = "Heatmap";
+	this.display_charts = 0;
 	this.heatmap_config = new HeatmapConfig();
 	this.editing_heatmap_config = new HeatmapConfig();
 	this.barplot_config = new BarplotConfig();
@@ -3584,6 +3585,9 @@ Annotation.prototype = {
 		this.is_group = is_group;
 	},
 
+	isGroup: function() {
+		return this.is_group;
+	},
 	getClass: function() {return "Annotation";}
 };
 
@@ -3623,9 +3627,10 @@ AnnotationFactory.prototype = {
 				for (var annot_name in this.annot_samples[sample_name]) {
 					for (var annot_value in this.annot_samples[sample_name][annot_name]) {
 						sample.addAnnotValue(annot_name, annot_value);
-						annotated++;
+						//annotated++;
 					}
 				}
+				annotated++;
 			}
 		}
 		return annotated;
@@ -3707,6 +3712,7 @@ AnnotationFactory.prototype = {
 				return 0;
 			}
 			var sample_name = line[0];
+			this.sample_read++;
 			if (!navicell.dataset.getSample(sample_name)) {
 				if (missing_cnt < 10) {
 					if (this.missing) {
@@ -3725,7 +3731,7 @@ AnnotationFactory.prototype = {
 				this.addAnnotValue(sample_name, annot_name, annot_value);
 			}
 			//console.log("sample_read: " + this.sample_read
-			this.sample_read++;
+			//this.sample_read++;
 		}
 		if (this.sample_read > 0) {
 			for (var nn = 1; nn < header_cnt; ++nn) {
@@ -3902,6 +3908,10 @@ Sample.prototype = {
 
 	getId: function() {
 		return this.id;
+	},
+
+	hasAnnots: function() {
+		return mapSize(this.annots);
 	},
 
 	getClass: function() {return "Sample";}

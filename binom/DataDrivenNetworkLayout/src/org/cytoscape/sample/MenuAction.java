@@ -45,7 +45,13 @@ public class MenuAction extends AbstractCyAction {
 		System.out.println("width= "+ width);
 		Double scale = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR );
 		System.out.println("scale= "+ scale);
-
+		
+		Double centerX = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION);
+		System.out.println("centerX= "+centerX);
+		Double centerY = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION);
+		System.out.println("centerY= "+centerY);
+		
+		
 		int count = mytable.getRowCount();
 
 		List<CyNode> nodes = mynetwork.getNodeList();
@@ -128,6 +134,10 @@ public class MenuAction extends AbstractCyAction {
 		PCALayout pca = new PCALayout();
 		pca.makeDataSet(matrix);
 		pca.computePCA();
+		
+		ArrayList<Double> arrayListX = new ArrayList<Double>();
+		ArrayList<Double> arrayListY = new ArrayList<Double>();
+		
 		System.out.println("POINT\tX\tY");
 		for(int i=0;i<numberOfPoints;i++){
 		System.out.println(i+"\t"+pca.geneProjections[i][0]+"\t"+pca.geneProjections[i][1]);
@@ -140,19 +150,62 @@ public class MenuAction extends AbstractCyAction {
 		Double y3 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
 		System.out.println("x="+x3 + "y="+ y3);
 		
+		
+		
+		
 		double x = pca.geneProjections[i][0];
 		double y = pca.geneProjections[i][1];
-		nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
-		nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
+		//nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
+		//nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
 		
-		Double x2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
-		Double y2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
-		System.out.println("x="+x2 + "y="+ y2);
+		arrayListX.add(x);
+		arrayListY.add(y);
+		
+		//Double x2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
+		//Double y2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
+		//System.out.println("x="+x2 + "y="+ y2);
 
 		}
+		ArrayList<Double> arrayListF = new ArrayList<Double>();
+		
+		Double maxX = Collections.max(arrayListX);
+		Double minX = Collections.min(arrayListX);
+		System.out.println("max X= "+ maxX + "minX= "+ minX);
+		
+		Double sumX = maxX +Math.abs(minX);
+		System.out.println(sumX);
 	
-		double scaleFactor = 130;
-		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR, scaleFactor);
+		
+		Double factorX =(width/(scale+1))/sumX;
+		System.out.println("factorX= " + factorX);
+		arrayListF.add(factorX);
+		
+		Double maxY = Collections.max(arrayListY);
+		Double minY = Collections.min(arrayListY);
+		System.out.println("max Y= "+ maxY+"minY= "+ minY);
+		
+		
+		Double sumY = maxY +Math.abs(minY);
+		System.out.println(sumY);
+
+		Double factorY =(height/(scale+1))/sumY;
+		System.out.println("factorY= " + factorY);
+		
+		arrayListF.add(factorY);
+		Double factor = Collections.min(arrayListF);
+		
+		for(int i=0;i<numberOfPoints;i++){
+			CyNode node = mynetwork.getNodeList().get(i);
+			View<CyNode> nodeView =  networkView.getNodeView(node) ;
+			double x = pca.geneProjections[i][0]*factor;
+			double y = pca.geneProjections[i][1]*factor;
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
+			nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
+		}
+		//networkView.setVisualProperty(BasicVisualLexicon.NETWORK_WIDTH,1000.0 );
+		//double scaleFactor = 130;
+		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION, 0.0);
+		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION, 0.0);
 		networkView.updateView();
 	
 	}

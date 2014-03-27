@@ -37,7 +37,7 @@ public class Matrix
     	return(sb.toString());
     }
 
-    public void removeRowsWithValue()
+    public void removeRowsWithValue(double treshold)
     {
             /* Use an array list to track of the rows we're going to want to 
                keep...arraylist makes it easy to grow dynamically so we don't 
@@ -59,7 +59,7 @@ public class Matrix
     			}
     			double rate=sum0/data[0].length;	
     				
-    			if(rate>0.2)	
+    			if(rate>treshold)	
     			{
     				found = true;
     				break;

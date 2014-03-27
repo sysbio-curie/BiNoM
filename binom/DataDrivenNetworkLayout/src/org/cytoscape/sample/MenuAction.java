@@ -148,7 +148,7 @@ public class MenuAction extends AbstractCyAction {
 		
 		Matrix newmatrix = new Matrix(matrix);
 		System.out.println(newmatrix);
-		newmatrix.removeRowsWithValue();
+		newmatrix.removeRowsWithValue(0.2);
     	System.out.println(newmatrix);
 		
 		PCALayout pca = new PCALayout();

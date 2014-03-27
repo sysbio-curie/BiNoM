@@ -152,7 +152,7 @@ public class MenuAction extends AbstractCyAction {
     	System.out.println(newmatrix);
 		
 		PCALayout pca = new PCALayout();
-		pca.makeDataSet(matrix);
+		pca.makeDataSet(newmatrix);
 		pca.computePCA();
 		
 		ArrayList<Double> arrayListX = new ArrayList<Double>();
@@ -229,7 +229,7 @@ public class MenuAction extends AbstractCyAction {
 		
 		//networkView.setVisualProperty(BasicVisualLexicon.EDGE_BEND,EdgeBendVisualProperty.DEFAULT_EDGE_BEND);
 		networkView.updateView();
-	
+		
 	}
 
 	

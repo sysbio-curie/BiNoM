@@ -5,8 +5,9 @@ import java.util.List;
 
 public class Matrix
 {
-    private float[][] data;
-
+    public float[][] data;
+    
+    
     public Matrix(float[][] data)
     {
         int r= data.length;
@@ -43,6 +44,9 @@ public class Matrix
                keep...arraylist makes it easy to grow dynamically so we don't 
                need to know up front how many rows we're keeping */
     	List<float[]> rowsToKeep = new ArrayList<float[]>(this.data.length);
+    	
+    	
+    	int nnode = 0;
     	for(float[] row : this.data)
     	{
     		/* If you download Apache Commons, it has built-in array search
@@ -62,6 +66,7 @@ public class Matrix
     			if(rate>treshold)	
     			{
     				found = true;
+    				
     				break;
     			}
     		}
@@ -82,7 +87,7 @@ public class Matrix
     		this.data[i] = rowsToKeep.get(i);
     	}
     }
-
+    
    /* public static void main(String[] args)
     {
     	float[][] test = { {1, 2, 3, 4, 5, 6, 7, 8, 9},

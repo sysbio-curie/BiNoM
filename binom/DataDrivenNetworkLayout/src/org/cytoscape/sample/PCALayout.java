@@ -70,7 +70,7 @@ public class PCALayout {
 		explainedVariation = new float[2];
 		double disp[] = pca.calcDispersionsRelative(dataset.simpleStatistics.totalDispersion*dataset.simpleStatistics.totalDispersion);
 		explainedVariation[0] = (float)disp[0];
-		explainedVariation[1] = (float)disp[1];
+		explainedVariation[1] = (float)disp[1]; 
 	}
 
 }

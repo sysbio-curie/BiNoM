@@ -966,6 +966,9 @@ public class MergingMapsProcessor {
 		 * Species name build with CellDesignerToCytoscape object to get complete and meaningful names
 		 * 
 		 */
+		boolean temp = CellDesignerToCytoscapeConverter.alwaysMentionCompartment;
+		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = true;
+		
 		HashMap<String, String> speciesNames = new HashMap<String, String>();
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
@@ -982,12 +985,13 @@ public class MergingMapsProcessor {
 		for (SpeciesDocument.Species sp : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
 			if (speciesNames.containsKey(name)) {
-				System.out.println("common species: "+name+" id1: "+speciesNames.get(name)+" id2: "+sp.getId());
+				//System.out.println("common species: "+name+" id1: "+speciesNames.get(name)+" id2: "+sp.getId());
 				this.speciesMap.put(sp.getId(), speciesNames.get(name));
 				this.speciesIdList.add(sp.getId());
 				//System.out.println(">>>"+sp.getId());
 			}
 		}
+		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = temp;
 
 	}
 
@@ -1007,7 +1011,7 @@ public class MergingMapsProcessor {
 		 */
 		
 		boolean doMergeSpecies = true;
-		if (doMergeSpecies) {
+		if (doMergeSpecies){
 			
 			System.out.println("merging species...");
 			
@@ -1124,7 +1128,13 @@ public class MergingMapsProcessor {
 					if(proteinMap.get(pr)!=null){
 						xs.setStringValue(proteinMap.get(pr));
 						//CellDesigner.entities = CellDesigner.getEntities(cd1);
-						String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true);
+						String cspname = null;
+						String id = Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
+						try{
+							cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,id, true, true);
+						}catch(Exception e){
+							System.out.println("ERROR: can not merge species "+id);
+						}
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference().set(xs);
 						xs.setStringValue(Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())); 
 						csp.setName(xs);

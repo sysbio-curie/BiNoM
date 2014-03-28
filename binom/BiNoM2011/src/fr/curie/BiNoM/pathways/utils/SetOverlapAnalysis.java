@@ -608,7 +608,7 @@ public class SetOverlapAnalysis {
 		fw.close();
 	}
 	
-	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order) throws Exception{
+	public void makeGMTOfReactionRegulators(String prefix, Graph reactionGraph, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order, boolean writeSignsOfRegulators) throws Exception{
 		FileWriter fw = new FileWriter(prefix+".gmt");
 		Vector<String> reactions = new Vector<String>();
 		// filter everything which is not reactions
@@ -636,11 +636,33 @@ public class SetOverlapAnalysis {
 					reactions.add(s);
 			}
 			Vector<Node> regulator_nodes = new Vector<Node>();
-			for(BiographUtils.ReactionRegulator reg: regulators)
+			Vector<Integer> regulator_signs = new Vector<Integer>();			
+			for(BiographUtils.ReactionRegulator reg: regulators){
 				regulator_nodes.add(reg.node);
-			Vector<String> regnames = BiographUtils.extractProteinNamesFromNodeNames(regulator_nodes);
+				regulator_signs.add(reg.sign);
+			}
+			Vector<String> regnames = new Vector<String>();
+			Vector<Integer> regnames_signs = new Vector<Integer>();
+			for(int s=0;s<regulator_nodes.size();s++){
+				Node n = regulator_nodes.get(s);
+				Vector<String> names = BiographUtils.extractProteinNamesFromNodeName(n.Id);
+				for(String name: names){
+					int k = regnames.indexOf(name);
+					if(k==-1){ 
+						regnames.add(name);
+						regnames_signs.add(regulator_signs.get(s));
+					}else{
+						int sign = regulator_signs.get(s);
+						if(regnames_signs.get(k)!=sign) 
+							regnames_signs.set(k, 0);
+					}
+				}
+ 			}
 			for(int j=0;j<regnames.size();j++){
-				fw.write(regnames.get(j)+"\t");
+				 	if(writeSignsOfRegulators)
+				 		fw.write(regnames.get(j)+"["+regnames_signs.get(j)+"]\t");
+				 	else
+				 		fw.write(regnames.get(j)+"\t");
 			}
 			fw.write("\n");
 		}
@@ -1315,6 +1337,27 @@ public class SetOverlapAnalysis {
 		sonew.saveSetsAsGMT(newFile, -1);
 	
 	
+	}
+	
+	public void assignWeightsFromAnotherWeightedGMT(String fn){
+		SetOverlapAnalysis so = new SetOverlapAnalysis();
+		so.LoadSetsFromGMT(fn);
+		for(int j=0; j<lists.size();j++){
+			Vector<String> v = lists.get(j);
+			String setname = setnames.get(j);
+			for(int i=0;i<v.size();i++){
+				String s = v.get(i);
+				int k = so.setnames.indexOf(setname);
+				if(k!=-1){
+					Vector<String> externalNames = so.lists.get(k);
+					Vector<Float> externalWeights = so.listsWeights.get(k);
+					int k1 = externalNames.indexOf(s);
+					if(k1!=-1){
+						listsWeights.get(j).set(i, externalWeights.get(k1));
+					}
+				}
+			}
+		}
 	}
 
 }

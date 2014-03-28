@@ -27,6 +27,7 @@ public class ModifyCellDesignerNotes {
 	GMTFile gmtFile = null;
 	public boolean useHUGOIdsForModuleIdentification = true;
 	public boolean overwriteModuleSection = true;
+	public boolean useTypedNames = false;
 	
 	public boolean allannotations = true;
 	//public boolean insertTemplateForEntitiesReactions = true;
@@ -103,10 +104,10 @@ public class ModifyCellDesignerNotes {
 		//System.exit(0);
 			
 		ModifyCellDesignerNotes mn = new ModifyCellDesignerNotes();
-		mn.spreadReactionRefsToSpecies = true;
+		//mn.spreadReactionRefsToSpecies = true;
 		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/mTOR_nucleus_zoom_3"; 
 		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test";
-		String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test1_master";
+		//String nameCD = "C:/Datas/BinomTest/Annotation/acsn/test1_master";
 		//String nameCD = "C:/Datas/Binomtest/annotation/gmt/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/Binomtest/annotation/apoptosis_v1_names";
 		//String nameCD = "C:/Datas/acsn/repository/5_Release_xmls/dnarepair_v2_names";
@@ -120,13 +121,24 @@ public class ModifyCellDesignerNotes {
 		//extractCellDesignerNotesDialog dialog = new extractCellDesignerNotesDialog(); 
 		//dialog.raise();
 		
+		String nameCD = "C:/Datas/BinomTest/Annotation/gmt1/pcd_master";
+		//String nameCD = "C:/Datas/BinomTest/Annotation/test";
+		
 		mn.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		//mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/gmt/apoptosis_modules.gmt";
+		mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/gmt1/pcd_modules_all.gmt";
+		//mn.moduleGMTFileName = "C:/Datas/Binomtest/annotation/test.gmt";
+		mn.overwriteModuleSection = true;
+		mn.useTypedNames = true;
+		mn.useHUGOIdsForModuleIdentification = false;
+		//mn.guessIdentifiers = true;
 		String s = mn.exportCellDesignerNotes();
 		System.out.println(s);
 		//mn.comments = Utils.loadString(nameCD+"_notes.txt");
 		//mn.ModifyCellDesignerNotes();
 		Utils.saveStringToFile(s, nameCD+"_notes.txt");
+		mn.comments = s;
+		mn.ModifyCellDesignerNotes();
 		CellDesigner.saveCellDesigner(mn.sbmlDoc, nameCD+"_notes.xml");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -348,12 +360,16 @@ public class ModifyCellDesignerNotes {
 			}
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
-				annotations.append("### "+p.getName()+"\n");
+				annotations.append("### "+p.getName()+" ### g"+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
-				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
+				if(formatAnnotation){
+					String name = p.getName();
+					if(useTypedNames)
+						name="g"+name;
+					annot = processAnnotations(annot,name,p.getId(),reqsections,guessIdentifiers);
+				}
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -371,12 +387,16 @@ public class ModifyCellDesignerNotes {
 			}
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
-				annotations.append("### "+p.getName()+"\n");
+				annotations.append("### "+p.getName()+" ### r"+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
-				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
+				if(formatAnnotation){
+					String name = p.getName();
+					if(useTypedNames)
+						name="r"+name;
+					annot = processAnnotations(annot,name,p.getId(),reqsections,guessIdentifiers);
+				}
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -394,12 +414,16 @@ public class ModifyCellDesignerNotes {
 			}
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
-				annotations.append("### "+p.getName()+"\n");
+				annotations.append("### "+p.getName()+" ### ar"+p.getName()+"\n");
 				String reqsections[] = {"Identifiers","Maps_Modules","References"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
-				if(formatAnnotation)
-					annot = processAnnotations(annot,p.getName(),p.getId(),reqsections,guessIdentifiers);
+				if(formatAnnotation){
+					String name = p.getName();
+					if(useTypedNames)
+						name="ar"+name;
+					annot = processAnnotations(annot,name,p.getId(),reqsections,guessIdentifiers);
+				}
 				annotations.append(annot+"\n\n");
 			}
 		}		
@@ -468,7 +492,8 @@ public class ModifyCellDesignerNotes {
 					if(Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("DEGRADED"))
 						degraded = true;
 				if(formatAnnotation)if(!degraded)
-					annot = processAnnotations(annot,Utils.getValue(sp.getName()),sp.getId(),reqsections, false, nonannotated, secs);
+					//annot = processAnnotations(annot,Utils.getValue(sp.getName()),sp.getId(),reqsections, false, nonannotated, secs);
+					annot = processAnnotations(annot,spName,sp.getId(),reqsections, false, nonannotated, secs);
 				if(spreadReactionRefsToSpecies){
 					annot = spreadReactionReferencesToSpecies(sp.getId(),annot);
 					secs = divideInSections(annot);
@@ -653,7 +678,7 @@ public class ModifyCellDesignerNotes {
 		// Try to fill empty identifiers
 		if(_guessIdentifiers){
 			//if(entityName.equals("_beta_TrCP*"))
-				fillIdentifiers(getSectionByName(secs,"Identifiers"),entityName);
+				fillIdentifiers(getSectionByName(secs,"Identifiers"),untypeName(entityName));
 			// if HUGO tag is not defined, mark with @@@ mark
 			String text = this.getSectionByName(secs, "Identifiers").content;
 			st = new StringTokenizer(text,"\t\n .,;");
@@ -970,6 +995,13 @@ public class ModifyCellDesignerNotes {
 		AnnotationSection moduleSection = getSectionByName(secs, "Maps_Modules");
 		Vector<String> hugos = Utils.getTagValues(identifiers.content, "HUGO");
 		Vector<String> moduleNames = gmtFile.getListOfSets(entityName);
+		//if(entityName.contains("ATG3:CFLAR"))
+		//	System.out.println();
+		// Fix for the case when a complex species without compartment is indicated in gmt
+		if((entityName!=null)&&(moduleNames.size()==0)&&entityName.contains("@")&&entityName.contains(":")){
+			StringTokenizer st = new StringTokenizer(entityName,"@");
+			moduleNames = gmtFile.getListOfSets(st.nextToken());
+		}
 		Vector<String> moduleNamesbyId = gmtFile.getListOfSets(id);
 		if(moduleNamesbyId!=null)
 			for(int i=0;i<moduleNamesbyId.size();i++)
@@ -1166,4 +1198,9 @@ public class ModifyCellDesignerNotes {
 	*/
 	
 	
+
+	public static String untypeName(String name){
+		Vector<String> v = BiographUtils.extractProteinNamesFromNodeName(name);
+		return v.get(0);
+	}
 }

@@ -1,10 +1,12 @@
 package fr.curie.BiNoM.pathways.scripts;
 
+import java.io.FileWriter;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import vdaoengine.utils.Utils;
-
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.utils.SetOverlapAnalysis;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
@@ -23,27 +25,42 @@ public class DNARepairMapAnalysis {
 		try{
 			
 			SetOverlapAnalysis so = new SetOverlapAnalysis();
-			String folder = "C:/Datas/DNARepairAnalysis/ver3/";
+			String folder = "C:/Datas/DNARepairAnalysis/ver5/";
 			String prefix = "paths_all";
-			String mapFileName = "dnarepair_master_12122013_nophenotype.xgmml";
+			String mapFileName = "dnarepair_master_10032014_nophenotype.xgmml";
 			String stgFileName = "STG.xgmml";
-			int order = 3;
+			int order = 2;
 			
 			// Process the paths file (extracted from the OCSANA report)
 			//so.createGMTFromOCSANAOutput(folder+"ocsana_report");
 			//System.exit(0);
 			
 			Graph stg = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+stgFileName));
+			Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+mapFileName));
+			String typesOfPositiveRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
+			String typesOfNegativeRegulations[] = new String[]{"INHIBITION","UNKNOWN_INHIBITION"};
 
+			CheckComplexFormationConsistency(graph);
+			
+			//ExtractReactionsFromModules(stg, folder+"module_reactions.gmt");
+			
+			//so.LoadSetsFromGMT(folder+"module_reactions.gmt");
+			//so.makeGMTOfReactionRegulators(folder+"module_reactions_reg"+order, graph, typesOfPositiveRegulations, typesOfNegativeRegulations, order, true);
+			//so.expandSetsOfLists_ExpandSets(folder+"module_reactions_reg"+order+".gmt", folder+"dnarepair_master_10032014.xml.gmt", folder+"module_reactions_reg"+order+"_HUGO.gmt");
+			
+			//so.LoadSetsFromGMT(folder+"dnarepair_master_10032014.gmt");
+			//so.assignWeightsFromAnotherWeightedGMT(folder+"module_reactions_reg3_HUGO.gmt");
+			//so.saveSetsAsGMT(folder+"dnarepair_master_10032014_signed.gmt", Integer.MAX_VALUE);
+			
+			System.exit(0);
+			
+			
 			// Extract regulators along the paths as gmt file with "reg" suffix
 			so.LoadSetsFromGMT(folder+prefix+".gmt");
 			RenamePaths(so, stg);
 			so.saveSetsAsGMT(folder+prefix+"1.gmt", Integer.MAX_VALUE, true);
 			
-			String typesOfPositiveRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
-			String typesOfNegativeRegulations[] = new String[]{"INHIBITION","UNKNOWN_INHIBITION"};
-			Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+mapFileName));
-			so.makeGMTOfReactionRegulators(folder+prefix+"_reg"+order, graph, typesOfPositiveRegulations, typesOfNegativeRegulations, order);
+			so.makeGMTOfReactionRegulators(folder+prefix+"_reg"+order, graph, typesOfPositiveRegulations, typesOfNegativeRegulations, order, false);
 			
 			Graph gr = ProduceSTGRegulatorsGraph(stg, folder+prefix+"_reg"+order+"_protein_reaction.txt");
 			XGMML.saveToXGMML(gr, folder+prefix+"_reg"+order+"_protein_reaction.xgmml");
@@ -155,6 +172,85 @@ public class DNARepairMapAnalysis {
 		}
 		stg.name = stg.name+"_regulators";
 		return stg;
+	}
+	
+	public static void ExtractReactionsFromModules(Graph gr, String fn) throws Exception{
+		gr.calcNodesInOut();
+		FileWriter fw = new FileWriter(fn);
+		HashMap<String, Vector<String>> moduleReactions = new HashMap<String, Vector<String>>(); 
+		for(int i=0;i<gr.Nodes.size();i++){
+			Node n = gr.Nodes.get(i);
+			String reactionId = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
+			if(!n.Id.startsWith("gIntact"))
+			if((reactionId==null)||(reactionId.trim().equals(""))){
+			String moduleString = n.getFirstAttributeValue("MODULE");
+			//System.out.println(n.Id+"\t"+moduleString);
+			StringTokenizer st = new StringTokenizer(moduleString,"@");
+			while(st.hasMoreTokens()){
+				String module = st.nextToken();
+				if(!module.trim().equals("")){
+				Vector<String> reactions = moduleReactions.get(module);
+				if(reactions==null){
+					reactions = new Vector<String>();
+					moduleReactions.put(module, reactions);
+				}
+				for(int j=0;j<n.outcomingEdges.size();j++){
+					Edge e = n.outcomingEdges.get(j);
+					String reaction = e.Node2.Id;
+					if(!reactions.contains(reaction))
+						reactions.add(reaction);
+				}
+				}
+			}
+			}
+		}
+		for(String module: moduleReactions.keySet()){
+			fw.write(module+"\tna\t");
+			Vector<String> reactions = moduleReactions.get(module);
+			for(String reaction: reactions){
+				fw.write(reaction+"\t");
+			}
+			fw.write("\n");
+		}
+		fw.close();
+	}
+	
+	public static Vector<String> CheckComplexFormationConsistency(Graph graph){
+		Vector<String> inconsistentReactions = new Vector<String>();
+		graph.calcNodesInOut();
+		for(Node n: graph.Nodes){
+			String reactionId = n.getFirstAttributeValue("CELLDESIGNER_REACTION");
+			String tp = n.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE");
+			if(reactionId!=null)if(!reactionId.equals(""))if(tp.equals("HETERODIMER_ASSOCIATION")){
+				Vector<String> complexComponents = new Vector<String>();
+				Vector<String> reactants = new Vector<String>();
+				String complex = null;
+				for(Edge e: n.outcomingEdges)if(e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE").equals("RIGHT")){
+					complex = e.Node2.Id;
+					complexComponents = BiographUtils.extractProteinNamesFromNodeName(e.Node2.Id);
+				}
+				for(Edge e: n.incomingEdges)if(e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE").equals("LEFT")){
+					String reactant = e.Node1.Id;
+					Vector<String> ps = BiographUtils.extractProteinNamesFromNodeName(e.Node1.Id);
+					for(String s: ps) if(!reactants.contains(s)) reactants.add(s);
+				}
+				// check if all reactants appear in complex
+				for(String reactant: reactants){
+					if(!complexComponents.contains(reactant)){
+						System.out.println("ERROR: reaction "+n.Id+": reactant "+reactant+" is not present in the complex "+complex);
+						if(!inconsistentReactions.contains(n.Id)) inconsistentReactions.add(n.Id);
+					}
+				}
+				// check if all complex components appear in reactants
+				for(String component: complexComponents){
+					if(!reactants.contains(component)){
+						System.out.println("ERROR: reaction "+n.Id+": component "+component+" is not present among reactants.");
+						if(!inconsistentReactions.contains(n.Id)) inconsistentReactions.add(n.Id);						
+					}
+				}
+			}
+		}
+		return inconsistentReactions;
 	}
 
 }

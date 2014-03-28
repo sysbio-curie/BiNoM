@@ -75,8 +75,8 @@ public class BiographUtils extends Graph {
     	
     	String prefix = "C:/Datas/BinomTest/RegulatorExtraction/";
     	//String file = "Influences_collapse_scheme_1";
-    	String file = "test1";
-    	String rid = "re327";    	
+    	String file = "test3";
+    	String rid = "re81";    	
     	//String prefix = "C:/Datas/DNARepairAnalysis/ver3/";
     	//String file = "CHEK2_re17";
     	//String rid = "re17";
@@ -85,6 +85,9 @@ public class BiographUtils extends Graph {
     	Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+file+".xgmml"));
     	
     	Vector<ReactionRegulator> regs = findReactionRegulators(graph,rid,typesOfPositiveRegulations,typesOfNegativeRegulations,3);
+    	for(ReactionRegulator reg: regs){
+    		System.out.println(rid+"\t"+reg.node.Id+"\t"+reg.sign+"\t"+reg.level);
+    	}    	
     	System.out.println();
     	regs = convertNodeRegulators2ProteinRegulators(regs);    	
     	for(ReactionRegulator reg: regs){
@@ -1094,7 +1097,14 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 			  if(proteinName.substring(1, 2).equals(proteinName.substring(1, 2).toUpperCase())){
 			  	proteinName = proteinName.substring(1, proteinName.length());
 			  }
-			  System.out.println(proteinName);
+			  //System.out.println(proteinName);
+		  }
+		  if(proteinName.startsWith("ar")){
+			  //System.out.println(proteinName);
+			  if(proteinName.substring(2, 3).equals(proteinName.substring(2, 3).toUpperCase())){
+			  	proteinName = proteinName.substring(2, proteinName.length());
+			  }
+			  //System.out.println(proteinName);
 		  }
 		  if(!names.contains(proteinName))
 			  names.add(proteinName);
@@ -1337,6 +1347,9 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
   
   public static Vector<ReactionRegulator> findReactionRegulators(Graph reactionNetwork, String reid, String typesOfPositiveRegulations[], String typesOfNegativeRegulations[], int order){
 	  Vector<ReactionRegulator> regs = findImmediateReactionRegulators(reactionNetwork, reid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+	  //for(ReactionRegulator reg: regs){
+	  //	  System.out.println(reg.node.Id+"\t"+reg.sign);
+	  //}
 	  Vector<ReactionRegulator> regs2 = new Vector<ReactionRegulator>();
 	  Vector<ReactionRegulator> regs3 = new Vector<ReactionRegulator>();
 	  if(order>1){
@@ -1345,6 +1358,8 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  reactionNetwork.calcNodesInOut();
 		  Vector<ReactionRegulator> regs2_in = new Vector<ReactionRegulator>();
 		  Vector<ReactionRegulator> regs2_out = new Vector<ReactionRegulator>();
+		  Vector<ReactionRegulator> regs2_in_all = new Vector<ReactionRegulator>();
+		  Vector<ReactionRegulator> regs2_out_all = new Vector<ReactionRegulator>();		  
 		  Vector<Node> reactants = new Vector<Node>();
 		  Vector<String> reactions2 = new Vector<String>();
 		  for(int i=0;i<regs.size();i++){
@@ -1355,6 +1370,10 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 				  if(intType.equals("RIGHT")){
 					  String rid = e.Node1.Id;
 					  regs2_in = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+					  for(ReactionRegulator rg: regs2_in){ 
+						  //System.out.println("\tin(2)\t"+rg.node.Id+"\t"+rg.sign);
+						  regs2_in_all.add(rg);
+					  }
 					  for(Edge er: e.Node1.incomingEdges){
 						  intType = er.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE");
 						  if(intType.equals("LEFT")){
@@ -1371,17 +1390,21 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 				  if(intType.equals("LEFT")){
 					  String rid = e.Node2.Id;
 					  regs2_out = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+					  for(ReactionRegulator rg: regs2_out){ 
+						  //System.out.println("\tout(2)\t"+rg.node.Id+"\t"+rg.sign);
+						  regs2_out_all.add(rg);
+					  }
 				  }
 			  }			  
 		  }
 
-		  for(ReactionRegulator r: regs2_in)
+		  for(ReactionRegulator r: regs2_in_all)
 			  if(!r.contains(r, regs2))
 				  if(!r.contains(r, regs)){
 					  r.level = 2;
 					  regs2.add(r);
 				  }
-		  for(ReactionRegulator r: regs2_out){
+		  for(ReactionRegulator r: regs2_out_all){
 			  r.sign *=-1;
 			  if(!r.contains(r, regs2))
 				  if(!r.contains(r, regs)){
@@ -1390,10 +1413,14 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 				  }
 		  }
 		  
+		  
 		  if(order>2){
 			  // Now, let us look at the reactions which modifies the reactants from which the direct regulators are produced
 			  Vector<ReactionRegulator> regs3_in = new Vector<ReactionRegulator>();
 			  Vector<ReactionRegulator> regs3_out = new Vector<ReactionRegulator>();
+			  Vector<ReactionRegulator> regs3_in_all = new Vector<ReactionRegulator>();
+			  Vector<ReactionRegulator> regs3_out_all = new Vector<ReactionRegulator>();
+			  
 			  
 			  for(Node reactant: reactants){
 				  //System.out.println("Reactant: "+reactant.Id);
@@ -1404,6 +1431,10 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 						  String rid = e.Node1.Id;
 						  if(!reactions2.contains(rid)){
 						  regs3_in = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+						  for(ReactionRegulator rg: regs3_in){ 
+							  //System.out.println("\t\tin(3)\t"+rg.node.Id+"\t"+rg.sign);
+							  regs3_in_all.add(rg);
+						  }
 						  for(ReactionRegulator reg3in: regs3_in)
 							  reg3in.sign *= ((ReactionRegulator)reactant.link).sign;
 						  }
@@ -1416,25 +1447,30 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 						  String rid = e.Node2.Id;
 						  if(!reactions2.contains(rid)){
 						  regs3_out = findImmediateReactionRegulators(reactionNetwork, rid, typesOfPositiveRegulations, typesOfNegativeRegulations);
+						  for(ReactionRegulator rg: regs3_out){ 
+							  //System.out.println("\t\tout(3)\t"+rg.node.Id+"\t"+rg.sign);
+							  regs3_out_all.add(rg);
+						  }
 						  for(ReactionRegulator reg3out: regs3_out)
 							  reg3out.sign *= -((ReactionRegulator)reactant.link).sign;
 						  }}
 					  }
 			  }
-			  
-			  for(ReactionRegulator r: regs3_in)
+			  //System.out.println("Count in regs3_in_all\t"+regs3_in_all.size());
+			  for(ReactionRegulator r: regs3_in_all)
 				  if(!r.contains(r, regs3))
 					  if(!r.contains(r, regs)){
 						  r.level = 3;
 						  regs3.add(r);
 					  }
-			  for(ReactionRegulator r: regs3_out){
+			  for(ReactionRegulator r: regs3_out_all){
 				  if(!r.contains(r, regs3))
 					  if(!r.contains(r, regs)){
 						  r.level = 3;
 						  regs3.add(r);
 					  }
 			  }
+			  //for(ReactionRegulator rg: regs3) System.out.println("\t\treg(3)\t"+rg.node.Id+"\t"+rg.sign);						  
 		  }
 	  }
 	  

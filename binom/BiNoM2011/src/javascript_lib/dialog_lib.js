@@ -28,8 +28,9 @@ function nv2() {
 	$("#right_tabs").css("height", "59.5%");
 }
 
+var CANCEL_CLOSES = false;
+
 $(function() {
-	var CANCEL_CLOSES = false;
 	/*
 	window.console.log("TRYING TO execute this function on module " + get_module() + " " + navicell.isModuleInit(get_module()));
 	console.trace();
@@ -1490,9 +1491,10 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		//console.log("div.length: " + div.length);
 		var width;
 		if (what == COLOR_SIZE_CONFIG) {
-			width = 500;
+			//width = 500;
+			width = this.biotype.isDiscrete() ? 760 : 500;
 		} else if (what == 'color') {
-			width = 440;
+			width = this.biotype.isDiscrete() ? 700 : 440;
 		} else if (what == 'shape') {
 			width = 400;
 		} else {

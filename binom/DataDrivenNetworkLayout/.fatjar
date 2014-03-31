@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Thu Mar 27 14:04:04 CET 2014
+#Mon Mar 31 18:05:41 CEST 2014
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
@@ -10,5 +10,5 @@ manifest.mainclass=
 manifest.file=MANIFEST.MF
 jarname.isextern=false
 onejar.expand=
-excludes=
+excludes=<jar|cytoscape-swing-app-api-3.1.0.jar>;<jar|ocap-api-1.2.jar>
 includes=

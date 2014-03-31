@@ -17,6 +17,7 @@ import fr.curie.BiNoM.cytoscape.utils.ComboBoxes;
 /**
  * Update Influence Attribute WEIGHT at +1 or -1
  * from an attribute, generally interaction
+ * 3 possible value for attribute
  * 
  * @author Daniel.Rovera@curie.fr
  */

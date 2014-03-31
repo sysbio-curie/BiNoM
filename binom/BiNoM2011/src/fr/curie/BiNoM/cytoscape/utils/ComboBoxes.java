@@ -28,11 +28,11 @@ import javax.swing.JLabel;
 public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 	private static final long serialVersionUID = 1L;
 	Container container;
-	final int width=420;
+	final int width=360;
 	final int heightByLine=32;
 	private JButton okBouton,cancelBouton;
 	private boolean ok=false;
-	JComboBox[] comboBoxes;
+	JComboBox<String>[] comboBoxes;
 	ArrayList<String> fields;
 	ArrayList<ArrayList<String>> datas;
 	public ComboBoxes(JFrame parent,String title,String[] label,ArrayList<String> fields,String selected,ArrayList<ArrayList<String>> datas){ 
@@ -44,7 +44,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		container.setLayout(new GridLayout(label.length+1,2));
 		comboBoxes=new JComboBox[label.length];
 		container.add(new JLabel(label[0]));
-		comboBoxes[0]=new JComboBox();
+		comboBoxes[0]=new JComboBox<String>();
 		container.add(comboBoxes[0]);
 		fill(comboBoxes[0],fields);
 		comboBoxes[0].setSelectedItem(selected);
@@ -52,7 +52,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		int fi=fields.indexOf(selected);
 		for(int i=1;i<label.length;i++){
 			container.add(new JLabel(label[i]));
-			comboBoxes[i]=new JComboBox();
+			comboBoxes[i]=new JComboBox<String>();
 			container.add(comboBoxes[i]);
 			fill(comboBoxes[i],datas.get(fi));
 		}
@@ -73,7 +73,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		}
 		return ok;
 	}
-	void fill(JComboBox comboBox,ArrayList<String> data){
+	void fill(JComboBox<String> comboBox,ArrayList<String> data){
 		comboBox.removeAllItems();
 		for(int i=0;i<data.size();i++) comboBox.addItem(data.get(i));
 	}

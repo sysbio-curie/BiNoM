@@ -6,22 +6,31 @@ Copyright (C) 2010-2013 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE
 import java.awt.event.ActionEvent;
 import cytoscape.Cytoscape;
 import fr.curie.BiNoM.cytoscape.utils.TextBox;
-import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
+import fr.curie.BiNoM.pathways.utils.*;
 /**
  * Display Influence Area from start nodes
  * in text box
  * 
  * @author Daniel.Rovera@curie.fr
  */
-public class InfluenceAreaInArray  extends FromToNodes {
+public class InfluenceAreaInArray  extends ModelMenuUtils {
 	private static final long serialVersionUID = 1L;
 	final public static String title="Display Influence Reach Area in Array";
 	public void actionPerformed(ActionEvent e){
-		double fade=reachParameter();
-		bfs=new ComputingByBFS(Cytoscape.getCurrentNetwork(),true);
-		getSrcAllTgt(title);
-		if(srcDialog.isEmpty()) return;
-		String txt=influenceToString(bfs,bfs.reachArea(fade),null,srcDialog,tgtDialog);
-		new TextBox(Cytoscape.getDesktop(),titleOfArray(),txt).setVisible(true);		
+		WeightGraphStructure wgs=new WeightGraphStructure(Cytoscape.getCurrentNetwork());		
+		updatePathModel();
+		updateFade();
+		getSrcAllTgt(wgs,title);
+		if(srcDialog.isEmpty()) return;;
+		Double[][] areaMx;
+		if(ifMultiPath){
+			ComputingByDFS cpt=new ComputingByDFS(wgs,maxDepth());
+			areaMx=cpt.reachArea(fade, srcDialog);
+			new TextBox(Cytoscape.getDesktop(),addTitle(title),matrixToFormatTxt(cpt,areaMx,null).toString()).setVisible(true);
+		}else{
+			ComputingByBFS cpt=new ComputingByBFS(wgs);
+			areaMx=cpt.reachArea(fade, srcDialog);
+			new TextBox(Cytoscape.getDesktop(),addTitle(title),matrixToFormatTxt(cpt,areaMx,null)).setVisible(true);
+		}
 	}
 }

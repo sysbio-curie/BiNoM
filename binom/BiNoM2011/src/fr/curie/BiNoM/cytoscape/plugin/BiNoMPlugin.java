@@ -82,15 +82,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.colorCellDesignerProteins;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.pathwayStainingCellDesigner;
-import fr.curie.BiNoM.cytoscape.influence.FromToNodes;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceAreaInArray;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceAreaInAttribute;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceArrayAsGraphic;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceArrayAsText;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceByAttribute;
-import fr.curie.BiNoM.cytoscape.influence.InfluenceFeatures;
-import fr.curie.BiNoM.cytoscape.influence.InputReachParameter;
-import fr.curie.BiNoM.cytoscape.influence.UpdateInfluenceAttrib;
+import fr.curie.BiNoM.cytoscape.influence.*;
 import fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory;
 import fr.curie.BiNoM.cytoscape.nestmanager.ClusterByShortPath;
 import fr.curie.BiNoM.cytoscape.nestmanager.CreateConnectionsBetweenNests;
@@ -390,12 +382,24 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		/*
 		 * Fade Model menu
 		 */
-	    JMenu binomInfluenceMenu = new JMenu("Fade signal propagation model");
+	    JMenu binomInfluenceMenu = new JMenu("Fade Signal Propagation Model");
 	    structAnaMenu.add(binomInfluenceMenu);
+		
+		menuItem=new JMenuItem(PreselectSrcTgt.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new PreselectSrcTgt());
 		
 		menuItem=new JMenuItem(FromToNodes.title);
 		binomInfluenceMenu.add(menuItem);
 		menuItem.addActionListener(new FromToNodes());
+		
+		menuItem=new JMenuItem(ChooseModelType.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new ChooseModelType());
+		
+		menuItem=new JMenuItem(SignedDistances.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new SignedDistances());
 		
 		binomInfluenceMenu.addSeparator();
 
@@ -410,6 +414,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(InfluenceFeatures.title);
 		binomInfluenceMenu.add(menuItem);
 		menuItem.addActionListener(new  InfluenceFeatures());
+		
+		menuItem=new JMenuItem(OpenedBackEdges.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  OpenedBackEdges());
 		
 		binomInfluenceMenu.addSeparator();
 		
@@ -438,7 +446,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(InfluenceByAttribute.title);
 		binomInfluenceMenu.add(menuItem);
 		menuItem.addActionListener(new  InfluenceByAttribute());
-	
+		
 		binomInfluenceMenu.addSeparator();
 		
 		menuItem=new JMenuItem(InfluenceAreaInArray.title);
@@ -448,6 +456,24 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(InfluenceAreaInAttribute.title);
 		binomInfluenceMenu.add(menuItem);
 		menuItem.addActionListener(new  InfluenceAreaInAttribute());
+		
+		binomInfluenceMenu.addSeparator();
+		
+		menuItem=new JMenuItem(InputScoreThreshold.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InputScoreThreshold());
+
+		menuItem=new JMenuItem(SignEqualityScore.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  SignEqualityScore());
+		
+		menuItem=new JMenuItem(ReverseSignWeightTest.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  ReverseSignWeightTest());
+		
+		menuItem=new JMenuItem(NullWeightTest.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  NullWeightTest());
 		
 
 		structAnaMenu.addSeparator();

@@ -7,15 +7,16 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 import cytoscape.Cytoscape;
 import fr.curie.BiNoM.cytoscape.utils.*;
-import fr.curie.BiNoM.pathways.utils.ComputingByBFS;
+import fr.curie.BiNoM.pathways.utils.*;
 /**
  * Display Influence Array for Visualizing 2 options
- * 1: as text, not connected: nc, 3 digits after point
+ * 1: as text, not connected: ?, 3 digits after point
  * 2: for computing, non connected=0, all possible digits
+ * See ModelMenuUtils and format in plug-in
  * 
  * @author Daniel.Rovera@curie.fr
  */
-public class InfluenceArrayAsText extends FromToNodes {
+public class InfluenceArrayAsText extends ModelMenuUtils {
 	private static final long serialVersionUID = 1L;
 	final public static String title="Display Influence Array As Text";
 	final public static String titleV="For Visualizing";
@@ -24,16 +25,25 @@ public class InfluenceArrayAsText extends FromToNodes {
 	public InfluenceArrayAsText(String format){
 		this.format=format;
 	}
-	public void actionPerformed(ActionEvent e){
-		double fade=reachParameter();
-		bfs=new ComputingByBFS(Cytoscape.getCurrentNetwork(),true);
-		getSrcTgt(title,true);
-		if(srcDialog.isEmpty()|tgtDialog.isEmpty()) return;
-		if(!bfs.initWeigths()){
+	public void actionPerformed(ActionEvent e){		
+		WeightGraphStructure wgs=new WeightGraphStructure(Cytoscape.getCurrentNetwork());		
+		if(!wgs.initWeights()){
 			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),errorWeigth,title,JOptionPane.ERROR_MESSAGE);
 			return;
-		}	
-		String txt=influenceToString(bfs,bfs.allInfluence(fade),format,srcDialog,tgtDialog);
-		new TextBox(Cytoscape.getDesktop(),titleOfArray(),txt).setVisible(true);		
+		}
+		updatePathModel();
+		updateFade();
+		getSrcTgt(wgs,title);
+		if(srcDialog.isEmpty()|tgtDialog.isEmpty()) return;
+		Double[][] inflMx;
+		if(ifMultiPath){
+			ComputingByDFS cpt=new ComputingByDFS(wgs,maxDepth());
+			inflMx=cpt.allInfluence(fade, srcDialog);
+			new TextBox(Cytoscape.getDesktop(),addTitle(title),matrixToFormatTxt(cpt,inflMx,format).toString()).setVisible(true);
+		}else{
+			ComputingByBFS cpt=new ComputingByBFS(wgs);
+			inflMx=cpt.allInfluence(fade, srcDialog);
+			new TextBox(Cytoscape.getDesktop(),addTitle(title),matrixToFormatTxt(cpt,inflMx,format)).setVisible(true);
+		}
 	}
 }

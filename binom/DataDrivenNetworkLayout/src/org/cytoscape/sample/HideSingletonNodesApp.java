@@ -1,5 +1,4 @@
 package org.cytoscape.sample;
-
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
 
@@ -9,6 +8,6 @@ public class HideSingletonNodesApp extends AbstractCySwingApp
 	{
 		super(adapter);
 		adapter.getCySwingApplication()
-        .addAction(new MenuAction(adapter));
+                    .addAction(new MenuAction(adapter));
 	}
 }

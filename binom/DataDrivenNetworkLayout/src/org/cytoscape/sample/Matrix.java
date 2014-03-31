@@ -10,19 +10,19 @@ public class Matrix
     
     public Matrix(float[][] data)
     {
-        int r= data.length;
+        /*int r= data.length;
         int c= data[0].length;
         this.data= new float[r][c];
         for(int i = 0; i < r; i++) {
             for(int j = 0; j < c; j++) {
                     this.data[i][j] = data[i][j];
             }
-        }
+        }*/
     }
 
     /* convenience method for getting a 
        string representation of matrix */
-    public String toString()
+    /*  public String toString()
     {
     	StringBuilder sb = new StringBuilder(1024);
     	for(float[] row : this.data)
@@ -36,18 +36,18 @@ public class Matrix
     	}
 
     	return(sb.toString());
-    }
+    }*/
 
-    public void removeRowsWithValue(double treshold)
+    public float[][] removeRowsWithValue(double treshold)
     {
             /* Use an array list to track of the rows we're going to want to 
                keep...arraylist makes it easy to grow dynamically so we don't 
                need to know up front how many rows we're keeping */
-    	List<float[]> rowsToKeep = new ArrayList<float[]>(this.data.length);
+    	List<float[]> rowsToKeep = new ArrayList<float[]>(data.length);
     	
     	
-    	int nnode = 0;
-    	for(float[] row : this.data)
+    	//int nnode = 0;
+    	for(float[] row : data)
     	{
     		/* If you download Apache Commons, it has built-in array search
                       methods so you don't have to write your own */
@@ -76,16 +76,19 @@ public class Matrix
     		if(!found)
     		{
     			rowsToKeep.add(row);
+    			//System.out.println(row);
     		}
     	}
 
             /* now that we know what rows we want to keep, make our 
                new 2D array with only those rows */
-    	this.data = new float[rowsToKeep.size()][];
+    	data = new float[rowsToKeep.size()][];
     	for(int i=0; i < rowsToKeep.size(); i++)
     	{
-    		this.data[i] = rowsToKeep.get(i);
+    		data[i] = rowsToKeep.get(i);
+    		
     	}
+    	return data;
     }
     
    /* public static void main(String[] args)
@@ -104,4 +107,5 @@ public class Matrix
     	m.removeRowsWithValue(10);
     	System.out.println(m);
     }*/
+    
 }

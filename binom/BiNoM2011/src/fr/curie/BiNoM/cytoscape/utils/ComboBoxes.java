@@ -52,7 +52,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		int fi=fields.indexOf(selected);
 		for(int i=1;i<label.length;i++){
 			container.add(new JLabel(label[i]));
-			comboBoxes[i]=new JComboBox<String>();
+			comboBoxes[i]=new JComboBox();
 			container.add(comboBoxes[i]);
 			fill(comboBoxes[i],datas.get(fi));
 		}
@@ -73,7 +73,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		}
 		return ok;
 	}
-	void fill(JComboBox<String> comboBox,ArrayList<String> data){
+	void fill(JComboBox comboBox,ArrayList<String> data){
 		comboBox.removeAllItems();
 		for(int i=0;i<data.size();i++) comboBox.addItem(data.get(i));
 	}

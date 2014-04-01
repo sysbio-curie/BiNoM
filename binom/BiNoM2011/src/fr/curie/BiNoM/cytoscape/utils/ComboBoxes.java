@@ -32,7 +32,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 	final int heightByLine=32;
 	private JButton okBouton,cancelBouton;
 	private boolean ok=false;
-	JComboBox<String>[] comboBoxes;
+	JComboBox [] comboBoxes;
 	ArrayList<String> fields;
 	ArrayList<ArrayList<String>> datas;
 	public ComboBoxes(JFrame parent,String title,String[] label,ArrayList<String> fields,String selected,ArrayList<ArrayList<String>> datas){ 
@@ -44,7 +44,7 @@ public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 		container.setLayout(new GridLayout(label.length+1,2));
 		comboBoxes=new JComboBox[label.length];
 		container.add(new JLabel(label[0]));
-		comboBoxes[0]=new JComboBox<String>();
+		comboBoxes[0]=new JComboBox();
 		container.add(comboBoxes[0]);
 		fill(comboBoxes[0],fields);
 		comboBoxes[0].setSelectedItem(selected);

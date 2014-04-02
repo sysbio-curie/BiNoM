@@ -1,36 +1,45 @@
 package fr.curie.BiNoM.cytoscape.nestmanager;
+/*
+BiNoM Cytoscape Plugin under GNU Lesser General Public License 
+Copyright (C) 2010-2011 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
+*/
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import javax.swing.JOptionPane;
-import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
+import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.util.CytoscapeAction;
 /**
  * Pack nodes inside selected networks in nest pointing to these networks
  * Position of nest are the mean position of nodes
- * Edges are recreated between nests and nodes with the same attributes
+ * Every Edges are recreated between nests and nodes with the same attributes without compacting them
+ * When a node is here several times, edges connecting it are duplicated
  * 
  * @author Daniel.Rovera@curie.fr
  */
 public class PackInNestNode extends CytoscapeAction{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Create Modules from Networks";
-	private final String attrName="PREVIOUS_ID";
+	final public static String title="Pack Network In Modules";
 	public void actionPerformed(ActionEvent v){
-		CyNetwork currentNW=Cytoscape.getCurrentNetwork();
-		Cytoscape.getNetworkView(currentNW.getIdentifier()).redrawGraph(true,true);
-		for(CyEdge edge:NestUtils.getEdgeList(currentNW)) Cytoscape.getEdgeAttributes().setAttribute(edge.getIdentifier(),attrName,edge.getIdentifier());
 		TreeMap<String,CyNetwork> networks=NestUtils.getNetworksMap();
-		ArrayList<String> selection=NestUtils.selectNetworks(networks,title,"Select pack networks");
-		for(int i=0;i<selection.size();i++){
-			String absentNode=NestUtils.createConnectNestPack(currentNW,networks.get(selection.get(i)));
-			if(absentNode!=null){JOptionPane.showMessageDialog(Cytoscape.getDesktop(),absentNode+" of "+networks.get(selection.get(i)).getIdentifier()+
-						"\r\nis not in current network","Cannot pack for this network",JOptionPane.WARNING_MESSAGE);
-				return;
-			}				
-		}		
-		Cytoscape.getCurrentNetworkView().redrawGraph(true,true);
+		ArrayList<String> selection=NestUtils.selectNetworks(networks,title+": "+Cytoscape.getCurrentNetwork().getIdentifier(),"Select pack networks");
+		if(selection.isEmpty()){
+			NestUtils.cloneCurrent(" copy");
+			return;
+		}
+		CyNetwork cloneNW=NestUtils.cloneCurrent(" packed");
+		String cloneName=Cytoscape.getCurrentNetwork().getTitle();
+		int ni=0;while(networks.keySet().contains(cloneName+ni)) ni++;
+		cloneNW.setTitle(cloneName+ni);
+		ArrayList<CyNetwork> nestNetworks=new ArrayList<CyNetwork>();
+		for(int i=0;i<selection.size();i++) nestNetworks.add(networks.get(selection.get(i)));
+		if(!NestUtils.createAndPlaceNests(cloneNW,nestNetworks)){
+			Cytoscape.destroyNetwork(cloneNW);
+			return;
+		}
+		NestUtils.explicitConnectNestAndNode(cloneNW);
+		for(CyNetwork nestNetwork:nestNetworks)
+			for(CyNode node:NestUtils.getNodeList(nestNetwork)) cloneNW.removeNode(cloneNW.getIndex(node),false);
 	}
 }

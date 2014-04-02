@@ -5,7 +5,6 @@ package fr.curie.BiNoM.cytoscape.utils;
 */
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -19,7 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 /**
- * A dialog box to select strings in a sorted list displaying selected strings
+ * A dialog box to select strings in a list displaying selected strings
+ * An arrayList is filled of selected values
  * 
  * @author Daniel.Rovera@curie.fr
  */
@@ -36,8 +36,8 @@ public class ListDialog extends GridBagDialog implements ActionListener,ListSele
 	final int height=480;
 	private JButton okBouton, cancelBouton ;
 	private boolean ok = false ;
-	private JList listBox;
-	private List list;
+	private JList display;
+	private JList selected;
 	public ListDialog(JFrame parent,String title, String label,String[]values){ 
 		super(parent,title,true,cx,cy,cw,ch,xw,yw,cf);
 		setSize(width,height);
@@ -45,13 +45,12 @@ public class ListDialog extends GridBagDialog implements ActionListener,ListSele
 		container.setLayout(new GridBagLayout());
 		constraints = new GridBagConstraints();
 		addWithConstraints(0,new JLabel(label));
-		listBox = new JList(values);
-		addWithConstraints(1,new JScrollPane(listBox));
-		listBox.addListSelectionListener(this);
-		list=new List();
-		addWithConstraints(2,list);
-		list.add("Select in the list");
-		list.setFont(listBox.getFont());
+		display = new JList(values);
+		addWithConstraints(1,new JScrollPane(display));
+		display.addListSelectionListener(this);
+		selected=new JList();
+		addWithConstraints(2,selected);
+		selected.setFont(display.getFont());
 		okBouton = new JButton ("OK") ;
 		addWithConstraints(3,okBouton);		
 		okBouton.addActionListener(this) ;
@@ -62,10 +61,10 @@ public class ListDialog extends GridBagDialog implements ActionListener,ListSele
 	}
 	public void launchDialog(ArrayList<String> values){
 		ok = false ;
-		listBox.clearSelection();
-		setVisible(true) ;
+		display.clearSelection();
+		setVisible(true);
 		if(ok){
-			Object[] valTemp = listBox.getSelectedValues();
+			Object[] valTemp = display.getSelectedValues();
 			values.clear();
 			for (int i = 0 ; i<valTemp.length ; i++) values.add((String)valTemp[i]); 
 		}
@@ -79,9 +78,7 @@ public class ListDialog extends GridBagDialog implements ActionListener,ListSele
 	}
 	public void valueChanged(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting()){
-			list.removeAll();
-			Object[]val = listBox.getSelectedValues();
-			for (int i=0; i<val.length ; i++) list.add((String)val[i]) ;
+			selected.setListData(display.getSelectedValues());
 		}		
 	}
 }

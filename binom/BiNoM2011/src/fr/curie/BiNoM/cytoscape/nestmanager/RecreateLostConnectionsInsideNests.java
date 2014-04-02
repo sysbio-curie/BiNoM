@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.TreeMap;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
+import cytoscape.Cytoscape;
+import cytoscape.data.Semantics;
 import cytoscape.util.CytoscapeAction;
 import fr.curie.BiNoM.cytoscape.lib.TaskManager;
 /**
@@ -26,7 +28,7 @@ public class RecreateLostConnectionsInsideNests  extends CytoscapeAction {
 		if(network==referenceNW) return;
 		for(CyEdge edge:NestUtils.getEdgeList(network))network.removeEdge(network.getIndex(edge),true);
 		HashSet<CyEdge> edges=NestUtils.edgesLinkingNodes(referenceNW,NestUtils.getNodeSet(network));
-		for(CyEdge edge:edges)(network).addEdge(NestUtils.reconnect2Nodes(edge.getSource(),edge.getTarget(),edge));
+		for(CyEdge edge:edges)(network).addEdge(NestUtils.connect2NodesFrom(edge.getSource(),edge.getTarget(),edge,Cytoscape.getEdgeAttributes().getStringAttribute(edge.getIdentifier(),Semantics.INTERACTION)));
 	}
 	public void actionPerformed(ActionEvent v) {
 		TreeMap<String,CyNetwork> networks=NestUtils.getNetworksMap();

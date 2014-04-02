@@ -7,6 +7,9 @@ import fr.curie.BiNoM.cytoscape.utils.ListDialog;
 import giny.model.GraphPerspective;
 import giny.model.Node;
 import giny.view.NodeView;
+
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -22,11 +25,8 @@ import cytoscape.view.CyNetworkView;
 /**
  * Class gathering useful functions shared by several classes of nest manager:
  * - Access by different structure to list of nodes or edges
- * - Edges linking nodes
- * - Reconnection between 2 nodes by copy an edge from a reference network
- * - Create network made of nests
- * - Pack part of network in nest keeping connections 
- * - Transfer positions, delete edges
+ * - Creation of nests and edges in different contexts
+ * - Positioning of nodes and nests
  * - Dialog to select one or several networks
  * 
  * @author Daniel.Rovera@curie.fr
@@ -61,9 +61,13 @@ public class NestUtils {
 		}
 		return edges;
 	}
-	public static CyEdge reconnect2Nodes(Node src,Node tgt,CyEdge fromEdge){
+	/**
+	 * Connect 2 nodes using attributes from an edge
+	 * ID may be different from node1(interaction)node2 by copying attributes
+	*/
+	public static CyEdge connect2NodesFrom(Node src,Node tgt,CyEdge fromEdge,String idInterValue){
 		CyAttributes attr=Cytoscape.getEdgeAttributes();
-		CyEdge edge=Cytoscape.getCyEdge(src,tgt,Semantics.INTERACTION,attr.getStringAttribute(fromEdge.getIdentifier(),Semantics.INTERACTION),true,true);
+		CyEdge edge=Cytoscape.getCyEdge(src,tgt,Semantics.INTERACTION,idInterValue,true,true);
 		String[] attrNames=attr.getAttributeNames();
 		for(int i=0;i<attrNames.length;i++){
 			switch(attr.getType(attrNames[i])){
@@ -84,6 +88,10 @@ public class NestUtils {
 		return edge;
 	}
 	final static String modular="Modular";
+	/**
+	 * Create a network made of nests,
+	 * Avoid same name for 2 networks using TreeMap from dialog
+	*/
 	public static CyNetwork createNestNetwork(ArrayList<String> networksToNest,TreeMap<String,CyNetwork> networks){
 		int ni=0;while(networks.keySet().contains(modular+ni)) ni++;
 		CyNetwork network=Cytoscape.createNetwork(modular+ni,false);
@@ -94,45 +102,18 @@ public class NestUtils {
 		}
 		return network;
 	}
-	static String createConnectNestPack(CyNetwork network,CyNetwork nestIntoPack){
-		double nx=0.0,ny=0.0;
-		HashSet<CyNode> packSet=NestUtils.getNodeSet(nestIntoPack);
-		if(packSet.size()==0) return null;
-		CyNetworkView view=Cytoscape.getNetworkView(network.getIdentifier());
-		for(CyNode node:packSet){
-			NodeView nv=view.getNodeView(node);
-			if(nv==null){
-				return node.getIdentifier();
-			}
-			nx=nx+nv.getXPosition();
-			ny=ny+nv.getYPosition();			
-		}
-		nx=nx/packSet.size();
-		ny=ny/packSet.size();		
-		CyNode pack=Cytoscape.getCyNode(nestIntoPack.getTitle(),true);
-		network.addNode(pack);
-		Cytoscape.getNodeAttributes().setAttribute(pack.getIdentifier(),"BIOPAX_NODE_TYPE","pathway");
-		pack.setNestedNetwork(nestIntoPack);
-		view.getNodeView(pack).setXPosition(nx);
-		view.getNodeView(pack).setYPosition(ny);	
-		for(CyEdge edge:NestUtils.getEdgeList(network)){
-			Node src=edge.getSource();
-			Node tgt=edge.getTarget();
-			if(packSet.contains(src)){
-				if(!packSet.contains(tgt)) network.addEdge(NestUtils.reconnect2Nodes(pack,tgt,edge));
-			}else{
-				if(packSet.contains(tgt)) network.addEdge(NestUtils.reconnect2Nodes(src,pack,edge));				
-			}
-		}
-		for(CyNode node:packSet) network.removeNode(network.getIndex(node),false);
-		return null;		
-	}
+	/**
+	 * Delete only edges between nests 
+	 */
 	public static void deleteNestEdges(CyNetwork network){
 		for(CyEdge edge:NestUtils.getEdgeList(network)){
-			if((edge.getSource().getNestedNetwork()!=null)||(edge.getTarget().getNestedNetwork()!=null))
+			if((edge.getSource().getNestedNetwork()!=null)&&(edge.getTarget().getNestedNetwork()!=null))
 				network.removeEdge(network.getIndex(edge),true);
 		}
 	}
+	/**
+	 * Transfer position of all nodes to a view to another
+	 */
 	public static void reportPosition(CyNetworkView fromView,CyNetworkView toView){
 		for(CyNode node:getNodeList(toView.getNetwork())){
 			NodeView toNodeView=toView.getNodeView(node);
@@ -143,11 +124,120 @@ public class NestUtils {
 			}
 		}
 	}
+	/**
+	 * create nests from a list of networks placing them at the mean coordinate of nodes from networks
+	 */
+	static boolean createAndPlaceNests(CyNetwork network,Collection<CyNetwork> nestNetworks){
+		for(CyNetwork nest:nestNetworks){
+			double nx=0.0,ny=0.0;
+			HashSet<CyNode> packSet=NestUtils.getNodeSet(nest);
+			if(packSet.size()==0){
+				continue;
+			}
+			CyNetworkView view=Cytoscape.getNetworkView(network.getIdentifier());
+			for(CyNode node:packSet){
+				NodeView nv=view.getNodeView(node);
+				if(nv==null){
+					JOptionPane.showMessageDialog(Cytoscape.getDesktop(),node.getIdentifier()+" of "+nest.getIdentifier()+
+							"\r\nis not in current network","Cannot pack for this network",JOptionPane.WARNING_MESSAGE);
+					return false;
+				}
+				nx=nx+nv.getXPosition();
+				ny=ny+nv.getYPosition();			
+			}
+			nx=nx/packSet.size();
+			ny=ny/packSet.size();		
+			CyNode pack=Cytoscape.getCyNode(nest.getTitle(),true);
+			network.addNode(pack);
+			Cytoscape.getNodeAttributes().setAttribute(pack.getIdentifier(),"BIOPAX_NODE_TYPE","pathway");
+			pack.setNestedNetwork(nest);
+			view.getNodeView(pack).setXPosition(nx);
+			view.getNodeView(pack).setYPosition(ny);			
+		}			
+		return true;
+	}
+	/**
+	 * Clone the current network and add postfix at the end of its name
+	 */
+	static CyNetwork cloneCurrent(String postfix){
+		CyNetwork oldNW=Cytoscape.getCurrentNetwork();
+		CyNetwork newNW=Cytoscape.createNetwork(oldNW.nodesList(),oldNW.edgesList(),oldNW.getTitle()+postfix);
+		CyNetworkView newView=Cytoscape.createNetworkView(newNW);
+		NestUtils.reportPosition(Cytoscape.getNetworkView(oldNW.getIdentifier()),newView);
+		Cytoscape.setCurrentNetwork(newNW.getIdentifier());
+		newView.redrawGraph(true,true);
+		return newNW;
+	}
+	/**
+	 * Create a useful logical link from nodes to nests used in several functions
+	 */
+	static HashMap<CyNode,HashSet<CyNode>> doNodeToNests(CyNetwork network){
+		HashMap<CyNode,HashSet<CyNode>> nodeToNests=new HashMap<CyNode,HashSet<CyNode>>();
+		for(CyNode nest:NestUtils.getNodeList(network)){
+			GraphPerspective nestNW=nest.getNestedNetwork();
+			if(nestNW==null) continue;		
+			for(CyNode node:NestUtils.getNodeList(nestNW)){
+				if(nodeToNests.containsKey(node)) nodeToNests.get(node).add(nest);
+				else{
+					HashSet<CyNode> nests=new HashSet<CyNode>();
+					nests.add(nest);
+					nodeToNests.put(node,nests);
+				}
+			}
+		}
+		return nodeToNests;
+	}
+	/**
+	 * Create edges between nests, compacting synonym edges in one
+	 */
+	static void createNestConnection(CyNetwork referenceNW,CyNetwork currentNW,HashMap<CyNode,HashSet<CyNode>> nodesToNest){
+		for(CyEdge edge:NestUtils.getEdgeList(referenceNW)){
+			HashSet<CyNode> srcList=nodesToNest.get(edge.getSource());
+			if(srcList==null) continue;
+			HashSet<CyNode> tgtList=nodesToNest.get(edge.getTarget());
+			if(tgtList==null) continue;
+			String interaction=Cytoscape.getEdgeAttributes().getStringAttribute(edge.getIdentifier(),Semantics.INTERACTION);
+			if(interaction.equalsIgnoreCase("RIGHT")||interaction.equalsIgnoreCase("LEFT")) interaction="MOLECULEFLOW";
+			for(CyNode src:srcList){
+				for(CyNode tgt:tgtList){
+					if(!src.equals(tgt)) currentNW.addEdge(Cytoscape.getCyEdge(src,tgt,Semantics.INTERACTION,interaction,true,true));					
+				}
+			}
+		}	
+	}
+	/**
+	 * Reconnect every edge of the initial network between nodes and nests,
+	 * duplicating it if necessary,
+	 * Use the initial ID of edges, () are replaced by [] to not disturb Cytoscape
+	 */
+	static void explicitConnectNestAndNode(CyNetwork network){
+		HashMap<CyNode,HashSet<CyNode>> nodesToNest=doNodeToNests(network);
+		for(CyEdge edge:NestUtils.getEdgeList(network)){
+			Node src=edge.getSource();
+			Node tgt=edge.getTarget();
+			String idInterValue=edge.getIdentifier();
+			idInterValue=idInterValue.replace('(','[');
+			idInterValue=idInterValue.replace(')',']');
+			if(nodesToNest.get(src)!=null) for(CyNode s:nodesToNest.get(src)) 
+				network.addEdge(connect2NodesFrom(s,tgt,edge,idInterValue));
+			if(nodesToNest.get(tgt)!=null) for(CyNode t:nodesToNest.get(tgt)) 
+				network.addEdge(connect2NodesFrom(src,t,edge,idInterValue));
+			if((nodesToNest.get(src)!=null)&&(nodesToNest.get(tgt)!=null))
+				for(CyNode s:nodesToNest.get(src)) for(CyNode t:nodesToNest.get(tgt)) if(s!=t) 
+					network.addEdge(connect2NodesFrom(s,t,edge,idInterValue));
+		}				
+	}
+	/**
+	 * Return a tree map of networks useful in dialog for sorted list
+	 */
 	public static TreeMap<String,CyNetwork> getNetworksMap(){
 		TreeMap<String,CyNetwork> networks=new TreeMap<String,CyNetwork>();
 		for(CyNetwork network:Cytoscape.getNetworkSet()) networks.put(network.getTitle(),network);
 		return networks;
 	}
+	/**
+	 * Dialog to select one network
+	 */
 	public static String selectOneNetwork(TreeMap<String,CyNetwork> networks,String title, String label){
 		String[] netNames=new String[networks.keySet().size()];
 		int ni=0;for(String s:networks.keySet()) netNames[ni++]=s;
@@ -156,6 +246,9 @@ public class NestUtils {
 				JOptionPane.PLAIN_MESSAGE, null, netNames, netNames[0]);
 		return selected;
 	}
+	/**
+	 * Dialog to select several networks
+	 */
 	public static ArrayList<String> selectNetworks(TreeMap<String,CyNetwork> networks,String title, String label){
 		String[] netNames=new String[networks.keySet().size()];
 		int ni=0;for(String s:networks.keySet()) netNames[ni++]=s;

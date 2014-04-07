@@ -1544,6 +1544,13 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	makeValueInput: function(id, config, tabname, idx) {
+		/*
+		var disabled = this.discrete_ordered[tabname] ? 'disabled' : '';
+		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' " + disabled + " onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+		*/
+		if (this.discrete_ordered[tabname]) {
+			return "<td>" + this.getValueAt(config, tabname, idx) + "</td>";
+		}
 		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
 	},
 
@@ -1707,7 +1714,7 @@ DisplayContinuousConfig.prototype = {
 		if (really_dont_use_gradient) {
 			html += "<th></th>";
 		}
-		html += "<th>Value</th>";
+		html += "<th>&nbsp;Value&nbsp;</th>";
 		if (config == 'color') {
 			html += "<th>Color</th>";
 		}
@@ -1777,9 +1784,11 @@ DisplayContinuousConfig.prototype = {
 		var width = (use_absval && tabname != 'group' ? '120px' : '150px');
 		html += "<tr><td style='background: #EEEEEE'>&nbsp;</td></tr>";
 		html += "<tr>";
-		html += "<td id='min_val_label_" + id_suffix + "'><span class='config-label'>" + min_label + "</span></td>";
-		html += "<td id='min_val_" + id_suffix + "'>" + minval + "</td>";
-		html += "<td width='10px'>&nbsp;</td>";
+		if (!this.discrete_ordered[tabname]) {
+			html += "<td id='min_val_label_" + id_suffix + "'><span class='config-label'>" + min_label + "</span></td>";
+			html += "<td id='min_val_" + id_suffix + "'>" + minval + "</td>";
+			html += "<td width='10px'>&nbsp;</td>";
+		}
 		if (tabname == 'sample') {
 			if (!this.discrete_ordered[tabname] && this.datatable.minval < 0) {
 				html += "<td width='" + width + "'rowspan='2'><span class='config-label'>&nbsp;&nbsp;Use&nbsp;abs&nbsp;values&nbsp;</span><input id='step_config_absval_" + id_suffix + "' type='checkbox' onchange='DisplayContinuousConfig.setSampleAbsval(\"" + config + "\", \"" + id + "\")'" + (use_absval ? " checked" : "") + "></input></td>"
@@ -1790,11 +1799,13 @@ DisplayContinuousConfig.prototype = {
 			html += "<td width='" + width + "' style='text-align: center'><span class='config-label' style='text-align: center'>Group&nbsp;Method</span></td>";
 		}
 		html += "</tr><tr>";
-		html += "<td id='max_val_label_" + id_suffix + "'><span class='config-label'>" + max_label + "</span></td>";
-		html += "<td id='max_val_" + id_suffix + "'>" + maxval + "</td>";
+		if (!this.discrete_ordered[tabname]) {
+			html += "<td id='max_val_label_" + id_suffix + "'><span class='config-label'>" + max_label + "</span></td>";
+			html += "<td id='max_val_" + id_suffix + "'>" + maxval + "</td>";
+		}
 		if (tabname == 'group') {
 			html += "<td width='10px'>&nbsp;</td>";
-			html += "<td>" + this.makeSelectGroupMethod(config) + "</td>";
+			html += "<td width='" + width + "' style='text-align: center'>" + this.makeSelectGroupMethod(config) + "</td>";
 		}
 		html += "</tr>";
 		html += "</tbody>";

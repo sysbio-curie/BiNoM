@@ -1196,7 +1196,7 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.use_gradient['color'] = true;
 		this.use_gradient['shape'] = true;
 		this.use_gradient['size'] = true;
-		var step_cnt = this.datatable.maxval_abs - this.datatable.minval_abs;
+		step_cnt = this.datatable.getDiscreteValues().length-1;
 		this.default_step_count['sample']['color'] = step_cnt;
 		this.default_step_count['sample']['shape'] = step_cnt;
 		this.default_step_count['sample']['size'] = step_cnt;
@@ -1264,7 +1264,7 @@ DisplayContinuousConfig.prototype = {
 		step_cnt *= 1.;
 		var step_cnt_1 = this.use_gradient[config] ? step_cnt+1 : step_cnt;
 		var keep = this.values[tabname][config] && step_cnt_1 == this.getStepCount(config, tabname);
-		console.log("KEEPING for config " + tabname + " " + config + " " + step_cnt + " " + (this.values[tabname][config] ? this.getStepCount(config, tabname) : -1) + " keep=" + keep);
+		//console.log("KEEPING for config " + tabname + " " + config + " " + step_cnt + " " + (this.values[tabname][config] ? this.getStepCount(config, tabname) : -1) + " keep=" + keep);
 		this.values[tabname][config] = [];
 		var values = this.values[tabname][config];
 		var minval = this.getDatatableMinval(config, tabname);
@@ -1276,7 +1276,7 @@ DisplayContinuousConfig.prototype = {
 		if (this.has_empty_values) {
 			values.push(Number.MIN_NUMBER);
 		}
-		console.log("HAS EMPTY VALUE: " + this.has_empty_values);
+		//console.log("HAS EMPTY VALUE: " + this.has_empty_values);
 		values.push(minval);
 		for (var nn = 0; nn < step_cnt-1; ++nn) {
 			var value = minval + (nn+1.)*step;
@@ -1973,7 +1973,6 @@ DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
 }
 
 DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
-	console.log("setColors:");
 	var datatable = navicell.dataset.datatables_id[id];
 	var module = get_module();
 	var displayContinuousConfig = datatable.getDisplayConfig(module);
@@ -1984,24 +1983,19 @@ DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
 	var color = $("#discrete_color_same_color_" + id_suffix).val();
 	var beg_gradient = $("#discrete_color_beg_gradient_" + id_suffix).val();
 	var end_gradient = $("#discrete_color_end_gradient_" + id_suffix).val();
-	console.log("CHECKED1 : " + checked);
 	if (checked == "checked") {
-		console.log("COLOR; " + color);
 		displayContinuousConfig.useColors(config, "same_color", color);
 		displayContinuousConfig.update_colors(config, tabname, {checked: "same_color", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 	}
 	if (same_color) {
 		return;
 	}
-	console.log("setColors Complete:");
 	checked = $("#discrete_color_palette_" + id_suffix).attr("checked");
-	console.log("CHECKED2 : " + checked);
 	if (checked == "checked") {
 		displayContinuousConfig.useColors(config, "palette");
 		displayContinuousConfig.update_colors(config, tabname, {checked: "palette", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 	} else {
 		checked = $("#discrete_color_gradient_" + id_suffix).attr("checked");
-		console.log("CHECKED3 : " + checked);
 		if (checked == "checked") {
 			displayContinuousConfig.useColors(config, "gradient", beg_gradient, end_gradient);
 			displayContinuousConfig.update_colors(config, tabname, {checked: "gradient", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
@@ -2015,7 +2009,6 @@ DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, 
 		win = window;
 	}
 	var module = get_module(win);
-	console.log("setEditing : " + module + " " + datatable_id);
 	var div = datatable.getDisplayConfig(module).getDiv(config);
 
 	if (div) {
@@ -2633,9 +2626,11 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	},
 
 	setValueInfo: function(config, tabname, idx, color, size, shape, cond) {
+		/*
 		if (tabname == 'group') {
 			console.log("setting value info " + tabname + " " + idx + " " + this.colors[tabname][config].length + " " + color);
 		}
+		*/
 		if (idx < this.colors[tabname][config].length) {
 			this.colors[tabname][config][idx] = color;
 			this.sizes[tabname][config][idx] = size;
@@ -3114,16 +3109,23 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			} else {
 				checked = "";
 			}
-			var beg_gradient;
-			var end_gradient;
-			if (params) {
-				beg_gradient = params.beg_gradient;
-				end_gradient = params.end_gradient;
-			} else {
-				beg_gradient = "00FF00";
-				end_gradient = "FF0000";
+			var HAS_GRADIENT = false;
+			if (HAS_GRADIENT) {
+				var beg_gradient;
+				var end_gradient;
+				if (params) {
+					beg_gradient = params.beg_gradient;
+					end_gradient = params.end_gradient;
+				} else {
+					beg_gradient = "00FF00";
+					end_gradient = "FF0000";
+				}
+				html += "<tr rowspan='1'><td colspan='1' class='config-label'><div style='vertical-align: center;'><span style='vertical-align: center;'><input name='discrete_color_choice_\"" + id_suffix + "' type='radio'" + checked + " id='discrete_color_gradient_" + id_suffix + "'" + onchange + ">&nbsp;Use color gradient</span></div></td>";
+				html += "<td style='background: #EEEEEE'><table>";
+				html += "<tr><td><input id='discrete_color_beg_gradient_" + id_suffix + "' value='" + beg_gradient + "' class='color'" + onchange + "></td></tr>";
+				html += "<tr><td><input id='discrete_color_end_gradient_" + id_suffix + "' value='" + end_gradient + "' class='color'" + onchange + "></td></tr>";
+				html += "</table></td></tr>";
 			}
-			html += "<tr rowspan='1'><td colspan='1' class='config-label'><div style='vertical-align: center;'><span style='vertical-align: center;'><input name='discrete_color_choice_\"" + id_suffix + "' type='radio'" + checked + " id='discrete_color_gradient_" + id_suffix + "'" + onchange + ">&nbsp;Use color gradient</span></div></td><td style='background: #EEEEEE'><table><tr><td><input id='discrete_color_beg_gradient_" + id_suffix + "' value='" + beg_gradient + "' class='color'" + onchange + "></td></tr><tr><td><input id='discrete_color_end_gradient_" + id_suffix + "' value='" + end_gradient + "' class='color'" + onchange + "></td></tr></table></td>";
 			var color = "";
 			if (params && params.checked == "same_color") {
 				checked = " checked";
@@ -3954,7 +3956,7 @@ Datatable.prototype = {
 			console.log("DECLARING DATATABLE in map " + map_name);
 			this.declareWindow(doc.win);
 		}
-		if (this.biotype.isUnorderedDiscrete()) {
+		if (this.biotype.isUnorderedDiscrete() || this.biotype.isOrderedDiscrete()) {
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
 		} else if (this.biotype.isSet()) { // duplicated code for now
@@ -4154,7 +4156,7 @@ Datatable.prototype = {
 				return "expected numeric value, got '" + value + "'";
 			}
 		}
-		if (this.biotype.isUnorderedDiscrete() || this.biotype.isSet()) {
+		if (this.biotype.isUnorderedDiscrete() || this.biotype.isOrderedDiscrete() || this.biotype.isSet()) {
 			this.discrete_values_map[value] = 1;
 		}
 		this.data[gene_nn][sample_nn] = value;

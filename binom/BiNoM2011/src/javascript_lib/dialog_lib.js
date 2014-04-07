@@ -213,6 +213,7 @@ $(function() {
 
 							datatable.ready.then(function() {
 								if (datatable.error) {
+									body.css("cursor", ocursor);
 									error_message(datatable.error);
 								} else {
 									console.log("hierarchy #1: " + window.document.navicell_module_name);

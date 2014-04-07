@@ -20,6 +20,7 @@
 
 var GLYPH_COUNT = 5;
 var DISPLAY_TIMEOUT = 500;
+var MAX_DISCRETE_VALUES = 30;
 
 if (!window.console) {
 	window.console = new function()
@@ -1197,6 +1198,9 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.use_gradient['shape'] = true;
 		this.use_gradient['size'] = true;
 		step_cnt = this.datatable.getDiscreteValues().length-1;
+		if (this.has_empty_values) {
+			--step_cnt;
+		}
 		this.default_step_count['sample']['color'] = step_cnt;
 		this.default_step_count['sample']['shape'] = step_cnt;
 		this.default_step_count['sample']['size'] = step_cnt;
@@ -1271,19 +1275,26 @@ DisplayContinuousConfig.prototype = {
 		var maxval = this.getDatatableMaxval(config, tabname);
 		//values.push(minval);
 		//var step = (maxval - minval)/(step_cnt+1);
-		var step = (maxval - minval)/(step_cnt);
-//		console.log("step_cnt: " + step_cnt + " step: " + step + " " + minval + " " + this.datatable.maxval);
-		if (this.has_empty_values) {
-			values.push(Number.MIN_NUMBER);
+		if (this.discrete_ordered[tabname]) {
+			var discrete_values = this.datatable.getDiscreteValues();
+			for (var value in discrete_values) {
+				values.push(discrete_values[value]);
+			}
+		} else {
+			var step = (maxval - minval)/(step_cnt);
+			//		console.log("step_cnt: " + step_cnt + " step: " + step + " " + minval + " " + this.datatable.maxval);
+			if (this.has_empty_values) {
+				values.push(Number.MIN_NUMBER);
+			}
+			//console.log("HAS EMPTY VALUE: " + this.has_empty_values);
+			values.push(minval);
+			for (var nn = 0; nn < step_cnt-1; ++nn) {
+				var value = minval + (nn+1.)*step;
+				value = parseInt(value*100.)/100;
+				values.push(value);
+			}
+			values.push(this.datatable.maxval);
 		}
-		//console.log("HAS EMPTY VALUE: " + this.has_empty_values);
-		values.push(minval);
-		for (var nn = 0; nn < step_cnt-1; ++nn) {
-			var value = minval + (nn+1.)*step;
-			value = parseInt(value*100.)/100;
-			values.push(value);
-		}
-		values.push(this.datatable.maxval);
 		if (this.has_empty_values && !keep) {
 			step_cnt++;
 		}
@@ -3956,10 +3967,13 @@ Datatable.prototype = {
 			console.log("DECLARING DATATABLE in map " + map_name);
 			this.declareWindow(doc.win);
 		}
-		if (this.biotype.isUnorderedDiscrete() || this.biotype.isOrderedDiscrete()) {
+		if (this.biotype.isUnorderedDiscrete()) {
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
-		} else if (this.biotype.isSet()) { // duplicated code for now
+		} else if (this.biotype.isOrderedDiscrete()) {
+			this.discrete_values = mapKeys(this.discrete_values_map);
+			this.discrete_values.sort(cmp=function(x, y) {return x-y;});
+		} else if (this.biotype.isSet()) {
 			this.discrete_values = mapKeys(this.discrete_values_map);
 			this.discrete_values.sort();
 		}
@@ -4157,7 +4171,12 @@ Datatable.prototype = {
 			}
 		}
 		if (this.biotype.isUnorderedDiscrete() || this.biotype.isOrderedDiscrete() || this.biotype.isSet()) {
-			this.discrete_values_map[value] = 1;
+			if (!this.discrete_values_map[value]) {
+				if (mapSize(this.discrete_values_map) > MAX_DISCRETE_VALUES) {
+					return 'maximum discrete values exceeded: ' + MAX_DISCRETE_VALUES;
+				}
+				this.discrete_values_map[value] = 1;
+			}
 		}
 		this.data[gene_nn][sample_nn] = value;
 		return '';

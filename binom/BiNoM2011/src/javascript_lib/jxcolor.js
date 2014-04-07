@@ -497,3 +497,19 @@ function color_gradient(color1, color2, steps) {
 	}
 	return gradients;
 }
+
+function get_color_gradient(color1, color2, minval, maxval, value) {
+	value *= 1.;
+	var ratio = (value-minval)/(maxval-minval);
+	/*
+	console.log("ratio=" + ratio + ", minval=" + minval + ", maxval=" + maxval + ", value=" + value);
+	console.log("color.red: " + color1.getRed() + " " + color2.getRed());
+	console.log("color.green: " + color1.getGreen() + " " + color2.getGreen());
+	console.log("color.blue: " + color1.getBlue() + " " + color2.getBlue());
+	*/
+	var red = color2.getRed() * ratio + color1.getRed() * (1. - ratio);
+	var green = color2.getGreen() * ratio + color1.getGreen() * (1. - ratio);
+	var blue = color2.getBlue() * ratio + color1.getBlue() * (1. - ratio);
+	//console.log("red: " + red + " " + green + " " + blue);
+	return new RGBColor(red&255, green&255, blue&255);
+}

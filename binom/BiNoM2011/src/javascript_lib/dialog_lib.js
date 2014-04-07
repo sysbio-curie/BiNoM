@@ -200,97 +200,102 @@ $(function() {
 				if (error) {
 					error_message(error);
 				} else {
-					var file_elem = file.get()[0];
-					var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0], window);
-					if (datatable.error) {
-						error_message(datatable.error);
-					} else {
-						status_message("Importing...");
+					var body = $('body', document);
+					var ocursor = body.css("cursor");
+					body.css("cursor", "wait");
+					setTimeout(function() {
+						var file_elem = file.get()[0];
+						var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0], window);
+						if (datatable.error) {
+							error_message(datatable.error);
+						} else {
+							status_message("Importing...");
 
-						datatable.ready.then(function() {
-							if (datatable.error) {
-								error_message(datatable.error);
-							} else {
-								console.log("hierarchy #1: " + window.document.navicell_module_name);
-								var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
-								status_str += "<table>";
-								status_str += "<tr><td>Samples</td><td>" + datatable.getSampleCount() + "</td></tr>\n";
-								var opener = window;
-								var nnn = 0;
-								while (opener && opener.document.map_name) {
-									status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
-									opener = opener.opener;
-									if (nnn++ > 4) {
-										console.log("too many level of hierarchy !");
-										break;
-									}
-								}
-								status_str += "</table>";
-								status_message(status_str);
-								
-								//navicell.annot_factory.sync();
-								//navicell.annot_factory.readannots(null, null);
-								navicell.annot_factory.refresh();
-								var display_graphics;
-								if (import_display_barplot.attr('checked')) {
-									var barplotConfig = drawing_config.editing_barplot_config;
-									barplotConfig.setDatatableAt(0, datatable);
-									if (OPEN_DRAWING_EDITOR) {
-										$("#barplot_editing").html(EDITING_CONFIGURATION);
-										$("#barplot_editor_div").dialog("open");
-									} else {
-										$("#drawing_config_chart_type").val('Barplot');
-										drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
-										barplot_sample_action('allsamples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
-							
-										barplot_editor_apply(drawing_config.barplot_config);
-										barplot_editor_apply(drawing_config.editing_barplot_config);
-										barplot_editor_set_editing(false);
-
-										max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
-
-										display_graphics = true;
-									}
-								} else if (import_display_heatmap.attr('checked')) {
-									var heatmapConfig = drawing_config.editing_heatmap_config;
-									var datatable_cnt = mapSize(navicell.dataset.datatables);
-									for (var idx = 0; idx < datatable_cnt; ++idx) {
-										if (!heatmapConfig.getDatatableAt(idx)) {
+							datatable.ready.then(function() {
+								if (datatable.error) {
+									error_message(datatable.error);
+								} else {
+									console.log("hierarchy #1: " + window.document.navicell_module_name);
+									var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
+									status_str += "<table>";
+									status_str += "<tr><td>Samples</td><td>" + datatable.getSampleCount() + "</td></tr>\n";
+									var opener = window;
+									var nnn = 0;
+									while (opener && opener.document.map_name) {
+										status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
+										opener = opener.opener;
+										if (nnn++ > 4) {
+											console.log("too many level of hierarchy !");
 											break;
 										}
 									}
-									heatmapConfig.setDatatableAt(idx, datatable);
-									if (OPEN_DRAWING_EDITOR) {
-										$("#heatmap_editing").html(EDITING_CONFIGURATION);
-										$("#heatmap_editor_div").dialog("open");
-									} else {
-										$("#drawing_config_chart_type").val('Heatmap');
-										drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
-										if (!drawing_config.heatmap_config.getSampleOrGroupCount()) {
-											heatmap_sample_action('allsamples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+									status_str += "</table>";
+									status_message(status_str);
+									
+									//navicell.annot_factory.sync();
+									//navicell.annot_factory.readannots(null, null);
+									navicell.annot_factory.refresh();
+									var display_graphics;
+									if (import_display_barplot.attr('checked')) {
+										var barplotConfig = drawing_config.editing_barplot_config;
+										barplotConfig.setDatatableAt(0, datatable);
+										if (OPEN_DRAWING_EDITOR) {
+											$("#barplot_editing").html(EDITING_CONFIGURATION);
+											$("#barplot_editor_div").dialog("open");
 										} else {
-											heatmap_sample_action('pass');
+											$("#drawing_config_chart_type").val('Barplot');
+											drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+											barplot_sample_action('allsamples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
+											
+											barplot_editor_apply(drawing_config.barplot_config);
+											barplot_editor_apply(drawing_config.editing_barplot_config);
+											barplot_editor_set_editing(false);
+
+											max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
+
+											display_graphics = true;
 										}
+									} else if (import_display_heatmap.attr('checked')) {
+										var heatmapConfig = drawing_config.editing_heatmap_config;
+										var datatable_cnt = mapSize(navicell.dataset.datatables);
+										for (var idx = 0; idx < datatable_cnt; ++idx) {
+											if (!heatmapConfig.getDatatableAt(idx)) {
+												break;
+											}
+										}
+										heatmapConfig.setDatatableAt(idx, datatable);
+										if (OPEN_DRAWING_EDITOR) {
+											$("#heatmap_editing").html(EDITING_CONFIGURATION);
+											$("#heatmap_editor_div").dialog("open");
+										} else {
+											$("#drawing_config_chart_type").val('Heatmap');
+											drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+											if (!drawing_config.heatmap_config.getSampleOrGroupCount()) {
+												heatmap_sample_action('allsamples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+											} else {
+												heatmap_sample_action('pass');
+											}
 
-										heatmap_editor_apply(drawing_config.heatmap_config);
-										heatmap_editor_apply(drawing_config.editing_heatmap_config);
-										heatmap_editor_set_editing(false);
+											heatmap_editor_apply(drawing_config.heatmap_config);
+											heatmap_editor_apply(drawing_config.editing_heatmap_config);
+											heatmap_editor_set_editing(false);
 
-										max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
+											max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
 
-										display_graphics = true;
+											display_graphics = true;
+										}
+									} else {
+										display_graphics = false;
 									}
-								} else {
-									display_graphics = false;
+									var display_markers = import_display_markers.attr('checked');
+									datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
+									drawing_editing(false);
+									update_status_tables();
+									body.css("cursor", ocursor);
 								}
-								var display_markers = import_display_markers.attr('checked');
-								datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
-								drawing_editing(false);
-								update_status_tables();
-							}
-						});
-					}
-					
+							});
+						}
+					}, DISPLAY_TIMEOUT);
 				}
 			},
 
@@ -1432,6 +1437,7 @@ function get_biotype_select(id, include_none, value, onchange) {
 
 function update_datatables() {
 	var update_cnt = 0;
+	var remove_cnt = 0;
 	var doc = window.document;
 	for (var dt_name in navicell.dataset.datatables) {
 		// TBD: do not support space in names: check all selector
@@ -1445,7 +1451,7 @@ function update_datatables() {
 		var new_dt_remove = dt_remove_elem.attr('checked');
 		if (new_dt_remove) {
 			navicell.dataset.removeDatatable(datatable);
-			update_cnt++;
+			remove_cnt++;
 		} else {
 			if ((new_dt_name && dt_name !== new_dt_name) ||
 			    new_dt_type !==  datatable.biotype.name) {
@@ -1461,9 +1467,23 @@ function update_datatables() {
 		}
 
 	}
-	if (update_cnt) {
+	if (remove_cnt) {
+		var drawing_config = navicell.getDrawingConfig(get_module());
+		drawing_config.heatmap_config.syncDatatables();
+		drawing_config.editing_heatmap_config.syncDatatables();
+		drawing_config.barplot_config.syncDatatables();
+		drawing_config.editing_barplot_config.syncDatatables();
+		for (var num = 1; num <= GLYPH_COUNT; ++num) {
+			drawing_config.getGlyphConfig(num).syncDatatables();
+			drawing_config.getEditingGlyphConfig(num).syncDatatables();
+		}
+	}
+	if (update_cnt || remove_cnt) {
 		update_datatable_status_table(doc, {force: true});
 		update_status_tables();
+	}
+	if (remove_cnt) {
+		clickmap_refresh(true);
 	}
 	datatable_management_set_editing(false);
 }
@@ -1492,9 +1512,9 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		var width;
 		if (what == COLOR_SIZE_CONFIG) {
 			//width = 500;
-			width = this.biotype.isDiscrete() ? 760 : 500;
+			width = this.biotype.isUnorderedDiscrete() ? 760 : 500;
 		} else if (what == 'color') {
-			width = this.biotype.isDiscrete() ? 700 : 440;
+			width = this.biotype.isUnorderedDiscrete() ? 700 : 440;
 		} else if (what == 'shape') {
 			width = 400;
 		} else {
@@ -1510,20 +1530,26 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 				"Apply": function() {
 					var datatable = navicell.getDatatableById(datatable_id);
 					//console.log("module : " + module);
-					var displayStepConfig = datatable.displayStepConfig[module];
-					var displayDiscreteConfig = datatable.displayDiscreteConfig[module];
+					var displayContinuousConfig = datatable.displayContinuousConfig[module];
+					var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
 					var active = div.tabs("option", "active");
-					var tabname = DisplayStepConfig.tabnames[active];
-					if (displayStepConfig) {
+					var tabname = DisplayContinuousConfig.tabnames[active];
+					if (displayContinuousConfig) {
 						var prev_value = datatable.minval;
 						var error = 0;
-						var step_cnt = displayStepConfig.getStepCount(what, tabname);
-						if (displayStepConfig.has_empty_values) {
+						var step_cnt = displayContinuousConfig.getStepCount(what, tabname);
+						if (displayContinuousConfig.has_empty_values) {
 							step_cnt++;
 						}
+						var use_gradient = displayContinuousConfig.use_gradient[what];
+						/*
+						if (use_gradient) {
+							step_cnt--;
+						}
+						*/
 						for (var idx = 0; idx < step_cnt; ++idx) {
 							var value;
-							if (idx == step_cnt-1) {
+							if (idx == step_cnt-1 && !use_gradient) {
 								value = datatable.maxval;
 							} else {
 								value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
@@ -1540,7 +1566,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						if (!error) {
 							for (var idx = 0; idx < step_cnt; ++idx) {
 								var value;
-								if (idx == step_cnt-1) {
+								if (idx == step_cnt-1 && !use_gradient) {
 									value = datatable.maxval;
 								} else {
 									value = $("#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
@@ -1548,24 +1574,27 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 								var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-								displayStepConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+								displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
 							}
-							DisplayStepConfig.setEditing(datatable_id, false, what, doc.win);
+							DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
 						}
 					}
-					if (displayDiscreteConfig) {
-						var value_cnt = displayDiscreteConfig.getValueCount();
+					if (displayUnorderedDiscreteConfig) {
+						var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
 						if (tabname == 'group') {
 							value_cnt++;
 						}
+						var advanced = displayUnorderedDiscreteConfig.advanced;
+						console.log("APPLY " + advanced);
 						for (var idx = 0; idx < value_cnt; ++idx) {
 							var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-							displayDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+							if (!advanced && idx > 0) {idx = value_cnt-1;}
+							displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
 						}
-						DisplayDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
+						DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
 						//display_discrete_config_set_editing(datatable_id, false, what, tabname);
 					}
 					//datatable.refresh();
@@ -1576,17 +1605,17 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 
 				"Cancel": function() {
 					var datatable = navicell.getDatatableById(datatable_id);
-					var displayStepConfig = datatable.displayStepConfig[module];
-					var displayDiscreteConfig = datatable.displayDiscreteConfig[module];
+					var displayContinuousConfig = datatable.displayContinuousConfig[module];
+					var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
 					var active = div.tabs("option", "active");
-					var tabname = DisplayStepConfig.tabnames[active];
-					if (displayStepConfig) {
-						displayStepConfig.update();
-						DisplayStepConfig.setEditing(datatable_id, false, what, doc.win);
+					var tabname = DisplayContinuousConfig.tabnames[active];
+					if (displayContinuousConfig) {
+						displayContinuousConfig.update();
+						DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
 					}
-					if (displayDiscreteConfig) {
-						displayDiscreteConfig.update();
-						DisplayDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
+					if (displayUnorderedDiscreteConfig) {
+						displayUnorderedDiscreteConfig.update();
+						DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
 						//display_discrete_config_set_editing(datatable_id, false, what, tabname);
 					}
 					if (CANCEL_CLOSES) {
@@ -1609,7 +1638,7 @@ function datatable_management_set_editing(val) {
 }
 
 
-// TBD: should be a method DisplayDiscreteConfig
+// TBD: should be a method DisplayUnorderedDiscreteConfig
 function display_discrete_config_set_editing(datatable_id, val, what, tabname) {
 	$("#discrete_config_editing_" + tabname + '_' + what + '_' + datatable_id).html(val ? EDITING_CONFIGURATION : "");
 }
@@ -2127,7 +2156,7 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "</select></td>";
 
 	if (sel_gene && sel_datatable) {
-		var config = sel_datatable.biotype.isDiscrete() ? COLOR_SIZE_CONFIG : 'color';
+		var config = sel_datatable.biotype.isUnorderedDiscrete() ? COLOR_SIZE_CONFIG : 'color';
 		var gene_name = sel_gene.name;
 		var displayConfig = sel_datatable.getDisplayConfig(module);
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {

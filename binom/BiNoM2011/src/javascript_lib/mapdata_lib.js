@@ -88,7 +88,7 @@ var INPUT_SEPS = ["\t", ";", ",", " "];
 var COLOR_SIZE_CONFIG = "color_size";
 var EDITING_CONFIGURATION = "configuration not applied...";
 //var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[NO&nbsp;SAMPLE]</span>";
-var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[empty]</span>";
+var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[gene&nbsp;list]</span>";
 //var GENE_SET = "<span style='font-style: italic; font-size: smaller'>[GENE]</span>";
 var GENE_SET = "[GENE]";
 var INVALID_VALUE = '* INVALID *';

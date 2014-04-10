@@ -335,13 +335,6 @@ Mapdata.prototype = {
 
 	getPostModuleLink: function(postid) {
 		return this.module_postid[postid];
-		/*
-		var alt = this.module_postid[postid];
-		if (alt) {
-			return "<a href='#'><img align=\"top\" class=\"blogfromright\" border=\"0\" src=\"../../../map_icons/misc/blog.png\" alt=\"" + alt + "\"/></a>";
-		}
-		return null;
-		*/
 	},
 
 	getJXTree: function(module_name) {
@@ -1226,11 +1219,6 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 	this.setGroupMethod('shape', Group.CONTINUOUS_AVERAGE);
 	this.setGroupMethod('size', Group.CONTINUOUS_AVERAGE);
 	this.divs = {};
-	/*
-	this.buildDiv(this.default_step_count['color'], 'color');
-	this.buildDiv(this.default_step_count['shape'], 'shape');
-	this.buildDiv(this.default_step_count['size'], 'size');
-	*/
 	this.buildDiv('color');
 	this.buildDiv('shape');
 	this.buildDiv('size');
@@ -1853,15 +1841,6 @@ DisplayContinuousConfig.prototype = {
 		jscolor.init(this.win);
 	},
 
-	/*
-	buildDivs: function(step_cnt) {
-		this.divs = {};
-		this.buildDiv(step_cnt, 'color');
-		this.buildDiv(step_cnt, 'shape');
-		this.buildDiv(step_cnt, 'size');
-	},
-	*/
-
 	buildDiv: function(config) {
 		var doc = this.win.document;
 		var mod = config + '_';
@@ -1909,12 +1888,6 @@ DisplayContinuousConfig.prototype = {
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		DisplayContinuousConfig.switch_sample_tab(mod + id, doc);
 	},
-
-	/*
-	getDivId: function(what) {
-		return this.div_ids[what];
-	},
-	*/
 
 	getDiv: function(config) {
 		return this.divs[config];
@@ -3738,133 +3711,15 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
 		       }
 		      );
 	} else {
-	reader.readAsBinaryString(file);
-
-	reader.onload = function() { 
-		var data = reader.result;
-		datatable.loadData(data, ready, win);
-	}
-        /*
-		var dataset = datatable.dataset;
-
-		var lines = text.split(LINE_BREAK_REGEX);
-		var gene_length = lines.length;
-
-		var firstline;
-		var sample_cnt = 0;
-		var sep = null;
-
-		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
-			sep = INPUT_SEPS[ii];
-			firstline = lines[0].trim().split(sep);
-			sample_cnt = firstline.length-1;
-			if (!firstline[firstline.length-1]) {
-				--sample_cnt;
-			}
-			if (sample_cnt >= 1) {
-				break;
-			}
-		}
-
-		var biotype_is_set = datatable.biotype.isSet();
-		if (sample_cnt < 1) {
-			if (!biotype_is_set) {
-				datatable.error = "invalid file format: tabular, comma or space separated file expected";
-				ready.resolve();
-				return;
-			}
-			firstline.push(NO_SAMPLE);
-			sample_cnt = 1;
-		} else {
-			if (biotype_is_set) {
-				datatable.error = "invalid file format: only one column expected";
-				ready.resolve();
-				return;
-			}
-		}
-
-		var samples_to_add = [];
-		var genes_to_add = [];
-		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
-			var sample_name = firstline[sample_nn+1];
-			if (sample_name.length > 1) {
-				samples_to_add.push(sample_name);
-				datatable.sample_index[sample_name] = sample_nn;
-			}
-		}
+		reader.readAsBinaryString(file);
 		
-		for (var gene_nn = 0, gene_jj = 1; gene_jj < gene_length; ++gene_jj) {
-			var line = lines[gene_jj].trim().split(sep);
-			var line_cnt = line.length-1;
-			if (!line[line.length-1]) {
-				--line_cnt;
-			}
-			if (biotype_is_set) {
-				line_cnt++;
-			}
-			if (line_cnt < sample_cnt) {
-				datatable.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
-			} else if (line_cnt > sample_cnt) {
-				datatable.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
-				ready.resolve();
-				return;
-
-			}
-			var gene_name = line[0];
-			if (!navicell.mapdata.hugo_map[gene_name]) {
-				continue;
-			}
-			genes_to_add.push(gene_name);
-
-			datatable.gene_index[gene_name] = gene_nn;
-			datatable.data[gene_nn] = [];
-			for (var sample_nn = 0; sample_nn < line_cnt; ++sample_nn) {
-				var value;
-				if (biotype_is_set) {
-					value = GENE_SET;
-				} else {
-					value = line[sample_nn+1];
-				}
-				var err = datatable.setData(gene_nn, sample_nn, value);
-				if (err) {
-					console.log("data error " + err);
-					datatable.error = "datatable " + name + " invalid data: " + err;
-					ready.resolve();
-					return;
-				}
-			}
-			++gene_nn;
+		reader.onload = function() { 
+			var data = reader.result;
+			datatable.loadData(data, ready, win);
 		}
-
-		// no error, so adding genes
-		var has_new_samples;
-		for (var nn = 0; nn < samples_to_add.length; ++nn) {
-			var sample = dataset.addSample(samples_to_add[nn]);
-			has_new_samples = sample.refcnt == 1;
+		reader.onerror = function(e) {  // If anything goes wrong
+			datatable.loadDataError(ready, e);
 		}
-
-		for (var nn = 0; nn < genes_to_add.length; ++nn) {
-			var gene_name = genes_to_add[nn];
-			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
-		}
-
-		if (has_new_samples) {
-			navicell.group_factory.buildGroups();
-		}
-		datatable.epilogue(win);
-		ready.resolve();
-		dataset.syncModifs();
-	}
-	*/
-
-	reader.onerror = function(e) {  // If anything goes wrong
-		datatable.loadDataError(ready, e);
-		/*
-		datatable.error = e.toString();
-		console.log("Error", e);    // Just log it
-		ready.resolve();
-		*/
-	}
 	}
 }
 
@@ -3998,7 +3853,7 @@ Datatable.prototype = {
 	loadDataError: function(ready, e) {
 		this.error = e.toString();
 		console.log("Error", e);    // Just log it
-		ready.resolve();
+		ready.resolve(this);
 	},
 
 	// 2013-05-31

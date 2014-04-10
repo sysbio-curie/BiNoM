@@ -172,10 +172,8 @@ $(function() {
 	
 	function add_to_dt_desc_list(dt_desc_list, data) {
 		var lines = data.split(LINE_BREAK_REGEX);
-		console.log("LINES " + lines.length);
 		for (var ii = 0; ii < lines.length; ++ii) {
 			var args = lines[ii].trim().split("\t");
-			console.log("ARGS : " + args.length);
 			if (args.length != 3) {
 				continue;
 			}
@@ -197,6 +195,7 @@ $(function() {
 					       },
 					       
 					       error: function() {
+						       console.log("error");
 						       ready.resolve();
 					       }
 				       }
@@ -207,19 +206,9 @@ $(function() {
 				reader.onload = function() { 
 					var data = reader.result;
 					add_to_dt_desc_list(dt_desc_list, data);
-					/*
-					console.log("read [" + data + "]");
-					var lines = data.split(LINE_BREAK_REGEX);
-					console.log("LINES " + lines.length);
-					for (var ii = 0; ii < lines.length; ++ii) {
-						var args = lines[ii].trim().split("\t");
-						console.log("ARGS : " + args.length);
-						if (args.length != 3) {
-							continue;
-						}
-						dt_desc_list.push({url: args[0], name: args[1], type: args[2]}); 
-					}
-					*/
+					ready.resolve();
+				}
+				reader.onerror = function() {
 					ready.resolve();
 				}
 			}
@@ -282,6 +271,10 @@ $(function() {
 
 					ready.then(function() {
 						var msg_cnt = 0;
+						if (!dt_desc_list.length) {
+							error_message("No Datatables Imported");
+							return;
+						}
 						for (var idx in dt_desc_list) {
 							var dt_desc = dt_desc_list[idx];
 							var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, window);

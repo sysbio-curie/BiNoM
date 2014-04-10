@@ -170,25 +170,58 @@ $(function() {
 		}
 	});
 	
+	function add_to_dt_desc_list(dt_desc_list, data) {
+		var lines = data.split(LINE_BREAK_REGEX);
+		console.log("LINES " + lines.length);
+		for (var ii = 0; ii < lines.length; ++ii) {
+			var args = lines[ii].trim().split("\t");
+			console.log("ARGS : " + args.length);
+			if (args.length != 3) {
+				continue;
+			}
+			dt_desc_list.push({url: args[0], name: args[1], type: args[2]}); 
+		}
+	}
+
 	function get_dt_desc_list(type, name, file_elem, url, dt_desc_list) {
 		var ready = $.Deferred();
 		if (type == DATATABLE_LIST) {
-			var reader = new FileReader();
-			reader.readAsBinaryString(file_elem);
-			reader.onload = function() { 
-				var data = reader.result;
-				console.log("read [" + data + "]");
-				var lines = data.split(LINE_BREAK_REGEX);
-				console.log("LINES " + lines.length);
-				for (var ii = 0; ii < lines.length; ++ii) {
-					var args = lines[ii].trim().split("\t");
-					console.log("ARGS : " + args.length);
-					if (args.length != 3) {
-						continue;
+			if (url) {
+				$.ajax(url,
+				       {
+					       async: true,
+					       dataType: 'text',
+					       success: function(data) {
+						       add_to_dt_desc_list(dt_desc_list, data);
+						       ready.resolve();
+					       },
+					       
+					       error: function() {
+						       ready.resolve();
+					       }
+				       }
+				      );
+			} else {
+				var reader = new FileReader();
+				reader.readAsBinaryString(file_elem);
+				reader.onload = function() { 
+					var data = reader.result;
+					add_to_dt_desc_list(dt_desc_list, data);
+					/*
+					console.log("read [" + data + "]");
+					var lines = data.split(LINE_BREAK_REGEX);
+					console.log("LINES " + lines.length);
+					for (var ii = 0; ii < lines.length; ++ii) {
+						var args = lines[ii].trim().split("\t");
+						console.log("ARGS : " + args.length);
+						if (args.length != 3) {
+							continue;
+						}
+						dt_desc_list.push({url: args[0], name: args[1], type: args[2]}); 
 					}
-					dt_desc_list.push({url: args[0], name: args[1], type: args[2]}); 
+					*/
+					ready.resolve();
 				}
-				ready.resolve();
 			}
 		} else {
 			dt_desc_list.push({type: type, name: name, file_elem: file_elem, url: url});

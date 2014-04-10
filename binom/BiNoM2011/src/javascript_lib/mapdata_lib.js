@@ -21,6 +21,7 @@
 var GLYPH_COUNT = 5;
 var DISPLAY_TIMEOUT = 500;
 var MAX_DISCRETE_VALUES = 30;
+var DATATABLE_LIST = 'Datatable list';
 
 if (!window.console) {
 	window.console = new function()
@@ -312,6 +313,7 @@ var TAG_REGEX = new RegExp(">\\w+:\\w+</a>|&nbsp;(\\w| )+&nbsp;", "g");
 var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
 //var LINE_BREAK_REGEX = /[\r\n]+/;
 var LINE_BREAK_REGEX = /\r\n?|\n/;
+var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
 
 var time_cnt = 0;
 
@@ -924,8 +926,8 @@ Dataset.prototype = {
 		return mapSize(this.datatables);
 	},
 
-	readDatatable: function(biotype_name, name, file, win) {
-		var datatable = new Datatable(this, biotype_name, name, file, this.datatable_id++, win);
+	readDatatable: function(biotype_name, name, file, url, win) {
+		var datatable = new Datatable(this, biotype_name, name, file, url, this.datatable_id++, win);
 		var dataset = this;
 		datatable.ready.then(function() {
 			if (!datatable.error) {
@@ -1276,9 +1278,16 @@ DisplayContinuousConfig.prototype = {
 		//values.push(minval);
 		//var step = (maxval - minval)/(step_cnt+1);
 		if (this.discrete_ordered[tabname]) {
+			if (this.has_empty_values) {
+				values.push(Number.MIN_NUMBER);
+			}
 			var discrete_values = this.datatable.getDiscreteValues();
-			for (var value in discrete_values) {
-				values.push(discrete_values[value]);
+			for (var idx in discrete_values) {
+				var value = discrete_values[idx];
+				if (!is_empty_value(value)) {
+					console.log("pushing " + value);
+					values.push(value);
+				}
 			}
 		} else {
 			var step = (maxval - minval)/(step_cnt);
@@ -1502,6 +1511,7 @@ DisplayContinuousConfig.prototype = {
 		var config = 'color';
 		var use_gradient = this.use_gradient[config] && !this.discrete_ordered[tabname];
 		var idx = this.getStepIndex(config, tabname, value);
+		//console.log("idx: " + idx);
 		if (idx < 0) {
 			return undefined;
 		}
@@ -1509,6 +1519,11 @@ DisplayContinuousConfig.prototype = {
 		if (use_gradient) {
 			var len = colors.length;
 			//console.log("value : " + value + " len " + len + " " + idx + " " + this.values[tabname][config].length + " lowval=" + this.values[tabname][config][1]);
+			if (idx < 1 && this.has_empty_values) {
+				//console.log("THIS CASE");
+				return colors[0];
+			}
+			/*
 			if (idx < 1) {
 				//console.log("THIS CASE");
 				if (this.has_empty_values) {
@@ -1516,6 +1531,7 @@ DisplayContinuousConfig.prototype = {
 				}
 				return undefined;
 			}
+			*/
 			if (idx+1 >= len) {
 				if (this.has_empty_values) {
 					return colors[0];
@@ -1524,6 +1540,11 @@ DisplayContinuousConfig.prototype = {
 			}
 			var minval = this.getDatatableMinval(config, tabname);
 			var maxval = this.getDatatableMaxval(config, tabname);
+			console.log("minval : " + minval + " " + maxval);
+			minval = this.values[tabname][config][idx];
+			maxval = this.values[tabname][config][idx+1];
+			console.log("values : " + this.values[tabname][config][idx] + " " + this.values[tabname][config][idx+1]);
+			console.log("colors : " + colors[idx] + " " + colors[idx+1]);
 			return get_color_gradient(RGBColor.fromHex(colors[idx]), RGBColor.fromHex(colors[idx+1]), minval, maxval, value).getRGBValue();
 		} else {
 			return colors[idx];
@@ -1676,6 +1697,7 @@ DisplayContinuousConfig.prototype = {
 
 	getColorGroup: function(group, gene_name) {
 		var value = this.getColorGroupValue(group, gene_name);
+		console.log("getColorGroup -> " + value);
 		return this._getColor(value, 'group');
 	},
 
@@ -3643,12 +3665,22 @@ GlyphConfig.prototype = {
 };
 
 // TBD datatable id management
-function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
-	var reader = new FileReader();
-	var ready = this.ready = $.Deferred(reader.onload);
+function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
+	var reader;
+	var ready;
+	if (file) {
+		reader = new FileReader();
+		ready = $.Deferred(reader.onload);
+	} else {
+		reader = null;
+		ready = $.Deferred();
+	}
+
+	this.ready = ready;
+	ready.datatable = this;
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
-		ready.resolve();
+		ready.resolve(this);
 		return;
 	}
 	this.minval = Number.MAX_NUMBER;
@@ -3660,6 +3692,12 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 	this.id = datatable_id;
 	this.dataset = dataset;
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
+	if (!this.biotype) {
+		this.error = "Unknown type: \"" + biotype_name + "\"";
+		ready.resolve(this);
+		return;
+	}
+
 	this.discrete_values_map = {};
 	this.discrete_values = [];
 	this.empty_value_cnt = 0;
@@ -3681,14 +3719,33 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 
 	navicell.DTStatusMustUpdate = true;
 
-	reader.readAsBinaryString(file);
-
 	var datatable = this;
 
-	reader.onload = function() { 
-		var dataset = datatable.dataset;
+	console.log("URL: " + url);
+	if (url) {
+		$.ajax(url,
+		       {
+			       async: true,
+			       dataType: 'text',
+			       success: function(data) {
+				       console.log("navicell: datatable [" + url + "] loaded !");
+				       datatable.loadData(data, ready, win);
+			       },
+			       
+			       error: function() {
+				       datatable.loadDataError(ready, "error loading [" + url + "]");
+			       }
+		       }
+		      );
+	} else {
+	reader.readAsBinaryString(file);
 
-		var text = reader.result;
+	reader.onload = function() { 
+		var data = reader.result;
+		datatable.loadData(data, ready, win);
+	}
+        /*
+		var dataset = datatable.dataset;
 
 		var lines = text.split(LINE_BREAK_REGEX);
 		var gene_length = lines.length;
@@ -3798,11 +3855,16 @@ function Datatable(dataset, biotype_name, name, file, datatable_id, win) {
 		ready.resolve();
 		dataset.syncModifs();
 	}
+	*/
 
 	reader.onerror = function(e) {  // If anything goes wrong
+		datatable.loadDataError(ready, e);
+		/*
 		datatable.error = e.toString();
 		console.log("Error", e);    // Just log it
 		ready.resolve();
+		*/
+	}
 	}
 }
 
@@ -3820,6 +3882,124 @@ Datatable.prototype = {
 	ready: null,
 	minval: null,
 	maxval: null,
+
+	loadData: function(data, ready, win) {
+		var dataset = this.dataset;
+
+		var lines = data.split(LINE_BREAK_REGEX);
+		var gene_length = lines.length;
+
+		var firstline;
+		var sample_cnt = 0;
+		var sep = null;
+
+		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
+			sep = INPUT_SEPS[ii];
+			firstline = lines[0].trim().split(sep);
+			sample_cnt = firstline.length-1;
+			if (!firstline[firstline.length-1]) {
+				--sample_cnt;
+			}
+			if (sample_cnt >= 1) {
+				break;
+			}
+		}
+
+		var biotype_is_set = this.biotype.isSet();
+		if (sample_cnt < 1) {
+			if (!biotype_is_set) {
+				this.error = "invalid file format: tabular, comma or space separated file expected";
+				ready.resolve(this);
+				return;
+			}
+			firstline.push(NO_SAMPLE);
+			sample_cnt = 1;
+		} else {
+			if (biotype_is_set) {
+				this.error = "invalid file format: only one column expected";
+				ready.resolve(this);
+				return;
+			}
+		}
+
+		var samples_to_add = [];
+		var genes_to_add = [];
+		for (var sample_nn = 0; sample_nn < sample_cnt; ++sample_nn) {
+			var sample_name = firstline[sample_nn+1];
+			if (sample_name.length > 1) {
+				samples_to_add.push(sample_name);
+				this.sample_index[sample_name] = sample_nn;
+			}
+		}
+		
+		for (var gene_nn = 0, gene_jj = 1; gene_jj < gene_length; ++gene_jj) {
+			var line = lines[gene_jj].trim().split(sep);
+			var line_cnt = line.length-1;
+			if (!line[line.length-1]) {
+				--line_cnt;
+			}
+			if (biotype_is_set) {
+				line_cnt++;
+			}
+			if (line_cnt < sample_cnt) {
+				this.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
+			} else if (line_cnt > sample_cnt) {
+				this.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
+				ready.resolve(this);
+				return;
+
+			}
+			var gene_name = line[0];
+			if (!navicell.mapdata.hugo_map[gene_name]) {
+				continue;
+			}
+			genes_to_add.push(gene_name);
+
+			this.gene_index[gene_name] = gene_nn;
+			this.data[gene_nn] = [];
+			for (var sample_nn = 0; sample_nn < line_cnt; ++sample_nn) {
+				var value;
+				if (biotype_is_set) {
+					value = GENE_SET;
+				} else {
+					value = line[sample_nn+1];
+				}
+				var err = this.setData(gene_nn, sample_nn, value);
+				if (err) {
+					console.log("data error " + err);
+					this.error = "datatable " + name + " invalid data: " + err;
+					ready.resolve(this);
+					return;
+				}
+			}
+			++gene_nn;
+		}
+
+		// no error, so adding genes
+		var has_new_samples;
+		for (var nn = 0; nn < samples_to_add.length; ++nn) {
+			var sample = dataset.addSample(samples_to_add[nn]);
+			has_new_samples = sample.refcnt == 1;
+		}
+
+		for (var nn = 0; nn < genes_to_add.length; ++nn) {
+			var gene_name = genes_to_add[nn];
+			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
+		}
+
+		if (has_new_samples) {
+			navicell.group_factory.buildGroups();
+		}
+		this.epilogue(win);
+		ready.resolve(this);
+		dataset.syncModifs();
+	},
+
+	loadDataError: function(ready, e) {
+		this.error = e.toString();
+		console.log("Error", e);    // Just log it
+		ready.resolve();
+	},
 
 	// 2013-05-31
 	// TBD: need methods:
@@ -4862,7 +5042,7 @@ Group.prototype = {
 		if (!method) {
 			method = this.getMethod(datatable);
 		}
-		if (datatable.biotype.isContinuous()) {
+		if (datatable.biotype.isContinuous() || datatable.biotype.isOrderedDiscrete()) {
 			if (method == Group.CONTINUOUS_AVERAGE || method == Group.CONTINUOUS_ABS_AVERAGE) {
 				var total_value = 0;
 				var total_absvalue = 0;
@@ -5127,7 +5307,36 @@ BiotypeFactory.prototype = {
 	},
 
 	getBiotype: function(biotype_name) {
-		return this.biotypes[biotype_name];
+		biotype_name = biotype_name.trim();
+		var biotype = this.biotypes[biotype_name];
+		if (biotype) {
+			return biotype;
+		}
+		// approximative search: case insensitive + suppress separators + substring
+		var biotype_name_mod = biotype_name.toUpperCase().replace(SEP_REGEX, "");
+		var biotype_name_len = biotype_name_mod.length;
+		//console.log("comparing " + biotype_name_mod);
+		for (var bname in this.biotypes) {
+			var bname_mod = bname.toUpperCase().replace(SEP_REGEX, "");
+			var bname_len = bname_mod.length;
+			//console.log("to: " + bname_mod + " (" + biotype_name_len + ", " + bname_len + ")");
+			if (biotype_name_len == bname_len) {
+				if (bname_mod == biotype_name_mod) {
+					return this.biotypes[bname];
+				}
+			} else if (biotype_name_len < bname_len) {
+				//console.log("#1 [" + bname_mod.substring(0, biotype_name_len) + "]");
+				if (bname_mod.substring(0, biotype_name_len) == biotype_name_mod) {
+					return this.biotypes[bname];
+				}
+			} else if (biotype_name_len > bname_len) {
+				//console.log("#2 [" + biotype_name_mod.substring(0, bname_len) + "]");
+				if (biotype_name_mod.substring(0, bname_len) == bname_mod) {
+					return this.biotypes[bname];
+				}
+			}
+		}
+		return null;
 	}
 };
 

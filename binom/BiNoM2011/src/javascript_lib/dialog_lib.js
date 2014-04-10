@@ -57,6 +57,7 @@ $(function() {
 
 	var name = $("#dt_import_name");
 	var file = $("#dt_import_file");
+	var url = $("#dt_import_url");
 	var type = $("#dt_import_type");
 	var status = $("#dt_import_status");
 	var import_display_markers = $("#dt_import_display_markers");
@@ -74,12 +75,14 @@ $(function() {
 
 	var win = window;
 
-	function error_message(error) {
-		status.html("<span class=\"error-message\">" + error + "</span>");
+	function error_message(error, add) {
+		var html = add ? status.html() + "<br/>" : "";
+		status.html(html + "<span class=\"error-message\">" + error + "</span>");
 	}
 
-	function status_message(message) {
-		status.html("<span class=\"status-message\">" + message + "</span>");
+	function status_message(message, add) {
+		var html = add ? status.html() + "<br/>" : "";
+		status.html(html + "<span class=\"status-message\">" + message + "</span>");
 	}
 
 	$("#search_dialog").dialog({
@@ -166,27 +169,54 @@ $(function() {
 			}
 		}
 	});
+	
+	function get_dt_desc_list(type, name, file_elem, url, dt_desc_list) {
+		var ready = $.Deferred();
+		if (type == DATATABLE_LIST) {
+			var reader = new FileReader();
+			reader.readAsBinaryString(file_elem);
+			reader.onload = function() { 
+				var data = reader.result;
+				console.log("read [" + data + "]");
+				var lines = data.split(LINE_BREAK_REGEX);
+				console.log("LINES " + lines.length);
+				for (var ii = 0; ii < lines.length; ++ii) {
+					var args = lines[ii].trim().split("\t");
+					console.log("ARGS : " + args.length);
+					if (args.length != 3) {
+						continue;
+					}
+					dt_desc_list.push({url: args[0], name: args[1], type: args[2]}); 
+				}
+				ready.resolve();
+			}
+		} else {
+			dt_desc_list.push({type: type, name: name, file_elem: file_elem, url: url});
+			ready.resolve();
+		}
+		return ready;
+	}
 
 	$("#dt_import_dialog" ).dialog({
 		autoOpen: false,
-		width: 450,
-		height: 760,
+		width: 550,
+		height: 900,
 		modal: false,
 		buttons: {
 			"Import": function() {
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
 				var error = "";
-				if (!name.val()) {
+				if (!name.val() && type.val() != DATATABLE_LIST) {
 					error = "Missing Name"
 				}
-				if (!file.val()) {
+				if (!file.val() && !url.val().trim()) {
 					if (error) {
 						error += ", ";
 					} else {
 						error = "Missing ";
 					}
-					error += "File";
+					error += "File or URL";
 				}
 				if (type.val() == "_none_") {
 					if (error) {
@@ -196,113 +226,147 @@ $(function() {
 					}
 					error += "Type";
 				}
+				if (file.val() && url.val().trim()) {
+					if (error) {
+						error += "<br/>";
+					}
+					error += "Cannot specify a File and an URL";
+				}
 
 				if (error) {
 					error_message(error);
-				} else {
-					var body = $('body', document);
-					var ocursor = body.css("cursor");
-					body.css("cursor", "wait");
-					setTimeout(function() {
-						var file_elem = file.get()[0];
-						var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem.files[0], window);
-						if (datatable.error) {
-							error_message(datatable.error);
-						} else {
-							status_message("Importing...");
+					return;
+				}
+				//var body = $('body', document);
+				//var ocursor = body.css("cursor");
+				//body.css("cursor", "wait");
+				setTimeout(function() {
+					error_message("");
+					status_message("Importing...");
+					var file_elem = (file ? file.get()[0].files[0] : null);
+					var dt_desc_list = [];
+					var ready = get_dt_desc_list(type.val(), name.val().trim(), file_elem, url.val().trim(), dt_desc_list);
 
-							datatable.ready.then(function() {
-								if (datatable.error) {
-									body.css("cursor", ocursor);
-									error_message(datatable.error);
-								} else {
-									console.log("hierarchy #1: " + window.document.navicell_module_name);
-									var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
-									status_str += "<table>";
-									status_str += "<tr><td>Samples</td><td>" + datatable.getSampleCount() + "</td></tr>\n";
-									var opener = window;
-									var nnn = 0;
-									while (opener && opener.document.map_name) {
-										status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
-										opener = opener.opener;
-										if (nnn++ > 4) {
-											console.log("too many level of hierarchy !");
-											break;
-										}
-									}
-									status_str += "</table>";
-									status_message(status_str);
-									
-									//navicell.annot_factory.sync();
-									//navicell.annot_factory.readannots(null, null);
-									navicell.annot_factory.refresh();
-									var display_graphics;
-									if (import_display_barplot.attr('checked')) {
-										var barplotConfig = drawing_config.editing_barplot_config;
-										barplotConfig.setDatatableAt(0, datatable);
-										if (OPEN_DRAWING_EDITOR) {
-											$("#barplot_editing").html(EDITING_CONFIGURATION);
-											$("#barplot_editor_div").dialog("open");
-										} else {
-											$("#drawing_config_chart_type").val('Barplot');
-											drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
-											barplot_sample_action('allsamples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
-											
-											barplot_editor_apply(drawing_config.barplot_config);
-											barplot_editor_apply(drawing_config.editing_barplot_config);
-											barplot_editor_set_editing(false);
-
-											max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
-
-											display_graphics = true;
-										}
-									} else if (import_display_heatmap.attr('checked')) {
-										var heatmapConfig = drawing_config.editing_heatmap_config;
-										var datatable_cnt = mapSize(navicell.dataset.datatables);
-										for (var idx = 0; idx < datatable_cnt; ++idx) {
-											if (!heatmapConfig.getDatatableAt(idx)) {
+					ready.then(function() {
+						var msg_cnt = 0;
+						for (var idx in dt_desc_list) {
+							var dt_desc = dt_desc_list[idx];
+							var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, window);
+							//var datatable = navicell.dataset.readDatatable(type.val(), name.val(), file_elem, url.val().trim(), window);
+							if (datatable.error) {
+								var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
+								error_str += "<table>";
+								error_str += "<tr><td>Datatable</td><td>" + dt_desc.name + "</td></tr>";
+								error_str += "<tr><td>Error</td><td>" + datatable.error + "</td></tr>";
+///								var error_str = "<div align='center'><span style='text-align: left; font-weight: bold'>Datatable " + dt_desc.name + " Import Failed</span></div>Error " + datatable.error;
+								error_str += "</table>";
+								error_message(error_str, msg_cnt++);
+								//body.css("cursor", ocursor);
+							} else {
+								datatable.ready.then(function(my_datatable) {
+									if (my_datatable.error) {
+										var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
+										error_str += "<table>";
+										error_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
+										error_str += "<tr><td>Error</td><td>" + my_datatable.error + "</td></tr>";
+										///								var error_str = "<div align='center'><span style='text-align: left; font-weight: bold'>Datatable " + dt_desc.name + " Import Failed</span></div>Error " + datatable.error;
+										error_str += "</table>";
+										//var error_str = "<div align='center'><span style='text-align: left; font-weight: bold'>Datatable " + my_datatable.name + " Import Failed</span></div>" + my_datatable.error;
+										//body.css("cursor", ocursor);
+										error_message(error_str, msg_cnt++);
+									} else {
+										var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
+										status_str += "<table>";
+										status_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
+										//status_str += "<tr><td>Import failed</td><td>" + my_datatable.error + "</td></tr>";
+										//var status_str = "<div align='center'><span style='text-align: left; font-weight: bold'>Datatable " + my_datatable.name + " Import Successful</span></div>";
+										//status_str += "<table>";
+										status_str += "<tr><td>Samples</td><td>" + my_datatable.getSampleCount() + "</td></tr>\n";
+										var opener = window;
+										var nnn = 0;
+										while (opener && opener.document.map_name) {
+											status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + my_datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
+											opener = opener.opener;
+											if (nnn++ > 4) {
+												console.log("too many level of hierarchy !");
 												break;
 											}
 										}
-										heatmapConfig.setDatatableAt(idx, datatable);
-										if (OPEN_DRAWING_EDITOR) {
-											$("#heatmap_editing").html(EDITING_CONFIGURATION);
-											$("#heatmap_editor_div").dialog("open");
-										} else {
-											$("#drawing_config_chart_type").val('Heatmap');
-											drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
-											if (!drawing_config.heatmap_config.getSampleOrGroupCount()) {
-												heatmap_sample_action('allsamples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+										status_str += "</table>";
+										status_message(status_str, msg_cnt++);
+										
+										//navicell.annot_factory.sync();
+										//navicell.annot_factory.readannots(null, null);
+										navicell.annot_factory.refresh();
+										var display_graphics;
+										if (import_display_barplot.attr('checked')) {
+											var barplotConfig = drawing_config.editing_barplot_config;
+											barplotConfig.setDatatableAt(0, datatable);
+											if (OPEN_DRAWING_EDITOR) {
+												$("#barplot_editing").html(EDITING_CONFIGURATION);
+												$("#barplot_editor_div").dialog("open");
 											} else {
-												heatmap_sample_action('pass');
+												$("#drawing_config_chart_type").val('Barplot');
+												drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+												barplot_sample_action('allsamples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
+												
+												barplot_editor_apply(drawing_config.barplot_config);
+												barplot_editor_apply(drawing_config.editing_barplot_config);
+												barplot_editor_set_editing(false);
+
+												max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
+
+												display_graphics = true;
 											}
+										} else if (import_display_heatmap.attr('checked')) {
+											var heatmapConfig = drawing_config.editing_heatmap_config;
+											var datatable_cnt = mapSize(navicell.dataset.datatables);
+											for (var idx = 0; idx < datatable_cnt; ++idx) {
+												if (!heatmapConfig.getDatatableAt(idx)) {
+													break;
+												}
+											}
+											heatmapConfig.setDatatableAt(idx, datatable);
+											if (OPEN_DRAWING_EDITOR) {
+												$("#heatmap_editing").html(EDITING_CONFIGURATION);
+												$("#heatmap_editor_div").dialog("open");
+											} else {
+												$("#drawing_config_chart_type").val('Heatmap');
+												drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+												if (!drawing_config.heatmap_config.getSampleOrGroupCount()) {
+													heatmap_sample_action('allsamples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+												} else {
+													heatmap_sample_action('pass');
+												}
 
-											heatmap_editor_apply(drawing_config.heatmap_config);
-											heatmap_editor_apply(drawing_config.editing_heatmap_config);
-											heatmap_editor_set_editing(false);
+												heatmap_editor_apply(drawing_config.heatmap_config);
+												heatmap_editor_apply(drawing_config.editing_heatmap_config);
+												heatmap_editor_set_editing(false);
 
-											max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
+												max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
 
-											display_graphics = true;
+												display_graphics = true;
+											}
+										} else {
+											display_graphics = false;
 										}
-									} else {
-										display_graphics = false;
+										var display_markers = import_display_markers.attr('checked');
+										my_datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
+										drawing_editing(false);
+										update_status_tables();
+										//body.css("cursor", ocursor);
 									}
-									var display_markers = import_display_markers.attr('checked');
-									datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
-									drawing_editing(false);
-									update_status_tables();
-									body.css("cursor", ocursor);
-								}
-							});
+								});
+							}
 						}
-					}, DISPLAY_TIMEOUT);
-				}
+					})
+				}, DISPLAY_TIMEOUT);
 			},
 
 			Clear: function() {
 				name.val("");
 				file.val("");
+				url.val("");
 				type.val("");
 				status_message("");
 			},
@@ -714,7 +778,8 @@ function import_annot_file()
 		navicell.annot_factory.readfile(file_elem.files[0], function(file) {status.html("<span class=\"error-message\">Cannot read file " + $(file_elem).val() + "</span>");});
 		navicell.annot_factory.ready.then(function() {
 			if (navicell.annot_factory.sample_read > 0) {
-				status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_read + " samples read<br/>" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+				//status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_read + " samples read<br/>" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+				status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
 			} else {
 				status.html("<span class=\"error-message\">Missing samples: " + navicell.annot_factory.missing + "<br>No samples annotated, may be something wrong in the file.</span>");
 			}
@@ -1374,29 +1439,29 @@ function update_status_tables(params) {
 		if (params && params.doc && params.doc != doc) {
 			continue;
 		}
-		console.log("update_status_table " + map_name);
+		//console.log("update_status_table " + map_name);
 		if (!params || !params.no_sample_status_table) {
-			console.log("sample_status_table");
+			//console.log("sample_status_table");
 			update_sample_status_table(doc, params);
 		}
 		if (!params || !params.no_gene_status_table) {
-			console.log("gene_status_table");
+			//console.log("gene_status_table");
 			update_gene_status_table(doc, params);
 		}
 		if (!params || !params.no_group_status_table) {
-			console.log("group_status_table");
+			//console.log("group_status_table");
 			update_group_status_table(doc, params);
 		}
 		if (!params || !params.no_module_status_table) {
-			console.log("module_status_table");
+			//console.log("module_status_table");
 			update_module_status_table(doc, params);
 		}
 		if (!params || !params.no_datatable_status_table) {
-			console.log("datatable_status_table");
+			//console.log("datatable_status_table");
 			update_datatable_status_table(doc, params);
 		}
 		if (!params || !params.no_sample_annot_table) {
-			console.log("sample_annot_status_table");
+			//console.log("sample_annot_status_table");
 			update_sample_annot_table(doc, params);
 		}
 
@@ -1432,6 +1497,8 @@ function get_biotype_select(id, include_none, value, onchange) {
 		var selected = biotype.name == value ? ' selected' : '';
 		str += '<option value="' + biotype.name + '"' + selected + '>' + biotype.name + '</option>';
 	}
+	var selected = DATATABLE_LIST == value ? ' selected' : '';
+	str += '<option value="' + DATATABLE_LIST + '"' + selected + '>' + DATATABLE_LIST + '</option>';
 	str += "</select>";
 	return str;
 }

@@ -17,6 +17,10 @@ public class TestDialog {
 		SelectColumnsDialog d = new SelectColumnsDialog(new JFrame(),"test",true);
 		d.setDialogData(myList);
 		d.setVisible(true);
+		
+		System.out.println("res:");
+		for (String str : d.myselList)
+			System.out.println(str);
 	}
 
 }

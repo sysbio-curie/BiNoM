@@ -24,28 +24,28 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class SelectColumnsDialog extends JDialog implements ActionListener {
-	
-	
+
+
 	private static final int SCROLL_WIDTH = 210;
 	private static final int SCROLL_HEIGHT = 180;
 	private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-	
+
 	private JPanel panel;
 	private JButton okB, cancelB;
-private JList sourceList, selList;
+	private JList sourceList;
 	private JScrollPane scrollPane;
-	public ArrayList<String> myselList = null;
-	
-	
+	public ArrayList<String> myselList = new ArrayList<String>();
+
+
 	SelectColumnsDialog(JFrame frame, String mess, boolean modal){
-		
+
 		// call JDialog constructor
 		super(frame, mess, modal);
 		createElements();
 	}
-	
+
 	private void createElements() {
-		
+
 		panel = new JPanel(new GridBagLayout());
 		GridBagConstraints c;
 
@@ -76,31 +76,28 @@ private JList sourceList, selList;
 		panel.add(scrollPane, c);
 		JPanel buttonPanel = new JPanel();
 		okB = new JButton("OK");
-		
-		
+
+
 		okB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
 				Object selList[] = sourceList.getSelectedValues();
 				for (int i=0;i<selList.length;i++) {
-	            String[] tk = ((String)selList[i]).split("::");
-	            myselList.add(tk[0]);
-	            
-	            
-	          }
+					String item = (String) selList[i];
+					myselList.add(item);
+					//System.out.println(item);
+				}
+				setVisible(false);
+				dispose();
 			}
 		});
-		
-		 
-
 		buttonPanel.add(okB);
+
 		cancelB = new JButton("Cancel");
 		cancelB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 			}
 		});
-
 		buttonPanel.add(cancelB);
 
 		getContentPane().setLayout(new BorderLayout());
@@ -108,21 +105,21 @@ private JList sourceList, selList;
 		getContentPane().add(jpane, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
-	
+
 	public void setDialogData(ArrayList<String> dataList) {
-		
+
 		Vector v = new Vector();
 		for (String n : dataList)
 			v.add(n);
-		
+
 		sourceList.setListData(v);
-		
+
 		setSize(400, 300);
 		setLocation((screenSize.width - getSize().width) / 2,
 				(screenSize.height - getSize().height) / 2);
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
-	  // nothing to do here
+		// nothing to do here
 	}
 }

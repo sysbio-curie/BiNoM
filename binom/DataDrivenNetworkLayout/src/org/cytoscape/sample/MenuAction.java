@@ -19,8 +19,11 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.EdgeBendVisualProperty;
 import org.cytoscape.view.presentation.property.values.Bend;
 import org.cytoscape.view.presentation.property.values.LineType;
+import org.cytoscape.work.Tunable;
 
 import java.util.*;
+
+import javax.swing.JFrame;
 
 public class MenuAction extends AbstractCyAction {
 	private final CyAppAdapter adapter;
@@ -32,9 +35,12 @@ public class MenuAction extends AbstractCyAction {
 				adapter.getCyNetworkViewManager());
 		this.adapter = adapter;
 		setPreferredMenu("Layout");
+		
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		
+		
 		final CyApplicationManager manager = adapter.getCyApplicationManager();
 		final CyNetworkView networkView = manager.getCurrentNetworkView();
 		final CyNetwork network = networkView.getModel();
@@ -42,6 +48,9 @@ public class MenuAction extends AbstractCyAction {
 		CyNetwork mynetwork = manager.getCurrentNetwork();
 		CyTable mytable = mynetwork.getDefaultNodeTable();
 
+		
+		
+		
 		//general network description
 		Double height = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_HEIGHT );
 		System.out.println("height= "+height);
@@ -83,28 +92,47 @@ public class MenuAction extends AbstractCyAction {
 			//BasicVisualLexicon.NODE_VISIBLE, false);
 			
 			
+		
+			
+			
+			
 			//filter on column names-tobe replaced with selective menu
 			for (String col: values.keySet()){
-				if (col.startsWith("EW")){
+				
 					set_attributes.add(col);
 					//System.out.println(col);
-				}
+				
 			}
 			//String myname = mynetwork.getRow(node).get("name", String.class);
 			//System.out.println(myname);
 		}
 		
-		
+			//test
+			ArrayList<String> myList = new ArrayList<String>();
+			for (String col: set_attributes){
+				
+					myList.add(col);
+					//System.out.println(col);
+				
+			}
+			
+			SelectColumnsDialog d = new SelectColumnsDialog(new JFrame(),"Select column names",true);
+			d.setDialogData(myList);
+			d.setVisible(true);
+
+			
+			
 		//re-creation of attributes marix
-		float [][] matrix = new float [nodes.size()] [set_attributes.size()] ; 
+		@SuppressWarnings("static-access")
+		float [][] matrix = new float [nodes.size()] [d.myselList.size()] ; 
 		Map<String,Integer> map_index = new HashMap<String,Integer>();
 		int ct = 0;
-		for (String att : set_attributes){
+		for (String att : d.myselList){
 			map_index.put(att,ct);
 			ct++;
 		}
 		//System.out.println(map_index);
-		System.out.println(set_attributes);
+		System.out.println(d.myselList);
 
 		int ct2=0;
 		for (CyNode node : mynetwork.getNodeList()) {
@@ -142,7 +170,7 @@ public class MenuAction extends AbstractCyAction {
 
 
 		for (int i = 0; i < nodes.size(); i++) {
-			for (int j = 0; j < set_attributes.size(); j++) {
+			for (int j = 0; j < d.myselList.size(); j++) {
 				System.out.print(matrix[i][j] + " ");
 			}
 			System.out.print("\n");
@@ -253,11 +281,7 @@ public class MenuAction extends AbstractCyAction {
 		pca.computePCA();
 		
 		
-		CyNode delenode = nodes.get(1);
-		View<CyNode> nodeView =  networkView.getNodeView(delenode) ;
-		Double xd = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
-		Double yd = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
-		System.out.println("delx="+xd + "dely="+ yd);
+		
 		
 		ArrayList<Double> arrayListX = new ArrayList<Double>();
 		ArrayList<Double> arrayListY = new ArrayList<Double>();
@@ -330,6 +354,9 @@ public class MenuAction extends AbstractCyAction {
 			nodeViewf.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
 			nodeViewf.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
 		}
+		
+	
+		
 		for (int node : delnodes)
 		{		
 			CyNode delnode = nodes.get(node);
@@ -354,10 +381,11 @@ public class MenuAction extends AbstractCyAction {
 			Average avy = new Average(ny);
 			nodeViewD.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, avy.mean);
 			System.out.print(ny + "mean = "+ avy.mean);
+
+			
 		}
 		
-		
-		//networkView.setVisualProperty(BasicVisualLexicon.NETWORK_WIDTH,1000.0 );
+			//networkView.setVisualProperty(BasicVisualLexicon.NETWORK_WIDTH,1000.0 );
 		//double scaleFactor = 130;
 		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION, 0.0);
 		networkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION, 0.0);
@@ -365,10 +393,11 @@ public class MenuAction extends AbstractCyAction {
 		//networkView.setVisualProperty(BasicVisualLexicon.EDGE_BEND,EdgeBendVisualProperty.DEFAULT_EDGE_BEND);
 		networkView.updateView();
 		
-	
+		
+
 
 	}
 
-
+ 
 }
 

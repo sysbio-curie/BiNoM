@@ -1,5 +1,6 @@
 package org.cytoscape.sample;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,6 +11,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -30,8 +32,9 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 	
 	private JPanel panel;
 	private JButton okB, cancelB;
-	private JList sourceList;
+private JList sourceList, selList;
 	private JScrollPane scrollPane;
+	public ArrayList<String> myselList = null;
 	
 	
 	SelectColumnsDialog(JFrame frame, String mess, boolean modal){
@@ -73,14 +76,22 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 		panel.add(scrollPane, c);
 		JPanel buttonPanel = new JPanel();
 		okB = new JButton("OK");
-
+		
+		
 		okB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				// do something useful here
-				
+				setVisible(false);
+				Object selList[] = sourceList.getSelectedValues();
+				for (int i=0;i<selList.length;i++) {
+	            String[] tk = ((String)selList[i]).split("::");
+	            myselList.add(tk[0]);
+	            
+	            
+	          }
 			}
 		});
+		
+		 
 
 		buttonPanel.add(okB);
 		cancelB = new JButton("Cancel");

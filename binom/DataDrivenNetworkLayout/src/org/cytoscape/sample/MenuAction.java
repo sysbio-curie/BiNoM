@@ -24,6 +24,7 @@ import org.cytoscape.work.Tunable;
 import java.util.*;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class MenuAction extends AbstractCyAction {
 	private final CyAppAdapter adapter;
@@ -122,8 +123,7 @@ public class MenuAction extends AbstractCyAction {
 
 			
 			
-		//re-creation of attributes marix
-		@SuppressWarnings("static-access")
+		//re-creation of attributes matrix
 		float [][] matrix = new float [nodes.size()] [d.myselList.size()] ; 
 		Map<String,Integer> map_index = new HashMap<String,Integer>();
 		int ct = 0;
@@ -145,14 +145,22 @@ public class MenuAction extends AbstractCyAction {
 				if (map_index.containsKey(col)){
 					int index2=map_index.get(col);
 					//System.out.println(index2);
-
+					
 
 					Object value = mynetwork.getRow(node).getAllValues().get(col);
 					//System.out.print(value);
+					
+					if (value instanceof String||value instanceof Boolean){
+						JOptionPane.showMessageDialog(null, "Column must contain only numerical values","ERROR", JOptionPane.WARNING_MESSAGE);
+						
+					}
+					
 					if (value == null){
 						value=0.0;
 
 					}
+					
+					
 					Float fvalue = ((Double) value).floatValue();
 					//System.out.print(fvalue);
 

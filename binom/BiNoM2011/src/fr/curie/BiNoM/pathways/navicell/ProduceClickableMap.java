@@ -126,7 +126,7 @@ public class ProduceClickableMap
 
 	private static final String map_icon = icons_directory + "/map.png";
 
-	private static final String reset_icon = icons_directory + "/reset.png";
+	private static final String reset_icon = icons_directory + "/eraser.png";
 	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
 	private static final String sources_icon = icons_directory + "/sources.png";
 	private static final String help_icon = icons_directory + "/help.png";	
@@ -2609,6 +2609,7 @@ public class ProduceClickableMap
 		//sb.append("&amp;nbsp;");
 		sb.append(" ");
 		sb.append("<img align='top' class='mapmodulefromright' border='0' src='" + map_icon + "' alt='");
+		System.err.println("ALT=" + name);
 		sb.append(name);
 		sb.append("' title='go to ").append(name + " map view'");
 		sb.append("/>");
@@ -2703,10 +2704,13 @@ public class ProduceClickableMap
 						indent.getOutput().print(";");
 						indent.getOutput().print(toDouble(scales.getY(position[1])));
 						indent.getOutput().println("\">");
+						String full_module = blog_name + ":" + k.getKey();
 						content_line
 							(
 							 indent.add(),
+							 // EV: 2014-04-15
 							 make_right_hand_module_entry(post_id, k.getKey(), k.getKey()),
+							 //make_right_hand_module_entry(post_id, full_module, k.getKey()),
 							 make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)
 							 );
 						indent.close();
@@ -2726,7 +2730,9 @@ public class ProduceClickableMap
 							outjson.print("\"positions\" : {");
 							outjson.print("\"x\" : " + toDouble(scales.getX(position[0])) + ",");
 							outjson.print("\"y\" : " + toDouble(scales.getY(position[1])) + "},");
+							// EV: 2014-04-15
 							outjson.print("\"left_label\" : \"<a href='#'>" + tojson(make_right_hand_module_entry(post_id, k.getKey(), null)) + "</a>\"");
+							//outjson.print("\"left_label\" : \"<a href='#'>" + tojson(make_right_hand_module_entry(post_id, full_module, null)) + "</a>\"");
 
 							if (!NO_BUBBLE) {
 								//outjson.print(",\"bubble\" : \"" + tojson(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)) + "\"");
@@ -3547,7 +3553,7 @@ public class ProduceClickableMap
 	{
 		notes.append(" ");
 		bubble_to_post_link(post_id, notes);
-		notes.append("<img border='0' src=");
+		notes.append("<img border='0' width='16' height='16' src=");
 		html_quote(notes, blog_icon);
 		return notes.append(" alt='blog'>").append("</a>");
 	}
@@ -5186,9 +5192,9 @@ public class ProduceClickableMap
 		out.print("uncheck_all_entities(");
 		out.print(");");
 		out.print(onclick_after);
-		out.print(" title='uncheck all entities'>");
+		out.print(" title='Uncheck all entities'>");
 		//out.print("reset");
-		out.print("<img border='0' src=\""+reset_icon+"\" />");
+		out.print("<img border='0' width='16' height='16' src=\""+reset_icon+"\" />");
 		out.print("</a>");
 		out.println();
 		return out;
@@ -5443,17 +5449,19 @@ public class ProduceClickableMap
 		final Div header_right = new Div(header, "class='header-right'");
 		
 		out.println(bubble_to_post_link_with_anchor(module_post.getPostId(), new StringBuffer()).toString());
-		create_reset_button(out);
+		out.print("&nbsp;");
+		//create_reset_button(out);
 		//doc_in_new_window(out, "map_symbols", "map symbols");
-		doc_in_new_window(out, "map_symbols", "<img border='0' src=\""+mapsymbols_icon+"\" title=\"map legends\"/>");
+		doc_in_new_window(out, "map_symbols", "<img border='0' width='16' height='16' src=\""+mapsymbols_icon+"\" title=\"Map legends\"/>");
 		if (provide_sources) {
-			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img border='0' src=\"" + sources_icon + "\" title=\"navicell sources\"/></a>");
+			out.println("&nbsp;<a href=\"" + common_directory_url + "/" + blog_name + "_navicell_sources.zip\"><img border='0' src=\"" + sources_icon + "\" title=\"NaviCell sources\"/></a>");
 		}
 		out.print("&nbsp;");
-		doc_in_new_window(out, "map_help", "<img border='0' src=\""+help_icon+"\" title=\"help\"/>");
+		doc_in_new_window(out, "map_help", "<img border='0' width='16' height='16' src=\""+help_icon+"\" title=\"Help\"/>");
 
 		out.println("&nbsp;<input type='text' size='32' id='query_text' style='font-size: small'/>");
-		out.println("&nbsp;<img border='0' src='" + search_icon + "' width='16' height='16' onclick='show_search_dialog()' title='search'/>");
+		out.println("&nbsp;<a href='#'><img border='0' src='" + search_icon + "' width='16' height='16' onclick='show_search_dialog()' title='Advanced search'/></a>&nbsp;");
+		create_reset_button(out);
 		header_right.close();
 		header.close();
 

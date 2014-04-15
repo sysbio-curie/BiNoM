@@ -126,9 +126,9 @@ $(function() {
 				var search = "";
 				var op;
 				if (eq_any || neq_any) {
-					search = patterns.replace(new RegExp("[ \t\n]+", "g"), ","); 
+					search = patterns.replace(new RegExp("[ \t\n;]+", "g"), ","); 
 				} else if (eq_all || neq_all) {
-					search = patterns.replace(new RegExp("[\t\n]+", "g"), " "); 
+					search = patterns.replace(new RegExp("[\t\n;,]+", "g"), " "); 
 				}
 				search += " /";
 				if (eq_any || eq_all) {
@@ -1641,6 +1641,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 							step_cnt--;
 						}
 						*/
+						console.log("step_cnt: " + step_cnt + " " + use_gradient);
 						for (var idx = 0; idx < step_cnt; ++idx) {
 							var value;
 							if (idx == step_cnt-1 && !use_gradient) {
@@ -1663,9 +1664,14 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 								if (idx == step_cnt-1 && !use_gradient) {
 									value = datatable.maxval;
 								} else {
-									value = $("#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+									var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
+									value = $(id, doc).val();
+									if (!value) {
+										value = $(id, doc).text();
+									}
 								}
 								var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+//								console.log("VALUE at " + idx + " " + value + " " + color);
 								var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 								displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
@@ -1679,13 +1685,14 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 							value_cnt++;
 						}
 						var advanced = displayUnorderedDiscreteConfig.advanced;
-						console.log("APPLY " + advanced);
+						//console.log("APPLY " + advanced + " " + value_cnt);
 						for (var idx = 0; idx < value_cnt; ++idx) {
 							var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 							if (!advanced && idx > 0) {idx = value_cnt-1;}
+							//console.log("at " + idx + " " + color);
 							displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
 						}
 						DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
@@ -1805,13 +1812,16 @@ function heatmap_sample_action(action, cnt) {
 		drawing_config.editing_heatmap_config.reset(true);
 		//max_heatmap_sample_cnt = 0;
 	} else if (action == "allsamples") {
+		drawing_config.editing_heatmap_config.reset(true);
 		max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setAllSamples();
 	} else if (action == "allgroups") {
+		drawing_config.editing_heatmap_config.reset(true);
 		max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setAllGroups();
 	} else if (action == "from_barplot") {
 		var barplot_config = drawing_config.barplot_config;
 		var cnt = barplot_config.getSampleOrGroupCount();
 		if (cnt) {
+			drawing_config.editing_heatmap_config.reset(true);
 			max_heatmap_sample_cnt = drawing_config.editing_heatmap_config.setSamplesOrGroups(barplot_config.getSamplesOrGroups());
 		}
 	} else if (action == "pass") {
@@ -1851,6 +1861,9 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var module = get_module_from_doc(doc);
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!heatmapConfig) {
+		if (!drawing_config) {
+			console.log("module: " + module);
+		}
 		heatmapConfig = drawing_config.editing_heatmap_config;
 	}
 	var map_name = doc ? doc.map_name : "";
@@ -1949,7 +1962,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 				var value = undefined;
 				if (sel_sample) {
 					style = displayConfig.getHeatmapStyleSample(sel_sample.name, gene_name);
-
 					value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
 				} else if (sel_group) {
 					style = displayConfig.getHeatmapStyleGroup(sel_group, gene_name);
@@ -2135,13 +2147,16 @@ function barplot_sample_action(action, cnt) {
 		drawing_config.editing_barplot_config.reset(true);
 		//max_barplot_sample_cnt = 0;
 	} else if (action == "allsamples") {
+		drawing_config.editing_barplot_config.reset(true);
 		max_barplot_sample_cnt = drawing_config.editing_barplot_config.setAllSamples();
 	} else if (action == "allgroups") {
+		drawing_config.editing_barplot_config.reset(true);
 		max_barplot_sample_cnt = drawing_config.editing_barplot_config.setAllGroups();
 	} else if (action == "from_heatmap") {
 		var heatmap_config = drawing_config.heatmap_config;
 		var cnt = heatmap_config.getSampleOrGroupCount();
 		if (cnt) {
+			drawing_config.editing_barplot_config.reset(true);
 			max_barplot_sample_cnt = drawing_config.editing_barplot_config.setSamplesOrGroups(heatmap_config.getSamplesOrGroups());
 		}
 	}

@@ -6,7 +6,7 @@
 <!-- hot-sneaks is not too bad -->
 
 <div id="dt_import_dialog">
-  <h3>Datatable Import</h3>
+  <h3>Load Data</h3>
   <!--    <div id="dt_import_help"/> -->
   <form>
     <fieldset>
@@ -141,7 +141,7 @@
 </div>
 
 <div id="dt_sample_annot">
-  <h3>Group Management</h3>
+  <h3>Sample Annotation</h3>
   <div id="group_editing"></div>
   <form>
     <fieldset>
@@ -344,8 +344,8 @@
   <table>
     <tr><td class='search-label'>Patterns</td><td><textarea id="search_dialog_patterns" cols="40" rows="8"></textarea></tr>
     <tr><td>&nbsp;</td></tr>
-    <tr><td class='search-label'>Match mode</td><td><input name='search_dialog_match' id='search_dialog_match_eq_all' type='radio' checked></input><label>Match all these patterns</label></td></tr>
-    <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_eq_any' type='radio'></input><label>Match any pattern</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_eq_any' type='radio' checked></input><label>Match any pattern</label></td></tr>
+    <tr><td class='search-label'>Match mode</td><td><input name='search_dialog_match' id='search_dialog_match_eq_all' type='radio'></input><label>Match all these patterns</label></td></tr>
     <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_neq_all' type='radio'></input><label>Does not match all patterns</label></td></tr>
     <tr><td>&nbsp;</td><td><input name='search_dialog_match' id='search_dialog_match_neq_any' type='radio'></input><label>Does not match any pattern</label></td></tr>
     <tr><td>&nbsp;</td></tr>
@@ -358,14 +358,14 @@
 	<option value='label' selected>Labels</option>
 	<option value='tag' selected>Tags</option>
 	<option value='annot'>Annotations</option>
-	<option value='all'>Everywhere</option>
+<!--	<option value='all'>Everywhere</option> -->
       </select>
     </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
-    <tr><td class='search-label'>Entity classes</td><td><input name='search_dialog_class' id='search_dialog_class_all' type='radio'></input><label>All classes</label></td></tr>
-    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_but_included' type='radio' checked></input><label>All classes but included</label></td></tr>
-    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_included' type='radio'></input><label>All classes included</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_but_included' type='radio' checked></input><label>Any class but complex components</label></td></tr>
+    <tr><td class='search-label'>Entity classes</td><td><input name='search_dialog_class' id='search_dialog_class_all' type='radio'></input><label>Any class</label></td></tr>
+    <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_all_included' type='radio'></input><label>Any complex component</label></td></tr>
     <tr><td>&nbsp;</td><td><input name='search_dialog_class' id='search_dialog_class_select' type='radio'></input><label>Choose classes:</label></td></tr>
     <tr><td>&nbsp;</td><td>
       <select id='search_dialog_class_choose' size='6' multiple>
@@ -380,15 +380,15 @@
 	<option value='reaction'>Reaction</option>
 	<option value='complex'>Complex</option>
 	<option value='unknown'>Unknown</option>
-	<option value='protein:included'>Protein Included</option>
-	<option value='gene:included'>Gene Included</option>
-	<option value='rna:included'>Rna Included</option>
-	<option value='antisense_rna:included'>Antisense rna Included</option>
-	<option value='simple_molecule:included'>Simple molecule Included</option>
-	<option value='ion:included'>Ion Included</option>
-	<option value='drug:included'>Drug Included</option>
-	<option value='phenotype:included'>Phenotype Included</option>
-	<option value='reaction:included'>Reaction Included</option>
+	<option value='protein:included'>Protein Complex Component</option>
+	<option value='gene:included'>Gene Complex Component</option>
+	<option value='rna:included'>Rna Complex Component</option>
+	<option value='antisense_rna:included'>Antisense rna Complex Component</option>
+	<option value='simple_molecule:included'>Simple molecule Complex Component</option>
+	<option value='ion:included'>Ion Complex Component</option>
+	<option value='drug:included'>Drug Complex Component</option>
+	<option value='phenotype:included'>Phenotype Complex Component</option>
+	<option value='reaction:included'>Reaction Complex Component</option>
       </select>
     </td>
     </tr>

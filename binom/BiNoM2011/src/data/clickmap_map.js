@@ -1043,7 +1043,8 @@ function show_map_and_markers(map_name, ids)
 		map.navicell = navicell;
 		map.document.map_name = map_name;
 		// EV: 2014-03-24: WARNING: disconnected the following line
-		//maps[map_name] = map;
+		maps[map_name] = map;
+		// EV: 2014-04-15: WARNING: reconnected the previous line
 	}
 }
 

@@ -205,6 +205,11 @@ html, body {
     font-size: smaller;
 }
 
+.download-data {
+    text-align: left;
+    font-size: smaller;
+}
+
 /* NaviCell version 2 */
 
 #datatable_input {

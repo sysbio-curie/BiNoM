@@ -962,6 +962,35 @@ function glyph_editor_apply(num, glyph_config)
 	glyph_config.setScaleSize($("#glyph_editor_scale_size_" + num).val());
 }
 
+function download_samples() {
+	var str = ",#Genes for sample in datatable\n";
+	str += "Samples (" + mapSize(navicell.dataset.samples) + ")";
+
+	for (var dt_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[dt_name];
+		str += "," + datatable.html_name;
+	}
+	str += "\n";
+	for (var sample_name in navicell.dataset.samples) {
+		if (sample_name == "") {
+			continue;
+		}
+		str +=  sample_name;
+		for (var dt_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[dt_name];
+			var cnt = datatable.getGeneCount(sample_name);
+			if (cnt >= 0) {
+				str += "," + cnt;
+			} else {
+				str += "," + "-";
+			}
+		}
+		str += "\n";
+	}
+
+	download_csv($("#download_samples"), str, "samples");
+}
+
 function update_sample_status_table(doc, params) {
 	var table = $("#dt_sample_status_table", doc);
 	table.children().remove();
@@ -985,8 +1014,6 @@ function update_sample_status_table(doc, params) {
 			var datatable = navicell.dataset.datatables[dt_name];
 			var cnt = datatable.getGeneCount(sample_name);
 			if (cnt >= 0) {
-				//if (datatable.sample_index[sample_name] !== undefined) {
-				//str += "<td>" + mapSize(datatable.gene_index) + "</td>";
 				str += "<td style=\"width: 100%; text-align: center\">" + cnt + "</td>";
 			} else {
 				str += "<td style=\"width: 100%; text-align: center\">-</td>";
@@ -1130,6 +1157,78 @@ function set_group_method(datatable_id, group_id) {
 }
 */
 
+function download_groups() {
+	var str = "Groups (" + mapSize(navicell.group_factory.group_map) + ")";
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		str += "," + datatable.html_name + ",";
+	}
+	str += "\n";
+	for (var datatable_name in navicell.dataset.datatables) {
+		str += ",#Samples,Samples";
+	}
+	str += "\n";
+	var sample_names_per_datatable = {};
+	var sample_cnt_per_datatable = {};
+	var maxcnt_per_groups = {}
+	var datatable_cnt = 0;
+	for (var datatable_name in navicell.dataset.datatables) {
+		datatable_cnt++;
+	}
+
+	for (var group_name in navicell.group_factory.group_map) {
+		var group = navicell.group_factory.group_map[group_name];
+		sample_names_per_datatable[group_name] = [];
+		sample_cnt_per_datatable[group_name] = [];
+		var maxcnt = 0;
+		for (var datatable_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[datatable_name];
+			var cnt = 0;
+			var sample_names = [];
+			for (var sample_name in navicell.dataset.samples) {
+				var sample = navicell.dataset.samples[sample_name];
+				if (datatable.sample_index[sample_name] != undefined) {
+					for (var sample_group_name in sample.groups) {
+						if (sample_group_name == group_name) {
+							sample_names.push(sample_name);
+							cnt++;
+						}
+					}
+				}
+			}
+			sample_names.sort();
+			sample_names_per_datatable[group_name].push(sample_names);
+			sample_cnt_per_datatable[group_name].push(cnt);
+			if (cnt > maxcnt) {
+				maxcnt = cnt;
+			}
+		}
+		maxcnt_per_groups[group_name] = maxcnt;
+	}
+
+	for (var group_name in navicell.group_factory.group_map) {
+		var group = navicell.group_factory.group_map[group_name];
+		var maxcnt = maxcnt_per_groups[group_name];
+		var group_cnt = sample_cnt_per_datatable[group_name];
+		var group_sample_names = sample_names_per_datatable[group_name];
+		for (var nn = 0; nn < maxcnt; nn++) {
+			str += group.name;
+			for (var jj = 0; jj < datatable_cnt; jj++) {
+				var cnt = group_cnt[jj];
+				var sample_names = group_sample_names[jj];
+				str += "," + cnt;
+				if (nn >= cnt) {
+					str += ",-";
+				} else {
+					str += "," + sample_names[nn];
+				}
+			}
+			str += "\n";
+		}
+	}
+	download_csv($("#download_groups"), str, "groups");
+}
+
 function update_group_status_table(doc, params) {
 	var table = $("#dt_group_status_table", doc);
 	table.children().remove();
@@ -1226,6 +1325,62 @@ function in_module_gene_count(module_name) {
 	return cnt;
 }
 
+function download_genes() {
+	var opener = document.win;
+	var module_stack = [];
+	while (opener && opener.document.map_name) {
+		module_stack.push(opener.document.map_name);
+		opener = opener.opener;
+	}
+
+	var str = "Genes in";
+	for (var ll = 0; ll < module_stack.length; ll++) {
+		str += ",";
+	}
+
+	var size = mapSize(navicell.dataset.datatables);
+	str += "#Samples for gene in datatable";
+	for (var ll = 0; ll < size-1; ll++) {
+		str += ",";
+	}
+	str += "\n";
+	for (var nn = 0; nn < module_stack.length; ++nn) {
+		var module_name = module_stack[nn];
+		str += (nn>0?",":"") + module_name + " (" + in_module_gene_count(module_stack[nn]) + ")";
+	}
+
+	for (var dt_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[dt_name];
+		str += "," + datatable.html_name;
+	}
+	str += "\n";
+	for (var gene_name in navicell.dataset.genes) {
+		if (gene_name == "") {
+			continue;
+		}
+		str += gene_name;
+		for (var nn = module_stack.length-2; nn >= 0; --nn) {
+			var module_name = module_stack[nn];
+			if (navicell.mapdata.hugo_map[gene_name][module_name]) {
+				str += "," + gene_name;
+			} else {
+				str += ",";
+			}
+		}
+		for (var dt_name in navicell.dataset.datatables) {
+			var datatable = navicell.dataset.datatables[dt_name];
+			var cnt = datatable.getSampleCount(gene_name);
+			if (cnt >= 0) {
+				str += "," + cnt;
+			} else {
+				str += ",-";
+			}
+		}
+		str += "\n";
+	}	
+	download_csv($("#download_genes"), str, "genes");
+}
+
 function update_gene_status_table(doc, params) {
 	var table = $("#dt_gene_status_table", doc);
 	table.children().remove();
@@ -1289,28 +1444,25 @@ function show_cursor_wait(id) {
 }
 */
 
+function download_csv(obj, csv, name) {
+	obj.attr("download", name + ".csv");
+	obj.attr("href", 'data:text/csv;charset=utf-8,' + escape(csv));
+}
+
 function download_datatable_data(id) {
-	console.log("DOWNLOAD_DATATABLE_DATA " + id);
+	//console.log("DOWNLOAD_DATATABLE_DATA " + id);
 	var datatable = navicell.getDatatableById(id);
 	var csv = datatable.makeDataTable_genes_csv(get_module());
-
+	download_csv($("#dt_download_data_" + datatable.getId()), csv, datatable.name);
+	/*
 	var obj = $("#dt_download_data_" + datatable.getId());
-
 	obj.attr("download", datatable.name + ".csv");
 	obj.attr("href", 'data:text/csv;charset=utf-8,' + escape(csv));
-
+	*/
 
         //window.open('data:text/csv;charset=utf-8,' + escape(csv));
-//        window.open('data:text/csv;filename=titi.csv;charset=utf-8,' + escape(csv));
         //window.open('data:text/plain;charset=utf-8,' + escape(csv));
 	//window.open('data:application/x-excel;charset=utf-8,' + escape(csv));
-/*
-        var w = window.open("name");
-	var doc = w.document;
-	$(doc).ready(function() {
-		$('body', doc).html(escape(csv));
-	});
-*/
 }
 
 function show_datatable_data(id) {
@@ -1447,7 +1599,7 @@ function update_datatable_status_table(doc, params) {
 		}
 		*/
 		str += "<td style='border: none; text-decoration: underline; font-size: 11px'><a id='dt_show_markers_" + datatable.getId() + "' href='#' onclick='show_datatable_markers(" + datatable.getId() + ")'>gene&nbsp;markers</a><br/>";
-		str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a><br/>";
+		//str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a><br/>";
 		str += "<a id='dt_download_data_" + datatable.getId() + "' href='#' onclick='download_datatable_data(" + datatable.getId() + ")'>download&nbsp;data</a></td>";
 		//str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onMouseDown='show_cursor_wait(" + datatable.getId() + ")' onMouseUp='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";
 		//str += "<a id='show_datatable_" + datatable.getId() + "' href='#'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";

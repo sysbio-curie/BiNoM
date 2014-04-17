@@ -1289,6 +1289,30 @@ function show_cursor_wait(id) {
 }
 */
 
+function download_datatable_data(id) {
+	console.log("DOWNLOAD_DATATABLE_DATA " + id);
+	var datatable = navicell.getDatatableById(id);
+	var csv = datatable.makeDataTable_genes_csv(get_module());
+
+	var obj = $("#dt_download_data_" + datatable.getId());
+
+	obj.attr("download", datatable.name + ".csv");
+	obj.attr("href", 'data:text/csv;charset=utf-8,' + escape(csv));
+
+
+        //window.open('data:text/csv;charset=utf-8,' + escape(csv));
+//        window.open('data:text/csv;filename=titi.csv;charset=utf-8,' + escape(csv));
+        //window.open('data:text/plain;charset=utf-8,' + escape(csv));
+	//window.open('data:application/x-excel;charset=utf-8,' + escape(csv));
+/*
+        var w = window.open("name");
+	var doc = w.document;
+	$(doc).ready(function() {
+		$('body', doc).html(escape(csv));
+	});
+*/
+}
+
 function show_datatable_data(id) {
 	console.log("SHOW_DATATABLE_DATA " + id);
 	var datatable = navicell.getDatatableById(id);
@@ -1309,12 +1333,6 @@ function show_datatable_data(id) {
 	} else {
 		datatable.refresh(window);
 		div.dialog("open");
-		/*
-		var body = $(body, document);
-		var dt_show_data = $("#dt_show_data_" + id, document);
-		body.css("cursor", 'auto');
-		dt_show_data.css("cursor", 'auto');
-		*/
 	}
 }
 
@@ -1429,7 +1447,8 @@ function update_datatable_status_table(doc, params) {
 		}
 		*/
 		str += "<td style='border: none; text-decoration: underline; font-size: 11px'><a id='dt_show_markers_" + datatable.getId() + "' href='#' onclick='show_datatable_markers(" + datatable.getId() + ")'>gene&nbsp;markers</a><br/>";
-		str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";
+		str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onclick='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a><br/>";
+		str += "<a id='dt_download_data_" + datatable.getId() + "' href='#' onclick='download_datatable_data(" + datatable.getId() + ")'>download&nbsp;data</a></td>";
 		//str += "<a id='dt_show_data_" + datatable.getId() + "' href='#' onMouseDown='show_cursor_wait(" + datatable.getId() + ")' onMouseUp='show_datatable_data(" + datatable.getId() + ")'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";
 		//str += "<a id='show_datatable_" + datatable.getId() + "' href='#'>data&nbsp;" + (datatable.biotype.isSet() ? "list" : "matrix") + "</a></td>";
 		str += "</tr>";

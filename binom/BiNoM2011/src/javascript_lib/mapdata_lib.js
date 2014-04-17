@@ -963,6 +963,8 @@ Dataset.prototype = {
 
 			this.sorted_gene_names = mapKeys(this.genes);
 			this.sorted_gene_names.sort();
+
+			navicell.group_factory.buildGroups();
 		}
 	},
 
@@ -1172,6 +1174,15 @@ function force_datatable_display(id) {
 	}
 }
 
+function assert(cond) {
+	if (!cond) {
+		console.log("** ASSERT FAILED **");
+		console.trace();
+	}
+}
+
+DisplayContinuousConfig.DEFAULT_STEP_COUNT = 5;
+
 function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 	this.datatable = datatable;
 	this.win = win;
@@ -1185,6 +1196,9 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.use_absval[tabname] = {};
 	}
 	this.use_gradient = {};
+	this.use_intervals = {};
+	this.use_intervals['sample'] = {};
+	this.use_intervals['group'] = {};
 	this.default_step_count = {};
 	this.default_step_count['sample'] = {};
 	this.default_step_count['group'] = {};
@@ -1202,16 +1216,31 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.default_step_count['group']['color'] = 1;
 		this.default_step_count['group']['shape'] = step_cnt;
 		this.default_step_count['group']['size'] = step_cnt;
+
+		this.use_intervals['sample']['color'] = false;
+		this.use_intervals['sample']['shape'] = false;
+		this.use_intervals['sample']['size'] = false;
+		this.use_intervals['group']['color'] = false;
+		this.use_intervals['group']['shape'] = true;
+		this.use_intervals['group']['size'] = true;
 	} else {
 		this.use_gradient['color'] = true;
 		this.use_gradient['shape'] = false;
 		this.use_gradient['size'] = false;
+
 		this.default_step_count['sample']['color'] = 1;
-		this.default_step_count['sample']['shape'] = 5;
-		this.default_step_count['sample']['size'] = 5;
+		this.default_step_count['sample']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
+		this.default_step_count['sample']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 		this.default_step_count['group']['color'] = 1;
-		this.default_step_count['group']['shape'] = 5;
-		this.default_step_count['group']['size'] = 5;
+		this.default_step_count['group']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
+		this.default_step_count['group']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
+
+		this.use_intervals['sample']['color'] = false;
+		this.use_intervals['sample']['shape'] = true;
+		this.use_intervals['sample']['size'] = true;
+		this.use_intervals['group']['color'] = false;
+		this.use_intervals['group']['shape'] = true;
+		this.use_intervals['group']['size'] = true;
 	}
 
 	this.group_method = {};
@@ -1273,7 +1302,7 @@ DisplayContinuousConfig.prototype = {
 			for (var idx in discrete_values) {
 				var value = discrete_values[idx];
 				if (!is_empty_value(value)) {
-					console.log("pushing " + value);
+					//console.log("pushing " + value);
 					values.push(value);
 				}
 			}
@@ -1296,7 +1325,6 @@ DisplayContinuousConfig.prototype = {
 			step_cnt++;
 		}
 		if (!keep) {
-			//var step_cnt_1 = this.use_gradient[config] ? step_cnt+1 : step_cnt;
 			this.colors[tabname][config] = new Array(step_cnt_1);
 			this.sizes[tabname][config] = new Array(step_cnt_1);
 			this.shapes[tabname][config] = new Array(step_cnt_1);
@@ -1333,8 +1361,6 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	setDefaults: function(step_cnt, config, tabname) {
-		//console.trace();
-		//if (DisplayContinuousConfig.GRADIENT) {
 		if (this.use_gradient[config]) {
 			step_cnt++;
 		}
@@ -1374,7 +1400,6 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getStepCount: function(config, tabname) {
-		//if (DisplayContinuousConfig.GRADIENT) {
 		if (this.use_gradient[config]) {
 			return this.values[tabname][config].length-this.has_empty_values;
 		} else {
@@ -1429,7 +1454,6 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getValueAt: function(config, tabname, idx) {
-		//if (DisplayContinuousConfig.GRADIENT) {
 		if (this.use_gradient[config]) {
 			return this.values[tabname][config][idx];
 		} else {
@@ -1612,6 +1636,8 @@ DisplayContinuousConfig.prototype = {
 		var str = "<select id='group_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
 		selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
 		str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
+		selected = (method == Group.CONTINUOUS_MEDIAN) ? " selected" : "";
+		str += "<option value='" + Group.CONTINUOUS_MEDIAN + "'" + selected + ">Median</option>\n";
 		selected = (method == Group.CONTINUOUS_MINVAL) ? " selected" : "";
 		str += "<option value='" + Group.CONTINUOUS_MINVAL + "'" + selected + ">Min Value</option>\n";
 
@@ -1686,7 +1712,7 @@ DisplayContinuousConfig.prototype = {
 
 	getColorGroup: function(group, gene_name) {
 		var value = this.getColorGroupValue(group, gene_name);
-		console.log("getColorGroup -> " + value);
+		//console.log("getColorGroup -> " + value);
 		return this._getColor(value, 'group');
 	},
 
@@ -1772,7 +1798,6 @@ DisplayContinuousConfig.prototype = {
 		}
 		var step_cnt = this.getStepCount(config, tabname);
 		for (var idx = beg; idx < step_cnt; idx++) {
-			//if (config == 'shape' || !this.use_gradient[config]) {
 			if (really_dont_use_gradient) {
 				html += "<tr><td><span class='less-than'>Less&nbsp;than</span></td>";
 			} else {
@@ -1970,42 +1995,42 @@ DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win) {
 DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	var module = get_module();
-	var displayContinuousConfig = datatable.getDisplayConfig(module);
+	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'group';
 	var id_suffix = tabname + '_' + config + "_" + id;
 	var checked = $("#discrete_color_advanced_" + id_suffix).attr("checked");
-	displayContinuousConfig.advanced = (checked == "checked");
+	displayUnorderedConfig.advanced = (checked == "checked");
 	//console.log("ADVANCED: " + displayContinuousConfig.advanced);
-	displayContinuousConfig.update_config(config, tabname, {checked: checked});
+	displayUnorderedConfig.update_config(config, tabname, {checked: checked});
 }
 
 DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
 	var datatable = navicell.dataset.datatables_id[id];
 	var module = get_module();
-	var displayContinuousConfig = datatable.getDisplayConfig(module);
+	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'sample';
 	var id_suffix = tabname + '_' + config + "_" + id;
-	DisplayContinuousConfig.setEditing(datatable.id, true, config);
+	DisplayUnorderedConfig.setEditing(datatable.id, true, config);
 	var checked = $("#discrete_color_same_" + id_suffix).attr("checked");
 	var color = $("#discrete_color_same_color_" + id_suffix).val();
 	var beg_gradient = $("#discrete_color_beg_gradient_" + id_suffix).val();
 	var end_gradient = $("#discrete_color_end_gradient_" + id_suffix).val();
 	if (checked == "checked") {
-		displayContinuousConfig.useColors(config, "same_color", color);
-		displayContinuousConfig.update_colors(config, tabname, {checked: "same_color", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
+		displayUnorderedConfig.useColors(config, "same_color", color);
+		displayUnorderedConfig.update_colors(config, tabname, {checked: "same_color", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 	}
 	if (same_color) {
 		return;
 	}
 	checked = $("#discrete_color_palette_" + id_suffix).attr("checked");
 	if (checked == "checked") {
-		displayContinuousConfig.useColors(config, "palette");
-		displayContinuousConfig.update_colors(config, tabname, {checked: "palette", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
+		displayUnorderedConfig.useColors(config, "palette");
+		displayUnorderedConfig.update_colors(config, tabname, {checked: "palette", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 	} else {
 		checked = $("#discrete_color_gradient_" + id_suffix).attr("checked");
 		if (checked == "checked") {
-			displayContinuousConfig.useColors(config, "gradient", beg_gradient, end_gradient);
-			displayContinuousConfig.update_colors(config, tabname, {checked: "gradient", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
+			displayUnorderedConfig.useColors(config, "gradient", beg_gradient, end_gradient);
+			displayUnorderedConfig.update_colors(config, tabname, {checked: "gradient", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 		}
 	}
 }
@@ -2530,6 +2555,7 @@ function DisplayUnorderedDiscreteConfig(datatable, win) {
 	this.has_empty_values = datatable.hasEmptyValues();
 	this.values = [];
 	this.values_idx = {};
+	this.biotype_is_set = datatable.biotype.isSet();
 	var discrete_values = datatable.getDiscreteValues();
 	for (var value in discrete_values) {
 		//console.log("setting value [" + discrete_values[value] + "]");
@@ -2565,11 +2591,16 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		html += "<h3 id='discrete_config_title_" + mod + id + "'></h3>";
 		html += "<ul>";
 		html += "<li><a class='ui-button-text' href='#discrete_config_sample_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_sample_tab(\"" + mod + id + "\")'>Samples</a></li>";
-		html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
+		if (!this.biotype_is_set) {
+			html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
+		}
 		html += "</ul>";
 
 		for (var tab in DisplayContinuousConfig.tabnames) {
 			var tabname = DisplayContinuousConfig.tabnames[tab];
+			if (this.biotype_is_set && tabname == 'group') {
+				continue;
+			}
 			var id_suffix = tabname + '_' + mod + id 
 			var div_editing_id = "discrete_config_editing_" + id_suffix;
 
@@ -2607,6 +2638,9 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var configs = ['color', COLOR_SIZE_CONFIG, 'shape', 'size'];
 		for (var tab in DisplayContinuousConfig.tabnames) {
 			var tabname = DisplayContinuousConfig.tabnames[tab];
+			if (this.biotype_is_set && tabname == 'group') {
+				continue;
+			}
 			this.colors[tabname] = {};
 			this.sizes[tabname] = {};
 			this.shapes[tabname] = {};
@@ -2649,7 +2683,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	setDefaults: function(config, tabname) {
 		var step_cnt = this.getValueCount();
 		var colors;
-		var biotype_is_set = this.datatable.biotype.isSet();
 		var step_cnt_1, beg;
 		//if (false && this.has_empty_values) {
 		if (tabname == 'sample' && this.has_empty_values) {
@@ -2660,7 +2693,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			step_cnt_1 = step_cnt;
 			beg = 0;
 		}
-		if (biotype_is_set) {
+		if (this.biotype_is_set) {
 			colors = color_gradient(new RGBColor(0, 0, 120), new RGBColor(0, 0, 120), step_cnt_1);
 		} else {
 			//colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1);
@@ -2679,7 +2712,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		// sample case (nether group case)
 		console.log("useColors: " + mode);
 		var step_cnt = this.getValueCount();
-		var biotype_is_set = this.datatable.biotype.isSet();
 		var step_cnt_1, beg;
 		if (this.has_empty_values) {
 			//this.colors['sample'][config][0] = "FFFFFF";
@@ -2723,6 +2755,9 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	update: function() {
 		for (var tab in DisplayContinuousConfig.tabnames) {
 			var tabname = DisplayContinuousConfig.tabnames[tab];
+			if (this.biotype_is_set && tabname == 'group') {
+				continue;
+			}
 			this.update_config('color', tabname);
 			this.update_config(COLOR_SIZE_CONFIG, tabname);
 			this.update_config('shape', tabname);
@@ -3086,7 +3121,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			html += "</tr>\n";
 		}
 
-		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && is_sample) {
+		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && is_sample && !this.datatable.biotype.isSet()) {
 			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", " + id + ")'";
 			var onchange2 = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", " + id + ", true)'";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'><table>";
@@ -3823,10 +3858,13 @@ Datatable.prototype = {
 		}
 
 		// no error, so adding genes
-		var has_new_samples;
+		var has_new_samples = false;
 		for (var nn = 0; nn < samples_to_add.length; ++nn) {
 			var sample = dataset.addSample(samples_to_add[nn]);
-			has_new_samples = sample.refcnt == 1;
+			//has_new_samples = sample.refcnt == 1;
+			if (!has_new_samples) {
+				has_new_samples = sample.refcnt == 1;
+			}
 		}
 
 		for (var nn = 0; nn < genes_to_add.length; ++nn) {
@@ -3834,9 +3872,11 @@ Datatable.prototype = {
 			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
 		}
 
+		/*
 		if (has_new_samples) {
 			navicell.group_factory.buildGroups();
 		}
+		*/
 		this.epilogue(win);
 		ready.resolve(this);
 		dataset.syncModifs();
@@ -4083,15 +4123,36 @@ Datatable.prototype = {
 		return this.displayUnorderedDiscreteConfig[module];
 	},
 
+	makeDataTable_genes_csv: function(module) {
+		var str = "Genes";
+		if (!this.biotype_is_set) {
+			for (var sample_name in this.sample_index) {
+				str += "," + sample_name;
+			}
+		}
+		str += "\n";
+		for (var gene_name in this.gene_index) {
+			str += gene_name;
+			var limit = 0;
+			if (!this.biotype_is_set) {
+				for (var sample_name in this.sample_index) {
+					var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
+					str += "," + value;
+				}
+			}
+			str += "\n";
+		}
+		return str;
+	},
+
 	makeDataTable_genes: function(module) {
-		var biotype_is_set = this.biotype.isSet();
-		if (biotype_is_set) {
+		if (this.biotype_is_set) {
 			this.switch_button[module].val("");
 		} else {
 			this.switch_button[module].val("Switch to Samples / Genes");
 		}
 		var str = "<thead><th>Genes</th>";
-		if (!biotype_is_set) {
+		if (!this.biotype_is_set) {
 			for (var sample_name in this.sample_index) {
 				str += "<th>" + sample_name + "</th>";
 			}
@@ -4101,7 +4162,7 @@ Datatable.prototype = {
 		for (var gene_name in this.gene_index) {
 			str += "<tr><td>" + gene_name + "</td>";
 			var limit = 0;
-			if (!biotype_is_set) {
+			if (!this.biotype_is_set) {
 				for (var sample_name in this.sample_index) {
 					/*
 					  if (limit++ == 10) {
@@ -4597,7 +4658,7 @@ AnnotationFactory.prototype = {
 				this.getAnnotation(header[nn]);
 			}
 		}
-		console.log("done");
+		console.log("sample annotation done");
 		this.sample_annotated = this.sync();
 		if (ready) {
 			ready.resolve();
@@ -4816,11 +4877,12 @@ function Group(annots, values, id) {
 }
 
 Group.CONTINUOUS_AVERAGE = "1";
-Group.CONTINUOUS_MINVAL = "2";
-Group.CONTINUOUS_MAXVAL = "3";
-Group.CONTINUOUS_ABS_AVERAGE = "4";
-Group.CONTINUOUS_ABS_MINVAL = "5";
-Group.CONTINUOUS_ABS_MAXVAL = "6";
+Group.CONTINUOUS_MEDIAN = "2";
+Group.CONTINUOUS_MINVAL = "3";
+Group.CONTINUOUS_MAXVAL = "4";
+Group.CONTINUOUS_ABS_AVERAGE = "5";
+Group.CONTINUOUS_ABS_MINVAL = "6";
+Group.CONTINUOUS_ABS_MAXVAL = "7";
 
 Group.DISCRETE_IGNORE = 0;
 Group.DISCRETE_EQ_0 = 1;
@@ -4890,7 +4952,33 @@ Group.prototype = {
 			method = this.getMethod(datatable);
 		}
 		if (datatable.biotype.isContinuous() || datatable.biotype.isOrderedDiscrete()) {
+			if (method == Group.CONTINUOUS_MEDIAN) {
+				var values = [];
+				for (var sample_name in this.samples) {
+					var value = datatable.getValue(sample_name, gene_name);
+					if (value == '') {
+						continue;
+					}
+					value *= 1.;
+					values.push(value);
+				}
+				var len = values.length;
+				if (len == 0) {
+					return undefined;
+				}
+				values.sort(cmp=function(x, y) {return x-y;});
+				var len2 = Math.floor(len/2);
+				if (0 == (len & 1)) {
+					return values[len2];
+				}
+				return (values[len2-1]+values[len2])/2;
+				
+			}
 			if (method == Group.CONTINUOUS_AVERAGE || method == Group.CONTINUOUS_ABS_AVERAGE) {
+				// could use a cache:
+				// this.average[datatable.id][gene_name]
+				// this.abs_average[datatable.id][gene_name]
+				// etc.
 				var total_value = 0;
 				var total_absvalue = 0;
 				var cnt = 0;

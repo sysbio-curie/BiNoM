@@ -66,6 +66,7 @@ RGBColor.fromHex = function(str) {
 RGBColor.COLOR_PALETTE = [];
 
 RGBColor.buildColorPalette = function() {
+	// must be as long as MAX_DISCRETE_VALUES
 	RGBColor.COLOR_PALETTE.push(new RGBColor(0xFF, 0x00, 0x00));
 	RGBColor.COLOR_PALETTE.push(new RGBColor(0xFF, 0x80, 0x00));
 	RGBColor.COLOR_PALETTE.push(new RGBColor(0xFF, 0xFF, 0x00));
@@ -474,6 +475,10 @@ RGBColor.buildColorPalette_old = function() {
 RGBColor.buildColorPalette();
 
 function color_palette(cnt, from) {
+	var len = RGBColor.COLOR_PALETTE.length;
+	if (cnt >= len) {
+		return color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), cnt);
+	}
 	if (!from) {
 		from = 0;
 	}

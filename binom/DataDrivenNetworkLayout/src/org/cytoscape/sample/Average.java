@@ -10,9 +10,10 @@ public class Average
 	public Average(ArrayList<Double> arraylist)
 	{
 		double sum= 0.0;
-	
-	for (Double el : arraylist)
-	{sum=sum+el;}
-	mean=sum/arraylist.size();
 
-}}
+		for (Double el : arraylist)
+		{sum=sum+el;}
+		
+		mean=sum/arraylist.size();
+
+	}}

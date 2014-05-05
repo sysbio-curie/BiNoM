@@ -78,7 +78,7 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 
 		int y = 1;
 		int x = 1;
-		label = new JLabel("Chose columns:");
+		label = new JLabel("Choose columns:");
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y+12;
@@ -137,7 +137,7 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 		
 		///
 
-		 JLabel algoPL = new JLabel("Chose algorithm:");
+		 JLabel algoPL = new JLabel("Choose algorithm:");
 		    c = new GridBagConstraints();
 		    c.gridx = x;
 		    c.gridy = y;

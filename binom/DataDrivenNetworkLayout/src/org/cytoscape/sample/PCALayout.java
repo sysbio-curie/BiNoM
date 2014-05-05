@@ -2,6 +2,7 @@ package org.cytoscape.sample;
 import java.util.Random;
 
 import vdaoengine.analysis.PCAMethod;
+import vdaoengine.analysis.PCAMethodFixedCenter;
 import vdaoengine.data.VDataSet;
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
@@ -13,7 +14,7 @@ public class PCALayout {
 	public float geneProjections[][] = null; // This is used to make the layout
 	public float attributeContributions[][] = null; // This is not needed for layout but just in case
 	public float explainedVariation[] = null;
-	
+	public int pcNumber;
 	/*public static void main(String[] args) {
 		int numberOfPoints = 100; // 100 points
 		float matrix[][] = new float[numberOfPoints][10]; // 10 dimensions
@@ -59,26 +60,19 @@ public class PCALayout {
 		
 		PCAMethod pca = new PCAMethod();
 		pca.setDataSet(dataset);
-		pca.calcBasis(10);
+		pca.calcBasis(pcNumber);
 
-		attributeContributions = new float[dataset.coordCount][10];
-		for(int j=0;j<10;j++) for(int i=0;i<dataset.coordCount;i++) attributeContributions[i][j] = (float)pca.getBasis().basis[j][i];
+		attributeContributions = new float[dataset.coordCount][pcNumber];
+		for(int j=0;j<pcNumber;j++) for(int i=0;i<dataset.coordCount;i++) attributeContributions[i][j] = (float)pca.getBasis().basis[j][i];
 		
 		VDataSet vdprojected = pca.getProjectedDataset();
 		geneProjections = vdprojected.massif;
 		
-		explainedVariation = new float[10];
+		explainedVariation = new float[pcNumber];
 		double disp[] = pca.calcDispersionsRelative(dataset.simpleStatistics.totalDispersion*dataset.simpleStatistics.totalDispersion);
-		explainedVariation[0] = (float)disp[0];
-		explainedVariation[1] = (float)disp[1];
-		explainedVariation[2] = (float)disp[2];
-		explainedVariation[3] = (float)disp[3];
-		explainedVariation[4] = (float)disp[4];
-		explainedVariation[5] = (float)disp[5];
-		explainedVariation[6] = (float)disp[6];
-		explainedVariation[7] = (float)disp[7];
-		explainedVariation[8] = (float)disp[8];
-		explainedVariation[9] = (float)disp[9];
+		for (int i=0; i<pcNumber;i++){
+		explainedVariation[i] = (float)disp[i];
+		}
 	
 	
 		

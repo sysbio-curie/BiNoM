@@ -3,14 +3,22 @@ import java.awt.event.ActionEvent;
 import java.lang.Object;
 
 import org.cytoscape.app.CyAppAdapter;
+import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.model.CyColumn;
+import org.cytoscape.model.subnetwork.CyRootNetwork;
+import org.cytoscape.model.subnetwork.CyRootNetworkManager;
+import org.cytoscape.io.read.CyNetworkReader;
+import org.cytoscape.io.read.CyNetworkReaderManager;
 import org.cytoscape.io.write.* ;
 import org.cytoscape.io.CyFileFilter;
 import org.cytoscape.view.model.CyNetworkView;
@@ -20,6 +28,9 @@ import org.cytoscape.view.presentation.property.EdgeBendVisualProperty;
 import org.cytoscape.view.presentation.property.values.Bend;
 import org.cytoscape.view.presentation.property.values.LineType;
 import org.cytoscape.work.Tunable;
+import org.cytoscape.work.util.ListSingleSelection;
+import org.cytoscape.application.swing.CytoPanel;
+import org.cytoscape.application.swing.CytoPanelName;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -29,22 +40,28 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 public class MenuAction extends AbstractCyAction {
-	private final CyAppAdapter adapter;
+	public CyAppAdapter adapter;
 
-	public MenuAction(CyAppAdapter adapter) {
-		super("Data Driven Layout",
-				adapter.getCyApplicationManager(),
-				"network",
-				adapter.getCyNetworkViewManager());
-		this.adapter = adapter;
-		setPreferredMenu("Layout");
-		
-	}
+	
+public MenuAction(CySwingAppAdapter adapter){
+// Add a menu item
+	super("Data Driven Layout",
+			adapter.getCyApplicationManager(),
+			"network",
+			adapter.getCyNetworkViewManager());
+	this.adapter = adapter;
+	setPreferredMenu("Layout.Intelligent Layout");
+
+}
+
 
 	public void actionPerformed(ActionEvent e) {
 		
 		
 		final CyApplicationManager manager = adapter.getCyApplicationManager();
+		final CyRootNetworkManager rootmanager = adapter.getCyRootNetworkManager();
+		final CyNetworkManager netmanager = adapter.getCyNetworkManager();
+		//final CyNetworkReader reader = readermanager.getReader(arg0, arg1)
 		final CyNetworkView networkView = manager.getCurrentNetworkView();
 		final CyNetwork network = networkView.getModel();
 
@@ -63,14 +80,8 @@ public class MenuAction extends AbstractCyAction {
 		Double scale = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR );
 		//System.out.println("scale= "+ scale);
 
-		/*Double centerX = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION);
-		System.out.println("centerX= "+centerX);
-		Double centerY = networkView.getVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION);
-		System.out.println("centerY= "+centerY);
-		*/
-
-		//int count = mytable.getRowCount();
-
+		
+		
 		//all nodes of the network
 		List<CyNode> nodes = mynetwork.getNodeList();
 		//System.out.println(nodes);
@@ -274,7 +285,10 @@ public class MenuAction extends AbstractCyAction {
 		
 			
 		PCALayout pca = new PCALayout();
-
+		if (data[0].length<10){pca.pcNumber = data[0].length;}
+		else {pca.pcNumber = 10;}
+		System.out.print("pcNumber= "+ pca.pcNumber);
+		System.out.print("data[0].length= "+ data[0].length);
 		pca.makeDataSet(data);
 		pca.computePCA();
 		
@@ -290,29 +304,35 @@ public class MenuAction extends AbstractCyAction {
 		int a7 =0;
 		int a8 =0;
 		int a9 =0;
-	
+		//check only 2 PC
+		int index = 0;
+		int pcCount =0;
+		if (d.pc1.isSelected()){index++; pcCount=1;}
+		if (d.pc2.isSelected()){index++;pcCount=2;}
+		if (d.pc3.isSelected()){index++;pcCount=3;}
+		if (d.pc4.isSelected()){index++;pcCount=4;}
+		if (d.pc5.isSelected()){index++;pcCount=5;}
+		if (d.pc6.isSelected()){index++;pcCount=6;}
+		if (d.pc7.isSelected()){index++;pcCount=7;}
+		if (d.pc8.isSelected()){index++;pcCount=8;}
+		if (d.pc9.isSelected()){index++;pcCount=9;}
+		if (d.pc10.isSelected()){index++;pcCount=10;}
+		//System.out.println(index);
+		if (index!=2){
+			JOptionPane.showMessageDialog(null, "Choose exacly 2 principal components","ERROR", JOptionPane.WARNING_MESSAGE);
+			}
+		else if (data[0].length<2){
+			JOptionPane.showMessageDialog(null, "Load data first","ERROR", JOptionPane.WARNING_MESSAGE);
+		}
+		else if (pcCount>data[0].length){
+			JOptionPane.showMessageDialog(null, "You can compute as many principal components as colums in your data set, not more!","ERROR", JOptionPane.WARNING_MESSAGE);
+			}else{
 		//System.out.println("POINT\tX\tY");
 		for(int i=0;i<numberOfPoints;i++){
 			
 
 			
-			//check only 2 PC
-			int index = 0;
-			if (d.pc1.isSelected()){index++;}
-			if (d.pc2.isSelected()){index++;}
-			if (d.pc3.isSelected()){index++;}
-			if (d.pc4.isSelected()){index++;}
-			if (d.pc5.isSelected()){index++;}
-			if (d.pc6.isSelected()){index++;}
-			if (d.pc7.isSelected()){index++;}
-			if (d.pc8.isSelected()){index++;}
-			if (d.pc9.isSelected()){index++;}
-			if (d.pc10.isSelected()){index++;}
-			//System.out.println(index);
-			if (index!=2){
-				JOptionPane.showMessageDialog(null, "Chose exacly 2 principal components","ERROR", JOptionPane.WARNING_MESSAGE);
-				}
-			
+	
 			
 			if (d.pc1.isSelected()){
 				
@@ -388,31 +408,7 @@ public class MenuAction extends AbstractCyAction {
 				double y = pca.geneProjections[i][9];
 				arrayListY.add(y);
 			}
-			//nodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, x);
-			//nodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, y);
-
 			
-
-			//Double x2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
-			//Double y2 = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
-			//System.out.println("x="+x2 + "y="+ y2);
-
-			//System.out.println(i+"\t"+pca.geneProjections[i][0]+"\t"+pca.geneProjections[i][1]);
-			//System.out.println("Variance explained by PC1 = "+pca.explainedVariation[0]);
-			//System.out.println("Variance explained by PC2 = "+pca.explainedVariation[1]);
-
-
-			//CyNode node = mynewnodelist.get(i);
-			
-
-			//View<CyNode> nodeView1 =  networkView.getNodeView(node) ;
-
-			//Double x3 = nodeView1.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
-			//Double y3 = nodeView1.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
-			//System.out.println("x="+x3 + "y="+ y3);
-		
-			
-			//JOptionPane.showMessageDialog(null,pca.explainedVariation ,"REPORT", JOptionPane.INFORMATION_MESSAGE);
 		
 		
 		}
@@ -447,7 +443,7 @@ public class MenuAction extends AbstractCyAction {
 		//System.out.println(sumX);
 
 
-		Double factorX =(width/(scale+1))/sumX;
+		Double factorX =(width/(scale))/sumX;
 		//System.out.println("factorX= " + factorX);
 		arrayListF.add(factorX);
 
@@ -459,7 +455,7 @@ public class MenuAction extends AbstractCyAction {
 		Double sumY = maxY +Math.abs(minY);
 		//System.out.println(sumY);
 
-		Double factorY =(height/(scale+1))/sumY;
+		Double factorY =(height/(scale))/sumY;
 		//System.out.println("factorY= " + factorY);
 
 		arrayListF.add(factorY);
@@ -485,7 +481,7 @@ public class MenuAction extends AbstractCyAction {
 		for (int node : delnodes)
 		{		
 			CyNode delnode = nodes.get(node);
-			String delnodename = mynetwork.getRow(delnode).get("name", String.class);
+			//String delnodename = mynetwork.getRow(delnode).get("name", String.class);
 			//System.out.println("empty node name: " + delnodename);
 			List<CyNode> neighbors = mynetwork.getNeighborList(delnode, CyEdge.Type.ANY);
 			ArrayList<Double> nx = new  ArrayList<Double>();
@@ -493,7 +489,7 @@ public class MenuAction extends AbstractCyAction {
 			for (CyNode neighnode : neighbors)
 			 {
 				View<CyNode> nodeViewN =  networkView.getNodeView(neighnode) ;
-				String mynameneig = mynetwork.getRow(neighnode).get("name", String.class);
+				//String mynameneig = mynetwork.getRow(neighnode).get("name", String.class);
 				//System.out.println("neighbor: " + mynameneig);
 				Double xD = nodeViewN.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION);
 				Double yD = nodeViewN.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION);
@@ -577,7 +573,22 @@ public class MenuAction extends AbstractCyAction {
 
 
 	}
-
- 
+		networkView.fitContent();//miraculous!!!!!!!!!!
+		
+		CyRootNetwork root = rootmanager.getRootNetwork(network);
+		CyRootNetwork rroot = rootmanager.getRootNetwork(root);
+		System.out.println("root :"+root + "rroot"+ rroot);
+		
+		Set<CyNetwork> setnet = netmanager.getNetworkSet();
+		System.out.println("NETWORKS :"+setnet);
+		List<CyNetwork> networks = manager.getSelectedNetworks();
+		for (CyNetwork net : networks){
+			Long netname = net.getSUID();
+			System.out.println("SEL NETWORK :"+netname);
+		}
+		System.out.println("SEL NETWORKS"+networks);
+		
+		
+	}
 }
 

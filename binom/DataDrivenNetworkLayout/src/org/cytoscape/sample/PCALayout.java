@@ -16,6 +16,7 @@ public class PCALayout {
 	public float geneProjections[][] = null; // This is used to make the layout
 	public float attributeContributions[][] = null; // This is not needed for layout but just in case
 	public float explainedVariation[] = null;
+	public int pcNumber;
 	
 	public String settings = "#ALG8\n"+
 			"algtype = epoch\n\n"+
@@ -87,24 +88,25 @@ public class PCALayout {
 		dataset = VSimpleProcedures.SimplyPreparedDataset(vt, -1);
 	}
 	
-	public void computePCA(){
+	
+public void computePCA(){
 		
 		PCAMethod pca = new PCAMethod();
 		pca.setDataSet(dataset);
-		pca.calcBasis(2);
+		pca.calcBasis(pcNumber);
 
-		attributeContributions = new float[dataset.coordCount][2];
-		for(int j=0;j<2;j++) for(int i=0;i<dataset.coordCount;i++) attributeContributions[i][j] = (float)pca.getBasis().basis[j][i];
+		attributeContributions = new float[dataset.coordCount][pcNumber];
+		for(int j=0;j<pcNumber;j++) for(int i=0;i<dataset.coordCount;i++) attributeContributions[i][j] = (float)pca.getBasis().basis[j][i];
 		
 		VDataSet vdprojected = pca.getProjectedDataset();
 		geneProjections = vdprojected.massif;
 		
-		explainedVariation = new float[2];
+		explainedVariation = new float[pcNumber];
 		double disp[] = pca.calcDispersionsRelative(dataset.simpleStatistics.totalDispersion*dataset.simpleStatistics.totalDispersion);
-		explainedVariation[0] = (float)disp[0];
-		explainedVariation[1] = (float)disp[1];
-	}
-	
+		for (int i=0; i<pcNumber;i++){
+		explainedVariation[i] = (float)disp[i];
+		}
+}
 	public void computeNonlinearPCALayout(){
 		  ElmapProjection elmap = new ElmapProjection();
 	      ElmapAlgorithm ela = new ElmapAlgorithm();

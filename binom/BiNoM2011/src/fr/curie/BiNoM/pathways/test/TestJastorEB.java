@@ -64,7 +64,7 @@ biopax_DASH_level3_DOT_owlFactory.
 			//Pathway path = biopax_DASH_level3_DOT_owlFactory.createPathway(biopax.namespaceString+"pathway1", biopax.biopaxmodel);
 			//path.addName("toto");
 			
-			BioPAX.saveToFile("/bioinfo/users/ebonnet/test.owl",biopax.biopaxmodel);
+			BioPAX.saveToFile("/Users/eric/test_jastor.owl",biopax.biopaxmodel);
 			
 //			BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
 //			

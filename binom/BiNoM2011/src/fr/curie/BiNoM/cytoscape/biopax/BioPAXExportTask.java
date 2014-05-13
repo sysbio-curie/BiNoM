@@ -102,7 +102,6 @@ public class BioPAXExportTask implements Task {
 			SbmlDocument sbml = CellDesignerSourceDB.getInstance().getCellDesigner(network);
 
 			if (biopax != null) {
-
 				Vector species = new Vector();
 				Vector reactions = new Vector();
 				//findBioPAXSpeciesAndReactions(species, reactions);

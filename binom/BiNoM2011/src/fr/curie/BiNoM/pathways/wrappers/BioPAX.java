@@ -113,7 +113,7 @@ public class BioPAX {
 	 */
 	public static String importString = "http://www.biopax.org/Downloads/Level3v1.0/biopax-level3.owl";
 	
-	public static String baseString  = "http://sysbio.curie.fr";
+	public static String baseString  = "http://sysbio.curie.fr/";
 
 	/**
 	 * not yet used

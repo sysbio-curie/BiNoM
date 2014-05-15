@@ -1,5 +1,5 @@
-
 package org.cytoscape.sample;
+
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -61,6 +61,7 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 	JCheckBox pc10;
 	JRadioButton nlpcaButton;
 	JRadioButton pcaButton;
+	JLabel components;
 	SelectColumnsDialog(JFrame frame, String mess, boolean modal){
 
 		// call JDialog constructor
@@ -164,6 +165,8 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 		    nlpcaButton = new JRadioButton(nlpcaString);
 		    nlpcaButton.setMnemonic(KeyEvent.VK_B);
 		    nlpcaButton.setActionCommand(nlpcaString);
+		    nlpcaButton.setActionCommand("desactivate");
+		    nlpcaButton.addActionListener(this);
 		    
 	        c = new GridBagConstraints();
 	        c.gridx = x;
@@ -202,7 +205,8 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 	        //
 	        //if (pcaButton.isSelected()){
 	        
-	        JLabel components = new JLabel("Project components (Check two):");
+	        //JLabel components = new JLabel("Project components (Check two):");
+	        components = new JLabel("Project components (Check two):");
 		    c = new GridBagConstraints();
 		    c.gridx = x;
 		    c.gridy = y+4;
@@ -318,6 +322,33 @@ y++;
 	        panel.add(pc10, c);
 	        
 	        //}
+	        
+	        
+	        
+	        /*partialRB.setActionCommand("enum");
+partialRB.addActionListener(this);
+
+et ensuite d'intercepter les actions avec cette fonction:
+
+        public void actionPerformed(ActionEvent e) {
+                if (e.getActionCommand().equals("berge")) {
+                        maxSetSize.setText("inf");
+                        maxSetNb.setText("");
+                        maxSetNb.setEnabled(false);
+                }
+                if (e.getActionCommand().equals("enum")) {
+                        maxSetSize.setText("10"); // ici on change les propri�t�s d un autre
+objet
+                        maxSetNb.setText("50");
+                        maxSetNb.setEnabled(true);
+                }
+        }*/
+	        
+	        
+	        
+	        
+	        
+	        
 	}
 
 	public void setDialogData(ArrayList<String> dataList) {
@@ -341,7 +372,22 @@ y++;
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		if (nlpcaButton.getActionCommand().equals("desactivate")) {
+			components.setEnabled(false);
+			pc1.setEnabled(false);
+			pc2.setEnabled(false);
+			pc3.setEnabled(false);
+			pc4.setEnabled(false);
+			pc5.setEnabled(false);
+			pc6.setEnabled(false);
+			pc7.setEnabled(false);
+			pc8.setEnabled(false);
+			pc9.setEnabled(false);
+			pc10.setEnabled(false);
+			
+          
+    }
+    
 		
 	}
 }

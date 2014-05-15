@@ -16,14 +16,14 @@ public class SliderPCA extends JPanel
     //Set up animation parameters.
     static final int FPS_MIN = 0;
     static final int FPS_MAX = 100;
-    static final int FPS_INIT = 1;    //initial frames per second
+    static final int FPS_INIT = 99;    //initial frames per second
     int frameNumber = 0;
-    int NUM_FRAMES = 14;
-    ImageIcon[] images = new ImageIcon[NUM_FRAMES];
+ 
+   
     int delay;
     Timer timer;
     boolean frozen = false;
-    static int p= 0;
+   
 
     //This label uses ImageIcon to show the doggy pictures.
     JLabel picture;
@@ -31,7 +31,7 @@ public class SliderPCA extends JPanel
     public SliderPCA() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        delay = 1000 / FPS_INIT;
+      
 
         //Create the label.
         JLabel sliderLabel = new JLabel("Percentage of initial layout", JLabel.CENTER);
@@ -48,7 +48,7 @@ public class SliderPCA extends JPanel
         framesPerSecond.setPaintTicks(true);
         framesPerSecond.setPaintLabels(true);
         framesPerSecond.setBorder(
-                BorderFactory.createEmptyBorder(0,0,100,0));
+                BorderFactory.createEmptyBorder(0,0,3,0));
 
         
 
@@ -56,13 +56,9 @@ public class SliderPCA extends JPanel
         add(sliderLabel);
         add(framesPerSecond);
        
-        setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        
 
-        //Set up a timer that calls this object's action handler.
-        timer = new Timer(delay, this);
-        timer.setInitialDelay(delay * 7); //We pause animation twice per cycle
-                                          //by restarting the timer
-        timer.setCoalesce(true);
+     
     }
 
     /** Add a listener for window events. */
@@ -88,7 +84,9 @@ public class SliderPCA extends JPanel
     public void stateChanged(ChangeEvent e) {
         JSlider source = (JSlider)e.getSource();
         if (source.getValueIsAdjusting()) {
-           // TransitionalLayout.p = (int)source.getValue()/100;
+        	
+         Double s = (double)source.getValue()/100;
+           TransitionalLayout.getInstance().doMyLayout (s);
             
           
         }
@@ -110,8 +108,8 @@ public class SliderPCA extends JPanel
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("Slider");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = new JFrame("SliderDemo");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
         //Create and set up the content pane.
         SliderPCA animator = new SliderPCA();

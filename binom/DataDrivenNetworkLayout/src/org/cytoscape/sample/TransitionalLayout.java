@@ -40,10 +40,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 public class TransitionalLayout extends AbstractCyAction {
-	public static  Double p;
+	//public static  Double p;
 	public CyAppAdapter adapter;
-
-
+public Map<String,List<Double>> currNetMap=null;
+public Map<String,List<Double>> adPcaNetMap=null;
+private static TransitionalLayout instance;
 	public TransitionalLayout(CySwingAppAdapter adapter){
 		// Add a menu item
 		super("Transitional Layout",
@@ -52,10 +53,11 @@ public class TransitionalLayout extends AbstractCyAction {
 				adapter.getCyNetworkViewManager());
 		this.adapter = adapter;
 		setPreferredMenu("Layout.Intelligent Layout");
-
+instance=this;
+System.out.println("transitionalL");
 	}
 	
-	
+	public static TransitionalLayout getInstance(){return instance;}
 
 
 	
@@ -67,7 +69,7 @@ public class TransitionalLayout extends AbstractCyAction {
 		final CyNetworkManager netmanager = adapter.getCyNetworkManager();
 		
 		CyNetworkView currNetworkView = manager.getCurrentNetworkView();
-		
+		System.out.println("actionP");
 
 		CyNetwork currNetwork = manager.getCurrentNetwork();
 		//System.out.println("current network" + myrefnetwork);
@@ -77,7 +79,8 @@ public class TransitionalLayout extends AbstractCyAction {
 		currNetworkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_X_LOCATION, 0.0);
 		currNetworkView.setVisualProperty(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION, 0.0);
 		
-		Map<String, List<Double>> currNetMap = new HashMap<String, List<Double>>();
+		//Map<String,List<Double>> currNetMap = new HashMap<String,List<Double>>();
+		currNetMap=new HashMap<String,List<Double>>();
 		for (CyNode refnode: currNodes ){
 			String currName = currNetwork.getRow(refnode).get("name", String.class);
 			View<CyNode> currNodeView=  currNetworkView.getNodeView(refnode) ;
@@ -273,7 +276,7 @@ public class TransitionalLayout extends AbstractCyAction {
 				double rate=sum0/data[0].length;	
 
 				if(rate>treshold)	
-				{System.out.println(nnode);
+				{//System.out.println(nnode);
 					found = true;
 					//System.out.println("found"+nnode);
 					//System.out.println("found"+nnode2);
@@ -854,7 +857,8 @@ public class TransitionalLayout extends AbstractCyAction {
 		CyNetwork adPcaNetwork = manager.getCurrentNetwork();
 		List<CyNode> adPcaNodes = adPcaNetwork.getNodeList();
 
-		Map<String, List<Double>> adPcaNetMap = new HashMap<String, List<Double>>();
+		//Map<String, List<Double>> adPcaNetMap = new HashMap<String, List<Double>>();
+		adPcaNetMap=new HashMap<String,List<Double>>();
 		for (CyNode adPcanode: adPcaNodes ){
 			String adPcaName = adPcaNetwork.getRow(adPcanode).get("name", String.class);
 			View<CyNode> adPcaNodeView=  pcaNetworkView.getNodeView(adPcanode) ;
@@ -867,7 +871,7 @@ public class TransitionalLayout extends AbstractCyAction {
 		}
 		
 		
-		/*System.out.println("Fetching Keys and corresponding [Multiple] Values n");
+		System.out.println("Fetching Keys and corresponding [Multiple] Values n");
 		int i =0;
 		for (Map.Entry<String, List<Double>> entry : adPcaNetMap.entrySet()) {
 			i++;
@@ -875,7 +879,7 @@ public class TransitionalLayout extends AbstractCyAction {
 			List<Double> values = entry.getValue();
 			System.out.println("Key = " + key);
 			System.out.println("Values = " + values + i);
-		}*/
+		}
 		
 		
 		
@@ -884,103 +888,12 @@ public class TransitionalLayout extends AbstractCyAction {
 		//calculate dist btw 1st layout and PCA
 		
 		
-		 
-	
-      
-        
-       
-   
-		for (CyNode pcaNode:pcaNodes){
-			
-			String pcaName = pcaNetwork.getRow(pcaNode).get("name", String.class);
-			System.out.println("name  " + pcaName);
-		for (Map.Entry<String, List<Double>> pcaEntry : adPcaNetMap.entrySet()) {
-			
-			String pcaKey = pcaEntry.getKey();
-			
-			
-			// to be given by user p%
-			
-			for (Map.Entry<String, List<Double>> currEntry : currNetMap.entrySet()) {
-				String currKey = currEntry.getKey();
-				//System.out.println("pcaKey " + pcaKey);
-				//System.out.println("currKey " + currKey);
-				if ((pcaKey.equals(currKey)) &&  (pcaKey.equals(pcaName))) {
-					System.out.println("pcaKey " + pcaKey);
-					System.out.println("currKey " + currKey);
-					List<Double> pcaValues = pcaEntry.getValue();
-					Double xpca = pcaValues.get(0);
-					Double ypca = pcaValues.get(1);
-					List<Double> currValues = currEntry.getValue();
-					Double xcurr = currValues.get(0);
-					Double ycurr = currValues.get(1);
-					Double edist = Math.sqrt(Math.pow(xpca-xcurr,2)+Math.pow(ypca-ycurr,2));
-					Double edistSq = Math.pow(xpca-xcurr,2)+Math.pow(ypca-ycurr,2);
-					//coordinates of the line to wich both nodes belongs ax+by+c=0
-					/*System.out.println("xpca "+xpca +"xcurr " + xcurr );
-					System.out.println("ypca "+ypca +"ycurr " + ycurr );
-					Double a = ypca-ycurr;
-					Double b = xcurr-xpca;
-					Double c = ((xpca-xcurr)*ycurr) -((ypca-ycurr)*xcurr);
-					Double z = p*edist; //real distance from curr layout 
-					//there can be only 2 points distanced from curr layout belonging to the line at given distance
-					Double e = Math.pow(a,2)+Math.pow(b,2);
-					Double f = 2*b*c + xcurr*a*b;
-					Double h = Math.pow(c,2)+ 2*a*c*xcurr +  (Math.pow(a,2)* Math.pow(xcurr,2))+(Math.pow(a,2)*Math.pow(ycurr,2))-(Math.pow(z,2)*Math.pow(a,2));
-					System.out.println("a "+a +"b " + b + "c "+ c + "z "+ z +"e "+e+ "f "+f+ " h"+ h);
-					Double yNew1= (-f-Math.sqrt(Math.pow(f,2)-4*e*h))/(2*e);
-					Double xNew1 = (b*yNew1+c)/-a;
-					Double yNew2= (-f+Math.sqrt(Math.pow(f,2)-4*e*h))/(2*e);
-					Double xNew2 = (b*yNew2+c)/-a;
-					System.out.println("new x1 " + xNew1+"new y1 " + yNew1+ "new x2 " + xNew2+ "new y2 " + yNew2);
-					Double z2 = (1-p)*edist;//real dist from aligned pca layout
-					*/
-					
-					//two circles with the center in the points of the old and pca layout with radius equal to demanded dist and 1-demanded dist
-					//xcurr= 1.0;
-					//ycurr=1.0;
-					//xpca=3.0;
-					//ypca=2.0;
-					//edistSq=5.0;
-					p=0.99;
-					Double z = p*p*edistSq; //*
-					
-					Double z1 = (1-p)*(1-p)*edistSq; //*
-					Double f = -(2*xpca-2*xcurr);//*
-					Double h = -(Math.pow(xcurr,2)-Math.pow(xpca,2)+Math.pow(ycurr,2)-Math.pow(ypca,2)-z+z1);//*
-					Double e = 2*ypca- 2*ycurr;//*
-					
-					Double a =  Math.pow(e,2)+Math.pow(f,2);//*
-					Double b = -2*Math.pow(e,2)*xcurr-2*e*f*ycurr+2*f*h;
-					Double c = Math.pow(e,2)*Math.pow(xcurr,2) + h*h-2*e*h*ycurr+Math.pow(e,2)*Math.pow(ycurr,2)-Math.pow(e,2)*z;
-					
-					Double delta = b*b - 4*a*c;
-					//System.out.println("xpca " + xpca+"ypca " + ypca+ "xcurr " + xcurr + "ycurr " + ycurr);
-					//System.out.println("pow " + Math.pow(xcurr,2));
-					System.out.println("z " + z+"z1 " + z1+ "f " + f + "h " + h+ "e "+ e);
-					//System.out.println(" a " + a +" b " + b+ " c " + c );
-					System.out.println("delta" + delta);
-					
-					Double xNew=-b/ (2*a);
-					Double yNew= (f*xNew + h )/e;
-					System.out.println(" xNew " + xNew+ " y New " + yNew + " f * xNew " + f*xNew);
-					
-					
-					
-					View<CyNode> pcaNodeView=  pcaNetworkView.getNodeView(pcaNode) ;	
-					
-					
-						
-						pcaNodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, xNew);
-						pcaNodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, yNew);
-						
-					
-				}
-			}
-		}
-		}
-	
+		doMyLayout (0.99);
 		//slider
+		createAndShowGUI();
+      
+	
+		
 		
 		
 		
@@ -990,8 +903,131 @@ public class TransitionalLayout extends AbstractCyAction {
 		
 	}
 	
-public void doMyLayout (int p){
 	
+	public void createAndShowGUI() {
+        //Create and set up the window.
+        JFrame frame = new JFrame("Slider");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+        //Create and set up the content pane.
+        SliderPCA animator = new SliderPCA();
+        animator.setOpaque(true); //content panes must be opaque
+        frame.setContentPane(animator);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+        
+    }
+
+public void doMyLayout (Double pourcentage){
+	final CyApplicationManager manager = adapter.getCyApplicationManager();
+
+	final CyNetworkManager netmanager = adapter.getCyNetworkManager();
+	
+	CyNetworkView currNetworkView = manager.getCurrentNetworkView();
+	System.out.println(" do layout p " + pourcentage);
+
+	CyNetwork currNetwork = manager.getCurrentNetwork();
+	//System.out.println("current network" + myrefnetwork);
+	//CyTable myreftable = myrefnetwork.getDefaultNodeTable();
+	List<CyNode> currNodes = currNetwork.getNodeList();
+
+	   
+			for (CyNode pcaNode:currNodes){
+				
+				String pcaName = currNetwork.getRow(pcaNode).get("name", String.class);
+				//System.out.println("name  " + pcaName);
+			for (Map.Entry<String, List<Double>> pcaEntry : adPcaNetMap.entrySet()) {
+				
+				String pcaKey = pcaEntry.getKey();
+				
+				
+				// to be given by user p%
+				
+				for (Map.Entry<String, List<Double>> currEntry : currNetMap.entrySet()) {
+					String currKey = currEntry.getKey();
+					//System.out.println("pcaKey " + pcaKey);
+					//System.out.println("currKey " + currKey);
+					if ((pcaKey.equals(currKey)) &&  (pcaKey.equals(pcaName))) {
+						//System.out.println("pcaKey " + pcaKey);
+						//System.out.println("currKey " + currKey);
+						List<Double> pcaValues = pcaEntry.getValue();
+						Double xpca = pcaValues.get(0);
+						Double ypca = pcaValues.get(1);
+						List<Double> currValues = currEntry.getValue();
+						Double xcurr = currValues.get(0);
+						Double ycurr = currValues.get(1);
+						Double edist = Math.sqrt(Math.pow(xpca-xcurr,2)+Math.pow(ypca-ycurr,2));
+						Double edistSq = Math.pow(xpca-xcurr,2)+Math.pow(ypca-ycurr,2);
+						//coordinates of the line to wich both nodes belongs ax+by+c=0
+						/*System.out.println("xpca "+xpca +"xcurr " + xcurr );
+						System.out.println("ypca "+ypca +"ycurr " + ycurr );
+						Double a = ypca-ycurr;
+						Double b = xcurr-xpca;
+						Double c = ((xpca-xcurr)*ycurr) -((ypca-ycurr)*xcurr);
+						Double z = p*edist; //real distance from curr layout 
+						//there can be only 2 points distanced from curr layout belonging to the line at given distance
+						Double e = Math.pow(a,2)+Math.pow(b,2);
+						Double f = 2*b*c + xcurr*a*b;
+						Double h = Math.pow(c,2)+ 2*a*c*xcurr +  (Math.pow(a,2)* Math.pow(xcurr,2))+(Math.pow(a,2)*Math.pow(ycurr,2))-(Math.pow(z,2)*Math.pow(a,2));
+						System.out.println("a "+a +"b " + b + "c "+ c + "z "+ z +"e "+e+ "f "+f+ " h"+ h);
+						Double yNew1= (-f-Math.sqrt(Math.pow(f,2)-4*e*h))/(2*e);
+						Double xNew1 = (b*yNew1+c)/-a;
+						Double yNew2= (-f+Math.sqrt(Math.pow(f,2)-4*e*h))/(2*e);
+						Double xNew2 = (b*yNew2+c)/-a;
+						System.out.println("new x1 " + xNew1+"new y1 " + yNew1+ "new x2 " + xNew2+ "new y2 " + yNew2);
+						Double z2 = (1-p)*edist;//real dist from aligned pca layout
+						*/
+						
+						//two circles with the center in the points of the old and pca layout with radius equal to demanded dist and 1-demanded dist
+						//xcurr= 1.0;
+						//ycurr=1.0;
+						//xpca=3.0;
+						//ypca=2.0;
+						//edistSq=5.0;
+				
+						Double z = pourcentage*pourcentage*edistSq; //*
+						
+						Double z1 = (1-pourcentage)*(1-pourcentage)*edistSq; //*
+						Double f = -(2*xpca-2*xcurr);//*
+						Double h = -(Math.pow(xcurr,2)-Math.pow(xpca,2)+Math.pow(ycurr,2)-Math.pow(ypca,2)-z+z1);//*
+						Double e = 2*ypca- 2*ycurr;//*
+						
+						Double a =  Math.pow(e,2)+Math.pow(f,2);//*
+						Double b = -2*Math.pow(e,2)*xcurr-2*e*f*ycurr+2*f*h;
+						Double c = Math.pow(e,2)*Math.pow(xcurr,2) + h*h-2*e*h*ycurr+Math.pow(e,2)*Math.pow(ycurr,2)-Math.pow(e,2)*z;
+						
+						Double delta = b*b - 4*a*c;
+						//System.out.println("xpca " + xpca+"ypca " + ypca+ "xcurr " + xcurr + "ycurr " + ycurr);
+						//System.out.println("pow " + Math.pow(xcurr,2));
+						//System.out.println("z " + z+"z1 " + z1+ "f " + f + "h " + h+ "e "+ e);
+						//System.out.println(" a " + a +" b " + b+ " c " + c );
+						//System.out.println("delta" + delta);
+						
+						Double xNew=-b/ (2*a);
+						Double yNew= (f*xNew + h )/e;
+						//System.out.println(" xNew " + xNew+ " y New " + yNew + " f * xNew " + f*xNew);
+						
+						
+						
+						View<CyNode> pcaNodeView=  currNetworkView.getNodeView(pcaNode) ;	
+						
+						
+							
+							pcaNodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, xNew);
+							pcaNodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, yNew);
+							
+							
+							
+						
+					}
+				}
+			}
+			
+			}
+			currNetworkView.updateView();
+			currNetworkView.fitContent();
 }
 
 

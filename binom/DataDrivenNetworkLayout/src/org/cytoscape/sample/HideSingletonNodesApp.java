@@ -11,6 +11,6 @@ public class HideSingletonNodesApp extends AbstractCySwingApp
 		CySwingApplication application = adapter.getCySwingApplication();
 		application.addAction(new MenuAction(adapter));
 		application.addAction(new Adjust(adapter));
-		
+		application.addAction(new TransitionalLayout(adapter));
 	}
 }

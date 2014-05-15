@@ -1,6 +1,5 @@
+
 package org.cytoscape.sample;
-
-
 
 import java.awt.BorderLayout;
 import java.awt.Color;

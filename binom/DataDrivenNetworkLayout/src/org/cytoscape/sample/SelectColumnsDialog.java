@@ -1,6 +1,5 @@
+
 package org.cytoscape.sample;
-
-
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -78,7 +77,7 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 
 		int y = 1;
 		int x = 1;
-		label = new JLabel("Choose columns:");
+		label = new JLabel("Chose columns:");
 		c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y+12;
@@ -137,7 +136,7 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 		
 		///
 
-		 JLabel algoPL = new JLabel("Choose algorithm:");
+		 JLabel algoPL = new JLabel("Chose algorithm:");
 		    c = new GridBagConstraints();
 		    c.gridx = x;
 		    c.gridy = y;
@@ -201,6 +200,8 @@ public class SelectColumnsDialog extends JDialog implements ActionListener {
 	        
 	        
 	        //
+	        //if (pcaButton.isSelected()){
+	        
 	        JLabel components = new JLabel("Project components (Check two):");
 		    c = new GridBagConstraints();
 		    c.gridx = x;
@@ -316,7 +317,7 @@ y++;
 	        c.anchor = GridBagConstraints.CENTER;
 	        panel.add(pc10, c);
 	        
-	      
+	        //}
 	}
 
 	public void setDialogData(ArrayList<String> dataList) {

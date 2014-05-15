@@ -1,5 +1,5 @@
-package org.cytoscape.sample;
 
+package org.cytoscape.sample;
 import java.util.Random;
 
 import vdaoengine.analysis.PCAMethod;

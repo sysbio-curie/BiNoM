@@ -45,7 +45,7 @@ public class Adjust extends AbstractCyAction {
 
 	public Adjust(CySwingAppAdapter adapter){
 		// Add a menu item
-		super("Adjust Networks",
+		super("Align Networks",
 				adapter.getCyApplicationManager(),
 				"network",
 				adapter.getCyNetworkViewManager());

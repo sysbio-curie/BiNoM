@@ -432,7 +432,19 @@ public MenuAction(CySwingAppAdapter adapter){
 		//JOptionPane.showMessageDialog(null,,"REPORT", JOptionPane.INFORMATION_MESSAGE);
 		}
 		
-		
+		}
+		else if (d.nlpcaButton.isSelected()){
+			PCALayout nlpca = new PCALayout();
+			nlpca.makeDataSet(data);
+			nlpca.computeNonlinearPCALayout();
+			for(int i=0;i<numberOfPoints;i++){
+			double x = nlpca.geneProjections[i][0];
+			arrayListX.add(x);
+			double y = nlpca.geneProjections[i][1];
+			arrayListY.add(y);
+			}
+			
+	}
 		ArrayList<Double> arrayListF = new ArrayList<Double>();
 
 		Double maxX = Collections.max(arrayListX);
@@ -572,7 +584,7 @@ public MenuAction(CySwingAppAdapter adapter){
 		
 
 
-	}
+	
 		networkView.fitContent();//miraculous!!!!!!!!!!
 		
 		CyRootNetwork root = rootmanager.getRootNetwork(network);

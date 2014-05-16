@@ -1,6 +1,9 @@
+
 package org.cytoscape.sample;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.lang.Object;
+import java.awt.Component;
 
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.CySwingAppAdapter;
@@ -41,6 +44,7 @@ import javax.swing.JTextArea;
 
 public class TransitionalLayout extends AbstractCyAction {
 	//public static  Double p;
+	private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 	public CyAppAdapter adapter;
 public Map<String,List<Double>> currNetMap=null;
 public Map<String,List<Double>> adPcaNetMap=null;
@@ -489,6 +493,21 @@ System.out.println("transitionalL");
 			arrayListY.add(y);
 			}
 			
+			String sortie ="";
+			sortie += " PC\t% of variance";
+			 
+				double pofv = nlpca.explainedVariation[0];
+				DecimalFormat df = new DecimalFormat("#.00");
+				String c = df.format(pofv*100);
+				//i = (double)Math.round(i * 1000) / 1000;
+				sortie+= "\n Explained variation \t" + c + "%";
+			
+		JTextArea aireSortie = new JTextArea (7,10);
+		aireSortie.setText (sortie);
+		
+		JOptionPane.showMessageDialog(null,aireSortie,"Rapport", JOptionPane.INFORMATION_MESSAGE);
+			
+			
 	}
 		ArrayList<Double> arrayListF = new ArrayList<Double>();
 
@@ -890,7 +909,8 @@ System.out.println("transitionalL");
 		
 		doMyLayout (0.99);
 		//slider
-		createAndShowGUI();
+		SliderPCA slider= new SliderPCA();
+        slider.createAndShowGUI();
       
 	
 		
@@ -904,21 +924,7 @@ System.out.println("transitionalL");
 	}
 	
 	
-	public void createAndShowGUI() {
-        //Create and set up the window.
-        JFrame frame = new JFrame("Slider");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
-        //Create and set up the content pane.
-        SliderPCA animator = new SliderPCA();
-        animator.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(animator);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-        
-    }
+	
 
 public void doMyLayout (Double pourcentage){
 	final CyApplicationManager manager = adapter.getCyApplicationManager();

@@ -1,3 +1,4 @@
+
 package org.cytoscape.sample;
 import java.awt.event.ActionEvent;
 import java.lang.Object;
@@ -444,6 +445,21 @@ public MenuAction(CySwingAppAdapter adapter){
 			arrayListY.add(y);
 			}
 			
+			
+			String sortie ="";
+			sortie += " PC\t% of variance";
+			 
+				double pofv = nlpca.explainedVariation[0];
+				DecimalFormat df = new DecimalFormat("#.00");
+				String c = df.format(pofv*100);
+				//i = (double)Math.round(i * 1000) / 1000;
+				sortie+= "\n Explained variation \t" + c + "%";
+			
+		JTextArea aireSortie = new JTextArea (7,10);
+		aireSortie.setText (sortie);
+		
+		JOptionPane.showMessageDialog(null,aireSortie,"Rapport", JOptionPane.INFORMATION_MESSAGE);
+			
 	}
 		ArrayList<Double> arrayListF = new ArrayList<Double>();
 
@@ -587,19 +603,7 @@ public MenuAction(CySwingAppAdapter adapter){
 	
 		networkView.fitContent();//miraculous!!!!!!!!!!
 		
-		CyRootNetwork root = rootmanager.getRootNetwork(network);
-		CyRootNetwork rroot = rootmanager.getRootNetwork(root);
-		System.out.println("root :"+root + "rroot"+ rroot);
-		
-		Set<CyNetwork> setnet = netmanager.getNetworkSet();
-		System.out.println("NETWORKS :"+setnet);
-		List<CyNetwork> networks = manager.getSelectedNetworks();
-		for (CyNetwork net : networks){
-			Long netname = net.getSUID();
-			System.out.println("SEL NETWORK :"+netname);
-		}
-		System.out.println("SEL NETWORKS"+networks);
-		
+		networkView.updateView();
 		
 	}
 }

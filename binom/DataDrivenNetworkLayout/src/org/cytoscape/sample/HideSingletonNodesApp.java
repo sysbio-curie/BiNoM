@@ -1,3 +1,4 @@
+
 package org.cytoscape.sample;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;

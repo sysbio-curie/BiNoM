@@ -1,3 +1,4 @@
+
 package org.cytoscape.sample;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,7 +19,8 @@ public class SliderPCA extends JPanel
     static final int FPS_MAX = 100;
     static final int FPS_INIT = 99;    //initial frames per second
     int frameNumber = 0;
- 
+	private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+
    
     int delay;
     Timer timer;
@@ -49,7 +51,7 @@ public class SliderPCA extends JPanel
         framesPerSecond.setPaintLabels(true);
         framesPerSecond.setBorder(
                 BorderFactory.createEmptyBorder(0,0,3,0));
-
+    
         
 
         //Put everything together.
@@ -106,15 +108,20 @@ public class SliderPCA extends JPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private static void createAndShowGUI() {
+	
+	public  void createAndShowGUI() {
+		 
+
         //Create and set up the window.
-        JFrame frame = new JFrame("SliderDemo");
+        JFrame frame = new JFrame("Slider");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
         //Create and set up the content pane.
         SliderPCA animator = new SliderPCA();
         animator.setOpaque(true); //content panes must be opaque
         frame.setContentPane(animator);
+        frame.setLocation((screenSize.width - getSize().width) / 2,
+				(screenSize.height - getSize().height) / 2);
 
         //Display the window.
         frame.pack();
@@ -127,7 +134,9 @@ public class SliderPCA extends JPanel
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI();
+            	
+                SliderPCA slider= new SliderPCA();
+                slider.createAndShowGUI();
             }
             
             

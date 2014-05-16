@@ -1,4 +1,5 @@
 
+
 package org.cytoscape.sample;
 import java.util.Random;
 
@@ -9,7 +10,6 @@ import vdaoengine.data.VDataSet;
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
 import vdaoengine.utils.VSimpleProcedures;
-
 
 public class PCALayout {
 	

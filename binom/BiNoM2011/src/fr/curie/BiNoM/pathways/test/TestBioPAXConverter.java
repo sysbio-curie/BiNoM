@@ -26,7 +26,8 @@ public class TestBioPAXConverter {
 		
 	    
 		 // Load celldesigner file 
-		File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_APC.xml");
+		//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_APC.xml");
+		File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
 		CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());
 
 		// extract SbmlDocument for conversion
@@ -41,9 +42,11 @@ public class TestBioPAXConverter {
 		Vector reactions = new Vector();
 		Vector degraded = new Vector();
 
-		CellDesignerExportTask.findSBMLSpeciesAndReactions
-		(sbml, species, speciesAliases,
-				reactions, degraded);
+		/*
+		 * this step do no seem to be necessary
+		 */
+		//CellDesignerExportTask.findSBMLSpeciesAndReactions(sbml, species, speciesAliases, reactions, degraded);
+		
 		CellDesignerToBioPAXConverter cd2bp = new CellDesignerToBioPAXConverter();
 
 		String outputFile = "/Users/eric/toto.owl";

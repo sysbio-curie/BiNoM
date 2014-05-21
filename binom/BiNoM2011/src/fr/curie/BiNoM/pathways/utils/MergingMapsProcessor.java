@@ -1134,6 +1134,7 @@ public class MergingMapsProcessor {
 							cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,id, true, true);
 						}catch(Exception e){
 							System.out.println("ERROR: can not merge species "+id);
+							e.printStackTrace();
 						}
 						csp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference().set(xs);
 						xs.setStringValue(Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())); 

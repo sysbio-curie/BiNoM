@@ -10,14 +10,14 @@ public class TestMergeMapsACSN {
 
 		MergingMapsProcessor mm = new MergingMapsProcessor();
 		try {
-			mm.loadConfigFile("/bioinfo/users/ebonnet/test_merge_maps/config.txt");
+			mm.loadConfigFile("/Users/eric/wk/test_merge/survival_configEB.txt");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("config loaded.");
-		mm.prefixLength = 1;
-		String outputFileName = "/bioinfo/users/ebonnet/test_merge_maps/res.xml"; 
+		//mm.prefixLength = 1;
+		String outputFileName = "/Users/eric/res.xml"; 
 		mm.mergeAll(outputFileName);
 		mm.postProcessAnnotations(outputFileName);
 		

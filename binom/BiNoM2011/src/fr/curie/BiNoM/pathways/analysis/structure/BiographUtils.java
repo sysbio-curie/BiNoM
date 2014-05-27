@@ -1317,6 +1317,7 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 					  if(typesOfPositiveRegulations[k].equals(interactionTypes.get(j)))
 						  typeFound = 1;
 				  }
+				  if(typesOfNegativeRegulations!=null)
 				  for(int k=0;k<typesOfNegativeRegulations.length;k++){
 					  if(typesOfNegativeRegulations[k].equals(interactionTypes.get(j)))
 						  typeFound = -1;

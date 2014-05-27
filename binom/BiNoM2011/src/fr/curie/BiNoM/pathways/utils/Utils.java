@@ -1370,7 +1370,13 @@ public static String correctIllegalCharacters(String text){
 	return new String(textc);
 }
 
-
+public static char[] charHistogram(String text){
+	char[] hist = new char[256];
+	char ctext[] = text.toCharArray();
+	for(char c: ctext)
+		hist[c]++;
+	return hist;
+}
 
 
 

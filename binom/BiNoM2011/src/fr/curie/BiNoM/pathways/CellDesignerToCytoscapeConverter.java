@@ -985,6 +985,7 @@ public class CellDesignerToCytoscapeConverter {
 	       }
 	     }*/
 	     Vector<CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> cscv = complexSpeciesAliasMap.get(sp_id);
+	     if(cscv!=null)
 	     for(CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csc: cscv){
 		       if(csc.getSpecies().equals(sp_id)){
 			       if(csc.getCelldesignerActivity()!=null){

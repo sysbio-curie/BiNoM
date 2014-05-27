@@ -514,6 +514,7 @@ public class SetOverlapAnalysis {
 					System.out.print(set.get(i)+"\t");
 					fw.write(set.get(i)+"\t");
 				}
+			System.out.println();	
 			for(int i=set.size();i<=maxFoundSize;i++){
 				//System.out.print("\t");
 				fw.write("\t");

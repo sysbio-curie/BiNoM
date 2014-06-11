@@ -17,7 +17,7 @@ public class TestMergeMapsACSN {
 		}
 		System.out.println("config loaded.");
 		//mm.prefixLength = 1;
-		String outputFileName = "/Users/eric/res.xml"; 
+		String outputFileName = "/Users/eric/res.xml";
 		mm.mergeAll(outputFileName);
 		mm.postProcessAnnotations(outputFileName);
 		

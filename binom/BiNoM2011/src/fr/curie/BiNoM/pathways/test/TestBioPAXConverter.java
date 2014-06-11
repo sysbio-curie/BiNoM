@@ -56,7 +56,7 @@ public class TestBioPAXConverter {
 		System.out.println(cd2bp.biopax.biopaxmodel);
 		BioPAX bp = cd2bp.convert();
 		//cd2bp.biopax.saveToFile(outputFile, cd2bp.biopax.biopaxmodel);
-		System.out.println("Done.");
+		System.out.println("Done....");
 		
 
 	}

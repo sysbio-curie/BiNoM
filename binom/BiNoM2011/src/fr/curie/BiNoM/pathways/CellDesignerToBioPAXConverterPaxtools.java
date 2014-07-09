@@ -159,7 +159,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	
 	private void fillBioPAXModel() {
 		
-		//testER();
 		System.out.println("start filling the model...");
 		getSpecies();
 		getIncludedSpecies();
@@ -178,10 +177,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		setBioPAXAntisenseRNAs();
 		setBioPAXSmallMolecules();
 		setBioPAXSpecies();
-		
-		//test();
-		
-		//dumpModel();
+		setBioPAXReactions();
 	}
 	
 	/**
@@ -516,6 +512,9 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 	}
 	
+	/**
+	 * Encode CellDesigner Species as BioPAX PhysicalEntities, also species included in complexes.
+	 */
 	private void setBioPAXSpecies() {
 		for (String id : species.keySet()) {
 			SpeciesDocument.Species sp = species.get(id);
@@ -527,9 +526,14 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 	}
 	
+	/**
+	 * return an existing CellDesigner species as PhysicalEntity or create a new one
+	 * @param speciesId
+	 * @return BioPAX PhysicalEntity
+	 */
 	private PhysicalEntity getOrCreateBioPAXSpecies(String speciesId) {
 		
-		
+		// return PhysicalEntity if it's already in the current list
 		if (bpPhysicalEntities.get(speciesId) != null)
 			return bpPhysicalEntities.get(speciesId);
 					
@@ -541,6 +545,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		String speciesName = "";
 		String cdClass = "";
 		CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si = null;
+		boolean complexComponent = false;
 		
 		if (sp != null) {
 			// regular species
@@ -550,35 +555,47 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 		else {
 			// included species
+			complexComponent = true;
 			CelldesignerSpeciesDocument.CelldesignerSpecies isp = includedSpecies.get(speciesId);
 			speciesName = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,isp.getId(),true,true);
 			speciesName = cleanString(speciesName);
-			//System.out.println("_name " + speciesName + " " + cleanString(speciesName));
 			si = isp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
 			cdClass = Utils.getValue(si.getCelldesignerClass());
-			//System.out.println("_data" + speciesId + " " +speciesName + " " + cdClass);
 		}
 		
-		// build uri using species ID
+		// build uri using BioPAX prefix and species ID
 		String uri =  biopaxNameSpacePrefix + speciesId;
 		
 		if (cdClass.equals("PROTEIN")) {
-			Protein pr = model.addNew(Protein.class, uri);
-			pr.addName(speciesName);
-			pr.setStandardName(speciesName);
-			pr.setDisplayName(speciesName);
-			String referenceId = Utils.getValue(si.getCelldesignerProteinReference());
-			pr.setEntityReference(bpEntityReferences.get(referenceId));
-			//System.out.println("_test_ref: " + bpEntityReferences.get(referenceId).getDisplayName());
-			bpPhysicalEntities.put(speciesId, pr);
-			retPe = pr;
+			boolean homodimer = false;
+			if (si.getCelldesignerState() != null && si.getCelldesignerState().getCelldesignerHomodimer() != null)
+				homodimer = true;
+			// if the protein is an homodimer and is not included in a complex, create it as a complex
+			if (homodimer && !complexComponent) {
+				Complex co = model.addNew(Complex.class, uri);
+				co.addName(speciesName);
+				co.setStandardName(speciesName);
+				co.setDisplayName(speciesName);
+				//TODO: add stoichiometry as included component, see old code
+				bpPhysicalEntities.put(speciesId, co);
+				retPe = co;
+			}
+			else {
+				Protein pr = model.addNew(Protein.class, uri);
+				pr.addName(speciesName);
+				pr.setStandardName(speciesName);
+				pr.setDisplayName(speciesName);
+				String referenceId = Utils.getValue(si.getCelldesignerProteinReference());
+				pr.setEntityReference(bpEntityReferences.get(referenceId));
+				bpPhysicalEntities.put(speciesId, pr);
+				retPe = pr;
+			}
 		} else if (cdClass.equals("GENE")) {
 			DnaRegion dr = model.addNew(DnaRegion.class, uri);
 			dr.addName(speciesName);
 			dr.setDisplayName(speciesName);
 			dr.setStandardName(speciesName);
 			String referenceId = Utils.getValue(si.getCelldesignerGeneReference());
-			//System.out.println("_test_ref: " + bpEntityReferences.get(referenceId).getDisplayName());
 			dr.setEntityReference(bpEntityReferences.get(referenceId));
 			bpPhysicalEntities.put(speciesId, dr);
 			retPe = dr;
@@ -592,18 +609,15 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				referenceId = Utils.getValue(si.getCelldesignerRnaReference());
 			else
 				referenceId = Utils.getValue(si.getCelldesignerAntisensernaReference());
-			//System.out.println("_test_ref: "+ bpEntityReferences.get(referenceId).getDisplayName() +" "+cdClass);
 			rr.setEntityReference(bpEntityReferences.get(referenceId));
 			bpPhysicalEntities.put(speciesId, rr);
 			retPe = rr;
 		} else if (cdClass.equals("ION") || cdClass.equals("DRUG") || cdClass.equals("SIMPLE_MOLECULE")) {
 			SmallMolecule sm = model.addNew(SmallMolecule.class, uri);
-			//System.out.println("__test " + bpEntityReferences.get(sp.getId()).getDisplayName());
 			sm.addName(speciesName);
 			sm.setDisplayName(speciesName);
 			sm.setStandardName(speciesName);
 			sm.setEntityReference(bpEntityReferences.get(speciesId+"_ref"));
-			//System.out.println("_test "+sm.getRDFId() + " ref: "+sm.getEntityReference().getRDFId());
 			bpPhysicalEntities.put(speciesId, sm);
 			retPe = sm;
 		} else if (cdClass.equals("COMPLEX")) {
@@ -618,15 +632,11 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			}
 			else {
 				for (CelldesignerSpeciesDocument.CelldesignerSpecies ispc: vis) {
-					//CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity ispi = ispc.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
-					//System.out.println("_component " + ispc.getId());
 					PhysicalEntity ipe = getOrCreateBioPAXSpecies(ispc.getId());
-					if (ipe != null) {
+					if (ipe != null)
 						co.addComponent(ipe);
-					}
-					else {
+					else
 						System.out.println("Warning: null PhysicalEntity for complex component "+ispc.getId());
-					}
 				}
 			}
 			bpPhysicalEntities.put(speciesId, co);
@@ -643,6 +653,23 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		
 		return retPe;
 	}
+	
+	private void setBioPAXReactions() {
+		
+		int k=0;
+		for (String reactionId : reactions.keySet()){
+			ReactionDocument.Reaction reaction = reactions.get(reactionId);
+			//String reactionType = "UNKNOWN_TRANSITION";
+			String reactionType = "";
+			if (reaction.getAnnotation() != null && 
+					reaction.getAnnotation().getCelldesignerReactionType() != null) {
+				reactionType = Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType());
+			}
+			k++;
+			System.out.println("_Reaction ("+k+"/"+reactions.size()+"):\t"+reaction.getId()+"\t"+reactionType);
+		}
+	}
+	
 	
 	private void testSetBioPAXSpecies() {
 		//System.out.println(">>> mem:: "+Utils.getUsedMemoryMb());

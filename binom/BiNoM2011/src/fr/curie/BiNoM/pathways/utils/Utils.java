@@ -45,7 +45,14 @@ import org.sbml.x2001.ns.celldesigner.BodyDocument;
 import org.sbml.x2001.ns.celldesigner.HtmlDocument;
 import org.sbml.x2001.ns.celldesigner.NotesDocument;
 
+import vdaoengine.data.VDataTable;
+import vdaoengine.data.io.VDatReadWrite;
+import vdaoengine.utils.VSimpleFunctions;
 import edu.rpi.cs.xgmml.*;
+import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
+import fr.curie.BiNoM.pathways.analysis.structure.Edge;
+import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.biopax.*;
 
 import com.hp.hpl.jena.rdf.model.*;
@@ -617,13 +624,13 @@ public static int compareTwoSets(Vector v1, Vector v2){
  for(int i=0;i<v1.size();i++){
    if(v2.indexOf(v1.get(i))>=0)
      inters++;
-   else
-     System.out.println(v1.get(i)+" from list1 not found in list2");
+   //else
+   // System.out.println(v1.get(i)+" from list1 not found in list2");
  }
- for(int i=0;i<v2.size();i++){
-   if(v1.indexOf(v2.get(i))<0)
-     System.out.println(v2.get(i)+" from list2 not found in list1");
- }
+ //for(int i=0;i<v2.size();i++){
+ //  if(v1.indexOf(v2.get(i))<0)
+ //    System.out.println(v2.get(i)+" from list2 not found in list1");
+ //}
  return inters;
 }
 /**
@@ -633,6 +640,17 @@ public static int compareTwoSets(Vector v1, Vector v2){
  * @return Union of two sets
  */
 public static Set UnionOfSets(Set set1, Set set2){
+    Iterator it = set2.iterator();
+    while(it.hasNext()){
+      Object o = it.next();
+      if(!set1.contains(o))
+        set1.add(o);
+    }
+    return set1;
+  }
+
+
+public static Vector UnionOfVectors(Vector set1, Vector set2){
     Iterator it = set2.iterator();
     while(it.hasNext()){
       Object o = it.next();
@@ -1377,6 +1395,94 @@ public static char[] charHistogram(String text){
 		hist[c]++;
 	return hist;
 }
+
+/** 
+ * The tables should have first column as index.
+ * @param vt1
+ * @param prefix1 
+ * @param vt2
+ * @param prefix2
+ * @param folder is used for keeping the results
+ * @param correlationThreshold
+ * @throws Exception
+ */
+public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VDataTable vt2, String prefix2, float correlationThreshold, boolean chooseOnlyMaximalCorrelation) throws Exception{
+	vt1.makePrimaryHash(vt1.fieldNames[0]);
+	vt2.makePrimaryHash(vt2.fieldNames[0]);
+	// make common list of objects
+	HashSet<String> names_set = new HashSet<String>();
+	Vector<String> names = new Vector<String>();
+	for(int i=0;i<vt1.rowCount;i++){
+		String name1 = vt1.stringTable[i][0];
+		if(vt2.tableHashPrimary.get(name1)!=null){
+			if(!names_set.contains(name1))
+				names_set.add(name1);
+		}
+	}
+	for(String s: names_set)
+		names.add(s);
+	Collections.sort(names);
+	System.out.println(names.size()+" common objects are found.");
+	
+	//FileWriter fw  = new FileWriter(folder+prefix1+"_"+prefix2+".txt");
+	//fw.write("FIELD1\tFIELD2\tCORRELATION\tCORRELATION_ABS\n");
+	
+	Graph graph = new Graph();
+	
+	for(int i=0;i<vt1.colCount;i++)if(vt1.fieldTypes[i]==vt1.NUMERICAL){
+		String fni = vt1.fieldNames[i]+"_"+prefix1;
+		Node ni = graph.getCreateNode(fni);
+		ni.setAttributeValueUnique("FIELD", vt1.fieldNames[i], Attribute.ATTRIBUTE_TYPE_STRING);
+		ni.setAttributeValueUnique("SET", prefix1, Attribute.ATTRIBUTE_TYPE_STRING);
+		int maxi = -1;
+		float maxabscorr = 0f;
+		float maxcorr = 0f;
+		for(int j=0;j<vt2.colCount;j++)if(vt2.fieldTypes[j]==vt2.NUMERICAL){
+			String fnj = vt2.fieldNames[j]+"_"+prefix2;
+			Node nj = graph.getCreateNode(fnj);
+			nj.setAttributeValueUnique("FIELD", vt2.fieldNames[j], Attribute.ATTRIBUTE_TYPE_STRING);
+			nj.setAttributeValueUnique("SET", prefix2, Attribute.ATTRIBUTE_TYPE_STRING);
+			float xi[] = new float[names.size()];
+			float xj[] = new float[names.size()];
+			for(int k=0;k<names.size();k++){
+				xi[k] = Float.parseFloat(vt1.stringTable[vt1.tableHashPrimary.get(names.get(k)).get(0)][i]);
+				xj[k] = Float.parseFloat(vt2.stringTable[vt2.tableHashPrimary.get(names.get(k)).get(0)][j]);
+			}
+			float corr = VSimpleFunctions.calcCorrelationCoeff(xi, xj);
+			float abscorr = Math.abs(VSimpleFunctions.calcCorrelationCoeff(xi, xj));
+			System.out.print(corr+"\t");
+			if(!chooseOnlyMaximalCorrelation)
+			if(abscorr>=correlationThreshold){
+			//	fw.write(fni+"_"+prefix1+"\t"+fnj+"_"+prefix2+"\t"+corr+"\t"+Math.abs(corr)+"\n");
+				Edge e = graph.getCreateEdge(fni+"__"+fnj);
+				e.Node1 = ni;
+				e.Node2 = nj;
+				e.setAttributeValueUnique("CORR", ""+corr, Attribute.ATTRIBUTE_TYPE_REAL);
+				e.setAttributeValueUnique("ABSCORR", ""+abscorr, Attribute.ATTRIBUTE_TYPE_REAL);
+			}
+			if(abscorr>maxabscorr){
+				maxabscorr = abscorr;
+				maxi = j;
+			}
+		}
+		System.out.println();
+		if(chooseOnlyMaximalCorrelation){
+			if(maxabscorr>=correlationThreshold){
+			//	fw.write(fni+"_"+prefix1+"\t"+fnj+"_"+prefix2+"\t"+corr+"\t"+Math.abs(corr)+"\n");
+				String fnj = vt2.fieldNames[maxi]+"_"+prefix2;
+				Node nj = graph.getCreateNode(fnj);
+				Edge e = graph.getCreateEdge(fni+"__"+fnj);
+				e.Node1 = ni;
+				e.Node2 = nj;
+				e.setAttributeValueUnique("CORR", ""+maxcorr, Attribute.ATTRIBUTE_TYPE_REAL);
+				e.setAttributeValueUnique("ABSCORR", ""+maxabscorr, Attribute.ATTRIBUTE_TYPE_REAL);
+			}
+		}
+	}
+	return graph;
+	//fw.close();
+}
+
 
 
 

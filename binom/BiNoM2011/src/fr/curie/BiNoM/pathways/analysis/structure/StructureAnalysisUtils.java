@@ -29,15 +29,9 @@ package fr.curie.BiNoM.pathways.analysis.structure;
 import java.util.*;
 import java.io.*;
 
-import vdaoengine.utils.Algorithms;
 import edu.rpi.cs.xgmml.*;
-
-/*
- * Coonection of graph algorithms
- * to BiNoM interface 
- */
-
 import fr.curie.BiNoM.pathways.utils.SubnetworkProperties;
+import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.*;
 
 /**
@@ -274,7 +268,7 @@ public class StructureAnalysisUtils {
 	  for(int i=0;i<graph.Nodes.size();i++){
 		  connectivity[i] = 0f+graph.Nodes.get(i).incomingEdges.size()+graph.Nodes.get(i).outcomingEdges.size();
 	  }
-	  int ind[] = Algorithms.SortMass(connectivity);
+	  int ind[] = Utils.SortMass(connectivity);
 	  for(int i=0;i<ind.length;i++){
 		  Node n = graph.Nodes.get(ind[i]);
 		  gr.calcNodesInOut();

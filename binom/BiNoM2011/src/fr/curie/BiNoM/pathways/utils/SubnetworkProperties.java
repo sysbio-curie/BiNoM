@@ -1090,8 +1090,12 @@ public class SubnetworkProperties {
 		double pvalue = (double)num/(double)numOfSamples;
 		System.out.println("p-value="+pvalue);
 	}
-
+	
 	public String makeTestOfConnectivity(int numOfSamples, boolean conserveDegrees, String fileNameForComplexProfile, int thresholdForComplexProfile, Vector<String> fixedNodes) throws Exception{
+		return makeTestOfConnectivity(numOfSamples, conserveDegrees, fileNameForComplexProfile, thresholdForComplexProfile, fixedNodes, true);
+	}
+
+	public String makeTestOfConnectivity(int numOfSamples, boolean conserveDegrees, String fileNameForComplexProfile, int thresholdForComplexProfile, Vector<String> fixedNodes, boolean verbose) throws Exception{
 		
 		StringBuffer report = new StringBuffer(); 
 		
@@ -1099,13 +1103,14 @@ public class SubnetworkProperties {
 		
 		int components[][] = calcDistributionOfConnectedComponentSizes(subnetwork);
 		distributionOfConnectedComponentSizes = components;
-		
-		System.out.print("Distribution of connected components: ");
+		if(verbose)
+			System.out.print("Distribution of connected components: ");
 		for(int i=0;i<components.length;i++){
-			System.out.print(components[i][0]+":"+components[i][1]+"\t");
+			if(verbose)
+				System.out.print(components[i][0]+":"+components[i][1]+"\t");
 			report.append(components[i][0]+":"+components[i][1]+"\t");
 		}
-		System.out.println(); report.append("\n");
+		if(verbose) System.out.println(); report.append("\n");
 
 		Vector<String> complexes = readComplexProfile(fileNameForComplexProfile,thresholdForComplexProfile);
 		
@@ -1174,7 +1179,8 @@ public class SubnetworkProperties {
 			}
 			
 			if(i<10){
-				System.out.println("Sample "+i+", size="+subnetwork.Nodes.size()+")");
+				if(verbose)
+					System.out.println("Sample "+i+", size="+subnetwork.Nodes.size()+")");
 				report.append("Sample "+i+")\n");
 			}
 			int componentSample[][] = calcDistributionOfConnectedComponentSizes(grsample);
@@ -1184,7 +1190,8 @@ public class SubnetworkProperties {
 			
 			for(int k=0;k<componentSample.length;k++){
 				if(i<10){
-					System.out.print(componentSample[k][0]+":"+componentSample[k][1]+"\t");
+					if(verbose)
+						System.out.print(componentSample[k][0]+":"+componentSample[k][1]+"\t");
 					report.append(componentSample[k][0]+":"+componentSample[k][1]+"\t");
 				}
 				totalComps[componentSample[k][0]] += componentSample[k][1];
@@ -1192,7 +1199,8 @@ public class SubnetworkProperties {
 					maxSize = componentSample[k][0];
 			}
 			if(i<10){
-				System.out.println();
+				if(verbose)
+					System.out.println();
 				report.append("\n");
 			}
 			for(int l=0;l<components.length;l++){
@@ -1205,7 +1213,8 @@ public class SubnetworkProperties {
 						if(componentSample[kk][0]>=sizeToEvaluate)
 							num+=componentSample[kk][1];
 					if(i<10){
-						System.out.println("\tcomponentSize > "+sizeToEvaluate+":"+numToEvaluate+", met "+num+" times:");
+						if(verbose)
+							System.out.println("\tcomponentSize > "+sizeToEvaluate+":"+numToEvaluate+", met "+num+" times:");
 						report.append("\tcomponentSize > "+sizeToEvaluate+":"+numToEvaluate+", met "+num+" times:\n");
 					}
 					if(num>=numToEvaluate)
@@ -1218,7 +1227,8 @@ public class SubnetworkProperties {
 			//System.out.println(i+"\t"+totalComps[i]/(float)numOfSamples);
 			report.append(i+"\t"+totalComps[i]/(float)numOfSamples+"\n");
 		}
-		System.out.println("Connected components p-values:");
+		if(verbose)
+			System.out.println("Connected components p-values:");
 		report.append("Connected components p-values:\n");
 		
 		averageSizeOfRandomBiggestComponent/=(float)numOfSamples;
@@ -1229,7 +1239,8 @@ public class SubnetworkProperties {
 			int numToEvaluate = 0;
 			for(int kk=l;kk<components.length;kk++) 
 				numToEvaluate+=components[kk][1];
-			System.out.println(sizeToEvaluate+":"+numToEvaluate+", p-value="+pvalues[l]/(float)numOfSamples);
+			if(verbose)
+				System.out.println(sizeToEvaluate+":"+numToEvaluate+", p-value="+pvalues[l]/(float)numOfSamples);
 			report.append(sizeToEvaluate+":"+numToEvaluate+", p-value="+pvalues[l]/(float)numOfSamples+"\n");
 			significanceOfConnectedComponents[l] = pvalues[l]/(float)numOfSamples;
 		}
@@ -1651,6 +1662,10 @@ public class SubnetworkProperties {
 	}
 	
 	public static String calcSignificanceVsNumberOfGenes(Graph network, Vector<String> rankedListOfProteins, int numberOfPermutations, int nga[]) throws Exception{
+		return calcSignificanceVsNumberOfGenes(network, rankedListOfProteins, numberOfPermutations, nga, true);
+	}
+	
+	public static String calcSignificanceVsNumberOfGenes(Graph network, Vector<String> rankedListOfProteins, int numberOfPermutations, int nga[], boolean verbose) throws Exception{
 		String report = "";
 		Vector<Integer> numberOfGenes = new Vector<Integer>();
 		Vector<Integer> genesSelected = new Vector<Integer>();
@@ -1665,9 +1680,11 @@ public class SubnetworkProperties {
 		//int nga[] = {100,150,200,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,420,440,460,480,500,520,540,560,580,600,620,640,660,680,700,1000};
 		for(int k=0;k<nga.length;k++){
 			int ng = nga[k];
+			if(verbose){
 			System.out.println("================================");
 			System.out.println("NUMBER OF GENES TO SELECT = "+ng);
 			System.out.println("================================");
+			}
 			Vector<String> list = new Vector<String>();
 			for(int i=0;i<ng;i++)
 				list.add(rankedListOfProteins.get(i));
@@ -1675,9 +1692,9 @@ public class SubnetworkProperties {
 			SP.subnetwork.addConnections(SP.network);
 			
 			StructureAnalysisUtils.Option options = new StructureAnalysisUtils.Option();
-			SP.calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, true);
+			SP.calcDegreeDistribution(SP.network, SP.degreeDistribution, SP.degrees, verbose);
 			Vector<String> fixedNodes = options.fixedNodeList;
-			String reportCompactness = SP.makeTestOfConnectivity(numberOfPermutations, true, null, 0, fixedNodes);
+			String reportCompactness = SP.makeTestOfConnectivity(numberOfPermutations, true, null, 0, fixedNodes, verbose);
 
 			if(SP.distributionOfConnectedComponentSizes.length>0){
 				numberOfGenes.add(ng);
@@ -1688,13 +1705,16 @@ public class SubnetworkProperties {
 			}
 		}
 		//report+="================================================\n";
-		System.out.println("================================================");
+		if(verbose)
+			System.out.println("================================================");
 		report+="NGENES\tSELECTED\tLARGESTCOMPONENT\tSIGNIFICANCE\tLARGESTRANDOMCOMPONENT\tSCORE\n";
-		System.out.println("NGENES\tSELECTED\tLARGESTCOMPONENT\tSIGNIFICANCE\tLARGESTRANDOMCOMPONENT\tSCORE");
+		if(verbose)
+			System.out.println("NGENES\tSELECTED\tLARGESTCOMPONENT\tSIGNIFICANCE\tLARGESTRANDOMCOMPONENT\tSCORE");
 		for(int i=0;i<numberOfGenes.size();i++){
 			float score = (float)(genesInTheBiggestConnectedComponent.get(i)-averageSizeOfRandomBiggestComponent.get(i))/genesSelected.get(i);
 			report+=numberOfGenes.get(i)+"\t"+genesSelected.get(i)+"\t"+genesInTheBiggestConnectedComponent.get(i)+"\t"+significanceOfTheBiggestComponent.get(i)+"\t"+averageSizeOfRandomBiggestComponent.get(i)+"\t"+score+"\n";
-			System.out.println(numberOfGenes.get(i)+"\t"+genesSelected.get(i)+"\t"+genesInTheBiggestConnectedComponent.get(i)+"\t"+significanceOfTheBiggestComponent.get(i)+"\t"+averageSizeOfRandomBiggestComponent.get(i)+"\t"+score);
+			if(verbose)
+				System.out.println(numberOfGenes.get(i)+"\t"+genesSelected.get(i)+"\t"+genesInTheBiggestConnectedComponent.get(i)+"\t"+significanceOfTheBiggestComponent.get(i)+"\t"+averageSizeOfRandomBiggestComponent.get(i)+"\t"+score);
 			//System.out.println(numberOfGenes.get(i)+"\t"+genesSelected.get(i));
 		}
 		return report;

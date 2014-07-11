@@ -72,8 +72,15 @@ public class BiographUtils extends Graph {
     	graph = StructureAnalysisUtils.removeReciprocalEdges(graph);
     	XGMML.saveToXGMML(graph, prefix+"_entity.xgmml");*/
     	
+    	String prefix = "C:/Datas/acsn/assembly/acsn_src/acsn_master";
+    	Graph graph1 = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(prefix+".xgmml"));
+    	graph1 = convertReactionNetworkIntoEntityNetwork(graph1);
+    	graph1 = StructureAnalysisUtils.removeReciprocalEdges(graph1);
+    	XGMML.saveToXGMML(graph1, prefix+"_entity.xgmml");    	
+    	System.exit(0);
     	
-    	String prefix = "C:/Datas/BinomTest/RegulatorExtraction/";
+    	
+    	//String prefix = "C:/Datas/BinomTest/RegulatorExtraction/";
     	//String file = "Influences_collapse_scheme_1";
     	String file = "test3";
     	String rid = "re81";    	

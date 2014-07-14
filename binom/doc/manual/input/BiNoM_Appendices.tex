@@ -126,6 +126,41 @@ The first stop condition make that too far clusters are not merged. When the las
 The next page shows 3 examples (network inspired by toynet ). If the maximal length of the shortest paths is 1, nodes inside clusters are connected as a clique in a not oriented graph. But, if not, it may not be the case.\\\\
 From a \textbf{practical point of view}, the input of ceiling number of nodes and maximal length of the shortest paths gives a set of not intersecting sub-networks. They are a partition of the network; their union is the whole network. This process is only useful for connected networks. Obviously, isolated nodes or sub-networks are not merged unless the maximal distance is infinity.
 
+\subsection{Fading Signal Propagation Model}\label{FadeModel}
+\subsubsection{Computing at nodes and along edges}
+The network for this model is a directed graph where edges are weighted: weight = +1 if activation and weight = -1 if inhibition. Any real value of weight can be used, but the accuracy of this model casts a doubt about this way.\\\\
+The model is based on fading propagation of the biological signal. The fading effect  is simply translated as multiplying edge weights  by a global positive factor \textquotedblleft fade\textquotedblright (less than 1) along every edge. Influence on a node is the sum of influences from upstream nodes by incoming edges. This model is the simplest which respect the transitivity by addition of the path lengths as:\\\\
+$activity(at\ length1,activity(at\ length2,start\ active\ node)=\\\hspace*{2em}activity(at\ length1+length2, start\ active\ node)$\\\\
+More precisely, when going all over the network, the recurrence from every root and every edge (source, target) from the root is:
+\begin{itemize}
+\item $all\_influence = 0$
+\item $influence (root, root) = 1$
+\item $influence (root, target)= influence (root, target) +\\influence (root, source) * fade * weight (source, target)$
+\end{itemize}
+The structure of the network is described by an adjacency list matching every node to lists of adjacent edges. Going over the network can be done by two exploring mode:
+\begin{enumerate}
+\item mono path: exploration by by breadth first search ends when a node already reached is found, every edge edge is counted once ; 
+\item multi path: loops are opened as far as possible from source by depth first search (back edges), after all paths are explored in order of distances from the source, the exploration stops at 2*reach  ;
+\end{enumerate}
+So,  the arrest of exploration at 2*reach keeps multi path process fast (error 0.25\%) while coping with forward feed path.
+\subsubsection{Comparing to observations}
+The result is a simple linear model as product of matrices:
+\begin{itemize}
+\item $[Activation\_level\_ output] = [Influence\_matrix] * [Activation\_level\_input]$
+\end{itemize}
+Activation\_level\_input can be the states of observed species in input of the network, values being generally:
+\begin{itemize}
+\item +1, if active
+\item -1, if inactive
+\item 0 if no observed
+\end{itemize}
+Activation\_level\_ output can be compared to observations of nodes in output of the network. The computing performance allows to test on every edge weight=0 or weight=-weight to question the relevance of the network.\\\\
+To compare model results and observations, only the number of matching signs are taken in a threshold near for computed values. As it exists an alternative, the pertinent indicator is Cohen's coefficient named kappa (\cite{Kappa}):\\\\
+\hspace*{1cm}$kappa=(Po-Ph)/(1-Ph)$ \\
+\hspace*{1cm}$Po$ is the relative observed agreement,\\
+\hspace*{1cm}$Ph$ is the hypothetical probability of chance agreement.\\\\
+The comparison can concern several sets of observations and, so, it gives a global appreciation of the network.
+
 \subsection{GLOSSARY}\label{GLOSSARY}
 \subsubsection{BioPAX}
 BioPAX is an OWL (Web Ontology Language) document designed to exchange biological pathways. BioPAX format provides separate layers of information: information about the reactions involved in the networks along with the participants, information about the structure of the pathway, and information about the protein-protein interactions. 

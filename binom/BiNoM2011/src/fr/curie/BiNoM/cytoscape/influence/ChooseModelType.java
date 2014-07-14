@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
  */
 public class ChooseModelType extends ModelMenuUtils{
 	private static final long serialVersionUID = 1L;
-	final public static String title="Select Mono or Multi Path Model";
+	final public static String title="Select Mono or Multi Path Mode";
 	public void actionPerformed(ActionEvent e){
 		inputPathModel();
 	}

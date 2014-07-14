@@ -32,8 +32,8 @@ public class TextBoxDialog extends GridBagDialog implements ActionListener,Clipb
 	final static int xw[]={1,8,1,1,1};
 	final static int yw[]={0,8,0,0,0} ;
 	final static int cf[]={B,B,H,H,H};
-	final int width=320;
-	final int height=320;
+	final int width=480;
+	final int height=480;
 	private boolean clickYes;
 	private JTextArea mess;
 	private JTextArea dtext;

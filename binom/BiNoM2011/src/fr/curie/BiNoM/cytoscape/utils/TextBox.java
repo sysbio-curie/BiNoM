@@ -32,7 +32,7 @@ public class TextBox extends GridBagDialog implements ActionListener,ClipboardOw
 	final static int xw[]={8,1,1};
 	final static int yw[]={8,0,0} ;
 	final static int cf[]={B,H,H};
-	final int width=240;
+	final int width=480;
 	final int height=320;
 	private JTextArea dtext;
 	private JButton copyButton,exitButton ;

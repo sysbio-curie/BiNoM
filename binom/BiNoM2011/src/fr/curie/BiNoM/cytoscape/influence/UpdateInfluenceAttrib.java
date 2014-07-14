@@ -1,7 +1,7 @@
 package fr.curie.BiNoM.cytoscape.influence;
 /*
 BiNoM Cytoscape Plugin under GNU Lesser General Public License 
-Copyright (C) 2010-2013 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
+Copyright (C) 2010-2014 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
 */
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -26,12 +26,21 @@ public class UpdateInfluenceAttrib extends CytoscapeAction {
 	final public static String title="Update Weigth Influence Attribute";
 	String attribName="WEIGHT";
 	String[] label={"Attribute to use for influence",
-			"Attribute 1 for activation",
-			"Attribute 2 for activation",
-			"Attribute 3 for activation",
-			"Attribute 1 for inhibition",
-			"Attribute 2 for inhibition",
-			"Attribute 3 for inhibition"};
+			"Attribute Values for Activation:",
+			"Value 1 for Activation",
+			"Value 2 for Activation",
+			"Value 3 for Activation",
+			"Attribute Values for Inhibition:",
+			"Value 1 for Inhibition",
+			"Value 2 for Inhibition",
+			"Value 3 for Inhibition"};
+	Double[] values={0.0,
+			1.0,
+			1.0,
+			1.0,
+			-1.0,
+			-1.0,
+			-1.0};
 	String nothing="Nothing";
 	String selected="interaction";
 	CyNetwork network;
@@ -60,20 +69,16 @@ public class UpdateInfluenceAttrib extends CytoscapeAction {
 	}
 	int update(){
 		CyAttributes attrib=Cytoscape.getEdgeAttributes();
-		Double unknown=new Double(0.0);
-		Double activ=new Double(1.0);
-		Double inhib=new Double(-1.0);
 		int unknownNb=0;
 		for(CyEdge edge:NestUtils.getEdgeList(network)){
 			String attrStr=attrib.getStringAttribute(edge.getIdentifier(),data.get(0));
 			int ai=data.indexOf(attrStr);
 			if(ai==-1){
 				unknownNb++;
-				attrib.setAttribute(edge.getIdentifier(),attribName,unknown);
+				attrib.setAttribute(edge.getIdentifier(),attribName,0.0);
 			}
 			else{
-				if(ai<((label.length+1)/2)) attrib.setAttribute(edge.getIdentifier(),attribName,activ);
-				else attrib.setAttribute(edge.getIdentifier(),attribName,inhib);			 
+				attrib.setAttribute(edge.getIdentifier(),attribName,values[ai]);			 
 			}
 		}
 		return unknownNb;

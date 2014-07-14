@@ -33,6 +33,7 @@ public class ModelMenuUtils extends CytoscapeAction {
 	final int notSelected=0;
 	final int selectedAsSrc=1;
 	final int selectedAsTgt=2;
+	final int selectAsSrcTgt=3;
 	boolean ifMultiPath=false;
 	final String pathModelAttrib="PATH_MODEL";
 	Double reach;
@@ -56,7 +57,7 @@ public class ModelMenuUtils extends CytoscapeAction {
 		}else if(model.equals("MULTI")) ifMultiPath=true; 
 	}
 	protected boolean inputPathModel(){
-		AlternativeDialog dialog=new AlternativeDialog(Cytoscape.getDesktop(),ChooseModelType.title,"Click on choosen path type","Mono Path Model","Multi Path Model");
+		AlternativeDialog dialog=new AlternativeDialog(Cytoscape.getDesktop(),ChooseModelType.title,"Click on choosen path exploring mode","Mono Path Mode","Multi Path Mode");
 		int option=dialog.getOption();
 		if(option==1){
 			ifMultiPath=false;
@@ -106,6 +107,12 @@ public class ModelMenuUtils extends CytoscapeAction {
 			Cytoscape.getNetworkAttributes().setAttribute(Cytoscape.getCurrentNetwork().getIdentifier(),thresholdAttrib,thresholdDefault);
 		}	
 	}
+	protected void getAllSrcAllTgt(WeightGraphStructure wgs){
+		srcDialog=new ArrayList<Integer>();
+		tgtDialog=new ArrayList<Integer>();
+		for(int i=0;i<wgs.nodes.size();i++) srcDialog.add(i);
+		for(int i=0;i<wgs.nodes.size();i++) tgtDialog.add(i);	
+	}
 	protected void getSrcAllTgt(WeightGraphStructure wgs,String title){
 		srcDialog=new ArrayList<Integer>();
 		tgtDialog=new ArrayList<Integer>();
@@ -136,7 +143,8 @@ public class ModelMenuUtils extends CytoscapeAction {
 				Integer s=Cytoscape.getNodeAttributes().getIntegerAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib);			
 				if(s!=null) switch(s){
 				case selectedAsSrc:preSrc.add(n);break;
-				case selectedAsTgt:preTgt.add(n);
+				case selectedAsTgt:preTgt.add(n);break;
+				case selectAsSrcTgt:preSrc.add(n);preTgt.add(n);
 				}		
 			}
 		}
@@ -164,6 +172,17 @@ public class ModelMenuUtils extends CytoscapeAction {
 				txt.append("\t");
 				txt.append(matrix[tgtDialog.get(t)][srcDialog.get(s)]);
 			}
+			txt.append("\r\n");
+		}
+		return txt.toString();
+	}
+	String matrixToList(WeightGraphStructure wgs,Double[][] matrix){
+		StringBuffer txt=new StringBuffer("Source\tTarget\tInfluence\r\n");;
+		for(int s=0;s<srcDialog.size();s++)for(int t=0;t<tgtDialog.size();t++){			
+			txt.append(wgs.nodes.get(srcDialog.get(s)).getIdentifier());txt.append("\t");
+			txt.append(wgs.nodes.get(tgtDialog.get(t)).getIdentifier());txt.append("\t");
+			if(matrix[tgtDialog.get(t)][srcDialog.get(s)].isNaN()) txt.append(0.0);
+			else txt.append(matrix[tgtDialog.get(t)][srcDialog.get(s)]);
 			txt.append("\r\n");
 		}
 		return txt.toString();

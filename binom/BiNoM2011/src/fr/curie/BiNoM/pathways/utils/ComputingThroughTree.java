@@ -4,7 +4,6 @@ BiNoM Cytoscape Plugin under GNU Lesser General Public License
 Copyright (C) 2010-2013 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
 */
 import giny.model.GraphPerspective;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -94,6 +93,7 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		}
 		void init(int root){
 			this.root=root;
+			influence[root][root]=1.0;
 			valueQueue.clear();
 			valueQueue.add(1.0);
 		}
@@ -122,6 +122,7 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		}
 		void init(int root){
 			this.root=root;
+			activity[root][root]=activIn[root];
 			valueQueue.clear();
 			valueQueue.add(activIn[root]);
 		}
@@ -147,6 +148,7 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		}
 		void init(int root){
 			this.root=root;
+			area[root][root]=1.0;
 			valueQueue.clear();
 			valueQueue.add(1.0);
 		}

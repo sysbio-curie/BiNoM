@@ -91,6 +91,7 @@ import fr.curie.BiNoM.cytoscape.nestmanager.DestroyUnusedNetworksAsNest;
 import fr.curie.BiNoM.cytoscape.nestmanager.FindCommonNodes;
 import fr.curie.BiNoM.cytoscape.nestmanager.InterOf2SelectedNests;
 import fr.curie.BiNoM.cytoscape.nestmanager.ListComponents;
+import fr.curie.BiNoM.cytoscape.nestmanager.ListEdgesLinkingNests;
 import fr.curie.BiNoM.cytoscape.nestmanager.ListNodesByNest;
 import fr.curie.BiNoM.cytoscape.nestmanager.MergeSelectedNests;
 import fr.curie.BiNoM.cytoscape.nestmanager.ModuleVisualStyle;
@@ -376,13 +377,11 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem = new JMenuItem("Path Influence Quantification analysis...");
 		menuItem.addActionListener(new PathConsistencyAnalyzer());
 		structAnaMenu.add(menuItem);
-		
-		// Fade
-		
+				
 		/*
 		 * Fade Model menu
 		 */
-	    JMenu binomInfluenceMenu = new JMenu("Fade Signal Propagation Model");
+	    JMenu binomInfluenceMenu = new JMenu("Fading Signal Propagation Model");
 	    structAnaMenu.add(binomInfluenceMenu);
 		
 		menuItem=new JMenuItem(PreselectSrcTgt.title);
@@ -431,6 +430,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem = new JMenuItem(InfluenceArrayAsText.titleC);
 		menuItem.addActionListener(new InfluenceArrayAsText(null));
 		textMenu.add(menuItem);
+		
+		menuItem=new JMenuItem(InfluenceAsList.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceAsList());
 				
 		JMenu graphicMenu=new JMenu(InfluenceArrayAsGraphic.title);
 		binomInfluenceMenu.add(graphicMenu);
@@ -446,6 +449,12 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(InfluenceByAttribute.title);
 		binomInfluenceMenu.add(menuItem);
 		menuItem.addActionListener(new  InfluenceByAttribute());
+		
+		binomInfluenceMenu.addSeparator();
+		
+		menuItem=new JMenuItem(InfluenceArrayBetweenModule.title);
+		binomInfluenceMenu.add(menuItem);
+		menuItem.addActionListener(new  InfluenceArrayBetweenModule());
 		
 		binomInfluenceMenu.addSeparator();
 		
@@ -473,8 +482,9 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		
 		menuItem=new JMenuItem(NullWeightTest.title);
 		binomInfluenceMenu.add(menuItem);
-		menuItem.addActionListener(new  NullWeightTest());
+		menuItem.addActionListener(new  NullWeightTest());		
 		
+		//Fade Model End
 
 		structAnaMenu.addSeparator();
 		menuItem = new JMenuItem("OCSANA analysis...");
@@ -515,6 +525,10 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		menuItem=new JMenuItem(ListNodesByNest.title);
 		binomNestManagerMenu.add(menuItem);
 		menuItem.addActionListener(new ListNodesByNest());
+		
+		menuItem=new JMenuItem(ListEdgesLinkingNests.title);
+		binomNestManagerMenu.add(menuItem);
+		menuItem.addActionListener(new  ListEdgesLinkingNests());
 
 		menuItem=new JMenuItem(FindCommonNodes.title);
 		binomNestManagerMenu.add(menuItem);
@@ -546,6 +560,7 @@ public class BiNoMPlugin extends CytoscapePlugin {
 		binomNestManagerMenu.add(menuItem);
 		menuItem.addActionListener(new DestroyUnusedNetworksAsNest());
 		
+		//Module Manager End
 
 		/*
 		 * BioPAX 3 utils menu

@@ -19,6 +19,9 @@ public class PreselectSrcTgt extends ModelMenuUtils{
 		getSrcTgt(wgs,title);
 		for(int n=0;n<wgs.nodes.size();n++) Cytoscape.getNodeAttributes().setAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib,notSelected);
 		for(int n:srcDialog) Cytoscape.getNodeAttributes().setAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib,selectedAsSrc);
-		for(int n:tgtDialog) Cytoscape.getNodeAttributes().setAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib,selectedAsTgt);		
+		for(int n:tgtDialog){
+			if(srcDialog.contains(n)) Cytoscape.getNodeAttributes().setAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib,selectAsSrcTgt);
+			else Cytoscape.getNodeAttributes().setAttribute(wgs.nodes.get(n).getIdentifier(),preselectAttrib,selectedAsTgt);
+		}
 	}
 }

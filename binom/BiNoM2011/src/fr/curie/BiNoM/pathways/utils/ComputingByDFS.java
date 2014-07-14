@@ -4,7 +4,6 @@ BiNoM Cytoscape Plugin under GNU Lesser General Public License
 Copyright (C) 2010-2014 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
 */
 import giny.model.GraphPerspective;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;

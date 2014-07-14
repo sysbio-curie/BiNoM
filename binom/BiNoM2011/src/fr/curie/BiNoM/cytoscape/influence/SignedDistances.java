@@ -26,11 +26,11 @@ public class SignedDistances extends ModelMenuUtils{
 			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),errorWeigth,title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		updatePathModel();
-		updateFade();
+		updatePathModel();		
 		getSrcTgt(wgs,title);
 		ArrayList<Integer>[][] sdMx;
 		if(ifMultiPath){
+			updateFade();
 			ComputingByDFS cpt=new ComputingByDFS(wgs,maxDepth());
 			sdMx=cpt.signedDistances(srcDialog);
 			new TextBox(Cytoscape.getDesktop(),addTitle(title),matrixToTxt(cpt,sdMx)).setVisible(true);

@@ -47,6 +47,7 @@ import org.sbml.x2001.ns.celldesigner.NotesDocument;
 
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
+import vdaoengine.utils.Algorithms;
 import vdaoengine.utils.VSimpleFunctions;
 import edu.rpi.cs.xgmml.*;
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
@@ -1482,6 +1483,40 @@ public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VD
 	return graph;
 	//fw.close();
 }
+
+public static float calcCorrelationCoeff(float m1[], float m2[]){
+float res = 0;
+int N = m1.length;
+float xy = 0f, x2 = 0f, y2 = 0f, x = 0f, y = 0f;
+for(int i=0;i<N;i++){
+  xy+=m1[i]*m2[i];
+  x+=m1[i];
+  y+=m2[i];
+  x2+=m1[i]*m1[i];
+  y2+=m2[i]*m2[i];
+}
+double disp = Math.sqrt((x2-x*x/N)*(y2-y*y/N));
+if(Math.abs(disp)<1e-20)
+	  res = 0;
+else
+    res = (float)((xy-x*y/N)/disp);
+return res;
+}
+
+public static float calcMedian(float f[]){
+    float r = 0;
+    int ind[] = Algorithms.SortMass(f);
+    if(f.length!=0){
+    if(f.length==2*(int)(0.5f*f.length)){
+      int mid1 = (int)(0.5f*f.length)-1;
+      int mid2 = (int)(0.5f*f.length);
+      r = 0.5f*(f[ind[mid1]]+f[ind[mid2]]);
+    }else{
+      int mid = (int)(0.5f*f.length);
+      r = f[ind[mid]];
+    }}
+    return r;
+  }
 
 
 

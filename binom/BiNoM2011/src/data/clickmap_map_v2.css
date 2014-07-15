@@ -377,6 +377,11 @@ label {font-size: 12px; vertical-align: middle;}
     color: #CC6C00;
 }
 
+.glyph-message {
+    color: #CC6C00;
+    font-size: small;
+}
+
 .error-message {
     color: red;
 }

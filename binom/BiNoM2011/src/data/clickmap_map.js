@@ -462,7 +462,7 @@ function refresh_old_markers() {
 	}
 }
 
-function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift)
+function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg)
 {
 	var lat_ = 90;
 	var lng_ = 180;
@@ -488,8 +488,6 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 		return r;
 	}
 	
-	var id = "ClickMap";
-
 	var element = document.getElementById(map_elementId);
 
 	map = new google.maps.Map(element, {
@@ -503,36 +501,41 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 			opened: true
 		},
 		zoom : min_zoom,
-		mapTypeId : id
+		mapTypeId : "navicell"
 	});
 
 	map.setOptions({draggableCursor:'default', draggingCursor: 'move'});
 
 	window.map = map;
-//	console.log(width + " " +  height);
-	
-	var map_type = new google.maps.ImageMapType({
-		getTileUrl: function(coord, zoom) {
-			var ntiles = 1 << zoom;
-//			
-			if (coord.y < 0 || coord.y >= ntiles)
-				return null;
-			if (coord.x < 0 || coord.x >= ntiles)
-				return null;
-			
-			var r = coord.x + "_" + coord.y;
-//			console.log(coord, zoom, x, y, ntiles, r);
-			return "tiles/" + zoom + "/" + r + ".png";
-		},
-		tileSize : new google.maps.Size(tile_width, tile_height),
-		maxZoom : max_zoom,
-		minZoom : min_zoom
-	});
 	
 	projection = new ClickMapProjection();
-	map_type.projection = projection;
-	map.mapTypes.set(id, map_type);
+
+	navicell.mapTypes = new MapTypes(map, has_nobg);
+
+	var map_type_info = navicell.mapTypes.getMapTypeInfo();
+	for (var id in map_type_info) {
+		var map_type = new google.maps.ImageMapType({
+			getTileUrl: function(coord, zoom) {
+				var ntiles = 1 << zoom;
+				if (coord.y < 0 || coord.y >= ntiles)
+					return null;
+				if (coord.x < 0 || coord.x >= ntiles)
+					return null;
+			
+				var r = coord.x + "_" + coord.y;
+				return "tiles/" + zoom + "/" + r + navicell.mapTypes.tile_suffix + ".png";
+			},
+			tileSize : new google.maps.Size(tile_width, tile_height),
+			maxZoom : max_zoom,
+			minZoom : min_zoom
+		});
 	
+		map_type.projection = projection;
+		navicell.mapTypes.set(id, map_type);
+	}
+	
+	navicell.mapTypes.setDefaultMapType();
+
 	var bounds = new google.maps.LatLngBounds();
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift + width, yshift + height)));
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift, yshift)));
@@ -706,7 +709,8 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 		}
 	});
 
-	build_entity_tree_when_ready(window, selector, projection, whenloaded);
+	//build_entity_tree_when_ready(window, selector, projection, whenloaded);
+	build_entity_tree_when_ready(window, selector, null, whenloaded);
 }
 
 function build_jstree(selector, source, map, projection, whenloaded, firstEntityName)
@@ -920,7 +924,7 @@ function dbg_sleep(millis)
   while(curDate-date < millis);
 }
 
-function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, firstEntityName)
+function clickmap_start(blogname, map_name, panel_selector, map_selector, source, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, firstEntityName, has_nobg)
 {
 	use_jxtree = !source;
 	document.win = window;
@@ -935,7 +939,8 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 	new_markers = Array();
 
-	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift);
+	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg);
+
 	map.map.map_name = map_name;
 
 	var whenready = function(e, data)
@@ -969,7 +974,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		$("img.blogfromright").click(open_blog_click);
 		$("img.mapmodulefromright").click(open_module_map_click);
 		//console.log("to_open set", to_open, to_open.length);
-		
+	
 	};
         start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
 	var tell_opener = function()

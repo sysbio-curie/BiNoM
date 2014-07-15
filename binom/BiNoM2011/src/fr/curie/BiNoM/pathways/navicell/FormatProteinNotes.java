@@ -195,6 +195,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	public FormatProteinNotes(final Set<String> modules, final ProduceClickableMap.AtlasInfo atlasInfo, String[][] xrefs, final String blog_name)
 	{
 		this.modules = modules;
+		System.err.println("AAAA " + atlasInfo);
 		this.atlasInfo = atlasInfo;
 		this.blog_name = blog_name;
 		this.xrefs = xrefs;
@@ -420,6 +421,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
 							//System.out.println("TAG " + tag);
 							if (tag.equals("MAP")) {
+								System.err.println("ATLAS INFO: " + atlasInfo);
 								mapInfo = atlasInfo.getMapInfo(value);
 								if (mapInfo != null) {
 									value = mapInfo.getName();

@@ -177,6 +177,8 @@ public class ProduceClickableMap
 	
 	private static final String celldesigner_suffix = ".xml";
 	private static final String image_suffix = ".png";
+	private static final String nobg_prefix = "nobg_";
+	private static final String nobg_infix = "_nobg";
 	private static final String common_directory_name = "_common";
 	static final String common_directory_url = "../" + common_directory_name;
 	private static final String jslib_dir = "../../../lib";
@@ -906,7 +908,8 @@ public class ProduceClickableMap
 	{
 		final int minzoom, maxzoom, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0;
 		final double z;
-		ImagesInfo(final int minzoom, final int maxzoom, final int tile_width, final int tile_height, final int xshift_zoom0, final int yshift_zoom0, final int width_zoom0, final int height_zoom0)
+		boolean has_nobg;
+		ImagesInfo(final int minzoom, final int maxzoom, final int tile_width, final int tile_height, final int xshift_zoom0, final int yshift_zoom0, final int width_zoom0, final int height_zoom0, boolean has_nobg)
 		{
 			if (false) {
 				System.out.println("ImagesInfo {");
@@ -929,6 +932,7 @@ public class ProduceClickableMap
 			this.width_zoom0 = width_zoom0;
 			this.height_zoom0 = height_zoom0;
 			this.z = 1 << maxzoom;
+			this.has_nobg = has_nobg;
 		}
 		double getX(double x) { return x / z + xshift_zoom0; }
 		double getY(double y) { return y / z + yshift_zoom0; }
@@ -955,15 +959,17 @@ public class ProduceClickableMap
 		
 		final BufferedImage tiled = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_RGB);
 		final java.awt.Graphics2D g = tiled.createGraphics();
+
+		boolean has_nobg = true;
+		int difference_zoom0_image0 = -1;
+		int xshift_zoom0 = 0;
+		int yshift_zoom0 = 0;
+		int width_zoom0 = 0;
+		int height_zoom0 = 0;
 		
-		final int difference_zoom0_image0;
-		final int xshift_zoom0;
-		final int yshift_zoom0;
-		final int width_zoom0;
-		final int height_zoom0;
-		
+		for (String infix : new String[]{"", nobg_infix})
 		{
-			final File image_file0 = new File(source_directory, root + "-" + 0 + image_suffix);
+			final File image_file0 = new File(source_directory, root + infix + "-" + 0 + image_suffix);
 			BufferedImage image0;
 			try
 			{
@@ -971,17 +977,21 @@ public class ProduceClickableMap
 			}
 			catch (IOException e)
 			{
+				if (infix.equals(nobg_infix)) {
+					has_nobg = false;
+					break;
+				}
 				throw new IOException("failed to read image from " + image_file0, e);
 			}
 			final int width0 = image0.getWidth();
 			final int height0 = image0.getHeight();
 		
 			       
-			difference_zoom0_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
+			int tmp_difference_zoom2_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
 			
 			//System.out.println("width0 " + width0 + ", height0 " + height0 + ", max_width " + max_width + ", max_height " + max_height + ", diff_zoom " + difference_zoom0_image0 + " " + get_maxscale(height0, max_height) + " " + get_maxscale(width0, max_width));
 
-			if (difference_zoom0_image0 < 0) {
+			if (tmp_difference_zoom2_image0 < 0) {
 				//throw new NavicellException("image " + image_file + " is too small, minimum size is 128x128");
 				System.err.println("image at zoom level 0 " + image_file0 + " is too small, minimum size is 119x129");
 				/*
@@ -993,76 +1003,86 @@ public class ProduceClickableMap
 				System.exit(1);
 			}
 
-			width_zoom0 = width0 >> difference_zoom0_image0;
-			xshift_zoom0 = (MAX_WIDTH - width_zoom0) / 2 + XMARGIN;
-			height_zoom0 = height0 >> difference_zoom0_image0;
-			yshift_zoom0 = (MAX_HEIGHT - height_zoom0) / 2;
-			
-			calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, difference_zoom0_image0);
-			count += write_tiles(image0, outdir, difference_zoom0_image0, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
-		}
-		
-		int last_found = difference_zoom0_image0;
-		
-		for (int file_number = 1;; file_number++)
-		{
-			/*
-			System.out.println("performing file_num=" + file_number);
-			System.gc();
-			Utils.printUsedMemory();
-			*/
-
-			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
-			System.out.println("------------"+root + "-" + file_number + image_suffix);			
-			final BufferedImage image;
-			try
-			{
-				image = ImageIO.read(image_file);
-			}
-			catch (IOException e)
-			{
-				return new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
-			}
-			
-			/*
-			System.out.println("performing #2 GC");
-			System.gc();
-			Utils.printUsedMemory();
-			*/
-
-			final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, MAX_WIDTH, MAX_HEIGHT);
-			assert scale_factor > last_found : scale_factor + " " + last_found;
-			
-			for (int i = last_found + 1; i <= scale_factor; i++)
-			{
-				final BufferedImage resize;
-				if (i == scale_factor) {
-					resize = image;
-				} else {
-					final int d = scale_factor - i;
-					final int w = image.getWidth() >> d;
-					resize = Scalr.resize(image, Scalr.Method.QUALITY, w, image.getHeight() >> d, Scalr.OP_ANTIALIAS);
-					Utils.eclipsePrintln("resized image " + file_number + " to " + i + " by " + d + " width " + image.getWidth() + " -> " + w);
+			if (difference_zoom0_image0 >= 0) {
+				if (difference_zoom0_image0 != tmp_difference_zoom2_image0) {
+					System.err.println("difference_zoom0_image0 inconsistency " + difference_zoom0_image0 + " " + tmp_difference_zoom2_image0);
+					System.exit(1);
 				}
-
-				// 2013-05-16: EV patch: do not create a padded image, use the already created image (resize) although it is smaller then required
-
-				/*
-				System.out.println("Creating padded image " + (tile_width << i) + "x" + (tile_height << i));
-				final BufferedImage padded_image = new BufferedImage(tile_width << i, tile_height << i, BufferedImage.TYPE_INT_RGB);
-				System.out.println("Done: " + padded_image.getWidth() + "x" + padded_image.getHeight());
-				padded_image.createGraphics().drawRenderedImage(resize, null);
-				*/
-				
-				final BufferedImage padded_image = resize;
-				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, i);
-				count += write_tiles(padded_image, outdir, i, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
+			} else {
+				difference_zoom0_image0 = tmp_difference_zoom2_image0;
+				width_zoom0 = width0 >> difference_zoom0_image0;
+				xshift_zoom0 = (MAX_WIDTH - width_zoom0) / 2 + XMARGIN;
+				height_zoom0 = height0 >> difference_zoom0_image0;
+				yshift_zoom0 = (MAX_HEIGHT - height_zoom0) / 2;
+				calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, difference_zoom0_image0);
 			}
-			last_found = scale_factor;
-			
-			System.gc();
-			Utils.printUsedMemory();
+			count += write_tiles(image0, infix, outdir, difference_zoom0_image0, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
 		}
+		
+	
+		ImagesInfo imginfo = null;
+		for (String infix : new String[]{"", nobg_infix}) {
+			int last_found = difference_zoom0_image0;
+			for (int file_number = 1;; file_number++) {
+				/*
+				  System.out.println("performing file_num=" + file_number);
+				  System.gc();
+				  Utils.printUsedMemory();
+				*/
+
+				final File image_file = new File(source_directory, root + infix + "-" + file_number + image_suffix);
+				System.out.println("------------"+root + "-" + file_number + image_suffix);			
+				BufferedImage image = null;
+				try {
+					image = ImageIO.read(image_file);
+				}
+				catch (IOException e) {
+					if (imginfo == null) {
+						imginfo = new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0, has_nobg);
+					}
+					break;
+				}
+			
+				/*
+				  System.out.println("performing #2 GC");
+				  System.gc();
+				  Utils.printUsedMemory();
+				*/
+
+				final int scale_factor = get_scale(image.getWidth(), image.getHeight(), image_file, MAX_WIDTH, MAX_HEIGHT);
+				assert scale_factor > last_found : scale_factor + " " + last_found;
+			
+				for (int i = last_found + 1; i <= scale_factor; i++) {
+					final BufferedImage resize;
+					if (i == scale_factor) {
+						resize = image;
+					} else {
+						final int d = scale_factor - i;
+						final int w = image.getWidth() >> d;
+						resize = Scalr.resize(image, Scalr.Method.QUALITY, w, image.getHeight() >> d, Scalr.OP_ANTIALIAS);
+						Utils.eclipsePrintln("resized image " + file_number + " to " + i + " by " + d + " width " + image.getWidth() + " -> " + w);
+					}
+
+					// 2013-05-16: EV patch: do not create a padded image, use the already created image (resize) although it is smaller then required
+
+					/*
+					  System.out.println("Creating padded image " + (tile_width << i) + "x" + (tile_height << i));
+					  final BufferedImage padded_image = new BufferedImage(tile_width << i, tile_height << i, BufferedImage.TYPE_INT_RGB);
+					  System.out.println("Done: " + padded_image.getWidth() + "x" + padded_image.getHeight());
+					  padded_image.createGraphics().drawRenderedImage(resize, null);
+					*/
+				
+					final BufferedImage padded_image = resize;
+					calculate_shifts(shifts, xshift_zoom0, yshift_zoom0, i);
+					count += write_tiles(padded_image, infix, outdir, i, tiled, g, TILE_WIDTH, TILE_HEIGHT, shifts);
+				}
+				last_found = scale_factor;
+			
+				System.gc();
+				Utils.printUsedMemory();
+			}
+		}
+		return imginfo;
 	}
 
 	private static void calculate_shifts(int[] shifts, final int xshift, final int yshift, final int scale_factor)
@@ -1099,6 +1119,7 @@ public class ProduceClickableMap
 		final int yshift_zoom0;
 		final int width_zoom0;
 		final int height_zoom0;
+		boolean has_nobg = true;
 
 		difference_zoom0_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
 		width_zoom0 = width0 >> difference_zoom0_image0;
@@ -1106,6 +1127,15 @@ public class ProduceClickableMap
 		height_zoom0 = height0 >> difference_zoom0_image0;
 		yshift_zoom0 = (MAX_HEIGHT - height_zoom0) / 2;
 		
+		final File image_file0_nobg = new File(source_directory, root + nobg_infix + "-" + 0 + image_suffix);
+		try {
+			final BufferedImage image;
+			image = ImageIO.read(image_file0_nobg);
+		}
+		catch (IOException e) {
+			has_nobg = false;
+		}
+
 		for (int file_number = last_found + 1; ; file_number++)
 		{
 			final File image_file = new File(source_directory, root + "-" + file_number + image_suffix);
@@ -1125,7 +1155,7 @@ public class ProduceClickableMap
 				System.out.println("  height_zoom0: " + height_zoom0);
 				*/
 
-				return new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0);
+				return new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0, has_nobg);
 				//return null; //new int[]{ last_found, width, height };
 			}
 			//last_found = get_scale(image.getWidth(), image.getHeight(), image_file, width0, height0);
@@ -1336,7 +1366,7 @@ public class ProduceClickableMap
 	
 	private static int write_tiles
 	(
-		final BufferedImage scaledImage, final File outdir,
+	 final BufferedImage scaledImage, final String tile_suffix, final File outdir,
 		final int scale_factor, final BufferedImage tiled, final java.awt.Graphics2D g,
 		int width, int height, int[] shifts
 	)
@@ -1356,7 +1386,7 @@ public class ProduceClickableMap
 			{
 				g.clearRect(0, 0, width, height);
 				g.drawRenderedImage(scaledImage, af);
-				final File png = new File(zoom_dir, j + "_" + i + image_suffix);
+				final File png = new File(zoom_dir, j + "_" + i + tile_suffix + image_suffix);
 				try
 				{
 					ImageIO.write(tiled, "png", png);
@@ -2144,7 +2174,8 @@ public class ProduceClickableMap
 				outjson.print("\"x\" : " + toDouble(scales.getX(place.x)) + ", ");
 				outjson.print("\"y\" : " + toDouble(scales.getY(place.y)) + ", ");
 				outjson.print("\"w\" : " + toDouble(scales.getL(place.width)) + ", ");
-				outjson.print("\"h\" : " + toDouble(scales.getL(place.height)));
+				outjson.print("\"h\" : " + toDouble(scales.getL(place.height)) + ", ");
+				outjson.print("\"said\" : \"" + shape_id + "\"");
 				outjson.print("}");
 		}
 		outjson.print("]");
@@ -5412,6 +5443,8 @@ public class ProduceClickableMap
 		out.print(scales.yshift_zoom0);
 		out.print(", ");
 		out.print("\"" + firstEntityName + "\"");
+		out.print(", ");
+		out.print(scales.has_nobg ? "true" : "false");
 		out.print(");\n");
 		if (NV2) {
 			out.println("    update_status_tables();");

@@ -39,8 +39,12 @@ public class SimpleTable {
   public int colCount = 0;
   public int rowCount = 0;
   public String fieldNames[] = null;
+  public int fieldTypes[] = null;
   public String stringTable[][] = null;
   public String filename = null;
+
+  public static int NUMERICAL = 1;
+  public static int STRING = 0;
   
   public boolean makeUpperCaseInIndex = false;
   
@@ -127,6 +131,7 @@ public class SimpleTable {
   StringTokenizer sti = new StringTokenizer(s,delim);
   colCount = sti.countTokens();
   fieldNames = new String[colCount];
+  fieldTypes = new int[colCount];
   if(!firstLineFNames){
     for(int i=0;i<colCount;i++) fieldNames[i] = "N"+(i+1);
   }else{

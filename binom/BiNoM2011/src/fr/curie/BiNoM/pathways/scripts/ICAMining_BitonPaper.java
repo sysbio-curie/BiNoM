@@ -2,13 +2,12 @@ package fr.curie.BiNoM.pathways.scripts;
 
 import java.io.File;
 
-import static java.nio.file.StandardCopyOption.*;
-
 import java.io.FileWriter;
 import java.math.BigDecimal;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
@@ -21,8 +20,10 @@ import vdaoengine.utils.VSimpleProcedures;
 import com.ibm.icu.util.StringTokenizer;
 
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
+import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
 import fr.curie.BiNoM.pathways.utils.GMTFile;
+import fr.curie.BiNoM.pathways.utils.MetaGene;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
 import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
@@ -33,6 +34,8 @@ public class ICAMining_BitonPaper {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try{
+			
+			
 			
 			/*ICAMining_BitonPaper ibp = new ICAMining_BitonPaper();
 			Graph gr = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/ICA/Anne/corrgraph/allcancers.xgmml"));
@@ -56,7 +59,9 @@ public class ICAMining_BitonPaper {
 			//PrepareDataFilesForICA("C:/Datas/OvarianCancer/TCGA/expression/exonarray/","OVCA_TCGA_HUEX");
 			
 			//MakeCorrelationGraph("C:/Datas/ICA/Anne/corrgraph/recalculate/");
-			MakeCorrelationGraph("C:/Datas/OvarianCancer/TCGA/analysis/corrgraph/");
+			//MakeCorrelationGraph("C:/Datas/OvarianCancer/TCGA/analysis/corrgraph/");
+			
+			ProduceMetaComponents("C:/Datas/ICA/Anne/metaranking/","dataset_corr_table.txt");
 			
 			
 			
@@ -433,6 +438,92 @@ public class ICAMining_BitonPaper {
 		for(int i=1;i<vt2.colCount;i++)
 			fw3.write(vt2.fieldNames[i]+"\n");
 		fw3.close();
+	}
+	
+	public static void ProduceMetaComponents(String folder, String correspondenceFile) throws Exception{
+		Vector<String> corr = Utils.loadStringListFromFile(folder+correspondenceFile);
+		HashMap<String, String> corrMap = new HashMap<String, String>(); 
+		for(int i=0;i<corr.size();i++){
+			StringTokenizer st = new StringTokenizer(corr.get(i),"\t");
+			corrMap.put(st.nextToken(), st.nextToken());
+		}
+		File files[] = (new File(folder)).listFiles();
+		//HashMap<String, VDataTable> tables = new HashMap<String, VDataTable>();
+		HashMap<String, MetaGene> metagenes = new HashMap<String, MetaGene>();
+		for(File f: files){
+			if(f.getName().startsWith("S_")&&f.getName().endsWith(".txt")){
+				String prefix = f.getName().substring(2,f.getName().length()-4);
+				System.out.println("Loading "+prefix);
+				SimpleTable t = new SimpleTable();
+				t.LoadFromSimpleDatFile(f.getAbsolutePath(), true, "\t");
+				for(int i=1;i<t.colCount;i++)
+					t.fieldTypes[i] = t.NUMERICAL;
+				Vector<MetaGene> mgv = MetaGene.decomposeTableIntoMetaGenes(t, t.fieldNames[0], prefix);
+				for(int i=0;i<mgv.size();i++){
+					mgv.get(i).name = prefix+(i+1);
+					metagenes.put(mgv.get(i).name, mgv.get(i));
+				}
+			}
+		}
+		
+		for(File f: files){
+			if(f.getName().endsWith(".xgmml")){
+				String cliqueName = f.getName().substring(0, f.getName().length()-6);
+				System.out.println("Clique = "+cliqueName);
+				Graph gr = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(f.getAbsolutePath()));
+				// First, find the core component
+				String coreComp = "";
+				Vector<String> dsets = new Vector<String>();
+				for(int i=0;i<gr.Nodes.size();i++){
+					Node n = gr.Nodes.get(i);
+					String dataset = n.getFirstAttributeValue("labAn");
+					String numComp = n.getFirstAttributeValue("indComp");
+					dataset = corrMap.get(dataset);
+					dsets.add(dataset);
+				}
+				if(dsets.indexOf("CIT")>=0){
+					coreComp = "CIT"+(gr.Nodes.get(dsets.indexOf("CIT"))).getFirstAttributeValue("indComp");
+				}else if(dsets.indexOf("TCGABRCAAGL")>=0){
+					coreComp = "TCGABRCAAGL"+(gr.Nodes.get(dsets.indexOf("TCGABRCAAGL"))).getFirstAttributeValue("indComp");
+				}else if(dsets.indexOf("TCGABREAST")>=0){
+					coreComp = "TCGABREAST"+(gr.Nodes.get(dsets.indexOf("TCGABREAST"))).getFirstAttributeValue("indComp");
+				}else{
+					coreComp = dsets.get(0)+(gr.Nodes.get(0)).getFirstAttributeValue("indComp");
+				}
+				System.out.println("Core Component = "+coreComp);
+				MetaGene coreMetaGene = metagenes.get(coreComp);
+				
+				float positiveStd = coreMetaGene.sidedStandardDeviation(+1);
+				float negativeStd = coreMetaGene.sidedStandardDeviation(-1);
+				if(negativeStd>positiveStd) coreMetaGene.invertSignsOfWeights();
+				
+				Vector<MetaGene> mgs = new Vector<MetaGene>();
+				// Second, prepare a set of correlated components, excluding the core component
+				for(int i=0;i<gr.Nodes.size();i++){
+					Node n = gr.Nodes.get(i);
+					String dataset = corrMap.get(n.getFirstAttributeValue("labAn"));
+					String numComp = n.getFirstAttributeValue("indComp");
+					if(!dataset.equals("???")){
+						String mgname = dataset+numComp;
+						if(!mgname.equals(coreMetaGene.name)){
+							MetaGene m = metagenes.get(mgname);
+							mgs.add(m);
+						}
+					}
+				}
+				// Now, compute the metascores
+				int minOccurence = (int)(mgs.size()*0.5f);
+				minOccurence = 2;
+				System.out.println("minOccurence = "+minOccurence);
+				Vector<MetaGene> mgs1 = coreMetaGene.standartatizeMetaGenes(mgs);
+				mgs1.add(coreMetaGene);
+				for(MetaGene m: mgs1)
+					m.normalizeWeightsToSidedZScores();
+				MetaGene metameta = coreMetaGene.makeMetaGeneScoredFromMetagenes(mgs1, minOccurence, true);
+				metameta.sortWeights();
+				metameta.saveToFile(folder+cliqueName+"_metascore.txt");
+			}
+		}
 	}
 
 }

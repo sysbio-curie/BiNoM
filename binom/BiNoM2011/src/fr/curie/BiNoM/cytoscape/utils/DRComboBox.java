@@ -1,4 +1,4 @@
-package src.fr.curie.BiNoM.cytoscape.utils;
+package fr.curie.BiNoM.cytoscape.utils;
 /*
 BiNoM Cytoscape Plugin under GNU Lesser General Public License 
 Copyright (C) 2010-2014 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
@@ -33,7 +33,7 @@ import javax.swing.JTextField;
  * 
  * @author Daniel.Rovera@curie.fr
  */
-public class CopyOfComboBoxes extends JDialog implements ActionListener,ItemListener {
+public class DRComboBox extends JDialog implements ActionListener,ItemListener {
 	private static final long serialVersionUID = 1L;
 	Container container;
 	final int width=360;
@@ -43,7 +43,7 @@ public class CopyOfComboBoxes extends JDialog implements ActionListener,ItemList
 	JComboBox [] comboBoxes;
 	ArrayList<String> fields;
 	ArrayList<ArrayList<String>> datas;
-	public CopyOfComboBoxes(JFrame parent,String title,String[] label,ArrayList<String> fields,String selected,ArrayList<ArrayList<String>> datas){ 
+	public DRComboBox(JFrame parent,String title,String[] label,ArrayList<String> fields,String selected,ArrayList<ArrayList<String>> datas){ 
 		super(parent,title,true);
 		this.fields=fields;
 		this.datas=datas;

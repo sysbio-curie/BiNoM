@@ -14,8 +14,11 @@ import org.biopax.paxtools.model.BioPAXFactory;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.Control;
+import org.biopax.paxtools.model.level3.Conversion;
 import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.EntityReference;
+import org.biopax.paxtools.model.level3.Interaction;
 import org.biopax.paxtools.model.level3.Pathway;
 import org.biopax.paxtools.model.level3.PhysicalEntity;
 import org.biopax.paxtools.model.level3.Protein;
@@ -28,6 +31,7 @@ import org.biopax.paxtools.model.level3.UnificationXref;
 import org.biopax.paxtools.model.level3.Xref;
 import org.biopax.paxtools.model.level3.DnaRegion;
 import org.biopax.paxtools.model.level3.RnaRegion;
+import org.biopax.paxtools.model.level3.Transport;
 import org.sbml.x2001.ns.celldesigner.AnnotationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerAntisenseRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
@@ -658,16 +662,45 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		
 		int k=0;
 		for (String reactionId : reactions.keySet()){
-			ReactionDocument.Reaction reaction = reactions.get(reactionId);
-			//String reactionType = "UNKNOWN_TRANSITION";
-			String reactionType = "";
-			if (reaction.getAnnotation() != null && 
-					reaction.getAnnotation().getCelldesignerReactionType() != null) {
-				reactionType = Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType());
-			}
+			ReactionDocument.Reaction re = reactions.get(reactionId);
 			k++;
-			System.out.println("_Reaction ("+k+"/"+reactions.size()+"):\t"+reaction.getId()+"\t"+reactionType);
+			//System.out.println("_Reaction ("+k+"/"+reactions.size()+"):\t"+reaction.getId()+"\t"+reactionType);
+			createBioPAXReaction(re);
 		}
+	}
+	
+	private void createBioPAXReaction(ReactionDocument.Reaction reaction) {
+		
+		// default reaction type
+		String reactionType = "UNKNOWN_TRANSITION";
+		if (reaction.getAnnotation() != null && 
+				reaction.getAnnotation().getCelldesignerReactionType() != null) {
+			reactionType = Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType());
+		}
+		
+		Control ctrl = null;
+		Conversion conv = null;
+		Interaction inter = null;
+		
+		if (reactionType.equals("TRANSPORT")) {
+			String uri = biopaxNameSpacePrefix + reaction.getId();
+			Transport tr = model.addNew(Transport.class, uri);
+			inter = tr;
+			conv = tr;
+		}
+		
+		// create catalysis reactions
+		if(reaction.getListOfModifiers() != null) {
+			for (int j=0; j < reaction.getListOfModifiers().getModifierSpeciesReferenceArray().length; j++) {
+				String speciesId = reaction.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
+				PhysicalEntity pe = bpPhysicalEntities.get(speciesId);
+				if (pe == null)
+					System.out.println("_error "+ speciesId);
+			}
+		}
+	
+	
+	
 	}
 	
 	

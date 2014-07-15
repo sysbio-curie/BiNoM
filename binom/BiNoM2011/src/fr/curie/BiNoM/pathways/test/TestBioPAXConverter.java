@@ -27,7 +27,9 @@ public class TestBioPAXConverter {
 	    
 		 // Load celldesigner file 
 		//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_APC.xml");
-		File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
+		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
+		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
+		File cellDesignerFile = new File("/Users/eric/wk/transport1.xml");
 		CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());
 
 		// extract SbmlDocument for conversion
@@ -49,13 +51,13 @@ public class TestBioPAXConverter {
 		
 		CellDesignerToBioPAXConverter cd2bp = new CellDesignerToBioPAXConverter();
 
-		String outputFile = "/Users/eric/toto.owl";
+		String outputFile = "/Users/eric/wk/biopax.owl";
 		
 		cd2bp.sbml = sbml;
 		cd2bp.biopax = new BioPAX();
-		System.out.println(cd2bp.biopax.biopaxmodel);
+		//System.out.println(cd2bp.biopax.biopaxmodel);
 		BioPAX bp = cd2bp.convert();
-		//cd2bp.biopax.saveToFile(outputFile, cd2bp.biopax.biopaxmodel);
+		cd2bp.biopax.saveToFile(outputFile, cd2bp.biopax.biopaxmodel);
 		System.out.println("Done....");
 		
 

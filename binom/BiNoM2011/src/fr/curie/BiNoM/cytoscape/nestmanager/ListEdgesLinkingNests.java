@@ -1,4 +1,4 @@
-package src.fr.curie.BiNoM.cytoscape.nestmanager;
+package fr.curie.BiNoM.cytoscape.nestmanager;
 /*
    BiNoM Cytoscape Plugin under GNU Lesser General Public License 
    Copyright (C) 2010-2011 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   

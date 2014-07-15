@@ -6,14 +6,16 @@ Copyright (C) 2010-2014 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+
 import javax.swing.JOptionPane;
+
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
 import cytoscape.util.CytoscapeAction;
 import fr.curie.BiNoM.cytoscape.nestmanager.NestUtils;
-import fr.curie.BiNoM.cytoscape.utils.ComboBoxes;
+import fr.curie.BiNoM.cytoscape.utils.DRComboBox;
 /**
  * Update Influence Attribute WEIGHT at +1 or -1
  * from an attribute, generally interaction
@@ -87,7 +89,7 @@ public class UpdateInfluenceAttrib extends CytoscapeAction {
 		network=Cytoscape.getCurrentNetwork();
 		fillAttributesValues();
 		data=new ArrayList<String>();
-		ComboBoxes dialog=new ComboBoxes(Cytoscape.getDesktop(),title,label,fields,selected,datas);
+		DRComboBox dialog=new DRComboBox(Cytoscape.getDesktop(),title,label,fields,selected,datas);
 		if(dialog.launchDialog(data)){
 			int unknown=update();
 			if(unknown!=0) JOptionPane.showMessageDialog(Cytoscape.getDesktop(),unknown+" edges with unknown influence",

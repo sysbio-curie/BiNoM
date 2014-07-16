@@ -13,8 +13,12 @@ import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.BioPAXFactory;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
+import org.biopax.paxtools.model.level3.Catalysis;
 import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.ComplexAssembly;
 import org.biopax.paxtools.model.level3.Control;
+import org.biopax.paxtools.model.level3.ControlType;
 import org.biopax.paxtools.model.level3.Conversion;
 import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.EntityReference;
@@ -37,6 +41,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerAntisenseRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerHomodimerDocument.CelldesignerHomodimer;
+import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
@@ -44,7 +49,9 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesIdentityDocument;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
+import org.sbml.x2001.ns.celldesigner.SpeciesReferenceDocument;
 
+import fr.curie.BiNoM.pathways.biopax.complexAssembly;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
 public class CellDesignerToBioPAXConverterPaxtools {
@@ -327,27 +334,54 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 	}
 	
+//	/**
+//	 * Encode CellDesigner Phenotypes as BioPAX "black box" Pathway object.
+//	 */
+//	private void setBioPAXPhenotypes() {
+//		for (String id : species.keySet()) {
+//			SpeciesDocument.Species sp = species.get(id);
+//			if (sp.getAnnotation() != null) {
+//				if (sp.getAnnotation().getCelldesignerSpeciesIdentity() != null) {
+//					if (Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("PHENOTYPE")) {
+//						
+//						String uri = biopaxNameSpacePrefix + sp.getId() + "_phenotype";
+//						String name = cleanString(sp.getName().getStringValue());
+//						Pathway pa = model.addNew(Pathway.class, uri);
+//						pa.setDisplayName(name);
+//						pa.addComment("This is a CellDesigner PHENOTYPE entity, representing an abstract biological process.");
+//					}
+//				}
+//			}
+//		}
+//	}
+
 	/**
-	 * Encode CellDesigner Phenotypes as BioPAX "black box" Pathway object.
+	 * Encode CellDesigner Phenotypes as BioPAX PhysicalEntities
 	 */
 	private void setBioPAXPhenotypes() {
-		for (String id : species.keySet()) {
-			SpeciesDocument.Species sp = species.get(id);
-			if (sp.getAnnotation() != null) {
-				if (sp.getAnnotation().getCelldesignerSpeciesIdentity() != null) {
-					if (Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("PHENOTYPE")) {
-						
-						String uri = biopaxNameSpacePrefix + sp.getId() + "_phenotype";
-						String name = cleanString(sp.getName().getStringValue());
-						Pathway pa = model.addNew(Pathway.class, uri);
-						pa.setDisplayName(name);
-						pa.addComment("This is a CellDesigner PHENOTYPE entity, representing an abstract biological process.");
-					}
+	for (String id : species.keySet()) {
+		SpeciesDocument.Species sp = species.get(id);
+		if (sp.getAnnotation() != null) {
+			if (sp.getAnnotation().getCelldesignerSpeciesIdentity() != null) {
+				if (Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()).equals("PHENOTYPE")) {
+					
+					String uri = biopaxNameSpacePrefix + sp.getId();
+					String name = cleanString(sp.getName().getStringValue());
+					PhysicalEntity pe = model.addNew(PhysicalEntity.class, uri);
+					pe.setDisplayName(name);
+					pe.addName(name);
+					pe.setStandardName(name);
+					pe.addComment("This is a CellDesigner PHENOTYPE entity, representing an abstract biological process.");
+					bpPhysicalEntities.put(sp.getId(), pe);
 				}
 			}
 		}
 	}
-
+}
+	
+	
+	
+	
 	/**
 	 * Encode CellDesigner Unknowns as BioPAX PhysicalEntities
 	 */
@@ -660,11 +694,9 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	
 	private void setBioPAXReactions() {
 		
-		int k=0;
 		for (String reactionId : reactions.keySet()){
 			ReactionDocument.Reaction re = reactions.get(reactionId);
-			k++;
-			//System.out.println("_Reaction ("+k+"/"+reactions.size()+"):\t"+reaction.getId()+"\t"+reactionType);
+			//System.out.println("_reaction\t"+re.getId());
 			createBioPAXReaction(re);
 		}
 	}
@@ -689,17 +721,165 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			conv = tr;
 		}
 		
+		// these cases never seems to be used, even on the master 
+		if (reactionType.equals("CATALYSIS")||
+				reactionType.equals("UNKNOWN_CATALYSIS")||
+				reactionType.equals("TRANSCRIPTIONAL_ACTIVATION")||
+				reactionType.equals("TRANSLATIONAL_ACTIVATION")) {
+			
+			// create catalysis reaction and set controller and participant
+			String cat_uri = biopaxNameSpacePrefix + "c" + reaction.getId();
+			Catalysis cat = model.addNew(Catalysis.class, cat_uri);
+			cat.setControlType(ControlType.ACTIVATION);
+			String reactantId = reaction.getListOfReactants().getSpeciesReferenceArray(0).getSpecies();
+			PhysicalEntity per = bpPhysicalEntities.get(reactantId);
+			cat.addController(per);
+			String productId = reaction.getListOfProducts().getSpeciesReferenceArray(0).getSpecies();
+			PhysicalEntity pep = bpPhysicalEntities.get(productId);
+			cat.addParticipant(pep);
+			
+			ctrl = cat;
+			inter = cat;
+			
+			// create biochemical reaction and add catalysis as controller
+			String br_uri = biopaxNameSpacePrefix + reaction.getId();
+			BiochemicalReaction bre = model.addNew(BiochemicalReaction.class, br_uri);
+			cat.addControlled(bre);
+			conv = bre;
+			//System.out.println("_test!");
+			// not used, even with acsn_master !?!
+		}
+		
+		// this code is never executed, even on master.
+		if (reactionType.equals("INHIBITION")||
+				reactionType.equals("UNKNOWN_INHIBITION")||
+				reactionType.equals("TRANSCRIPTIONAL_INHIBITION")||
+				reactionType.equals("TRANSLATIONAL_INHIBITION")) {
+			
+			String cat_uri = biopaxNameSpacePrefix + "c" + reaction.getId();
+			Catalysis cat = model.addNew(Catalysis.class, cat_uri);
+			cat.setControlType(ControlType.INHIBITION);
+			String reactantId = reaction.getListOfReactants().getSpeciesReferenceArray(0).getSpecies();
+			PhysicalEntity per = bpPhysicalEntities.get(reactantId);
+			cat.addController(per);
+			String productId = reaction.getListOfProducts().getSpeciesReferenceArray(0).getSpecies();
+			PhysicalEntity pep = bpPhysicalEntities.get(productId);
+			cat.addParticipant(pep);
+			
+			ctrl = cat;
+			inter = cat;
+			
+			// create biochemical reaction and add catalysis as controller
+			String br_uri = biopaxNameSpacePrefix + reaction.getId();
+			BiochemicalReaction bre = model.addNew(BiochemicalReaction.class, br_uri);
+			cat.addControlled(bre);
+			conv = bre;
+		}
+		
+		
+		if(reactionType.equals("HETERODIMER_ASSOCIATION")) {
+			//System.out.println("HETERODIMER_ASSOCIATION");
+			String uri = biopaxNameSpacePrefix + reaction.getId();
+			ComplexAssembly cas = model.addNew(ComplexAssembly.class, uri);
+			inter = cas;
+			conv = cas;
+		}
+		
+		if(reactionType.equals("DISSOCIATION")) {
+			System.out.println("DISSOCIATION");
+		}
+		if(reactionType.equals("STATE_TRANSITION")) {
+			System.out.println("STATE_TRANSITION");
+		}
+		if(reactionType.equals("TRUNCATION")) {
+			System.out.println("TRUNCATION");
+		}
+		if(reactionType.equals("KNOWN_TRANSITION_OMITTED")) {
+			System.out.println("KNOWN_TRANSITION_OMITTED");
+		}
+		if(reactionType.equals("UNKNOWN_TRANSITION")) {
+			System.out.println("UNKNOWN_TRANSITION");
+		}
+		if(reactionType.equals("DEGRADATION")) {
+			System.out.println("DEGRADATION");
+		}
+		if(reactionType.equals("UNKNOWN_TRANSITION")) {
+			System.out.println("UNKNOWN_TRANSITION");
+		}
+		if(reactionType.equals("UNKNOWN_TRANSITION")) {
+			System.out.println("UNKNOWN_TRANSITION");
+		}
+		if(reactionType.equals("TRANSLATION")||reactionType.equals("TRANSCRIPTION")){
+			System.out.println("TRANSLATION or TRANSCRIPTION");
+		}
+		if(reactionType.contains("POSITIVE_INFLUENCE")||reactionType.contains("NEGATIVE_INFLUENCE")){
+			System.out.println("POSITIVE_INFLUENCE or NEGATIVE_INFLUENCE");
+		}
+		
+		
+		
 		// create catalysis reactions
-		if(reaction.getListOfModifiers() != null) {
+		if (reaction.getListOfModifiers() != null) {
 			for (int j=0; j < reaction.getListOfModifiers().getModifierSpeciesReferenceArray().length; j++) {
 				String speciesId = reaction.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
 				PhysicalEntity pe = bpPhysicalEntities.get(speciesId);
-				if (pe == null)
-					System.out.println("_error "+ speciesId);
+				// create uri unique for each modifiers related to the main reaction
+				String uri = biopaxNameSpacePrefix + "_c" + Integer.toString(j) + "_"+ reaction.getId();
+				Catalysis cat = model.addNew(Catalysis.class, uri);
+//				//TODO add cat to pathway here
+				cat.addController(pe);
+				cat.addControlled(inter);
+				if (reaction.getAnnotation() != null && reaction.getAnnotation().getCelldesignerListOfModification() != null) {
+					CelldesignerModificationDocument.CelldesignerModification modif = 
+							reaction.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
+					String modifType = "";
+					try {
+						modifType =  modif.getType().toString();
+					}
+					catch (Exception e) {
+						modifType = "UNKNOWN_CATALYSIS";
+					}
+					if(modifType.equals("CATALYSIS") || modifType.equals("UNKNOWN_CATALYSIS")){
+						cat.setControlType(ControlType.ACTIVATION);
+					}
+					if(modifType.equals("INHIBITION") || modifType.equals("UNKNOWN_INHIBITION")){
+						cat.setControlType(ControlType.INHIBITION);
+					}
+					cat.addComment("CDTYPE:"+modifType);
+				}
 			}
 		}
-	
-	
+		
+		/*
+		 * here add  to pathway, see old code
+		 */
+		
+		// add publications cross-references
+		if (inter != null && reaction.getNotes() != null) {
+			String notes = Utils.getValue(reaction.getNotes()).trim();
+			for (PublicationXref pref : extractPubMedReferences(notes))
+				inter.addXref(pref);
+		}
+		
+		// manage conversions
+		if (conv != null) {
+			for (int j=0; j < reaction.getListOfReactants().getSpeciesReferenceArray().length; j++) {
+				String id = reaction.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
+				/*
+				 * test this, might be better to call getOrCreate function (same below)
+				 */
+				PhysicalEntity pe = bpPhysicalEntities.get(id);
+				//  stochiometry coefficients might be added here, see old code (same below)
+				if (pe != null)
+					conv.addLeft(pe);
+			}
+			for (int j=0; j < reaction.getListOfProducts().getSpeciesReferenceArray().length; j++) {
+				String id = reaction.getListOfProducts().getSpeciesReferenceArray(j).getSpecies();
+				PhysicalEntity pe = bpPhysicalEntities.get(id);
+				if (pe != null)
+					conv.addRight(pe);
+			}
+		}
 	
 	}
 	

@@ -20,6 +20,7 @@ import org.biopax.paxtools.model.level3.ComplexAssembly;
 import org.biopax.paxtools.model.level3.Control;
 import org.biopax.paxtools.model.level3.ControlType;
 import org.biopax.paxtools.model.level3.Conversion;
+import org.biopax.paxtools.model.level3.Degradation;
 import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Interaction;
@@ -600,6 +601,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			si = isp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
 			cdClass = Utils.getValue(si.getCelldesignerClass());
 		}
+		System.out.println("_species\t"+speciesId+"\t"+cdClass);
 		
 		// build uri using BioPAX prefix and species ID
 		String uri =  biopaxNameSpacePrefix + speciesId;
@@ -777,48 +779,37 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 		
 		
-		if(reactionType.equals("HETERODIMER_ASSOCIATION")) {
-			//System.out.println("HETERODIMER_ASSOCIATION");
+		if(reactionType.equals("HETERODIMER_ASSOCIATION") || reactionType.equals("DISSOCIATION")) {
 			String uri = biopaxNameSpacePrefix + reaction.getId();
 			ComplexAssembly cas = model.addNew(ComplexAssembly.class, uri);
 			inter = cas;
 			conv = cas;
 		}
 		
-		if(reactionType.equals("DISSOCIATION")) {
-			System.out.println("DISSOCIATION");
+		if(reactionType.equals("STATE_TRANSITION") || 
+				reactionType.equals("TRUNCATION") || 
+				reactionType.equals("KNOWN_TRANSITION_OMITTED") || 
+				reactionType.equals("UNKNOWN_TRANSITION") ||
+				reactionType.equals("TRANSLATION") ||
+				reactionType.equals("TRANSCRIPTION") ||
+				reactionType.equals("POSITIVE_INFLUENCE") ||
+				reactionType.equals("NEGATIVE_INFLUENCE")
+				) {
+			String uri = biopaxNameSpacePrefix + reaction.getId();
+			BiochemicalReaction bre = model.addNew(BiochemicalReaction.class, uri);
+			inter = bre;
+			conv = bre;
 		}
-		if(reactionType.equals("STATE_TRANSITION")) {
-			System.out.println("STATE_TRANSITION");
-		}
-		if(reactionType.equals("TRUNCATION")) {
-			System.out.println("TRUNCATION");
-		}
-		if(reactionType.equals("KNOWN_TRANSITION_OMITTED")) {
-			System.out.println("KNOWN_TRANSITION_OMITTED");
-		}
-		if(reactionType.equals("UNKNOWN_TRANSITION")) {
-			System.out.println("UNKNOWN_TRANSITION");
-		}
+	
 		if(reactionType.equals("DEGRADATION")) {
-			System.out.println("DEGRADATION");
-		}
-		if(reactionType.equals("UNKNOWN_TRANSITION")) {
-			System.out.println("UNKNOWN_TRANSITION");
-		}
-		if(reactionType.equals("UNKNOWN_TRANSITION")) {
-			System.out.println("UNKNOWN_TRANSITION");
-		}
-		if(reactionType.equals("TRANSLATION")||reactionType.equals("TRANSCRIPTION")){
-			System.out.println("TRANSLATION or TRANSCRIPTION");
-		}
-		if(reactionType.contains("POSITIVE_INFLUENCE")||reactionType.contains("NEGATIVE_INFLUENCE")){
-			System.out.println("POSITIVE_INFLUENCE or NEGATIVE_INFLUENCE");
+			//System.out.println("DEGRADATION");
+			String uri = biopaxNameSpacePrefix + reaction.getId();
+			Degradation deg = model.addNew(Degradation.class, uri);
+			conv = deg;
+			inter = deg;
 		}
 		
-		
-		
-		// create catalysis reactions
+		// if reaction is catalysed, create catalysis reaction here
 		if (reaction.getListOfModifiers() != null) {
 			for (int j=0; j < reaction.getListOfModifiers().getModifierSpeciesReferenceArray().length; j++) {
 				String speciesId = reaction.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
@@ -861,23 +852,29 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				inter.addXref(pref);
 		}
 		
-		// manage conversions
+		// add physical entities to conversion reactions
 		if (conv != null) {
+			
 			for (int j=0; j < reaction.getListOfReactants().getSpeciesReferenceArray().length; j++) {
 				String id = reaction.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
-				/*
-				 * test this, might be better to call getOrCreate function (same below)
-				 */
-				PhysicalEntity pe = bpPhysicalEntities.get(id);
-				//  stochiometry coefficients might be added here, see old code (same below)
+				//PhysicalEntity pe = bpPhysicalEntities.get(id);
+				PhysicalEntity pe = getOrCreateBioPAXSpecies(id);
+				//  stochiometry coefficients might be added here, see old code
 				if (pe != null)
 					conv.addLeft(pe);
+				else
+					System.out.println("Warning: left PhysicalEntity "+id+" null for reaction "+ reaction.getId());
 			}
+			
 			for (int j=0; j < reaction.getListOfProducts().getSpeciesReferenceArray().length; j++) {
 				String id = reaction.getListOfProducts().getSpeciesReferenceArray(j).getSpecies();
-				PhysicalEntity pe = bpPhysicalEntities.get(id);
+				//PhysicalEntity pe = bpPhysicalEntities.get(id);
+				PhysicalEntity pe = getOrCreateBioPAXSpecies(id);
+			//  stochiometry coefficients might be added here, see old code
 				if (pe != null)
 					conv.addRight(pe);
+				else
+					System.out.println("Warning: right PhysicalEntity "+id+" null for reaction "+ reaction.getId());
 			}
 		}
 	

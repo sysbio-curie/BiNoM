@@ -106,11 +106,17 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 * BioPAX name space prefix
 	 */
 	private String biopaxNameSpacePrefix = "http://www.biopax.org/release/biopax-level3.owl#";
+	
 	/**
 	 * Map to BioPAX PublicationXref objects
 	 */
 	private HashMap<String, PublicationXref> bpPublicationXref;
 	private HashMap<String, UnificationXref> bpUnificationXref;
+	
+	/**
+	 * Pathway
+	 */
+	private Pathway pathway;
 	
 	/**
 	 * Constructor.
@@ -156,6 +162,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	public void convert() {
 		createBioPAXModel();
+		createPathway();
 		fillBioPAXModel();
 	}
 	
@@ -169,6 +176,12 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		model.setXmlBase("http://sysbio.curie.fr/");
 	}
 	
+	private void createPathway() {
+		String modelId = sbml.getSbml().getModel().getId();
+		String uri = biopaxNameSpacePrefix + modelId;
+		pathway = model.addNew(Pathway.class, uri);
+		pathway.addComment("Pathway generated automatically from CellDesigner xml file using BiNoM software http://binom.curie.fr");
+	}
 	private void fillBioPAXModel() {
 		
 		System.out.println("start filling the model...");
@@ -601,7 +614,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			si = isp.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();
 			cdClass = Utils.getValue(si.getCelldesignerClass());
 		}
-		System.out.println("_species\t"+speciesId+"\t"+cdClass);
 		
 		// build uri using BioPAX prefix and species ID
 		String uri =  biopaxNameSpacePrefix + speciesId;
@@ -723,7 +735,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			conv = tr;
 		}
 		
-		// these cases never seems to be used, even on the master 
+		// !!! these cases never seems to be used, even on the master 
 		if (reactionType.equals("CATALYSIS")||
 				reactionType.equals("UNKNOWN_CATALYSIS")||
 				reactionType.equals("TRANSCRIPTIONAL_ACTIVATION")||
@@ -752,7 +764,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			// not used, even with acsn_master !?!
 		}
 		
-		// this code is never executed, even on master.
+		// !!! this code is never executed, even on master.
 		if (reactionType.equals("INHIBITION")||
 				reactionType.equals("UNKNOWN_INHIBITION")||
 				reactionType.equals("TRANSCRIPTIONAL_INHIBITION")||
@@ -817,7 +829,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				// create uri unique for each modifiers related to the main reaction
 				String uri = biopaxNameSpacePrefix + "_c" + Integer.toString(j) + "_"+ reaction.getId();
 				Catalysis cat = model.addNew(Catalysis.class, uri);
-//				//TODO add cat to pathway here
+				pathway.addPathwayComponent(cat);
 				cat.addController(pe);
 				cat.addControlled(inter);
 				if (reaction.getAnnotation() != null && reaction.getAnnotation().getCelldesignerListOfModification() != null) {
@@ -841,9 +853,14 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			}
 		}
 		
-		/*
-		 * here add  to pathway, see old code
-		 */
+		// add reaction to global pathway
+		if (inter == null) {
+			System.out.println("Warning: inter null for reaction " + reaction.getId() + " type: " + reactionType);
+		}
+		else {
+			pathway.addPathwayComponent(inter);
+			pathway.addComment("CDTYPE: " + reactionType);
+		}
 		
 		// add publications cross-references
 		if (inter != null && reaction.getNotes() != null) {
@@ -862,8 +879,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				//  stochiometry coefficients might be added here, see old code
 				if (pe != null)
 					conv.addLeft(pe);
-				else
-					System.out.println("Warning: left PhysicalEntity "+id+" null for reaction "+ reaction.getId());
+//				else
+//					System.out.println("Warning: left PhysicalEntity "+id+" null for reaction "+ reaction.getId());
 			}
 			
 			for (int j=0; j < reaction.getListOfProducts().getSpeciesReferenceArray().length; j++) {
@@ -873,8 +890,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			//  stochiometry coefficients might be added here, see old code
 				if (pe != null)
 					conv.addRight(pe);
-				else
-					System.out.println("Warning: right PhysicalEntity "+id+" null for reaction "+ reaction.getId());
+//				else
+//					System.out.println("Warning: right PhysicalEntity "+id+" null for reaction "+ reaction.getId());
 			}
 		}
 	

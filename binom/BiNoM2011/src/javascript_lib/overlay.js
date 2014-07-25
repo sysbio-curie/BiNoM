@@ -64,11 +64,11 @@ function event_ckmap(e, e2, type, overlay) {
 	var module = overlay.win.document.navicell_module_name;
 
 	var jxtree = navicell.mapdata.getJXTree(module);
-	var ckmap = navicell.mapdata.getCKMap(module);
+	var modif_map = navicell.mapdata.getModifMap(module);
 	var clicked_node = null;
 	var clicked_boundbox = null;
-	for (var id in ckmap) {
-		var boxes = ckmap[id];
+	for (var id in modif_map) {
+		var boxes = modif_map[id];
 		for (var kk = 0; kk < boxes.length; ++kk) {
 			var box = boxes[kk];
 			if (!box.gpt) {
@@ -82,7 +82,8 @@ function event_ckmap(e, e2, type, overlay) {
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
 				if (type == 'click') {
-					console.log("click ID " + id + " in " + module);
+					var said = box[4];
+					console.log("click ID " + id + " said=" + said + " in " + module);
 					var node = jxtree.getNodeByUserId(id);
 					if (node) {
 						if (clicked_boundbox) {
@@ -315,14 +316,22 @@ USGSOverlay.prototype.draw = function(module) {
 	this.boundBoxes = [];
 
 	//console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
-//	console.log("arrpos early: " + this.arrpos.length + " " + navicell.drawing_config.displayDLOs());
+	//console.log("arrpos early: " + this.arrpos.length + " " + navicell.drawing_config.displayDLOs());
+	//console.log("MODULE: " + module + " " + get_module());
 	if (!module) {
 		module = get_module();
 	}
+
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!drawing_config.displayDLOs()) {
 		return;
 	}
+	// ----------------------------------------------------------------------------------------
+	if (drawing_config.displayMapStaining()) {
+		draw_voronoi(module, this.context, this.div_);
+	}
+	// ----------------------------------------------------------------------------------------
+
 	// may add another condition, such as drawing_config.blablabla
 	var arrpos = null;
 	if (drawing_config.displayDLOsOnAllGenes()) {

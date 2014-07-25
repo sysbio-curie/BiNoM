@@ -128,6 +128,26 @@ function load_info(url, module_name)
 	      );
 }
 
+function load_voronoi(url, module_name)
+{
+	navicell.mapdata.voronoi_ready[module_name] = new $.Deferred();
+	$.ajax(url,
+	       {
+		       async: true,
+		       dataType: 'text',
+		       
+		       success: function(data) {
+			       console.log("navicell: voronoi [" + url + "] loaded !");
+			       navicell.mapdata.addVoronoiCells(module_name, data);
+		       },
+			       
+		       error: function() {
+			       console.log("navicell: error loading voronoi [" + url + "]");
+		       }
+	       }
+	      );
+}
+
 //
 // Mapdata class
 //
@@ -291,6 +311,59 @@ function jxtree_user_find_id_regex(matcher, regex, node) {
         return false;
 }
 
+function VoronoiCells(module_name, data) {
+	var voronoiShapeMap = {};
+	var lines = data.split(LINE_BREAK_REGEX);
+	var len = lines.length;
+	var shape_map = navicell.mapdata.getShapeMap(module_name);
+	var found = 0;
+	var not_found = 0;
+	for (var nn = 0; nn < len; ++nn) {
+		var arr = lines[nn].split("\t");
+		var points = [];
+		var neighbourghs = [];
+		var shape_id = arr[0];
+		if (!shape_id) {
+			continue;
+		}
+		for (var kk = 1; kk < arr.length; ++kk) {
+			if (!arr[kk].length) {
+				continue;
+			}
+			if (arr[kk].match(NUM_REGEX)) {
+				points.push(parseInt(arr[kk]));
+			} else {
+				neighbourghs.push(arr[kk]);
+				if (shape_map[arr[kk]]) {
+					found++;
+				} else {
+					not_found++;
+					console.log("NB SHAPE_ID " + arr[kk] + " not found");
+				}
+			}
+		}
+		voronoiShapeMap[shape_id] = [points, neighbourghs];
+		// note: cannot really use shmap at this point as it may be not completely loaded
+		//console.log("SHA " + shape_id + " => " + shMap[shape_id][0].length + " " + shMap[shape_id][1].length + " found: " + shmap[shape_id]);
+		if (shape_map[shape_id]) {
+			found++;
+		} else {
+			not_found++;
+			console.log("SHAPE_ID " + shape_id + " not found");
+		}
+	}
+	console.log("FOUND " + found + " " + not_found);
+	this.voronoiShapeMap = voronoiShapeMap;
+}
+
+
+VoronoiCells.prototype = {
+
+	getShapeMap: function() {
+		return this.voronoiShapeMap;
+	}
+};
+
 function Mapdata(to_load_count) {
 	this.to_load_count = to_load_count;
 
@@ -299,6 +372,7 @@ function Mapdata(to_load_count) {
 	this.is_ready = {};
 	this.straight_data = {};
 	this.info_ready = {};
+	this.voronoi_ready = {};
 	this.deferred_module_bubble = {};
 	this.module_postid = {};
 //	this.reset();
@@ -314,6 +388,7 @@ var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
 //var LINE_BREAK_REGEX = /[\r\n]+/;
 var LINE_BREAK_REGEX = /\r\n?|\n/;
 var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
+var NUM_REGEX = new RegExp("^-?[0-9]+(\.[0-9]*)?$");
 
 var time_cnt = 0;
 
@@ -323,11 +398,13 @@ Mapdata.prototype = {
 	module_mapdata_by_id: {},
 	module_info: {},
 	module_tag_map: {},
+	module_voronoi: {},
 	module_bubble: {},
 	module_jxtree: {},
 	module_res_jxtree: {},
 	module_classes: {},
-	module_ckmap: {},
+	module_modif_map: {},
+	module_shape_map: {},
 	class_list: {},
 
 	// Hashmap from hugo name to entity information (including positions)
@@ -367,11 +444,11 @@ Mapdata.prototype = {
 		}
 	},
 
-	//findJXTreeContinue: function(jxtree, to_find, no_ext, win, action, hints, module_name) {
 	findJXTreeContinue: function(win, to_find, no_ext, action, hints) {
 		var module_name = win.document.navicell_module_name;
 		var mapdata = this;
 		var jxtree = mapdata.module_jxtree[module_name];
+		var res_jxtree = null;
 
 		if (no_ext) {
 			var user_find = mapdata.useJXTreeSimpleFind(jxtree);
@@ -426,8 +503,12 @@ Mapdata.prototype = {
 				$(hints.div, win.document).css("display", "block");
 			}
 
-			time_cnt++;
 			mapdata.module_res_jxtree[module_name] = res_jxtree;
+
+			if (overlay) {
+				overlay.draw(win.document.navicell_module_name);
+			}
+			time_cnt++;
 			$("img.blogfromright", win.document).click(open_blog_click);
 			$("img.mapmodulefromright", win.document).click(open_module_map_click);
 		}
@@ -442,7 +523,6 @@ Mapdata.prototype = {
 		hints.class_list = this.class_list;
 		this.whenInfoReady(module_name, function() {
 			var jxtree = mapdata.module_jxtree[module_name];
-			var res_jxtree = null;
 			// so ?
 			if (no_ext) {
 				var to_find_str = "^(";
@@ -461,9 +541,9 @@ Mapdata.prototype = {
 			} else {
 				mapdata.searchFor(win, to_find, hints.div);
 				setTimeout(function() {
-					//mapdata.findJXTreeContinue(jxtree, to_find, no_ext, win, action, hints, module_name);
 					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
 				}, 20);
+				//mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
 			}
 
 			return;
@@ -496,12 +576,22 @@ Mapdata.prototype = {
 		this.info_ready[module_name].resolve();
 	},
 
+	addVoronoiCells: function(module_name, data) {
+		console.log("adding voronoi");
+		this.module_voronoi[module_name] = new VoronoiCells(module_name, data);
+		this.voronoi_ready[module_name].resolve();
+	},
+
 	getInfo: function(module_name, id) {
 		var info = this.module_info[module_name];
 		if (info) {
 			return info[id];
 		}
 		return null;
+	},
+
+	getVoronoiCells: function(module_name) {
+		return this.module_voronoi[module_name];
 	},
 
 	getTagMap: function(module_name, id) {
@@ -682,7 +772,8 @@ Mapdata.prototype = {
 		this.module_mapdata[module_name] = module_mapdata;
 		this.module_mapdata_by_id[module_name] = {};
 
-		var ckmap = {};
+		var modif_map = {};
+		var shape_map = {};
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
@@ -702,7 +793,7 @@ Mapdata.prototype = {
 				//console.log("FOUND maps: " + maps.length);
 				for (var jj = 0; jj < maps.length; ++jj) {
 					var map = maps[jj];
-					//console.log("map.id " + map.id);
+					console.log("map.id " + map.id);
 					this.module_mapdata_by_id[module_name][map.id] = map;
 					var map_modules = map.modules;
 					if (map_modules) {
@@ -750,18 +841,22 @@ Mapdata.prototype = {
 							var o_modif = this.module_mapdata_by_id[module_name][modif.id];
 							/*
 							if (modif.positions && o_modif && o_modif.positions) {
-								console.log("WARNING: should compare positions " + ckmap[modif.id] + " " + modif.positions[0].x + " " + o_modif.positions[0].x);
+								console.log("WARNING: should compare positions " + modif_map[modif.id] + " " + modif.positions[0].x + " " + o_modif.positions[0].x);
 							}
 							*/
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
 							if (modif.positions) {
-								ckmap[modif.id] = [];
+								modif_map[modif.id] = [];
 								for (var ll = 0; ll < modif.positions.length; ++ll) {
 									var pos = modif.positions[ll];
 									if (pos.w && pos.h) {
-										var box = [pos.x, pos.w, pos.y, pos.h];
-										ckmap[modif.id].push(box);
+										var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
+										modif_map[modif.id].push(box);
 									}
+									if (!pos.said) {
+										console.log("position.said " + modif.id + " " + pos.said);
+									}
+									shape_map[pos.said] = pos;
 								}
 							}
 						}
@@ -773,12 +868,17 @@ Mapdata.prototype = {
 		}
 	
 		console.log("module map added " + module_name);
-		this.module_ckmap[module_name] = ckmap;
+		this.module_modif_map[module_name] = modif_map;
+		this.module_shape_map[module_name] = shape_map;
 		return !--this.to_load_count;
 	},
 
-	getCKMap: function(module_name) {
-		return this.module_ckmap[module_name];
+	getModifMap: function(module_name) {
+		return this.module_modif_map[module_name];
+	},
+
+	getShapeMap: function(module_name) {
+		return this.module_shape_map[module_name];
 	},
 
 	load_mapdata: function(url, module_name) {
@@ -798,7 +898,7 @@ Mapdata.prototype = {
 				       mapdata.straight_data[module_name] = data;
 				       console.log("navicell: " + module_name + " data loaded");
 				       if (mapdata.addModuleMapdata(module_name, data)) {
-					       //console.log("now all is ready");
+					       console.log("now all is ready " + url);
 					       //mapdata.ready.resolve();
 				       }
 				       mapdata.ready[module_name].resolve();
@@ -897,6 +997,7 @@ function Dataset(name) {
 
 	this.modifs_id = {};
 
+	this.gene_shape_map = {};
 	this.module_arrpos = {};
 }
 
@@ -976,12 +1077,21 @@ Dataset.prototype = {
 		return null;
 	},
 
+	getGeneByShapeId: function(module_name, shape_id) {
+		if (this.gene_shape_map[module_name]) {
+			return this.gene_shape_map[module_name][shape_id];
+		}
+		return null;
+	},
+
 	syncModifs: function() {
 		console.log("syncModifs starting " + mapSize(this.genes));
 		this.modifs_id = {};
+		this.gene_shape_map = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
 			var module_name = navicell.module_names[jj];
 			this.modifs_id[module_name] = {};
+			this.gene_shape_map[module_name] = {};
 			for (var gene_name in this.genes) {
 				var gene = this.genes[gene_name];
 				var hugo_module_map = this.genes[gene_name].hugo_module_map;
@@ -1000,7 +1110,13 @@ Dataset.prototype = {
 							var arrpos = [];
 							if (positions) {
 								for (var kk = 0; kk < positions.length; ++kk) {
-									arrpos.push({id : modif.id, p : new google.maps.Point(positions[kk].x, positions[kk].y), gene_name: gene_name});
+									var pos = positions[kk];
+									arrpos.push({id : modif.id, p : new google.maps.Point(pos.x, pos.y), gene_name: gene_name});
+									if (pos.said) {
+										//console.log("POS.SAID: " + pos.said + " => " + gene_name);
+										this.gene_shape_map[module_name][pos.said] = gene_name;
+										gene.addShapeId(module_name, pos.said);
+									}
 								}
 							}
 							this.modifs_id[module_name][modif.id] = [gene, arrpos];
@@ -1031,6 +1147,10 @@ Dataset.prototype = {
 		var jxtree = navicell.mapdata.getJXTree(module_name);
 		var jxtreeScanner = new JXTreeScanner(module_name);
 		jxtree.scanTree(jxtreeScanner);
+		var jxrestree = navicell.mapdata.getResJXTree(module_name);
+		if (jxrestree) {
+			jxrestree.scanTree(jxtreeScanner);
+		}
 		return jxtreeScanner.getArrayPos();
 	},
 	
@@ -3170,6 +3290,59 @@ GlyphConfig.prototype = {
 	}
 };
 
+function MapStainingConfig() {
+	this.reset();
+}
+
+MapStainingConfig.prototype = {
+
+	reset: function() {
+		this.sample_or_group = null;
+		this.color_datatable = null;
+	},
+
+	syncDatatables: function() {
+		var datatable;
+		datatable = this.getColorDatatable();
+		if (datatable && !navicell.dataset.getDatatableById(datatable.getId())) {
+			this.setColorDatatable(null);
+		}
+	},
+
+	setSampleOrGroup: function(sample_or_group) {
+		this.sample_or_group = sample_or_group;
+	},
+
+	getSampleOrGroup: function() {
+		return this.sample_or_group;
+	},
+
+	getGroup: function() {
+		var sample_or_group = this.getSampleOrGroup();
+		return this.sample_or_group && sample_or_group.isGroup() ? sample_or_group : undefined;
+	},
+
+	getSample: function() {
+		var sample_or_group = this.getSampleOrGroup();
+		return sample_or_group && sample_or_group.isSample() ? sample_or_group : undefined;
+	},
+
+	setColorDatatable: function(datatable) {
+		this.color_datatable = datatable;
+	},
+
+	getColorDatatable: function() {
+		return this.color_datatable;
+	},
+
+	cloneFrom: function(map_staining_config) {
+		this.reset();
+
+		this.sample_or_group = map_staining_config.sample_or_group;
+		this.color_datatable = map_staining_config.color_datatable;
+	}
+};
+
 // TBD datatable id management
 function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
 	var reader;
@@ -3834,7 +4007,9 @@ Datatable.prototype = {
 	getClass: function() {return "Datatable";}
 };
 
-function DrawingConfig() {
+function DrawingConfig(win) {
+	this.win = win;
+
 	this.display_markers = 1;
 	this.display_old_markers = 1;
 
@@ -3844,6 +4019,10 @@ function DrawingConfig() {
 	this.editing_heatmap_config = new HeatmapConfig();
 	this.barplot_config = new BarplotConfig();
 	this.editing_barplot_config = new BarplotConfig();
+
+	this.map_staining_config = new MapStainingConfig();
+	this.editing_map_staining_config = new MapStainingConfig();
+
 	//this.piechart_config = new PiechartConfig();
 
 	this.glyph_configs = [];
@@ -3855,6 +4034,7 @@ function DrawingConfig() {
 		this.display_glyphs.push(0);
 	}
 
+	this.display_map_staining = 0;
 	this.display_labels = 0;
 
 	this.display_DLOs_on_all_genes = 1;
@@ -3862,12 +4042,36 @@ function DrawingConfig() {
 
 DrawingConfig.prototype = {
 
+	getHeatmapConfig: function() {
+		return this.heatmap_config;
+	},
+
+	getEditingHeatmapConfig: function() {
+		return this.editing_heatmap_config;
+	},
+
+	getBarplotConfig: function() {
+		return this.barplot_config;
+	},
+
+	getEditingBarplotConfig: function() {
+		return this.editing_barplot_config;
+	},
+
 	getGlyphConfig: function(num) {
 		return this.glyph_configs[num-1];
 	},
 
 	getEditingGlyphConfig: function(num) {
 		return this.editing_glyph_configs[num-1];
+	},
+
+	getMapStainingConfig: function() {
+		return this.map_staining_config;
+	},
+
+	getEditingMapStainingConfig: function() {
+		return this.editing_map_staining_config;
 	},
 
 	displayMarkers: function() {
@@ -3903,6 +4107,10 @@ DrawingConfig.prototype = {
 		return this.display_glyphs[num-1];
 	},
 
+	displayMapStaining: function() {
+		return this.display_map_staining;
+	},
+
 	displayLabels: function() {
 		return this.display_labels;
 	},
@@ -3916,7 +4124,7 @@ DrawingConfig.prototype = {
 	},
 
 	displayDLOs: function() {
-		return this.displayCharts() || this.displayAnyGlyph() || this.displayLabels();
+		return this.displayCharts() || this.displayAnyGlyph() || this.displayMapStaining() || this.displayLabels();
 	},
 
 	displayDLOsOnAllGenes: function() {
@@ -3925,6 +4133,10 @@ DrawingConfig.prototype = {
 
 	setDisplayDLOsOnAllGenes: function(val) {
 		this.display_DLOs_on_all_genes = val;
+	},
+
+	setDisplayMapStaining: function(val) {
+		this.display_map_staining = val;
 	},
 
 	setDisplayMarkers: function(val) {
@@ -3948,10 +4160,9 @@ DrawingConfig.prototype = {
 	},
 
 	apply: function() {
-		this.setDisplayDLOsOnAllGenes($("#drawing_config_display_all").attr("checked"));
-		//drawing_config.sync(); // ??
-		clickmap_refresh(true);
-		drawing_editing(false);
+		this.setDisplayDLOsOnAllGenes($("#drawing_config_display_all", this.win.document).attr("checked"));
+		this.win.clickmap_refresh(true);
+		this.win.drawing_editing(false);
 	},
 
 	sync: function() {
@@ -4281,6 +4492,7 @@ function Gene(name, hugo_module_map, id) {
 	this.hugo_module_map = hugo_module_map;
 	this.refcnt = 1;
 	this.id = id;
+	this.shape_ids = {};
 }
 
 Gene.prototype = {
@@ -4289,6 +4501,21 @@ Gene.prototype = {
 
 	getId: function() {
 		return this.id;
+	},
+
+	addShapeId: function(module, shape_id) {
+		if (!this.shape_ids[module]) {
+			this.shape_ids[module] = {};
+		}
+		this.shape_ids[module][shape_id] = true;
+	},
+
+	getShapeIds: function(module) {
+		var shape_ids = this.shape_ids[module];
+		if (!shape_ids) {
+			return {};
+		}
+		return shape_ids;
 	},
 
 	getClass: function() {return "Gene";}
@@ -4734,13 +4961,21 @@ MapTypes.prototype = {
 		return {"navicell" : ""};
 	},
 
+	setMapTypeByMapStaining: function(map_staining) {
+		if (map_staining && this.has_nobg) {
+			this.setMapType("navicell_nobg");
+		} else {
+			this.setMapType("navicell");
+		}
+	},
+
 	setDefaultMapType: function() {
 		this.setMapType("navicell");
 	},
 
 	setMapType: function(id) {
 		var map_type = this.maptypes[id];
-		console.log("attempt to change BG: " + map_type);
+		console.log("attempt to change BG: " + id + " " +  map_type);
 		if (map_type) {
 			this.tile_suffix = this.getMapTypeInfo()[id];
 			this.map.setMapTypeId(id);
@@ -4845,6 +5080,7 @@ function navicell_init() {
 	_navicell.annot_factory = new AnnotationFactory();
 	_navicell._drawing_config = {};
 	_navicell.module_init = {};
+	_navicell.mapTypes = {};
 
 	_navicell.EXPRESSION = 1;
 	_navicell.COPYNUMBER = 2;
@@ -4937,12 +5173,21 @@ function navicell_init() {
 		for (var datatable_name in dataset.datatables) {
 			dataset.datatables[datatable_name].declareWindow(win);
 		}
-		_navicell._drawing_config[module] = new DrawingConfig();
+		_navicell._drawing_config[module] = new DrawingConfig(win);
 		_navicell.syncWindows();
 	},
 	
 	_navicell.getDrawingConfig = function(module) {
 		return _navicell._drawing_config[module];
+	},
+
+	_navicell.addMapTypes = function(map_name, mapTypes) {
+		_navicell.mapTypes[map_name] = mapTypes;
+		return mapTypes;
+	},
+
+	_navicell.getMapTypes = function(map_name) {
+		return _navicell.mapTypes[map_name];
 	},
 
 	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];

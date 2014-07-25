@@ -462,7 +462,7 @@ function refresh_old_markers() {
 	}
 }
 
-function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg)
+function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg)
 {
 	var lat_ = 90;
 	var lng_ = 180;
@@ -510,9 +510,9 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 	
 	projection = new ClickMapProjection();
 
-	navicell.mapTypes = new MapTypes(map, has_nobg);
+	var mapTypes = navicell.addMapTypes(map_name, new MapTypes(map, has_nobg));
 
-	var map_type_info = navicell.mapTypes.getMapTypeInfo();
+	var map_type_info = mapTypes.getMapTypeInfo();
 	for (var id in map_type_info) {
 		var map_type = new google.maps.ImageMapType({
 			getTileUrl: function(coord, zoom) {
@@ -523,7 +523,8 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 					return null;
 			
 				var r = coord.x + "_" + coord.y;
-				return "tiles/" + zoom + "/" + r + navicell.mapTypes.tile_suffix + ".png";
+				//return "tiles/" + zoom + "/" + r + navicell.mapTypes.tile_suffix + ".png";
+				return "tiles/" + zoom + "/" + r + navicell.getMapTypes(get_module()).tile_suffix + ".png";
 			},
 			tileSize : new google.maps.Size(tile_width, tile_height),
 			maxZoom : max_zoom,
@@ -531,10 +532,10 @@ function start_map(map_elementId, min_zoom, max_zoom, tile_width, tile_height, w
 		});
 	
 		map_type.projection = projection;
-		navicell.mapTypes.set(id, map_type);
+		mapTypes.set(id, map_type);
 	}
 	
-	navicell.mapTypes.setDefaultMapType();
+	mapTypes.setDefaultMapType();
 
 	var bounds = new google.maps.LatLngBounds();
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift + width, yshift + height)));
@@ -939,7 +940,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 
 	new_markers = Array();
 
-	var map = start_map(map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg);
+	var map = start_map(map_name, map_selector, min_zoom, max_zoom, tile_width, tile_height, width, height, xshift, yshift, has_nobg);
 
 	map.map.map_name = map_name;
 
@@ -1074,9 +1075,11 @@ function uncheck_all_entities(win)
 				this.checkSubtree(false);
 			});
 		}
+		/*
 		if (overlay) {
 			overlay.draw(window.document.navicell_module_name);
 		}
+		*/
 	} else if (jQuery.jstree._reference(jtree)) {
 		jQuery.jstree._reference(jtree).uncheck_all();
 	}

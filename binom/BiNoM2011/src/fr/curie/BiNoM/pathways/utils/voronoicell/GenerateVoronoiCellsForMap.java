@@ -48,7 +48,7 @@ public class GenerateVoronoiCellsForMap {
 	}
 	
 	
-	public static String getVoronoiCellsForCellDesignerMap(String fn){
+	public static String getVoronoiCellsForCellDesignerMap(String fn, fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo scales){
 		String descr = "";
 		try{
 		GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();
@@ -58,11 +58,12 @@ public class GenerateVoronoiCellsForMap {
 		gvc.calcVoronoiCells();
         for(int k=0;k<gvc.points.size();k++){
         	Pnt[] pol = gvc.polygons.get(k);
-        	descr+=gvc.aliases.get(k)+"\t";
-        	for(int i=0;i<pol.length;i++)
-        		descr+=""+pol[i].coord(0)+"\t"+pol[i].coord(1)+"\t";
-        	for(int i=0;i<gvc.neighbours.get(k).size();i++){
-        		descr+=""+gvc.neighbours.get(k).get(i)+"\t";
+        	descr+=gvc.aliases.get(k);
+        	for(int i=0;i<pol.length;i++) {
+        		descr+="\t"+scales.getX(pol[i].coord(0))+"\t"+scales.getY(pol[i].coord(1));
+		}
+        	for(int i=0;i<gvc.neighbours.get(k).size();i++) {
+        		descr+="\t"+gvc.neighbours.get(k).get(i);
         	}
         	descr+="\n";
         }

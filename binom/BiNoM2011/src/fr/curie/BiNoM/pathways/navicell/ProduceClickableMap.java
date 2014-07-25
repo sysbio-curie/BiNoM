@@ -83,6 +83,7 @@ import org.apache.xmlbeans.*;
 import com.thebuzzmedia.imgscalr.Scalr;
 
 import fr.curie.BiNoM.pathways.utils.OptionParser;
+import fr.curie.BiNoM.pathways.utils.voronoicell.GenerateVoronoiCellsForMap;
 
 public class ProduceClickableMap
 {
@@ -159,6 +160,7 @@ public class ProduceClickableMap
 	
 	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>();
 	public SbmlDocument cd = null;
+	public String voronoiCells;
 	private final HashMap<String, XmlObject> species = new HashMap<String, XmlObject>(); // not used
 	private final HashMap<String, Vector<String>> speciesAliases = new HashMap<String, Vector<String>>();
 	private final HashMap<String, Vector<ReactionDocument.Reaction>> speciesInReactions = new HashMap<String, Vector<ReactionDocument.Reaction>>();
@@ -189,6 +191,7 @@ public class ProduceClickableMap
 	static final String jquery_NV2_js = jslib_dir + "/jquery/jquery-1.8.3.js";
 	
 	private final String blog_name;
+	private final File input;
 	private ImagesInfo scales;
 	private ItemCloser right_panel;
 	
@@ -359,12 +362,14 @@ public class ProduceClickableMap
 	public ProduceClickableMap(final String blog_name, File input)
 	{
 		this.blog_name = blog_name;
+		this.input = input;
 		assert input.canRead() : "cannot read " + input;
 		assert input.getName().endsWith(celldesigner_suffix) : "bad input file " + input + " (name must end in xml)";
 		
 		module_name = input.getName().substring(0, input.getName().length() - celldesigner_suffix.length());
 
 		loadCellDesigner(input.getPath());
+		//voronoiCells = GenerateVoronoiCellsForMap.getVoronoiCellsForCellDesignerMap(input.getPath());
 		buildComplexSpecies();
 
 		final Map<String, EntityBase> _entityIDToEntityMap = new HashMap<String, EntityBase>();
@@ -694,7 +699,8 @@ public class ProduceClickableMap
 		{
 			master_outinfo_json = new JSONInfo(destination_common, "master");
 			master_outjson = new PrintStream(new File(destination_common, "master_mapdata.json"));
-			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, master_outjson, master_outinfo_json, modules, atlasInfo, xrefs, provide_sources);
+			PrintStream master_outvoronoi = new PrintStream(new File(destination_common, "master_voronoi.csv"));
+			master = process_a_map_master(project_name, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, master_outjson, master_outvoronoi, master_outinfo_json, modules, atlasInfo, xrefs, provide_sources);
 		}
 		catch (IOException e)
 		{
@@ -721,7 +727,8 @@ public class ProduceClickableMap
 					//outinfo_json.print("{");
 					JSONInfo outinfo_json = new JSONInfo(destination_common, map_name);
 					PrintStream outjson = new PrintStream(new File(destination_common, map_name + "_mapdata.json"));
-					process_a_map_module(project_name, map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, outjson, outinfo_json, modules, atlasInfo, provide_sources);
+					PrintStream outvoronoi = new PrintStream(new File(destination_common, map_name + "_voronoi.csv"));
+					process_a_map_module(project_name, map_name, master, root, base, source_directory, wp, make_tiles, only_tiles, outmapdata, outjson, outvoronoi, outinfo_json, modules, atlasInfo, provide_sources);
 					outjson.close();
 					//outinfo_json.print("}");
 					outinfo_json.close();
@@ -866,6 +873,8 @@ public class ProduceClickableMap
 		{
 			String base_name = f.getName();
 			String map_name = base_name.substring(base.length(), base_name.length() - celldesigner_suffix.length());
+
+			System.err.println("FILE [" + source_directory + "/" + f.getName() + "]");
 			list.put(map_name, null);
 		}
 		return (list);
@@ -904,7 +913,7 @@ public class ProduceClickableMap
 	static final int MAX_WIDTH = TILE_WIDTH - 2 * XMARGIN;
 	static final int MAX_HEIGHT = TILE_HEIGHT;
 
-	static class ImagesInfo
+	public static class ImagesInfo
 	{
 		final int minzoom, maxzoom, tile_width, tile_height, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0;
 		final double z;
@@ -934,8 +943,8 @@ public class ProduceClickableMap
 			this.z = 1 << maxzoom;
 			this.has_nobg = has_nobg;
 		}
-		double getX(double x) { return x / z + xshift_zoom0; }
-		double getY(double y) { return y / z + yshift_zoom0; }
+		public double getX(double x) { return x / z + xshift_zoom0; }
+		public double getY(double y) { return y / z + yshift_zoom0; }
 		double getL(double l) { return l / z; }
 	};
 	
@@ -1198,7 +1207,7 @@ public class ProduceClickableMap
 	}
 
 	private static void process_a_map_module(final String project_name, final String map, final ProduceClickableMap master, File destination, String base, File source_directory,
-						 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, JSONInfo outinfo_json, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, boolean provide_sources) throws IOException
+						 BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, PrintStream outvoronoi, JSONInfo outinfo_json, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, boolean provide_sources) throws IOException
 	{
 
 		if (only_tiles) {
@@ -1213,14 +1222,16 @@ public class ProduceClickableMap
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
 			ImagesInfo scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+			clMap.voronoiCells = GenerateVoronoiCellsForMap.getVoronoiCellsForCellDesignerMap(clMap.input.getPath(), scales);
 			
 			String firstEntityName = clMap.generatePages_module(map, wp, outmapdata, outjson, outinfo_json, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources);
+			outvoronoi.print(clMap.voronoiCells);
 		}
 	}
 
 	private static ProduceClickableMap process_a_map_master(final String blog_name, File destination, String base, File source_directory,
-								BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, JSONInfo outinfo_json, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs, boolean provide_sources)
+								BlogCreator wp, boolean make_tiles, boolean only_tiles, PrintStream outmapdata, PrintStream outjson, PrintStream outvoronoi, JSONInfo outinfo_json, Map<String, ModuleInfo> modules, AtlasInfo atlasInfo, String[][] xrefs, boolean provide_sources)
 		throws IOException, NaviCellException
 	{
 		
@@ -1237,6 +1248,7 @@ public class ProduceClickableMap
 			
 			final File this_map_directory = mk_maps_directory(map, destination);
 			clMap.scales = make_tiles(map, base, source_directory, make_tiles, this_map_directory);
+			clMap.voronoiCells = GenerateVoronoiCellsForMap.getVoronoiCellsForCellDesignerMap(clMap.input.getPath(), clMap.scales);
 			
 			clMap.master_format = new FormatProteinNotes(modules.keySet(), atlasInfo, xrefs, blog_name);
 			MasterInfo masterInfo = clMap.generatePages_master(wp, outmapdata, outjson, outinfo_json, new File(this_map_directory, right_panel_list), clMap.scales, clMap.master_format, modules, atlasInfo);
@@ -1244,6 +1256,7 @@ public class ProduceClickableMap
 			final BlogCreator.Post module_post = create_module_post(blog_name, wp, module_notes, map, clMap.master_format, atlasInfo);
 			make_index_html(this_map_directory, blog_name, clMap.get_map_title(), map, clMap.scales, module_post, wp, atlasInfo, masterInfo.firstEntityName, provide_sources);
 			modules.put(map, new ModuleInfo(module_notes, module_post));
+			outvoronoi.print(clMap.voronoiCells);
 			return clMap;
 		}
 	}
@@ -2298,7 +2311,8 @@ public class ProduceClickableMap
 					outjson.print("\"x\" : " + toDouble(scales.getX(includedSpecies.getX())) + ", ");
 					outjson.print("\"y\" : " + toDouble(scales.getY(includedSpecies.getY())) + ", ");
 					outjson.print("\"w\" : " + toDouble(scales.getL(includedSpecies.getW())) + ", ");
-					outjson.print("\"h\" : " + toDouble(scales.getL(includedSpecies.getH())));
+					outjson.print("\"h\" : " + toDouble(scales.getL(includedSpecies.getH())) + ", ");
+					outjson.print("\"said\" : \"SAID__" + includedSpecies.getId() + "\"");
 					outjson.print("}],");
 					String bubble;
 					if (ent.getPost() != null) {
@@ -2420,7 +2434,8 @@ public class ProduceClickableMap
 								outjson.print("\"x\" : " + toDouble(scales.getX(x)) + ", ");
 								outjson.print("\"y\" : " + toDouble(scales.getY(y)) + ", ");
 								outjson.print("\"w\" : " + toDouble(scales.getL(0)) + ", ");
-								outjson.print("\"h\" : " + toDouble(scales.getL(0)));
+								outjson.print("\"h\" : " + toDouble(scales.getL(0)) + ", ");
+								outjson.print("\"said\" : \"XAID__" + r.getId() + "\"");
 								outjson.print("}]"); // same kludge
 								outjson.print("}]");
 								outjson.print("}");
@@ -5325,8 +5340,9 @@ public class ProduceClickableMap
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='" + (NV1_2 ? jquery_NV2_js : jquery_js) + "' type='text/javascript'></script>");
-		out.println("<script src='" + jstree_directory_url + "/jquery.jstree-navicell.js" + "' type='text/javascript'></script>");
-		
+		if (!USE_JXTREE) {
+			out.println("<script src='" + jstree_directory_url + "/jquery.jstree-navicell.js" + "' type='text/javascript'></script>");
+		}		
 		out.println("<script src='" + jslib_dir + "/splitter-1.5.1-patched.js' type='text/javascript'></script>");
 		if (NV2) {
 			if (USE_JXTREE) {
@@ -5410,10 +5426,10 @@ public class ProduceClickableMap
 		
 		if (NV2) {
 			if (USE_JXTREE) {
-				//out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", \"" + map_name + "\");");
 				out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", window.document.navicell_module_name);");
 			}
 		}
+		out.println("    load_voronoi(\"" + common_directory_url + "/" + map_name + "_voronoi.csv\", window.document.navicell_module_name);");
 		out.print("    clickmap_start(");
 		out.print(html_quote(blog_name));
 		//out.print(html_quote(new StringBuffer(","), map_name).toString());
@@ -5450,6 +5466,10 @@ public class ProduceClickableMap
 			out.println("    update_status_tables();");
 			out.println("    heatmap_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    barplot_editor_set_editing(true, undefined, window.document.navicell_module_name);");
+			out.println("    for (var num = 1; num <= GLYPH_COUNT; ++num) {");
+			out.println("    \tglyph_editor_set_editing(num, true, undefined);");
+			out.println("    }");
+			out.println("    map_staining_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    overlay_init(map);");
 		}
 		out.println("  });\n");

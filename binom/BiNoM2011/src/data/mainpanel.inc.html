@@ -241,6 +241,17 @@
 
       </table>
   </div>
+
+  <h4>Map Staining</h4>
+  <div class='drawing_config_box' style='overflow: auto; max-height: 125px'>
+    <table>
+      <tr>
+	<td>Display</td><td><input id="drawing_config_map_staining_display" type="checkbox" onchange='drawing_editing(true)'></input></td>
+	<td><a href="#" class='drawing_config_link' onclick='drawing_config_map_staining()'><span class='drawing_config_link'>configuration</span></a></td>
+      </tr>
+    </table>
+  </div>
+
 <!--
   <h4>Label</h4>
   <div class='drawing_config_box'>
@@ -336,6 +347,16 @@
   <div id="glyph_editor_msg_div_5" class="glyph-message"></div>
   <div id="glyph_editor_size_div_5"></div>
   <div id="glyph_gene_choice_5"></div>
+</div>
+
+<div id="map_staining_editor_div">
+  <h3>Map Staining Configuration Editor</h3>
+  <div id="map_staining_editing"></div>
+  <table id='map_staining_editor_table'>
+  </table>
+  <div id="map_staining_editor_msg_div" class="glyph-message"></div>
+  <div id="map_staining_editor_size_div"></div>
+  <div id="map_staining_gene_choice"></div>
 </div>
 
 <div id='search_dialog'>

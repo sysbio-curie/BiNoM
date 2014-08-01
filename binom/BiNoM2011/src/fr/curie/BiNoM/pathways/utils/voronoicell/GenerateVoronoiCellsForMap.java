@@ -233,6 +233,10 @@ public class GenerateVoronoiCellsForMap {
 		for(int i=0;i<points.size();i++){
 			Pnt c = points.get(i);
 			Pnt polygon[] = polygons.get(i);
+			if (polygon == null) {
+				System.err.println("warning: voronoi polygon is null at " + i);
+				continue;
+			}
 			for(int k=0;k<polygon.length;k++){
 				Pnt p = polygon[k];
 				float x = (float)p.coord(0);

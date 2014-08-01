@@ -385,6 +385,27 @@ label {font-size: 12px; vertical-align: middle;}
     font-style: italic;
 }
 
+.heatmap-message, .barplot-message {
+    color: #CC6C00;
+    font-size: small;
+    margin-top: 10px;
+    padding-left: 0px;
+    font-style: italic;
+}
+
+.slider-title {
+/*    color: #CC6C00;*/
+    color: #000000;
+    font-size: small;
+    font-weight: bold;
+}
+
+.slider-label {
+    position: absolute;
+    font-size: x-small;
+    margin-top: 15px;
+}
+
 .error-message {
     color: red;
 }

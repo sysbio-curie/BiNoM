@@ -76,6 +76,16 @@ function array_push_all(arr, to_append) {
 	}
 }
 
+function print_stack()
+{
+	var e = new Error('dummy');
+	var stack = e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+		.replace(/^\s+at\s+/gm, '')
+		.replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+		.split('\n');
+	console.log(stack);
+}
+
 if (!Number.MAX_NUMBER) {
 	Number.MAX_NUMBER = 4000000000; // not the correct value, but ok for our purposes
 }
@@ -316,6 +326,9 @@ function VoronoiCells(module_name, data) {
 	var lines = data.split(LINE_BREAK_REGEX);
 	var len = lines.length;
 	var shape_map = navicell.mapdata.getShapeMap(module_name);
+	if (!shape_map) {
+		console.log("SHAPE_MAP DOES NOT exist for module " + module_name);
+	}
 	var found = 0;
 	var not_found = 0;
 	for (var nn = 0; nn < len; ++nn) {
@@ -331,25 +344,25 @@ function VoronoiCells(module_name, data) {
 				continue;
 			}
 			if (arr[kk].match(NUM_REGEX)) {
-				points.push(parseInt(arr[kk]));
+				points.push(parseFloat(arr[kk]));
 			} else {
 				neighbourghs.push(arr[kk]);
-				if (shape_map[arr[kk]]) {
+				if (shape_map && shape_map[arr[kk]]) {
 					found++;
 				} else {
 					not_found++;
-					console.log("NB SHAPE_ID " + arr[kk] + " not found");
+					//console.log("SHAPE_ID " + arr[kk] + " not found");
 				}
 			}
 		}
 		voronoiShapeMap[shape_id] = [points, neighbourghs];
 		// note: cannot really use shmap at this point as it may be not completely loaded
 		//console.log("SHA " + shape_id + " => " + shMap[shape_id][0].length + " " + shMap[shape_id][1].length + " found: " + shmap[shape_id]);
-		if (shape_map[shape_id]) {
+		if (shape_map && shape_map[shape_id]) {
 			found++;
 		} else {
 			not_found++;
-			console.log("SHAPE_ID " + shape_id + " not found");
+			//console.log("SHAPE_ID " + shape_id + " not found");
 		}
 	}
 	console.log("FOUND " + found + " " + not_found);
@@ -1214,7 +1227,6 @@ Dataset.prototype = {
 		}					
 		var datatable = this.datatables[datatable_name];
 		delete this.datatables[datatable_name];
-		//datatable.name = new_datatable_name;
 		datatable.setName(new_datatable_name);
 		datatable.biotype = navicell.biotype_factory.getBiotype(new_datatable_type);
 		this.datatables[new_datatable_name] = datatable;
@@ -1230,15 +1242,12 @@ Dataset.prototype = {
 	drawDLO: function(module, overlay, context, scale, gene_name, topx, topy) {
 		var size = 2;
 		//console.log("Drawing " + gene_name);
-		//context.fillStyle = 'rgba(100, 30, 100, 1)';
-		//context.fillRect(topx, topy, (size+2)*scale, size*scale);
 		var bound = null;
 		var drawing_config = navicell.getDrawingConfig(module);
 		for (var num = 1; num <= GLYPH_COUNT; ++num) {
 			if (drawing_config.displayGlyphs(num)) {
 				bound = draw_glyph(module, num, overlay, context, scale, gene_name, topx, topy);
 				if (bound) {
-//					topx = bound[0] + bound[2] - 6;
 					topx = bound[0] + bound[2] - 2;
 				}
 			}
@@ -1246,18 +1255,12 @@ Dataset.prototype = {
 		if (bound) {
 			topx -= 6;
 		}
-		/*
-		if (bound) {
-			topx = bound[0] + bound[2] - 6;
-		}
-			*/
 		if (drawing_config.displayHeatmaps()) {
 			draw_heatmap(module, overlay, context, scale, gene_name, topx, topy);
 		}
 		if (drawing_config.displayBarplots()) {
 			draw_barplot(module, overlay, context, scale, gene_name, topx, topy);
 		}
-		//var gene = this.getGeneByName(gene_name);
 	},
 
 	getClass: function() {return "Dataset";}
@@ -1378,8 +1381,11 @@ var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
 var TABS_DIV_ID = 1;
 var KSUFFIX = 1;
-
 //DisplayContinuousConfig.GRADIENT = true;
+
+DisplayContinuousConfig.LT_MIN = 1;
+DisplayContinuousConfig.GT_MAX = 2;
+
 
 DisplayContinuousConfig.prototype = {
 
@@ -1500,7 +1506,7 @@ DisplayContinuousConfig.prototype = {
 		//this.displayShapes(tabname);
 	},
 
-	getStepIndex: function(config, tabname, value) {
+	getStepIndex: function(config, tabname, value, gradient_mode) {
 		if (value == '') {
 			return 0;
 		}
@@ -1511,7 +1517,17 @@ DisplayContinuousConfig.prototype = {
 		value *= 1.;
 		var values = this.values[tabname][config];
 		var len = values.length;
-		for (var nn = 1; nn < len; ++nn) {
+		var offset = this.has_empty_values ? 1 : 0;
+		if (gradient_mode) {
+			if (value < values[offset]) {
+				return len+DisplayContinuousConfig.LT_MIN;
+			}
+			if (value >= values[len-1]) {
+				return len+DisplayContinuousConfig.GT_MAX;
+			}
+		}
+
+		for (var nn = 1+offset; nn < len; ++nn) {
 			if (value < values[nn]) {
 				return nn-1;
 			}
@@ -1642,8 +1658,8 @@ DisplayContinuousConfig.prototype = {
 	_getColor: function(value, tabname) {
 		var config = 'color';
 		var use_gradient = this.use_gradient[config] && !this.discrete_ordered[tabname];
-		var idx = this.getStepIndex(config, tabname, value);
-		//console.log("idx: " + idx);
+		var idx = this.getStepIndex(config, tabname, value, use_gradient);
+		//console.log("getcolor: " + value + " idx: " + idx);
 		if (idx < 0) {
 			return undefined;
 		}
@@ -1652,31 +1668,23 @@ DisplayContinuousConfig.prototype = {
 			var len = colors.length;
 			//console.log("value : " + value + " len " + len + " " + idx + " " + this.values[tabname][config].length + " lowval=" + this.values[tabname][config][1]);
 			if (idx < 1 && this.has_empty_values) {
-				//console.log("THIS CASE");
 				return colors[0];
 			}
-			/*
-			if (idx < 1) {
-				//console.log("THIS CASE");
-				if (this.has_empty_values) {
-					return colors[0];
-				}
-				return undefined;
+			if (idx == len+DisplayContinuousConfig.LT_MIN) {
+				//console.log("< MIN");
+				var idx_beg = this.has_empty_values?1:0;
+				var color = RGBColor.fromHex(colors[idx_beg]);
+				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
-			*/
-			if (idx+1 >= len) {
-				if (this.has_empty_values) {
-					return colors[0];
-				}
-				return undefined;
+			if (idx == len+DisplayContinuousConfig.GT_MAX) {
+				//console.log(">= MAX");
+				var color = RGBColor.fromHex(colors[len-1]);
+				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
 			var minval = this.getDatatableMinval(config, tabname);
 			var maxval = this.getDatatableMaxval(config, tabname);
-			//console.log("minval : " + minval + " " + maxval);
 			minval = this.values[tabname][config][idx];
 			maxval = this.values[tabname][config][idx+1];
-			//console.log("values : " + this.values[tabname][config][idx] + " " + this.values[tabname][config][idx+1]);
-			//console.log("colors : " + colors[idx] + " " + colors[idx+1]);
 			return get_color_gradient(RGBColor.fromHex(colors[idx]), RGBColor.fromHex(colors[idx+1]), minval, maxval, value).getRGBValue();
 		} else {
 			return colors[idx];
@@ -2845,7 +2853,9 @@ DisplayUnorderedDiscreteConfig.switch_group_tab = function(suffix, doc) {
 	$("#discrete_config_group_" + suffix, doc).css("display", "block");
 }
 
-function HeatmapConfig() {
+function HeatmapConfig(win) {
+	this.win = win;
+	this.setSlider(null);
 	this.reset();
 }
 
@@ -2857,7 +2867,27 @@ HeatmapConfig.prototype = {
 			this.datatables = [];
 			this.setSize(4);
 			this.setScaleSize(4);
+			this.setTransparency(1);
 		}
+	},
+
+	setTransparency: function(transparency) {
+		if (transparency < 1) {
+			transparency = 1;
+		}
+		this.transparency = transparency;
+	},
+
+	getTransparency: function() {
+		return this.transparency;
+	},
+
+	setSlider: function(slider) {
+		this.slider = slider;
+	},
+
+	getSlider: function() {
+		return this.slider;
 	},
 
 	setAllSamples: function() {
@@ -2888,6 +2918,7 @@ HeatmapConfig.prototype = {
 		}
 		this.setSize(heatmap_config.getSize());
 		this.setScaleSize(heatmap_config.getScaleSize());
+		this.setTransparency(heatmap_config.getTransparency());
 	},
 
 	setSize: function(size) {
@@ -3011,7 +3042,9 @@ HeatmapConfig.prototype = {
 // TBD: MUST factorize with HeatmapConfig (probably inheritance)
 //
 
-function BarplotConfig() {
+function BarplotConfig(win) {
+	this.win = win;
+	this.setSlider(null, null);
 	this.reset();
 }
 
@@ -3024,7 +3057,27 @@ BarplotConfig.prototype = {
 			this.setHeight(4);
 			this.setWidth(4);
 			this.setScaleSize(4);
+			this.setTransparency(1);
 		}
+	},
+
+	setTransparency: function(transparency) {
+		if (transparency < 1) {
+			transparency = 1;
+		}
+		this.transparency = transparency;
+	},
+
+	getTransparency: function() {
+		return this.transparency;
+	},
+
+	setSlider: function(slider) {
+		this.slider = slider;
+	},
+
+	getSlider: function() {
+		return this.slider;
 	},
 
 	setAllSamples: function() {
@@ -3056,6 +3109,7 @@ BarplotConfig.prototype = {
 		this.setHeight(barplot_config.getHeight());
 		this.setWidth(barplot_config.getWidth());
 		this.setScaleSize(barplot_config.getScaleSize());
+		this.setTransparency(barplot_config.getTransparency());
 	},
 
 	setWidth: function(width) {
@@ -3179,7 +3233,10 @@ BarplotConfig.prototype = {
 	}
 };
 
-function GlyphConfig() {
+function GlyphConfig(win, num) {
+	this.win = win;
+	this.num = num;
+	this.setCanvasAndSlider(null, null);
 	this.reset();
 }
 
@@ -3192,6 +3249,20 @@ GlyphConfig.prototype = {
 		this.size_datatable = null;
 		this.setSize(4);
 		this.setScaleSize(4);
+		this.setTransparency(1);
+	},
+
+	setCanvasAndSlider: function(drawing_canvas, slider) {
+		this.drawing_canvas = drawing_canvas;
+		this.slider = slider;
+	},
+
+	getSlider: function() {
+		return this.slider;
+	},
+
+	getDrawingCanvas: function() {
+		return this.drawing_canvas;
 	},
 
 	setSize: function(size) {
@@ -3208,6 +3279,17 @@ GlyphConfig.prototype = {
 
 	getScaleSize: function() {
 		return this.scale_size;
+	},
+
+	setTransparency: function(transparency) {
+		if (transparency < 1) {
+			transparency = 1;
+		}
+		this.transparency = transparency;
+	},
+
+	getTransparency: function() {
+		return this.transparency;
 	},
 
 	syncDatatables: function() {
@@ -3287,18 +3369,45 @@ GlyphConfig.prototype = {
 		this.shape_datatable = glyph_config.shape_datatable;
 		this.color_datatable = glyph_config.color_datatable;
 		this.size_datatable = glyph_config.size_datatable;
+		this.transparency = glyph_config.transparency;
+		this.drawing_canvas = glyph_config.drawing_canvas;
 	}
 };
 
-function MapStainingConfig() {
+function MapStainingConfig(win) {
+	this.win = win;
+	this.setCanvasAndSlider(null, null);
 	this.reset();
 }
+
+MapStainingConfig.DEFAULT_TRANSPARENCY = 70;
 
 MapStainingConfig.prototype = {
 
 	reset: function() {
 		this.sample_or_group = null;
 		this.color_datatable = null;
+		this.setTransparency(MapStainingConfig.DEFAULT_TRANSPARENCY);
+	},
+
+	setTransparency: function(transparency) {
+		if (transparency < 1) {
+			transparency = 1;
+		}
+		this.transparency = transparency;
+	},
+
+	getTransparency: function() {
+		return this.transparency;
+	},
+
+	setCanvasAndSlider: function(drawing_canvas, slider) {
+		this.drawing_canvas = drawing_canvas;
+		this.slider = slider;
+	},
+
+	getSlider: function() {
+		return this.slider;
 	},
 
 	syncDatatables: function() {
@@ -3340,6 +3449,7 @@ MapStainingConfig.prototype = {
 
 		this.sample_or_group = map_staining_config.sample_or_group;
 		this.color_datatable = map_staining_config.color_datatable;
+		this.setTransparency(map_staining_config.getTransparency());
 	}
 };
 
@@ -4015,13 +4125,13 @@ function DrawingConfig(win) {
 
 	//this.display_charts = "Heatmap";
 	this.display_charts = 0;
-	this.heatmap_config = new HeatmapConfig();
-	this.editing_heatmap_config = new HeatmapConfig();
-	this.barplot_config = new BarplotConfig();
-	this.editing_barplot_config = new BarplotConfig();
+	this.heatmap_config = new HeatmapConfig(win);
+	this.editing_heatmap_config = new HeatmapConfig(win);
+	this.barplot_config = new BarplotConfig(win);
+	this.editing_barplot_config = new BarplotConfig(win);
 
-	this.map_staining_config = new MapStainingConfig();
-	this.editing_map_staining_config = new MapStainingConfig();
+	this.map_staining_config = new MapStainingConfig(win);
+	this.editing_map_staining_config = new MapStainingConfig(win);
 
 	//this.piechart_config = new PiechartConfig();
 
@@ -4029,8 +4139,8 @@ function DrawingConfig(win) {
 	this.editing_glyph_configs = [];
 	this.display_glyphs = [];
 	for (var num = 1; num <= GLYPH_COUNT; ++num) {
-		this.glyph_configs.push(new GlyphConfig());
-		this.editing_glyph_configs.push(new GlyphConfig());
+		this.glyph_configs.push(new GlyphConfig(win, num));
+		this.editing_glyph_configs.push(new GlyphConfig(win, num));
 		this.display_glyphs.push(0);
 	}
 
@@ -4041,6 +4151,10 @@ function DrawingConfig(win) {
 }
 
 DrawingConfig.prototype = {
+
+	getWindow: function() {
+		return this.win;
+	},
 
 	getHeatmapConfig: function() {
 		return this.heatmap_config;

@@ -5369,6 +5369,7 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.resizable.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.button.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.dialog.js\"></script>");
+			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.slider.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.tabs.js\"></script>");
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");
 			out.println("<script src=\"" + jslib_dir + "/jquery.tablesorter.js\"></script>");

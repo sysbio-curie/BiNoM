@@ -421,7 +421,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
 							//System.out.println("TAG " + tag);
 							if (tag.equals("MAP")) {
-								System.err.println("ATLAS INFO: " + atlasInfo);
+								//System.err.println("ATLAS INFO: " + atlasInfo);
 								mapInfo = atlasInfo.getMapInfo(value);
 								if (mapInfo != null) {
 									value = mapInfo.getName();

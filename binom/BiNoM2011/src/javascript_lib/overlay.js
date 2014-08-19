@@ -18,8 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-//var MAX_SCREEN_WIDTH = 1920;
-//var MAX_SCREEN_HEIGHT = 1200;
 var MAX_SCREEN_WIDTH = 2500;
 var MAX_SCREEN_HEIGHT = 2000;
 var ESP_LATLNG = 0.01;
@@ -59,8 +57,6 @@ function event_ckmap(e, e2, type, overlay) {
 	var div = overlay.div_;
 
 	var found = false;
-	//var module_name = window.document.navicell_module_name;
-	//console.log("module_name: " + module_name + " vs. " + overlay.win.document.navicell_module_name);
 	var module = overlay.win.document.navicell_module_name;
 
 	var jxtree = navicell.mapdata.getJXTree(module);
@@ -98,7 +94,6 @@ function event_ckmap(e, e2, type, overlay) {
 					found = true;
 					break;
 				} else if (type == 'mouseup') {
-					//var button = (window.event ? window.event : overlay.event.button);
 					var button = overlay.event ? overlay.event.button : 0;
 					if (button == 2) {
 						console.log("right button");
@@ -133,14 +128,12 @@ function event_ckmap(e, e2, type, overlay) {
 				var diff_lng = Math.abs(latlng.lng() - this.getPosition().lng());
 				
 				if (diff_lat <= ESP_LATLNG && diff_lng <= ESP_LATLNG) {
-					//console.log("included");
 					if (is_checked) {
 						bubble_open(this);
 					} else {
 						bubble_close(this);
 					}
 				} else {
-					//console.log("NOT included");
 				}
 			});
 		}
@@ -163,7 +156,6 @@ USGSOverlay.prototype.onAdd = function() {
 		return function() { func.apply(thisArg); };
 	}
 
-//	google.maps.event.addListener(this.getMap(), 'bounds_changed', simpleBindShim(this, this.resize));
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
 
 	var overlay = this;
@@ -207,8 +199,6 @@ USGSOverlay.prototype.onAdd = function() {
 		}
 		event_ckmap(e, e2, 'click', overlay);
 	});
-
-	// ....
 
 	google.maps.event.addListener(this.getMap(), 'mousemove', function(e, e2) {
 		var x = e.pixel.x;
@@ -273,7 +263,6 @@ USGSOverlay.prototype.onAdd = function() {
 
 USGSOverlay.prototype.resize = function() {
 	if (this.div_ == null) {
-		//this.onAdd();
 		return;
 	}
 	var overlayProjection = this.getProjection();
@@ -315,9 +304,6 @@ USGSOverlay.prototype.draw = function(module) {
 	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 	this.boundBoxes = [];
 
-	//console.log("displayDLOs: " + navicell.drawing_config.displayDLOs());
-	//console.log("arrpos early: " + this.arrpos.length + " " + navicell.drawing_config.displayDLOs());
-	//console.log("MODULE: " + module + " " + get_module());
 	if (!module) {
 		module = get_module();
 	}
@@ -326,13 +312,10 @@ USGSOverlay.prototype.draw = function(module) {
 	if (!drawing_config.displayDLOs()) {
 		return;
 	}
-	// ----------------------------------------------------------------------------------------
 	if (drawing_config.displayMapStaining()) {
 		draw_voronoi(module, this.context, this.div_);
 	}
-	// ----------------------------------------------------------------------------------------
 
-	// may add another condition, such as drawing_config.blablabla
 	var arrpos = null;
 	if (drawing_config.displayDLOsOnAllGenes()) {
 		this.arrpos = navicell.dataset.getArrayPos(module);
@@ -342,7 +325,6 @@ USGSOverlay.prototype.draw = function(module) {
 
 	var arrpos = this.arrpos;
 	if (arrpos && arrpos.length) {
-		//console.log("drawing " + arrpos.length);
 		var div = this.div_;
 		var overlayProjection = this.getProjection();
 		var mapProjection = this.map_.getProjection();
@@ -351,41 +333,17 @@ USGSOverlay.prototype.draw = function(module) {
 		var MARGIN = 30;
 		var div_width = div.width;
 		var div_height = div.height+MARGIN;
-		//console.log("drawing " + arrpos.length + " points");
 		for (var nn = 0; nn < arrpos.length; ++nn) {
-			//var latlng = map.getProjection().fromPointToLatLng(arrpos[nn].p);
-			//console.log("drawing: " + arrpos[nn].gene_name + " " + arrpos[nn].p.x + " " + arrpos[nn].p.y);
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			/*
-			if (nn == 0) {
-				console.log("DLO: div.left=" + div.left + ", div.top=" + div.top + ", div.width=" + div.width + ", div.height=" + div.height + ", pix.x=" + pix.x + ", pix.y=" + pix.y + " WINDOW: xoffset=" + window.pageXOffset + ", yoffset=" + window.pageYOffset + ", innerWidth=" + window.innerWidth + ", innerHeight=" + window.innerHeight + " " + arrpos[nn].gene_name);
-			}
-			*/
 			var pos_x = pix.x - div.left;
 			var pos_y = pix.y - div.top;
 			if (pos_x > -MARGIN && pos_x < div_width &&
 			    pos_y >= 0 && pos_y < div_height) {
 				navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 			} else {
-				/*console.log(arrpos[nn].gene_name + " not drawn");*/
 			}
 		}
-		
-		/*
-		var latlng0 = mapProjection.fromPointToLatLng(arrpos[0].p);
-		var pix0 = overlayProjection.fromLatLngToDivPixel(latlng0);
-		this.context.strokeStyle = 'orange';
-		this.context.lineWidth = 1;
-		for (var nn = 1; nn < arrpos.length; ++nn) {
-			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
-			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			this.context.beginPath();
-			this.context.moveTo(pix0.x-div.left, pix0.y-div.top);
-			this.context.lineTo(pix.x-div.left, pix.y-div.top);
-			this.context.stroke();
-		}
-		*/
 	}
 }
 
@@ -398,18 +356,9 @@ USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type, hint) {
 }
 
 USGSOverlay.prototype.remove_old = function(rm_arrpos) {
-	//console.log("trying to remove: " + rm_arrpos.length + " " + this.arrpos.length);
 	if (!rm_arrpos.length) {
 		return;
 	}
-	/*
-	for (var jj = 0; jj < rm_arrpos.length; ++jj) {
-		console.log("rm_pos " + rm_arrpos[jj].id);
-	}
-	for (var jj = 0; jj < this.arrpos.length; ++jj) {
-		console.log("pos " + this.arrpos[jj].id);
-	}
-	*/
 	var arrpos = [];
 	for (var ii = 0; ii < this.arrpos.length; ++ii) {
 		var pos = this.arrpos[ii];

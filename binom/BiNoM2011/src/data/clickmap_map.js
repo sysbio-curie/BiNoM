@@ -48,43 +48,23 @@ var ICON_VBIG_ANCHOR_Y = 68
 
 var icon_map = {};
 
-/*
-var jtree;
-var map;
-var projection;
-var to_open;
-
-var maps;
-
-var new_markers;
-
-var marker_list = [];
-var checked_elements = {};
-
-var refreshing = false;
-*/
 var bubble_list = [];
 
 function CHECK_NO_JXTREE(fun) {
 	if (use_jxtree) {
 		console.log("the function \"" + fun + "\" should NOT be used with jxtree");
-		//dummy_function();
 	}
 }
 
 function panMapToBounds_jxtree(map, bounds)
 {
-	if (bounds && bounds.length > 0) {
-		var map_bound = map.getBounds();
-		//console.log("map_bounds: " + map_bound);
+	var map_bound = map.getBounds();
+	if (bounds && bounds.length > 0 && map_bound) {
 		for (var nn = 0; nn < bounds.length; ++nn) {
-			//console.log("bounds[" + nn + "]" + bounds[nn]);
 			if (map_bound.intersects(bounds[nn])) {
 				return;
 			}
 		}
-
-		//console.log("panToBounds: " + bounds[0]);
 		map.panToBounds(bounds[0]);
 	}
 }
@@ -186,33 +166,15 @@ function setup_icons()
 	icon_map["REACTION:INCLUDED"] = colored_icon("00AA00", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
 
 	icon_map["MODULE"] = colored_icon("5555FF", ICON_BIG_W, ICON_BIG_H, ICON_BIG_ANCHOR_X, ICON_BIG_ANCHOR_Y);
-	//icon_map["MODULE:INCLUDED"] = colored_icon("5555FF", ICON_SMALL_W, ICON_SMALL_H, ICON_SMALL_ANCHOR_X, ICON_SMALL_ANCHOR_Y);
-//	icon_map["MAP"] = colored_icon("5555FF", ICON_VBIG_W, ICON_VBIG_H, ICON_VBIG_ANCHOR_X, ICON_VBIG_ANCHOR_Y);
-
-		/*
-	var complex_new_icon = custom_icon("../../../map_icons/entity/COMPLEX2.png");
-	var complex_old_icon = custom_icon("../../../map_icons/entity/COMPLEX2_O.png");
-	icon_map["COMPLEX"] = make_icon(complex_old_icon, complex_new_icon);
-	*/
 
 	var complex_icon = custom_icon("../../../map_icons/entity/ACSN_complex_marker_small.png");
 	icon_map["COMPLEX"] = make_icon(complex_icon, complex_icon);
-	//var complex_included_icon = custom_icon("../../../map_icons/entity/ACSN_complex_marker_small.png");
-	//icon_map["COMPLEX:INCLUDED"] = make_icon(complex_icon, complex_icon); // non sense
-	//icon_map["COMPLEX"] = colored_icon("D6AAaa", ICON_MEDIUM_W, ICON_MEDIUM_H, ICON_MEDIUM_ANCHOR_X, ICON_MEDIUM_ANCHOR_Y);
-
-	/*
-	icon_shadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
-	        new google.maps.Size(40, 37),
-	        new google.maps.Point(0, 0),
-	        new google.maps.Point(12, 35));	*/
 }
 
 function get_icon(cls) {
 	if (icon_map[cls]) {
 		return icon_map[cls];
 	}
-	//console.log("not found for [" + cls + "]");
 	return medium_icon;
 }
 
@@ -252,9 +214,7 @@ function set_old_markers_color(val)
 	for (var nn = 0; nn < marker_list.length; ++nn) {
 		var marker = marker_list[nn];
 		if (marker.type == "old") {
-			//console.log("found an old marker");
 			marker.setIcon(val ? marker.getIcon().old_icon : marker.getIcon().new_icon);
-			//marker.setVisible(true); // bad idea to make them visible back
 		}
 	}
 }
@@ -286,7 +246,6 @@ if (!window.console) {
 
 function extend(bounds, marker)
 {
-//	bounds.extend(marker.getPosition());
 	var marker_width = 20; // should calculate this from the shape
 	var marker_height = 33; // should calculate this from the shape
 	
@@ -307,7 +266,6 @@ var check_node_inhibit = false;
 
 function show_markers_ref(markers, ref)
 {
-	console.log("show_markers_ref: " + markers.length);
 	if (use_jxtree) {
 		var jxtree = navicell.mapdata.getJXTree(window.document.navicell_module_name);
 		$.each(markers, function() {
@@ -338,7 +296,6 @@ function show_markers_ref(markers, ref)
 			(
 				function ()
 				{
-//					alert("show_markers_ref lookup " + this + " for " + id);
 					get_markers_for_modification(this, projection, map);
 					if (navicell.dataset) {
 						var gene_info = navicell.dataset.getGeneInfoByModifId(window.document.navicell_module_name, this.id);
@@ -380,15 +337,16 @@ function show_markers_ref(markers, ref)
 
 function show_markers(markers)
 {
-	var ref = jQuery.jstree._reference(jtree);
-	show_markers_ref(markers, ref);
+	if (!use_jxtree) {
+		var ref = jQuery.jstree._reference(jtree);
+		show_markers_ref(markers, ref);
+	}
 }
 
 function jstree_uncheck_all()
 {
 	CHECK_NO_JXTREE("jstree_uncheck_all");
 	hide_all_markers();
-	//jtree.jstree("uncheck_node", jquery_to_dom($(".jstree-checked")));
 	jtree.jstree("uncheck_all");
 	overlay.reset();
 	overlay.draw(window.document.navicell_module_name);
@@ -523,7 +481,6 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 					return null;
 			
 				var r = coord.x + "_" + coord.y;
-				//return "tiles/" + zoom + "/" + r + navicell.mapTypes.tile_suffix + ".png";
 				return "tiles/" + zoom + "/" + r + navicell.getMapTypes(get_module()).tile_suffix + ".png";
 			},
 			tileSize : new google.maps.Size(tile_width, tile_height),
@@ -606,7 +563,6 @@ function get_markers_for_modification(element, projection, map)
 					{
 						if (element.bubble == null)
 						{
-	//						var ln = data.inst.get_text(element, 'ln');
 							var ln = jtree.jstree("get_text", element, "ln");
 							element.bubble = new google.maps.InfoWindow
 							(
@@ -633,7 +589,6 @@ function get_markers_for_modification(element, projection, map)
 				}
 			);
 			element.id = id; // EV 2013-08-27
-//			console.log($(element).attr("id"), "created", element.markers.length);
 		}
 	}
 	return element.markers;
@@ -685,8 +640,11 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
         		search_field.blur();
     			var val = $(this).val().trim();
 			if (use_jxtree) {
-				//navicell.mapdata.findJXTree(window.document.navicell_module_name, val, false, 'select');
-				if (val == '@nv2') {
+				if (val[0] == '@' && val[1] == '!' && val[2] == '!') {
+					$("#command-dialog").dialog("open");
+				} else if (val[0] == '@' && val[1] == '!') { // for instance: @! nv_find_entities(window, "C.*")
+					window.eval(val.substring(2));
+				} else if (val == '@nv2') {
 					nv2();
 				} else if (val == '@nv1') {
 					nv1();
@@ -710,14 +668,12 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 		}
 	});
 
-	//build_entity_tree_when_ready(window, selector, projection, whenloaded);
 	build_entity_tree_when_ready(window, selector, null, whenloaded);
 }
 
 function build_jstree(selector, source, map, projection, whenloaded, firstEntityName)
 {
 	CHECK_NO_JXTREE("build_jstree");
-	console.log("search setup");
 	
 	var tree = $(selector);
 	var search_field = $('#query_text');
@@ -774,7 +730,6 @@ function build_jstree(selector, source, map, projection, whenloaded, firstEntity
 			plugins : [ "themes", "search", "xml_data", "ui", "checkbox", "languages" ],
 			html_titles : true
 		}).bind("uncheck_node.jstree", function(event, data) {
-			//console.log("uncheck_node " + data.args[0]);
 			var rm_arrpos = [];
 			var f = function(index, element)
 			{
@@ -801,24 +756,18 @@ function build_jstree(selector, source, map, projection, whenloaded, firstEntity
 					}
 				}
 			};
-			/*try*/ {
+			{
 				$(this).jstree("get_unchecked", data.args[0], true).filter(filter).each(f);
 				if (data.args[0].parentNode) {
 					$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 				} else {
-					console.log("parent is null");
 				}
 				if (overlay && rm_arrpos.length) {
 					overlay.remove(rm_arrpos);
 					overlay.draw(window.document.navicell_module_name);
 				}
-			} /*catch(f) {
-				console.log("get_unchecked error: " + f);
-			}*/
-		/*}).bind("before.jstree", function(event, data) {
-			console.log("before.jstree: " + data.func + " " + data.args[0]);*/
+			}
 		}).bind("check_node.jstree", function(event, data) {
-			//console.log("check_node " + data + " " + data.args[0]);
 			if (check_node_inhibit) {
 				return;
 			}
@@ -830,12 +779,6 @@ function build_jstree(selector, source, map, projection, whenloaded, firstEntity
 			var bounds = new google.maps.LatLngBounds();
 			var f = function(index, element)
 			{
-				/*
-				for (var kk in event) {
-					console.log("event[" + kk + "] = " + event[kk]);
-				}
-				console.log("INDEX: " + index + " " + element + " " + data.args[0] + " class=" + $(element).attr("class") + " id=" + $(element).attr("id") + " type=" + $(element).attr("type"));
-				*/
 				get_markers_for_modification(element, projection, map);
 				
 				if (navicell.dataset) {
@@ -871,29 +814,23 @@ function build_jstree(selector, source, map, projection, whenloaded, firstEntity
 				}
 			};
 			
-			/*try*/ {
+			{
 				jtree.jstree("get_checked", data.args[0], true).filter(filter).each(f);
 				if (data.args[0].parentNode) {
 					$(data.args[0].parentNode.parentNode).filter(filter).each(f);
 				}
-			} /*catch(f) {
-				console.log("get_checked error: " + f);
-			}*/
-			//				jtree.jstree("get_checked", data.args[0], true).each(f);
-			//				$(data.args[0].parentNode.parentNode).each(f);
+			}
 			panMapToBounds(map, bounds);
 			check_node_inhibit = false;
 			if (overlay) {
 				overlay.draw(window.document.navicell_module_name);
 			}
 		}).bind("search.jstree", function (e, data) {
-//			alert("Found " + data.rslt.nodes.length + " nodes matching '" + data.rslt.str + "'.");
 		});
 };
 
 function open_blog_click(e)
 {
-	console.log("open_blog_click");
 	try
 	{
 		show_blog(e.currentTarget.alt);
@@ -930,7 +867,6 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 	use_jxtree = !source;
 	document.win = window;
 
-	console.log("clickmap_start ... ", to_open, window.to_open);
 	if (!maps)
 	{
 		maps = Object();
@@ -949,7 +885,6 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		if (use_jxtree) {
 			$("#loading-jxtree").css("display", "none");
 		}
-		console.log("when ready", to_open);
 		if (to_open && to_open.length > 0)
 		{
 			if (use_jxtree) {
@@ -960,21 +895,14 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 				var e = $(panel_selector).find("#entities"); // $("#entities");
 				data.inst.open_all(e, false); // otherwise the tree is not checked
 				show_markers_ref(to_open, data.inst);
-				//			data.inst.close_all(e, false); // -1 closes all nodes in the container
-				//			data.inst.open_node(e, false, true);
 				var children = data.inst._get_children(e);
 				for (var i = 0; i < children.length; i++) {
 					data.inst.close_all(children[i], false);
 				}
 			}
 		}
-		//dbg_sleep(3000);
-		//console.log("AFTER SLEEP ", (window.to_open ? window.to_open : []));
-
-		//to_open = [];
 		$("img.blogfromright").click(open_blog_click);
 		$("img.mapmodulefromright").click(open_module_map_click);
-		//console.log("to_open set", to_open, to_open.length);
 	
 	};
         start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
@@ -983,11 +911,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		var blog = maps[""];
 		if (blog && !blog.closed)
 		{
-			//console.log("tell_opener yes", blog, maps);
 			blog.maps = maps;
-		}
-		else {
-			//console.log("tell_opener no", maps);
 		}
 	};
 	tell_opener();
@@ -999,9 +923,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 function show_blog(postid)
 {
 	var ori_postid = postid;
-	//console.log("show_blog " + postid);
 	if (parseInt(postid) != postid) {
-		//console.log("SHOULD search for " + postid + " -> " + navicell.mapdata.getPostModuleLink(postid));
 		postid = navicell.mapdata.getPostModuleLink(postid);
 		if (!postid) {
 			return;
@@ -1022,11 +944,9 @@ function show_blog(postid)
 
 function show_map_and_markers(map_name, ids)
 {
-	console.log("show_map_and_markers", map_name, ids);
 	var map = maps[map_name];
 	if (map && !map.closed)
 	{
-		console.log("map already open");
 		if (!map.to_open)
 			map.to_open = ids;
 		else if (map.to_open.length < 1)
@@ -1037,8 +957,6 @@ function show_map_and_markers(map_name, ids)
 	}
 	else
 	{
-		//console.log("not open is map", map, maps);
-		console.log("map not open");
 		if (map_name.indexOf(".html") > 0) {
 			map = window.open(map_name);
 		} else {
@@ -1048,9 +966,7 @@ function show_map_and_markers(map_name, ids)
 		map.maps = maps;
 		map.navicell = navicell;
 		map.document.map_name = map_name;
-		// EV: 2014-03-24: WARNING: disconnected the following line
 		maps[map_name] = map;
-		// EV: 2014-04-15: WARNING: reconnected the previous line
 	}
 }
 
@@ -1061,8 +977,6 @@ function uncheck_all_entities(win)
 	}
 
 	if (use_jxtree) {
-		// but... the uncheck could be per tree !
-		//console.log("MODULE_NAME: " + win.document.navicell_module_name);
 		var jxtree = navicell.mapdata.getJXTree(win.document.navicell_module_name);
 		if (jxtree) {
 			$.each(jxtree.getRootNodes(), function() {
@@ -1075,11 +989,6 @@ function uncheck_all_entities(win)
 				this.checkSubtree(false);
 			});
 		}
-		/*
-		if (overlay) {
-			overlay.draw(window.document.navicell_module_name);
-		}
-		*/
 	} else if (jQuery.jstree._reference(jtree)) {
 		jQuery.jstree._reference(jtree).uncheck_all();
 	}
@@ -1177,7 +1086,6 @@ function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 		(
 			marker, 'click', function()
 			{
-				//console.log("has clicked");
 				bubble_toggle(this);
 			}
 		);
@@ -1198,7 +1106,6 @@ function tree_context_epilogue(tree_context) {
 function tree_node_click_before(tree_context, checked) {
 	if (!checked) {
 		tree_context_prologue(tree_context);
-		//make_new_markers_old();
 		new_markers = Array();
 	}
 }

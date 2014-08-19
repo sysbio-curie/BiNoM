@@ -944,3 +944,15 @@ div.tablesorterPager input {
 .search-label {
     font-weight: bold;
 }
+
+#command-dialog {
+    font-size: small;
+}
+
+#command-dialog h3, #command-dialog h4 {
+    text-align: center;
+}
+
+#command-history {
+    margin-right: 25px;
+}

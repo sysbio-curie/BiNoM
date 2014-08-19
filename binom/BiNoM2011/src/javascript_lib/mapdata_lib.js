@@ -97,9 +97,7 @@ if (!Number.MIN_NUMBER) {
 var INPUT_SEPS = ["\t", ";", ",", " "];
 var COLOR_SIZE_CONFIG = "color_size";
 var EDITING_CONFIGURATION = "configuration not applied...";
-//var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[NO&nbsp;SAMPLE]</span>";
 var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[gene&nbsp;list]</span>";
-//var GENE_SET = "<span style='font-style: italic; font-size: smaller'>[GENE]</span>";
 var GENE_SET = "[GENE]";
 var INVALID_VALUE = '* INVALID *';
 
@@ -115,7 +113,7 @@ function load_info(url, module_name)
 				       dataType: 'json',
 				       cache: false,
 				       success: function(data) {
-					       console.log("navicell: info [" + url + "] loaded #" + nn);
+					       //console.log("navicell: info [" + url + "] loaded #" + nn);
 				       }
 			       });
 		}
@@ -127,12 +125,12 @@ function load_info(url, module_name)
 		       dataType: 'json',
 		       
 		       success: function(data) {
-			       console.log("navicell: info [" + url + "] loaded !");
+			       //console.log("navicell: info [" + url + "] loaded !");
 			       navicell.mapdata.addInfo(module_name, data);
 		       },
 			       
 		       error: function() {
-			       console.log("navicell: error loading [" + url + "] jxtree");
+			       //console.log("navicell: error loading [" + url + "] jxtree");
 		       }
 	       }
 	      );
@@ -147,12 +145,12 @@ function load_voronoi(url, module_name)
 		       dataType: 'text',
 		       
 		       success: function(data) {
-			       console.log("navicell: voronoi [" + url + "] loaded !");
+			       //console.log("navicell: voronoi [" + url + "] loaded !");
 			       navicell.mapdata.addVoronoiCells(module_name, data);
 		       },
 			       
 		       error: function() {
-			       console.log("navicell: error loading voronoi [" + url + "]");
+			       //console.log("navicell: error loading voronoi [" + url + "]");
 		       }
 	       }
 	      );
@@ -171,10 +169,12 @@ jxtree_mapfun_map['label'] = function(datanode) {
 		return datanode.name;
 	}
 	if (!datanode.label) {
+		/*
 		console.log("NULL LABEL " + datanode + " " + mapSize(datanode));
 		for (var key in datanode) {
 			console.log(key + " -> " + datanode[key].length);
 		}
+		*/
 		return datanode["class"];
 	}
 	return datanode.label;
@@ -351,21 +351,16 @@ function VoronoiCells(module_name, data) {
 					found++;
 				} else {
 					not_found++;
-					//console.log("SHAPE_ID " + arr[kk] + " not found");
 				}
 			}
 		}
 		voronoiShapeMap[shape_id] = [points, neighbourghs];
-		// note: cannot really use shmap at this point as it may be not completely loaded
-		//console.log("SHA " + shape_id + " => " + shMap[shape_id][0].length + " " + shMap[shape_id][1].length + " found: " + shmap[shape_id]);
 		if (shape_map && shape_map[shape_id]) {
 			found++;
 		} else {
 			not_found++;
-			//console.log("SHAPE_ID " + shape_id + " not found");
 		}
 	}
-	console.log("FOUND " + found + " " + not_found);
 	this.voronoiShapeMap = voronoiShapeMap;
 }
 
@@ -388,17 +383,11 @@ function Mapdata(to_load_count) {
 	this.voronoi_ready = {};
 	this.deferred_module_bubble = {};
 	this.module_postid = {};
-//	this.reset();
 }
 
-//var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>", "g");
-//var CLEAN_HTML_REGEX_NBSP = new RegExp("&nbsp;", "g");
 var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>|&nbsp;", "g");
-//var TAG_REGEX = new RegExp("\\w+:\\w+", "g");
-//var TAG_REGEX = new RegExp("\\w+:\\w+|/\\w+", "g");
 var TAG_REGEX = new RegExp(">\\w+:\\w+</a>|&nbsp;(\\w| )+&nbsp;", "g");
 var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
-//var LINE_BREAK_REGEX = /[\r\n]+/;
 var LINE_BREAK_REGEX = /\r\n?|\n/;
 var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
 var NUM_REGEX = new RegExp("^-?[0-9]+(\.[0-9]*)?$");
@@ -437,7 +426,6 @@ Mapdata.prototype = {
 
 	useJXTreeSimpleFind: function(jxtree) {
 		var user_find = jxtree.user_find;
-//		jxtree.userFind(jxtree_user_find_id);
 		jxtree.userFind(jxtree_user_find_id_regex);
 		return user_find;
 	},
@@ -476,11 +464,9 @@ Mapdata.prototype = {
 				var dialog = $("#info_dialog", win.document);
 				var msg = hints.error ? hints.error : hints.help;
 				var title = hints.error ? "Searching Error" : "Search Help";
-//				dialog.html("<div style='text-align: vertical-center'><h3>" + title + "</h3>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
 				dialog.html("<div style='text-align: vertical-center'>" + "<br/>" + msg.replace(new RegExp("\n", "g"), "<br>") + "</div>");
 				dialog.dialog({
 					autoOpen: false,
-					//resizable: true,
 					width: 430,
 					height: 750,
 					modal: false,
@@ -536,7 +522,6 @@ Mapdata.prototype = {
 		hints.class_list = this.class_list;
 		this.whenInfoReady(module_name, function() {
 			var jxtree = mapdata.module_jxtree[module_name];
-			// so ?
 			if (no_ext) {
 				var to_find_str = "^(";
 				for (var nn = 0; nn < to_find.length; ++nn) {
@@ -546,17 +531,14 @@ Mapdata.prototype = {
 					to_find_str += to_find[nn];
 				}
 				to_find_str += ")$";
-				//console.log("to_find_str [" + to_find_str + "]");
 				hints.case_sensitive = true;
 				mapdata.searchFor(win, to_find_str, hints.div);
-				//mapdata.findJXTreeContinue(jxtree, to_find_str, no_ext, win, action, hints, module_name);
 				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints);
 			} else {
 				mapdata.searchFor(win, to_find, hints.div);
 				setTimeout(function() {
 					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
 				}, 20);
-				//mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
 			}
 
 			return;
@@ -578,7 +560,6 @@ Mapdata.prototype = {
 				var tmap = {};
 				for (var nn = 0; nn < arr.length; ++nn) {
 					var tag = arr[nn].replace(TAG_CLEAN_REGEX, "");
-					//console.log("tag [" + tag + "]");
 					tmap[tag] = 1;
 				}
 				tag_map[id] = tmap;
@@ -590,7 +571,6 @@ Mapdata.prototype = {
 	},
 
 	addVoronoiCells: function(module_name, data) {
-		console.log("adding voronoi");
 		this.module_voronoi[module_name] = new VoronoiCells(module_name, data);
 		this.voronoi_ready[module_name].resolve();
 	},
@@ -651,35 +631,23 @@ Mapdata.prototype = {
 	buildEntityTreeWhenReady: function(win, div_name, projection, whenloaded) {
 		var map = win.map;
 		var module_name = map.map_name;
-		win.console.log("buildEntityTreeWhenReady module_name: " + module_name);
 		if (this.isReady(module_name)) {
 			this.buildEntityTree(win, div_name, projection, whenloaded);
 		} else {
 			var mapdata = this;
 			this.whenReady(module_name, function() {
 				mapdata.buildEntityTree(win, div_name, projection, whenloaded);
-				console.log("TREE is ready");
 			});
 		}
 	},
 
 	buildEntityTree: function(win, div_name, projection, whenloaded) {
-		//var module_map = this.module_mapdata[module_name];
 		var map = win.map;
 		var module_name = map.map_name;
 		var data = this.straight_data[module_name];
-		win.console.log("building tree for " + module_name + " " + div_name + " " + $(div_name, win.document).get(0));
 
 		var datatree;
-		//if (module_name == "master") {
-		win.console.log("children: " + mapSize(data));
 		if (module_name.match(/master$/)) {
-			//if (!this.maps_modules) {
-			//this.maps_modules = data[data.length-1];
-			//data.pop();
-			//}
-			//datatree = [this.maps_modules, {name: 'Entities', children: data}];
-			// warning: I think this leads to a bug...
 			var maps_modules = data[data.length-1];
 			var cls = maps_modules["class"];
 			if (cls == "MAP" || cls == "MODULE") {
@@ -697,9 +665,7 @@ Mapdata.prototype = {
 			this.toggleOpen();
 		});
 
-		//jxtree.userFind(jxtree_user_find);
 		jxtree.userFind(jxtree_user_find_regex);
-		win.console.log("JXTREE count: " + jxtree.getNodeCount());
 
 		jxtree.context = {win: win};
 
@@ -718,21 +684,17 @@ Mapdata.prototype = {
 
 		jxtree.checkStateChanged(function(node, state) {
 			var data = node.getUserData();
-			//console.log("checking node: " + (data ? data.id : null));
 			if (data && data.id) {
 				var checked = state == JXTree.CHECKED;
 				if (!data.clickmap_tree_node) {
 					var info = mapdata.getMapdataById(module_name, data.id);
 					if (info && info.positions) {
-						//win.console.log("state changed: " + node.label + " " + data.id + " " + jxtree_get_node_class(node) + " " + map.map_name);
 						var cls = jxtree_get_node_class(node);
 						data.clickmap_tree_node = new win.ClickmapTreeNode(map, module_name, data.id, cls, node.label, info.positions, mapdata);
 						mapdata.module_classes[module_name][data.id] = cls;
 					} else {
-						//console.log("no info for [" + module_name + "][" + data.id + "]");
 					}
 				}					
-				//console.log((checked ? "checked " : "unchecked") + data.id);
 				win.tree_node_state_changed(node.jxtree.context, data.clickmap_tree_node, checked);
 			}
 		});
@@ -762,7 +724,6 @@ Mapdata.prototype = {
 			bubble.setContent("<div class=\"info_window\">" + bubble_content + "</div>");
 		} else {
 			bubble.setContent("Loading data...");
-			console.log("LOADING DATA [" + module_name + "][" + data_id + "]");
 			if (!this.deferred_module_bubble[module_name][data_id]) {
 				this.deferred_module_bubble[module_name][data_id] = [];
 			}
@@ -796,36 +757,25 @@ Mapdata.prototype = {
 				this.class_list[module_mapdata[ii]["class"]] = true;
 			}
 			if (postinf) {
-				//console.log("GOT up level post information: " + postinf);
 				postinf = postinf.split(" ");
 				this.module_postid[postinf[0]] = postinf[1];
 			}
-			//console.log("modules " + modules + " " + entities + " " + module_mapdata[ii]["class"]);
-			//console.log(module_mapdata[ii]["class"]);
 			if (maps) {
-				//console.log("FOUND maps: " + maps.length);
 				for (var jj = 0; jj < maps.length; ++jj) {
 					var map = maps[jj];
-					console.log("map.id " + map.id);
 					this.module_mapdata_by_id[module_name][map.id] = map;
 					var map_modules = map.modules;
 					if (map_modules) {
-						//console.log("  FOUND map_modules: " + map_modules.length);
 						for (var kk = 0; kk < map_modules.length; ++kk) {
 							var module = map_modules[kk];
-							//console.log("  module.id " + module.id);
 							this.module_mapdata_by_id[module_name][module.id] = module;
-							//console.log("setting info for [" + module_name + "][" + module.id + "]");
 						}
 					}
 				}
 			} else if (modules) {
-				//console.log("FOUND modules: " + modules.length);
 				for (var jj = 0; jj < modules.length; ++jj) {
 					var module = modules[jj];
-					//console.log("module.id " + module.id);
 					if (module.postinf) {
-						//console.log("GOT post information: " + module.postinf);
 						var postinf = module.postinf.split(" ");
 						this.module_postid[postinf[0]] = postinf[1];
 					}
@@ -852,11 +802,6 @@ Mapdata.prototype = {
 						for (var kk = 0; kk < modif_arr.length; ++kk) {
 							var modif = modif_arr[kk];
 							var o_modif = this.module_mapdata_by_id[module_name][modif.id];
-							/*
-							if (modif.positions && o_modif && o_modif.positions) {
-								console.log("WARNING: should compare positions " + modif_map[modif.id] + " " + modif.positions[0].x + " " + o_modif.positions[0].x);
-							}
-							*/
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
 							if (modif.positions) {
 								modif_map[modif.id] = [];
@@ -875,12 +820,9 @@ Mapdata.prototype = {
 						}
 					}
 				}
-			} else {
-				console.log("no entities neither modules");
 			}
 		}
 	
-		console.log("module map added " + module_name);
 		this.module_modif_map[module_name] = modif_map;
 		this.module_shape_map[module_name] = shape_map;
 		return !--this.to_load_count;
@@ -909,10 +851,7 @@ Mapdata.prototype = {
 			       
 			       success: function(data) {
 				       mapdata.straight_data[module_name] = data;
-				       console.log("navicell: " + module_name + " data loaded");
 				       if (mapdata.addModuleMapdata(module_name, data)) {
-					       console.log("now all is ready " + url);
-					       //mapdata.ready.resolve();
 				       }
 				       mapdata.ready[module_name].resolve();
 			       },
@@ -949,12 +888,10 @@ function mapdata_display_markers(module_name, win, hugo_names)
 			if (modif_arr) {
 				for (var kk = 0; kk < modif_arr.length; ++kk) {
 					var modif = modif_arr[kk];
-					// >> getting positions
 					var positions = modif.positions;
 					if (positions) {
 						id_arr.push(modif.id);
 					}
-					// << getting positions
 				}
 			}
 		}
@@ -987,7 +924,6 @@ JXTreeScanner.prototype = {
 	},
 
 	getArrayPos: function() {
-		//console.log("jxtreescanner: " + this.arrpos.length);
 		return this.arrpos;
 	}
 };
@@ -1083,7 +1019,6 @@ Dataset.prototype = {
 	},
 
 	getGeneInfoByModifId: function(module_name, modif_id) {
-		//console.log("getGeneInfoByModifId module_name: " + module_name + " " + navicell_module_name);
 		if (this.modifs_id[module_name]) {
 			return this.modifs_id[module_name][modif_id];
 		}
@@ -1098,7 +1033,6 @@ Dataset.prototype = {
 	},
 
 	syncModifs: function() {
-		console.log("syncModifs starting " + mapSize(this.genes));
 		this.modifs_id = {};
 		this.gene_shape_map = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
@@ -1114,7 +1048,6 @@ Dataset.prototype = {
 				}
 				for (var ii = 0; ii < entity_map_arr.length; ++ii) {
 					var entity_map = entity_map_arr[ii];
-					//if (entity) {
 					var modif_arr = entity_map.modifs;
 					if (modif_arr) {
 						for (var nn = 0; nn < modif_arr.length; ++nn) {
@@ -1126,7 +1059,6 @@ Dataset.prototype = {
 									var pos = positions[kk];
 									arrpos.push({id : modif.id, p : new google.maps.Point(pos.x, pos.y), gene_name: gene_name});
 									if (pos.said) {
-										//console.log("POS.SAID: " + pos.said + " => " + gene_name);
 										this.gene_shape_map[module_name][pos.said] = gene_name;
 										gene.addShapeId(module_name, pos.said);
 									}
@@ -1137,7 +1069,6 @@ Dataset.prototype = {
 					}
 				}
 			}
-			//console.log("syncModifs " + module_name + " " + mapSize(this.modifs_id[module_name]));
 		}
 
 		this.module_arrpos = {};
@@ -1241,7 +1172,6 @@ Dataset.prototype = {
 
 	drawDLO: function(module, overlay, context, scale, gene_name, topx, topy) {
 		var size = 2;
-		//console.log("Drawing " + gene_name);
 		var bound = null;
 		var drawing_config = navicell.getDrawingConfig(module);
 		for (var num = 1; num <= GLYPH_COUNT; ++num) {
@@ -1381,7 +1311,6 @@ var STEP_MAX_SIZE = 36.;
 var DISCRETE_SIZE_COEF = 2.;
 var TABS_DIV_ID = 1;
 var KSUFFIX = 1;
-//DisplayContinuousConfig.GRADIENT = true;
 
 DisplayContinuousConfig.LT_MIN = 1;
 DisplayContinuousConfig.GT_MAX = 2;
@@ -1413,13 +1342,10 @@ DisplayContinuousConfig.prototype = {
 		step_cnt *= 1.;
 		var step_cnt_1 = this.use_gradient[config] ? step_cnt+1 : step_cnt;
 		var keep = this.values[tabname][config] && step_cnt_1 == this.getStepCount(config, tabname);
-		//console.log("KEEPING for config " + tabname + " " + config + " " + step_cnt + " " + (this.values[tabname][config] ? this.getStepCount(config, tabname) : -1) + " keep=" + keep);
 		this.values[tabname][config] = [];
 		var values = this.values[tabname][config];
 		var minval = this.getDatatableMinval(config, tabname);
 		var maxval = this.getDatatableMaxval(config, tabname);
-		//values.push(minval);
-		//var step = (maxval - minval)/(step_cnt+1);
 		if (this.discrete_ordered[tabname]) {
 			if (this.has_empty_values) {
 				values.push(Number.MIN_NUMBER);
@@ -1428,17 +1354,14 @@ DisplayContinuousConfig.prototype = {
 			for (var idx in discrete_values) {
 				var value = discrete_values[idx];
 				if (!is_empty_value(value)) {
-					//console.log("pushing " + value);
 					values.push(value);
 				}
 			}
 		} else {
 			var step = (maxval - minval)/(step_cnt);
-			//		console.log("step_cnt: " + step_cnt + " step: " + step + " " + minval + " " + this.datatable.maxval);
 			if (this.has_empty_values) {
 				values.push(Number.MIN_NUMBER);
 			}
-			//console.log("HAS EMPTY VALUE: " + this.has_empty_values);
 			values.push(minval);
 			for (var nn = 0; nn < step_cnt-1; ++nn) {
 				var value = minval + (nn+1.)*step;
@@ -1469,13 +1392,10 @@ DisplayContinuousConfig.prototype = {
 
 
 	setStepInfo: function(config, tabname, idx, value, color, size, shape) {
-		//console.trace();
-		//console.log("setting at idx=" + idx + " value=" + value + " color=" + color + " " + size + " shape=" + shape);
 		if (value != Number.MIN_NUMBER) {
 			var idx_1 = this.use_gradient[config] ? idx : idx+1;
 			this.values[tabname][config][idx_1] = value;
 		} else {
-			//console.log("VALUE=" + this.values[tabname][config][idx+1]);
 		}
 		this.colors[tabname][config][idx] = color;
 		this.sizes[tabname][config][idx] = size;
@@ -1503,7 +1423,6 @@ DisplayContinuousConfig.prototype = {
 		for (var ii = beg; ii < step_cnt; ++ii) {
 			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii-beg].getRGBValue(), 4+2*ii, ii);
 		}
-		//this.displayShapes(tabname);
 	},
 
 	getStepIndex: function(config, tabname, value, gradient_mode) {
@@ -1573,7 +1492,6 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	setGroupMethod: function(config, group_method) {
-		//console.log("setting group method " + config + " " + group_method);
 		this.group_method[config] = group_method;
 		this.use_absval['group'][config] = 
 			group_method == Group.CONTINUOUS_ABS_AVERAGE ||
@@ -1659,25 +1577,21 @@ DisplayContinuousConfig.prototype = {
 		var config = 'color';
 		var use_gradient = this.use_gradient[config] && !this.discrete_ordered[tabname];
 		var idx = this.getStepIndex(config, tabname, value, use_gradient);
-		//console.log("getcolor: " + value + " idx: " + idx);
 		if (idx < 0) {
 			return undefined;
 		}
 		var colors = this.colors[tabname][config];
 		if (use_gradient) {
 			var len = colors.length;
-			//console.log("value : " + value + " len " + len + " " + idx + " " + this.values[tabname][config].length + " lowval=" + this.values[tabname][config][1]);
 			if (idx < 1 && this.has_empty_values) {
 				return colors[0];
 			}
 			if (idx == len+DisplayContinuousConfig.LT_MIN) {
-				//console.log("< MIN");
 				var idx_beg = this.has_empty_values?1:0;
 				var color = RGBColor.fromHex(colors[idx_beg]);
 				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
 			if (idx == len+DisplayContinuousConfig.GT_MAX) {
-				//console.log(">= MAX");
 				var color = RGBColor.fromHex(colors[len-1]);
 				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
@@ -1716,12 +1630,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	makeValueInput: function(id, config, tabname, idx) {
-		/*
-		var disabled = this.discrete_ordered[tabname] ? 'disabled' : '';
-		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' " + disabled + " onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
-		*/
 		if (this.discrete_ordered[tabname]) {
-			//return "<td><span id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "'>" + this.getValueAt(config, tabname, idx) + "</span></td>";
 			return "<td id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "'>" + this.getValueAt(config, tabname, idx) + "</td>";
 		}
 		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
@@ -1840,7 +1749,6 @@ DisplayContinuousConfig.prototype = {
 
 	getColorGroup: function(group, gene_name) {
 		var value = this.getColorGroupValue(group, gene_name);
-		//console.log("getColorGroup -> " + value);
 		return this._getColor(value, 'group');
 	},
 
@@ -1902,7 +1810,6 @@ DisplayContinuousConfig.prototype = {
 		}
 		html += "</thead><tbody>";
 		if (this.has_empty_values) {
-			//html += "<tr><td></td><td style='font-size: smaller; text-align: center;'>NA</td>";
 			html += "<tr>";
 			if (really_dont_use_gradient) {
 				html += "<td></td>";
@@ -1936,7 +1843,6 @@ DisplayContinuousConfig.prototype = {
 			} else {
 				html += this.makeValueInput(id, config, tabname, idx+this.has_empty_values);
 			}
-			//html += "</tr><tr><td colspan='2' class='less-than'>&nbsp;</td>"; // NEW
 			if (config == 'color') {
 				html += this.makeColorInput(id, config, tabname, idx+this.has_empty_values);
 			} else if (config == 'size') {
@@ -1944,7 +1850,6 @@ DisplayContinuousConfig.prototype = {
 			} else if (config == 'shape') {
 				html += this.makeSelectShape(id, config, tabname, idx+this.has_empty_values);
 			}
-			//html += "</tr><tr><td>&nbsp;</td>"; // NEW
 			html += "</tr>\n";
 		}
 		html += "</tbody>";
@@ -1999,7 +1904,6 @@ DisplayContinuousConfig.prototype = {
 		var doc = this.win.document;
 		var mod = config + '_';
 		var id = this.datatable.getId();
-		//var ksuffix = "_" + KSUFFIX++;
 		var ksuffix = "";
 		var div_id = "step_config_" + mod + id + ksuffix;
 		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
@@ -2036,9 +1940,7 @@ DisplayContinuousConfig.prototype = {
 		html += "</div>";
 		$('body', doc).append(html);
 		var div = $("#" + div_id, doc);
-		//this.div_ids[config] = div_id;
 		this.divs[config] = div;
-		//$("#" + div_id, doc).tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
 		DisplayContinuousConfig.switch_sample_tab(mod + id, doc);
 	},
@@ -2056,11 +1958,9 @@ DisplayContinuousConfig.stepCountChange = function(tabname, config, id) {
 	var datatable = navicell.dataset.datatables_id[id];
 	var module = get_module();
 	var win = window;
-	console.log("step_count_change(" + config + ") " + module);
 	if (datatable) {
 		var step_cnt = $("#step_config_count_" + tabname + '_' + config + '_' + id, win.document).val();
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
-		console.log("stepCountChange: " + step_cnt);
 		displayContinuousConfig.setStepCount_config(step_cnt, config, tabname);
 		DisplayContinuousConfig.setEditing(datatable.id, true, config);
 	}
@@ -2071,7 +1971,6 @@ DisplayContinuousConfig.setSampleAbsval = function(config, id) {
 	var checked = $("#step_config_absval_sample_" + config + '_' + id, win.document).attr("checked");
 	var datatable = navicell.dataset.getDatatableById(id);
 	var module = get_module();
-	console.log("set_sample_absval : " + module + " step_config_absval_sample_" + config + '_' + id + " " + checked);
 	if (datatable) {
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setUseAbsValue(config, checked == 'checked');
@@ -2088,7 +1987,6 @@ DisplayContinuousConfig.setGroupMethod = function(config, id) {
 	var datatable = navicell.getDatatableById(id);
 	var win = window;
 	var module = get_module();
-	console.log("set_group_methodn : " + module);
 	if (datatable) {
 		var obj = $("#group_method_" + config + '_' + id, win.document);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
@@ -2108,7 +2006,6 @@ DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win) {
 		win = window;
 	}
 	var module = get_module(win);
-	console.log("setEditing : " + module + " " + datatable_id);
 	var div = datatable.getDisplayConfig(module).getDiv(config);
 
 	if (div) {
@@ -2128,7 +2025,6 @@ DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
 	var id_suffix = tabname + '_' + config + "_" + id;
 	var checked = $("#discrete_color_advanced_" + id_suffix).attr("checked");
 	displayUnorderedConfig.advanced = (checked == "checked");
-	//console.log("ADVANCED: " + displayContinuousConfig.advanced);
 	displayUnorderedConfig.update_config(config, tabname, {checked: checked});
 }
 
@@ -2181,7 +2077,6 @@ DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, 
 }
 
 DisplayContinuousConfig.switch_sample_tab = function(suffix, doc) {
-	//console.log("switch_step_sample_tab " + suffix);
 	if (!doc) {
 		doc = window.document;
 	}
@@ -2190,7 +2085,6 @@ DisplayContinuousConfig.switch_sample_tab = function(suffix, doc) {
 }
 
 DisplayContinuousConfig.switch_group_tab = function(suffix, doc) {
-	//console.log("switch_step_group_tab " + suffix);
 	if (!doc) {
 		doc = window.document;
 	}
@@ -2211,7 +2105,6 @@ function DisplayUnorderedDiscreteConfig(datatable, win) {
 	this.biotype_is_set = datatable.biotype.isSet();
 	var discrete_values = datatable.getDiscreteValues();
 	for (var value in discrete_values) {
-		//console.log("setting value [" + discrete_values[value] + "]");
 		this.values.push(discrete_values[value]);
 	}
 	this.values.sort();
@@ -2320,11 +2213,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	},
 
 	setValueInfo: function(config, tabname, idx, color, size, shape, cond) {
-		/*
-		if (tabname == 'group') {
-			console.log("setting value info " + tabname + " " + idx + " " + this.colors[tabname][config].length + " " + color);
-		}
-		*/
 		if (idx < this.colors[tabname][config].length) {
 			this.colors[tabname][config][idx] = color;
 			this.sizes[tabname][config][idx] = size;
@@ -2337,7 +2225,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var step_cnt = this.getValueCount();
 		var colors;
 		var step_cnt_1, beg;
-		//if (false && this.has_empty_values) {
 		if (tabname == 'sample' && this.has_empty_values) {
 			this.setValueInfo(config, tabname, 0, "FFFFFF", 4, 0, Group.DISCRETE_IGNORE);
 			step_cnt_1 = step_cnt-1;
@@ -2349,25 +2236,20 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		if (this.biotype_is_set) {
 			colors = color_gradient(new RGBColor(0, 0, 120), new RGBColor(0, 0, 120), step_cnt_1);
 		} else {
-			//colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1);
 			colors = color_palette(step_cnt_1);
 		}
 		for (var ii = beg; ii < step_cnt; ++ii) {
 			this.setValueInfo(config, tabname, ii, colors[ii-beg].getRGBValue(), ii*2+4, ii, false && ii == 0 ? Group.DISCRETE_IGNORE : Group.DISCRETE_GT_0);
 		}
 		if (tabname == 'group') {
-			console.log("SETTING group else at " + step_cnt);
 			this.setValueInfo(config, tabname, step_cnt, "FFFFFF", 0, 0, Group.DISCRETE_IGNORE);
 		}
 	},
 
 	useColors: function(config, mode, use_color1, use_color2) {
-		// sample case (nether group case)
-		console.log("useColors: " + mode);
 		var step_cnt = this.getValueCount();
 		var step_cnt_1, beg;
 		if (this.has_empty_values) {
-			//this.colors['sample'][config][0] = "FFFFFF";
 			step_cnt_1 = step_cnt-1;
 			beg = 1;
 		} else {
@@ -2393,7 +2275,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	},
 
 	getColorAt: function(idx, config, tabname) {
-		//console.log("getColorAt: " + idx + " " + config + " " + tabname + " " + this.colors[tabname][config][idx]);
 		return this.colors[tabname][config][idx];
 	},
 
@@ -2476,34 +2357,28 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return max * (size/maxsize);
 	},
 
-	//----
 	getAcceptedCondition: function(group, gene_name, config, raw) {
 		var conds = this.conds['group'][config];
 		var id_suffix = 'group_' + config + '_' + this.datatable.getId();
 		var doc = this.win.document;
-		//console.log("conds.length: " + conds.length);
 		for (var idx in conds) {
 			if (conds[idx]) {
 				var idx2 = $("#discrete_value_" + id_suffix + "_" + idx, doc).val();
-				//console.log("getAcceptedCondition: " + idx + " -> " + idx2);
 				if (idx2 != undefined) {
 					if (idx2 == -1) {
 						for (var idx3 = 0; idx3 < this.values.length; ++idx3) {
 							if (group.acceptCondition(this.datatable, gene_name, this.values[idx3], conds[idx])) {
-								//console.log("return one " + idx);
 								return raw ? -(idx+1) : idx;
 							}
 						}
 					} else {
 						if (group.acceptCondition(this.datatable, gene_name, this.values[idx2], conds[idx])) {
-							//console.log("return " + idx);
 							return idx;
 						}
 					}
 				}
 			}
 		}
-		//console.log("returns default " + (conds.length-1));
 		return conds.length-1;
 	},
 
@@ -2537,17 +2412,11 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		if (cond == Group.DISCRETE_EQ_ALL) {
 			return label + ' = all';
 		}
-		/*
-		if (cond == Group.DISCRETE_NEQ_ALL) {
-			return '!= all';
-		}
-		*/
 		return '';
 	},
 	
 	getColorGroupValue: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, 'color', true);
-		//console.log("GETCOLORVALUE: " + idx);
 		if (idx == this.values.length) {
 			return "no matching condition";
 		}
@@ -2611,7 +2480,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var maxsize = STEP_MAX_SIZE/2;
 		return max * (size/maxsize);
 	},
-	//----
 
 	getConditionAt: function(idx, config) {
 		return this.conds['group'][config][idx];
@@ -2663,7 +2531,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		}
 		html += "</thead><tbody>";
 		var step_cnt = this.values.length;
-		//var step_cnt_1 = step_cnt + !is_sample;
 		var step_cnt_1;
 		var step_last;
 		var beg;
@@ -2701,7 +2568,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 					html += "<option value='" + Group.DISCRETE_EQ_0 + "' " + (selcond == Group.DISCRETE_EQ_0 ? "selected" : "") + ">No group element equals</option>";
 					html += "<option value='" + Group.DISCRETE_GT_0 + "' " + (selcond == Group.DISCRETE_GT_0 ? "selected" : "") + ">At least one element equals</option>";
 					html += "<option value='" + Group.DISCRETE_EQ_ALL + "' " + (selcond == Group.DISCRETE_EQ_ALL ? "selected" : "") + ">All group elements equals</option>";
-					//html += "<option value='" + Group.DISCRETE_NEQ_ALL + "' " + (selcond == Group.DISCRETE_NEQ_ALL ? "selected" : "") + ">!= all</option>";
 					html += "</select></td>";
 
 					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
@@ -2717,7 +2583,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 					html += "<option value='-1' selected><span style='font-style: italic; font-size: 60%' " + not_na_selected + ">Any Value (but not NA)</span></option>";
 					for (var idx2 = beg2; idx2 < step_cnt; idx2++) {
 						var value2 = this.getValueAt(idx2, config, tabname);
-						//html += "<option value='" + idx2 + "' " + (value2 == value ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>#" + (value2 ? value2 : "NA") + "</span></option>";
 						html += "<option value='" + idx2 + "' " + (this.advanced && !not_na_selected && value2 == value ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>" + (value2 ? value2 : "NA") + "</span></option>";
 					}
 					html += "</select></td>";
@@ -2730,7 +2595,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				}
 			}
 			if (config == 'color' || config == COLOR_SIZE_CONFIG) {
-				// EV 2014-04-07
 				var color = (idx == step_last ?  this.getColorAt(step_cnt, config, tabname) : this.getColorAt(idx, config, tabname));
 				html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
 			}
@@ -2836,7 +2700,6 @@ DisplayUnorderedDiscreteConfig.prototype = {
 };
 
 DisplayUnorderedDiscreteConfig.switch_sample_tab = function(suffix, doc) {
-	//console.log("switch_discrete_sample_tab " + suffix);
 	if (!doc) {
 		doc = window.document;
 	}
@@ -2845,7 +2708,6 @@ DisplayUnorderedDiscreteConfig.switch_sample_tab = function(suffix, doc) {
 }
 
 DisplayUnorderedDiscreteConfig.switch_group_tab = function(suffix, doc) {
-	//console.log("switch_discrete_group_tab " + suffix);
 	if (!doc) {
 		doc = window.document;
 	}
@@ -3510,14 +3372,12 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
 
 	var datatable = this;
 
-	console.log("URL: " + url);
 	if (url) {
 		$.ajax(url,
 		       {
 			       async: true,
 			       dataType: 'text',
 			       success: function(data) {
-				       console.log("navicell: datatable [" + url + "] loaded !");
 				       datatable.loadData(data, ready, win);
 			       },
 			       
@@ -3646,11 +3506,9 @@ Datatable.prototype = {
 			++gene_nn;
 		}
 
-		// no error, so adding genes
 		var has_new_samples = false;
 		for (var nn = 0; nn < samples_to_add.length; ++nn) {
 			var sample = dataset.addSample(samples_to_add[nn]);
-			//has_new_samples = sample.refcnt == 1;
 			if (!has_new_samples) {
 				has_new_samples = sample.refcnt == 1;
 			}
@@ -3661,11 +3519,6 @@ Datatable.prototype = {
 			dataset.addGene(gene_name, navicell.mapdata.hugo_map[gene_name]);
 		}
 
-		/*
-		if (has_new_samples) {
-			navicell.group_factory.buildGroups();
-		}
-		*/
 		this.epilogue(win);
 		ready.resolve(this);
 		dataset.syncModifs();
@@ -3690,7 +3543,6 @@ Datatable.prototype = {
 		if (!display_graphics && !display_markers) {
 			return;
 		}
-		//console.log("display_markers: " + module_name);
 		var id_arr = [];
 		var arrpos = [];
 		for (var gene_name in this.gene_index) {
@@ -3705,7 +3557,6 @@ Datatable.prototype = {
 				if (modif_arr) {
 					for (var nn = 0; nn < modif_arr.length; ++nn) {
 						var modif = modif_arr[nn];
-						// >> getting positions
 						var positions = modif.positions;
 						if (positions) {
 							for (var kk = 0; kk < positions.length; ++kk) {
@@ -3713,16 +3564,13 @@ Datatable.prototype = {
 							}
 							id_arr.push(modif.id);
 						}
-						// << getting positions
 					}
 				}
 			}
 		}
-		console.log("display.arrpos: " + arrpos.length);
 		if (display_markers) {
 			if (navicell.mapdata.getJXTree(win.document.navicell_module_name)) {
 				navicell.mapdata.findJXTree(win, id_arr, true, 'select');
-				//array_push_all(overlay.arrpos, navicell.mapdata.checked_arrpos);
 			} else {
 				win.show_markers(id_arr);
 			}
@@ -3758,7 +3606,6 @@ Datatable.prototype = {
 			return false;
 		}
 		var size = mapSize(this.gene_index) * mapSize(this.sample_index);
-		console.log("showingDataIsHuge: " + size);
 		return size > 50000;
 	},
 
@@ -3771,7 +3618,6 @@ Datatable.prototype = {
 		if (this.dialogs[module]) {
 			return;
 		}
-		win.console.log("DATATABLE " + this.name + " MAKE DIALOGS for " + module);
 		var doc = win.document;
 		var tab_body = $("#dt_datatable_tabs", doc);
 		$('body', doc).append("<div id='dt_data_dialog_" + this.id + "'><div id='dt_datatable_id" + this.id + "'><h3 id='dt_data_dialog_title_" + this.id + "' style='text-align: center;'><span style='font-style: italic;'>" + this.name + "</span> Datatable</h3><div class='switch-view-div'>" + make_button("", "switch_view_" + this.id, "switch_view(" + this.id + ")") + "</div><table id='dt_datatable_gene_table_id" + this.id + "' class='tablesorter datatable_table'></table><table id='dt_datatable_sample_table_id" + this.id + "' class='tablesorter datatable_table'></table></div></div>");
@@ -3820,7 +3666,6 @@ Datatable.prototype = {
 	epilogue: function(win) {
 		for (var map_name in maps) {
 			var doc = maps[map_name].document;
-			console.log("DECLARING DATATABLE in map " + map_name);
 			this.declareWindow(doc.win);
 		}
 		if (this.biotype.isUnorderedDiscrete()) {
@@ -3841,7 +3686,6 @@ Datatable.prototype = {
 
 	makeGeneView: function(module) {
 		this.current_view[module] = "gene";
-		console.log("makeGeneView: " + module);
 		if (!this.data_table_gene[module].ok) {
 			this.data_table_gene[module].children().remove();
 			this.data_table_gene[module].append(this.makeDataTable_genes(module));
@@ -3858,7 +3702,6 @@ Datatable.prototype = {
 		}
 	},
 
-	// ...
 	makeSampleView: function(module) {
 		this.current_view[module] = "sample";
 		if (!this.data_table_sample[module].ok) {
@@ -3902,7 +3745,6 @@ Datatable.prototype = {
 	},
 
 	getDisplayConfig: function(module) {
-		//console.log("getDisplayConfig: " + module + " " + this.dialogs[module] + " " + this.windows[module]);
 		if (!this.dialogs[module] && this.windows[module]) {
 			this.makeDialogsForWindow(this.windows[module]);
 		}
@@ -3953,14 +3795,7 @@ Datatable.prototype = {
 			var limit = 0;
 			if (!this.biotype_is_set) {
 				for (var sample_name in this.sample_index) {
-					/*
-					  if (limit++ == 10) {
-					  break;
-					  }
-					*/
 					var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
-					//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
-					//str += "<td class='datacell'>" + value + "</td>";
 					str += "<td>" + value + "</td>";
 				}
 			}
@@ -3979,7 +3814,6 @@ Datatable.prototype = {
 		if (sample_name == NO_SAMPLE) {
 			return INVALID_VALUE;
 		}
-		//return '';
 		return undefined;
 	},
 
@@ -3995,14 +3829,7 @@ Datatable.prototype = {
 			str += "<tr><td>" + sample_name + "</td>";
 			var limit = 0;
 			for (var gene_name in this.gene_index) {
-				/*
-				if (limit++ == 10) {
-					break;
-				}
-				*/
 				var value = this.data[this.gene_index[gene_name]][this.sample_index[sample_name]];
-				//str += "<td class='datacell'" + this.getStyle(value) + ">" + value + "</td>";
-				//str += "<td class='datacell'>" + value + "</td>";
 				str += "<td>" + value + "</td>";
 			}
 			str += "</tr>";
@@ -4123,7 +3950,6 @@ function DrawingConfig(win) {
 	this.display_markers = 1;
 	this.display_old_markers = 1;
 
-	//this.display_charts = "Heatmap";
 	this.display_charts = 0;
 	this.heatmap_config = new HeatmapConfig(win);
 	this.editing_heatmap_config = new HeatmapConfig(win);
@@ -4282,9 +4108,7 @@ DrawingConfig.prototype = {
 	sync: function() {
 		for (var map_name in maps) {
 			var doc = maps[map_name].document;
-			console.log("syncing drawing configuration for " + map_name);
 			if (doc == window.document) {
-				//continue;
 			}
 			if (!this.display_charts) {
 				$("#drawing_config_chart_display", doc).attr("checked", false);
@@ -4303,7 +4127,6 @@ function get_module(win) {
 		win = window;
 	} else {
 	}
-	//console.log("get_module : " + win.document.navicell_module_name);
 	return win.document.navicell_module_name;
 }
 
@@ -4312,13 +4135,11 @@ function get_module_from_doc(doc) {
 		doc = window.document;
 	} else {
 	}
-	//console.log("get_module_from_doc : " + doc.navicell_module_name);
 	return doc.navicell_module_name;
 }
 
 function switch_view(id) {
 	var module = get_module();
-	//console.log("module: " + module);
 	var datatable = navicell.dataset.datatables_id[id];
 	if (datatable) {
 		datatable.switchView(window);
@@ -4386,7 +4207,6 @@ AnnotationFactory.prototype = {
 				for (var annot_name in this.annot_samples[sample_name]) {
 					for (var annot_value in this.annot_samples[sample_name][annot_name]) {
 						sample.addAnnotValue(annot_name, annot_value);
-						//annotated++;
 					}
 				}
 				annotated++;
@@ -4409,7 +4229,6 @@ AnnotationFactory.prototype = {
 			annot.setIsGroup(checked);
 		}
 		navicell.group_factory.buildGroups();
-//		$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples have been built (groups are listed in Data Status / Groups tab) </span>");
 		// TBD: factorize message with annot_set_group in dialoglib.js
 		$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
 	},
@@ -4489,15 +4308,12 @@ AnnotationFactory.prototype = {
 				var annot_name = header[annot_nn+1];
 				this.addAnnotValue(sample_name, annot_name, annot_value);
 			}
-			//console.log("sample_read: " + this.sample_read
-			//this.sample_read++;
 		}
 		if (this.sample_read > 0) {
 			for (var nn = 1; nn < header_cnt; ++nn) {
 				this.getAnnotation(header[nn]);
 			}
 		}
-		console.log("sample annotation done");
 		this.sample_annotated = this.sync();
 		if (ready) {
 			ready.resolve();
@@ -4570,7 +4386,6 @@ Sample.prototype = {
 	},
 
 	addAnnotValue: function(annot_name, value) {
-		//console.log("sample: " + this.name + " add annot value: '" + annot + "' '" + value + "'");
 		this.annots[annot_name] = value;
 	},
 
@@ -4664,7 +4479,6 @@ Group.DISCRETE_IGNORE = 0;
 Group.DISCRETE_EQ_0 = 1;
 Group.DISCRETE_GT_0 = 2;
 Group.DISCRETE_EQ_ALL = 3;
-//Group.DISCRETE_NEQ_ALL = 4;
 
 Group.prototype = {
 	annots: [],
@@ -5026,22 +4840,18 @@ BiotypeFactory.prototype = {
 		// approximative search: case insensitive + suppress separators + substring
 		var biotype_name_mod = biotype_name.toUpperCase().replace(SEP_REGEX, "");
 		var biotype_name_len = biotype_name_mod.length;
-		//console.log("comparing " + biotype_name_mod);
 		for (var bname in this.biotypes) {
 			var bname_mod = bname.toUpperCase().replace(SEP_REGEX, "");
 			var bname_len = bname_mod.length;
-			//console.log("to: " + bname_mod + " (" + biotype_name_len + ", " + bname_len + ")");
 			if (biotype_name_len == bname_len) {
 				if (bname_mod == biotype_name_mod) {
 					return this.biotypes[bname];
 				}
 			} else if (biotype_name_len < bname_len) {
-				//console.log("#1 [" + bname_mod.substring(0, biotype_name_len) + "]");
 				if (bname_mod.substring(0, biotype_name_len) == biotype_name_mod) {
 					return this.biotypes[bname];
 				}
 			} else if (biotype_name_len > bname_len) {
-				//console.log("#2 [" + biotype_name_mod.substring(0, bname_len) + "]");
 				if (biotype_name_mod.substring(0, bname_len) == bname_mod) {
 					return this.biotypes[bname];
 				}
@@ -5059,12 +4869,6 @@ function MapTypes(map, has_nobg) {
 	this.map = map;
 	this.maptypes = {};
 	this.has_nobg = has_nobg;
-	// testing bg change
-	/*
-	setTimeout(function() {
-		navicell.mapTypes.setMapType("navicell_nobg");
-	}, 5000);
-	*/
 }
 
 MapTypes.prototype = {
@@ -5089,7 +4893,6 @@ MapTypes.prototype = {
 
 	setMapType: function(id) {
 		var map_type = this.maptypes[id];
-		console.log("attempt to change BG: " + id + " " +  map_type);
 		if (map_type) {
 			this.tile_suffix = this.getMapTypeInfo()[id];
 			this.map.setMapTypeId(id);
@@ -5108,7 +4911,6 @@ if (typeof Storage != 'undefined') {
 	}
 
 	Storage.prototype.setObject = function(key, value) {
-		console.log("JSON: " + JSON.stringify(value));
 		this.setItem(key, JSON.stringify(value));
 	}
 
@@ -5158,19 +4960,8 @@ if (typeof Storage != 'undefined') {
 
 		init: function() {
 			var _navicell = this.session.getData();
-			//console.log("session init: " + _navicell);
 			if (_navicell) {
-				//data.dataset.prototype = Dataset.prototype;
 				_navicell.dataset.geneCount = Dataset.prototype.geneCount;
-				//_navicell.mapdata = Mapdata.prototype;
-				/*
-				  console.log("session init2: " + data.dataset);
-				  console.log("session init3: " + data.dataset.genes);
-				  console.log("session init3.2: " + data.biotype_factory);
-				  console.log("session init3.3: " + mapSize(data.biotype_factory.biotypes));
-				  <			console.log("session init4: " + mapSize(data.dataset.genes));
-				  console.log("session init4: " + data.dataset.geneCount());
-				*/
 				return _navicell;
 			}
 			return navicell_init();
@@ -5187,7 +4978,6 @@ function navicell_init() {
 	var _navicell = {}; // namespace
 
 	_navicell.module_names = [];
-	//_navicell.mapdata = new Mapdata();
 	_navicell.dataset = new Dataset("navicell");
 	_navicell.group_factory = new GroupFactory();
 	_navicell.biotype_factory = new BiotypeFactory();
@@ -5202,14 +4992,12 @@ function navicell_init() {
 	_navicell.GENELIST = 4;
 
 	_navicell.CONTINUOUS = 10;
-	//_navicell.DISCRETE = 20;
 	_navicell.UNORDERED_DISCRETE = 20;
 	_navicell.ORDERED_DISCRETE = 30;
 	_navicell.SET = 40;
 
 	if (SIMPLIFY_TYPES) {
 		var biotypeExpr = new BiotypeType(_navicell.EXPRESSION, _navicell.CONTINUOUS);
-		//_navicell.biotype_factory.addBiotype(new Biotype("mRNA, microRNA or Protein Expression data", _navicell.CONTINUOUS));
 		_navicell.biotype_factory.addBiotype(new Biotype("mRNA expression data", biotypeExpr));
 		_navicell.biotype_factory.addBiotype(new Biotype("microRNA expression data", biotypeExpr));
 		_navicell.biotype_factory.addBiotype(new Biotype("Protein expression data", biotypeExpr));
@@ -5231,11 +5019,6 @@ function navicell_init() {
 		//_navicell.biotype_factory.addBiotype(new Biotype("Set data", _navicell.SET));
 	}
 	_navicell.getDatatableById = function(id) {
-		/*
-		console.log("this.dataset: " + this.dataset.getClass() + " " + id);
-		console.log("-> datatable: " + this.dataset.getDatatableById(id));
-		console.log("-> datatable class: " + this.dataset.getDatatableById(id).getClass());
-		*/
 		return this.dataset.getDatatableById(id);
 	}
 
@@ -5254,8 +5037,6 @@ function navicell_init() {
 				size++;
 			}
 		}
-		console.log("syncWindows : " + size + " " + mapSize(maps));
-		//var beforeunload = mapSize(maps) > 1;
 		var beforeunload = size > 1;
 		var todel = [];
 		for (var map_name in maps) {
@@ -5263,19 +5044,15 @@ function navicell_init() {
 				continue;
 			}
 			var win = maps[map_name].document.win;
-			console.log("map_name: " + map_name);
 			if (beforeunload) {
 				$(win).bind("beforeunload", function(e) { 
-					console.log("binding beforeunload");
 					return "Warning: closing " + map_name + " tab will make NaviCell instable";
 				});
 				$(win).unload(function() {
-					console.log("closing tab " + win.document.map_name); 
 					delete maps[win.document.map_name];
 					_navicell.syncWindows();
 				});
 			} else {
-				console.log("unbinding beforeunload");
 				$(win).unbind("beforeunload");
 			}
 		}
@@ -5305,7 +5082,6 @@ function navicell_init() {
 	},
 
 	_navicell.shapes = ["Triangle", "Square", "Rectangle", "Diamond", "Hexagon", "Circle"];
-//	_navicell.shapes = ["Triangle", "Square", "Diamond", "Hexagon", "Circle"];
 
 	return _navicell;
 }
@@ -5361,8 +5137,6 @@ function getPositiveThreshold(numbers, avg) {
 		if (!isNaN(num)) {
 			if (num > avg) {
 				positives.push(num);
-				//positives.push(2*avg - num);
-				//positives.push(-num);
 			}
 		}
 	}
@@ -5377,9 +5151,7 @@ function getNegativeThreshold(numbers, avg) {
 		var num = parseFloat(numbers[i]);
 		if (!isNaN(num)) {
 			if (num < avg) {
-				//negatives.push(-num);
 				negatives.push(num);
-				//negatives.push(2*avg - num);
 			}
 		}
 	}

@@ -5353,6 +5353,7 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jslib_dir + "/mapdata_lib.js" + "\" type='text/javascript'></script>");
 			out.println("<script src=\"" + common_directory_url + "/" + mapdata_list + "\" type='text/javascript'></script>");
 			out.println("<script src=\"" + jslib_dir + "/dialog_lib.js" + "\" type='text/javascript'></script>");
+			out.println("<script src=\"" + jslib_dir + "/nv_api.js" + "\" type='text/javascript'></script>");
 			out.println("<script src=\"" + jslib_dir + "/overlay.js" + "\" type='text/javascript'></script>");
 		}
 	

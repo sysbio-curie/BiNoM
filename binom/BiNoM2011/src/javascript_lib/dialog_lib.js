@@ -267,6 +267,7 @@ $(function() {
 							     {status_message: status_message,
 							      error_message: error_message,
 							      open_drawing_editor: true,
+							      async: true,
 							      import_display_markers: import_display_markers.attr('checked'),
 							      import_display_barplot: import_display_barplot.attr('checked'),
 							      import_display_heatmap: import_display_heatmap.attr('checked')});
@@ -1888,6 +1889,18 @@ function get_sample_names() {
 	return sample_names;
 }
 
+function heatmap_select_sample(idx, map_name)
+{
+	var doc = (map_name && maps ? maps[map_name].document : null);
+	nv_perform("nv_heatmap_editor_perform", get_win(map_name), "select_sample", idx, $("#heatmap_editor_gs_" + idx, doc).val());
+}
+
+function heatmap_select_datatable(idx, map_name)
+{
+	var doc = (map_name && maps ? maps[map_name].document : null);
+	nv_perform("nv_heatmap_editor_perform", get_win(map_name), "select_datatable", idx, $("#heatmap_editor_datatable_" + idx, doc).val());
+}
+
 // TBD: class HeatmapEditor
 function update_heatmap_editor(doc, params, heatmapConfig) {
 	var module = get_module_from_doc(doc);
@@ -1938,7 +1951,8 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 
 	var select_title = group_cnt ? 'Select a sample or group' : 'Select a sample';
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
-		html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_editor_set_editing(true, undefined, \"" + map_name + "\")'>\n";
+		//html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_editor_set_editing(true, undefined, \"" + map_name + "\")'>\n";
+		html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_select_sample(" + idx + ", \"" + map_name + "\")'>\n";
 		html += "<option value='_none_'>" + select_title + "</option>\n";
 		var sel_group = heatmapConfig.getGroupAt(idx);
 		var sel_sample = heatmapConfig.getSampleAt(idx);
@@ -1969,7 +1983,8 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		html += "<tr>";
 		html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='heatmap_step_display_config(" + idx + ",\"" + map_name + "\")'><span id='heatmap_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
-		html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_editor_set_editing(true," + idx + ", \"" + map_name + "\")'>\n";
+		//html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_editor_set_editing(true," + idx + ", \"" + map_name + "\")'>\n";
+		html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_select_datatable(" + idx + ", \"" + map_name + "\")'>\n";
 		html += "<option value='_none_'>Select a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
@@ -2045,7 +2060,8 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var slider = $("#heatmap_editor_slider_div", doc);
 	slider.slider({
 		slide: function( event, ui ) {
-			$("#heatmap_editing", doc).html(EDITING_CONFIGURATION);
+			nv_perform("nv_heatmap_editor_perform", get_win(map_name), "set_slider_value", ui.value);
+			//$("#heatmap_editing", doc).html(EDITING_CONFIGURATION);
 		}
 	});
 

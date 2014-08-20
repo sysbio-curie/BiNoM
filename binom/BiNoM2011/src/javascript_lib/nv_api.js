@@ -33,13 +33,13 @@ function add_to_datatable_desc_list(dt_desc_list, data) {
 	}
 }
 
-function get_datable_desc_list(type, name, file_elem, url, dt_desc_list) {
+function get_datatable_desc_list(type, name, file_elem, url, dt_desc_list, async) {
 	var ready = $.Deferred();
 	if (type == DATATABLE_LIST) {
 		if (url) {
 			$.ajax(url,
 			       {
-				       async: true,
+				       async: async,
 				       dataType: 'text',
 				       success: function(data) {
 					       add_to_datatable_desc_list(dt_desc_list, data);
@@ -137,7 +137,9 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 	var module = win.document.navicell_module_name;
 	var drawing_config = navicell.getDrawingConfig(module);
 	var dt_desc_list = [];
-	var ready = get_datable_desc_list(type, name, file_elem, url, dt_desc_list);
+	var async = params && params.async != undefined ? params.async : false;
+	console.log("ASYNC : " + async);
+	var ready = get_datatable_desc_list(type, name, file_elem, url, dt_desc_list, async);
 
 	var error_message = params ? params.error_message : null;
 	var status_message = params ? params.status_message : null;
@@ -154,7 +156,7 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 		}
 		for (var idx in dt_desc_list) {
 			var dt_desc = dt_desc_list[idx];
-			var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, win);
+			var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, win, async);
 			if (datatable.error) {
 				var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
 				error_str += "<table>";
@@ -321,7 +323,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 			$("#heatmap_editor_gs_" + idx, win.document).val(-1);
 			heatmap_editor_set_editing(true, undefined, win.document.map_name);
 		} else {
-			$("#heatmap_editor_gs_" + idx, win.document).val("s_" + arg2);
+			$("#heatmap_editor_gs_" + idx, win.document).val(arg2);
 			heatmap_editor_set_editing(true, undefined, win.document.map_name);
 		}
 	} else if (command == "apply") {
@@ -389,12 +391,7 @@ function nv_now()
 function nv_record(win, cmd) {
 	var history = $("#command-history", win.document).val();
 	var last = cmd[cmd.length-1];
-	/*
-	if (last != ';' && last != '}') {
-		cmd += ";";
-	}
-	*/
-	$("#command-history", win.document).val((history ? history + "\n\n" : "") + "// " + nv_now() + "\n" + cmd);
+	$("#command-history", win.document).val((history ? history + "\n\n" : "") + "## " + nv_now() + "\n" + cmd);
 }
 
 var nv_handlers = {
@@ -414,46 +411,47 @@ function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	action(win, arg1, arg2, arg3, arg4, arg5, arg6);
 	nv_record(win, nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
-	//win.eval(cmd);
-	//nv_record(win, cmd);
 }
 
 //
 // encoder/decoder
 //
-// TBD: must be factorized and recursive (maps within maps)
 
-var nv_CMD_BEG = "|@@|";
-var nv_ARG_SEP = "|--|";
-var nv_STRING_BEG = "S";
-var nv_NUMBER_BEG = "N";
-var nv_BOOL_BEG = "B";
-var nv_MAP_BEG = "M";
+var nv_CMD_MARK = "|@@|";
+var nv_STRING_MARK = "S";
+var nv_NUMBER_MARK = "N";
+var nv_BOOL_MARK = "B";
+var nv_UNK_MARK = "U";
+var nv_MAP_MARK = "M";
 var nv_KEY_VAL = "|::|";
+var nv_ARG_SEP = "|--|";
 
 var nv_type_markers = {
-	"string" : nv_STRING_BEG,
-	"number" : nv_NUMBER_BEG,
-	"boolean" : nv_BOOL_BEG,
-	"object" : nv_MAP_BEG
+	"string" : nv_STRING_MARK,
+	"number" : nv_NUMBER_MARK,
+	"boolean" : nv_BOOL_MARK,
+	"object" : nv_MAP_MARK
 };
 	
 // coder
-function nv_encode_arg(arg)
+function nv_encode_arg(arg, reentrant)
 {
 	var type_marker = nv_type_markers[typeof arg];
 	if (!type_marker) {
-		win.console.log("nv_encoder: type " + (typeof arg) + " not supported");
-		type_marker = 'S';
+		console.log("nv_encoder: type " + (typeof arg) + " " + arg + " not supported");
+		//return nv_ARG_SEP + nv_UNK_MARK;
+		return nv_ARG_SEP + nv_STRING_MARK;
 	}
-	var str = nv_ARG_SEP + type_marker;
-	if (type_marker == nv_MAP_BEG) {
+	var str = (reentrant ? "" : nv_ARG_SEP) + type_marker;
+	if (type_marker == nv_MAP_MARK) {
 		var has_key = false;
 		for (var key in arg) {
 			var val = arg[key];
 			if (typeof val != 'function') {
-				str += (has_key ? nv_KEY_VAL : "") + key + nv_KEY_VAL + nv_encode_arg(val);
-				has_key = true;
+				if (typeof val != 'object') { // object within object not supported
+					str += (has_key ? nv_KEY_VAL : "") + key + nv_KEY_VAL + nv_encode_arg(val, true);
+					has_key = true;
+				}
 			}
 		}
 	}
@@ -467,16 +465,19 @@ function nv_decode_arg(arg)
 {
 	var type_marker = arg[0];
 	arg = arg.substring(1);
-	if (type_marker == nv_NUMBER_BEG) {
+	if (type_marker == nv_UNK_MARK) {
+		return "";
+	}
+	if (type_marker == nv_NUMBER_MARK) {
 		return parseFloat(arg);
 	}
-	if (type_marker == nv_BOOL_BEG) {
+	if (type_marker == nv_BOOL_MARK) {
 		return arg == "true" || arg == "TRUE" ? true : false;
 	}
-	if (type_marker == nv_STRING_BEG) {
+	if (type_marker == nv_STRING_MARK) {
 		return arg;
 	}
-	if (type_marker == nv_MAP_BEG) {
+	if (type_marker == nv_MAP_MARK) {
 		var map = {};
 		var key_val_arr = arg.split(nv_KEY_VAL);
 		for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
@@ -490,7 +491,7 @@ function nv_decode_arg(arg)
 
 function nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 {
-	var str = nv_CMD_BEG + action_str + nv_ARG_SEP + nv_STRING_BEG + get_module(win);
+	var str = nv_CMD_MARK + action_str + nv_ARG_SEP + nv_STRING_MARK + get_module(win);
 	var args = [];
 	args.push(arg1);
 	args.push(arg2);
@@ -502,31 +503,9 @@ function nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 	for (var idx = 0; idx < args.length; ++idx) {
 		var arg = args[idx];
 		if (arg == undefined) {
-			//console.log(action_str + " breaks at " + idx);
 			break;
 		}
 		str += nv_encode_arg(arg);
-		/*
-		var type_marker = nv_type_markers[typeof arg];
-		if (!type_marker) {
-			win.console.log("nv_encoder: type " + (typeof arg) + " not supported");
-			type_marker = 'S';
-		}
-		str += nv_ARG_SEP + type_marker;
-		if (type_marker == nv_MAP_BEG) {
-			var has_key = false;
-			for (var key in arg) {
-				var val = arg[key];
-				if (typeof val != 'function') {
-					str += (has_key ? nv_KEY_VAL : "") + key + nv_KEY_VAL + nv_type_markers[typeof val] + val;
-					has_key = true;
-				}
-			}
-		}
-		else {
-			str += arg;
-		}
-		*/
 	}
 	return str;
 }
@@ -536,16 +515,19 @@ function nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 //
 // setTimeout(function() {nv_decoder("|@@|nv_heatmap_editor_perform|--||--|Sopen|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N0|--|S#1|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N2|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N0|--|S#0|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N1|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sapply|@@|nv_find_entities|--|S|--|SAK.*");}, 2000);
 //
-var COMMENT_REGEX = new RegExp("\/\/.*(\r\n?|\n)", "g");
+var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
 // decoder
 function nv_decoder(str)
 {
 	str = str.replace(COMMENT_REGEX, "");
 	//console.log("STR [" + str + "]");
-	var action_arr = str.split(nv_CMD_BEG);
+	var action_arr = str.split(nv_CMD_MARK);
 	for (var idx in action_arr) {
 		var tmpargs = action_arr[idx].split(nv_ARG_SEP);
+		if (tmpargs.length < 2) {
+			continue;
+		}
 		var args = [];
 		for (var idx2 in tmpargs) {
 			args.push(tmpargs[idx2].trim());
@@ -560,59 +542,10 @@ function nv_decoder(str)
 			console.log("nv_decoder: unknown module " + module);
 			continue;
 		}
-		//console.log("nv_decoder action_str " + action_str);
-		// could be generic: nv_perform(action_str, win, args[2], args[3], args[4], args[5], args[6], args[7])
-		// except for import_datatable ?
 		for (var idx2 = 2; idx2 < args.length; ++idx2) {
 			args[idx2] = nv_decode_arg(args[idx2]);
-			/*
-			var arg = args[idx2];
-			var type_marker = arg[0];
-			arg = nv_decode_arg(arg);
-			arg = arg.substring(1);
-			if (type_marker == nv_NUMBER_BEG) {
-				args[idx2] = parseFloat(arg);
-			} else if (type_marker == nv_BOOL_BEG) {
-				args[idx2] = parseBool(arg);
-			} else if (type_marker == nv_STRING_BEG) {
-				args[idx2] = arg;
-			} else if (type_marker == nv_MAP_BEG) {
-				var map = {};
-				var key_val_arr = arg.split(nv_KEY_VAL);
-				for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
-					var key = key_val_arr[idx3];
-					var val = key_val_arr[idx3+1];
-					type_marker = val[0];
-					val = val.substring(1);
-					if (type_marker == nv_NUMBER_BEG) {
-						val = parseFloat(val);
-					} else if (type_marker == nv_BOOL_BEG) {
-						if (val == "true" || val == "TRUE") {
-							val = true;
-						} else {
-							val = false;
-						}							
-					}
-					console.log(key + " -> " + val);
-					map[key] = val;
-				}
-				args[idx2] = map;
-			}
-			*/
 		}
 		nv_perform(action_str, win, args[2], args[3], args[4], args[5], args[6], args[7]);
-		/*
-		if (action_str == "nv_heatmap_editor_perform") {
-			var command = args[2];
-			nv_perform("nv_heatmap_editor_perform", win, command, args[3], args[4]);
-		} else if (action_str == "nv_find_entities") {
-			nv_perform("nv_find_entities", win, args[2]);
-		} else if (action_str == "nv_import_datatables") {
-			nv_perform("nv_import_datatables", win, args[2], args[3], null, args[4]);
-		} else {
-			win.console.log("nv_decoder: unknown action_str " + action_str);
-		}
-		*/
 	}
 }
 
@@ -635,4 +568,29 @@ nv_heatmap_editor_perform(window, "apply");
 nv_heatmap_editor_perform(window, "select_sample", 0, -1);
 nv_heatmap_editor_perform(window, "select_sample", 2, -1);
 
+*/
+
+/*
+|@@|nv_import_datatables|--|S20111118modelc:master|--|SDatatable list|--|S|--|S|--|Sfile:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt|--|Mimport_display_markers|::|Bfalse|::|import_display_barplot|::|Btrue
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sopen
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N0|--|S#1
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N2|--|S#2
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N0|--|S#0
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N1|--|S#2
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sapply
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_find_entities|--|S20111118modelc:master|--|SAK.*
 */

@@ -969,8 +969,8 @@ Dataset.prototype = {
 		return mapSize(this.datatables);
 	},
 
-	readDatatable: function(biotype_name, name, file, url, win) {
-		var datatable = new Datatable(this, biotype_name, name, file, url, this.datatable_id++, win);
+	readDatatable: function(biotype_name, name, file, url, win, async) {
+		var datatable = new Datatable(this, biotype_name, name, file, url, this.datatable_id++, win, async);
 		var dataset = this;
 		datatable.ready.then(function() {
 			if (!datatable.error) {
@@ -3316,7 +3316,7 @@ MapStainingConfig.prototype = {
 };
 
 // TBD datatable id management
-function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
+function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, async) {
 	var reader;
 	var ready;
 	if (file) {
@@ -3375,7 +3375,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win) {
 	if (url) {
 		$.ajax(url,
 		       {
-			       async: true,
+			       async: async,
 			       dataType: 'text',
 			       success: function(data) {
 				       datatable.loadData(data, ready, win);

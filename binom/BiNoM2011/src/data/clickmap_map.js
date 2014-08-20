@@ -643,7 +643,8 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 				if (val[0] == '@' && val[1] == '!' && val[2] == '!') {
 					$("#command-dialog").dialog("open");
 				} else if (val[0] == '@' && val[1] == '!') { // for instance: @! nv_find_entities(window, "C.*")
-					window.eval(val.substring(2));
+					var cmd = val.substring(2);
+					nv_decoder(cmd);
 				} else if (val == '@nv2') {
 					nv2();
 				} else if (val == '@nv1') {

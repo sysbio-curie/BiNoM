@@ -4138,6 +4138,16 @@ function get_module_from_doc(doc) {
 	return doc.navicell_module_name;
 }
 
+function get_win(module) {
+	for (var map_name in maps) {
+		var doc = maps[map_name].document;
+		if (module == doc.navicell_module_name) {
+			return doc.win;
+		}
+	}
+	return null;
+}
+
 function switch_view(id) {
 	var module = get_module();
 	var datatable = navicell.dataset.datatables_id[id];

@@ -155,7 +155,7 @@ $(function() {
 						search += (i ? "," : "class=") + $(selected).val();
 					});
 				}
-				nv_find_entities(window, search);
+				nv_perform("nv_find_entities", window, search);
 				/*
 				$("#right_tabs", window.document).tabs("option", "active", 1);
 				navicell.mapdata.findJXTree(window, search, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});
@@ -263,7 +263,7 @@ $(function() {
 					error_message("");
 					status_message("Importing...");
 					var file_elem = (file ? file.get()[0].files[0] : null);
-					nv_import_datatables(window, type.val(), name.val(), file_elem, url.val(),
+					nv_perform("nv_import_datatables", window, type.val().trim(), name.val().trim(), file_elem, url.val().trim(),
 							     {status_message: status_message,
 							      error_message: error_message,
 							      open_drawing_editor: true,
@@ -328,7 +328,7 @@ $(function() {
 											} else {
 												$("#drawing_config_chart_type").val('Barplot');
 												drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
-												barplot_sample_action('allsamples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
+												barplot_sample_action('all_samples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
 												
 												barplot_editor_apply(drawing_config.getBarplotConfig());
 												barplot_editor_apply(drawing_config.getEditingBarplotConfig());
@@ -354,7 +354,7 @@ $(function() {
 												$("#drawing_config_chart_type").val('Heatmap');
 												drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
 												if (!drawing_config.getHeatmapConfig().getSampleOrGroupCount()) {
-													heatmap_sample_action('allsamples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+													heatmap_sample_action('all_samples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
 												} else {
 													heatmap_sample_action('pass');
 												}
@@ -554,12 +554,13 @@ $(function() {
 
 	$("#heatmap_editor_div").dialog({
 		autoOpen: false,
-		width: 750,
-		height: 500,
+		width: 850,
+		height: 580,
 		modal: false,
 		buttons: {
 			"Apply": function() {
-				nv_heatmap_editor_perform(window, "apply", true);
+				nv_perform("nv_heatmap_editor_perform", window, "apply", true);
+
 				/*
 				var msg = get_heatmap_config_message(true);
 				if (msg) {
@@ -585,7 +586,8 @@ $(function() {
 			},
 			
 			"Cancel": function() {
-				nv_heatmap_editor_perform(window, "cancel");
+				nv_perform("nv_heatmap_editor_perform", window, "cancel");
+
 				/*
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
@@ -599,7 +601,8 @@ $(function() {
 			},
 
 			"OK": function() {
-				nv_heatmap_editor_perform(window, "close");
+				nv_perform("nv_heatmap_editor_perform", window, "close");
+
 				//$(this).dialog('close');
 			}
 		}
@@ -746,21 +749,16 @@ $(function() {
 
 	$("#command-dialog").dialog({
 		autoOpen: false,
-		width: 820,
-		height: 660,
+		width: 1030,
+		height: 770,
 		modal: false,
 
 		buttons: {
 			"Execute": function() {
 				var cmd = $("#command-exec").val().trim();
-				window.eval(cmd);
+				//window.eval(cmd);
+				nv_decoder(cmd);
 				$("#command-exec").val("");
-				var history = $("#command-history").val();
-				var last = cmd[cmd.length-1];
-				if (last != ';' && last != '}') {
-					cmd += ";";
-				}
-				$("#command-history").val((history ? history + "\n" : "") + cmd);
 			},
 
 			"Clear": function() {
@@ -1835,26 +1833,29 @@ function heatmap_step_display_config(idx, map_name) {
 	}
 }
 
-function heatmap_sample_action(action, cnt) {
-	var doc = window.document;
+function heatmap_sample_action(action, cnt, win) {
+	if (!win) {
+		win = window;
+	}
+	var doc = win.document;
 	var module = get_module();
 	var drawing_config = navicell.getDrawingConfig(module);
-	if (action == "clear") {
+	if (action == "clear_samples") {
 		drawing_config.getEditingHeatmapConfig().reset(true);
-	} else if (action == "allsamples") {
+	} else if (action == "all_samples") {
 		drawing_config.getEditingHeatmapConfig().reset(true);
 		max_heatmap_sample_cnt = drawing_config.getEditingHeatmapConfig().setAllSamples();
-	} else if (action == "allgroups") {
+	} else if (action == "all_groups") {
 		drawing_config.getEditingHeatmapConfig().reset(true);
 		max_heatmap_sample_cnt = drawing_config.getEditingHeatmapConfig().setAllGroups();
 	} else if (action == "from_barplot") {
 		var barplot_config = drawing_config.getBarplotConfig();
-		var cnt = barplot_config.getSampleOrGroupCount();
-		if (cnt) {
+		if (barplot_config.getSampleOrGroupCount()) {
 			drawing_config.getEditingHeatmapConfig().reset(true);
 			max_heatmap_sample_cnt = drawing_config.getEditingHeatmapConfig().setSamplesOrGroups(barplot_config.getSamplesOrGroups());
 		}
 	} else if (action == "pass") {
+		// nop
 	}
 
 	if (cnt) {
@@ -1862,7 +1863,7 @@ function heatmap_sample_action(action, cnt) {
 	}
 	max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
 	$("#heatmap_editing", doc).html(EDITING_CONFIGURATION);
-	update_heatmap_editor(window.document);
+	update_heatmap_editor(doc);
 	var msg = get_heatmap_config_message(false);
 	$("#heatmap_editor_msg_div", doc).html(msg);
 }
@@ -1916,13 +1917,13 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var html = "";
 	html += "<tbody>";
 	html += "<tr>";
-	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\")") + "&nbsp;&nbsp;&nbsp;";
 	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
 
-	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"allsamples\")");
+	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\")");
 	html += "&nbsp;&nbsp;";
 	if (group_cnt) {
-		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"allgroups\")");
+		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\")");
 	}
 	html += "</td>";
 	html += "</tr>";
@@ -2179,12 +2180,12 @@ function barplot_step_display_config(idx, map_name) {
 function barplot_sample_action(action, cnt) {
 	var module = get_module_from_doc(window.document);
 	var drawing_config = navicell.getDrawingConfig(module);
-	if (action == "clear") {
+	if (action == "clear_samples") {
 		drawing_config.getEditingBarplotConfig().reset(true);
-	} else if (action == "allsamples") {
+	} else if (action == "all_samples") {
 		drawing_config.getEditingBarplotConfig().reset(true);
 		max_barplot_sample_cnt = drawing_config.getEditingBarplotConfig().setAllSamples();
-	} else if (action == "allgroups") {
+	} else if (action == "all_groups") {
 		drawing_config.getEditingBarplotConfig().reset(true);
 		max_barplot_sample_cnt = drawing_config.getEditingBarplotConfig().setAllGroups();
 	} else if (action == "from_heatmap") {
@@ -2233,11 +2234,11 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	var html = "";
 	html += "<tbody>";
 
-	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear\")") + "&nbsp;&nbsp;&nbsp;";
+	html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "barplot_clear_samples", "barplot_sample_action(\"clear_samples\")") + "&nbsp;&nbsp;&nbsp;";
 	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
-	html += make_button("All samples", "barplot_all_samples", "barplot_sample_action(\"allsamples\")") + "&nbsp;&nbsp;&nbsp;";
+	html += make_button("All samples", "barplot_all_samples", "barplot_sample_action(\"all_samples\")") + "&nbsp;&nbsp;&nbsp;";
 	if (group_cnt) {
-		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "barplot_all_groups", "barplot_sample_action(\"allgroups\")");
+		html += "<td style='" + empty_cell_style + "'>" + make_button("All groups", "barplot_all_groups", "barplot_sample_action(\"all_groups\")");
 	}
 	html += "</td></tr>";
 	if (drawing_config.getHeatmapConfig().getSampleOrGroupCount()) {

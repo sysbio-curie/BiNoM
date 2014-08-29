@@ -2312,7 +2312,7 @@ public class ProduceClickableMap
 					outjson.print("\"y\" : " + toDouble(scales.getY(includedSpecies.getY())) + ", ");
 					outjson.print("\"w\" : " + toDouble(scales.getL(includedSpecies.getW())) + ", ");
 					outjson.print("\"h\" : " + toDouble(scales.getL(includedSpecies.getH())) + ", ");
-					outjson.print("\"said\" : \"SAID__" + includedSpecies.getId() + "\"");
+					outjson.print("\"said\" : \"SAID__" + includedSpecies.getId() + "\""); // EV: TBD, set the correct shape id
 					outjson.print("}],");
 					String bubble;
 					if (ent.getPost() != null) {
@@ -2435,7 +2435,7 @@ public class ProduceClickableMap
 								outjson.print("\"y\" : " + toDouble(scales.getY(y)) + ", ");
 								outjson.print("\"w\" : " + toDouble(scales.getL(0)) + ", ");
 								outjson.print("\"h\" : " + toDouble(scales.getL(0)) + ", ");
-								outjson.print("\"said\" : \"XAID__" + r.getId() + "\"");
+								outjson.print("\"said\" : \"XAID__" + r.getId() + "\""); // shape id to be ignored
 								outjson.print("}]"); // same kludge
 								outjson.print("}]");
 								outjson.print("}");
@@ -4118,7 +4118,9 @@ public class ProduceClickableMap
 
 	static private StringBuffer open_map_from_bubble_maybe_with_markers(StringBuffer fw, List<String> markers, final String map_name, final String title)
 	{
-		fw.append(onclick_before).append( "show_map_and_markers(");
+		// NV_SERVER: 2014-08-26
+		//fw.append(onclick_before).append("show_map_and_markers(");
+		fw.append(onclick_before).append("nv_perform(\"nv_open\", window, ");
 		html_quote(fw, map_name);
 		fw.append(", [");
 		if (markers != null)
@@ -5235,8 +5237,7 @@ public class ProduceClickableMap
 	private static PrintStream create_reset_button(final PrintStream out)
 	{
 		out.print(onclick_before);
-		out.print("uncheck_all_entities(");
-		out.print(");");
+		out.print("nv_perform(\"uncheck_all_entities\", window)");
 		out.print(onclick_after);
 		out.print(" title='Uncheck all entities'>");
 		//out.print("reset");

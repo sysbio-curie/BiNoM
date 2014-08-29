@@ -32,11 +32,30 @@ function nv2() {
 function display_dialog(title, header, msg, win)
 {
 	var dialog = $("#info_dialog", win.document);
-	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center'>" + "<br/>" + msg.replace(new RegExp("\n", "g"), "<br/>") + "</div>");
+	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
+	var lines = msg.split(LINE_BREAK_REGEX);
+	var maxlen = 0;
+	for (var ii = 0; ii < lines.length; ++ii) {
+		if (lines[ii].length > maxlen) {
+			maxlen = lines[ii].length;
+		}
+	}
+	var width = maxlen * 10;
+	if (width < 400) {
+		width = 400;
+	} else if (width > 800) {
+		width = 800;
+	}
+	var height = 200 + lines.length * 10;
+	if (height < 400) {
+		height = 400;
+	} else if (height > 800) {
+		height = 800;
+	}
 	dialog.dialog({
 		autoOpen: false,
-		width: 430,
-		height: 350,
+		width: width,
+		height: height,
 		modal: false,
 		title: title,
 		buttons: {
@@ -259,11 +278,12 @@ $(function() {
 					return;
 				}
 
+				$("#dt_import_file_message").css("display", "none");
 				setTimeout(function() {
 					error_message("");
 					status_message("Importing...");
 					var file_elem = (file ? file.get()[0].files[0] : null);
-					nv_perform("nv_import_datatables", window, type.val().trim(), name.val().trim(), file_elem, url.val().trim(),
+					nv_perform("nv_import_datatables", window, type.val().trim(), name.val().trim(), (file_elem == undefined ? "" : file_elem), url.val().trim(),
 							     {status_message: status_message,
 							      error_message: error_message,
 							      open_drawing_editor: true,
@@ -757,9 +777,20 @@ $(function() {
 		buttons: {
 			"Execute": function() {
 				var cmd = $("#command-exec").val().trim();
-				//window.eval(cmd);
-				nv_decoder(cmd);
+				nv_decode(cmd);
 				$("#command-exec").val("");
+			},
+
+			"Get URL": function() {
+				var cmd = $("#command-exec").val().trim();
+				nv_get_url(cmd);
+				$("#command-exec").val("");
+			},
+
+			"Eval": function() { // for testing, Eval button will disapear
+				var cmd = $("#command-exec").val().trim();
+				window.eval(cmd);
+				//$("#command-exec").val("");
 			},
 
 			"Clear": function() {
@@ -1774,7 +1805,8 @@ function drawing_config_chart() {
 	var doc = window.document;
 	var val = $("#drawing_config_chart_type", doc).val();
 	if (val == "Heatmap") {
-		$("#heatmap_editor_div", doc).dialog("open");
+		//$("#heatmap_editor_div", doc).dialog("open");
+		nv_perform("nv_heatmap_editor_perform", window, "open");
 	} else if (val == "Barplot") {
 		$("#barplot_editor_div", doc).dialog("open");
 	}
@@ -1800,11 +1832,12 @@ function group_editing(val) {
 
 function heatmap_editor_set_editing(val, idx, map_name) {
 	var doc = (map_name && maps ? maps[map_name].document : null);
+	//doc.win.console.log("heatmap_editor_set_editing: " + val + " " + idx + " " + doc.win);
 	$("#heatmap_editing", doc).html(val ? EDITING_CONFIGURATION : "");
 	if (val) {
 		var module = get_module_from_doc(doc);
 		var drawing_config = navicell.getDrawingConfig(module);
-		heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
+		doc.win.heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
 		doc.win.update_heatmap_editor(doc, null, drawing_config.getEditingHeatmapConfig());
 	}
 	if (idx != undefined) {
@@ -1834,7 +1867,7 @@ function heatmap_step_display_config(idx, map_name) {
 	}
 }
 
-function heatmap_sample_action(action, cnt, win) {
+function heatmap_sample_action_perform(action, cnt, win) {
 	if (!win) {
 		win = window;
 	}
@@ -1889,6 +1922,11 @@ function get_sample_names() {
 	return sample_names;
 }
 
+function heatmap_sample_action(action_str, map_name)
+{
+	nv_perform("nv_heatmap_editor_perform", get_win(map_name), action_str);
+}
+
 function heatmap_select_sample(idx, map_name)
 {
 	var doc = (map_name && maps ? maps[map_name].document : null);
@@ -1898,11 +1936,16 @@ function heatmap_select_sample(idx, map_name)
 function heatmap_select_datatable(idx, map_name)
 {
 	var doc = (map_name && maps ? maps[map_name].document : null);
+	console.log("HEATMAP_SELECT_DATATABLE: " + idx + " " + map_name + " " + doc);
+	if (doc) {
+		doc.win.console.log("in this window");
+	}
 	nv_perform("nv_heatmap_editor_perform", get_win(map_name), "select_datatable", idx, $("#heatmap_editor_datatable_" + idx, doc).val());
 }
 
 // TBD: class HeatmapEditor
 function update_heatmap_editor(doc, params, heatmapConfig) {
+	//console.log("update_heatmap_editor");
 	var module = get_module_from_doc(doc);
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!heatmapConfig) {
@@ -1930,20 +1973,24 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var html = "";
 	html += "<tbody>";
 	html += "<tr>";
-	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\")") + "&nbsp;&nbsp;&nbsp;";
+//	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\")") + "&nbsp;&nbsp;&nbsp;";
+	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\", \"" + map_name + "\")") + "&nbsp;&nbsp;&nbsp;";
 	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
 
-	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\")");
+	//html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\")");
+	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\", \"" + map_name + "\")");
 	html += "&nbsp;&nbsp;";
 	if (group_cnt) {
-		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\")");
+		//html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\")");
+		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\", \"" + map_name + "\")");
 	}
 	html += "</td>";
 	html += "</tr>";
 	if (drawing_config.getBarplotConfig().getSampleOrGroupCount()) {
 		var label = (group_cnt ? "Samples and Groups" : "Samples") + " from Barplot";
 		html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>";
-		html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\")");
+		//html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\")");
+		html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\", \"" + map_name + "\")");
 		html += "</td></tr>";
 	}
 	html += "<tr><td style='" + empty_cell_style + " height: 10px'>&nbsp;</td></tr>";
@@ -3319,6 +3366,7 @@ function draw_voronoi(module, context, div)
 	context.globalAlpha = slider2alpha(mapStainingConfig.getTransparency());
 	context.font = "normal 12px";
 	context.strokeStyle = "#000000";
+	// TBD: for complexes, need to compute value (then color) in a different way: average of colors (not values)
 	for (var shape_id in voronoi_shape_map) {
 		var gene_name = navicell.dataset.getGeneByShapeId(module, shape_id);
 		var color;
@@ -3366,10 +3414,10 @@ function draw_voronoi(module, context, div)
 			}
 		}
 		context.closePath();
-		context.stroke();
+		//context.stroke();
 		context.fill();
 
 		// debug mode
-		//context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
+		context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
 	}		
 }

@@ -410,6 +410,12 @@ label {font-size: 12px; vertical-align: middle;}
     color: red;
 }
 
+#dt_import_file_message {
+    font-size: small;
+    color: red;
+    padding: 5px;
+}
+
 #dt_gene_status_table thead {
     background-color: rgb(160, 138, 189);
     color: white;

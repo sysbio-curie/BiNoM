@@ -21,6 +21,8 @@
 
 // NaviCell API
 
+var nv_decoding = false;
+
 // Utility functions
 function add_to_datatable_desc_list(dt_desc_list, data) {
 	var lines = data.split(LINE_BREAK_REGEX);
@@ -34,6 +36,9 @@ function add_to_datatable_desc_list(dt_desc_list, data) {
 }
 
 function get_datatable_desc_list(type, name, file_elem, url, dt_desc_list, async) {
+	for (var key in file_elem) {
+		console.log("file_elem [" + key + "] [" + file_elem[key] + "]");
+	}
 	var ready = $.Deferred();
 	if (type == DATATABLE_LIST) {
 		if (url) {
@@ -84,6 +89,13 @@ function nv_win(win)
 
 // API
 
+function nv_open(win, module, ids)
+{
+	console.log("module: [" + module + "] " + ids.length);
+	win.show_map_and_markers(module, ids ? ids : []);
+	return null;
+}
+
 // ------------------------------------------------------------------------------------------------------------------
 // nv_find_entities
 //
@@ -102,6 +114,65 @@ function nv_find_entities(win, search)
 	win = nv_win(win);
 	navicell.mapdata.findJXTree(win, search, false, 'subtree', {div: $("#result_tree_contents", win.document).get(0)});
 	$("#right_tabs", win.document).tabs("option", "active", 1);
+	return null;
+}
+
+function nv_select_entity(win, id, mode, center, clicked_boundbox)
+{
+	var module = get_module(win);
+	var jxtree = navicell.mapdata.getJXTree(module);
+	var node = jxtree.getNodeByUserId(id);
+	if (node) {
+		win.click_node(win.overlay, node, mode, center, clicked_boundbox);
+	}
+	return null;
+}
+
+function nv_set_zoom(win, zoom)
+{
+	win.map.setZoom(zoom);
+	return null;
+}
+
+function nv_uncheck_all_entities(win)
+{
+	win.uncheck_all_entities();
+	return null;
+}
+
+function nv_scroll(win, xoffset, yoffset)
+{
+	var map = win.map;
+	console.log("nv_scroll " + xoffset + " " + yoffset);
+
+	var center = map.getCenter();
+	var scrolled_center;
+
+	if (xoffset == "CENTER") {
+		scrolled_center = win.map_ori_center;
+	} else if (xoffset == "W_CENTER") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getNorthEast().lng());
+	} else if (xoffset == "E_CENTER") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getSouthWest().lng());
+	} else if (xoffset == "S_CENTER") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getNorthEast().lat(), win.map_ori_center.lng());
+	} else if (xoffset == "N_CENTER") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getSouthWest().lat(), win.map_ori_center.lng());
+	} else if (xoffset == "SW_CENTER") {
+		scrolled_center = win.map_ori_bounds.getNorthEast();
+	} else if (xoffset == "NE_CENTER") {
+		scrolled_center = win.map_ori_bounds.getSouthWest();
+	} else if (typeof xoffset == "number" && typeof yoffset == "number") {
+		scrolled_center = new google.maps.LatLng(center.lat()+yoffset, center.lng()+xoffset, true);
+	} else {
+		scrolled_center = null;
+	}
+
+	if (scrolled_center != null) {
+		map.setCenter(scrolled_center);
+		console.log("has scrolled to center [" + scrolled_center + "]");
+	}
+	return null;
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -134,11 +205,11 @@ function nv_find_entities(win, search)
 function nv_import_datatables(win, type, name, file_elem, url, params)
 {
 	win = nv_win(win);
-	var module = win.document.navicell_module_name;
+	var module = get_module(win);
+	//var module = win.document.navicell_module_name;
 	var drawing_config = navicell.getDrawingConfig(module);
 	var dt_desc_list = [];
-	var async = params && params.async != undefined ? params.async : false;
-	console.log("ASYNC : " + async);
+	var async = params && params.async != undefined && !nv_decoding ? params.async : false;
 	var ready = get_datatable_desc_list(type, name, file_elem, url, dt_desc_list, async);
 
 	var error_message = params ? params.error_message : null;
@@ -209,12 +280,12 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 								var barplotConfig = drawing_config.getEditingBarplotConfig();
 								barplotConfig.setDatatableAt(0, datatable);
 								if (params.open_drawing_editor) {
-									$("#barplot_editing").html(EDITING_CONFIGURATION);
-									$("#barplot_editor_div").dialog("open");
+									$("#barplot_editing", win.document).html(EDITING_CONFIGURATION);
+									$("#barplot_editor_div", win.document).dialog("open");
 								} else {
-									$("#drawing_config_chart_display").attr("checked", 'checked')
-									$("#drawing_config_chart_type").val('Barplot');
-									drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+									$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
+									$("#drawing_config_chart_type", win.document).val('Barplot');
+									drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
 									barplot_sample_action('all_samples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
 									
 									barplot_editor_apply(drawing_config.getBarplotConfig());
@@ -235,23 +306,23 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 								}
 								heatmapConfig.setDatatableAt(idx, datatable);
 								if (params.open_drawing_editor) {
-									$("#heatmap_editing").html(EDITING_CONFIGURATION);
-									$("#heatmap_editor_div").dialog("open");
+									$("#heatmap_editing", win.document).html(EDITING_CONFIGURATION);
+									$("#heatmap_editor_div", win.document).dialog("open");
 								} else {
-									$("#drawing_config_chart_display").attr("checked", 'checked')
-									$("#drawing_config_chart_type").val('Heatmap');
-									drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
+									$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
+									$("#drawing_config_chart_type", win.document).val('Heatmap');
+									drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
 									if (!drawing_config.getHeatmapConfig().getSampleOrGroupCount()) {
-										heatmap_sample_action('all_samples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+										win.heatmap_sample_action_perform('all_samples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
 									} else {
-										heatmap_sample_action('pass');
+										win.heatmap_sample_action_perform('pass');
 									}
 
-									heatmap_editor_apply(drawing_config.getHeatmapConfig());
-									heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
-									heatmap_editor_set_editing(false);
+									win.heatmap_editor_apply(drawing_config.getHeatmapConfig());
+									win.heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
+									win.heatmap_editor_set_editing(false);
 
-									max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
+									win.max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
 
 									display_graphics = true;
 								}
@@ -269,6 +340,23 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 			}
 		}
 	});
+	return null;
+}
+
+function nv_prepare_import_dialog(win, filename, name, type)
+{
+	var doc = win.document;
+	$("#dt_import_file_message", doc).css("display", "block");
+	$("#dt_import_file_message", doc).html("The file '" + filename + "' has been sent by NV client, please import it:");
+	$("#dt_import_type", doc).val(type);
+	$("#dt_import_name", doc).val(name);
+	$("#dt_import_dialog", doc ).dialog("open");
+	return null;
+}
+
+function nv_get_gene_list(win)
+{
+	return navicell.dataset.getSortedGeneNames();
 }
 
 function nv_heatmap_editor_perform(win, command, arg1, arg2)
@@ -351,7 +439,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 		drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
 		drawing_config.apply();
 	} else if (command == "clear_samples" || command == "all_samples" || command == "all_groups" || command == "from_barplot") {
-		heatmap_sample_action(command, 0, win);
+		heatmap_sample_action_perform(command, 0, win);
 	} else if (command == "set_slider_value") {
 		var value = arg1;
 		heatmap_config.getSlider().slider("value", value);
@@ -372,6 +460,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 
 	// select_datatables (arg1 and arg2: array of same length expected)
 	// select_samples (arg1 and arg2: array of same length expected)
+	return null;
 }
 
 function nv_now()
@@ -395,8 +484,15 @@ function nv_record(win, cmd) {
 }
 
 var nv_handlers = {
+	"nv_open": nv_open,
 	"nv_find_entities": nv_find_entities,
+	"nv_select_entity": nv_select_entity,
+	"nv_set_zoom": nv_set_zoom,
+	"nv_uncheck_all_entities": nv_uncheck_all_entities,
+	"nv_scroll": nv_scroll,
+	"nv_get_gene_list": nv_get_gene_list,
 	"nv_import_datatables": nv_import_datatables,
+	"nv_prepare_import_dialog": nv_prepare_import_dialog,
 	"nv_heatmap_editor_perform": nv_heatmap_editor_perform
 };
 
@@ -409,12 +505,13 @@ function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 		win.console.log("nv_perform: error no action \"" + action_str + "\"");
 		return;
 	}
-	action(win, arg1, arg2, arg3, arg4, arg5, arg6);
-	nv_record(win, nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
+	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6);
+	nv_record(win, nv_encode(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
+	return ret;
 }
 
 //
-// encoder/decoder
+// encode/decode
 //
 
 var nv_CMD_MARK = "|@@|";
@@ -423,6 +520,8 @@ var nv_NUMBER_MARK = "N";
 var nv_BOOL_MARK = "B";
 var nv_UNK_MARK = "U";
 var nv_MAP_MARK = "M";
+var nv_OBJ_MARK = "O";
+var nv_LIST_MARK = "L";
 var nv_KEY_VAL = "|::|";
 var nv_ARG_SEP = "|--|";
 
@@ -430,20 +529,24 @@ var nv_type_markers = {
 	"string" : nv_STRING_MARK,
 	"number" : nv_NUMBER_MARK,
 	"boolean" : nv_BOOL_MARK,
-	"object" : nv_MAP_MARK
+	"object" : nv_OBJ_MARK
 };
 	
-// coder
+// code
 function nv_encode_arg(arg, reentrant)
 {
 	var type_marker = nv_type_markers[typeof arg];
 	if (!type_marker) {
-		console.log("nv_encoder: type " + (typeof arg) + " " + arg + " not supported");
+		console.log("nv_encode: type " + (typeof arg) + " " + arg + " not supported");
 		//return nv_ARG_SEP + nv_UNK_MARK;
 		return nv_ARG_SEP + nv_STRING_MARK;
 	}
+	if (type_marker == nv_OBJ_MARK) {
+		type_marker = (arg.length == undefined) ? nv_MAP_MARK : nv_LIST_MARK;
+	}
 	var str = (reentrant ? "" : nv_ARG_SEP) + type_marker;
-	if (type_marker == nv_MAP_MARK) {
+	if (type_marker == nv_MAP_MARK || type_marker == nv_LIST_MARK) {
+		//if (type_marker == nv_MAP_MARK) {console.log("encode map");} else {console.log("encode list " + arg.length);}
 		var has_key = false;
 		for (var key in arg) {
 			var val = arg[key];
@@ -454,8 +557,7 @@ function nv_encode_arg(arg, reentrant)
 				}
 			}
 		}
-	}
-	else {
+	} else {
 		str += arg;
 	}
 	return str;
@@ -463,6 +565,9 @@ function nv_encode_arg(arg, reentrant)
 
 function nv_decode_arg(arg)
 {
+	if (!arg) {
+		return null;
+	}
 	var type_marker = arg[0];
 	arg = arg.substring(1);
 	if (type_marker == nv_UNK_MARK) {
@@ -479,17 +584,32 @@ function nv_decode_arg(arg)
 	}
 	if (type_marker == nv_MAP_MARK) {
 		var map = {};
-		var key_val_arr = arg.split(nv_KEY_VAL);
-		for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
-			var key = key_val_arr[idx3];
-			map[key] = nv_decode_arg(key_val_arr[idx3+1]);
+		console.log("receive a map");
+		if (arg) {
+			var key_val_arr = arg.split(nv_KEY_VAL);
+			for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
+				var key = key_val_arr[idx3];
+				map[key] = nv_decode_arg(key_val_arr[idx3+1]);
+			}
 		}
 		return map;
+	}
+	if (type_marker == nv_LIST_MARK) {
+		var list = [];
+		console.log("receive a list");
+		if (arg) {
+			var key_val_arr = arg.split(nv_KEY_VAL);
+			console.log("length " + key_val_arr.length);
+			for (var idx3 = 0; idx3 < key_val_arr.length; ++idx3) {
+				list.push(nv_decode_arg(key_val_arr[idx3]));
+			}
+		}
+		return list;
 	}
 	return null;
 }
 
-function nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
+function nv_encode(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 {
 	var str = nv_CMD_MARK + action_str + nv_ARG_SEP + nv_STRING_MARK + get_module(win);
 	var args = [];
@@ -507,21 +627,114 @@ function nv_encoder(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 		}
 		str += nv_encode_arg(arg);
 	}
+	//console.log("encoding " + action_str + " " + arg1 + " " + arg2 + " " + arg3 + " " + arg4 + " " + arg5 + " " + arg6 + " => " + str);
 	return str;
 }
 
+function nv_get_url(cmd)
+{
+	if (cmd.trim().length == 0) {
+		return;
+	}
+	var url = window.location.href;
+	console.log("CMD [" + cmd + "]");
+	console.log("CMD2 [" + cmd.replace(COMMENT_REGEX, "") + "]");
+	console.log("CMD3 [" + cmd.replace(COMMENT_REGEX, "").replace(LINE_BREAK_REGEX_G, "") + "]");
+	var data = cmd.replace(COMMENT_REGEX, "").replace(LINE_BREAK_REGEX_G, "");
+	var url = window.location.href;
+	var idx = url.lastIndexOf('/');
+	url = url.substr(0, idx);
+	console.log("DATA [" + data + "]");
+	var geturl = url + "/index.php?command=" + escape(data);
+	var posturl = url + "/launcher.php";
+	var text = "GET URL<br/>" + geturl + "<br/><br/>" + "POST URL<br/>" + posturl + "<br/>POST data<br/>" + data;
+	display_dialog("URL", "", text, window);
+
+
+
+}
+
+var RSP_ID = 1;
+var SERVER_TRACE = 0;
+
+function nv_rsp(url, data) {
+	if (SERVER_TRACE) {
+		console.log("nv_rsp: " + url + "  " + data + " " + RSP_ID++);
+	}
+	$.ajax(url,
+	       {
+		       async: true,
+		       dataType: 'text',
+		       type: 'POST',
+		       data: {data: nv_encode_arg(data)},
+		       success: function(ret) {
+			       if (SERVER_TRACE) {
+				       console.log("response has been sucesfully send [" + ret + "]");
+			       }
+		       },
+		       
+		       error: function(e) {
+			       console.log("sending response failure");
+		       }
+	       }
+	      );
+}
+
+function nv_rcv(base_url, url) {
+	if (SERVER_TRACE) {
+		console.log("nv_rcv: " + url);
+	}
+	$.ajax(url,
+	       {
+		       async: true,
+		       dataType: 'text',
+		       success: function(cmd) {
+			       if (SERVER_TRACE) {
+				       console.log("received [" + cmd + "]");
+			       }
+			       if (cmd.trim().length > 0) {
+				       var data = nv_decode(cmd);
+				       if (data) {
+					       if (SERVER_TRACE) {
+						       console.log("returning data " + data);
+					       }
+					       var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
+					       nv_rsp(rsp_url, data);
+				       }
+			       }
+			       nv_rcv(base_url, url);
+		       },
+		       
+		       error: function(e) {
+			       console.log("error!! " + e);
+		       }
+	       }
+	      );
+}
+
+function nv_server(win, id) {
+	var href = window.location.href;
+	var idx = href.indexOf('/navicell/');
+	var base_url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?id=" + id;
+	var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
+	nv_rcv(base_url, url);
+}
+
 //
-// to be moved to nv_decoder.js ?
+// to be moved to nv_decode.js ?
 //
-// setTimeout(function() {nv_decoder("|@@|nv_heatmap_editor_perform|--||--|Sopen|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N0|--|S#1|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N2|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N0|--|S#0|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N1|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sapply|@@|nv_find_entities|--|S|--|SAK.*");}, 2000);
+// setTimeout(function() {nv_decode("|@@|nv_heatmap_editor_perform|--||--|Sopen|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N0|--|S#1|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N2|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N0|--|S#0|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N1|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sapply|@@|nv_find_entities|--|S|--|SAK.*");}, 2000);
 //
 var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
-// decoder
-function nv_decoder(str)
+// decode
+function nv_decode(str)
 {
+	var o_decoding = nv_decoding;
+	nv_decoding = true;
+	var ret = null;
+
 	str = str.replace(COMMENT_REGEX, "");
-	//console.log("STR [" + str + "]");
 	var action_arr = str.split(nv_CMD_MARK);
 	for (var idx in action_arr) {
 		var tmpargs = action_arr[idx].split(nv_ARG_SEP);
@@ -539,14 +752,17 @@ function nv_decoder(str)
 		var module = args[1].substring(1);
 		var win = module ? get_win(module) : window;
 		if (!win) {
-			console.log("nv_decoder: unknown module " + module);
+			console.log("nv_decode: unknown module " + module);
 			continue;
 		}
 		for (var idx2 = 2; idx2 < args.length; ++idx2) {
 			args[idx2] = nv_decode_arg(args[idx2]);
 		}
-		nv_perform(action_str, win, args[2], args[3], args[4], args[5], args[6], args[7]);
+		ret = nv_perform(action_str, win, args[2], args[3], args[4], args[5], args[6], args[7]);
 	}
+
+	nv_decoding = o_decoding;
+	return ret;
 }
 
 /*
@@ -568,6 +784,11 @@ nv_heatmap_editor_perform(window, "apply");
 nv_heatmap_editor_perform(window, "select_sample", 0, -1);
 nv_heatmap_editor_perform(window, "select_sample", 2, -1);
 
+
+nv_open(window, "SQUARE");
+nv_heatmap_editor_perform("OVAL", "open");
+nv_heatmap_editor_perform("OVAL", "select_datatable", 0, '#0');
+nv_heatmap_editor_perform("20111118modelc:master", "select_datatable", 1, '#2');
 */
 
 /*
@@ -593,4 +814,8 @@ nv_heatmap_editor_perform(window, "select_sample", 2, -1);
 
 ## 6:04:36 PM 2014-08-20
 |@@|nv_find_entities|--|S20111118modelc:master|--|SAK.*
+
+|@@|nv_open|--|S|--|SSQUARE
+|@@|nv_open|--|S|--|SOVAL
 */
+

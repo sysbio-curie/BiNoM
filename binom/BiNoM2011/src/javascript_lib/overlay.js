@@ -47,6 +47,56 @@ function is_included(box, clicked_boundbox) {
 		box[1] >= clicked_boundbox[1] && box[1]+box[3] <= clicked_boundbox[1]+clicked_boundbox[3];
 }
 
+function click_node(overlay, node, mode, center, clicked_boundbox) {
+	var overlayProjection = overlay.getProjection();
+	var mapProjection = overlay.map_.getProjection();
+
+	var is_checked = node.isChecked();
+	if (is_checked) {
+		node.checkSubtree(JXTree.UNCHECKED);
+	} else {
+		node.checkSubtree(JXTree.CHECKED);
+		node.openSupertree(JXTree.OPEN);
+	}
+	is_checked = node.isChecked();
+	var clickmap_tree_node = node.getUserData().clickmap_tree_node;
+	var latlng = (clicked_boundbox ? mapProjection.fromPointToLatLng(clicked_boundbox.gpt) : null);
+	console.log("clickmap_tree_node: " + clickmap_tree_node);
+	if (clickmap_tree_node) {
+		$.each(clickmap_tree_node.markers, function() {
+			var diff_lat;
+			var diff_lng;
+			if (latlng) {
+				diff_lat = Math.abs(latlng.lat() - this.getPosition().lat());
+				diff_lng = Math.abs(latlng.lng() - this.getPosition().lng());
+			}
+			if (!latlng || (diff_lat <= ESP_LATLNG && diff_lng <= ESP_LATLNG)) {
+				if (mode == "select") {
+					bubble_open(this);
+					if (center) {
+						var bounds = new google.maps.LatLngBounds();
+						extend(bounds, this);
+						overlay.win.map.setCenter(bounds.getNorthEast());
+					}
+				} else if (mode == "unselect") {
+					bubble_close(this);
+				} else if (mode == "toggle") {
+					if (is_checked) {
+						bubble_open(this);
+						if (center) {
+							var bounds = new google.maps.LatLngBounds();
+							extend(bounds, this);
+							overlay.win.map.setCenter(bounds.getNorthEast());
+						}
+					} else {
+						bubble_close(this);
+					}
+				}
+			}
+		});
+	}
+}
+
 function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
@@ -110,6 +160,10 @@ function event_ckmap(e, e2, type, overlay) {
 		console.log("clicked_node: " + clicked_node);
 	}
 	if (clicked_node) {
+		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, "toggle", false, clicked_boundbox);
+		//click_node(overlay, clicked_node, "toggle", clicked_boundbox);
+
+		/*
 		var node = clicked_node;
 		var is_checked = node.isChecked();
 		if (is_checked) {
@@ -137,6 +191,7 @@ function event_ckmap(e, e2, type, overlay) {
 				}
 			});
 		}
+		*/
 	}
 
 	var map_name = overlay.map_.map_name;

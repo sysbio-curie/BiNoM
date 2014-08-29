@@ -389,6 +389,7 @@ var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>|&nbsp;", "g");
 var TAG_REGEX = new RegExp(">\\w+:\\w+</a>|&nbsp;(\\w| )+&nbsp;", "g");
 var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
 var LINE_BREAK_REGEX = /\r\n?|\n/;
+var LINE_BREAK_REGEX_G = new RegExp("\r\n?|\n", "g");
 var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
 var NUM_REGEX = new RegExp("^-?[0-9]+(\.[0-9]*)?$");
 
@@ -3375,6 +3376,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 	if (url) {
 		$.ajax(url,
 		       {
+			       crossDomain: true, // TESTING
 			       async: async,
 			       dataType: 'text',
 			       success: function(data) {
@@ -4140,9 +4142,8 @@ function get_module_from_doc(doc) {
 
 function get_win(module) {
 	for (var map_name in maps) {
-		var doc = maps[map_name].document;
-		if (module == doc.navicell_module_name) {
-			return doc.win;
+		if (module == map_name) {
+			return maps[map_name].document.win;
 		}
 	}
 	return null;

@@ -2,9 +2,14 @@ package fr.curie.BiNoM.pathways;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -13,6 +18,7 @@ import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.BioPAXFactory;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level3.BioSource;
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Catalysis;
 import org.biopax.paxtools.model.level3.Complex;
@@ -52,6 +58,7 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesReferenceDocument;
 
+import fr.curie.BiNoM.pathways.biopax.bioSource;
 import fr.curie.BiNoM.pathways.biopax.complexAssembly;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
@@ -116,7 +123,16 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	/**
 	 * Pathway
 	 */
-	private Pathway pathway;
+	//private Pathway pathway;
+	
+	/**
+	 * Map pathways(CellDesigner map or module name) to reaction ID.
+	 */
+	private HashMap<String, HashSet<String>> pathwayReactionMap;
+	
+	private HashMap<String, Pathway> pathwayMap;
+	
+	private HashSet<String> pathwayNames;
 	
 	/**
 	 * Constructor.
@@ -131,20 +147,24 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		genes = new HashMap<String, CelldesignerGeneDocument.CelldesignerGene>();
 		rnas = new HashMap<String, CelldesignerRNADocument.CelldesignerRNA>();
 		asrnas = new HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA>();
+		pathwayReactionMap = new HashMap<String, HashSet<String>>();
+		pathwayMap = new HashMap<String, Pathway>();
+		pathwayNames = new HashSet<String>();
 		// initialize BioPAX objects containers
 		bpEntityReferences = new HashMap<String, EntityReference>();
 		bpPhysicalEntities = new HashMap<String, PhysicalEntity>();
 		bpPublicationXref = new  HashMap<String, PublicationXref>();
 		bpUnificationXref = new  HashMap<String, UnificationXref>();
+		
 	}
 	
-	// test 
+	// test routine
 	public static void main(String[] args) {
 		
 		 // Load celldesigner file 
 		//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_APC.xml");
-		//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
-		File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
+		File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
+		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
 		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/acsn_master.xml");
 		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
 		CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());
@@ -162,8 +182,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	public void convert() {
 		createBioPAXModel();
-		createPathway();
 		fillBioPAXModel();
+		//saveModel();
 	}
 	
 	public void setCellDesigner(SbmlDocument sb) {
@@ -176,12 +196,13 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		model.setXmlBase("http://sysbio.curie.fr/");
 	}
 	
-	private void createPathway() {
-		String modelId = sbml.getSbml().getModel().getId();
-		String uri = biopaxNameSpacePrefix + modelId;
-		pathway = model.addNew(Pathway.class, uri);
-		pathway.addComment("Pathway generated automatically from CellDesigner xml file using BiNoM software http://binom.curie.fr");
-	}
+//	private void createPathway() {
+//		String modelId = sbml.getSbml().getModel().getId();
+//		String uri = biopaxNameSpacePrefix + modelId;
+//		pathway = model.addNew(Pathway.class, uri);
+//		pathway.addComment("Pathway generated automatically from CellDesigner xml file using BiNoM software http://binom.curie.fr");
+//	}
+	
 	private void fillBioPAXModel() {
 		
 		System.out.println("start filling the model...");
@@ -203,6 +224,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		setBioPAXSmallMolecules();
 		setBioPAXSpecies();
 		setBioPAXReactions();
+		
 	}
 	
 	/**
@@ -211,7 +233,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	private void getSpecies(){
 		for (int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++) {
 			SpeciesDocument.Species s = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
-			//System.out.println(s);
 			species.put(s.getId(), s);
 		}
 	}
@@ -236,12 +257,20 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 * Fill the map of CellDesigner reactions
 	 */
 	private void getReactions(){
-		if(sbml.getSbml().getModel().getListOfReactions() != null) {
+		if (sbml.getSbml().getModel().getListOfReactions() != null) {
 			for (int i=0; i<sbml.getSbml().getModel().getListOfReactions().getReactionArray().length; i++) {
 				ReactionDocument.Reaction r = sbml.getSbml().getModel().getListOfReactions().getReactionArray(i);
 				reactions.put(r.getId(),r);
-				//System.out.println("reaction: " + r.getId());
+				buildPathwayReactionMap(r);
 			}
+		buildPathwayMap();
+		
+//		for (String r : pathwayReactionMap.keySet())
+//			System.out.println(">>>" + r + ":" + pathwayReactionMap.get(r).toString());
+		
+		for (String n : pathwayMap.keySet())
+			System.out.println("--> "+n+" "+pathwayMap.get(n));
+			
 		}
 	}
 	
@@ -707,8 +736,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	}
 	
 	private void setBioPAXReactions() {
-		
-		for (String reactionId : reactions.keySet()){
+		for (String reactionId : reactions.keySet()) {
 			ReactionDocument.Reaction re = reactions.get(reactionId);
 			//System.out.println("_reaction\t"+re.getId());
 			createBioPAXReaction(re);
@@ -723,6 +751,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				reaction.getAnnotation().getCelldesignerReactionType() != null) {
 			reactionType = Utils.getValue(reaction.getAnnotation().getCelldesignerReactionType());
 		}
+		//System.out.println("_reactionType\t"+reactionType+"\t"+reaction.getId());
 		
 		Control ctrl = null;
 		Conversion conv = null;
@@ -791,7 +820,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 		
 		
-		if(reactionType.equals("HETERODIMER_ASSOCIATION") || reactionType.equals("DISSOCIATION")) {
+		if(reactionType.equals("HETERODIMER_ASSOCIATION") || 
+				reactionType.equals("DISSOCIATION")) {
 			String uri = biopaxNameSpacePrefix + reaction.getId();
 			ComplexAssembly cas = model.addNew(ComplexAssembly.class, uri);
 			inter = cas;
@@ -805,6 +835,10 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				reactionType.equals("TRANSLATION") ||
 				reactionType.equals("TRANSCRIPTION") ||
 				reactionType.equals("POSITIVE_INFLUENCE") ||
+				reactionType.equals("UNKNOWN_POSITIVE_INFLUENCE") ||
+				reactionType.equals("UNKNOWN_NEGATIVE_INFLUENCE") ||
+				reactionType.equals("MODULATION") ||
+				reactionType.equals("REDUCED_MODULATION") ||
 				reactionType.equals("NEGATIVE_INFLUENCE")
 				) {
 			String uri = biopaxNameSpacePrefix + reaction.getId();
@@ -814,7 +848,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 	
 		if(reactionType.equals("DEGRADATION")) {
-			//System.out.println("DEGRADATION");
 			String uri = biopaxNameSpacePrefix + reaction.getId();
 			Degradation deg = model.addNew(Degradation.class, uri);
 			conv = deg;
@@ -829,7 +862,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				// create uri unique for each modifiers related to the main reaction
 				String uri = biopaxNameSpacePrefix + "_c" + Integer.toString(j) + "_"+ reaction.getId();
 				Catalysis cat = model.addNew(Catalysis.class, uri);
-				pathway.addPathwayComponent(cat);
+				//pathway.addPathwayComponent(cat);
 				cat.addController(pe);
 				cat.addControlled(inter);
 				if (reaction.getAnnotation() != null && reaction.getAnnotation().getCelldesignerListOfModification() != null) {
@@ -855,11 +888,11 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		
 		// add reaction to global pathway
 		if (inter == null) {
-			System.out.println("Warning: inter null for reaction " + reaction.getId() + " type: " + reactionType);
+			System.out.println("Warning! inter null for reaction " + reaction.getId() + " type: " + reactionType);
 		}
 		else {
-			pathway.addPathwayComponent(inter);
-			pathway.addComment("CDTYPE: " + reactionType);
+			//pathway.addPathwayComponent(inter);
+			//pathway.addComment("CDTYPE: " + reactionType);
 		}
 		
 		// add publications cross-references
@@ -894,9 +927,57 @@ public class CellDesignerToBioPAXConverterPaxtools {
 //					System.out.println("Warning: right PhysicalEntity "+id+" null for reaction "+ reaction.getId());
 			}
 		}
-	
+		
 	}
 	
+	/**
+	 * create map of reaction to pathway names 
+	 * @param reaction
+	 */
+	private void buildPathwayReactionMap(ReactionDocument.Reaction reaction) {
+		String reactionId  = reaction.getId();
+		String comment  = Utils.getValue(reaction.getNotes()).trim();
+		StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
+		while (st.hasMoreTokens()) {
+			String ss = st.nextToken();
+			if (ss.equals("MAP") || ss.equals("MODULE")) {
+				String str = st.nextToken();
+				String pathwayName = ss.toLowerCase() + "_" + str;
+				pathwayNames.add(pathwayName);
+				if (pathwayReactionMap.get(reactionId) == null)
+					pathwayReactionMap.put(reactionId, new HashSet<String>());
+				pathwayReactionMap.get(reactionId).add(pathwayName);
+			}
+		}
+	}
+	
+	/**
+	 * build map of pathway names to BioPAX pathway objects
+	 */
+	private void buildPathwayMap() {
+		// set taxon for pathways
+		BioSource bs = model.addNew(BioSource.class, biopaxNameSpacePrefix + "_organism");
+		HashSet<String> taxon = new HashSet<String>();
+		taxon.add("Homo sapiens");
+		bs.setName(taxon);
+		for (String pathwayName : pathwayNames) {
+			String uri = biopaxNameSpacePrefix + pathwayName;
+			Pathway p = model.addNew(Pathway.class, uri);
+			p.addComment("Pathway generated automatically from CellDesigner xml file using BiNoM software http://binom.curie.fr");
+			p.setOrganism(bs);
+			p.setDisplayName(pathwayName);
+			p.setStandardName(pathwayName);
+			pathwayMap.put(pathwayName, p);
+		}
+	}
+	
+	private void addReactionToPathway(String reactionId, Interaction inter) {
+		for (String pathwayName : pathwayMap.keySet()) {
+			if (pathwayReactionMap.get(pathwayName).contains(reactionId)) {
+				pathwayMap.get(pathwayName).addPathwayComponent(inter);
+			}
+		}
+	}
 	
 	private void testSetBioPAXSpecies() {
 		//System.out.println(">>> mem:: "+Utils.getUsedMemoryMb());
@@ -987,6 +1068,22 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		handler.convertToOWL(model, out);
 		System.out.println(out);
 	}
+	
+	/**
+	 * save BioPAX model to file
+	 */
+	private void saveModel() {
+		try {
+			FileOutputStream fo = new FileOutputStream("/Users/eric/test.owl");
+			BioPAXIOHandler handler = new SimpleIOHandler();
+			handler.convertToOWL(model, fo);
+			fo.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
 
 	/**
 	 * Extracts Pubmed IDs from CellDesigner comment string (PMID:xxxxxx) in Celldesigner object notes 
@@ -1006,7 +1103,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 					if (xref == null) {
 						String uri = biopaxNameSpacePrefix + "Pubmed_" + pubmed_id;
 						xref = model.addNew(PublicationXref.class, uri);
-						xref.setDb("Pubmed");
+						xref.setDb("pubmed");
 						xref.setId(pubmed_id);
 						bpPublicationXref.put(pubmed_id, xref);
 					}
@@ -1037,7 +1134,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 					if (xref == null) {
 						String uri = biopaxNameSpacePrefix + "HUGO_" + hugo_id;
 						xref = model.addNew(UnificationXref.class, uri);
-						xref.setDb("HUGO");
+						xref.setDb("HGNC");
 						xref.setId(hugo_id);
 						bpUnificationXref.put(hugo_id, xref);
 					}

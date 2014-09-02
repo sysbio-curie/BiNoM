@@ -60,7 +60,17 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 	}
 	is_checked = node.isChecked();
 	var clickmap_tree_node = node.getUserData().clickmap_tree_node;
-	var latlng = (clicked_boundbox ? mapProjection.fromPointToLatLng(clicked_boundbox.gpt) : null);
+
+	var latlng;
+	if (clicked_boundbox) {
+		if (!clicked_boundbox.gpt) {
+				clicked_boundbox.gpt = new google.maps.Point(clicked_boundbox[0], clicked_boundbox[2]);
+		}
+		latlng = mapProjection.fromPointToLatLng(clicked_boundbox.gpt);
+	} else {
+		latlng = null;
+	}
+
 	console.log("clickmap_tree_node: " + clickmap_tree_node);
 	if (clickmap_tree_node) {
 		$.each(clickmap_tree_node.markers, function() {

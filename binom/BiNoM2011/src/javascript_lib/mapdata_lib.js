@@ -413,6 +413,10 @@ Mapdata.prototype = {
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
 
+	getModules: function() {
+		return this.module_mapdata;
+	},
+
 	getPostModuleLink: function(postid) {
 		return this.module_postid[postid];
 	},
@@ -435,6 +439,15 @@ Mapdata.prototype = {
 		jxtree.userFind(user_find);
 	},
 
+	getHugoNames: function() {
+		var hugo_names = [];
+		for (var hugo_name in this.hugo_map) {
+			hugo_names.push(hugo_name);
+		}
+		console.log("getHugoNames: " + mapSize(this.hugo_map) + " " + hugo_names.length);
+		return hugo_names;
+	},
+
 	// no effect... should fixed that
 	searchFor: function(win, what, div) {
 		if (what.trim() == "/?") {
@@ -446,7 +459,7 @@ Mapdata.prototype = {
 		}
 	},
 
-	findJXTreeContinue: function(win, to_find, no_ext, action, hints) {
+	findJXTreeContinue: function(win, to_find, no_ext, action, hints, open_bubble) {
 		var module_name = win.document.navicell_module_name;
 		var mapdata = this;
 		var jxtree = mapdata.module_jxtree[module_name];
@@ -484,6 +497,9 @@ Mapdata.prototype = {
 		}
 
 		if (action == 'subtree' && res_jxtree) {
+			var o_open_bubble = nv_open_bubble;
+			nv_open_bubble = open_bubble;
+
 			if (!no_ext) {
 				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
 			}
@@ -511,10 +527,12 @@ Mapdata.prototype = {
 			time_cnt++;
 			$("img.blogfromright", win.document).click(open_blog_click);
 			$("img.mapmodulefromright", win.document).click(open_module_map_click);
+
+			nv_open_bubble = o_open_bubble;
 		}
 	},
 
-	findJXTree: function(win, to_find, no_ext, action, hints) {
+	findJXTree: function(win, to_find, no_ext, action, hints, open_bubble) {
 		var module_name = win.document.navicell_module_name;
 		var mapdata = this;
 		if (!hints) {
@@ -534,11 +552,11 @@ Mapdata.prototype = {
 				to_find_str += ")$";
 				hints.case_sensitive = true;
 				mapdata.searchFor(win, to_find_str, hints.div);
-				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints);
+				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints, open_bubble);
 			} else {
 				mapdata.searchFor(win, to_find, hints.div);
 				setTimeout(function() {
-					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints);
+					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints, open_bubble);
 				}, 20);
 			}
 
@@ -749,6 +767,7 @@ Mapdata.prototype = {
 
 		var modif_map = {};
 		var shape_map = {};
+		console.log("addModuleMapData");
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
@@ -783,10 +802,12 @@ Mapdata.prototype = {
 					this.module_mapdata_by_id[module_name][module.id] = module;
 				}
 			} else if (entities) {
+				console.log("entities: " + entities.length);
 				for (var jj = 0; jj < entities.length; ++jj) {
 					var entity_map = entities[jj];
 					var hugo_arr = entity_map['hugo'];
 					if (hugo_arr && hugo_arr.length > 0) {
+						console.log("hugo: " + hugo_arr.length);
 						for (var kk = 0; kk < hugo_arr.length; ++kk) {
 							var hugo = hugo_arr[kk];
 							if (!this.hugo_map[hugo]) {
@@ -968,6 +989,10 @@ Dataset.prototype = {
 
 	datatableCount: function() {
 		return mapSize(this.datatables);
+	},
+
+	getDatatables: function() {
+		return this.datatables;
 	},
 
 	readDatatable: function(biotype_name, name, file, url, win, async) {
@@ -3374,20 +3399,25 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 	var datatable = this;
 
 	if (url) {
-		$.ajax(url,
-		       {
-			       crossDomain: true, // TESTING
-			       async: async,
-			       dataType: 'text',
-			       success: function(data) {
-				       datatable.loadData(data, ready, win);
-			       },
-			       
-			       error: function() {
-				       datatable.loadDataError(ready, "error loading [" + url + "]");
+		if (url.match(/^@DATA\n/)) {
+			console.log("@DATA found !");
+			datatable.loadData(url.substring(6), ready, win); // TBD: change 6 to "@DATA".length+1
+		} else {
+			$.ajax(url,
+			       {
+				       crossDomain: true, // TESTING
+				       async: async,
+				       dataType: 'text',
+				       success: function(data) {
+					       datatable.loadData(data, ready, win);
+				       },
+				       
+				       error: function() {
+					       datatable.loadDataError(ready, "error loading [" + url + "]");
+				       }
 			       }
-		       }
-		      );
+			      );
+		}
 	} else {
 		reader.readAsBinaryString(file);
 		

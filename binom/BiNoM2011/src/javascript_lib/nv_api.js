@@ -21,6 +21,7 @@
 
 // NaviCell API
 
+var nv_open_bubble = false;
 var nv_decoding = false;
 
 // Utility functions
@@ -89,7 +90,7 @@ function nv_win(win)
 
 // API
 
-function nv_open(win, module, ids)
+function nv_open_module(win, module, ids)
 {
 	console.log("module: [" + module + "] " + ids.length);
 	win.show_map_and_markers(module, ids ? ids : []);
@@ -109,10 +110,10 @@ function nv_open(win, module, ids)
 //    nv_find_entities(window, "AK.*");
 // ------------------------------------------------------------------------------------------------------------------
 
-function nv_find_entities(win, search)
+function nv_find_entities(win, search, open_bubble)
 {
 	win = nv_win(win);
-	navicell.mapdata.findJXTree(win, search, false, 'subtree', {div: $("#result_tree_contents", win.document).get(0)});
+	navicell.mapdata.findJXTree(win, search, false, 'subtree', {div: $("#result_tree_contents", win.document).get(0)}, open_bubble);
 	$("#right_tabs", win.document).tabs("option", "active", 1);
 	return null;
 }
@@ -143,7 +144,7 @@ function nv_uncheck_all_entities(win)
 function nv_scroll(win, xoffset, yoffset)
 {
 	var map = win.map;
-	console.log("nv_scroll " + xoffset + " " + yoffset);
+	//console.log("nv_scroll " + xoffset + " " + yoffset);
 
 	var center = map.getCenter();
 	var scrolled_center;
@@ -206,7 +207,6 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 {
 	win = nv_win(win);
 	var module = get_module(win);
-	//var module = win.document.navicell_module_name;
 	var drawing_config = navicell.getDrawingConfig(module);
 	var dt_desc_list = [];
 	var async = params && params.async != undefined && !nv_decoding ? params.async : false;
@@ -354,9 +354,34 @@ function nv_prepare_import_dialog(win, filename, name, type)
 	return null;
 }
 
-function nv_get_gene_list(win)
+function nv_get_module_list(win)
+{
+	var module_names = [];
+	for (var module_name in navicell.mapdata.getModules()) {
+		module_names.push(module_name);
+	}
+	return module_names;
+}
+
+function nv_get_datatable_list(win)
+{
+	var ret_datatables = [];
+	var datatables = navicell.dataset.getDatatables();
+	for (var name in datatables) {
+		var datatable = datatables[name];
+		ret_datatables.push([datatable.name, datatable.biotype.name]);
+	}
+	return ret_datatables;
+}
+
+function nv_get_datatable_gene_list(win)
 {
 	return navicell.dataset.getSortedGeneNames();
+}
+
+function nv_get_hugo_list(win)
+{
+	return navicell.mapdata.getHugoNames();
 }
 
 function nv_heatmap_editor_perform(win, command, arg1, arg2)
@@ -474,26 +499,33 @@ function nv_now()
 	if (day.length == 1) {
 		day = "0" + day;
 	}
-	return date.toLocaleTimeString() + " " + date.getFullYear() + "-" + month + "-" + day; 
+	return {date: date.toLocaleTimeString() + " " + date.getFullYear() + "-" + month + "-" + day, timestamp: date.getTime()};
 }
 
-function nv_record(win, cmd) {
+function nv_record(win, to_encode) {
 	var history = $("#command-history", win.document).val();
+	var now = to_encode.now;
+	var cmd = to_encode.cmd;
 	var last = cmd[cmd.length-1];
-	$("#command-history", win.document).val((history ? history + "\n\n" : "") + "## " + nv_now() + "\n" + cmd);
+	$("#command-history", win.document).val((history ? history + "\n\n" : "") + "## " + now.date + "\n" + cmd);
 }
 
 var nv_handlers = {
-	"nv_open": nv_open,
+	"nv_open_module": nv_open_module,
 	"nv_find_entities": nv_find_entities,
 	"nv_select_entity": nv_select_entity,
 	"nv_set_zoom": nv_set_zoom,
 	"nv_uncheck_all_entities": nv_uncheck_all_entities,
 	"nv_scroll": nv_scroll,
-	"nv_get_gene_list": nv_get_gene_list,
+
 	"nv_import_datatables": nv_import_datatables,
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,
-	"nv_heatmap_editor_perform": nv_heatmap_editor_perform
+	"nv_heatmap_editor_perform": nv_heatmap_editor_perform,
+
+	"nv_get_module_list": nv_get_module_list,
+	"nv_get_datatable_list": nv_get_datatable_list,
+	"nv_get_datatable_gene_list": nv_get_datatable_gene_list,
+	"nv_get_hugo_list": nv_get_hugo_list
 };
 
 // nv_perform("nv_import_datatables", window, "Datatable list", "", "", "file:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt", {import_display_markers: false, import_display_barplot: true});
@@ -506,7 +538,7 @@ function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 		return;
 	}
 	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6);
-	nv_record(win, nv_encode(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
+	nv_record(win, nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
 	return ret;
 }
 
@@ -514,121 +546,36 @@ function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 // encode/decode
 //
 
-var nv_CMD_MARK = "|@@|";
-var nv_STRING_MARK = "S";
-var nv_NUMBER_MARK = "N";
-var nv_BOOL_MARK = "B";
-var nv_UNK_MARK = "U";
-var nv_MAP_MARK = "M";
-var nv_OBJ_MARK = "O";
-var nv_LIST_MARK = "L";
-var nv_KEY_VAL = "|::|";
-var nv_ARG_SEP = "|--|";
+var nv_CMD_MARK = "@COMMAND";
 
-var nv_type_markers = {
-	"string" : nv_STRING_MARK,
-	"number" : nv_NUMBER_MARK,
-	"boolean" : nv_BOOL_MARK,
-	"object" : nv_OBJ_MARK
-};
-	
-// code
-function nv_encode_arg(arg, reentrant)
+function nv_push_arg(args, arg)
 {
-	var type_marker = nv_type_markers[typeof arg];
-	if (!type_marker) {
-		console.log("nv_encode: type " + (typeof arg) + " " + arg + " not supported");
-		//return nv_ARG_SEP + nv_UNK_MARK;
-		return nv_ARG_SEP + nv_STRING_MARK;
+	if (arg != undefined) {
+		args.push(arg);
 	}
-	if (type_marker == nv_OBJ_MARK) {
-		type_marker = (arg.length == undefined) ? nv_MAP_MARK : nv_LIST_MARK;
-	}
-	var str = (reentrant ? "" : nv_ARG_SEP) + type_marker;
-	if (type_marker == nv_MAP_MARK || type_marker == nv_LIST_MARK) {
-		//if (type_marker == nv_MAP_MARK) {console.log("encode map");} else {console.log("encode list " + arg.length);}
-		var has_key = false;
-		for (var key in arg) {
-			var val = arg[key];
-			if (typeof val != 'function') {
-				if (typeof val != 'object') { // object within object not supported
-					str += (has_key ? nv_KEY_VAL : "") + key + nv_KEY_VAL + nv_encode_arg(val, true);
-					has_key = true;
-				}
-			}
-		}
-	} else {
-		str += arg;
-	}
-	return str;
 }
 
-function nv_decode_arg(arg)
+function nv_encode_data(data)
 {
-	if (!arg) {
-		return null;
-	}
-	var type_marker = arg[0];
-	arg = arg.substring(1);
-	if (type_marker == nv_UNK_MARK) {
-		return "";
-	}
-	if (type_marker == nv_NUMBER_MARK) {
-		return parseFloat(arg);
-	}
-	if (type_marker == nv_BOOL_MARK) {
-		return arg == "true" || arg == "TRUE" ? true : false;
-	}
-	if (type_marker == nv_STRING_MARK) {
-		return arg;
-	}
-	if (type_marker == nv_MAP_MARK) {
-		var map = {};
-		console.log("receive a map");
-		if (arg) {
-			var key_val_arr = arg.split(nv_KEY_VAL);
-			for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
-				var key = key_val_arr[idx3];
-				map[key] = nv_decode_arg(key_val_arr[idx3+1]);
-			}
-		}
-		return map;
-	}
-	if (type_marker == nv_LIST_MARK) {
-		var list = [];
-		console.log("receive a list");
-		if (arg) {
-			var key_val_arr = arg.split(nv_KEY_VAL);
-			console.log("length " + key_val_arr.length);
-			for (var idx3 = 0; idx3 < key_val_arr.length; ++idx3) {
-				list.push(nv_decode_arg(key_val_arr[idx3]));
-			}
-		}
-		return list;
-	}
-	return null;
+	return JSON.stringify(data);
 }
 
-function nv_encode(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
+function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 {
-	var str = nv_CMD_MARK + action_str + nv_ARG_SEP + nv_STRING_MARK + get_module(win);
+	var map = {};
 	var args = [];
-	args.push(arg1);
-	args.push(arg2);
-	args.push(arg3);
-	args.push(arg4);
-	args.push(arg5);
-	args.push(arg6);
-	
-	for (var idx = 0; idx < args.length; ++idx) {
-		var arg = args[idx];
-		if (arg == undefined) {
-			break;
-		}
-		str += nv_encode_arg(arg);
-	}
-	//console.log("encoding " + action_str + " " + arg1 + " " + arg2 + " " + arg3 + " " + arg4 + " " + arg5 + " " + arg6 + " => " + str);
-	return str;
+	nv_push_arg(args, arg1);
+	nv_push_arg(args, arg2);
+	nv_push_arg(args, arg3);
+	nv_push_arg(args, arg4);
+	nv_push_arg(args, arg5);
+	nv_push_arg(args, arg6);
+	var now = nv_now();
+	map["action"] = action_str;
+	map["module"] = get_module(win);
+	map["args"] = args;
+	map["timestamp"] = now.timestamp;
+	return {now: now, cmd: nv_CMD_MARK + " " + JSON.stringify(map)};
 }
 
 function nv_get_url(cmd)
@@ -666,7 +613,7 @@ function nv_rsp(url, data) {
 		       async: true,
 		       dataType: 'text',
 		       type: 'POST',
-		       data: {data: nv_encode_arg(data)},
+		       data: {data: nv_encode_data(data)},
 		       success: function(ret) {
 			       if (SERVER_TRACE) {
 				       console.log("response has been sucesfully send [" + ret + "]");
@@ -693,20 +640,24 @@ function nv_rcv(base_url, url) {
 				       console.log("received [" + cmd + "]");
 			       }
 			       if (cmd.trim().length > 0) {
-				       var data = nv_decode(cmd);
-				       if (data) {
-					       if (SERVER_TRACE) {
-						       console.log("returning data " + data);
+				       try {
+					       var data = nv_decode(cmd);
+					       if (data) {
+						       if (SERVER_TRACE) {
+							       console.log("returning data " + data);
+						       }
+						       var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
+						       nv_rsp(rsp_url, data);
 					       }
-					       var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
-					       nv_rsp(rsp_url, data);
+				       } catch(e) {
+					       console.log("nv_rcv exception: " + e);
 				       }
 			       }
 			       nv_rcv(base_url, url);
 		       },
 		       
 		       error: function(e) {
-			       console.log("error!! " + e);
+			       console.log("error DECODING " + e);
 		       }
 	       }
 	      );
@@ -729,6 +680,207 @@ var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
 // decode
 function nv_decode(str)
+{
+	var o_decoding = nv_decoding;
+	nv_decoding = true;
+	var ret = null;
+
+	str = str.replace(COMMENT_REGEX, "");
+	var action_arr = str.split(nv_CMD_MARK);
+	for (var idx in action_arr) {
+		var action = action_arr[idx].trim();
+		if (action.length == 0) {
+			continue;
+		}
+		var action_map = JSON.parse(action);
+		var action_str = action_map.action;
+		var module = action_map.module;
+		var args = action_map.args;
+		var win = module ? get_win(module) : window;
+		if (!win) {
+			console.log("nv_decode: unknown module " + module);
+			continue;
+		}
+		ret = nv_perform(action_str, win, args[0], args[1], args[2], args[3], args[4], args[5]);
+	}
+
+	nv_decoding = o_decoding;
+	return ret;
+}
+
+/*
+nv_heatmap_editor_perform(window, "open");
+
+nv_heatmap_editor_perform(window, "select_datatable", 0, '#0');
+nv_heatmap_editor_perform(window, "select_datatable", 1, '#1');
+nv_heatmap_editor_perform(window, "select_datatable", 2, '#2');
+
+nv_heatmap_editor_perform(window, "select_sample", 0, '#0');
+nv_heatmap_editor_perform(window, "select_sample", 1, '#4');
+nv_heatmap_editor_perform(window, "select_sample", 2, '#3');
+nv_heatmap_editor_perform(window, "select_sample", 3, '#6');
+
+nv_heatmap_editor_perform(window, "set_slider_value", 80);
+nv_heatmap_editor_perform(window, "apply");
+
+// unselect samples
+nv_heatmap_editor_perform(window, "select_sample", 0, -1);
+nv_heatmap_editor_perform(window, "select_sample", 2, -1);
+
+
+nv_open_module(window, "SQUARE");
+nv_heatmap_editor_perform("OVAL", "open");
+nv_heatmap_editor_perform("OVAL", "select_datatable", 0, '#0');
+nv_heatmap_editor_perform("20111118modelc:master", "select_datatable", 1, '#2');
+*/
+
+/*
+|@@|nv_import_datatables|--|S20111118modelc:master|--|SDatatable list|--|S|--|S|--|Sfile:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt|--|Mimport_display_markers|::|Bfalse|::|import_display_barplot|::|Btrue
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sopen
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N0|--|S#1
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N2|--|S#2
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N0|--|S#0
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N1|--|S#2
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sapply
+
+## 6:04:36 PM 2014-08-20
+|@@|nv_find_entities|--|S20111118modelc:master|--|SAK.*
+
+|@@|nv_open_module|--|S|--|SSQUARE
+|@@|nv_open_module|--|S|--|SOVAL
+*/
+
+//
+// OLD //
+/*
+var nv_STRING_MARK = "S";
+var nv_NUMBER_MARK = "N";
+var nv_BOOL_MARK = "B";
+var nv_UNK_MARK = "U";
+var nv_MAP_MARK = "M";
+var nv_OBJ_MARK = "O";
+var nv_LIST_MARK = "L";
+var nv_KEY_VAL = "|::|";
+var nv_ARG_SEP = "|--|";
+
+var nv_type_markers = {
+	"string" : nv_STRING_MARK,
+	"number" : nv_NUMBER_MARK,
+	"boolean" : nv_BOOL_MARK,
+	"object" : nv_OBJ_MARK
+};
+	
+function nv_encode_arg_old(arg, reentrant)
+{
+	var type_marker = nv_type_markers[typeof arg];
+	if (!type_marker) {
+		console.log("nv_encode: type " + (typeof arg) + " " + arg + " not supported");
+		//return nv_ARG_SEP + nv_UNK_MARK;
+		return nv_ARG_SEP + nv_STRING_MARK;
+	}
+	if (type_marker == nv_OBJ_MARK) {
+		type_marker = (arg.length == undefined) ? nv_MAP_MARK : nv_LIST_MARK;
+	}
+	var str = (reentrant ? "" : nv_ARG_SEP) + type_marker;
+	if (type_marker == nv_MAP_MARK || type_marker == nv_LIST_MARK) {
+		//if (type_marker == nv_MAP_MARK) {console.log("encode map");} else {console.log("encode list " + arg.length);}
+		var has_key = false;
+		for (var key in arg) {
+			var val = arg[key];
+			if (typeof val != 'function') {
+				if (typeof val != 'object') { // object within object not supported
+					str += (has_key ? nv_KEY_VAL : "") + key + nv_KEY_VAL + nv_encode_arg_old(val, true);
+					has_key = true;
+				}
+			}
+		}
+	} else {
+		str += arg;
+	}
+	return str;
+}
+
+function nv_decode_arg_old(arg)
+{
+	if (!arg) {
+		return null;
+	}
+	var type_marker = arg[0];
+	arg = arg.substring(1);
+	if (type_marker == nv_UNK_MARK) {
+		return "";
+	}
+	if (type_marker == nv_NUMBER_MARK) {
+		return parseFloat(arg);
+	}
+	if (type_marker == nv_BOOL_MARK) {
+		return arg == "true" || arg == "TRUE" ? true : false;
+	}
+	if (type_marker == nv_STRING_MARK) {
+		return arg;
+	}
+	if (type_marker == nv_MAP_MARK) {
+		var map = {};
+		console.log("receive a map");
+		if (arg) {
+			var key_val_arr = arg.split(nv_KEY_VAL);
+			for (var idx3 = 0; idx3 < key_val_arr.length; idx3 += 2) {
+				var key = key_val_arr[idx3];
+				map[key] = nv_decode_arg_old(key_val_arr[idx3+1]);
+			}
+		}
+		return map;
+	}
+	if (type_marker == nv_LIST_MARK) {
+		var list = [];
+		console.log("receive a list");
+		if (arg) {
+			var key_val_arr = arg.split(nv_KEY_VAL);
+			console.log("length " + key_val_arr.length);
+			for (var idx3 = 0; idx3 < key_val_arr.length; ++idx3) {
+				list.push(nv_decode_arg_old(key_val_arr[idx3]));
+			}
+		}
+		return list;
+	}
+	return null;
+}
+
+function nv_encode_old(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
+{
+	var str = nv_CMD_MARK + action_str + nv_ARG_SEP + nv_STRING_MARK + get_module(win);
+	var args = [];
+	args.push(arg1);
+	args.push(arg2);
+	args.push(arg3);
+	args.push(arg4);
+	args.push(arg5);
+	args.push(arg6);
+	
+	for (var idx = 0; idx < args.length; ++idx) {
+		var arg = args[idx];
+		if (arg == undefined) {
+			break;
+		}
+		str += nv_encode_arg_old(arg);
+	}
+	//console.log("encoding " + action_str + " " + arg1 + " " + arg2 + " " + arg3 + " " + arg4 + " " + arg5 + " " + arg6 + " => " + str);
+	return str;
+}
+
+function nv_decode_old(str)
 {
 	var o_decoding = nv_decoding;
 	nv_decoding = true;
@@ -765,57 +917,4 @@ function nv_decode(str)
 	return ret;
 }
 
-/*
-nv_heatmap_editor_perform(window, "open");
-
-nv_heatmap_editor_perform(window, "select_datatable", 0, '#0');
-nv_heatmap_editor_perform(window, "select_datatable", 1, '#1');
-nv_heatmap_editor_perform(window, "select_datatable", 2, '#2');
-
-nv_heatmap_editor_perform(window, "select_sample", 0, '#0');
-nv_heatmap_editor_perform(window, "select_sample", 1, '#4');
-nv_heatmap_editor_perform(window, "select_sample", 2, '#3');
-nv_heatmap_editor_perform(window, "select_sample", 3, '#6');
-
-nv_heatmap_editor_perform(window, "set_slider_value", 80);
-nv_heatmap_editor_perform(window, "apply");
-
-// unselect samples
-nv_heatmap_editor_perform(window, "select_sample", 0, -1);
-nv_heatmap_editor_perform(window, "select_sample", 2, -1);
-
-
-nv_open(window, "SQUARE");
-nv_heatmap_editor_perform("OVAL", "open");
-nv_heatmap_editor_perform("OVAL", "select_datatable", 0, '#0');
-nv_heatmap_editor_perform("20111118modelc:master", "select_datatable", 1, '#2');
 */
-
-/*
-|@@|nv_import_datatables|--|S20111118modelc:master|--|SDatatable list|--|S|--|S|--|Sfile:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt|--|Mimport_display_markers|::|Bfalse|::|import_display_barplot|::|Btrue
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sopen
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N0|--|S#1
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_datatable|--|N2|--|S#2
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N0|--|S#0
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sselect_sample|--|N1|--|S#2
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_heatmap_editor_perform|--|S20111118modelc:master|--|Sapply
-
-## 6:04:36 PM 2014-08-20
-|@@|nv_find_entities|--|S20111118modelc:master|--|SAK.*
-
-|@@|nv_open|--|S|--|SSQUARE
-|@@|nv_open|--|S|--|SOVAL
-*/
-

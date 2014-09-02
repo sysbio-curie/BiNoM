@@ -1129,6 +1129,9 @@ function tree_node_state_changed(tree_context, tree_node, checked) {
 	$.each(tree_node.markers, function() {
 		if (checked) {
 			make_marker_visible(this);
+			if (nv_open_bubble) {
+				bubble_open(this);
+			}
 			if (tree_context.marker_bounds) {
 				var marker_bound = new google.maps.LatLngBounds();
 				extend(marker_bound, this);

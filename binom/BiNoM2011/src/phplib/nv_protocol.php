@@ -18,6 +18,13 @@ function logmsg($id, $msg) {
   fclose($fd);
 }
 
+function get_post_var($param) {
+  if (isset($_POST[$param])) {
+    return $_POST[$param];
+  }
+  return "";
+}
+
 function get_url_var($param) {
   if (isset($_GET[$param])) {
     return $_GET[$param];
@@ -73,8 +80,9 @@ function unlock($fdlck) {
 $mode = get("mode", "none");
 $perform = get("perform", "");
 $id = get("id", "");
-$block = get("block", "off");
-
+$block = get("block", "on");
+$data = get_post_var("data");
+logmsg($id, "DATA LEN " . strlen($data) . "\n");
 $file_prefix = "/tmp/nv_";
 
 if ($mode == "none") {
@@ -116,7 +124,8 @@ if ($mode == "none") {
   }
 } else if ($mode == "cli2srv") {
   if ($perform == "send" || $perform == "send_and_rcv") {
-    $data = get_url_var("data");
+    //    $data = get_url_var("data");
+    $data = get_post_var("data");
     logmsg($id, "cli2srv: $perform $id $data\n");
 
     if ($data) {
@@ -128,7 +137,7 @@ if ($mode == "none") {
 	  break;
 	}
 	unlock($fdlck);
-	usleep(100000);
+	usleep(10000);
       }
       file_put_contents($file, $data);
       
@@ -147,7 +156,7 @@ if ($mode == "none") {
 	    break;
 	  }
 	  unlock($fdlck);
-	  usleep(100000);
+	  usleep(10000);
 	}
       }
     }
@@ -172,7 +181,7 @@ if ($mode == "none") {
   }
 } else if ($mode == "srv2cli") {
   if ($perform == "rsp") {
-    $data = get_url_var("data");
+    $data = get_post_var("data");
     logmsg($id, "srv2cli: send response to client $id $data\n");
     if ($data) {
       $file = rspfile($id);

@@ -89,6 +89,9 @@ public class ModelMenuUtils extends CytoscapeAction {
 		}	
 	}
 	protected int maxDepth(){
+	    reach=Cytoscape.getNetworkAttributes().getDoubleAttribute(Cytoscape.getCurrentNetwork().getIdentifier(),reachAttrib);
+	    if (reach==null) 
+	    	inputReach();
 		return (reach.intValue()*2+1);
 	}
 	protected void updateThreshold(){

@@ -49,19 +49,39 @@ function get($param, $defval) {
   return $value;
 }
 
-function lockfile($id) {
+function creatfile($file) {
+  $fd = fopen($file, "w") or die("cannot create file " . $file);
+  ftruncate($fd, 0);
+  fclose($fd);
+}
+
+function delfile($file) {
+  unlink($file) or die("cannot delete file " . $file);
+}
+
+function mkfile($id, $ext) {
   global $file_prefix;
-  return $file_prefix . $id . ".lck";
+  return $file_prefix . $id . $ext;
+}
+
+function lockfile($id) {
+  return mkfile($id, ".lck");
 }
 
 function cmdfile($id) {
-  global $file_prefix;
-  return $file_prefix . $id . ".cmd";
+  return mkfile($id, ".cmd");
 }
 
 function rspfile($id) {
-  global $file_prefix;
-  return $file_prefix . $id . ".rsp";
+  return mkfile($id, ".rsp");
+}
+
+function datafile($id) {
+  return mkfile($id, ".dat");
+}
+
+function packnumfile($id) {
+  return mkfile($id, ".pkn");
 }
 
 function lock($id) {
@@ -88,43 +108,62 @@ $file_prefix = "/tmp/nv_";
 if ($mode == "none") {
   if ($perform == "init") {
 
-    $file = logfile($id);
-    $fd = fopen($file, "w") or die("cannot create file " . $file);
-    ftruncate($fd, 0);
-    fclose($fd);
+    creatfile(logfile($id));
 
-    $file = lockfile($id);
-    $fd = fopen($file, "w") or die("cannot create file " . $file);
-    ftruncate($fd, 0);
-    fclose($fd);
+    creatfile(lockfile($id));
 
-    $file = cmdfile($id);
-    $fd = fopen($file, "w") or die("cannot create file " . $file);
-    ftruncate($fd, 0);
-    fclose($fd);
+    creatfile(cmdfile($id));
 
-    $file = rspfile($id);
-    $fd = fopen($file, "w") or die("cannot create file " . $file);
-    ftruncate($fd, 0);
-    fclose($fd);
+    creatfile(rspfile($id));
 
     logmsg($id, "init $id\n");
+
     return;
   }
   if ($perform == "reset") {
-    $file = lockfile($id);
-    unlink($file) or die("cannot delete file " . $file);
-    $file = cmdfile($id);
-    unlink($file) or die("cannot delete file " . $file);
-    $file = rspfile($id);
-    unlink($file) or die("cannot delete file " . $file);
-    $file = logfile($id);
-    unlink($file) or die("cannot delete file " . $file);
+
+    delfile(logfile($id));
+
+    delfile(lockfile($id));
+
+    delfile(cmdfile($id));
+
+    delfile(rspfile($id));
+
+    delfile(datafile($id));
+
+    delfile(packnumfile($id));
+
     return;
   }
 } else if ($mode == "cli2srv") {
-  if ($perform == "send" || $perform == "send_and_rcv") {
-    //    $data = get_url_var("data");
+  if ($perform == "filling") {
+    logmsg($id, "cli2srv: $perform $id\n");
+
+    $packnum = get_url_var("packnum");
+    $packnumfile = packnumfile($id);
+    $datafile = datafile($id);
+    for (;;) {
+	$fdlck = lock($id);
+	$packstr = file_get_contents($packnumfile);
+	if (!$packstr) {
+	  $packstr = "0";
+	}
+	if (intval($packnum) == intval($packstr)+1) {
+	  logmsg($id, "cli2srv: found packet $packnum\n");
+	  $fd = fopen($datafile, "a") or die("cannot append to file " . $file);
+	  fwrite($fd, get_post_var("data"));
+	  fclose($fd);
+	  file_put_contents($packnumfile, $packnum);
+	  unlock($fdlck);
+	  break;
+	}
+	// check for packnum num
+	unlock($fdlck);
+	usleep(10000);
+    }
+    return;
+  } else if ($perform == "send" || $perform == "send_and_rcv") {
     $data = get_post_var("data");
     logmsg($id, "cli2srv: $perform $id $data\n");
 
@@ -139,6 +178,26 @@ if ($mode == "none") {
 	unlock($fdlck);
 	usleep(10000);
       }
+
+      $packcount = get_url_var("packcount");
+      if ($packcount) {
+	logmsg($id, "cli2srv: multipart $packcount\n");
+	$packnumfile = packnumfile($id);
+	$datafile = datafile($id);
+	creatfile($datafile);
+	creatfile($packnumfile);
+	for (;;) {
+	  $packstr = file_get_contents($packnumfile);
+	  if ($packstr && intval($packstr) == intval($packcount)) {
+	    logmsg($id, "cli2srv: multipart find packet $packstr");
+	    $data = file_get_contents($datafile);
+	    break;
+	  }
+	  unlock($fdlck);
+	  usleep(10000);
+	}
+      } 
+
       file_put_contents($file, $data);
       
       unlock($fdlck);

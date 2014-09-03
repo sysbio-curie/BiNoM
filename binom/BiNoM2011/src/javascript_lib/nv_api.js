@@ -90,10 +90,15 @@ function nv_win(win)
 
 // API
 
-function nv_open_module(win, module, ids)
+function nv_open_module(win, module_id, ids)
 {
 	console.log("module: [" + module + "] " + ids.length);
-	win.show_map_and_markers(module, ids ? ids : []);
+	var module = navicell.mapdata.getModuleDescriptions()[module_id];
+	if (!module) {
+		console.log("module " + module_id + " not found");
+		return null;
+	}
+	win.show_map_and_markers((module.url ? module.url : module), ids ? ids : []);
 	return null;
 }
 
@@ -357,8 +362,10 @@ function nv_prepare_import_dialog(win, filename, name, type)
 function nv_get_module_list(win)
 {
 	var module_names = [];
-	for (var module_name in navicell.mapdata.getModules()) {
-		module_names.push(module_name);
+	var module_descriptions = navicell.mapdata.getModuleDescriptions();
+	for (var module_id in module_descriptions) {
+		var module = module_descriptions[module_id];
+		module_names.push({id: module.id, name: module.name, url: module.url});
 	}
 	return module_names;
 }
@@ -382,6 +389,17 @@ function nv_get_datatable_gene_list(win)
 function nv_get_hugo_list(win)
 {
 	return navicell.mapdata.getHugoNames();
+}
+
+function nv_get_biotype_list(win)
+{
+	var ret_biotypes = [];
+	var biotypes = navicell.biotype_factory.getBiotypes();
+	for (biotype_name in biotypes) {
+		var biotype = biotypes[biotype_name];
+		ret_biotypes.push({name: biotype_name, type: biotype.type.getTypeString(), subtype: biotype.type.getSubtypeString()});
+	}
+	return ret_biotypes;
 }
 
 function nv_heatmap_editor_perform(win, command, arg1, arg2)
@@ -465,7 +483,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 		drawing_config.apply();
 	} else if (command == "clear_samples" || command == "all_samples" || command == "all_groups" || command == "from_barplot") {
 		heatmap_sample_action_perform(command, 0, win);
-	} else if (command == "set_slider_value") {
+	} else if (command == "set_transparency") {
 		var value = arg1;
 		heatmap_config.getSlider().slider("value", value);
 		heatmap_config.setTransparency(value);
@@ -525,7 +543,8 @@ var nv_handlers = {
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,
 	"nv_get_datatable_gene_list": nv_get_datatable_gene_list,
-	"nv_get_hugo_list": nv_get_hugo_list
+	"nv_get_hugo_list": nv_get_hugo_list,
+	"nv_get_biotype_list": nv_get_biotype_list
 };
 
 // nv_perform("nv_import_datatables", window, "Datatable list", "", "", "file:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt", {import_display_markers: false, import_display_barplot: true});
@@ -720,7 +739,7 @@ nv_heatmap_editor_perform(window, "select_sample", 1, '#4');
 nv_heatmap_editor_perform(window, "select_sample", 2, '#3');
 nv_heatmap_editor_perform(window, "select_sample", 3, '#6');
 
-nv_heatmap_editor_perform(window, "set_slider_value", 80);
+nv_heatmap_editor_perform(window, "set_transparency", 80);
 nv_heatmap_editor_perform(window, "apply");
 
 // unselect samples

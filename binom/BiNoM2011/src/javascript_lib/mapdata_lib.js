@@ -399,6 +399,7 @@ Mapdata.prototype = {
 	// Mapdata for each module
 	module_mapdata: {},
 	module_mapdata_by_id: {},
+	module_desc: {},
 	module_info: {},
 	module_tag_map: {},
 	module_voronoi: {},
@@ -413,8 +414,8 @@ Mapdata.prototype = {
 	// Hashmap from hugo name to entity information (including positions)
 	hugo_map: {},
 
-	getModules: function() {
-		return this.module_mapdata;
+	getModuleDescriptions: function() {
+		return this.module_desc;
 	},
 
 	getPostModuleLink: function(postid) {
@@ -497,8 +498,8 @@ Mapdata.prototype = {
 		}
 
 		if (action == 'subtree' && res_jxtree) {
-			var o_open_bubble = nv_open_bubble;
-			nv_open_bubble = open_bubble;
+			var o_open_bubble = win.nv_open_bubble;
+			win.nv_open_bubble = open_bubble;
 
 			if (!no_ext) {
 				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
@@ -528,7 +529,7 @@ Mapdata.prototype = {
 			$("img.blogfromright", win.document).click(open_blog_click);
 			$("img.mapmodulefromright", win.document).click(open_module_map_click);
 
-			nv_open_bubble = o_open_bubble;
+			win.nv_open_bubble = o_open_bubble;
 		}
 	},
 
@@ -767,7 +768,6 @@ Mapdata.prototype = {
 
 		var modif_map = {};
 		var shape_map = {};
-		console.log("addModuleMapData");
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
@@ -784,11 +784,13 @@ Mapdata.prototype = {
 				for (var jj = 0; jj < maps.length; ++jj) {
 					var map = maps[jj];
 					this.module_mapdata_by_id[module_name][map.id] = map;
+					this.module_desc[map.id] = map;
 					var map_modules = map.modules;
 					if (map_modules) {
 						for (var kk = 0; kk < map_modules.length; ++kk) {
 							var module = map_modules[kk];
 							this.module_mapdata_by_id[module_name][module.id] = module;
+							this.module_desc[module.id] = module;
 						}
 					}
 				}
@@ -800,14 +802,13 @@ Mapdata.prototype = {
 						this.module_postid[postinf[0]] = postinf[1];
 					}
 					this.module_mapdata_by_id[module_name][module.id] = module;
+					this.module_desc[module.id] = module;
 				}
 			} else if (entities) {
-				console.log("entities: " + entities.length);
 				for (var jj = 0; jj < entities.length; ++jj) {
 					var entity_map = entities[jj];
 					var hugo_arr = entity_map['hugo'];
 					if (hugo_arr && hugo_arr.length > 0) {
-						console.log("hugo: " + hugo_arr.length);
 						for (var kk = 0; kk < hugo_arr.length; ++kk) {
 							var hugo = hugo_arr[kk];
 							if (!this.hugo_map[hugo]) {
@@ -4832,7 +4833,39 @@ BiotypeType.prototype = {
 
 	isSet: function() {
 		return this.subtype == navicell.SET;
-	}
+	},
+
+	getTypeString: function() {
+		switch(this.type) {
+		case navicell.EXPRESSION:
+			return "EXPRESSION"
+		case navicell.COPYNUMBER:
+			return "COPYNUMBER";
+		case navicell.MUTATION:
+			return"MUTATION";
+		case navicell.GENELIST:
+			return "GENELIST";
+		default:
+			return "<UNKNOWN>";
+		}
+	},
+
+	getSubtypeString: function() {
+		switch(this.subtype) {
+		case navicell.CONTINUOUS:
+			return "CONTINUOUS";
+		case navicell.ORDERED_DISCRETE:
+			return "ORDERED_DISCRETE";
+		case navicell.UNORDERED_DISCRETE:
+			return "UNORDERED_DISCRETE";
+		case navicell.SET:
+			return "SET";
+		default:
+			return "<UNKNOWN>";
+		}
+	},
+
+
 };
 
 function Biotype(name, type) {
@@ -4867,6 +4900,10 @@ function BiotypeFactory() {
 
 BiotypeFactory.prototype = {
 	biotypes: {},
+
+	getBiotypes: function() {
+		return this.biotypes;
+	},
 
 	addBiotype: function(biotype) {
 		this.biotypes[biotype.name] = biotype;

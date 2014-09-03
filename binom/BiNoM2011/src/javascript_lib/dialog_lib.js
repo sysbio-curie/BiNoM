@@ -121,7 +121,7 @@ $(function() {
 	$("#search_dialog").dialog({
 		autoOpen: false,
 		width: 450,
-		height: 840,
+		height: 860,
 		modal: false,
 		buttons: {
 			"Search": function() {
@@ -140,6 +140,7 @@ $(function() {
 				var all_classes_but_included = $("#search_dialog_class_all_but_included").attr("checked") == "checked";
 				var all_classes_included = $("#search_dialog_class_all_included").attr("checked") == "checked";
 				var select_classes = $("#search_dialog_class_select").attr("checked") == "checked";
+				var open_bubble = $("#search_dialog_open_bubble").attr("checked") == "checked";
 				var search = "";
 				var op;
 
@@ -174,7 +175,7 @@ $(function() {
 						search += (i ? "," : "class=") + $(selected).val();
 					});
 				}
-				nv_perform("nv_find_entities", window, search);
+				nv_perform("nv_find_entities", window, search, open_bubble);
 				/*
 				$("#right_tabs", window.document).tabs("option", "active", 1);
 				navicell.mapdata.findJXTree(window, search, false, 'subtree', {div: $("#result_tree_contents", window.document).get(0)});

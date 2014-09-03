@@ -38,6 +38,7 @@ function JXTreeMatcher(pattern, hints) {
 	this.search_in = 0;
 	this.search_not = false;
 	this.search_user_find = false;
+	this.bubble = false;
 
 	var tokens = pattern.split("/");
 	this.class_filters = [];

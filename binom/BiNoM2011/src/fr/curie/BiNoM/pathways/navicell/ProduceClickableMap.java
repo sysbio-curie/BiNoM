@@ -1226,6 +1226,7 @@ public class ProduceClickableMap
 			
 			String firstEntityName = clMap.generatePages_module(map, wp, outmapdata, outjson, outinfo_json, new File(this_map_directory, right_panel_list), scales, master.master_format);
 			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources);
+			make_index_html(this_map_directory, master.blog_name, clMap.get_map_title(), map, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources);
 			outvoronoi.print(clMap.voronoiCells);
 		}
 	}
@@ -2826,6 +2827,7 @@ public class ProduceClickableMap
 					outjson.print("{\"name\" : \"" +  mapInfo.getName() + "\",");
 					//outjson.print("\"id\" : \"" +  mapInfo.getName() + "\",");
 					outjson.print("\"id\" : \"" + map_key + "\",");
+					outjson.print("\"url\" : \"" + mapInfo.url + "\",");
 				}
 				if (map_position != null) {
 					map_item.getOutput().print(" position=\"");
@@ -2867,6 +2869,7 @@ public class ProduceClickableMap
 						outjson.print("{\"name\" : \"" +  moduleInfo.name + "\",");
 						//outjson.print("\"id\" : \"" +  moduleInfo.name + "\",");
 						outjson.print("\"id\" : \"" +  mapInfo.id + ":" + moduleInfo.name + "\",");
+						outjson.print("\"url\" : \"" +  moduleInfo.url + "\",");
 						outjson.print("\"class\" : \"MODULE\",");
 					}
 					if (module_position != null) {
@@ -4120,7 +4123,7 @@ public class ProduceClickableMap
 	{
 		// NV_SERVER: 2014-08-26
 		//fw.append(onclick_before).append("show_map_and_markers(");
-		fw.append(onclick_before).append("nv_perform(\"nv_open\", window, ");
+		fw.append(onclick_before).append("nv_perform(\"nv_open_module\", window, ");
 		html_quote(fw, map_name);
 		fw.append(", [");
 		if (markers != null)
@@ -5306,13 +5309,27 @@ public class ProduceClickableMap
 	}
 	
 	private static void make_index_html(final File this_map_directory, final String blog_name, final String title,
-		final String map_name,
-		ImagesInfo scales,
-		BlogCreator.Post module_post,
+					    final String map_name,
+					    ImagesInfo scales,
+					    BlogCreator.Post module_post,
 					    final BlogCreator wp, AtlasInfo atlasInfo, String firstEntityName, boolean provide_sources) throws FileNotFoundException
 	{
+		make_index_html_perform(this_map_directory, blog_name, title, map_name, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources, false);
+		make_index_html_perform(this_map_directory, blog_name, title, map_name, scales, module_post, wp, atlasInfo, firstEntityName, provide_sources, true);
+	}
+
+	private static void make_index_html_perform(final File this_map_directory, final String blog_name, final String title,
+						    final String map_name,
+						    ImagesInfo scales,
+						    BlogCreator.Post module_post,
+						    final BlogCreator wp,
+						    AtlasInfo atlasInfo,
+						    String firstEntityName,
+						    boolean provide_sources,
+						    boolean is_php) throws FileNotFoundException
+	{
 		System.out.println("make_index_html " + title + " " + map_name + " " + this_map_directory);
-		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index.html")));
+		final PrintStream out = new PrintStream(new FileOutputStream(new File(this_map_directory, "index" + (is_php ? ".php" : ".html"))));
 		
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
@@ -5413,7 +5430,9 @@ public class ProduceClickableMap
 		out.println("  var checked_elements = {};");
 
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
-
+		if (is_php) {
+			out.println("  navicell.id = '<?php echo $_GET[\"id\"] ?>';");
+		}
 		out.println("  $(document).ready(function() {");
 		
 		{
@@ -5474,6 +5493,19 @@ public class ProduceClickableMap
 			out.println("    }");
 			out.println("    map_staining_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    overlay_init(map);");
+			if (is_php) {
+				out.println("    var command = '<?php echo $_POST[\"command\"]; ?>';");
+				out.println("    if (!command) {");
+				out.println("      command = '<?php echo $_GET[\"command\"]; ?>';");
+				out.println("    }");
+				out.println("    console.log(\"COMMAND [\" + command + \"]\");");
+				out.println("    if (command) {");
+				out.println("      nv_decode(command);");
+				out.println("    }");
+				out.println("    if (navicell.id) {");
+				out.println("      nv_server(window, navicell.id);");
+				out.println("    }");
+			}
 		}
 		out.println("  });\n");
 		out.println("  " + wp.getBlogLinker());

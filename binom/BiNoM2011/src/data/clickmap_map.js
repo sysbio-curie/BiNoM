@@ -851,7 +851,7 @@ function open_module_map_click(e)
 	try
 	{
 		//show_map_and_markers(e.currentTarget.alt, []);
-		nv_perform("nv_open", window, e.currentTarget.alt, []);
+		nv_perform("nv_open_module", window, e.currentTarget.alt, []);
 	}
 	catch (f)
 	{

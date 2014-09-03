@@ -157,7 +157,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		bpPhysicalEntities = new HashMap<String, PhysicalEntity>();
 		bpPublicationXref = new  HashMap<String, PublicationXref>();
 		bpUnificationXref = new  HashMap<String, UnificationXref>();
-		
 	}
 	
 	// test routine
@@ -186,23 +185,6 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		createBioPAXModel();
 		fillBioPAXModel();
 		//saveModel();
-		
-		for (Pathway p : model.getObjects(Pathway.class)) {
-			for (Process pro : p.getPathwayComponent()) {
-				System.out.println(">>>"+pro.getRDFId());
-				for (Entity part : ((Interaction)pro).getParticipant()) {
-					if (part instanceof Protein) {
-						EntityReference pr = ((Protein)part).getEntityReference();
-						for (Xref xr : pr.getXref()) {
-							if (xr instanceof UnificationXref) {
-								System.out.print(xr.getId()+":");
-							}
-						}
-					}
-				}
-				System.out.println();
-			}
-		}
 	}
 	
 	public void setCellDesigner(SbmlDocument sb) {
@@ -997,6 +979,51 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	
 	}
 	
+	private void printHUGO() {
+		for (Pathway p : model.getObjects(Pathway.class)) {
+			HashSet<String> hugoSet = new HashSet<String>();
+			for (Process pro : p.getPathwayComponent()) {
+				//System.out.println(">>>"+pro.getRDFId());
+				for (Entity part : ((Interaction)pro).getParticipant()) {
+					
+					HashSet<EntityReference> entityReferenceSet = new HashSet<EntityReference>();
+					if (part instanceof Complex)
+						extractEntityReference(part, entityReferenceSet);
+					
+					for (EntityReference er : entityReferenceSet) {
+						for (Xref xr : er.getXref()) {
+							if (xr instanceof UnificationXref) {
+								hugoSet.add(xr.getId());
+							}
+						}
+					}
+				}
+			
+			}
+			
+			for (String h : hugoSet)
+			  System.out.println(">>> "+ p.getDisplayName()+ "\t"+ h);
+		}
+	}
+	
+	private void extractEntityReference(Entity part, HashSet<EntityReference> erSet) {
+		EntityReference pr = null;
+		if (part instanceof Protein)
+			pr = ((Protein)part).getEntityReference();
+		else if (part instanceof DnaRegion)
+			pr = ((DnaRegion)part).getEntityReference();
+		else if (part instanceof RnaRegion)
+			pr = ((RnaRegion)part).getEntityReference();
+		else if (part instanceof Complex) {
+			Complex co = ((Complex)part);
+			for (PhysicalEntity pe : co.getComponent())
+				extractEntityReference(pe, erSet);
+		}
+		if (pr != null)
+			erSet.add(pr);
+	}
+	
+	
 	private void testSetBioPAXSpecies() {
 		//System.out.println(">>> mem:: "+Utils.getUsedMemoryMb());
 		//long toto = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -1145,14 +1172,14 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
 		while (st.hasMoreTokens()){
 			String ss = st.nextToken();
-			if(ss.toLowerCase().equals("hugo")){
+			if (ss.toLowerCase().equals("hugo")) {
 				if(st.hasMoreTokens()) {
 					hugo_id = st.nextToken();
 					UnificationXref xref = bpUnificationXref.get(hugo_id);
 					if (xref == null) {
 						String uri = biopaxNameSpacePrefix + "HUGO_" + hugo_id;
 						xref = model.addNew(UnificationXref.class, uri);
-						xref.setDb("HGNC");
+						xref.setDb("HUGO");
 						xref.setId(hugo_id);
 						bpUnificationXref.put(hugo_id, xref);
 					}

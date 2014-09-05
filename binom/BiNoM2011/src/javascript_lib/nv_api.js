@@ -93,12 +93,17 @@ function nv_win(win)
 function nv_open_module(win, module_id, ids)
 {
 	console.log("module: [" + module + "] " + ids.length);
-	var module = navicell.mapdata.getModuleDescriptions()[module_id];
-	if (!module) {
-		console.log("module " + module_id + " not found");
-		return null;
+	var url;
+	if (module_id.match('/index.html')) {
+		url = module_id;
+	} else {
+		var module = navicell.mapdata.getModuleDescriptions()[module_id];
+		if (!module) {
+			throw "module " + module_id + " not found";
+		}
+		url = module.url ? module.url : module;
 	}
-	win.show_map_and_markers((module.url ? module.url : module), ids ? ids : []);
+	win.show_map_and_markers(url, ids ? ids : []);
 	return null;
 }
 
@@ -621,7 +626,7 @@ function nv_get_url(cmd)
 }
 
 var RSP_ID = 1;
-var SERVER_TRACE = 0;
+var SERVER_TRACE = 1;
 
 function nv_rsp(url, data) {
 	if (SERVER_TRACE) {
@@ -650,6 +655,7 @@ function nv_rcv(base_url, url) {
 	if (SERVER_TRACE) {
 		console.log("nv_rcv: " + url);
 	}
+	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
 	$.ajax(url,
 	       {
 		       async: true,
@@ -661,15 +667,15 @@ function nv_rcv(base_url, url) {
 			       if (cmd.trim().length > 0) {
 				       try {
 					       var data = nv_decode(cmd);
-					       if (data) {
-						       if (SERVER_TRACE) {
-							       console.log("returning data " + data);
-						       }
-						       var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
-						       nv_rsp(rsp_url, data);
+					       var rspdata = {status: 0, data: (data ? data : '')};
+
+					       if (SERVER_TRACE) {
+						       console.log("returning data " + rspdata);
 					       }
+					       nv_rsp(rsp_url, rspdata);
 				       } catch(e) {
 					       console.log("nv_rcv exception: " + e);
+					       nv_rsp(rsp_url, {status: 1, data: e.toString()});
 				       }
 			       }
 			       nv_rcv(base_url, url);

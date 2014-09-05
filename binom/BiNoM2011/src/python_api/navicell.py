@@ -24,15 +24,15 @@ import datetime
 print("")
 print("nv = NaviCell(NVChromeLauncher())")
 print("")
-print('nv.importDatatables("", "http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "async": False, "import_display_markers": "checked", "import_display_heatmap": True})')
+print('nv.importDatatables("", "http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
-print('nv.importDatatables("", nv.makeDataFromFile("", "/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "async": False, "import_display_markers": "checked", "import_display_heatmap": True})')
+print('nv.importDatatables("", nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
 print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')
 print("")
-print('nv_openModule("", "../../survival_light/master/index.html")')
+print('nv.openModule("../../survival_light/master/index.html")')
 print("")
 
 PACKSIZE = 500000
@@ -85,7 +85,7 @@ class NaviCell:
         if not session_id:
             session_id = self._make_session_id()
 
-        self._hugo_list = {}
+        self._hugo_list = []
         self._hugo_map = {}
         self.session_id = session_id
         self.nv_protocol = nv_protocol
@@ -121,7 +121,8 @@ class NaviCell:
             print("fillmode")
             fillparams = params
             fillparams['perform'] = 'filling'
-            for packnum in range(packcount):
+            for packnum in reversed(range(packcount)): # testing packing order
+#            for packnum in range(packcount):
                 fillparams['packnum'] = packnum+1
                 beg = packnum*PACKSIZE
                 end = (packnum+1)*PACKSIZE
@@ -138,7 +139,10 @@ class NaviCell:
 #        print (response.status, response.reason, data)
         conn.close()
         if data:
-            return json.loads(data.decode('utf-8'))
+            decoded_data = json.loads(data.decode('utf-8'))
+            if not decoded_data['status']:
+                return decoded_data['data']
+            raise Exception('navicell error', decoded_data[data])
         return data
 
     def _init_session(self):
@@ -150,17 +154,16 @@ class NaviCell:
     def _make_data(self, data):
         return "@COMMAND " + json.dumps(data)
 
-    def _cli2srv(self, action, module, args, perform='send'):
+    def _cli2srv(self, action, module, args, perform='send_and_rcv'):
         return self._send({'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args})})
 
     def _heatmap_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_heatmap_editor_perform', module, [action, arg1, arg2, arg3])
 
     # public API
-    def makeData(self, module, data):
-            hugo_map = {}
-            for hugo_name in self.getHugoList(module):
-                hugo_map[hugo_name] = True
+    def makeData(self, data):
+            self.getHugoList()
+            hugo_map = self._hugo_map
 
             lines = data.split('\n')
             ret = lines[0]
@@ -172,25 +175,20 @@ class NaviCell:
             return "@DATA\n" + ret
 
 
-    def makeDataFromFile(self, module, filename):
+    def makeDataFromFile(self, filename):
         with open(filename) as f:
-            self.getHugoList(module)
-            hugo_map = self._hugo_map[module]
+            self.getHugoList()
+            hugo_map = self._hugo_map
 
             ret = ''
             for line in f:
                 ret = line + "\n"
                 break
 
-            idx = 0
             for line in f:
                 arr = line.split('\t')
                 if arr[0] in hugo_map:
                     ret += line + "\n"
-                    idx += 1
-#                    if idx > 1000:
-#                        break
-#            print("IDX", idx)
             return "@DATA\n" + ret
 
     def importDatatables(self, module, datatable_url_list, datatable_name, datatable_type, params={}):
@@ -213,22 +211,6 @@ class NaviCell:
 
     def uncheckAllEntities(self, module):
         self._cli2srv('nv_uncheck_all_entities', module, [])
-
-    def getModuleList(self, module):
-        return self._cli2srv('nv_get_module_list', module, [], 'send_and_rcv')
-
-    def getBiotypeList(self, module):
-        return self._cli2srv('nv_get_biotype_list', module, [], 'send_and_rcv')
-
-    def getHugoList(self, module):
-        if module not in self._hugo_list:
-            self._hugo_list[module] = self._cli2srv('nv_get_hugo_list', module, [], 'send_and_rcv')
-            hugo_map = {}
-            for hugo_name in self._hugo_list[module]:
-                hugo_map[hugo_name] = True
-            self._hugo_map[module] = hugo_map
-
-        return self._hugo_list[module]
 
     def getDatatableList(self, module):
         return self._cli2srv('nv_get_datatable_list', module, [], 'send_and_rcv')
@@ -281,8 +263,26 @@ class NaviCell:
     def prepareImportDialog(self, module, filename, name, filetype):
         self._cli2srv('nv_prepare_import_dialog', module, [filename, name, filetype])
 
-    def openModule(self, module, module2open):
-        self._cli2srv('nv_open_module', module, [module2open, []])
+    # method where module argument is not needed
+    def getModuleList(self):
+        return self._cli2srv('nv_get_module_list', '', [], 'send_and_rcv')
+
+    def getBiotypeList(self):
+        return self._cli2srv('nv_get_biotype_list', '', [], 'send_and_rcv')
+
+    def getHugoList(self):
+        module = ''
+        if not self._hugo_list:
+            self._hugo_list = self._cli2srv('nv_get_hugo_list', '', [], 'send_and_rcv')
+            hugo_map = {}
+            for hugo_name in self._hugo_list:
+                hugo_map[hugo_name] = True
+            self._hugo_map = hugo_map
+
+        return self._hugo_list
+
+    def openModule(self, module2open):
+        self._cli2srv('nv_open_module', '', [module2open, []])
 
     def reset(self):
         self._reset_session()

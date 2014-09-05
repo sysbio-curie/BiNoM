@@ -49,6 +49,34 @@ function get($param, $defval) {
   return $value;
 }
 
+function waitandlock($id, $file) {
+  for (;;) {
+    $fdlck = lock($id);
+    $contents = file_get_contents($file);
+    if (!$contents) {
+      return $fdlck;
+    }
+    unlock($fdlck);
+    usleep(10000);
+  }
+}
+
+function waitfordata($id, $file, $block) {
+  for (;;) {
+    $fdlck = lock($id);
+    $contents = file_get_contents($file);
+    if ($contents || $block != "on") {
+      /*      logmsg($id, "cli2srv: client HAS received response from server $id [$contents]\n");*/
+      file_put_contents($file, "");
+      unlock($fdlck);
+      return $contents;
+    }
+    unlock($fdlck);
+    usleep(10000);
+  }
+  return '';
+}
+
 function creatfile($file) {
   $fd = fopen($file, "w") or die("cannot create file " . $file);
   ftruncate($fd, 0);
@@ -169,6 +197,8 @@ if ($mode == "none") {
 
     if ($data) {
       $file = cmdfile($id);
+      $fdlck = waitandlock($id, $file);
+      /*
       for (;;) {
 	$fdlck = lock($id);
 	$contents = file_get_contents($file);
@@ -178,6 +208,7 @@ if ($mode == "none") {
 	unlock($fdlck);
 	usleep(10000);
       }
+      */
 
       $packcount = get_url_var("packcount");
       if ($packcount) {
@@ -201,9 +232,15 @@ if ($mode == "none") {
       file_put_contents($file, $data);
       
       unlock($fdlck);
+      logmsg($id, "CLI has unlocked file\n");
 
       if ($perform == "send_and_rcv") {
-	for ($nn = 0; $nn < 1000; ++$nn) {
+	$file = rspfile($id);
+	$contents = waitfordata($id, $file, $block);
+	logmsg($id, "cli2srv: client HAS received response from server $id [$contents]\n");
+	print $contents;
+	/*
+	for (;;) {
 	  $fdlck = lock($id);
 	  $file = rspfile($id);
 	  $contents = file_get_contents($file);
@@ -217,12 +254,19 @@ if ($mode == "none") {
 	  unlock($fdlck);
 	  usleep(10000);
 	}
+	*/
       }
     }
     return;
   }
   if ($perform == "rcv") {
-    for ($nn = 0; $nn < 1000; ++$nn) {
+    $file = cmdfile($id);
+    logmsg($id, "SRV is waiting for cmd\n");
+    $contents = waitfordata($id, $file, $block);
+    logmsg($id, "cli2srv: server has received command from client $id $contents\n");
+    print $contents;
+    /*
+    for (;;) {
       $fdlck = lock($id);
       $file = cmdfile($id);
       $contents = file_get_contents($file);
@@ -236,6 +280,7 @@ if ($mode == "none") {
       unlock($fdlck);
       usleep(100000);
     }
+    */
     return;
   }
 } else if ($mode == "srv2cli") {
@@ -244,6 +289,8 @@ if ($mode == "none") {
     logmsg($id, "srv2cli: send response to client $id $data\n");
     if ($data) {
       $file = rspfile($id);
+      $fdlck = waitandlock($id, $file);
+      /*
       for (;;) {
 	$fdlck = lock($id);
 	$contents = file_get_contents($file);
@@ -253,6 +300,7 @@ if ($mode == "none") {
 	unlock($fdlck);
 	usleep(100000);
       }
+      */
       file_put_contents($file, $data);
       unlock($fdlck);
     }

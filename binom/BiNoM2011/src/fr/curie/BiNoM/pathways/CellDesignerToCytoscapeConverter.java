@@ -79,7 +79,7 @@ public class CellDesignerToCytoscapeConverter {
      * containing majority of the species
      */
     public static boolean alwaysMentionCompartment = false;
-    public static boolean verbose = true;
+    public static boolean verbose = false;
     
     public static HashMap<String,SpeciesDocument.Species> speciesMap = null;
     public static HashMap<String,CelldesignerSpeciesDocument.CelldesignerSpecies> includedSpeciesMap = null;

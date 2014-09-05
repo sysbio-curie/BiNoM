@@ -12,8 +12,8 @@ public class TestPaxtoolsConverter {
 		
 		 // Load celldesigner file 
 			//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_APC.xml");
-			File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
-			//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
+			//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
+			File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
 			//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/acsn_master.xml");
 			//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
 			CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());

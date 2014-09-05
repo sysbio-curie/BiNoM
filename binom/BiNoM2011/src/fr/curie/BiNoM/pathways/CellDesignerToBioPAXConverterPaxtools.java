@@ -251,7 +251,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		setBioPAXSmallMolecules();
 		setBioPAXSpecies();
 		setBioPAXReactions();
-		System.out.println("INFO: conversion done.");
+		System.out.println("INFO: CellDesigner to BioPAX conversion done.");
 	}
 	
 	/**
@@ -697,7 +697,16 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			pe.setDisplayName(speciesName);
 			pe.setStandardName(speciesName);
 			pe.addComment("This is a CellDesigner UNKNOWN entity.");
-			bpPhysicalEntities.put(sp.getId(), pe);
+			bpPhysicalEntities.put(speciesId, pe);
+			retPe = pe;
+		} else if (cdClass.equals("PHENOTYPE")) {
+			//String name = cleanString(sp.getName().getStringValue());
+			PhysicalEntity pe = model.addNew(PhysicalEntity.class, uri);
+			pe.setDisplayName(speciesName);
+			pe.addName(speciesName);
+			pe.setStandardName(speciesName);
+			pe.addComment("This is a CellDesigner PHENOTYPE entity, representing an abstract biological process.");
+			bpPhysicalEntities.put(speciesId, pe);
 			retPe = pe;
 		}
 		

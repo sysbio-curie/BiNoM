@@ -3,7 +3,7 @@
  * nv_protocol.php
  *
  * Eric Viara copyright(c) Institut Curie
- * 2014-08-27
+ * August-September 2014
  *
  */
 
@@ -45,12 +45,12 @@ function get($param, $defval) {
       exit(1);
     }
   }	  
-  //echo "$param: " . $value . "<br/>";
   return $value;
 }
 
 function waitandlock($id, $file) {
   for (;;) {
+    checkfile($file);
     $fdlck = lock($id);
     $contents = file_get_contents($file);
     if (!$contents) {
@@ -63,10 +63,10 @@ function waitandlock($id, $file) {
 
 function waitfordata($id, $file, $block) {
   for (;;) {
+    checkfile($file);
     $fdlck = lock($id);
     $contents = file_get_contents($file);
     if ($contents || $block != "on") {
-      /*      logmsg($id, "cli2srv: client HAS received response from server $id [$contents]\n");*/
       file_put_contents($file, "");
       unlock($fdlck);
       return $contents;
@@ -112,6 +112,11 @@ function packnumfile($id) {
   return mkfile($id, ".pkn");
 }
 
+function checkfile($file) {
+  $fd = fopen($file, "r") or die("cannot open file " . $file . " for reading");
+  fclose($fd);
+}
+
 function lock($id) {
   $file = lockfile($id);
   $fdlck = fopen($file, "r") or die("cannot open file " . $file . " for reading");
@@ -129,8 +134,7 @@ $mode = get("mode", "none");
 $perform = get("perform", "");
 $id = get("id", "");
 $block = get("block", "on");
-$data = get_post_var("data");
-logmsg($id, "DATA LEN " . strlen($data) . "\n");
+//$data = get_post_var("data");
 $file_prefix = "/tmp/nv_";
 
 if ($mode == "none") {
@@ -172,23 +176,23 @@ if ($mode == "none") {
     $packnumfile = packnumfile($id);
     $datafile = datafile($id);
     for (;;) {
-	$fdlck = lock($id);
-	$packstr = file_get_contents($packnumfile);
-	if (!$packstr) {
-	  $packstr = "0";
-	}
-	if (intval($packnum) == intval($packstr)+1) {
-	  logmsg($id, "cli2srv: found packet $packnum\n");
-	  $fd = fopen($datafile, "a") or die("cannot append to file " . $file);
-	  fwrite($fd, get_post_var("data"));
-	  fclose($fd);
-	  file_put_contents($packnumfile, $packnum);
-	  unlock($fdlck);
-	  break;
-	}
-	// check for packnum num
+      checkfile($packnumfile);
+      $fdlck = lock($id);
+      $packstr = file_get_contents($packnumfile);
+      if (!$packstr) {
+	$packstr = "0";
+      }
+      if (intval($packnum) == intval($packstr)+1) {
+	logmsg($id, "cli2srv: found packet $packnum\n");
+	$fd = fopen($datafile, "a") or die("cannot append to file " . $file);
+	fwrite($fd, get_post_var("data"));
+	fclose($fd);
+	file_put_contents($packnumfile, $packnum);
 	unlock($fdlck);
-	usleep(10000);
+	break;
+      }
+      unlock($fdlck);
+      usleep(10000);
     }
     return;
   } else if ($perform == "send" || $perform == "send_and_rcv") {
@@ -198,17 +202,6 @@ if ($mode == "none") {
     if ($data) {
       $file = cmdfile($id);
       $fdlck = waitandlock($id, $file);
-      /*
-      for (;;) {
-	$fdlck = lock($id);
-	$contents = file_get_contents($file);
-	if (!$contents) {
-	  break;
-	}
-	unlock($fdlck);
-	usleep(10000);
-      }
-      */
 
       $packcount = get_url_var("packcount");
       if ($packcount) {
@@ -218,6 +211,7 @@ if ($mode == "none") {
 	creatfile($datafile);
 	creatfile($packnumfile);
 	for (;;) {
+	  checkfile($packnumfile);
 	  $packstr = file_get_contents($packnumfile);
 	  if ($packstr && intval($packstr) == intval($packcount)) {
 	    logmsg($id, "cli2srv: multipart find packet $packstr");
@@ -232,55 +226,21 @@ if ($mode == "none") {
       file_put_contents($file, $data);
       
       unlock($fdlck);
-      logmsg($id, "CLI has unlocked file\n");
 
       if ($perform == "send_and_rcv") {
 	$file = rspfile($id);
 	$contents = waitfordata($id, $file, $block);
 	logmsg($id, "cli2srv: client HAS received response from server $id [$contents]\n");
 	print $contents;
-	/*
-	for (;;) {
-	  $fdlck = lock($id);
-	  $file = rspfile($id);
-	  $contents = file_get_contents($file);
-	  if ($contents || $block != "on") {
-	    logmsg($id, "cli2srv: client HAS received response from server $id [$contents]\n");
-	    file_put_contents($file, "");
-	    unlock($fdlck);
-	    print $contents;
-	    break;
-	  }
-	  unlock($fdlck);
-	  usleep(10000);
-	}
-	*/
       }
     }
     return;
   }
   if ($perform == "rcv") {
     $file = cmdfile($id);
-    logmsg($id, "SRV is waiting for cmd\n");
     $contents = waitfordata($id, $file, $block);
     logmsg($id, "cli2srv: server has received command from client $id $contents\n");
     print $contents;
-    /*
-    for (;;) {
-      $fdlck = lock($id);
-      $file = cmdfile($id);
-      $contents = file_get_contents($file);
-      if ($contents || $block != "on") {
-	logmsg($id, "cli2srv: server has received command from client $id $contents\n");
-	file_put_contents($file, "");
-	unlock($fdlck);
-	print $contents;
-	break;
-      }
-      unlock($fdlck);
-      usleep(100000);
-    }
-    */
     return;
   }
 } else if ($mode == "srv2cli") {
@@ -290,17 +250,6 @@ if ($mode == "none") {
     if ($data) {
       $file = rspfile($id);
       $fdlck = waitandlock($id, $file);
-      /*
-      for (;;) {
-	$fdlck = lock($id);
-	$contents = file_get_contents($file);
-	if (!$contents) {
-	  break;
-	}
-	unlock($fdlck);
-	usleep(100000);
-      }
-      */
       file_put_contents($file, $data);
       unlock($fdlck);
     }

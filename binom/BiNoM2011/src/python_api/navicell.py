@@ -18,16 +18,17 @@ import subprocess, sys, os
 import json
 import http.client, urllib.request, urllib.parse, urllib.error
 import datetime
+from time import sleep
 
 # NV_MAP_URL=http://localhost/~eviara/navicell/nv2.2/maps/acsn_light/master/index.php python -i navicell.py
 
 print("")
 print("nv = NaviCell(NVChromeLauncher())")
 print("")
-print('nv.importDatatables("", "http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+print('nv.importDatatables("http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
-print('nv.importDatatables("", nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
 print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')
@@ -104,21 +105,18 @@ class NaviCell:
             datalen = len(params['data'])
             if datalen > PACKSIZE:
                 packcount = int(datalen/PACKSIZE)+1
-                print("MULTIPACK protocol", datalen, PACKSIZE, packcount)
+#                print("MULTIPACK protocol", datalen, PACKSIZE, packcount)
                 params['packcount'] = packcount
                 data = params['data']
                 params['data'] = "@@"
 
-#        if 'data' in params:
-#            print("LEN", len(params['data']))
         encoded_params = urllib.parse.urlencode(params)
-#        print("encoding", len(encoded_params))
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         conn = http.client.HTTPConnection(self.nv_protocol.host)
         conn.request("POST", self.nv_protocol.url, encoded_params, headers);
 
         if packcount > 0:
-            print("fillmode")
+#            print("fillmode")
             fillparams = params
             fillparams['perform'] = 'filling'
             for packnum in reversed(range(packcount)): # testing packing order
@@ -160,6 +158,12 @@ class NaviCell:
     def _heatmap_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_heatmap_editor_perform', module, [action, arg1, arg2, arg3])
 
+    def _map_staining_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_map_staining_editor_perform', module, [action, arg1, arg2, arg3])
+
+    def _drawing_config_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_drawing_config_perform', module, [action, arg1, arg2, arg3])
+
     # public API
     def makeData(self, data):
             self.getHugoList()
@@ -191,9 +195,20 @@ class NaviCell:
                     ret += line + "\n"
             return "@DATA\n" + ret
 
-    def importDatatables(self, module, datatable_url_list, datatable_name, datatable_type, params={}):
-        self._cli2srv('nv_import_datatables', module, [datatable_type, datatable_name, '', datatable_url_list, params])
+### datatable data: methods do not depend on module
+    def importDatatables(self, datatable_url_list, datatable_name, datatable_type, params={}):
+        self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_list, params])
 
+    def getDatatableList(self):
+        return self._cli2srv('nv_get_datatable_list', '', [], 'send_and_rcv')
+
+    def getDatatableGeneList(self):
+        return self._cli2srv('nv_get_datatable_gene_list', '', [], 'send_and_rcv')
+
+    def getDatatableSampleList(self):
+        return self._cli2srv('nv_get_datatable_sample_list', '', [], 'send_and_rcv')
+
+###
     def findEntities(self, module, search, hints = {}, open_bubble = False):
         if hints:
             mod_list = []
@@ -212,21 +227,17 @@ class NaviCell:
     def uncheckAllEntities(self, module):
         self._cli2srv('nv_uncheck_all_entities', module, [])
 
-    def getDatatableList(self, module):
-        return self._cli2srv('nv_get_datatable_list', module, [], 'send_and_rcv')
-
-    def getDatatableGeneList(self, module):
-        return self._cli2srv('nv_get_datatable_gene_list', module, [], 'send_and_rcv')
-
     def selectEntity(self, module, entity_name):
         self._cli2srv('nv_find_entities', module, [entity_name])
 
+### navigation
     def setZoom(self, module, zoom):
         self._cli2srv('nv_set_zoom', module, [zoom])
 
     def scroll(self, module, xscroll, yscroll=0):
         self._cli2srv('nv_scroll', module, [xscroll, yscroll])
 
+### heatmap
     def heatmapEditorOpen(self, module):
         self._heatmap_editor_perform(module, 'open')
 
@@ -257,13 +268,65 @@ class NaviCell:
     def heatmapEditorSelectSample(self, module, where, sample):
         self._heatmap_editor_perform(module, 'select_sample', where, sample)
 
-    def heatmapEditorSelectSample(self, module, where, sample):
-        self._heatmap_editor_perform(module, 'select_sample', where, sample)
+    def heatmapEditorSelectDatatable(self, module, where, datatable):
+        self._heatmap_editor_perform(module, 'select_datatable', where, datatable)
+
+### map staining
+    def mapStainingEditorOpen(self, module):
+        self._map_staining_editor_perform(module, 'open')
+
+    def mapStainingEditorClose(self, module):
+        self._map_staining_editor_perform(module, 'close')
+
+    def mapStainingEditorApply(self, module):
+        self._map_staining_editor_perform(module, 'apply')
+
+    def mapStainingEditorCancel(self, module):
+        self._map_staining_editor_perform(module, 'cancel')
+
+    def mapStainingEditorSetTransparency(self, module, value):
+        self._map_staining_editor_perform(module, 'set_transparency', value)
+
+    def mapStainingEditorSelectSample(self, module, sample):
+        self._map_staining_editor_perform(module, 'select_sample', sample)
+
+    def mapStainingEditorSelectDatatable(self, module, datatable):
+        self._map_staining_editor_perform(module, 'select_datatable', datatable)
+
+### drawing configuration
+    def drawingConfigOpen(self, module):
+        self._drawing_config_perform(module, 'open')
+
+    def drawingConfigClose(self, module):
+        self._drawing_config_perform(module, 'close')
+
+    def drawingConfigApply(self, module):
+        self._drawing_config_perform(module, 'apply')
+
+    def drawingConfigCancel(self, module):
+        self._drawing_config_perform(module, 'cancel')
+
+    def drawingConfigSelectHeatmap(self, module, select=True):
+        self._drawing_config_perform(module, 'select_heatmap', select)
+
+    def drawingConfigSelectBarplot(self, module, select=True):
+        self._drawing_config_perform(module, 'select_barplot', select)
+
+    def drawingConfigSelectMapStaining(self, module, select=True):
+        self._drawing_config_perform(module, 'select_map_staining', select)
+
+###
 
     def prepareImportDialog(self, module, filename, name, filetype):
         self._cli2srv('nv_prepare_import_dialog', module, [filename, name, filetype])
 
-    # method where module argument is not needed
+    def getCommandHistory(self, module):
+        return self._cli2srv('nv_get_command_history', module, [], 'send_and_rcv')
+
+    def executeCommands(self, module, commands):
+        return self._send({'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': commands});
+
+### get methods
     def getModuleList(self):
         return self._cli2srv('nv_get_module_list', '', [], 'send_and_rcv')
 

@@ -107,6 +107,23 @@ function nv_open_module(win, module_id, ids)
 	return null;
 }
 
+function nv_get_command_history(win)
+{
+	return $("#command-history", win.document).val();
+}
+
+//var ESCAPE_LINE_BREAK = new RegExp("\\n", "g");
+var ESCAPE_LINE_BREAK = /\\n/g;
+//var ESCAPE_QUOTE = new RegExp('\\"', "g");
+var ESCAPE_QUOTE = /\\"/g;
+//var ESCAPE_TAB = new RegExp('\\t', "g");
+var ESCAPE_TAB = /\\t/g;
+
+function nv_execute_commands(win, cmd)
+{
+	return win.nv_decode(cmd);
+}
+
 // ------------------------------------------------------------------------------------------------------------------
 // nv_find_entities
 //
@@ -147,7 +164,7 @@ function nv_set_zoom(win, zoom)
 
 function nv_uncheck_all_entities(win)
 {
-	win.uncheck_all_entities();
+	win.uncheck_all_entities(win);
 	return null;
 }
 
@@ -391,6 +408,15 @@ function nv_get_datatable_gene_list(win)
 	return navicell.dataset.getSortedGeneNames();
 }
 
+function nv_get_datatable_sample_list(win)
+{
+	var sample_names = [];
+	for (var sample_name in navicell.dataset.getSamples()) {
+		sample_names.push(sample_name);
+	}
+	return sample_names;
+}
+
 function nv_get_hugo_list(win)
 {
 	return navicell.mapdata.getHugoNames();
@@ -422,12 +448,13 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 		var idx = arg1;
 
 		// if arg2 begins with a # it is number, otherwise a datatable name or id ?
-		if (arg2[0] == '#') {
-			var selected_datatable = parseInt(arg2.substring(1));
+		var is_datatable_num = arg2[0] == '#'
+		if (is_datatable_num || !is_int(arg2)) {
+			var selected_datatable = (is_datatable_num ? parseInt(arg2.substring(1)) : arg2);
 			var datatable_num = 0;
 			var datatables = navicell.dataset.datatables;
 			for (var datatable_name in navicell.dataset.datatables) {
-				if (selected_datatable == datatable_num) {
+				if (selected_datatable == datatable_num || selected_datatable == datatable_name) {
 					var datatable = datatables[datatable_name];
 					$("#heatmap_editor_datatable_" + idx, win.document).val(datatable.getId());
 					heatmap_editor_set_editing(true, idx, win.document.map_name);
@@ -443,13 +470,13 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 		}
 	} else if (command == "select_sample") {
 		var idx = arg1;
-		if (arg2[0] == '#') {
-			var selected_sample = parseInt(arg2.substring(1));
-			// if arg2 begins with a # it is number, otherwise a sample name or id ?
+		var is_sample_num = arg2[0] == '#'
+		if (is_sample_num || !is_int(arg2)) {
+			var selected_sample = (is_sample_num ? parseInt(arg2.substring(1)) : arg1);
 			var sample_names = get_sample_names();
 			for (var sample_num in sample_names) {
 				var sample_name = sample_names[sample_num];
-				if (selected_sample == sample_num) {
+				if (selected_sample == sample_num || selected_sample == sample_name) {
 					var sample = navicell.dataset.samples[sample_name];
 					$("#heatmap_editor_gs_" + idx, win.document).val("s_" + sample.getId());
 					heatmap_editor_set_editing(true, undefined, win.document.map_name);
@@ -469,7 +496,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 			if (interactive) {
 				warning_dialog("Apply cannot be performed", msg, win);
 			} else {
-				win.console.log("Apply cannot be performed", msg, win);
+				throw "nv_heatmap_editor_perform: apply cannot be performed";
 			}
 			return;
 		}
@@ -499,7 +526,7 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 		nv_heatmap_editor_perform(win, "close");
 		//$("#heatmap_editor_div", win.document).dialog("close");
 	} else {
-		win.console.log("nv_heatmap_editor_perform: unknown command \"" + command + "\"");
+		throw "nv_heatmap_editor_perform: unknown command \"" + command + "\"";
 	}
 	// must add:
 	// apply
@@ -509,6 +536,173 @@ function nv_heatmap_editor_perform(win, command, arg1, arg2)
 	// select_datatables (arg1 and arg2: array of same length expected)
 	// select_samples (arg1 and arg2: array of same length expected)
 	return null;
+}
+
+function nv_map_staining_editor_perform(win, command, arg1, arg2)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	var drawing_config = navicell.getDrawingConfig(module);
+	var map_staining_config = drawing_config.getMapStainingConfig();
+
+	var map_staining_editor = $("#map_staining_editor_div", win.document);
+	if (command == "open") {
+		map_staining_editor.dialog("open");
+	} else if (command == "close") {
+		map_staining_editor.dialog("close");
+	} else if (command == "select_datatable") {
+		// TBD: action to be called from mouse event (update_map_staining_editor)
+		var is_datatable_num = arg1[0] == '#'
+		if (is_datatable_num || !is_int(arg1)) {
+			var selected_datatable = (is_datatable_num ? parseInt(arg1.substring(1)) : arg1);
+			var datatable_num = 0;
+			var datatables = navicell.dataset.datatables;
+			for (var datatable_name in navicell.dataset.datatables) {
+				if (selected_datatable == datatable_num || selected_datatable == datatable_name) {
+					var datatable = datatables[datatable_name];
+					$("#map_staining_editor_datatable_color", win.document).val(datatable.getId());
+					map_staining_editor_set_editing(true, "color", win.document.map_name);
+					return;
+				}
+				datatable_num++;
+			}
+			$("#map_staining_editor_datatable_color", win.document).val(-1);
+			map_staining_editor_set_editing(true, "color", win.document.map_name);
+		} else {
+			$("#map_staining_editor_datatable_color", win.document).val(arg1);
+			map_staining_editor_set_editing(true, "color", win.document.map_name);
+		}
+	} else if (command == "select_sample") {
+		// TBD: action to be called from mouse event (update_map_staining_editor)
+		var is_sample_num = arg1[0] == '#'
+		if (is_sample_num || !is_int(arg1)) {
+			var selected_sample = (is_sample_num ? parseInt(arg1.substring(1)) : arg1);
+			var sample_names = get_sample_names();
+			for (var sample_num in sample_names) {
+				var sample_name = sample_names[sample_num];
+				if (selected_sample == sample_num || selected_sample == sample_name) {
+					var sample = navicell.dataset.samples[sample_name];
+					$("#map_staining_editor_gs", win.document).val("s_" + sample.getId());
+					map_staining_editor_set_editing(true, "color", win.document.map_name);
+					return;
+				}
+			}
+			$("#map_staining_editor_gs", win.document).val(-1);
+			map_staining_editor_set_editing(true, "color", win.document.map_name);
+		} else {
+			$("#map_staining_editor_gs", win.document).val(arg1);
+			map_staining_editor_set_editing(true, "color", win.document.map_name);
+		}
+	} else if (command == "apply") {
+		var interactive = arg1;
+		var msg = get_map_staining_config_message(true);
+		if (msg) {
+			if (interactive) {
+				warning_dialog("Apply cannot be performed", msg, win);
+			} else {
+				throw "nv_map_staining_editor_perform: apply cannot be performed";
+			}
+			return;
+		}
+		map_staining_editor_apply(drawing_config.getMapStainingConfig());
+		map_staining_editor_apply(drawing_config.getEditingMapStainingConfig());
+		update_map_staining_editor(win.document);
+		$("#drawing_config_map_staining_display").attr("checked", true);
+		drawing_config.setDisplayMapStaining(true);
+		navicell.getMapTypes(module).setMapTypeByMapStaining(true);
+		map_staining_editor_set_editing(false, "color", win.document.map_name);
+		drawing_config.apply(win);
+	} else if (command == "set_transparency") {
+		// TBD: action to be called from mouse event (update_map_staining_editor)
+		var value = arg1;
+		map_staining_config.getSlider().slider("value", value);
+		map_staining_config.setTransparency(value);
+	} else if (command == "cancel") {
+		drawing_config.getEditingMapStainingConfig().cloneFrom(drawing_config.getMapStainingConfig());
+		update_map_staining_editor(win.document);
+		map_staining_editor_set_editing(false, "color", win.document.map_name);
+		map_staining_editor.dialog("close");
+	} else {
+		throw "nv_map_staining_editor_perform: unknown command \"" + command + "\"";
+	}
+}
+
+function nv_drawing_config_perform(win, command, arg1, arg2)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	var drawing_config = navicell.getDrawingConfig(module);
+	var drawing_config_dialog = $("#drawing_config_div", win.document);
+
+	if (command == "open") {
+		drawing_config_dialog.dialog("open");
+	} else if (command == "close") {
+		drawing_config_dialog.dialog("close");
+	} else if (command == "select_map_staining") {
+		// TBD: action to be called from mouse event (onchange on drawing_config_map_staining_display)
+		var checked = arg1;
+		drawing_config.setDisplayMapStaining(checked);
+		if (checked) {
+			$("#drawing_config_map_staining_display", win.document).attr("checked", "checked");
+		} else {
+			$("#drawing_config_map_staining_display", win.document).removeAttr("checked");
+		}
+	} else if (command == "select_heatmap") {
+		// TBD: action to be called from mouse event (onchange on drawing_config_map_char*)
+		var checked = arg1;
+		if (checked) {
+			$("#drawing_config_map_chart_display", win.document).attr("checked", "checked");
+			drawing_config.displayCharts(checked, "Heatmap");
+			$("#drawing_config_chart_type", win.document).val(drawing_config.displayCharts());
+		} else {
+			$("#drawing_config_map_chart_display", win.document).removeAttr("checked");
+		}
+	} else if (command == "select_barplot") {
+		// TBD: action to be called from mouse event (onchange on drawing_config_map_char*)
+		var checked = arg1;
+		if (checked) {
+			drawing_config.displayCharts(checked, "Barplot");
+			$("#drawing_config_map_chart_display", win.document).attr("checked", "checked");
+			$("#drawing_config_chart_type", win.document).val(drawing_config.displayCharts());
+		} else {
+			$("#drawing_config_map_chart_display", win.document).removeAttr("checked");
+		}
+	} else if (command == "apply") {
+		drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
+		for (var num = 1; num <= GLYPH_COUNT; ++num) {
+			drawing_config.setDisplayGlyphs(num, $("#drawing_config_glyph_display_" + num, win.document).attr("checked"));
+		}
+		var map_staining = $("#drawing_config_map_staining_display", win.document).attr("checked");
+		drawing_config.setDisplayMapStaining(map_staining);
+		navicell.getMapTypes(module).setMapTypeByMapStaining(map_staining);
+		drawing_config.apply();
+	} else if (command == "cancel") {
+		if (drawing_config.displayCharts()) {
+			$("#drawing_config_chart_display", win.document).attr("checked", "checked");
+			$("#drawing_config_chart_type", win.document).val(drawing_config.displayCharts());
+		} else {
+			$("#drawing_config_chart_display", win.document).removeAttr("checked");
+		}
+		$("#drawing_config_old_marker", win.document).val(drawing_config.displayOldMarkers());
+		for (var num = 1; num <= GLYPH_COUNT; ++num) {
+			if (drawing_config.displayGlyphs(num)) {
+				$("#drawing_config_glyph_display_" + num).attr("checked", "checked");
+			} else {
+				$("#drawing_config_glyph_display_" + num).removeAttr("checked");
+			}
+		}
+		if (drawing_config.displayDLOsOnAllGenes()) {
+			$("#drawing_config_display_all", win.document).attr("checked", "checked");
+			$("#drawing_config_display_selected", win.document).removeAttr("checked");
+		} else {
+			$("#drawing_config_display_all", win.document).removeAttr("checked");
+			$("#drawing_config_display_selected", win.document).attr("checked", "checked");
+		}
+		drawing_editing(false);
+		drawing_config_dialog.dialog("close");
+	} else {
+		throw "nv_drawing_config_perform: unknown command \"" + command + "\"";
+	}
 }
 
 function nv_now()
@@ -544,12 +738,18 @@ var nv_handlers = {
 	"nv_import_datatables": nv_import_datatables,
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,
 	"nv_heatmap_editor_perform": nv_heatmap_editor_perform,
+	"nv_map_staining_editor_perform": nv_map_staining_editor_perform,
+	"nv_drawing_config_perform": nv_drawing_config_perform,
 
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,
 	"nv_get_datatable_gene_list": nv_get_datatable_gene_list,
+	"nv_get_datatable_sample_list": nv_get_datatable_sample_list,
 	"nv_get_hugo_list": nv_get_hugo_list,
-	"nv_get_biotype_list": nv_get_biotype_list
+	"nv_get_biotype_list": nv_get_biotype_list,
+
+	"nv_get_command_history": nv_get_command_history,
+	"nv_execute_commands": nv_execute_commands
 };
 
 // nv_perform("nv_import_datatables", window, "Datatable list", "", "", "file:///bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/datatable_list.txt", {import_display_markers: false, import_display_barplot: true});
@@ -666,6 +866,8 @@ function nv_rcv(base_url, url) {
 			       }
 			       if (cmd.trim().length > 0) {
 				       try {
+					       cmd = cmd.replace(ESCAPE_LINE_BREAK, "\n").replace(ESCAPE_QUOTE, '"').replace(ESCAPE_TAB, '\t');
+					       //console.log("CMD [" + cmd + "]");
 					       var data = nv_decode(cmd);
 					       var rspdata = {status: 0, data: (data ? data : '')};
 
@@ -699,8 +901,7 @@ function nv_server(win, id) {
 //
 // to be moved to nv_decode.js ?
 //
-// setTimeout(function() {nv_decode("|@@|nv_heatmap_editor_perform|--||--|Sopen|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N0|--|S#1|@@|nv_heatmap_editor_perform|--|S|--|Sselect_datatable|--|N2|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N0|--|S#0|@@|nv_heatmap_editor_perform|--|S|--|Sselect_sample|--|N1|--|S#2|@@|nv_heatmap_editor_perform|--|S|--|Sapply|@@|nv_find_entities|--|S|--|SAK.*");}, 2000);
-//
+
 var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
 // decode

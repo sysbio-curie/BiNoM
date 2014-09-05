@@ -433,6 +433,8 @@ $(function() {
 
 		buttons: {
 			"Apply": function() {
+				nv_perform("nv_drawing_config_perform", window, "apply");
+				/*
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
 				drawing_config.setDisplayCharts($("#drawing_config_chart_display").attr("checked"), $("#drawing_config_chart_type").val());
@@ -443,9 +445,12 @@ $(function() {
 				drawing_config.setDisplayMapStaining(map_staining);
 				navicell.getMapTypes(module).setMapTypeByMapStaining(map_staining);
 				drawing_config.apply();
+				*/
 			},
 
 			"Cancel": function() {
+				nv_perform("nv_drawing_config_perform", window, "cancel");
+				/*
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
 				if (drawing_config.displayCharts()) {
@@ -473,9 +478,11 @@ $(function() {
 				if (CANCEL_CLOSES) {
 					$(this).dialog('close');
 				}
+				*/
 			},
 			"OK": function() {
-				$(this).dialog('close');
+				nv_perform("nv_drawing_config_perform", window, "close");
+				//$(this).dialog('close');
 			}
 		}
 	});
@@ -736,6 +743,8 @@ $(function() {
 
 		buttons: {
 			"Apply": function() {
+				nv_perform("nv_map_staining_editor_perform", window, "apply", true);
+				/*
 				var msg = get_map_staining_config_message(true);
 				if (msg) {
 					warning_dialog("Apply cannot be performed", msg, window);
@@ -751,20 +760,25 @@ $(function() {
 				navicell.getMapTypes(module).setMapTypeByMapStaining(true);
 				map_staining_editor_set_editing(false);
 				drawing_config.apply(window);
+				*/
 			},
 
 			"Cancel": function() {
+				nv_perform("nv_map_staining_editor_perform", window, "cancel");
+				/*
 				var module = get_module();
 				var drawing_config = navicell.getDrawingConfig(module);
 				drawing_config.getEditingMapStainingConfig().cloneFrom(drawing_config.getMapStainingConfig());
 				update_map_staining_editor(window.document);
-				map_statining_editor_set_editing(false);
+				map_staining_editor_set_editing(false);
 				if (CANCEL_CLOSES) {
 					$(this).dialog('close');
 				}
+				*/
 			},
 			"OK": function() {
-				$(this).dialog('close');
+				nv_perform("nv_map_staining_editor_perform", window, "close");
+				//$(this).dialog('close');
 			}
 		}
 	});

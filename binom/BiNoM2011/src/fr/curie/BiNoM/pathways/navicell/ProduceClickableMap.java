@@ -5240,7 +5240,7 @@ public class ProduceClickableMap
 	private static PrintStream create_reset_button(final PrintStream out)
 	{
 		out.print(onclick_before);
-		out.print("nv_perform(\"uncheck_all_entities\", window)");
+		out.print("nv_perform(\"nv_uncheck_all_entities\", window)");
 		out.print(onclick_after);
 		out.print(" title='Uncheck all entities'>");
 		//out.print("reset");

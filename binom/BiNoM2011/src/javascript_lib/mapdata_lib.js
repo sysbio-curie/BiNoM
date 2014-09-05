@@ -392,6 +392,17 @@ var LINE_BREAK_REGEX = /\r\n?|\n/;
 var LINE_BREAK_REGEX_G = new RegExp("\r\n?|\n", "g");
 var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
 var NUM_REGEX = new RegExp("^-?[0-9]+(\.[0-9]*)?$");
+var INT_REGEX = new RegExp("^-?[0-9]+$");
+
+function is_number(str)
+{
+	return str.match(NUM_REGEX);
+}
+
+function is_int(str)
+{
+	return str.match(INT_REGEX);
+}
 
 var time_cnt = 0;
 
@@ -1123,6 +1134,10 @@ Dataset.prototype = {
 			jxrestree.scanTree(jxtreeScanner);
 		}
 		return jxtreeScanner.getArrayPos();
+	},
+	
+	getSamples: function() {
+		return this.samples;
 	},
 	
 	getSample: function(sample_name) {

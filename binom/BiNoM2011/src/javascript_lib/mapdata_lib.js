@@ -31,6 +31,73 @@ if (!window.console) {
 	};
 }
 
+function Debug()
+{
+}
+
+Debug.MASK = 0;
+Debug.MAPPOS = 0x1;
+Debug.MAPSTAIN = 0x2;
+
+Debug.MAP = {};
+Debug.MAP[Debug.MAPPOS] = "MAPPOS";
+Debug.MAP[Debug.MAPSTAIN] = "MAPSTAIN";
+
+Debug.RMAP = {};
+
+Debug.init = function() {
+	for (var key in Debug.MAP) {
+		var value = Debug.MAP[key];
+		Debug.RMAP[value] = key;
+	}
+}
+
+Debug.console = function(dbglevel, msg)
+{
+	if ((Debug.MASK & dbglevel) != 0) {
+		console.log("DEBUG " + Debug.MAP[dbglevel] + " " + msg);
+	}
+}
+
+Debug.getAllKeys = function()
+{
+	var keys = [];
+	for (var nn = 0; nn < arr.length; ++nn) {
+		var key = arr[nn];
+		keys.push(key);
+	}
+	return keys;
+}
+
+Debug.reset = function()
+{
+	Debug.MASK = 0;
+}
+
+Debug.add = function(str)
+{
+	var arr = str.split("+");
+	var mask = 0;
+	for (var nn = 0; nn < arr.length; ++nn) {
+		var key = arr[nn];
+		var value = Debug.RMAP[key];
+		if (value) {
+			mask |= value;
+		} else {
+			console.log("DEBUG: cannot find key " + key + ", available keys are " + Debug.getAllKeys());
+		}
+	}
+	Debug.MASK |= mask;
+}
+
+Debug.set = function(str)
+{
+	Debug.reset();
+	Debug.add(str);
+}
+
+Debug.init();
+
 function mapSize(map) {
 	var size = 0;
 	for (var key in map) {
@@ -375,7 +442,6 @@ VoronoiCells.prototype = {
 function Mapdata(to_load_count) {
 	this.to_load_count = to_load_count;
 
-	this.is_ready = false;
 	this.ready = {};
 	this.is_ready = {};
 	this.straight_data = {};
@@ -431,6 +497,13 @@ Mapdata.prototype = {
 
 	getPostModuleLink: function(postid) {
 		return this.module_postid[postid];
+	},
+
+	getMapByModifId: function(module_name, modif_id) {
+		if (this.module_modif_map[module_name]) {
+			return this.module_modif_map[module_name][modif_id];
+		}
+		return null;
 	},
 
 	getJXTree: function(module_name) {
@@ -643,7 +716,7 @@ Mapdata.prototype = {
 	},
 
 	isReady: function(module_name) {
-		return this.is_ready[module_name];
+		return this.is_ready[module_name] ? true : false;
 	},
 
 	whenReady: function(module_name, f) {
@@ -942,6 +1015,8 @@ function mapdata_display_markers(module_name, win, hugo_names)
 function JXTreeScanner(module_name) {
 	this.module_name = module_name;
 	this.arrpos = [];
+	this.mappos = {};
+	Debug.console(Debug.MAPPOS, "building JXTreeScanner");
 }
 
 JXTreeScanner.prototype = {
@@ -952,6 +1027,22 @@ JXTreeScanner.prototype = {
 				var pos = navicell.dataset.getGeneInfoByModifId(this.module_name, data.id);
 				if (pos) {
 					array_push_all(this.arrpos, pos[1]);
+					/*
+					for (var nn = 0; nn < pos[1].length; ++nn) {
+						Debug.console(Debug.MAPPOS, "setting said=" + pos[1][nn].said + ", gene=" + pos[1][nn].gene_name);
+						this.mappos[pos[1][nn].said] = true;
+					}
+					*/
+				}
+				var shape_info = navicell.mapdata.getMapByModifId(this.module_name, data.id);
+				if (shape_info) {
+					for (var nn = 0; nn < shape_info.length; ++nn) {
+						var said = shape_info[nn][4];
+						//Debug.console(Debug.MAPPOS, "said=" + said);
+						if (said) {
+							this.mappos[said] = true;
+						}
+					}
 				}
 			}
 		}
@@ -959,6 +1050,10 @@ JXTreeScanner.prototype = {
 
 	getArrayPos: function() {
 		return this.arrpos;
+	},
+
+	getMapPos: function() {
+		return this.mappos;
 	}
 };
 
@@ -1095,7 +1190,7 @@ Dataset.prototype = {
 							if (positions) {
 								for (var kk = 0; kk < positions.length; ++kk) {
 									var pos = positions[kk];
-									arrpos.push({id : modif.id, p : new google.maps.Point(pos.x, pos.y), gene_name: gene_name});
+									arrpos.push({id : modif.id, p : new google.maps.Point(pos.x, pos.y), gene_name: gene_name, said: pos.said});
 									if (pos.said) {
 										this.gene_shape_map[module_name][pos.said] = gene_name;
 										gene.addShapeId(module_name, pos.said);
@@ -1125,7 +1220,7 @@ Dataset.prototype = {
 		return this.module_arrpos[module_name];
 	},
 
-	getSelectedArrayPos: function(module_name) {
+	_scanTree: function(module_name) {
 		var jxtree = navicell.mapdata.getJXTree(module_name);
 		var jxtreeScanner = new JXTreeScanner(module_name);
 		jxtree.scanTree(jxtreeScanner);
@@ -1133,7 +1228,35 @@ Dataset.prototype = {
 		if (jxrestree) {
 			jxrestree.scanTree(jxtreeScanner);
 		}
+		return jxtreeScanner;
+	},
+
+	getSelectedArrayPos: function(module_name) {
+		var jxtreeScanner = this._scanTree(module_name);
+		/*
+		var jxtree = navicell.mapdata.getJXTree(module_name);
+		var jxtreeScanner = new JXTreeScanner(module_name);
+		jxtree.scanTree(jxtreeScanner);
+		var jxrestree = navicell.mapdata.getResJXTree(module_name);
+		if (jxrestree) {
+			jxrestree.scanTree(jxtreeScanner);
+		}
+		*/
 		return jxtreeScanner.getArrayPos();
+	},
+	
+	getSelectedMapPos: function(module_name) {
+		var jxtreeScanner = this._scanTree(module_name);
+		/*
+		var jxtree = navicell.mapdata.getJXTree(module_name);
+		var jxtreeScanner = new JXTreeScanner(module_name);
+		jxtree.scanTree(jxtreeScanner);
+		var jxrestree = navicell.mapdata.getResJXTree(module_name);
+		if (jxrestree) {
+			jxrestree.scanTree(jxtreeScanner);
+		}
+		*/
+		return jxtreeScanner.getMapPos();
 	},
 	
 	getSamples: function() {
@@ -3624,7 +3747,9 @@ Datatable.prototype = {
 			}
 		}
 
-		overlay.draw(module_name);
+		if (win.overlay) {
+			win.overlay.draw(module_name);
+		}
 	},
 
 	setName: function(name) {

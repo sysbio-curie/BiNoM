@@ -25,6 +25,12 @@ from time import sleep
 print("")
 print("nv = NaviCell(NVChromeLauncher())")
 print("")
+#print("nv.isReady('')")
+#print("")
+#print("nv.waitForReady('')")
+#print("")
+#print("nv.isReady('')")
+#print("")
 print('nv.importDatatables("http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
@@ -86,6 +92,7 @@ class NaviCell:
         if not session_id:
             session_id = self._make_session_id()
 
+        self._msg_id = 1000
         self._hugo_list = []
         self._hugo_map = {}
         self.session_id = session_id
@@ -95,17 +102,25 @@ class NaviCell:
         if nv_launcher:
             nv_launcher.launch(self.session_id)
 
-    def _send(self, params):
+        self._waitForReady('')
+
+    def _message_id(self):
+        self._msg_id += 1
+        return self._msg_id
+
+    def _send(self, msg_id, params):
         if not self.session_id:
             raise Exception('navicell session is not active')
 
         packcount = 0;
         params['id'] = self.session_id;
+        params['msg_id'] = msg_id
+
         if 'data' in params:
             datalen = len(params['data'])
+#            print("datalen", datalen, PACKSIZE)
             if datalen > PACKSIZE:
                 packcount = int(datalen/PACKSIZE)+1
-#                print("MULTIPACK protocol", datalen, PACKSIZE, packcount)
                 params['packcount'] = packcount
                 data = params['data']
                 params['data'] = "@@"
@@ -116,7 +131,7 @@ class NaviCell:
         conn.request("POST", self.nv_protocol.url, encoded_params, headers);
 
         if packcount > 0:
-#            print("fillmode")
+#            print("performing filling", packcount)
             fillparams = params
             fillparams['perform'] = 'filling'
             for packnum in reversed(range(packcount)): # testing packing order
@@ -136,6 +151,7 @@ class NaviCell:
         data = response.read()
 #        print (response.status, response.reason, data)
         conn.close()
+
         if data:
             decoded_data = json.loads(data.decode('utf-8'))
             if not decoded_data['status']:
@@ -144,25 +160,40 @@ class NaviCell:
         return data
 
     def _init_session(self):
-        self._send({'mode': 'none', 'perform': 'init'});
+        self._send(self._message_id(), {'mode': 'none', 'perform': 'init'});
 
     def _reset_session(self):
-        self._send({'mode': 'none', 'perform': 'reset'});
+        self._send(self._message_id(), {'mode': 'none', 'perform': 'reset'});
+
+    def _waitForReady(self, module):
+        while not self._isReady(module):
+            sleep(0.05)
+        return True
+
+    def _isReady(self, module):
+        return self._cli2srv('nv_is_ready', module, [], 'send_and_rcv')
 
     def _make_data(self, data):
         return "@COMMAND " + json.dumps(data)
 
     def _cli2srv(self, action, module, args, perform='send_and_rcv'):
-        return self._send({'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args})})
+        msg_id = self._message_id()
+        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args, 'msg_id': msg_id})})
+
+    def _drawing_config_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_drawing_config_perform', module, [action, arg1, arg2, arg3])
 
     def _heatmap_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_heatmap_editor_perform', module, [action, arg1, arg2, arg3])
 
+    def _barplot_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_barplot_editor_perform', module, [action, arg1, arg2, arg3])
+
+    def _glyph_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_glyph_editor_perform', module, [action, arg1, arg2, arg3])
+
     def _map_staining_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_map_staining_editor_perform', module, [action, arg1, arg2, arg3])
-
-    def _drawing_config_perform(self, module, action, arg1='', arg2='', arg3=''):
-        self._cli2srv('nv_drawing_config_perform', module, [action, arg1, arg2, arg3])
 
     # public API
     def makeData(self, data):
@@ -237,7 +268,7 @@ class NaviCell:
     def scroll(self, module, xscroll, yscroll=0):
         self._cli2srv('nv_scroll', module, [xscroll, yscroll])
 
-### heatmap
+### heatmap editor
     def heatmapEditorOpen(self, module):
         self._heatmap_editor_perform(module, 'open')
 
@@ -246,6 +277,9 @@ class NaviCell:
 
     def heatmapEditorApply(self, module):
         self._heatmap_editor_perform(module, 'apply')
+
+    def heatmapEditorApplyAndClose(self, module):
+        self._heatmap_editor_perform(module, 'apply_and_close')
 
     def heatmapEditorCancel(self, module):
         self._heatmap_editor_perform(module, 'cancel')
@@ -271,7 +305,75 @@ class NaviCell:
     def heatmapEditorSelectDatatable(self, module, where, datatable):
         self._heatmap_editor_perform(module, 'select_datatable', where, datatable)
 
-### map staining
+### barplot editor
+    def barplotEditorOpen(self, module):
+        self._barplot_editor_perform(module, 'open')
+
+    def barplotEditorClose(self, module):
+        self._barplot_editor_perform(module, 'close')
+
+    def barplotEditorApply(self, module):
+        self._barplot_editor_perform(module, 'apply')
+
+    def barplotEditorApplyAndClose(self, module):
+        self._barplot_editor_perform(module, 'apply_and_close')
+
+    def barplotEditorCancel(self, module):
+        self._barplot_editor_perform(module, 'cancel')
+
+    def barplotEditorClearSamples(self, module):
+        self._barplot_editor_perform(module, 'clear_samples')
+
+    def barplotEditorAllSamples(self, module):
+        self._barplot_editor_perform(module, 'all_samples')
+
+    def barplotEditorAllGroups(self, module):
+        self._barplot_editor_perform(module, 'all_groups')
+
+    def barplotEditorFromHeatmap(self, module):
+        self._barplot_editor_perform(module, 'from_heatmap')
+
+    def barplotEditorSetTransparency(self, module, value):
+        self._barplot_editor_perform(module, 'set_transparency', value)
+
+    def barplotEditorSelectSample(self, module, where, sample):
+        self._barplot_editor_perform(module, 'select_sample', where, sample)
+
+    def barplotEditorSelectDatatable(self, module, datatable):
+        self._barplot_editor_perform(module, 'select_datatable', datatable)
+
+### glyph editor
+    def glyphEditorOpen(self, module, num):
+        self._glyph_editor_perform(module, 'open', num)
+
+    def glyphEditorClose(self, module, num):
+        self._glyph_editor_perform(module, 'close', num)
+
+    def glyphEditorApply(self, module, num):
+        self._glyph_editor_perform(module, 'apply', num)
+
+    def glyphEditorApplyAndClose(self, module, num):
+        self._glyph_editor_perform(module, 'apply_and_close', num)
+
+    def glyphEditorCancel(self, module, num):
+        self._glyph_editor_perform(module, 'cancel', num)
+
+    def glyphEditorSetTransparency(self, module, num, value):
+        self._glyph_editor_perform(module, 'set_transparency', num, value)
+
+    def glyphEditorSelectSample(self, module, num, sample):
+        self._glyph_editor_perform(module, 'select_sample', num, sample)
+
+    def glyphEditorSelectShapeDatatable(self, module, num, datatable):
+        self._glyph_editor_perform(module, 'select_datatable_shape', num, datatable)
+
+    def glyphEditorSelectColorDatatable(self, module, num, datatable):
+        self._glyph_editor_perform(module, 'select_datatable_color', num, datatable)
+
+    def glyphEditorSelectSizeDatatable(self, module, num, datatable):
+        self._glyph_editor_perform(module, 'select_datatable_size', num, datatable)
+
+### map staining editor
     def mapStainingEditorOpen(self, module):
         self._map_staining_editor_perform(module, 'open')
 
@@ -280,6 +382,9 @@ class NaviCell:
 
     def mapStainingEditorApply(self, module):
         self._map_staining_editor_perform(module, 'apply')
+
+    def mapStainingEditorApplyAndClose(self, module):
+        self._map_staining_editor_perform(module, 'apply_and_close')
 
     def mapStainingEditorCancel(self, module):
         self._map_staining_editor_perform(module, 'cancel')
@@ -303,6 +408,9 @@ class NaviCell:
     def drawingConfigApply(self, module):
         self._drawing_config_perform(module, 'apply')
 
+    def drawingConfigApplyAndClose(self, module):
+        self._drawing_config_perform(module, 'apply_and_close')
+
     def drawingConfigCancel(self, module):
         self._drawing_config_perform(module, 'cancel')
 
@@ -312,8 +420,17 @@ class NaviCell:
     def drawingConfigSelectBarplot(self, module, select=True):
         self._drawing_config_perform(module, 'select_barplot', select)
 
+    def drawingConfigSelectGlyph(self, module, num, select=True):
+        self._drawing_config_perform(module, 'select_glyph', num, select)
+
     def drawingConfigSelectMapStaining(self, module, select=True):
         self._drawing_config_perform(module, 'select_map_staining', select)
+
+    def drawingConfigDisplayAllGenes(self, module):
+        self._drawing_config_perform(module, 'display_all_genes')
+
+    def drawingConfigDisplaySelectedGenes(self, module):
+        self._drawing_config_perform(module, 'display_selected_genes')
 
 ###
 
@@ -324,7 +441,7 @@ class NaviCell:
         return self._cli2srv('nv_get_command_history', module, [], 'send_and_rcv')
 
     def executeCommands(self, module, commands):
-        return self._send({'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': commands});
+        return self._send(self._message_id(), {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': commands});
 
 ### get methods
     def getModuleList(self):

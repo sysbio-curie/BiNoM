@@ -1006,6 +1006,8 @@ function uncheck_all_entities(win)
 	$.each(win.bubble_list, function() {
 		this.close();
 	});
+
+	overlay.draw(win.document.navicell_module_name);
 }
 
 function bubble_open(marker)

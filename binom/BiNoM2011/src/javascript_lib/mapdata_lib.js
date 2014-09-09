@@ -506,6 +506,39 @@ Mapdata.prototype = {
 		return null;
 	},
 
+	getBubbleContents: function(module_name) {
+		function LScanner(module_name) {
+			this.module_name = module_name;
+			this.contents = [];
+		}
+		LScanner.prototype = {
+			scanNode: function(node) {
+				if (node.isChecked()) {
+					var data = node.getUserData();
+					if (data && data.id) {
+						//var contents = navicell.mapdata.getBubbleContent(this.module_name, data.id);
+						var contents = navicell.mapdata.getBubble(this.module_name, data.id);
+						console.log("contents for " + data.id + " " + (contents ? contents.length : "no"));
+						if (contents) {
+							this.contents.push(contents);
+						}
+					}
+				}
+			}
+		}
+		var scanner = new LScanner(module_name);
+
+		var jxtree = navicell.mapdata.getJXTree(module_name);
+		jxtree.scanTree(scanner);
+
+		var jxrestree = navicell.mapdata.getResJXTree(module_name);
+		if (jxrestree) {
+			jxrestree.scanTree(scanner);
+		}
+		console.log("SCANNER: " + scanner.contents.length);
+		return scanner.contents;
+	},
+
 	getJXTree: function(module_name) {
 		return this.module_jxtree[module_name];
 	},
@@ -820,6 +853,14 @@ Mapdata.prototype = {
 			}
 				
 		});
+	},
+
+	getBubbleContent: function(module_name, data_id) {
+		var bubble = this.getBubble(module_name, data_id);
+		if (bubble) {
+			return bubble.getContent();
+		}
+		return '';
 	},
 
 	setBubbleContent: function(bubble, module_name, data_id) {

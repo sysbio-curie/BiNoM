@@ -145,6 +145,10 @@ function nv_find_entities(win, search, open_bubble)
 	navicell.mapdata.findJXTree(win, search, false, 'subtree', {div: $("#result_tree_contents", win.document).get(0)}, open_bubble);
 	$("#right_tabs", win.document).tabs("option", "active", 1);
 	return null;
+	// Two problems:
+	// 1. bubble contents is not sync with search (=> deferred)
+	// 2. contents is often too large, need POST data to be sliced into packets
+	//return navicell.mapdata.getBubbleContents(get_module(win));
 }
 
 function nv_select_entity(win, id, mode, center, clicked_boundbox)

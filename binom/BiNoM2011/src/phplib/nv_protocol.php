@@ -12,12 +12,14 @@ function logfile($id) {
 }
 
 function logmsg($id, $msg) {
+  /*
   $file = logfile($id);
   //$fdlck = lock($id);
   $fd = fopen($file, "a") or die("cannot append to file " . $file);
   fwrite($fd, $msg);
   //unlock($fdlck);
   fclose($fd);
+  */
 }
 
 function get_post_var($param) {

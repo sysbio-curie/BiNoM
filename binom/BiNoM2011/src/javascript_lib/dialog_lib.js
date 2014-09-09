@@ -418,7 +418,7 @@ $(function() {
 				status_message("");
 			},
 
-			Close: function() {
+			Done: function() {
 				$(this).dialog('close');
 			}
 		}});
@@ -543,7 +543,7 @@ $(function() {
 				group_editing(false);
 			},
 
-			OK: function() {
+			Done: function() {
 				$(this).dialog("close");
 			}
 		}
@@ -565,20 +565,12 @@ $(function() {
 	});
 
 	$("#drawing_config").button().click(function() {
-		//if (true || navicell.dataset.datatableCount()) {
 		if (navicell.dataset.datatableCount()) {
 			$("#drawing_config_div").dialog("open");
 		}
 	});
 
 	update_buttons();
-	/*
-	if (!navicell.dataset.datatableCount()) {
-		$("#import_annot_status").button("disable");
-		$("#status_tabs").button("disable");
-		$("#drawing_config").button("disable");
-	}
-	*/
 
 	if (DATATABLE_HAS_TABS) {
 		$("#dt_datatable_tabs").dialog({

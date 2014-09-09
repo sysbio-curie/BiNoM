@@ -253,13 +253,13 @@ class NaviCell:
                         mod += ";"
                     mod += mod_list[ind]
                 search += " " + mod
-        self._cli2srv('nv_find_entities', module, [search, open_bubble])
+        return self._cli2srv('nv_find_entities', module, [search, open_bubble])
 
     def uncheckAllEntities(self, module):
         self._cli2srv('nv_uncheck_all_entities', module, [])
 
     def selectEntity(self, module, entity_name):
-        self._cli2srv('nv_find_entities', module, [entity_name])
+        return self._cli2srv('nv_find_entities', module, [entity_name])
 
 ### navigation
     def setZoom(self, module, zoom):

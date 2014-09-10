@@ -1972,7 +1972,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getSizeGroup: function(group, gene_name) {
-		var value = this.getShapeGroupValue(group, gene_name);
+		var value = this.getSizeGroupValue(group, gene_name);
 		return this._getSize(value, 'group');
 	},
 
@@ -2240,7 +2240,7 @@ DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'sample';
 	var id_suffix = tabname + '_' + config + "_" + id;
-	DisplayUnorderedConfig.setEditing(datatable.id, true, config);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable.id, true, config);
 	var checked = $("#discrete_color_same_" + id_suffix).attr("checked");
 	var color = $("#discrete_color_same_color_" + id_suffix).val();
 	var beg_gradient = $("#discrete_color_beg_gradient_" + id_suffix).val();
@@ -2421,6 +2421,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	setValueInfo: function(config, tabname, idx, color, size, shape, cond) {
 		if (idx < this.colors[tabname][config].length) {
 			this.colors[tabname][config][idx] = color;
+			//console.log("setValueInfo size " + idx + " -> " + size + " " + config + " " + tabname);
 			this.sizes[tabname][config][idx] = size;
 			this.shapes[tabname][config][idx] = shape;
 			this.conds[tabname][config][idx] = cond;
@@ -2485,6 +2486,12 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	},
 
 	getSizeAt: function(idx, config, tabname) {
+		/*
+		console.log("getSizeAt " + idx + " " + config + " " + tabname + " -> " + this.sizes[tabname][config][idx]);
+		if (!this.sizes[tabname][config][idx]) {
+			console.log("undefined size for " + idx + " " + config + " " + tabname);
+		}
+		*/
 		return this.sizes[tabname][config][idx];
 	},
 
@@ -2647,19 +2654,14 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.getColorAt(idx, COLOR_SIZE_CONFIG, 'group');
 	},
 
-	getSizeGroup: function(group, gene_name) {
-		var idx = this.getAcceptedCondition(group, gene_name, 'color');
-		return this.getColorAt(idx, 'color', 'group');
-	},
-
 	getShapeGroup: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, 'shape');
-		return this.getColorAt(idx, 'shape', 'group');
+		return this.getShapeAt(idx, 'shape', 'group');
 	},
 
 	getSizeGroup: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, 'size');
-		return this.getColorAt(idx, 'size', 'group');
+		return this.getSizeAt(idx, 'size', 'group');
 	},
 
 	getHeatmapStyleGroup: function(group, gene_name) {
@@ -4459,6 +4461,9 @@ AnnotationFactory.prototype = {
 	readannots: function(ready, error_trigger) {
 		var lines = this.all_line_read;
 		if (!lines.length) {
+			if (ready) {
+				ready.resolve();
+			}
 			return 0;
 		}
 		var header;
@@ -4544,6 +4549,28 @@ AnnotationFactory.prototype = {
 		return 1;
 	},
 
+	readurl: function(url) {
+		console.log("READING [" + url + "]");
+		var ready = this.ready = $.Deferred();
+		var annot_factory = this;
+		$.ajax(url,
+		       {
+			       async: true,
+			       dataType: 'text',
+			       cache: false,
+			       success: function(text) {
+				       var lines = text.split(LINE_BREAK_REGEX);
+				       console.log("have read: " + lines.length);
+				       array_push_all(annot_factory.all_line_read, lines);
+				       annot_factory.readannots(ready, null);
+			       },
+			       error: function(e) {
+				       error_dialog("Loading Sample Annotations", "Cannot load URL " + url + " " + e.responseText, window);
+			       }
+		       }
+		      );
+	},
+
 	readfile: function(file, error_trigger) {
 		var reader = new FileReader();
 		reader.readAsBinaryString(file);
@@ -4554,13 +4581,10 @@ AnnotationFactory.prototype = {
 			var text = reader.result;
 			var lines = text.split(LINE_BREAK_REGEX);
 			array_push_all(annot_factory.all_line_read, lines);
-			annot_factory.readannots(ready, error_trigger);
+			annot_factory.readannots(ready);
 		},
 		reader.onerror = function(e) {  // If anything goes wrong
-			if (error_trigger) {
-				error_trigger(file);
-			}
-			console.log("Error", e);    // Just log it
+			error_dialog("Loading Sample Annotations", "Cannot load file " + file.name, window);
 		}
 	},
 

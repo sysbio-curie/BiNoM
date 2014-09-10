@@ -37,6 +37,9 @@ print("")
 print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
 print("")
 
+print('nv.sampleAnnotationImport("http://localhost/~eviara/data/cancer_cell_line_broad/SampleAnnotations.txt")')
+print("")
+
 print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')
 print("")
 print('nv.openModule("../../survival_light/master/index.html")')
@@ -229,6 +232,24 @@ class NaviCell:
 ### datatable data: methods do not depend on module
     def importDatatables(self, datatable_url_list, datatable_name, datatable_type, params={}):
         self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_list, params])
+
+    def sampleAnnotationImport(self, sample_annotation_url):
+        self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url])
+
+    def sampleAnnotationOpen(self):
+        self._cli2srv('nv_sample_annotation_perform', '', ['open'])
+
+    def sampleAnnotationClose(self):
+        self._cli2srv('nv_sample_annotation_perform', '', ['close'])
+
+    def sampleAnnotationApply(self):
+        self._cli2srv('nv_sample_annotation_perform', '', ['apply'])
+
+    def sampleAnnotationCancel(self):
+        self._cli2srv('nv_sample_annotation_perform', '', ['cancel'])
+
+    def sampleAnnotationSelectAnnotation(self, annot, select=True):
+        self._cli2srv('nv_sample_annotation_perform', '', ['select_annotation', annot, select])
 
     def getDatatableList(self):
         return self._cli2srv('nv_get_datatable_list', '', [], 'send_and_rcv')

@@ -291,6 +291,10 @@ label {font-size: 12px; vertical-align: middle;}
     border: 1px solid lightgray;
 }
 
+#dt_sample_annot {
+    min-height: 600px;
+}
+
 #dt_import_status, #dt_sample_annot_status {
     margin-left: 10px;
     margin-right: 20px;
@@ -465,10 +469,17 @@ label {font-size: 12px; vertical-align: middle;}
     vertical-align: top;
 }
 
+#dt_sample_annot_table_div {
+/*    direction: rtl; */
+}
+
 #dt_sample_annot_table {
     min-height: 400px;
-    min-width: 400px;
-    padding-right: 20px;
+    min-width: 600px;
+    padding-right: 10px;
+    padding-left: 10px;
+/*    direction: rtl; */
+    overflow: auto;
 }
 
 #dt_sample_annot_table thead {

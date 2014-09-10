@@ -960,6 +960,102 @@ function nv_drawing_config_perform(win, command, arg1, arg2)
 	}
 }
 
+function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
+{
+	console.log("nv_sample_annotation_perform [" + command + "]");
+	win = nv_win(win);
+	if (command == "open") {
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_sample_annot", win.document).dialog("open");
+		}
+	} else if (command == "close") {
+		$("#dt_sample_annot", win.document).dialog("close");
+	} else if (command == "apply") {
+		var annots = navicell.annot_factory.annots_per_name;
+		var annot_ids = [];
+		var checkeds = [];
+		for (var annot_name in annots) {
+			var annot = navicell.annot_factory.getAnnotation(annot_name);
+			var checkbox = $("#cb_annot_" + annot.id, win.document);
+			var checked = checkbox.attr("checked");
+			
+			annot_ids.push(annot.id);
+			annot.setIsGroup(checked);
+		}
+		navicell.group_factory.buildGroups();
+		update_status_tables({style_only: true, annot_ids: annot_ids, no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
+		$("#dt_sample_annot_status", win.document).html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
+		
+		group_editing(false);
+	} else if (command == "cancel") {
+		var annots = navicell.annot_factory.annots_per_name;
+		for (var annot_name in annots) {
+			var annot = navicell.annot_factory.getAnnotation(annot_name);
+			if (annot.isGroup()) {
+				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
+			} else {
+				$("#cb_annot_" + annot.id, win.document).removeAttr("checked");
+			}
+		}
+		group_editing(false);
+	} else if (command == "import") {
+		var url = arg1;
+		var file = arg2;
+		var interactive = arg3;
+		var status = $("#dt_import_status", win.document);
+
+		if (!url && !file) {
+			if (interative) {
+				error_dialog("Importing Sample Annotations", "no file neither url given", win);
+				return;
+			} else {
+				throw "Importing Sample Annotations: no file neither url given";
+			}
+		}
+		if (url && file) {
+			if (interative) {
+				error_dialog("Importing Sample Annotations", "cannot specify both file and URL", win);
+				return;
+			} else {
+				throw "Importing Sample Annotations: cannot specify both file and URL";
+			}
+		}
+		if (url) {
+			navicell.annot_factory.readurl(url);
+		} else {
+			navicell.annot_factory.readfile(file, function(file) {status.html("<span class=\"error-message\">Cannot read file " + file + "</span>");});
+		}
+
+		navicell.annot_factory.ready.then(function() {
+			var sample_file = $("#dt_sample_file");
+			var sample_url = $("#dt_sample_url");
+			if (navicell.annot_factory.sample_read > 0) {
+				status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+			} else {
+				status.html("<span class=\"error-message\">Missing samples: " + navicell.annot_factory.missing + "<br>No samples annotated, may be something wrong in the file.</span>");
+			}
+			sample_file.val("");
+			if (navicell.annot_factory.sample_annotated) {
+				update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
+			}
+		});
+	} else if (command == "select_annotation") {
+		var annot_name = arg1;
+		var checked = arg2;
+		var annot = navicell.annot_factory.getAnnotation(annot_name);
+		if (annot) {
+			if (checked) {
+				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
+			} else {
+				$("#cb_annot_" + annot.id, win.document).removeAttr("checked");
+			}
+		}
+	} else {
+		throw "nv_sample_annotation_perform: unknown command \"" + command + "\"";
+	}
+	return null;
+}
+
 function nv_now()
 {
 	var date = new Date();
@@ -1000,6 +1096,7 @@ var nv_handlers = {
 	"nv_glyph_editor_perform": nv_glyph_editor_perform,
 	"nv_map_staining_editor_perform": nv_map_staining_editor_perform,
 	"nv_drawing_config_perform": nv_drawing_config_perform,
+	"nv_sample_annotation_perform": nv_sample_annotation_perform,
 
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,

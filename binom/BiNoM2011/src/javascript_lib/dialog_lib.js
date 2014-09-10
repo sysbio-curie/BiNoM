@@ -72,6 +72,11 @@ function warning_dialog(header, msg, win)
 	display_dialog('Warning', header, msg, win);
 }
 
+function error_dialog(header, msg, win)
+{
+	display_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
+}
+
 var CANCEL_CLOSES = false;
 
 $(function() {
@@ -97,6 +102,7 @@ $(function() {
 	var import_display_barplot = $("#dt_import_display_barplot");
 	var import_display_heatmap = $("#dt_import_display_heatmap");
 	var sample_file = $("#dt_sample_file");
+	var sample_url = $("#dt_sample_url");
 
 	if (OPEN_DRAWING_EDITOR) {
 		$("#display_heatmap").html("Display Heatmap (will open heatmap editor after import)");
@@ -507,50 +513,68 @@ $(function() {
 
 	$("#dt_sample_annot").dialog({
 		autoOpen: false,
-		width: 800,
-		height: 750,
+		width: 850,
+		height: 950,
 		modal: false,
-		buttons: {
-			Apply: function() {
-				var annots = navicell.annot_factory.annots_per_name;
-				var annot_ids = [];
-				var checkeds = [];
-				for (var annot_name in annots) {
-					var annot = navicell.annot_factory.getAnnotation(annot_name);
-					var checkbox = $("#cb_annot_" + annot.id);
-					var checked = checkbox.attr("checked");
+		buttons: [
+			{
+				id: 'dt_sample_annot_apply',
+				text: 'Apply',
+				click: function() {
+					nv_perform("nv_sample_annotation_perform", window, "apply", true);
+					/*
+					var annots = navicell.annot_factory.annots_per_name;
+					var annot_ids = [];
+					var checkeds = [];
+					for (var annot_name in annots) {
+						var annot = navicell.annot_factory.getAnnotation(annot_name);
+						var checkbox = $("#cb_annot_" + annot.id);
+						var checked = checkbox.attr("checked");
 
-					annot_ids.push(annot.id);
-					annot.setIsGroup(checked);
-				}
-				navicell.group_factory.buildGroups();
-				update_status_tables({style_only: true, annot_ids: annot_ids, no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
-				$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
-
-				group_editing(false);
-			},
-
-			Cancel: function() {
-				var annots = navicell.annot_factory.annots_per_name;
-				for (var annot_name in annots) {
-					var annot = navicell.annot_factory.getAnnotation(annot_name);
-					if (annot.isGroup()) {
-						$("#cb_annot_" + annot.id).attr("checked", "checked");
-					} else {
-						$("#cb_annot_" + annot.id).removeAttr("checked");
+						annot_ids.push(annot.id);
+						annot.setIsGroup(checked);
 					}
-				}
-				group_editing(false);
-			},
+					navicell.group_factory.buildGroups();
+					update_status_tables({style_only: true, annot_ids: annot_ids, no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
+					$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
 
-			Done: function() {
-				$(this).dialog("close");
+					group_editing(false);
+					*/
+				},
+			},
+			{
+				id: 'dt_sample_annot_cancel',
+				text: 'Cancel',
+				click: function() {
+					nv_perform("nv_sample_annotation_perform", window, "cancel");
+					/*
+					var annots = navicell.annot_factory.annots_per_name;
+					for (var annot_name in annots) {
+						var annot = navicell.annot_factory.getAnnotation(annot_name);
+						if (annot.isGroup()) {
+							$("#cb_annot_" + annot.id).attr("checked", "checked");
+						} else {
+							$("#cb_annot_" + annot.id).removeAttr("checked");
+						}
+					}
+					group_editing(false);
+					*/
+				},
+
+			},
+			{
+				id: 'dt_sample_annot_done',
+				text: 'Done',
+				click: function() {
+					$(this).dialog("close");
+				}
 			}
-		}
+		]
+
 	});
 
-
 	$("#import_annot_status").button().click(function() {
+		// TBD: use nv_perform
 		if (navicell.dataset.datatableCount()) {
 			$("#dt_sample_annot").dialog("open");
 		}
@@ -569,8 +593,6 @@ $(function() {
 			$("#drawing_config_div").dialog("open");
 		}
 	});
-
-	update_buttons();
 
 	if (DATATABLE_HAS_TABS) {
 		$("#dt_datatable_tabs").dialog({
@@ -840,29 +862,42 @@ $(function() {
 			}
 		}
 	});
+
+	update_buttons();
 });
 
 function import_annot_file()
 {
 	var sample_file = $("#dt_sample_file");
+	var sample_url = $("#dt_sample_url");
+	nv_perform("nv_sample_annotation_perform", window, "import", sample_url.val().trim(), sample_file.get()[0].files[0], true);
+
+	/*
 	var status = $("#dt_sample_annot_status");
-	var file_elem = sample_file.get()[0];
 	if (!$(file_elem).val()) {
-		status.html("<span class=\"error-message\">No file given</span>");
+		var url = sample_url.val().trim();
+		if (!url) {
+			status.html("<span class=\"error-message\">No file given</span>");
+			return;
+		}
+		navicell.annot_factory.readurl(url, function() {});
 	} else {
 		navicell.annot_factory.readfile(file_elem.files[0], function(file) {status.html("<span class=\"error-message\">Cannot read file " + $(file_elem).val() + "</span>");});
-		navicell.annot_factory.ready.then(function() {
-			if (navicell.annot_factory.sample_read > 0) {
-				status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
-			} else {
-				status.html("<span class=\"error-message\">Missing samples: " + navicell.annot_factory.missing + "<br>No samples annotated, may be something wrong in the file.</span>");
-			}
-			sample_file.val("");
-			if (navicell.annot_factory.sample_annotated) {
-				update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
-			}
-		});
 	}
+
+	navicell.annot_factory.ready.then(function() {
+		if (navicell.annot_factory.sample_read > 0) {
+			status.html("<span class=\"status-message\">" + navicell.annot_factory.sample_annotated + " samples annotated</span>");
+		} else {
+			status.html("<span class=\"error-message\">Missing samples: " + navicell.annot_factory.missing + "<br>No samples annotated, may be something wrong in the file.</span>");
+		}
+		sample_file.val("");
+		sample_url.val("");
+		if (navicell.annot_factory.sample_annotated) {
+			update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true});
+		}
+	});
+	*/
 }
 
 var DEF_OVERVIEW_HEATMAP_SAMPLE_CNT = 5;
@@ -1113,6 +1148,7 @@ function update_sample_annot_table(doc, params) {
 		update_sample_annot_table_style(doc, params);
 		return;
 	}
+		//	var annots = navicell.annot_factory.annots_per_name;
 	var annots = navicell.annot_factory.annots_per_name;
 	var annot_cnt = mapSize(annots);
 	var table = $("#dt_sample_annot_table", doc);
@@ -1593,6 +1629,10 @@ function update_buttons()
 	$("#import_annot_status").button(enable);
 	$("#status_tabs").button(enable);
 	$("#drawing_config").button(enable);
+
+	enable = navicell.annot_factory.getAnnotCount() > 0;
+	$("#dt_sample_annot_apply").button(enable ? "enable" : "disable");
+	$("#dt_sample_annot_cancel").button(enable ? "enable" : "disable");
 }
 
 function update_status_tables(params) {
@@ -1735,106 +1775,108 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		} else {
 			width = 400;
 		}
-		div.dialog({
-			autoOpen: false,
-			width: width,
-			height: 670,
-			modal: false,
+		if (!div.built) {
+			div.dialog({
+				autoOpen: false,
+				width: width,
+				height: 670,
+				modal: false,
 
-			buttons: {
-				"Apply": function() {
-					var datatable = navicell.getDatatableById(datatable_id);
-					var displayContinuousConfig = datatable.displayContinuousConfig[module];
-					var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
-					var active = div.tabs("option", "active");
-					var tabname = DisplayContinuousConfig.tabnames[active];
-					if (displayContinuousConfig) {
-						var prev_value = datatable.minval;
-						var error = 0;
-						var step_cnt = displayContinuousConfig.getStepCount(what, tabname);
-						if (displayContinuousConfig.has_empty_values) {
-							step_cnt++;
-						}
-						var use_gradient = displayContinuousConfig.use_gradient[what];
-						for (var idx = 0; idx < step_cnt; ++idx) {
-							var value;
-							if (idx == step_cnt-1 && !use_gradient) {
-								value = datatable.maxval;
-							} else {
-								value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
+				buttons: {
+					"Apply": function() {
+						var datatable = navicell.getDatatableById(datatable_id);
+						var displayContinuousConfig = datatable.displayContinuousConfig[module];
+						var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+						var active = div.tabs("option", "active");
+						var tabname = DisplayContinuousConfig.tabnames[active];
+						if (displayContinuousConfig) {
+							var prev_value = datatable.minval;
+							var error = 0;
+							var step_cnt = displayContinuousConfig.getStepCount(what, tabname);
+							if (displayContinuousConfig.has_empty_values) {
+								step_cnt++;
 							}
-							value *= 1.;
-							if (value <= prev_value) {
-								error = 1;
-								break;
-							}
-							prev_value = value;
-						}
-						
-						if (!error) {
+							var use_gradient = displayContinuousConfig.use_gradient[what];
 							for (var idx = 0; idx < step_cnt; ++idx) {
 								var value;
 								if (idx == step_cnt-1 && !use_gradient) {
 									value = datatable.maxval;
 								} else {
-									var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
-									value = $(id, doc).val();
-									if (!value) {
-										value = $(id, doc).text();
-									}
+									value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
 								}
-								var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-								var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-								var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-								displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+								value *= 1.;
+								if (value <= prev_value) {
+									error = 1;
+									break;
+								}
+								prev_value = value;
 							}
+							
+							if (!error) {
+								for (var idx = 0; idx < step_cnt; ++idx) {
+									var value;
+									if (idx == step_cnt-1 && !use_gradient) {
+										value = datatable.maxval;
+									} else {
+										var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
+										value = $(id, doc).val();
+										if (!value) {
+											value = $(id, doc).text();
+										}
+									}
+									var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+									var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+									var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+									displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+								}
+								DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
+							}
+						}
+						if (displayUnorderedDiscreteConfig) {
+							var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
+							if (tabname == 'group') {
+								value_cnt++;
+							}
+							var advanced = displayUnorderedDiscreteConfig.advanced;
+							for (var idx = 0; idx < value_cnt; ++idx) {
+								var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+								if (!advanced && idx > 0) {idx = value_cnt-1;}
+								displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+							}
+							DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
+						}
+						doc.win.clickmap_refresh(true);
+						update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+					},
+
+					"Cancel": function() {
+						var datatable = navicell.getDatatableById(datatable_id);
+						var displayContinuousConfig = datatable.displayContinuousConfig[module];
+						var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+						var active = div.tabs("option", "active");
+						var tabname = DisplayContinuousConfig.tabnames[active];
+						if (displayContinuousConfig) {
+							displayContinuousConfig.update();
 							DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
 						}
-					}
-					if (displayUnorderedDiscreteConfig) {
-						var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
-						if (tabname == 'group') {
-							value_cnt++;
+						if (displayUnorderedDiscreteConfig) {
+							displayUnorderedDiscreteConfig.update();
+							DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
 						}
-						var advanced = displayUnorderedDiscreteConfig.advanced;
-						for (var idx = 0; idx < value_cnt; ++idx) {
-							var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-							var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-							var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-							var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-							if (!advanced && idx > 0) {idx = value_cnt-1;}
-							displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+						if (CANCEL_CLOSES) {
+							$(this).dialog('close');
 						}
-						DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
-					}
-					doc.win.clickmap_refresh(true);
-					update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
-				},
-
-				"Cancel": function() {
-					var datatable = navicell.getDatatableById(datatable_id);
-					var displayContinuousConfig = datatable.displayContinuousConfig[module];
-					var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
-					var active = div.tabs("option", "active");
-					var tabname = DisplayContinuousConfig.tabnames[active];
-					if (displayContinuousConfig) {
-						displayContinuousConfig.update();
-						DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
-					}
-					if (displayUnorderedDiscreteConfig) {
-						displayUnorderedDiscreteConfig.update();
-						DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
-					}
-					if (CANCEL_CLOSES) {
+					},
+					"OK": function() {
 						$(this).dialog('close');
 					}
-				},
-				"OK": function() {
-					$(this).dialog('close');
 				}
-			}
-		});
-
+			});
+			div.built = true;
+		}
 		div.dialog("open");
 	}
 }
@@ -3063,6 +3105,7 @@ function draw_glyph(module, num, overlay, context, scale, gene_name, topx, topy)
 			shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroup(sel_group, gene_name);
 			color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
 			size = sel_size_datatable.getDisplayConfig(module).getSizeGroup(sel_group, gene_name);
+			//console.log("group: " + gene_name + " " + sel_group.getId() + " " + shape + " " + color + " " + size);
 		}
 
 		var start_x = topx + (size*g_size)/8; // must depends on scale2 also

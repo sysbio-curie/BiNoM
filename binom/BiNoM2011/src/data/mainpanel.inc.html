@@ -146,9 +146,17 @@
       </div>
       <div id="dt_sample_annot_status"></div> 
       <div align='left'>
-      <label for="file"><span style='font-weight: bold'>Sample annotation file:</span></label>
-      <input type="file" name="file" id="dt_sample_file" value="" class="text ui-widget-content ui-corner-all" />
-      <input type="button" style='-moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" value="Import File" onclick='import_annot_file()'></input>
+	<table border='0'>
+	  <tr>
+	    <td><label for="file"><span style='font-weight: bold'>Sample&nbsp;annotation&nbsp;file:</span></label></td>
+	    <td><input type="file" name="file" id="dt_sample_file" value="" style='vertical-align: bottom' class="text ui-widget-content ui-corner-all" /></td>
+	    <td rowspan='2' align='center'><input type="button" style='padding-left: 10px; -moz-border-radius: 4px; border-radius: 4px; font-size: small' class="ui-widget ui-button ui-dialog-buttonpane ui-button-text ui-button-text-only ui-state-default ui-widget-content" value="Import Annotations" onclick='import_annot_file()'></input></td>
+	  </tr>
+	  <tr>
+	    <td><label for="file"><span style='font-weight: bold'>Sample&nbsp;annotation&nbsp;URL:</span></label></td>
+	    <td><input type="text" name="name" id="dt_sample_url" class="text ui-widget-content ui-corner-all" size='35'/></td>
+	  </tr>
+	</table>
       </div>
     </fieldset>
   </form>

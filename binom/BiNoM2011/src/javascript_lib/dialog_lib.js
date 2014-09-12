@@ -1757,7 +1757,7 @@ function cancel_datatables() {
 }
 
 Datatable.prototype.showDisplayConfig = function(doc, what) {
-	var div;
+	var div = null;
 	var module = get_module_from_doc(doc);
 	var displayConfig = this.getDisplayConfig(module);
 	if (displayConfig) {

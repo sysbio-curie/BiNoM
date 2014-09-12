@@ -153,6 +153,7 @@ function nv_find_entities(win, search, open_bubble)
 
 function nv_select_entity(win, id, mode, center, clicked_boundbox)
 {
+	win = nv_win(win);
 	var module = get_module(win);
 	var jxtree = navicell.mapdata.getJXTree(module);
 	var node = jxtree.getNodeByUserId(id);
@@ -450,7 +451,7 @@ function _nv_get_datatable_tag(arg)
 	var is_datatable_num = arg[0] == '#'
 	if (is_datatable_num || !is_int(arg)) {
 		var selected_datatable = (is_datatable_num ? parseInt(arg.substring(1)) : arg);
-		var datatable_num = 0;
+		var datatable_num = 1;
 		var datatables = navicell.dataset.datatables;
 		for (var datatable_name in navicell.dataset.datatables) {
 			if (selected_datatable == datatable_num || selected_datatable == datatable_name) {
@@ -485,6 +486,28 @@ function _nv_get_sample_tag(arg)
 		if (selected_sample == sample_num || selected_sample == sample_name || selected_sample == sample_tag) {
 			return sample_tag;
 		}
+	}
+	return null;
+}
+
+function _nv_get_datatable(arg)
+{
+	var is_datatable_num = arg[0] == '#'
+	var selected_datatable = (is_datatable_num ? parseInt(arg.substring(1)) : arg);
+	var datatable_num = 1;
+	var datatables = navicell.dataset.datatables;
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = datatables[datatable_name];
+		if (is_datatable_num) {
+			if (selected_datatable == datatable_num) {
+				return datatable;
+			}
+		} else {
+			if (selected_datatable == datatable_name || selected_datatable == datatable.getId()) {
+				return datatable;
+			}
+		}
+		datatable_num++;
 	}
 	return null;
 }
@@ -960,6 +983,251 @@ function nv_drawing_config_perform(win, command, arg1, arg2)
 	}
 }
 
+function _nv_datatable_config_build(win, div, datatable, what)
+{
+	if (div.built) {
+		return;
+	}
+	var datatable_id = datatable.getId();
+	var width;
+	if (what == COLOR_SIZE_CONFIG) {
+		width = datatable.biotype.isUnorderedDiscrete() ? 760 : 500;
+	} else if (what == 'color') {
+		width = datatable.biotype.isUnorderedDiscrete() ? 700 : 440;
+	} else if (what == 'shape') {
+		width = 400;
+	} else {
+		width = 400;
+	}
+	div.dialog({
+		autoOpen: false,
+		width: width,
+		height: 670,
+		modal: false,
+
+		buttons: {
+			"Apply": function() {
+				nv_perform("nv_datatable_config_perform", win, "apply", datatable_id.toString(), what);
+				/*
+				var datatable = navicell.getDatatableById(datatable_id);
+				// must call nv_perform("nv_datatable_config_perform", win, "apply", datatable_id, what, arg1...)
+				var displayContinuousConfig = datatable.displayContinuousConfig[module];
+				var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+				var active = div.tabs("option", "active");
+				var tabname = DisplayContinuousConfig.tabnames[active];
+				if (displayContinuousConfig) {
+					var prev_value = datatable.minval;
+					var error = 0;
+					var step_cnt = displayContinuousConfig.getStepCount(what, tabname);
+					if (displayContinuousConfig.has_empty_values) {
+						step_cnt++;
+					}
+					var use_gradient = displayContinuousConfig.use_gradient[what];
+					for (var idx = 0; idx < step_cnt; ++idx) {
+						var value;
+						if (idx == step_cnt-1 && !use_gradient) {
+							value = datatable.maxval;
+						} else {
+							value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
+						}
+						value *= 1.;
+						if (value <= prev_value) {
+							error = 1;
+							break;
+						}
+						prev_value = value;
+					}
+					
+					if (!error) {
+						for (var idx = 0; idx < step_cnt; ++idx) {
+							var value;
+							if (idx == step_cnt-1 && !use_gradient) {
+								value = datatable.maxval;
+							} else {
+								var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
+								value = $(id, doc).val();
+								if (!value) {
+									value = $(id, doc).text();
+								}
+							}
+							var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+							displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+						}
+						DisplayContinuousConfig.setEditing(datatable_id, false, what, win);
+					}
+				}
+				if (displayUnorderedDiscreteConfig) {
+					var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
+					if (tabname == 'group') {
+						value_cnt++;
+					}
+					var advanced = displayUnorderedDiscreteConfig.advanced;
+					for (var idx = 0; idx < value_cnt; ++idx) {
+						var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+						var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+						var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+						var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+						if (!advanced && idx > 0) {idx = value_cnt-1;}
+						displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+					}
+					DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, win);
+				}
+				win.clickmap_refresh(true);
+				update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+				*/
+			},
+
+			"Cancel": function() {
+				nv_perform("nv_datatable_config_perform", win, "cancel", datatable_id.toString(), what);
+				/*
+				var datatable = navicell.getDatatableById(datatable_id);
+				var displayContinuousConfig = datatable.displayContinuousConfig[module];
+				var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+				var active = div.tabs("option", "active");
+				var tabname = DisplayContinuousConfig.tabnames[active];
+				if (displayContinuousConfig) {
+					displayContinuousConfig.update();
+					DisplayContinuousConfig.setEditing(datatable_id, false, what, win);
+				}
+				if (displayUnorderedDiscreteConfig) {
+					displayUnorderedDiscreteConfig.update();
+					DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, win);
+				}
+				if (CANCEL_CLOSES) {
+					$(this).dialog('close');
+				}
+				*/
+			},
+			"OK": function() {
+				nv_perform("nv_datatable_config_perform", win, "apply_and_close", datatable_id.toString(), what);
+				//$(this).dialog('close');
+			}
+		}
+	});
+	div.built = true;
+}
+
+function nv_datatable_config_perform(win, command, dtarg, what, arg3)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	var datatable = _nv_get_datatable(dtarg);
+	if (!datatable) {
+		throw "nv_datatable_config_perform: unknown datatable \"" + dtarg + "\"";
+	}
+
+	var displayConfig = datatable.getDisplayConfig(module);
+	if (!displayConfig) {
+		throw "nv_datatable_config_perform: cannot find display config for datatable \"" + dtarg + "\"";
+	}
+	var div = displayConfig.getDiv(what);
+	if (!div) {
+		throw "nv_datatable_config_perform: cannot find display config for datatable \"" + dtarg + "\" and configuration \"" + what + "\"";
+	}
+
+	_nv_datatable_config_build(win, div, datatable, what);
+
+	var datatable_id = datatable.getId();
+	var doc = win.document;
+
+	if (command == "open") {
+		div.dialog("open");
+	} else if (command == "close") {
+		div.dialog("close");
+	} else if (command == "apply_and_close") {
+		nv_perform("nv_datatable_config_perform", win, "apply", datatable_id.toString(), what);
+		nv_perform("nv_datatable_config_perform", win, "close", datatable_id.toString(), what);
+	} else if (command == "apply") {
+		var displayContinuousConfig = datatable.displayContinuousConfig[module];
+		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+		var active = div.tabs("option", "active");
+		var tabname = DisplayContinuousConfig.tabnames[active];
+		if (displayContinuousConfig) {
+			var prev_value = datatable.minval;
+			var error = 0;
+			var step_cnt = displayContinuousConfig.getStepCount(what, tabname);
+			if (displayContinuousConfig.has_empty_values) {
+				step_cnt++;
+			}
+			var use_gradient = displayContinuousConfig.use_gradient[what];
+			for (var idx = 0; idx < step_cnt; ++idx) {
+				var value;
+				if (idx == step_cnt-1 && !use_gradient) {
+					value = datatable.maxval;
+				} else {
+					value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
+				}
+				value *= 1.;
+				if (value <= prev_value) {
+					error = 1;
+					break;
+				}
+				prev_value = value;
+			}
+			
+			if (!error) {
+				for (var idx = 0; idx < step_cnt; ++idx) {
+					var value;
+					if (idx == step_cnt-1 && !use_gradient) {
+						value = datatable.maxval;
+					} else {
+						var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
+						value = $(id, doc).val();
+						if (!value) {
+							value = $(id, doc).text();
+						}
+					}
+					var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+					var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+					var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+					displayContinuousConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+				}
+				DisplayContinuousConfig.setEditing(datatable_id, false, what, win);
+			}
+		}
+		if (displayUnorderedDiscreteConfig) {
+			var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
+			if (tabname == 'group') {
+				value_cnt++;
+			}
+			var advanced = displayUnorderedDiscreteConfig.advanced;
+			for (var idx = 0; idx < value_cnt; ++idx) {
+				var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				if (!advanced && idx > 0) {idx = value_cnt-1;}
+				displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+			}
+			DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, win);
+		}
+		win.clickmap_refresh(true);
+		update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+	} else if (command == "cancel") {
+		// Cancel does not currently work, but keep the following code.
+		/*
+		var displayContinuousConfig = datatable.displayContinuousConfig[module];
+		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+		var active = div.tabs("option", "active");
+		var tabname = DisplayContinuousConfig.tabnames[active];
+		if (displayContinuousConfig) {
+			displayContinuousConfig.update();
+			DisplayContinuousConfig.setEditing(datatable_id, false, what, win);
+		}
+		if (displayUnorderedDiscreteConfig) {
+			displayUnorderedDiscreteConfig.update();
+			DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, win);
+		}
+		*/
+		div.dialog('close');
+	} else {
+		throw "nv_datatable_config_perform: unknown command \"" + command + "\"";
+	}
+	return null;
+}
+
 function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 {
 	console.log("nv_sample_annotation_perform [" + command + "]");
@@ -1097,6 +1365,7 @@ var nv_handlers = {
 	"nv_map_staining_editor_perform": nv_map_staining_editor_perform,
 	"nv_drawing_config_perform": nv_drawing_config_perform,
 	"nv_sample_annotation_perform": nv_sample_annotation_perform,
+	"nv_datatable_config_perform": nv_datatable_config_perform,
 
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,
@@ -1177,9 +1446,6 @@ function nv_get_url(cmd)
 	var posturl = url + "/launcher.php";
 	var text = "GET URL<br/>" + geturl + "<br/><br/>" + "POST URL<br/>" + posturl + "<br/>POST data<br/>" + data;
 	display_dialog("URL", "", text, window);
-
-
-
 }
 
 var RSP_ID = 1;

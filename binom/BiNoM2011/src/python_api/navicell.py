@@ -198,6 +198,9 @@ class NaviCell:
     def _map_staining_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_map_staining_editor_perform', module, [action, arg1, arg2, arg3])
 
+    def _datatable_config_perform(self, module, action, datatable, what, arg1='', arg2=''):
+        self._cli2srv('nv_datatable_config_perform', module, [action, datatable, what, arg1, arg2])
+
     # public API
     def makeData(self, data):
             self.getHugoList()
@@ -452,6 +455,19 @@ class NaviCell:
 
     def drawingConfigDisplaySelectedGenes(self, module):
         self._drawing_config_perform(module, 'display_selected_genes')
+
+### datatable config
+    def datatableConfigOpen(self, module, datatable, what):
+        self._datatable_config_perform(module, 'open', datatable, what)
+
+    def datatableConfigClose(self, module, datatable, what):
+        self._datatable_config_perform(module, 'close', datatable, what)
+
+    def datatableConfigApply(self, module, datatable, what):
+        self._datatable_config_perform(module, 'apply', datatable, what)
+
+    def datatableConfigCancel(self, module, datatable, what):
+        self._datatable_config_perform(module, 'cancel', datatable, what)
 
 ###
 

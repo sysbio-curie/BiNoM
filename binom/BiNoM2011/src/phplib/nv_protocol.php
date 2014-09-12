@@ -7,19 +7,22 @@
  *
  */
 
+$MAXMSGLEN = 150;
+
 function logfile($id) {
   return "/tmp/nv_" . $id . ".log";
 }
 
 function logmsg($id, $msg) {
-  /*
   $file = logfile($id);
   //$fdlck = lock($id);
   $fd = fopen($file, "a") or die("cannot append to file " . $file);
+  if (strlen($msg) > $MAXMSGLEN) {
+    $msg = substr($msg, 0, $MAXMSGLEN) + "...";
+  }
   fwrite($fd, $msg);
   //unlock($fdlck);
   fclose($fd);
-  */
 }
 
 function get_post_var($param) {

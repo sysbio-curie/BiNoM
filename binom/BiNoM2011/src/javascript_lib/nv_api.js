@@ -114,11 +114,8 @@ function nv_get_command_history(win)
 	return $("#command-history", win.document).val();
 }
 
-//var ESCAPE_LINE_BREAK = new RegExp("\\n", "g");
 var ESCAPE_LINE_BREAK = /\\n/g;
-//var ESCAPE_QUOTE = new RegExp('\\"', "g");
 var ESCAPE_QUOTE = /\\"/g;
-//var ESCAPE_TAB = new RegExp('\\t', "g");
 var ESCAPE_TAB = /\\t/g;
 
 function nv_execute_commands(win, cmd)
@@ -138,6 +135,12 @@ function nv_execute_commands(win, cmd)
 //
 //    nv_find_entities(window, "AK.*");
 // ------------------------------------------------------------------------------------------------------------------
+
+function nv_notice(win, header, msg, position, width, height)
+{
+	win = nv_win(win);
+	win.notice_dialog(header, msg, win, position, width, height);
+}
 
 function nv_find_entities(win, search, open_bubble)
 {
@@ -1324,6 +1327,31 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 	return null;
 }
 
+function nv_mydata_perform(win, command, arg1, arg2)
+{
+	win = nv_win(win);
+	if (command == "open") {
+		if (navicell.dataset.datatableCount()) {
+			$("#dt_status_tabs").dialog("open");
+		}
+	} else if (command == "close") {
+		$("#dt_status_tabs").dialog("close");
+	} else if (command == "select_datatables") {
+		$("#dt_status_tabs").tabs("option", "active", 0);
+	} else if (command == "select_samples") {
+		$("#dt_status_tabs").tabs("option", "active", 1);
+	} else if (command == "select_genes") {
+		$("#dt_status_tabs").tabs("option", "active", 2);
+	} else if (command == "select_groups") {
+		$("#dt_status_tabs").tabs("option", "active", 3);
+	} else if (command == "select_modules") {
+		$("#dt_status_tabs").tabs("option", "active", 4);
+	} else {
+		throw "nv_mydata_perform: unknown command \"" + command + "\"";
+	}
+	return null;
+}
+
 function nv_now()
 {
 	var date = new Date();
@@ -1356,9 +1384,11 @@ var nv_handlers = {
 	"nv_set_zoom": nv_set_zoom,
 	"nv_uncheck_all_entities": nv_uncheck_all_entities,
 	"nv_scroll": nv_scroll,
+	"nv_notice": nv_notice,
 
 	"nv_import_datatables": nv_import_datatables,
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,
+	"nv_mydata_perform": nv_mydata_perform,
 	"nv_heatmap_editor_perform": nv_heatmap_editor_perform,
 	"nv_barplot_editor_perform": nv_barplot_editor_perform,
 	"nv_glyph_editor_perform": nv_glyph_editor_perform,
@@ -1475,6 +1505,17 @@ function nv_rsp(url, data, msg_id) {
 	      );
 }
 
+function nv_rcv_perform(rsp_url, cmd)
+{
+	var data = nv_decode(cmd);
+	var rspdata = {status: 0, msg_id: data.msg_id, data: data.retdata == undefined ? false : data.retdata};
+	
+	if (SERVER_TRACE) {
+		console.log(" -> returning data [" + rspdata + "]");
+	}
+	nv_rsp(rsp_url, rspdata, data.msg_id);
+}
+
 function nv_rcv(base_url, url) {
 	if (SERVER_TRACE) {
 		console.log("nv_rcv(" + url + ")");
@@ -1485,20 +1526,34 @@ function nv_rcv(base_url, url) {
 		       async: true,
 		       cache: false, // don't work without cache off
 		       dataType: 'text',
+		       timeout: -1,
 		       success: function(cmd) {
 			       if (SERVER_TRACE) {
 				       console.log(" -> received [" + cmd + "]");
 			       }
-			       if (cmd.trim().length > 0) {
+			       cmd = cmd.trim();
+			       if (cmd.length > 0) {
 				       try {
-					       //cmd = cmd.replace(ESCAPE_LINE_BREAK, "\n").replace(ESCAPE_QUOTE, '"').replace(ESCAPE_TAB, '\t');
-					       var data = nv_decode(cmd);
-					       var rspdata = {status: 0, msg_id: data.msg_id, data: data.retdata == undefined ? false : data.retdata};
-
-					       if (SERVER_TRACE) {
-						       console.log(" -> returning data [" + rspdata + "]");
+					       if (cmd.substring(0, 2) == '!!') {
+						       var dataurl = cmd.substring(2);
+						       $.ajax(dataurl,
+							      {
+								      async: false,
+								      cache: false, // don't work without cache off
+								      dataType: 'text',
+								      success: function(cmd) {
+									      nv_rcv_perform(rsp_url, cmd);
+								      },
+								      
+								      error: function() {
+									      console.log(" -> exception_2 [" + e + "]");
+									      nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+								      }
+							      }
+							     );
+					       } else {
+						       nv_rcv_perform(rsp_url, cmd);
 					       }
-					       nv_rsp(rsp_url, rspdata, data.msg_id);
 				       } catch(e) {
 					       console.log(" -> exception [" + e + "]");
 					       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);

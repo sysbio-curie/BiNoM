@@ -23,26 +23,17 @@ from time import sleep
 # NV_MAP_URL=http://localhost/~eviara/navicell/nv2.2/maps/acsn_light/master/index.php python -i navicell.py
 
 print("")
+print("=================================")
+print("Welcome in NaviCell python driver")
+print("=================================")
+print("")
+print("To launch navicell using default environment variables:")
 print("nv = NaviCell(NVChromeLauncher())")
 print("")
-#print("nv.isReady('')")
-#print("")
-#print("nv.waitForReady('')")
-#print("")
-#print("nv.isReady('')")
-#print("")
-print('nv.importDatatables("http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+print("To use https protocol:")
+print("nv = NaviCell(NVChromeLauncher(), True)")
 print("")
-
-print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
-print("")
-
-print('nv.sampleAnnotationImport("http://localhost/~eviara/data/cancer_cell_line_broad/SampleAnnotations.txt")')
-print("")
-
-print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')
-print("")
-print('nv.openModule("../../survival_light/master/index.html")')
+print("Once launched, you can get examples by calling nv.examples()")
 print("")
 
 PACKSIZE = 500000
@@ -91,11 +82,17 @@ class NaviCell:
             pid = "0" + pid
         return (d.strftime('%s%%06d') % d.microsecond) + pid;
 
-    def __init__(self, nv_launcher='', session_id='', nv_protocol=NVProtocol()):
+    def __init__(self, nv_launcher='', use_https=False, session_id='', nv_protocol=NVProtocol()):
         if not session_id:
             session_id = self._make_session_id()
 
         self._msg_id = 1000
+
+        if use_https:
+            self.protocol = 'https'
+        else:
+            self.protocol = 'http'
+
         self._hugo_list = []
         self._hugo_map = {}
         self.session_id = session_id
@@ -130,7 +127,12 @@ class NaviCell:
 
         encoded_params = urllib.parse.urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        conn = http.client.HTTPConnection(self.nv_protocol.host)
+#        print("HOST:", self.nv_protocol.host, self.nv_protocol.url);
+        if self.isHttps():
+            conn = http.client.HTTPSConnection(self.nv_protocol.host)
+        else:
+            conn = http.client.HTTPConnection(self.nv_protocol.host)
+
         conn.request("POST", self.nv_protocol.url, encoded_params, headers);
 
         if packcount > 0:
@@ -146,7 +148,10 @@ class NaviCell:
                     end = datalen
                 fillparams['data'] = data[beg:end]
                 encoded_params = urllib.parse.urlencode(fillparams)
-                fillconn = http.client.HTTPConnection(self.nv_protocol.host)
+                if self.isHttps():
+                    fillconn = http.client.HTTPSConnection(self.nv_protocol.host)
+                else:
+                    fillconn = http.client.HTTPConnection(self.nv_protocol.host)
                 fillconn.request("POST", self.nv_protocol.url, encoded_params, headers);
                 fillconn.close()
 
@@ -185,6 +190,9 @@ class NaviCell:
 
     def _drawing_config_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_drawing_config_perform', module, [action, arg1, arg2, arg3])
+
+    def _mydata_perform(self, module, action, arg1='', arg2='', arg3=''):
+        self._cli2srv('nv_mydata_perform', module, [action, arg1, arg2, arg3])
 
     def _heatmap_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_heatmap_editor_perform', module, [action, arg1, arg2, arg3])
@@ -291,6 +299,32 @@ class NaviCell:
 
     def scroll(self, module, xscroll, yscroll=0):
         self._cli2srv('nv_scroll', module, [xscroll, yscroll])
+
+### notice
+    def notice(self, module, header, msg, position='left top', width=0, height=0):
+        self._cli2srv('nv_notice', module, [header, msg, position, width, height])
+
+### mydata
+    def myDataOpen(self, module):
+        self._mydata_perform(module, 'open')
+
+    def myDataClose(self, module):
+        self._mydata_perform(module, 'close')
+
+    def myDataSelectDatatables(self, module):
+        self._mydata_perform(module, 'select_datatables')
+
+    def myDataSelectSamples(self, module):
+        self._mydata_perform(module, 'select_samples')
+
+    def myDataSelectGenes(self, module):
+        self._mydata_perform(module, 'select_genes')
+
+    def myDataSelectGroups(self, module):
+        self._mydata_perform(module, 'select_groups')
+
+    def myDataSelectModules(self, module):
+        self._mydata_perform(module, 'select_modules')
 
 ### heatmap editor
     def heatmapEditorOpen(self, module):
@@ -504,3 +538,40 @@ class NaviCell:
     def reset(self):
         self._reset_session()
         self.session_id = 0
+
+    def isHttps(self):
+        return self.protocol == 'https'
+
+    def examples(self):
+        if self.isHttps():
+            datalist_url = "datatable_list_url_secure.txt"
+        else:
+            datalist_url = "datatable_list_url.txt"
+
+        print('nv.importDatatables("http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print("")
+
+        print('nv.importDatatables("' + self.protocol + '://acsn.curie.fr/navicell/demo/data/CCL_CopyNumber.txt", "", "Continuous copy number data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print("")
+
+        print('nv.importDatatables("' + self.protocol + '://acsn.curie.fr/navicell/demo/data/' + datalist_url + '", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print("")
+        print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print("")
+        
+        print('nv.executeCommands("", "' + self.protocol + '://acsn.curie.fr/navicell/demo/commands/demo1.nvc")')
+        print("")
+        print('nv.executeCommands("", "!!http://localhost/~eviara/demo/demo1.nvc")')
+        print("")
+
+        print('nv.sampleAnnotationImport("http://localhost/~eviara/data/cancer_cell_line_broad/SampleAnnotations.txt")')
+        print("")
+
+        print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')
+        print("")
+        print('nv.openModule("../../survival_light/master/index.html")')
+        print("")
+        print('nv.notice("", "", "<span style=\\"color: darkblue\\">Running NaviCell in demo mode<br/>Please wait...</span>", "left top", 350, 300)')
+        print("")
+        print('nv.notice("", "<span style=\\"color: darkred; font-size: 18px\\">Demo</span>", "<span style=\\"color: darkblue; font-size: 14px\\">NaviCell is currently running in demo mode<br/><br/>Please&nbsp;wait...</span>", "left center", 380, 320)')
+        print("")

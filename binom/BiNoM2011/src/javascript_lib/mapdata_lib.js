@@ -813,7 +813,7 @@ Mapdata.prototype = {
 
 		jxtree.onClickAfter(function(node, checked) {
 			win.tree_node_click_after(node.jxtree.context, checked);
-			overlay.draw(module_name);
+			win.overlay.draw(module_name);
 		});
 
 		this.deferred_module_bubble[module_name] = {};

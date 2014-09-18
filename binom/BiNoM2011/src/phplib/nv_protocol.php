@@ -8,9 +8,12 @@
  */
 
 $MAXMSGLEN = 150;
+$LOCAL_TMPDIR = "/scratch/navicell";
+$FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
 
 function logfile($id) {
-  return "/tmp/nv_" . $id . ".log";
+  global $FILE_PREFIX;
+  return $FILE_PREFIX . $id . ".log";
 }
 
 function logmsg($id, $msg) {
@@ -95,8 +98,8 @@ function delfile($file) {
 }
 
 function mkfile($id, $ext) {
-  global $file_prefix;
-  return $file_prefix . $id . $ext;
+  global $FILE_PREFIX;
+  return $FILE_PREFIX . $id . $ext;
 }
 
 function lockfile($id) {
@@ -143,7 +146,6 @@ $mode = get("mode", "none");
 $perform = get("perform", "");
 $id = get("id", "");
 $msg_id = get("msg_id", "UNKNOWN");
-$file_prefix = "/tmp/nv_";
 
 if ($mode == "none") {
   if ($perform == "init") {

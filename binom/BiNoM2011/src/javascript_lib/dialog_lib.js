@@ -29,10 +29,11 @@ function nv2() {
 }
 
 
-function display_dialog(title, header, msg, win)
+function display_dialog(title, header, msg, win, position, width, height)
 {
 	var dialog = $("#info_dialog", win.document);
-	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
+//	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
+	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
 	var lines = msg.split(LINE_BREAK_REGEX);
 	var maxlen = 0;
 	for (var ii = 0; ii < lines.length; ++ii) {
@@ -40,17 +41,21 @@ function display_dialog(title, header, msg, win)
 			maxlen = lines[ii].length;
 		}
 	}
-	var width = maxlen * 10;
-	if (width < 400) {
-		width = 400;
-	} else if (width > 800) {
-		width = 800;
+	if (!width) {
+		width = maxlen * 5;
+		if (width < 400) {
+			width = 400;
+		} else if (width > 800) {
+			width = 800;
+		}
 	}
-	var height = 200 + lines.length * 10;
-	if (height < 400) {
-		height = 400;
-	} else if (height > 800) {
-		height = 800;
+	if (!height) {
+		height = 50 + lines.length * 5;
+		if (height < 300) {
+			height = 300;
+		} else if (height > 800) {
+			height = 800;
+		}
 	}
 	dialog.dialog({
 		autoOpen: false,
@@ -64,7 +69,14 @@ function display_dialog(title, header, msg, win)
 			}
 		}
 	});
+	if (position) {
+		dialog.dialog("option", "position", {my: position, at: position});
+	}
 	dialog.dialog("open");
+
+	dialog.css("background", "white");
+	dialog.parent().css("background", "white");
+	dialog.next().css("background", "white");
 }
 
 function warning_dialog(header, msg, win)
@@ -75,6 +87,11 @@ function warning_dialog(header, msg, win)
 function error_dialog(header, msg, win)
 {
 	display_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
+}
+
+function notice_dialog(header, msg, win, position, width, height)
+{
+	display_dialog('Notice', header, msg, win, position, width, height);
 }
 
 var CANCEL_CLOSES = false;

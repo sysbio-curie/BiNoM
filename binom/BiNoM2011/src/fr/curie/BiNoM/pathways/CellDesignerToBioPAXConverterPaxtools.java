@@ -29,12 +29,15 @@ import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.Entity;
 import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Interaction;
+import org.biopax.paxtools.model.level3.ModificationFeature;
 import org.biopax.paxtools.model.level3.Pathway;
 import org.biopax.paxtools.model.level3.PhysicalEntity;
 import org.biopax.paxtools.model.level3.Protein;
 import org.biopax.paxtools.model.level3.ProteinReference;
 import org.biopax.paxtools.model.level3.PublicationXref;
+import org.biopax.paxtools.model.level3.RelationshipXref;
 import org.biopax.paxtools.model.level3.RnaRegionReference;
+import org.biopax.paxtools.model.level3.SequenceModificationVocabulary;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.UnificationXref;
@@ -47,11 +50,13 @@ import org.sbml.x2001.ns.celldesigner.AnnotationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerAntisenseRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerListOfModificationsDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesIdentityDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerStateDocument;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
@@ -131,7 +136,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	/**
 	 * BioPAX name space prefix (legacy code, not used).
 	 */
-	private String biopaxNameSpacePrefix = "";
+	private String biopaxNameSpacePrefix = "http://sysbio.curie.fr/biopax/";
 	
 	/**
 	 * Map of Pubmed IDs to BioPAX PublicationXref objects.
@@ -158,6 +163,12 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	private HashSet<String> pathwayNames;
 	
+	/**
+	 * Map from CellDesigner post-translation state, e.g. "acetylated", to
+	 * PSI-MOD codes (Proteomic Standard Initiative Modification codes).
+	 */
+	private HashMap<String, String> state2MODCode;
+	
 	
 	/**
 	 * Constructor.
@@ -176,22 +187,22 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		reactionToPathwayMap = new HashMap<String, HashSet<String>>();
 		pathwayMap = new HashMap<String, Pathway>();
 		pathwayNames = new HashSet<String>();
+		state2MODCode = new HashMap<String, String>();
 		
 		// initialize BioPAX objects containers
 		bpEntityReferences = new HashMap<String, EntityReference>();
 		bpPhysicalEntities = new HashMap<String, PhysicalEntity>();
-		bpPublicationXref = new  HashMap<String, PublicationXref>();
-		bpUnificationXref = new  HashMap<String, UnificationXref>();
+		bpPublicationXref = new HashMap<String, PublicationXref>();
+		bpUnificationXref = new HashMap<String, UnificationXref>();
 	}
 	
 	/**
 	 * Do the conversion from CellDesigner file to BioPAX.
 	 */
 	public void convert() {
+		buildState2MODCodeMap();
 		createBioPAXModel();
 		fillBioPAXModel();
-		//saveModel();
-		//printHUGO();
 	}
 	
 	/**
@@ -224,7 +235,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	private void createBioPAXModel() {
 		BioPAXFactory factory = BioPAXLevel.L3.getDefaultFactory();
 		model = factory.createModel();
-		model.setXmlBase("http://sysbio.curie.fr/biopax/");
+		model.setXmlBase(this.biopaxNameSpacePrefix);
 	}
 	
 	/**
@@ -251,7 +262,21 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		setBioPAXSmallMolecules();
 		setBioPAXSpecies();
 		setBioPAXReactions();
+		
 		System.out.println("INFO: CellDesigner to BioPAX conversion done.");
+	}
+	
+	/**
+	 * Build the state to PSI-MOD map.
+	 */
+	private void buildState2MODCodeMap() {
+		state2MODCode.put("acetylated", "00394");
+		state2MODCode.put("phosphorylated", "00696");
+		state2MODCode.put("glycosylated", "00693");
+		state2MODCode.put("hydroxylated", "00677");
+		state2MODCode.put("myristoylated", "00438");
+		state2MODCode.put("prenylated", "00703");
+		state2MODCode.put("ubiquitinated", "01148");
 	}
 	
 	/**
@@ -440,7 +465,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				for (PublicationXref pref : extractPubMedReferences(notes))
 					pr.addXref(pref);
 				
-				for (UnificationXref u_xref : extractHUGOReferences(notes))
+				for (RelationshipXref u_xref : extractHUGOReferencesAsRelationshipXref(notes, id))
 					pr.addXref(u_xref);
 			}
 			bpEntityReferences.put(prot.getId(), pr);
@@ -468,7 +493,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				for (PublicationXref pref : extractPubMedReferences(notes))
 					gn.addXref(pref);
 				
-				for (UnificationXref u_xref : extractHUGOReferences(notes))
+				for (RelationshipXref u_xref : extractHUGOReferencesAsRelationshipXref(notes, id))
 					gn.addXref(u_xref);
 			}
 			bpEntityReferences.put(gene.getId(), gn);
@@ -496,7 +521,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				for (PublicationXref pref : extractPubMedReferences(notes))
 					rn.addXref(pref);
 				
-				for (UnificationXref u_xref : extractHUGOReferences(notes))
+				for (RelationshipXref u_xref : extractHUGOReferencesAsRelationshipXref(notes, id))
 					rn.addXref(u_xref);
 			}
 			bpEntityReferences.put(rna.getId(), rn);
@@ -524,7 +549,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				for (PublicationXref pref : extractPubMedReferences(notes))
 					rn.addXref(pref);
 				
-				for (UnificationXref u_xref : extractHUGOReferences(notes))
+				for (RelationshipXref u_xref : extractHUGOReferencesAsRelationshipXref(notes, id))
 					rn.addXref(u_xref);
 			}
 			bpEntityReferences.put(arna.getId(), rn);
@@ -631,12 +656,38 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				retPe = co;
 			}
 			else {
+				
+				
 				Protein pr = model.addNew(Protein.class, uri);
 				pr.addName(speciesName);
 				pr.setStandardName(speciesName);
 				pr.setDisplayName(speciesName);
 				String referenceId = Utils.getValue(si.getCelldesignerProteinReference());
 				pr.setEntityReference(bpEntityReferences.get(referenceId));
+				
+				// add post-translational modifications
+				CelldesignerStateDocument.CelldesignerState state = si.getCelldesignerState();
+				if (state!=null) {
+					 CelldesignerListOfModificationsDocument.CelldesignerListOfModifications lmodifs = 
+							 si.getCelldesignerState().getCelldesignerListOfModifications();
+					 if (lmodifs != null) {
+						 CelldesignerModificationDocument.CelldesignerModification modifs[] = lmodifs.getCelldesignerModificationArray();
+						 for (int j=0; j < modifs.length; j++) {
+							 CelldesignerModificationDocument.CelldesignerModification cm = modifs[j];
+							 String residueId = cm.getResidue();
+							 String stateStr = Utils.getValue(cm.getState());
+							 String MOD_code = state2MODCode.get(stateStr);
+							 if (residueId != null && stateStr != null && MOD_code != null) {
+								ModificationFeature mf = addModificationFeature(speciesId, residueId, stateStr, MOD_code);
+								pr.addFeature(mf);
+							 }
+						 }
+					 }
+				}
+				
+				
+				
+				
 				bpPhysicalEntities.put(speciesId, pr);
 				retPe = pr;
 			}
@@ -837,7 +888,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			inter = deg;
 		}
 		
-		// if reaction is catalysed, create catalysis reaction here
+		// if reaction has modifiers add them as catalysis objects
 		if (reaction.getListOfModifiers() != null) {
 			for (int j=0; j < reaction.getListOfModifiers().getModifierSpeciesReferenceArray().length; j++) {
 				String speciesId = reaction.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
@@ -962,6 +1013,38 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			}
 		}
 	
+	}
+	
+	/**
+	 * Create a new post-translational modification feature object.
+	 * 
+	 * @param speciesId species ID
+	 * @param residueId residue ID
+	 * @param stateStr state string from CellDesigner, e.g. "acetylated"
+	 * @param MOD_code Proteomics Standard Initiative MODification code
+	 * @return ModificationFeature object
+	 */
+	private ModificationFeature addModificationFeature(String speciesId, String residueId, String stateStr, String MOD_code) {
+		
+		String uri = biopaxNameSpacePrefix + "_" + speciesId + "_" + residueId + "_" + stateStr;
+		ModificationFeature mf = model.addNew(ModificationFeature.class, uri);
+		String modifId = "MODIFICATION_FEATURE_" + stateStr;
+		SequenceModificationVocabulary smv = (SequenceModificationVocabulary) model.getByID(modifId);
+		if (smv == null) {
+			smv = model.addNew(SequenceModificationVocabulary.class, modifId);
+
+			String mod_id = "MOD:" + MOD_code;
+			UnificationXref xref = (UnificationXref) model.getByID(mod_id);
+			if (xref == null) {
+				xref = model.addNew(UnificationXref.class, mod_id);
+				xref.setDb("MOD");
+				xref.setId(mod_id);
+			}
+			smv.addTerm(stateStr);
+			smv.addXref(xref);
+		}
+		mf.setModificationType(smv);
+		return mf;
 	}
 	
 	/**
@@ -1105,7 +1188,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 					if (xref == null) {
 						String uri = biopaxNameSpacePrefix + "HUGO_" + hugo_id;
 						xref = model.addNew(UnificationXref.class, uri);
-						xref.setDb("HUGO");
+						xref.setDb("HGNC");
 						xref.setId(hugo_id);
 						bpUnificationXref.put(hugo_id, xref);
 					}
@@ -1115,5 +1198,33 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 		return refs;
 	}
+	
+	private ArrayList<RelationshipXref> extractHUGOReferencesAsRelationshipXref(String comment, String id) {
+		
+		ArrayList<RelationshipXref> refs = new ArrayList<RelationshipXref>();
+		StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
+		HashSet<String> hugo_list = new HashSet<String>();
+		while (st.hasMoreTokens()){
+			String ss = st.nextToken();
+			if (ss.toLowerCase().equals("hugo")) {
+				if(st.hasMoreTokens()) {
+					String hugo_id = st.nextToken();
+					hugo_list.add(hugo_id);
+				}
+			}
+		}
+		
+		for (String hugo_id : hugo_list) {
+			// make uri unique
+			String uri = biopaxNameSpacePrefix + "HUGO_" + id + "_" + hugo_id;
+			RelationshipXref xref = model.addNew(RelationshipXref.class, uri);
+			xref.setDb("HGNC");
+			xref.setId(hugo_id);
+			refs.add(xref);
+		}
+		
+		return refs;
+	}
+	
 
 }

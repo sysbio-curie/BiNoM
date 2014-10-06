@@ -172,7 +172,7 @@ public class MergingMapsProcessor {
 	/** 
 	 * Print extended informations while merging elements
 	 */
-	public boolean verbose = false;
+	public boolean verbose = true;
 	public int prefixLength = 4;
 	
 	/**
@@ -854,9 +854,11 @@ public class MergingMapsProcessor {
 				cd1.getSbml().getModel().getListOfReactions().addNewReaction().set(cd2.getSbml().getModel().getListOfReactions().getReactionArray(i));
 		
 		// Included, simple and complex Aliases
-		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
+		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null){
+			cd1.getSbml().getModel().getAnnotation().addNewCelldesignerListOfIncludedSpecies();
 			for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++)
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().addNewCelldesignerSpecies().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i));
+		}
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++)
 			cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().addNewCelldesignerSpeciesAlias().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i));
 		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null)
@@ -1032,6 +1034,7 @@ public class MergingMapsProcessor {
 			 * Loop over reactions, change redundant species in reactants, base reactants, products, base products
 			 * modifiers, base products. 
 			 */
+			if(cd1.getSbml().getModel().getListOfReactions()!=null)
 			for (ReactionDocument.Reaction re : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
 
 				for(int j=0;j<re.getListOfReactants().sizeOfSpeciesReferenceArray();j++){
@@ -1107,7 +1110,7 @@ public class MergingMapsProcessor {
 					idx++;
 				}
 			}
-		}
+		}// doMergeSpecies
 		
 		/*
 		 *  Deal with redundant proteins, genes and rnas

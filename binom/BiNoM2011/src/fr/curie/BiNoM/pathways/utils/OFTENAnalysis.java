@@ -38,16 +38,19 @@ public class OFTENAnalysis {
 			OFTENAnalysis of = new OFTENAnalysis();
 			//of.loadHPRD(pathToHPRD);
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_CIT.txt","CIT");
+			of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/SADP_rda_files/S_CIT.txt","CIT");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/broad/S_CCLE05.txt","CCLE05");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/exon_curie/S_CUEX20.txt","CUEX20");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/OvarianCancer/TCGA/analysis/GSEA/S_OVAFFY.txt","OVAFFY");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/gsea/ica/S_EWING96.txt","S_EWING96");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/ica/rhabdoid_48/S_RHD96.txt","S_RHD96");
 			 
 			//
 			//of.makeGSEABatchFile("C:/Datas/OvarianCancer/TCGA/analysis/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/OvarianCancer/TCGA/analysis/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/cellline/broad/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/ICA/Anne/cellline/broad/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/results/");
-			of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/MOSAIC/analysis/gsea/ica/results/");
+			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/MOSAIC/analysis/gsea/ica/results/");
+			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica_rhabdo/","msigdb.v4.0.symbols.gmt","results/");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABLADDER.txt","TCGABLCA");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABREAST.txt","TCGABREAST");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_COAD.txt","COAD");

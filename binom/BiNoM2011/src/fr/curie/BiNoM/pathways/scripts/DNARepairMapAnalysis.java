@@ -38,10 +38,10 @@ public class DNARepairMapAnalysis {
 			//so.createGMTFromOCSANAOutput(folder+"ocsana_report_ssb");
 			//System.exit(0);
 			
-			Graph stg = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+stgFileName));
+			/*Graph stg = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+stgFileName));
 			Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+mapFileName));
 			String typesOfPositiveRegulations[] = new String[]{"CATALYSIS","TRIGGER","MODULATION","PHYSICAL_STIMULATION","UNKNOWN_CATALYSIS"};
-			String typesOfNegativeRegulations[] = new String[]{"INHIBITION","UNKNOWN_INHIBITION"};
+			String typesOfNegativeRegulations[] = new String[]{"INHIBITION","UNKNOWN_INHIBITION"};*/
 
 			//CheckComplexFormationConsistency(graph);
 			

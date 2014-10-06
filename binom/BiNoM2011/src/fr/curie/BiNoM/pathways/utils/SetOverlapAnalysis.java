@@ -5,7 +5,6 @@ import java.util.*;
 
 import javax.swing.JFileChooser;
 
-import cytoscape.Cytoscape;
 
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
@@ -106,14 +105,14 @@ public class SetOverlapAnalysis {
 			//so.printSetSizes();
 			//so.printSetIntersections();
 			
-			JFileChooser j = new JFileChooser();
+			/*JFileChooser j = new JFileChooser();
 			j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			Integer opt = j.showOpenDialog(Cytoscape.getDesktop());
 			if(opt!=-1){
 				//printSetIntersectionsInFolder("C:/Datas/acsn/naming/");
 				printSetIntersectionsInFolder(j.getSelectedFile().getAbsolutePath());
 			}
-			System.exit(0);
+			System.exit(0);*/
 			
 
 			//so.listSetsIncludingSet(prefix+".minhitsets",new String[]{"BRCA1"});

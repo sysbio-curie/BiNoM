@@ -29,6 +29,8 @@ package fr.curie.BiNoM.pathways.utils;
 import java.io.*;
 import java.util.*;
 
+import vdaoengine.data.VDataTable;
+
 /**
  * Simple implementation of a table of entries
  * @author Andrei Zinovyev
@@ -124,7 +126,7 @@ public class SimpleTable {
   try{
   LineNumberReader lri = new LineNumberReader(reader);
   
-  lri.mark(100000000);
+  lri.mark(1000000000);
   //lri.mark(1);
   
   s = lri.readLine();
@@ -221,5 +223,78 @@ public class SimpleTable {
 		  e.printStackTrace();
 	  }
   }
+  
+  public SimpleTable SelectColumns(Vector columns){
+	  SimpleTable res = new SimpleTable();
+	  Vector v = columns;
+	  res.rowCount = this.rowCount;
+	  res.colCount = v.size();
+	  res.stringTable = new String[res.rowCount][res.colCount];
+	  res.fieldNames = new String[res.colCount];
+	  res.fieldTypes = new int[res.colCount];
+	  for(int i=0;i<res.colCount;i++){
+	    String fn = (String)v.elementAt(i);
+	    int k = this.fieldNumByName(fn);
+	    res.fieldNames[i] = this.fieldNames[k];
+	    res.fieldTypes[i] = this.fieldTypes[k];
+	    for(int j=0;j<res.rowCount;j++)
+	      res.stringTable[j][i] = this.stringTable[j][k];
+	  }
+	  return res;
+	}
+  
+  public SimpleTable SelectRows(Vector lineNumbers){
+		    Vector rows = new Vector();
+		    int found = 0;
+		    Vector found_ids = new Vector();
+		    for(int i=0;i<this.rowCount;i++){
+		      String r[] = null;
+		      if(lineNumbers.indexOf(new Integer(i))>=0){
+		        r = this.stringTable[i];
+		        rows.add(r);
+		        found++;
+		      }
+		    }
+		    SimpleTable res = new SimpleTable();
+		    res.copyHeader(this);
+		    res.rowCount = rows.size();
+		    res.stringTable = new String[res.rowCount][res.colCount];
+		    for(int i=0;i<rows.size();i++){
+		      res.stringTable[i] = (String[])rows.elementAt(i);
+		    }
+		    //System.out.println(found+" from "+ids.size()+" found ("+found_ids.size()+" unique)");
+		    return res;
+	}
+
+  public SimpleTable SelectRowsInOrder(Vector<Integer> lineNumbers){
+	    Vector rows = new Vector();
+	    int found = 0;
+	    Vector found_ids = new Vector();
+	    for(int i=0;i<lineNumbers.size();i++){
+	      String r[] = this.stringTable[lineNumbers.get(i)];
+	        rows.add(r);
+	        found++;
+	    }
+	    SimpleTable res = new SimpleTable();
+	    res.copyHeader(this);
+	    res.rowCount = rows.size();
+	    res.stringTable = new String[res.rowCount][res.colCount];
+	    for(int i=0;i<rows.size();i++){
+	      res.stringTable[i] = (String[])rows.elementAt(i);
+	    }
+	    //System.out.println(found+" from "+ids.size()+" found ("+found_ids.size()+" unique)");
+	    return res;
+}
+
+  
+  public void copyHeader(SimpleTable vt){
+	    this.fieldNames = vt.fieldNames;
+	    this.fieldTypes = vt.fieldTypes;
+	    this.colCount = vt.colCount;
+	    this.rowCount = vt.rowCount;
+	}
+
+
+
 
 }

@@ -28,6 +28,8 @@ package fr.curie.BiNoM.pathways.analysis.structure;
 
 import java.util.*;
 import java.io.*;
+
+import vdaoengine.utils.VSimpleProcedures;
 import fr.curie.BiNoM.pathways.utils.*;
 
 /**
@@ -1469,5 +1471,35 @@ public class GraphAlgorithms {
 
 		  return covered;
 	  }
+	  
+	  public static int[][] GetAjacencyMatrix(Graph gr){
+		  int am[][] = new int[gr.Nodes.size()][gr.Nodes.size()];
+		  for(Edge e: gr.Edges){
+			  int i = gr.Nodes.indexOf(e.Node1);
+			  int j = gr.Nodes.indexOf(e.Node2);
+			  am[i][j] = 1;
+			  am[j][i] = 1;
+		  }
+		  return am;
+	  }
+	  
+	  public static int[][] GraphLaplacian(int adjacencyMatrix[][]){
+		  int L[][] = new int[adjacencyMatrix.length][adjacencyMatrix.length];
+		  int connectivity[] = new int[adjacencyMatrix.length];
+		  for(int i=0;i<adjacencyMatrix.length;i++){
+			  for(int j=0;j<adjacencyMatrix.length;j++)
+				  connectivity[i]+=adjacencyMatrix[i][j];
+		  }
+		  for(int i=0;i<L.length;i++)
+			  for(int j=0;j<L.length;j++){
+				  if(i==j)
+					  L[i][j] = connectivity[i];
+				  else
+					  L[i][j] = -adjacencyMatrix[i][j];
+			  }
+		  return L;
+	  }
+	  
+
 					  
 }

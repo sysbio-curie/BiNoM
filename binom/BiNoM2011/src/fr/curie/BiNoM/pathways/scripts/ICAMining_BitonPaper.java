@@ -1,7 +1,6 @@
 package fr.curie.BiNoM.pathways.scripts;
 
 import java.io.File;
-
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -13,8 +12,10 @@ import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
 
+import vdaoengine.data.VDataSet;
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
+import vdaoengine.utils.VSimpleFunctions;
 import vdaoengine.utils.VSimpleProcedures;
 
 import com.ibm.icu.util.StringTokenizer;
@@ -24,6 +25,7 @@ import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
 import fr.curie.BiNoM.pathways.utils.GMTFile;
 import fr.curie.BiNoM.pathways.utils.MetaGene;
+import fr.curie.BiNoM.pathways.utils.SetOverlapAnalysis;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
 import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
@@ -43,12 +45,19 @@ public class ICAMining_BitonPaper {
 			XGMML.saveToXGMML(gr, "C:/Datas/ICA/Anne/corrgraph/allcancers_nodoublons.xgmml");*/
 			
 			//ComputeTTestDistributionForComponentsExtremeGroups("C:/Datas/ICA/Anne/CIT.txt","C:/Datas/ICA/Anne/network_analysis/A_CIT.txt");
+			/*File dir[] = new File("C:/Datas/ICA/Anne/SADP_rda_files/dat/temp1").listFiles();
+			for(File f: dir){
+				String pref = f.getName().substring(0,f.getName().length()-4);
+					ComputeTTestDistributionForComponentsExtremeGroups("C:/Datas/ICA/Anne/SADP_rda_files/dat/temp1/"+pref+".txt","C:/Datas/ICA/Anne/SADP_rda_files/A_"+pref+".txt",pref);
+			}*/
+			
 			
 			//String folder = "C:/Datas/ICA/Anne/GSEA/results/res/";
 			//String gmts = "C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt";
 			/*String folder = "./";
 			String gmts = "msigdb.v4.0.symbols.gmt";
-			FilterGSEAResults(folder, 10, 3f, 0.01f, 1f, gmts);*/
+			gmts = args[1];
+			FilterGSEAResults(folder, Integer.parseInt(args[0]), 3f, 0.01f, 1f, gmts);*/
 			
 			//ReformatGSEAAnotationFile("C:/Datas/ICA/Anne/results_GSEA_filtered.html");
 			
@@ -60,9 +69,20 @@ public class ICAMining_BitonPaper {
 			
 			//MakeCorrelationGraph("C:/Datas/ICA/Anne/corrgraph/recalculate/");
 			//MakeCorrelationGraph("C:/Datas/OvarianCancer/TCGA/analysis/corrgraph/");
+			//MakeCorrelationGraph("C:/Datas/MOSAIC/analysis/ica/ica_corrgraph/");
+						
+			//ProduceMetaComponents("C:/Datas/ICA/Anne/metaranking/","dataset_corr_table.txt");
 			
-			ProduceMetaComponents("C:/Datas/ICA/Anne/metaranking/","dataset_corr_table.txt");
+			//ProduceMetaComponents("C:/Datas/ICA/Anne/metaranking/test2/","dataset_corr_table.txt");
+			//ProduceMetaComponents("C:/Datas/ICA/Anne/metaranking/CIT/","dataset_corr_table.txt");
 			
+			//CalcMeanExpressionAndCompareToMaximumContributionToICs("C:/Datas/OvarianCancer/TCGA/expression/rnaseq/mRNAexpr_RNAseqRPKM_TCGA_duplOut.txt","C:/Datas/OvarianCancer/TCGA/analysis/corrgraph/S_OVRSEQ.txt",true);
+			//CalcMeanExpressionAndCompareToMaximumContributionToICs("C:/Datas/OvarianCancer/TCGA/expression/affymetrix/mRNAexpr_Affy_TCGA.txt","C:/Datas/OvarianCancer/TCGA/analysis/corrgraph/S_OVAFFY.txt",false);
+			
+			//ExtractStressSignature("C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols_stress.gmt");
+			
+			ComputeTTestDistributionFor2Groups("C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT.txt","C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT_sg4","CHIRURGIE","CYST","RTUV");
+			//ComputeTTestDistributionFor2Groups("C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT.txt","C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT_T2","CHIRURGIE","CYST","RTUV");
 			
 			
 		}catch(Exception e){
@@ -76,7 +96,7 @@ public class ICAMining_BitonPaper {
 		return gr;
 	}
 	
-	public static void ComputeTTestDistributionForComponentsExtremeGroups(String dataFile, String sampleContributionFile) throws Exception{
+	public static void ComputeTTestDistributionForComponentsExtremeGroups(String dataFile, String sampleContributionFile, String pref) throws Exception{
 		System.out.println("Loading data...");
 		SimpleTable data = new SimpleTable();
 		data.LoadFromSimpleDatFile(dataFile, true, "\t");
@@ -84,8 +104,12 @@ public class ICAMining_BitonPaper {
 		SimpleTable atable = new SimpleTable();
 		atable.LoadFromSimpleDatFile(sampleContributionFile, true, "\t");
 		FileWriter fw = new FileWriter(dataFile.substring(0, dataFile.length()-4)+".ttests");
+		FileWriter fw1 = new FileWriter(dataFile.substring(0, dataFile.length()-4)+".ttests_score");
+		int numberOfGeneToTake1 = 10;
+		int numberOfGeneToTake2 = 100;
+		fw1.write(pref+numberOfGeneToTake1+"\t"+pref+numberOfGeneToTake2+"\n");
 		for(int i=1;i<atable.colCount;i++){
-			System.out.println("Column "+i);
+			System.out.println("Column "+(i-1));
 			float f[] = new float[atable.rowCount];
 			for(int j=0;j<atable.rowCount;j++)
 				f[j] = Float.parseFloat(atable.stringTable[j][i]);
@@ -97,18 +121,43 @@ public class ICAMining_BitonPaper {
 				groupMinus.add(atable.stringTable[inds[k]][0]);
 				groupPlus.add(atable.stringTable[inds[inds.length-k-1]][0]);
 			}
-			float ttests[] = calcTtestDistribution(data,groupMinus,groupPlus);
+			//float ttests[] = calcTtestDistribution(data,groupMinus,groupPlus, true);
+			float ttests[] = calcTtestDistribution(data,groupMinus,groupPlus,false);
 			for(int k=0;k<ttests.length;k++)
 				ttests[k] = Math.abs(ttests[k]);
 			inds = Utils.SortMass(ttests);
 			for(int k=0;k<ttests.length;k++)
 				fw.write(ttests[inds[inds.length-k-1]]+"\t");
 			fw.write("\n");
+			
+			float score1 = 0f;
+			float score2 = 0f;
+			int k1 = 0;
+			int k2 = 0;
+			for(int k=0;k<numberOfGeneToTake1;k++){
+				float t = ttests[inds[inds.length-k-1]];
+				if(!Float.isNaN(t))
+				if(!Float.isInfinite(t)){
+						score1+=t;
+						k1++;
+					}
+			}
+			for(int k=0;k<numberOfGeneToTake2;k++){
+				float t = ttests[inds[inds.length-k-1]];
+				if(!Float.isNaN(t))
+				if(!Float.isInfinite(t))
+				{
+						score2+=t;
+						k2++;
+				}
+			}
+			fw1.write((score1/k1)+"\t"+(score2/k2)+"\n");
 		}
 		fw.close();
+		fw1.close();
 	}
 	
-	public static float[] calcTtestDistribution(SimpleTable data, Vector<String> group1, Vector<String> group2){
+	public static float[] calcTtestDistribution(SimpleTable data, Vector<String> group1, Vector<String> group2, boolean onlyFoldChange){
 		float ttests[] = new float[data.rowCount];
 		for(int i=0;i<data.rowCount;i++){
 			Vector<Float> vector1 = new Vector<Float>();
@@ -118,7 +167,10 @@ public class ICAMining_BitonPaper {
 				if(group1.contains(field)) vector1.add(Float.parseFloat(data.stringTable[i][j]));
 				if(group2.contains(field)) vector2.add(Float.parseFloat(data.stringTable[i][j]));
 			}
-			ttests[i] = (float)vdaoengine.utils.VSimpleFunctions.calcTTest(vector1, vector2);
+			if(!onlyFoldChange)
+				ttests[i] = (float)vdaoengine.utils.VSimpleFunctions.calcTTest(vector1, vector2);
+			else
+				ttests[i] = (float)(vdaoengine.utils.VSimpleFunctions.calcMean(vector1)-vdaoengine.utils.VSimpleFunctions.calcMean(vector2));
 		}
 		return ttests;
 	}
@@ -406,7 +458,7 @@ public class ICAMining_BitonPaper {
 				VDataTable vt2 = VDatReadWrite.LoadFromSimpleDatFile(fs[j].getAbsolutePath(), true, "\t");
 				for(int k=1;k<vt1.colCount;k++) vt1.fieldTypes[k] = vt1.NUMERICAL;
 				for(int k=1;k<vt2.colCount;k++) vt2.fieldTypes[k] = vt1.NUMERICAL;
-				Graph gr = Utils.makeTableCorrelationGraph(vt1, fn1, vt2, fn2, 0.35f, true);
+				Graph gr = Utils.makeTableCorrelationGraph(vt1, fn1, vt2, fn2, 0.2f, true);
 				graph.addNodes(gr);
 				graph.addEdges(gr);
 			}
@@ -513,10 +565,12 @@ public class ICAMining_BitonPaper {
 				}
 				// Now, compute the metascores
 				int minOccurence = (int)(mgs.size()*0.5f);
-				minOccurence = 2;
+				if(minOccurence>2)
+					minOccurence = 2;
 				System.out.println("minOccurence = "+minOccurence);
 				Vector<MetaGene> mgs1 = coreMetaGene.standartatizeMetaGenes(mgs);
 				mgs1.add(coreMetaGene);
+				//if(false)
 				for(MetaGene m: mgs1)
 					m.normalizeWeightsToSidedZScores();
 				MetaGene metameta = coreMetaGene.makeMetaGeneScoredFromMetagenes(mgs1, minOccurence, true);
@@ -525,5 +579,123 @@ public class ICAMining_BitonPaper {
 			}
 		}
 	}
+	
+	public static void CalcMeanExpressionAndCompareToMaximumContributionToICs(String fn, String icfile, boolean takelog) throws Exception{
+		VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(fn, true, "\t", true);
+		VDataTable vtic = VDatReadWrite.LoadFromSimpleDatFile(icfile, true, "\t", true);
+		vtic.makePrimaryHash(vtic.fieldNames[0]);
+		for(int i=1;i<vt.colCount;i++) vt.fieldTypes[i] = vt.NUMERICAL;
+		for(int i=1;i<vtic.colCount;i++) vtic.fieldTypes[i] = vt.NUMERICAL;
+		VDataSet vd = VSimpleProcedures.SimplyPreparedDatasetWithoutNormalization(vt, -1);
+		VDataSet vdic = VSimpleProcedures.SimplyPreparedDatasetWithoutNormalization(vtic, -1);
+		FileWriter fw = new FileWriter(fn+".averages");
+		fw.write("NAME\tAVERAGE\tCOMPARISON\n");
+		for(int i=0;i<vd.pointCount;i++){
+			String name = vt.stringTable[i][0];
+			if(name.equals("ZZZ3"))
+				System.out.println();
+			float x[] = vd.getVector(i);
+			if(takelog){
+				for(int j=0;j<x.length;j++)
+					x[j] = (float)Math.log10(x[j]+1);
+			}
+			float av = VSimpleFunctions.calcMean(x);
+			String comp = "N/A";
+			if(vtic.tableHashPrimary.get(name)!=null){
+				int k=vtic.tableHashPrimary.get(name).get(0);
+				float xic[] = vdic.getVector(k);
+				float mx = -1;
+				for(int l=0;l<xic.length;l++){
+					xic[l] = Math.abs(xic[l]);
+					if(xic[l]>mx) mx = xic[l];
+				}
+				comp = ""+mx;
+			}
+			
+			fw.write(name+"\t"+av+"\t"+comp+"\n");
+		}
+		fw.close();
+	}
+	
+	public static void ExtractStressSignature(String modulesFile) throws Exception{
+		SetOverlapAnalysis sop = new SetOverlapAnalysis();
+		sop.LoadSetsFromGMT(modulesFile);
+		System.out.println(modulesFile+" loaded.");
+		Vector<String> newnames = new Vector<String>();
+		Vector<Vector<String>> newlists = new Vector<Vector<String>>();
+		Vector<Vector<Float>> newweights = new Vector<Vector<Float>>(); 
+		for(int i=0;i<sop.lists.size();i++){
+			String name = sop.setnames.get(i).toLowerCase();
+			if(name.contains("stress")||name.contains("hypoxi")||name.contains("heat")){
+				newnames.add(sop.setnames.get(i));
+				newlists.add(sop.lists.get(i));
+				newweights.add(sop.listsWeights.get(i));
+			}
+		}
+		sop.setnames = newnames;
+		sop.lists = newlists;
+		sop.listsWeights = newweights;
+		sop.saveSetsAsGMT(modulesFile.substring(0,modulesFile.length()-4)+"_stress.gmt", Integer.MAX_VALUE, false);
+		sop = new SetOverlapAnalysis();
+		sop.LoadSetsFromGMT(modulesFile.substring(0,modulesFile.length()-4)+"_stress.gmt");
+		Vector<String> list = sop.calcUnionOfSets();
+		for(int i=0;i<list.size();i++){
+			
+		}
+		Vector<Float> percentages = new Vector<Float>();
+		Vector<Integer> counts = sop.countOccurenciesInSets(list, percentages);
+		for(int i=0;i<list.size();i++){
+			System.out.println(list.get(i)+"\t"+counts.get(i));
+		}
+		for(int i=0;i<sop.sets.size();i++){
+			System.out.println(sop.setnames.get(i)+"\t"+percentages.get(i));
+		}
+	}
+	
+	public static void ComputeTTestDistributionFor2Groups(String dataFile, String groupFile, String field, String value1, String value2) throws Exception{
+		System.out.println("Loading data...");
+		SimpleTable data = new SimpleTable();
+		data.LoadFromSimpleDatFile(dataFile, true, "\t");
+		System.out.println("Loaded.");
+		SimpleTable atable = new SimpleTable();
+		atable.LoadFromSimpleDatFile(groupFile, true, "\t");
+		FileWriter fw = new FileWriter(groupFile+".ttests");
+
+			int i = atable.fieldNumByName(field);
+
+			Vector<String> groupMinus = new Vector<String>();
+			Vector<String> groupPlus = new Vector<String>();
+			for(int k=0;k<atable.rowCount;k++){
+				if(atable.stringTable[k][i].equals(value1))
+					groupMinus.add(atable.stringTable[k][0]);
+				if(atable.stringTable[k][i].equals(value2))
+					groupPlus.add(atable.stringTable[k][0]);
+			}
+			float ttests[] = calcTtestDistribution(data,groupMinus,groupPlus, false);
+			for(int k=0;k<ttests.length;k++)
+				ttests[k] = Math.abs(ttests[k]);
+			int inds[] = Utils.SortMass(ttests);
+			/*for(int k=0;k<ttests.length;k++)
+				fw.write(ttests[inds[inds.length-k-1]]+"\t");
+			fw.write("\n");*/
+			for(int k=0;k<data.rowCount;k++)
+				fw.write(data.stringTable[k][0]+"\t"+ttests[k]+"\n");
+			
+			Vector<String> columns = new Vector<String>();
+			columns.add("GENE");
+			for(int k=0;k<atable.rowCount;k++){
+				String fname = atable.stringTable[k][0];
+				columns.add(fname);
+			}
+			SimpleTable dat1 = data.SelectColumns(columns);
+			Vector<Integer> lineNumbers = new Vector<Integer>();
+			for(int k=0;k<inds.length;k++)
+				lineNumbers.add(inds[inds.length-k-1]);
+			dat1 = dat1.SelectRowsInOrder(lineNumbers);
+			dat1.saveToSimpleTxtTabDelimited(groupFile+".txt");
+			
+		fw.close();
+	}
+	
 
 }

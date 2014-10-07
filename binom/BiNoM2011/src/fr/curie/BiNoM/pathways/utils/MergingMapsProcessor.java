@@ -855,7 +855,8 @@ public class MergingMapsProcessor {
 		
 		// Included, simple and complex Aliases
 		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null){
-			cd1.getSbml().getModel().getAnnotation().addNewCelldesignerListOfIncludedSpecies();
+			if(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()==null)
+				cd1.getSbml().getModel().getAnnotation().addNewCelldesignerListOfIncludedSpecies();
 			for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++)
 				cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().addNewCelldesignerSpecies().set(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i));
 		}

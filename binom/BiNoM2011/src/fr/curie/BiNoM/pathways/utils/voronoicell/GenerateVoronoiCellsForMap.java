@@ -10,11 +10,70 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
+import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class GenerateVoronoiCellsForMap {
 	
+	private class vEdge{
+		Pnt x1 = null;
+		Pnt x2 = null;
+		
+		public vEdge(){
+		}
+		
+		public vEdge(Pnt _x1, Pnt _x2){
+			x1 = _x1;
+			x2 = _x2;
+		}
+		public float length(){
+			float vx1 = (float)x1.coord(0);
+			float vy1 = (float)x1.coord(1);
+			float vx2 = (float)x2.coord(0);
+			float vy2 = (float)x2.coord(1);
+			return (float)Math.sqrt((vx1-vx2)*(vx1-vx2)+(vy1-vy2)*(vy1-vy2));
+		}
+		
+		public boolean equals(vEdge e){
+			boolean res = false;
+			if((e.x1.coord(0)-x1.coord(0))*(e.x1.coord(0)-x1.coord(0))+(e.x1.coord(1)-x1.coord(1))*(e.x1.coord(1)-x1.coord(1))+(e.x2.coord(0)-x2.coord(0))*(e.x2.coord(0)-x2.coord(0))+(e.x2.coord(1)-x2.coord(1))*(e.x2.coord(1)-x2.coord(1))<1e-6f) res = true;
+			if((e.x1.coord(0)-x2.coord(0))*(e.x1.coord(0)-x2.coord(0))+(e.x1.coord(1)-x2.coord(1))*(e.x1.coord(1)-x2.coord(1))+(e.x2.coord(0)-x1.coord(0))*(e.x2.coord(0)-x1.coord(0))+(e.x2.coord(1)-x1.coord(1))*(e.x2.coord(1)-x1.coord(1))<1e-6f) res = true;
+			return res;
+		}
+		
+	}
+	
+	private class vAngle{
+		vEdge edge1 = null;
+		vEdge edge2 = null;
+		
+		public vAngle(vEdge e1, vEdge e2){
+			edge1 = e1;
+			edge2 = e2;
+		}
+		
+		public Vector<Pnt> cutAngle(float maxlength){
+			//Vector<vEdge> edges = new Vector<vEdge>();
+			Vector<Pnt> res = new Vector<Pnt>();
+			float frac1 = edge1.length()/maxlength;
+			float frac2 = edge2.length()/maxlength;
+			float x1 = (float)(edge1.x1.coord(0)+frac1*(edge1.x2.coord(0)-edge1.x1.coord(0)));
+			float y1 = (float)(edge1.x1.coord(1)+frac1*(edge1.x2.coord(1)-edge1.x1.coord(1)));
+			float x2 = (float)(edge2.x2.coord(0)+frac2*(edge2.x1.coord(0)-edge2.x2.coord(0)));
+			float y2 = (float)(edge2.x2.coord(1)+frac2*(edge2.x1.coord(1)-edge2.x2.coord(1)));
+			res.add(new Pnt(x1,y1));
+			res.add(new Pnt(x2,y2));
+			return res;
+			/*vEdge e1 = new vEdge(edge1.x1,new Pnt(x1,y1));
+			vEdge e2 = new vEdge(new Pnt(x1,y1),new Pnt(x2,y2));
+			vEdge e3 = new vEdge(new Pnt(x2,y2),edge2.x2);
+			edges.add(e1);
+			edges.add(e2);
+			edges.add(e3);
+			return edges;*/
+		}
+	}
 	
 	SbmlDocument sbml = null;
 	String folder = null;
@@ -28,17 +87,29 @@ public class GenerateVoronoiCellsForMap {
 	Triangle initialTriangle = null;
 	Triangulation dt = null;
 	public Vector<Pnt[]> polygons = new Vector<Pnt[]>();
-	public float maximalDist = 200f;
+	public float maximalDist = 500f;
+	public float maximalDistAsFractionOfSize = 0.05f;
 	
 	public boolean writeFiles = true;
 	
 	public static void main(String[] args) {
 		try{
 			
+			/*Vector<String> vs = Utils.guessProteinIdentifiers("TP53");
+			for(String s: vs) System.out.println(s);
+			System.exit(0);*/
+			
+			String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master_17032014.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/test.xml";
+			//fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo scales = new fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo(height, height, height, height, height, height, height, height, writeFiles);
+			//getVoronoiCellsForCellDesignerMap();
 			//System.out.println(getVoronoiCellsForCellDesignerMap("C:/Datas/BiNoMTest/VoronoiCell/M-Phase2.xml"));
 			GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();
 			//gvc.loadMap("C:/Datas/BiNoMTest/VoronoiCell/M-Phase2.xml");
-			gvc.loadMap("C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml");
+			//gvc.loadMap("C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml");
+			gvc.loadMap(fn); 
 			//gvc.testPoints("C:/Datas/BiNoMTest/VoronoiCell/");
 			gvc.calcTriangles();
 			gvc.calcVoronoiCells();
@@ -56,7 +127,7 @@ public class GenerateVoronoiCellsForMap {
 		gvc.loadMap(fn);
 		gvc.calcTriangles();
 		gvc.calcVoronoiCells();
-        for(int k=0;k<gvc.points.size();k++){
+        for(int k=0;k<gvc.points.size();k++)if(!gvc.aliases.equals("NONE")){
         	Pnt[] pol = gvc.polygons.get(k);
         	descr+=gvc.aliases.get(k);
         	for(int i=0;i<pol.length;i++) {
@@ -99,13 +170,46 @@ public class GenerateVoronoiCellsForMap {
 				if(!n.getFirstAttribute("CELLDESIGNER_SPECIES").equals("")){
 					/*points[i][0] = n.x;
 					points[i][1] = n.y;*/
-					points.add(new Pnt(n.x, n.y));
+					float x = n.x+n.w/2f;
+					float y = n.y+n.h/2f;
+					points.add(new Pnt(x, y));
 					aliases.add(n.getFirstAttributeValue("CELLDESIGNER_ALIAS"));
 				}
 		}
 		folder = (new File(fn)).getParentFile().getAbsolutePath();
 		//System.out.println(folder);
+		
+		maximalDist = width*maximalDistAsFractionOfSize;
+		
+		// Write fictitious points to avoid large polygons
+		/*int currentNumberOfPoints = points.size();
+		for(float x=1;x<width;x+=maximalDist)
+			for(float y=1;y<height;y+=maximalDist)if((x==1f)||(y==1f)||(!checkClosePoints(x,y,currentNumberOfPoints))){
+				points.add(new Pnt(x,y));
+				aliases.add("NONE");
+			}
+		for(float x=1;x<width;x+=maximalDist){
+				points.add(new Pnt(x,height-1));
+				aliases.add("NONE");
+			}
+		for(float y=1;y<height;y+=maximalDist){
+			points.add(new Pnt(width-1,y));
+			aliases.add("NONE");
+		}*/
+		
+		
 		writePoints(folder);
+	}
+	
+	public boolean checkClosePoints(float x, float y, int numberOfPointsToCheck){
+		boolean res = false;
+		for(int i=0;i<numberOfPointsToCheck;i++){
+			float dist = (new vEdge(points.get(i),new Pnt(x,y))).length();
+			if(dist<maximalDist){
+				res = true; break;
+			}
+		}
+		return res;
 	}
 	
 	public void writePoints(String folder) throws Exception{
@@ -162,7 +266,7 @@ public class GenerateVoronoiCellsForMap {
         HashSet<Pnt> done = new HashSet<Pnt>(initialTriangle);
         polygons.clear();
         neighbours.clear();
-        for(int k=0;k<points.size();k++){
+        for(int k=0;k<points.size();k++)if(!aliases.get(k).equals("NONE")){
         	polygons.add(null);
         	neighbours.add(null);
         }
@@ -171,6 +275,7 @@ public class GenerateVoronoiCellsForMap {
             for (Pnt site: triangle) {
             	int index = points.indexOf(site);
             	//System.out.println("SITE: "+site);
+            	if(index!=-1)if(aliases.get(index).equals("NONE")) continue;
                 if (done.contains(site)) continue;
                 done.add(site);
                 List<Triangle> list = dt.surroundingTriangles(site, triangle);
@@ -200,7 +305,8 @@ public class GenerateVoronoiCellsForMap {
             }
         }
 		//
-        rescalePolygons();
+        if(true)
+        	rescalePolygons();
         if(writeFiles){
         FileWriter fw1 = new FileWriter(folder+"/vc.txt");
         for(Pnt[] pol: polygons){
@@ -213,7 +319,7 @@ public class GenerateVoronoiCellsForMap {
         
         fw1 = new FileWriter(folder+"/vc_alias.txt");
         FileWriter fw2 = new FileWriter(folder+"/vc_names.txt");
-        for(int k=0;k<points.size();k++){
+        for(int k=0;k<points.size();k++)if(!aliases.get(k).equals("NONE")){
         	Pnt[] pol = polygons.get(k);
         	fw1.write(aliases.get(k)+"\t");
         	fw2.write(aliases.get(k)+"\n");
@@ -230,36 +336,61 @@ public class GenerateVoronoiCellsForMap {
 	}
 	
 	public void rescalePolygons(){
-		for(int i=0;i<points.size();i++){
+		for(int i=0;i<points.size();i++)if(!aliases.get(i).equals("NONE")){
 			Pnt c = points.get(i);
+			//System.out.println(c.coord(0)+"\t"+c.coord(1));
 			Pnt polygon[] = polygons.get(i);
 			if (polygon == null) {
 				System.err.println("warning: voronoi polygon is null at " + i);
 				continue;
 			}
-			for(int k=0;k<polygon.length;k++){
-				Pnt p = polygon[k];
-				float x = (float)p.coord(0);
-				float y = (float)p.coord(1);
-				float distance = (float)Math.sqrt((x-c.coord(0))*(x-c.coord(0))+(y-c.coord(1))*(y-c.coord(1)));
-				if(distance>maximalDist){
-					float factor = distance/maximalDist;
-					x = (float)(c.coord(0)+(x-c.coord(0))/factor);
-					y = (float)(c.coord(1)+(y-c.coord(1))/factor);
-					Pnt newp = new Pnt(x,y);
-					polygon[k] = newp;
-				}else
-				if((x<0)||(y<0)||(x>width)||(y>height)){
-					if(x<0) x=0;
-					if(x>width) x = width;
-					if(y<0) y=0;
-					if(y>height) y = height;
-					Pnt newp = new Pnt(x,y);
-					polygon[k] = newp;
-				}
-			}
+				Pnt polygon_rescaled[] = rescaledPolygon(polygon, c);
+				polygons.set(i, polygon_rescaled);
 		}
 	}
+	
+	public Pnt[] rescaledPolygon(Pnt polygon[], Pnt c){
+		
+		for(int i=0;i<polygon.length;i++){
+			Pnt p = polygon[i];
+			float x = (float)p.coord(0);
+			float y = (float)p.coord(1);
+			if((x<0)||(y<0)||(x>width)||(y>height)){
+				if(x<0) x=0;
+				if(x>width) x = width;
+				if(y<0) y=0;
+				if(y>height) y = height;
+				Pnt newp = new Pnt(x,y);
+				polygon[i] = newp;
+		}}
+		
+		
+		//Vector<vAngle> edges = new Vector<vAngle>();
+		Vector<Pnt> plgn = new Vector<Pnt>();
+		for(int k=0;k<polygon.length;k++){	
+			Pnt p_central = polygon[k];
+			Pnt p_prev = null;
+			Pnt p_next = null;
+			if(k>0) p_prev = polygon[k-1]; else p_prev = polygon[polygon.length-1];
+			if(k<polygon.length-1) p_next = polygon[k+1]; else p_next = polygon[0];
+			float length = (new vEdge(p_central,c)).length();
+			plgn.add(p_central);
+			/*if(length<=maximalDist){
+				plgn.add(p_central);
+			}else{
+				vAngle angle = new vAngle(new vEdge(p_prev,p_central), new vEdge(p_central,p_next));
+				Vector<Pnt> pnts = angle.cutAngle(maximalDist);
+				plgn.add(pnts.get(0));
+				plgn.add(pnts.get(1));
+			}*/
+		}
+				
+		Pnt polygon_rescaled[] = new Pnt[plgn.size()];
+		for(int i=0;i<plgn.size();i++)
+			polygon_rescaled[i] = plgn.get(i);
+		return polygon_rescaled;
+	}
+	
 	
 	public void testPoints(String folder) throws Exception{
 		/*points = new float[2][2];

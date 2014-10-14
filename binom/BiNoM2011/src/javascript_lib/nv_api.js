@@ -94,7 +94,7 @@ function nv_win(win)
 
 function nv_open_module(win, module_id, ids)
 {
-	console.log("module: [" + module_id + "] " + ids.length);
+	//console.log("module: [" + module_id + "] " + ids.length);
 	var url;
 	if (module_id.match('/index.html')) {
 		url = module_id;
@@ -103,7 +103,7 @@ function nv_open_module(win, module_id, ids)
 		if (!module) {
 			throw "module " + module_id + " not found";
 		}
-		url = module.url ? module.url : module;
+		url = module.url ? module.url : module_id;
 	}
 	win.show_map_and_markers(url, ids ? ids : []);
 	return null;

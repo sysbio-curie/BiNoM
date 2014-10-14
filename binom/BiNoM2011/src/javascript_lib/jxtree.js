@@ -467,7 +467,11 @@ JXTreeNode.prototype = {
 		if (matcher.class_filters.length) {
 			for (var jj = 0; jj < matcher.class_filters.length; ++jj) {
 				var class_filter = matcher.class_filters[jj];
-				var node_cls = jxtree_get_node_class(this).toUpperCase(); // BAD! should be an handler
+				var node_cls = jxtree_get_node_class(this);  // BAD! should be an handler
+				if (!node_cls) {
+					continue;
+				}
+				node_cls = node_cls.toUpperCase();
 				var cls_included = node_cls.match(/:INCLUDED/, "i");
 				if (class_filter.is_not) {
 					for (var nn = 0; nn < class_filter.classes.length; ++nn) {

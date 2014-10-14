@@ -236,13 +236,16 @@ jxtree_mapfun_map['label'] = function(datanode) {
 		return datanode.name;
 	}
 	if (!datanode.label) {
+		//console.log("NULL LABEL " + datanode + " " + mapSize(datanode));
 		/*
-		console.log("NULL LABEL " + datanode + " " + mapSize(datanode));
 		for (var key in datanode) {
 			console.log(key + " -> " + datanode[key].length);
 		}
 		*/
-		return datanode["class"];
+		if (datanode["class"]) {
+			return datanode["class"];
+		}
+		return "<unknown>";
 	}
 	return datanode.label;
 }
@@ -309,7 +312,7 @@ function jxtree_get_node_class(node, included) {
 		return data.cls + (included ? ":INCLUDED" : "");
 	}
 	if (node.getParent()) {
-		return jxtree_get_node_class(node.getParent(), included || data.included);
+		return jxtree_get_node_class(node.getParent(), included || (data && data.included));
 	}
 	return null;
 }

@@ -3,20 +3,40 @@
  * nv_protocol.php
  *
  * Eric Viara copyright(c) Institut Curie
- * August-September 2014
+ * August-October 2014
  *
  */
 
-$MAXMSGLEN = 150;
+// ------- local environment -------
 $LOCAL_TMPDIR = "/scratch/navicell";
+// ---------------------------------
+
 $FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
+$SESSION_FILE = $LOCAL_TMPDIR . "/nv_sessions.dat";
+$SESSION_LOCK_FILE = $LOCAL_TMPDIR . "/nv_sessions.lck";
 
 function logfile($id) {
   global $FILE_PREFIX;
   return $FILE_PREFIX . $id . ".log";
 }
 
+function write_session($id) {
+  global $SESSION_FILE, $SESSION_LOCK_FILE;
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $wouldblock = 1;
+  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+    die("cannot lock file " . $SESSION_LOCK_FILE);
+  }
+  $fd = fopen($SESSION_FILE, "a") or die("cannot append to file " . $SESSION_FILE);
+  fwrite($fd, "$id\t" . $_SERVER['REMOTE_ADDR'] . "\t" . date('jS F Y h:i:s A (T)', time()) . "\n");
+  fclose($fd);
+
+  flock($fdlck, LOCK_UN);
+  fclose($fdlck);
+}
+
 function logmsg($id, $msg) {
+  $MAXMSGLEN = 150;
   $file = logfile($id);
   //$fdlck = lock($id);
   $fd = fopen($file, "a") or die("cannot append to file " . $file);
@@ -144,38 +164,51 @@ function unlock($fdlck) {
 
 $mode = get("mode", "none");
 $perform = get("perform", "");
-$id = get("id", "");
+if ($perform != "genid") {
+  $id = get("id", "");
+}
 $msg_id = get("msg_id", "UNKNOWN");
 
-if ($mode == "none") {
+if ($mode == "session") {
+  if ($perform == "genid") {
+    list($usec, $sec) = explode(" ", microtime());
+    $usec = strval(floatval($usec)*1000000.);
+    for ($nn = 6 - strlen($usec); $nn > 0; $nn--) {
+      $usec = "0" . $usec;
+    }
+    $pid = strval(mt_rand(0, 999999));
+    for ($nn = 6 - strlen($pid); $nn > 0; $nn--) {
+      $pid = "0" . $pid;
+    }
+    $id = $sec . $usec . $pid;
+    print $id;
+    $perform = "init";
+  }
   if ($perform == "init") {
-
+    write_session($id);
     creatfile(logfile($id));
-
     creatfile(lockfile($id));
-
     creatfile(cmdfile($id));
-
     creatfile(rspfile($id));
-
     logmsg($id, "init $id\n");
-
     return;
   }
-  if ($perform == "reset") {
-
+  if ($perform == "reset") { // or delete
     delfile(logfile($id));
-
     delfile(lockfile($id));
-
     delfile(cmdfile($id));
-
     delfile(rspfile($id));
-
     delfile(datafile($id));
-
     delfile(packnumfile($id));
-
+    return;
+  }
+  if ($perform == "list") {
+    return;
+  }
+  if ($perform == "clean") { // clean all sessions
+    return;
+  }
+  if ($perform == "get") { // get("which") -> "@@" : last session, @referer : last referer
     return;
   }
 } else if ($mode == "cli2srv") {

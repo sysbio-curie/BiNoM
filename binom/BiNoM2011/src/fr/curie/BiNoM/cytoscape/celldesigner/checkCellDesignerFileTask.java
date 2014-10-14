@@ -55,6 +55,8 @@ public class checkCellDesignerFileTask implements Task {
     			CheckCellDesignerFile cf = new CheckCellDesignerFile();
     			cf.sbmlDoc = CellDesigner.loadCellDesigner(CellDesignerFileName);
     			cf.checkIfReactionConnectedToIncludedSpecies();
+    			cf.checkIfSpeciesIsWithoutAlias();
+    			cf.checkComplexFormationConsistency();
     			
     			String fn = CellDesignerFileName.substring(0, CellDesignerFileName.length()-4)+"_fixed.xml";
     			CellDesigner.saveCellDesigner(cf.sbmlDoc, fn);

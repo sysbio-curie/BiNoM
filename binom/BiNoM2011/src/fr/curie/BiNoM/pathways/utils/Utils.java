@@ -74,10 +74,19 @@ import java.net.*;
 public class Utils {
 	
 	public static void main(String args[]){
+		try{
+		
+		Vector<String> vs = guessProteinIdentifiers("ccl4");
+		for(String s: vs) System.out.println(s);
+		System.exit(0);
+
 		//for(int i=0;i<255;i++)
 		//	System.out.println(i+"\t"+(char)i);
 		String text = Utils.loadString("C:/Datas/acsn/assembly/acsn_src/acsn_bib.txt");
 		text = correctIllegalCharacters(text);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -1116,7 +1125,8 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	System.out.println("Accessing genenames.org.... for "+name);
 	
 	Vector<String> ids = new Vector<String>();
-	String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"&submit=Submit";
+	//String query1 = "http://www.genenames.org/cgi-bin/quick_search.pl?.cgifields=type&type=contains&num=50&search="+name+"&submit=Submit";
+	String query1 = "http://www.genenames.org/cgi-bin/search?search_type=symbol&search="+name+"&submit=Submit";
 	String html1 = downloadURL(query1);
 	
 	if(html1.contains("refused"))
@@ -1127,51 +1137,86 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	String s = null;
 	String HUGO = "";
 	String HGNC = "";
+	boolean finallyFound = false;
 	while((s=lr.readLine())!=null){
 		s = s.trim();
-		String key = "<a href=\"/data/hgnc_data.php?hgnc_id=";
+		String key = "<a href=\"/cgi-bin/gene_symbol_report?hgnc_id=HGNC:";
 		if(s.startsWith(key)){
 			s = s.substring(key.length(),s.length());
 			StringTokenizer st = new StringTokenizer(s,"\"></");
-			HGNC = st.nextToken();
-			HUGO = st.nextToken();
-			break;
+			String _HGNC = st.nextToken();
+			s = lr.readLine().trim();
+			key = "<span class=\"title\"><strong>";
+			s = s.substring(key.length(),s.length());
+			st = new StringTokenizer(s,"\"></");
+			String _HUGO = st.nextToken();
+
+			boolean foundSynonym = false;
+			if(!finallyFound)
+			while(!(s=lr.readLine().trim()).equals("</a>")){
+				//System.out.println(s);
+				if(s.equals("<dt>Synonyms:</dt>")||s.equals("<dt>Previous symbols & names:</dt>")){
+					lr.readLine();
+					s = lr.readLine().trim();
+					s = Utils.replaceString(s, "<dd>", "");
+					s = Utils.replaceString(s, "</dd>", "");
+					s = Utils.replaceString(s, "<span class=\"highlight\">", "");
+					s = Utils.replaceString(s, "</span>", "");
+					StringTokenizer st1 = new StringTokenizer(s,"<>\",");
+					while(st1.hasMoreTokens()){
+						s = st1.nextToken();
+						if(s.toLowerCase().equals(name.toLowerCase())){
+							foundSynonym = true;
+						}
+					}
+				}
+			}
+			
+			if(!foundSynonym){
+				if(!HGNC.equals("")) _HGNC = "";
+				if(!HUGO.equals("")) _HUGO = "";
+			}else{
+				finallyFound = true;
+			}
+			
+			if(!_HGNC.equals("")) HGNC = _HGNC;
+			if(!_HUGO.equals("")) HUGO = _HUGO;
 		}
 	}
 	
-	String query2 = "http://www.genenames.org/data/hgnc_data.php?hgnc_id="+HGNC;
+	String query2 = "http://www.genenames.org/cgi-bin/gene_symbol_report?hgnc_id=HGNC:"+HGNC;
 	String html2 = downloadURL(query2);
 	
 	lr = new LineNumberReader(new StringReader(html2));
+	String key1 = "<a class=\"dialog Information";
 	while((s=lr.readLine())!=null){
 		s = s.trim();
-		String key1 = "<th class=\"symbol_data-header-";
+		if(s.contains("External links")) key1 = "--------";
 		if(s.startsWith(key1)){
+			String s1 = lr.readLine();
+			if(s1.contains("icon-info")){
 			s = s.substring(key1.length(),s.length());
-			StringTokenizer st = new StringTokenizer(s,"\">");
+			StringTokenizer st = new StringTokenizer(s," \">");
 			String type = st.nextToken();
-			String nextLine = lr.readLine();
-			nextLine = nextLine.trim();
-			String key2 = "<td class=\"symbol_data-data-"+type+"\"><strong>";			
-			nextLine = nextLine.substring(key2.length(), nextLine.length());
-			st = new StringTokenizer(nextLine,"<");
-			String value = st.nextToken();
-			if(!type.equals("hgnc_id"))
-				ids.add(type+":"+value);
-			//System.out.println(type+":"+value);
+			
+			while(!(s=lr.readLine()).contains("first last"));
+			String value = lr.readLine().trim();
+			ids.add(type+":"+value);
+			}
 		}
-		String key3 = "Entrez Gene:";
+		String key3 = "Entrez Gene: <a href=\"http://view.ncbi.nlm.nih.gov/gene/";
 		if(s.indexOf(key3)>=0){
 			s = s.substring(s.indexOf(key3)+key3.length(), s.length());
-			StringTokenizer st = new StringTokenizer(s,"<");
+			StringTokenizer st = new StringTokenizer(s,"<\"");
 			String type = "ENTREZ";
 			String value = st.nextToken();
 			ids.add(type+":"+value);
 		}
-		key3 = "UniProtKB:";
+		key3 = ">UniProt<";
 		if(s.indexOf(key3)>=0){
-			s = s.substring(s.indexOf(key3)+key3.length(), s.length());
-			StringTokenizer st = new StringTokenizer(s,"<");
+			String kk = "<dd><a href=\"http://www.uniprot.org/uniprot/";
+			s = s.substring(kk.length(), s.length());
+			StringTokenizer st = new StringTokenizer(s,"<\"");
 			String type = "UNIPROT";
 			String value = st.nextToken();
 			ids.add(type+":"+value);

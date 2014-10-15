@@ -136,10 +136,19 @@ function nv_execute_commands(win, cmd)
 //    nv_find_entities(window, "AK.*");
 // ------------------------------------------------------------------------------------------------------------------
 
-function nv_notice(win, header, msg, position, width, height)
+function nv_notice_perform(win, command, header, msg, position, width, height)
 {
 	win = nv_win(win);
-	win.notice_dialog(header, msg, win, position, width, height);
+	if (command == "set_message_and_open") {
+		win.notice_dialog(header, msg, win, position, width, height);
+		//open_info_dialog(win);
+	} else if (command == "open") {
+		open_info_dialog(win);
+	} else if (command == "close") {
+		close_info_dialog(win);
+	} else {
+		throw "nv_notice_perform: unknown command \"" + command + "\"";
+	}
 }
 
 function nv_find_entities(win, search, open_bubble)
@@ -1384,7 +1393,6 @@ var nv_handlers = {
 	"nv_set_zoom": nv_set_zoom,
 	"nv_uncheck_all_entities": nv_uncheck_all_entities,
 	"nv_scroll": nv_scroll,
-	"nv_notice": nv_notice,
 
 	"nv_import_datatables": nv_import_datatables,
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,
@@ -1396,6 +1404,7 @@ var nv_handlers = {
 	"nv_drawing_config_perform": nv_drawing_config_perform,
 	"nv_sample_annotation_perform": nv_sample_annotation_perform,
 	"nv_datatable_config_perform": nv_datatable_config_perform,
+	"nv_notice_perform": nv_notice_perform,
 
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,
@@ -1516,6 +1525,20 @@ function nv_rcv_perform(rsp_url, cmd)
 	nv_rsp(rsp_url, rspdata, data.msg_id);
 }
 
+function nv_init_session(win, url) {
+	$.ajax(url,
+	       {
+		       async: true,
+		       cache: false, // don't work without cache off
+		       dataType: 'text',
+		       timeout: -1,
+		       success: function(id) {
+			       console.log("ID [" + id + "]");
+			       nv_server(win, id);
+		       }
+	       });
+}
+
 function nv_rcv(base_url, url) {
 	if (SERVER_TRACE) {
 		console.log("nv_rcv(" + url + ")");
@@ -1573,9 +1596,14 @@ function nv_rcv(base_url, url) {
 function nv_server(win, id) {
 	var href = window.location.href;
 	var idx = href.indexOf('/navicell/');
-	var base_url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?id=" + id;
-	var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
-	nv_rcv(base_url, url);
+	if (id) {
+		var base_url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?id=" + id;
+		var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
+		nv_rcv(base_url, url);
+	} else {
+		var url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?mode=session&perform=genid";
+		nv_init_session(win, url);
+	}
 }
 
 //

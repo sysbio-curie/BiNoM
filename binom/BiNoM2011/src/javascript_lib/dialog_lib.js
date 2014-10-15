@@ -29,7 +29,17 @@ function nv2() {
 }
 
 
-function display_dialog(title, header, msg, win, position, width, height)
+function open_info_dialog(win)
+{
+	$("#info_dialog", win.document).dialog("open");
+}
+
+function close_info_dialog(win)
+{
+	$("#info_dialog", win.document).dialog("close");
+}
+
+function display_info_dialog(title, header, msg, win, position, width, height)
 {
 	var dialog = $("#info_dialog", win.document);
 //	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
@@ -81,17 +91,17 @@ function display_dialog(title, header, msg, win, position, width, height)
 
 function warning_dialog(header, msg, win)
 {
-	display_dialog('Warning', header, msg, win);
+	display_info_dialog('Warning', header, msg, win);
 }
 
 function error_dialog(header, msg, win)
 {
-	display_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
+	display_info_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
 }
 
 function notice_dialog(header, msg, win, position, width, height)
 {
-	display_dialog('Notice', header, msg, win, position, width, height);
+	display_info_dialog('Notice', header, msg, win, position, width, height);
 }
 
 var CANCEL_CLOSES = false;
@@ -858,17 +868,20 @@ $(function() {
 				$("#command-exec").val("");
 			},
 
+			/*
 			"Get URL": function() {
 				var cmd = $("#command-exec").val().trim();
 				nv_get_url(cmd);
 				$("#command-exec").val("");
 			},
+			*/
 
+			/*
 			"Eval": function() { // for testing, Eval button will disapear
 				var cmd = $("#command-exec").val().trim();
 				window.eval(cmd);
-				//$("#command-exec").val("");
 			},
+			*/
 
 			"Clear": function() {
 				$("#command-exec").val("");

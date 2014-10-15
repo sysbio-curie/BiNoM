@@ -35,6 +35,74 @@ function write_session($id) {
   fclose($fdlck);
 }
 
+function list_sessions() {
+  global $SESSION_FILE, $SESSION_LOCK_FILE;
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $wouldblock = 1;
+  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+    die("cannot lock file " . $SESSION_LOCK_FILE);
+  }
+  print file_get_contents($SESSION_FILE);
+
+  flock($fdlck, LOCK_UN);
+  fclose($fdlck);
+}
+
+function clean_sessions() {
+  global $SESSION_FILE, $SESSION_LOCK_FILE;
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $wouldblock = 1;
+  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+    die("cannot lock file " . $SESSION_LOCK_FILE);
+  }
+  $fd = fopen($SESSION_FILE, "r") or die("cannot append to file " . $SESSION_FILE);
+  while ($line = fgets($fd)) {
+    $fields = explode("\t", $line);
+    $id = $fields[0];
+    reset_session($id, false);
+  }
+  fclose($fd);
+
+  unlink($SESSION_FILE);
+
+  flock($fdlck, LOCK_UN);
+  fclose($fdlck);
+}
+
+function list_session($which) {
+  global $SESSION_FILE, $SESSION_LOCK_FILE;
+  if ($which == "@@") {
+    $referer = 0;
+  } else if ($which[0] == "@") {
+    $referer = substr($which, 1);
+  } else {
+    die("unknown which value $which");
+  }
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $wouldblock = 1;
+  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+    die("cannot lock file " . $SESSION_LOCK_FILE);
+  }
+  $lines = array();
+  $fd = fopen($SESSION_FILE, "r") or die("cannot append to file " . $SESSION_FILE);
+  while ($line = fgets($fd)) {
+    $lines[] = $line;
+  }
+  fclose($fd);
+
+  for ($nn = count($lines)-1; $nn >= 0; $nn--) {
+    $line = $lines[$nn];
+    $fields = explode("\t", $line);
+    if (!$referer || $referer == $fields[1]) {
+      print $fields[0];
+      break;
+    }
+  }
+
+  flock($fdlck, LOCK_UN);
+  fclose($fdlck);
+}
+
 function logmsg($id, $msg) {
   $MAXMSGLEN = 150;
   $file = logfile($id);
@@ -46,6 +114,15 @@ function logmsg($id, $msg) {
   fwrite($fd, $msg);
   //unlock($fdlck);
   fclose($fd);
+}
+
+function reset_session($id, $check) {
+  delfile(logfile($id), $check);
+  delfile(lockfile($id), $check);
+  delfile(cmdfile($id), $check);
+  delfile(rspfile($id), $check);
+  delfile(datafile($id), $check);
+  delfile(packnumfile($id), $check);
 }
 
 function get_post_var($param) {
@@ -113,8 +190,12 @@ function creatfile($file) {
   fclose($fd);
 }
 
-function delfile($file) {
-  unlink($file) or die("cannot delete file " . $file);
+function delfile($file, $check) {
+  if (!$check) {
+    unlink($file);
+  } else {
+    unlink($file) or die("cannot delete file " . $file);
+  }
 }
 
 function mkfile($id, $ext) {
@@ -164,12 +245,24 @@ function unlock($fdlck) {
 
 $mode = get("mode", "none");
 $perform = get("perform", "");
-if ($perform != "genid") {
+if ($mode != "session") {
   $id = get("id", "");
-}
+} 
+
 $msg_id = get("msg_id", "UNKNOWN");
 
 if ($mode == "session") {
+  if ($perform == "check") {
+    $id = get("id", "");
+    $fd = fopen(logfile($id), "r");
+    if (!$fd) {
+      print "bad";
+    } else {
+      print "ok";
+      fclose($fd);
+    }
+    return;
+  }
   if ($perform == "genid") {
     list($usec, $sec) = explode(" ", microtime());
     $usec = strval(floatval($usec)*1000000.);
@@ -185,6 +278,9 @@ if ($mode == "session") {
     $perform = "init";
   }
   if ($perform == "init") {
+    if (!isset($id)) {
+      $id = get("id", "");
+    }
     write_session($id);
     creatfile(logfile($id));
     creatfile(lockfile($id));
@@ -194,21 +290,21 @@ if ($mode == "session") {
     return;
   }
   if ($perform == "reset") { // or delete
-    delfile(logfile($id));
-    delfile(lockfile($id));
-    delfile(cmdfile($id));
-    delfile(rspfile($id));
-    delfile(datafile($id));
-    delfile(packnumfile($id));
+    $id = get("id", "");
+    reset_session($id, false);
     return;
   }
   if ($perform == "list") {
+    list_sessions();
     return;
   }
   if ($perform == "clean") { // clean all sessions
+    clean_sessions();
     return;
   }
   if ($perform == "get") { // get("which") -> "@@" : last session, @referer : last referer
+    $which = get("which", "");
+    list_session($which);
     return;
   }
 } else if ($mode == "cli2srv") {

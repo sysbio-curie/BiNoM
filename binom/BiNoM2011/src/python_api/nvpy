@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# nvpy
+#
+# NaviCell python launcher
+#
+# Eric Viara for Institut Curie copyright(c) 2014
+#
+
+python3 -i navicell.py "$@"

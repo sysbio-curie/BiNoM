@@ -1391,8 +1391,23 @@ function nv_rcv(base_url, url) {
 		       },
 		       
 		       error: function(e) {
-			       console.log(" -> ERROR DECODING [" + e + "]");
-			       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+			       console.log(" -> ERROR DECODING [" + e.message + " " + e.toString() + "]");
+			       if (e.status == 500) {
+				       nv_cumul_error_cnt++;
+				       if (nv_cumul_error_cnt > NV_MAX_CUMUL_ERROR_CNT) {
+					       console.log("too many errors: SERVER MODE IS DEAD");
+				       } else {
+					       console.log("try again");
+					       nv_rcv(base_url, url);
+				       }
+			       } else {
+				       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+			       }
+			       /*
+			       for (var key in e) {
+				       console.log("e[" + key + "] [" + e[key] + "]");
+			       }
+*/
 		       }
 	       }
 	      );

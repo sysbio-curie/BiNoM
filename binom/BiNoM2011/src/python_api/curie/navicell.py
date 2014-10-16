@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # written by: Eric Viara (eric.viara@curie.fr)
 
-import subprocess, sys, os, optparse
+import subprocess, sys, os
 import json
 import http.client, urllib.request, urllib.parse, urllib.error
 import datetime
@@ -24,34 +24,34 @@ from time import sleep
 
 PACKSIZE = 500000
 
-class Cli2NV:
+class Proxy:
 
-    def __init_attrs__(self, cli2nv_url, is_https, str = ''):
+    def __init_attrs__(self, proxy_url, is_https, str = ''):
         self._is_https = is_https
         if not str:
-            url = cli2nv_url
+            url = proxy_url
         else:
-            url = cli2nv_url[len(str):]
+            url = proxy_url[len(str):]
         idx = url.find("/")
         if idx != -1:
             self._host = url[0:idx]
             self._url = url[idx:]
         else:
-            raise Exception("invalid format " + cli2nv_url)
+            raise Exception("invalid format " + proxy_url)
 
-    def __init__(self, cli2nv_url = ''):
-        if not cli2nv_url:
-            raise Exception("empty cli2nv URL")
+    def __init__(self, proxy_url = ''):
+        if not proxy_url:
+            raise Exception("empty proxy URL")
 
-        idx = cli2nv_url.find("http://")
+        idx = proxy_url.find("http://")
         if idx != -1:
-            self.__init_attrs__(cli2nv_url, False, "http://")
+            self.__init_attrs__(proxy_url, False, "http://")
         else:
-            idx = cli2nv_url.find("https://")
+            idx = proxy_url.find("https://")
             if idx != -1:
-                self.__init_attrs__(cli2nv_url, True, "https://")
+                self.__init_attrs__(proxy_url, True, "https://")
             else:                
-                self.__init_attrs__(cli2nv_url, False)
+                self.__init_attrs__(proxy_url, False)
 
     def getURL(self):
         return self._url
@@ -92,7 +92,7 @@ class NaviCell:
 
     def __init__(self, options):
 
-        self.cli2nv = Cli2NV(options.cli2nv_url)
+        self.proxy = Proxy(options.proxy_url)
 
         if options.map_url and options.browser_command:
             self._browser_launcher = BrowserLauncher(options.browser_command, options.map_url)
@@ -130,9 +130,9 @@ class NaviCell:
 
         encoded_params = urllib.parse.urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        conn = self.cli2nv.newConnection()
+        conn = self.proxy.newConnection()
 
-        conn.request("POST", self.cli2nv.getURL(), encoded_params, headers)
+        conn.request("POST", self.proxy.getURL(), encoded_params, headers)
 
         if packcount > 0:
 #            print("performing filling", packcount)
@@ -147,8 +147,8 @@ class NaviCell:
                     end = datalen
                 fillparams['data'] = data[beg:end]
                 encoded_params = urllib.parse.urlencode(fillparams)
-                fillconn = self.cli2nv.newConnection()
-                fillconn.request("POST", self.cli2nv.getURL(), encoded_params, headers);
+                fillconn = self.proxy.newConnection()
+                fillconn.request("POST", self.proxy.getURL(), encoded_params, headers);
                 fillconn.close()
 
         response = conn.getresponse()
@@ -593,8 +593,8 @@ class NaviCell:
 
 ###
     def examples(self):
-        protocol = self.cli2nv.getProtocol()
-        if self.cli2nv.isHttps():
+        protocol = self.proxy.getProtocol()
+        if self.proxy.isHttps():
             datalist_url = "datatable_list_url_secure.txt"
         else:
             datalist_url = "datatable_list_url.txt"
@@ -627,77 +627,74 @@ class NaviCell:
         print('nv.noticeMessage("", "<span style=\\"color: darkred; font-size: 18px\\">Demo</span>", "<span style=\\"color: darkblue; font-size: 14px\\">NaviCell is currently running in demo mode<br/><br/>Please&nbsp;wait...</span>", "left center", 380, 320)')
         print("")
 
-parser = optparse.OptionParser()
-parser.disable_interspersed_args()
-
-if 'NV_CLI2NV_URL' in os.environ:
-    parser.set_defaults(cli2nv_url = os.environ['NV_CLI2NV_URL'])
-if 'NV_BROWSER_COMMAND' in os.environ:
-    parser.set_defaults(browser_command = os.environ['NV_BROWSER_COMMAND'])
-if 'NV_MAP_URL' in os.environ:
-    parser.set_defaults(map_url = os.environ['NV_MAP_URL'])
-
-parser.set_defaults(navicell_varname = 'nv')
-
-parser.add_option("--map-url", help="URL of map [%default]", metavar="URL")
-parser.add_option("--launch-browser", action="store_true", help="launch browser using the URL given by --map-url URL")
-parser.add_option("--cli2nv_url", help="client/NaviCell communication URL [%default]", metavar="URL")
-parser.add_option("--browser-command", help="browser command to be used [%default]", metavar="COMMAND")
-parser.add_option("--attach-session", help="attach the given session", metavar="SESSION_ID")
-parser.add_option("--attach-last-session", action="store_true", help="attach the last session")
-parser.add_option("--attach-referer-session", help="attach the last session from this referer", metavar="REFERER_IP")
-parser.add_option("--list-sessions", action="store_true", help="list active sessions and exit")
-parser.add_option("--clean-sessions", action="store_true", help="clean all active sessions and exit")
-parser.add_option("--navicell-varname", help="name of python variable for navicell [%default]", metavar="VARNAME")
-    
-try:
-    (options, args) = parser.parse_args()
-except:
-    os._exit(0)
-
-if options.list_sessions and options.clean_sessions:
-    print("--list-sessions and --clean-sessions are exclusive options")
-    os._exit(1)
-
-if options.list_sessions and options.attach_session:
-    print("--list-sessions and --attach-session are exclusive options")
-    os._exit(1)
-
-if options.clean_sessions and options.attach_session:
-    print("--clean-sessions and --attach-session are exclusive options")
-    os._exit(1)
-
-try:
-    _nv_varname = options.navicell_varname
-    globals()[_nv_varname] = NaviCell(options)
-    if options.list_sessions:
-        globals()[_nv_varname].listSessions()
-        os._exit(0)
-    elif options.clean_sessions:
-        globals()[_nv_varname].cleanSessions()
-        os._exit(0)
-    elif options.attach_session:
-        globals()[_nv_varname].attachSession(options.attach_session)
-    elif options.attach_last_session:
-        globals()[_nv_varname].attachLastSession()
-    elif options.attach_referer_session:
-        globals()[_nv_varname].attachRefererSession(options.attach_referer_session)
-    elif options.launch_browser:
-        globals()[_nv_varname].launchBrowser()
-
-except Exception as e:
-    print("NaviCell Python Client:", str(e))
-    os._exit(1)
-
-print("")
-print("===================================")
-print(" Welcome in NaviCell python client")
-print("===================================")
-print("")
-
-print("Use python variable '" + _nv_varname + "' as the NaviCell object")
-print("Type '" + _nv_varname + ".examples()' to get examples")
-print("")
-#if options.attach_session or options.attach_last_session or options.attach_referer_session:
-#    print(_nv_varname + " object attached to session", globals()[_nv_varname].get_session_id())
-
+### parser = optparse.OptionParser()
+### parser.disable_interspersed_args()
+### 
+### if 'NV_PROXY_URL' in os.environ:
+###     parser.set_defaults(proxy_url = os.environ['NV_PROXY_URL'])
+### if 'NV_BROWSER_COMMAND' in os.environ:
+###     parser.set_defaults(browser_command = os.environ['NV_BROWSER_COMMAND'])
+### if 'NV_MAP_URL' in os.environ:
+###     parser.set_defaults(map_url = os.environ['NV_MAP_URL'])
+### 
+### parser.set_defaults(navicell_varname = 'nv')
+### 
+### parser.add_option("--map-url", help="URL of map [%default]", metavar="URL")
+### parser.add_option("--launch-browser", action="store_true", help="launch browser using the URL given by --map-url URL")
+### parser.add_option("--proxy_url", help="client/NaviCell communication URL [%default]", metavar="URL")
+### parser.add_option("--browser-command", help="browser command to be used [%default]", metavar="COMMAND")
+### parser.add_option("--attach-session", help="attach the given session", metavar="SESSION_ID")
+### parser.add_option("--attach-last-session", action="store_true", help="attach the last session")
+### parser.add_option("--attach-referer-session", help="attach the last session from this referer", metavar="REFERER_IP")
+### parser.add_option("--list-sessions", action="store_true", help="list active sessions and exit")
+### parser.add_option("--clean-sessions", action="store_true", help="clean all active sessions and exit")
+### parser.add_option("--navicell-varname", help="name of python variable for navicell [%default]", metavar="VARNAME")
+###     
+### try:
+###     (options, args) = parser.parse_args()
+### except:
+###     os._exit(0)
+### 
+### if options.list_sessions and options.clean_sessions:
+###     print("--list-sessions and --clean-sessions are exclusive options")
+###     os._exit(1)
+### 
+### if options.list_sessions and options.attach_session:
+###     print("--list-sessions and --attach-session are exclusive options")
+###     os._exit(1)
+### 
+### if options.clean_sessions and options.attach_session:
+###     print("--clean-sessions and --attach-session are exclusive options")
+###     os._exit(1)
+### 
+### try:
+###     _nv_varname = options.navicell_varname
+###     globals()[_nv_varname] = NaviCell(options)
+###     if options.list_sessions:
+###         globals()[_nv_varname].listSessions()
+###         os._exit(0)
+###     elif options.clean_sessions:
+###         globals()[_nv_varname].cleanSessions()
+###         os._exit(0)
+###     elif options.attach_session:
+###         globals()[_nv_varname].attachSession(options.attach_session)
+###     elif options.attach_last_session:
+###         globals()[_nv_varname].attachLastSession()
+###     elif options.attach_referer_session:
+###         globals()[_nv_varname].attachRefererSession(options.attach_referer_session)
+###     elif options.launch_browser:
+###         globals()[_nv_varname].launchBrowser()
+### 
+### except Exception as e:
+###     print("NaviCell Python Client:", str(e))
+###     os._exit(1)
+### 
+### print("")
+### print("===================================")
+### print(" Welcome in NaviCell python client")
+### print("===================================")
+### print("")
+### 
+### print("Use python variable '" + _nv_varname + "' as the NaviCell object")
+### print("Type '" + _nv_varname + ".examples()' to get examples")
+### print("")

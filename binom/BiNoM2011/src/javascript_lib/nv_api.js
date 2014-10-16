@@ -1402,11 +1402,11 @@ function nv_server(win, id) {
 	var href = window.location.href;
 	var idx = href.indexOf('/navicell/');
 	if (id) {
-		var base_url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?id=" + id;
+		var base_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?id=" + id;
 		var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
 		nv_rcv(base_url, url);
 	} else {
-		var url = href.substr(0, idx) + "/cgi-bin/nv_protocol.php?mode=session&perform=genid";
+		var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=genid";
 		nv_init_session(win, url);
 	}
 }

@@ -252,8 +252,8 @@ class NaviCell:
     def listSessions(self):
         print(self._send(self._message_id(), {'mode': 'session', 'perform': 'list'}, True), end="")
 
-    def cleanSessions(self):
-        print(self._send(self._message_id(), {'mode': 'session', 'perform': 'clean'}, True), end="")
+    def clearSessions(self):
+        print(self._send(self._message_id(), {'mode': 'session', 'perform': 'clear'}, True), end="")
 
     def attachSession(self, session_id):
         if self.session_id != "1":

@@ -286,9 +286,6 @@ if ($mode == "session") {
     creatfile(lockfile($id));
     creatfile(cmdfile($id));
     creatfile(rspfile($id));
-    // moved from if ($packount)
-    creatfile(packnumfile($id));
-    creatfile(datafile($id));
     logmsg($id, "init $id\n");
     return;
   }
@@ -344,29 +341,26 @@ if ($mode == "session") {
     if ($data) {
       $file = cmdfile($id);
       $fdlck = waitandlock($id, $file);
-      $lockfile = lockfile($id);
 
       $packcount = get_url_var("packcount");
       if ($packcount) {
-	logmsg($id, "cli2srv: multipart $packcount\n");
+	//	logmsg($id, "cli2srv: multipart $packcount\n");
 	$packnumfile = packnumfile($id);
 	$datafile = datafile($id);
-	//creatfile($datafile); // ??
-	//creatfile($packnumfile); // ??
-	checkfile($packnumfile);
+	creatfile($datafile);
+	creatfile($packnumfile);
 	for (;;) {
+	  checkfile($packnumfile);
 	  $packstr = file_get_contents($packnumfile);
 	  if ($packstr && intval($packstr) == intval($packcount)) {
-	    logmsg($id, "cli2srv: multipart find packet $packstr");
+	    //	    logmsg($id, "cli2srv: multipart find packet $packstr");
 	    $data = file_get_contents($datafile);
 	    break;
 	  }
 	  unlock($fdlck);
 	  usleep(10000);
-	  $fdlck = lock($id);
 	}
-	creatfile($datafile); // to empty file
-	creatfile($packnumfile); // to empty file
+
       }
       file_put_contents($file, $data);
       

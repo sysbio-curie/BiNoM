@@ -18,13 +18,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-
 // NaviCell API
 
 var nv_open_bubble = false;
 var nv_decoding = false;
 var nv_cumul_error_cnt = 0;
+var nv_timeout_ts = 0;
+
+// constants
+var SERVER_TRACE = 0;
 var NV_MAX_CUMUL_ERROR_CNT = 20;
+var ESCAPE_LINE_BREAK = /\\n/g;
+var ESCAPE_QUOTE = /\\"/g;
+var ESCAPE_TAB = /\\t/g;
 
 // Utility functions
 function add_to_datatable_desc_list(dt_desc_list, data) {
@@ -115,10 +121,6 @@ function nv_get_command_history(win)
 {
 	return $("#command-history", win.document).val();
 }
-
-var ESCAPE_LINE_BREAK = /\\n/g;
-var ESCAPE_QUOTE = /\\"/g;
-var ESCAPE_TAB = /\\t/g;
 
 function nv_execute_commands(win, cmd)
 {
@@ -1044,7 +1046,7 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 
 function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 {
-	console.log("nv_sample_annotation_perform [" + command + "]");
+	//console.log("nv_sample_annotation_perform [" + command + "]");
 	win = nv_win(win);
 	if (command == "open") {
 		if (navicell.dataset.datatableCount()) {
@@ -1266,32 +1268,9 @@ function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 	return {now: now, cmd: nv_CMD_MARK + " " + JSON.stringify(map)};
 }
 
-function nv_get_url(cmd)
-{
-	if (cmd.trim().length == 0) {
-		return;
-	}
-	var url = window.location.href;
-	console.log("CMD [" + cmd + "]");
-	console.log("CMD2 [" + cmd.replace(COMMENT_REGEX, "") + "]");
-	console.log("CMD3 [" + cmd.replace(COMMENT_REGEX, "").replace(LINE_BREAK_REGEX_G, "") + "]");
-	var data = cmd.replace(COMMENT_REGEX, "").replace(LINE_BREAK_REGEX_G, "");
-	var url = window.location.href;
-	var idx = url.lastIndexOf('/');
-	url = url.substr(0, idx);
-	console.log("DATA [" + data + "]");
-	var geturl = url + "/index.php?command=" + escape(data);
-	var posturl = url + "/launcher.php";
-	var text = "GET URL<br/>" + geturl + "<br/><br/>" + "POST URL<br/>" + posturl + "<br/>POST data<br/>" + data;
-	display_dialog("URL", "", text, window);
-}
-
-var RSP_ID = 1;
-var SERVER_TRACE = 1;
-
 function nv_rsp(url, data, msg_id) {
 	if (SERVER_TRACE) {
-		console.log("nv_rsp(" + url + ", " + data + ", " + msg_id + ")");
+		console.log("NV Server: nv_rsp(" + url + ", " + data + ", " + msg_id + ")");
 	}
 	$.ajax(url,
 	       {
@@ -1302,12 +1281,12 @@ function nv_rsp(url, data, msg_id) {
 		       data: {msg_id: msg_id, data: nv_encode_data(data)},
 		       success: function(ret) {
 			       if (SERVER_TRACE) {
-				       console.log("response has been sucesfully send [" + ret + "]");
+				       console.log("NV Server: response has been succesfully send [" + ret + "]");
 			       }
 		       },
 		       
 		       error: function(e) {
-			       console.log("sending response failure");
+			       console.log("NV Server: sending response failure");
 		       }
 	       }
 	      );
@@ -1319,7 +1298,7 @@ function nv_rcv_perform(rsp_url, cmd)
 	var rspdata = {status: 0, msg_id: data.msg_id, data: data.retdata == undefined ? false : data.retdata};
 	
 	if (SERVER_TRACE) {
-		console.log(" -> returning data [" + rspdata + "]");
+		console.log("NV Server: returning data [" + rspdata.msg_id + "]");
 	}
 	nv_rsp(rsp_url, rspdata, data.msg_id);
 }
@@ -1338,11 +1317,87 @@ function nv_init_session(win, url) {
 	       });
 }
 
-function nv_rcv(base_url, url) {
+function nv_maybe_timeout_status(e) {
+	return e.status == 500;
+}
+
+function nv_manage_timeout(e) {
+	if (nv_maybe_timeout_status(e)) {
+		var date = new Date();
+		var timeout_ts = date.getSeconds();
+		if (nv_timeout_ts && timeout_ts - nv_timeout_ts < 5) {
+			return false;
+		}
+		nv_timeout_ts = timeout_ts;
+		return true;
+	}
+	return false;
+}
+
+function nv_manage_command(cmd, base_url, url) {
+	if (cmd.length == 0) {
+		return;
+	}
 	if (SERVER_TRACE) {
-		console.log("nv_rcv(" + url + ")");
+		console.log("NV Server: received [" + cmd + "]");
 	}
 	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
+	try {
+		if (cmd.substring(0, 2) == '!!') {
+			var dataurl = cmd.substring(2);
+			$.ajax(dataurl,
+			       {
+				       async: false,
+				       cache: false, // don't work without cache off
+				       dataType: 'text',
+				       success: function(cmd) {
+					       nv_rcv_perform(rsp_url, cmd);
+				       },
+				       
+				       error: function() {
+					       console.log("NV Server: got exception #1 [" + e + "]");
+					       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+				       }
+			       }
+			      );
+		} else {
+			console.log("DATA LEN [" + cmd.length + "]");
+			nv_rcv_perform(rsp_url, cmd);
+		}
+		nv_cumul_error_cnt = 0;
+	} catch(e) {
+		nv_cumul_error_cnt++;
+		console.log("NV Server: got exception #2 [" + e + "]");
+		console.log("DATA [" + cmd.length + "]");
+		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+	}
+	if (nv_cumul_error_cnt > NV_MAX_CUMUL_ERROR_CNT) {
+		console.log("NV Server: too many errors: exiting server mode");
+	} else {
+		nv_rcv(base_url, url);
+	}
+}
+
+function nv_manage_error(e, base_url, url) {
+	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
+	console.log("NV Server: got exception #3 [" + e + "]");
+	if (!nv_maybe_timeout_status(e)) {
+		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+		return;
+	}
+
+	if (!nv_manage_timeout(e)) {
+		console.log("NV Server: too many timeout errors: exiting server mode");
+	} else {
+		console.log("NV Server: timeout detected: continue server mode");
+		nv_rcv(base_url, url);
+	}
+}
+
+function nv_rcv(base_url, url) {
+	if (SERVER_TRACE) {
+		console.log("NV Server: nv_rcv(" + url + ")");
+	}
 	$.ajax(url,
 	       {
 		       async: true,
@@ -1350,64 +1405,11 @@ function nv_rcv(base_url, url) {
 		       dataType: 'text',
 		       timeout: -1,
 		       success: function(cmd) {
-			       if (SERVER_TRACE) {
-				       console.log(" -> received [" + cmd + "]");
-			       }
-			       cmd = cmd.trim();
-			       if (cmd.length > 0) {
-				       try {
-					       if (cmd.substring(0, 2) == '!!') {
-						       var dataurl = cmd.substring(2);
-						       $.ajax(dataurl,
-							      {
-								      async: false,
-								      cache: false, // don't work without cache off
-								      dataType: 'text',
-								      success: function(cmd) {
-									      nv_rcv_perform(rsp_url, cmd);
-								      },
-								      
-								      error: function() {
-									      console.log(" -> exception_2 [" + e + "]");
-									      nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
-								      }
-							      }
-							     );
-					       } else {
-						       nv_rcv_perform(rsp_url, cmd);
-					       }
-					       nv_cumul_error_cnt = 0;
-				       } catch(e) {
-					       nv_cumul_error_cnt++;
-					       console.log(" -> exception [" + e + "]");
-					       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
-				       }
-			       }
-			       if (nv_cumul_error_cnt > NV_MAX_CUMUL_ERROR_CNT) {
-				       console.log("too many errors: SERVER MODE IS DEAD");
-			       } else {
-				       nv_rcv(base_url, url);
-			       }
+			       nv_manage_command(cmd.trim(), base_url, url);
 		       },
 		       
 		       error: function(e) {
-			       console.log(" -> ERROR DECODING [" + e.message + " " + e.toString() + "]");
-			       if (e.status == 500) {
-				       nv_cumul_error_cnt++;
-				       if (nv_cumul_error_cnt > NV_MAX_CUMUL_ERROR_CNT) {
-					       console.log("too many errors: SERVER MODE IS DEAD");
-				       } else {
-					       console.log("try again");
-					       nv_rcv(base_url, url);
-				       }
-			       } else {
-				       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
-			       }
-			       /*
-			       for (var key in e) {
-				       console.log("e[" + key + "] [" + e[key] + "]");
-			       }
-*/
+			       nv_manage_error(e, base_url, url);
 		       }
 	       }
 	      );
@@ -1453,7 +1455,7 @@ function nv_decode(str)
 		var args = action_map.args;
 		var win = module ? get_win(module) : window;
 		if (!win) {
-			console.log("nv_decode: unknown module " + module);
+			console.log("NV Server: nv_decode: unknown module " + module);
 			continue;
 		}
 		msg_id = action_map.msg_id;
@@ -1464,3 +1466,20 @@ function nv_decode(str)
 	return {'msg_id': msg_id, retdata: ret};
 }
 
+/*
+function nv_get_url(cmd)
+{
+	if (cmd.trim().length == 0) {
+		return;
+	}
+	var url = window.location.href;
+	var data = cmd.replace(COMMENT_REGEX, "").replace(LINE_BREAK_REGEX_G, "");
+	var url = window.location.href;
+	var idx = url.lastIndexOf('/');
+	url = url.substr(0, idx);
+	var geturl = url + "/index.php?command=" + escape(data);
+	var posturl = url + "/launcher.php";
+	var text = "GET URL<br/>" + geturl + "<br/><br/>" + "POST URL<br/>" + posturl + "<br/>POST data<br/>" + data;
+	display_dialog("URL", "", text, window);
+}
+*/

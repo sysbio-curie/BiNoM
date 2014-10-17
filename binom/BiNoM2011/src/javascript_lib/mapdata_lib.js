@@ -565,7 +565,7 @@ Mapdata.prototype = {
 		for (var hugo_name in this.hugo_map) {
 			hugo_names.push(hugo_name);
 		}
-		console.log("getHugoNames: " + mapSize(this.hugo_map) + " " + hugo_names.length);
+		//console.log("getHugoNames: " + mapSize(this.hugo_map) + " " + hugo_names.length);
 		return hugo_names;
 	},
 
@@ -3585,7 +3585,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 
 	if (url) {
 		if (url.match(/^@DATA\n/)) {
-			console.log("@DATA found !");
+			//console.log("@DATA found !");
 			datatable.loadData(url.substring(6), ready, win); // TBD: change 6 to "@DATA".length+1
 		} else {
 			$.ajax(url,

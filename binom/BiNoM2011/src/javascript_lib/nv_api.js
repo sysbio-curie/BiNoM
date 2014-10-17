@@ -1324,7 +1324,7 @@ function nv_maybe_timeout_status(e) {
 function nv_manage_timeout(e) {
 	if (nv_maybe_timeout_status(e)) {
 		var date = new Date();
-		var timeout_ts = date.getSeconds();
+		var timeout_ts = date.getTime()/1000;
 		if (nv_timeout_ts && timeout_ts - nv_timeout_ts < 5) {
 			return false;
 		}

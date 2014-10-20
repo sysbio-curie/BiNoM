@@ -24,7 +24,7 @@ parser.set_defaults(navicell_varname = 'nv')
 
 parser.add_option("--map-url", help="URL of map [%default]", metavar="URL")
 parser.add_option("--launch-browser", action="store_true", help="launch browser using the URL given by --map-url URL")
-parser.add_option("--proxy_url", help="client/NaviCell communication URL [%default]", metavar="URL")
+parser.add_option("--proxy-url", help="client/NaviCell communication URL [%default]", metavar="URL")
 parser.add_option("--browser-command", help="browser command to be used [%default]", metavar="COMMAND")
 parser.add_option("--attach-session", help="attach the given session", metavar="SESSION_ID")
 parser.add_option("--attach-last-session", action="store_true", help="attach the last session")

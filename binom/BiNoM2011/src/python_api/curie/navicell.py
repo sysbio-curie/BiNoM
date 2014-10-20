@@ -129,14 +129,13 @@ class NaviCell:
         if not self.session_id:
             raise Exception('navicell session is not active')
 
-        packcount = 0
+        packcount = 0 # useful when sending datatable contents
         params['id'] = self.session_id
         params['msg_id'] = msg_id
 
         if 'data' in params:
-            datalen = len(params['data'])
-#            print("datalen", datalen, PACKSIZE)
-            if datalen > PACKSIZE:
+            datalen = len(params['data']) # useful when sending datatable contents
+            if datalen > PACKSIZE: # condition and code useful when sending datatable contents
                 packcount = int(datalen/PACKSIZE)+1
                 params['packcount'] = packcount
                 data = params['data']
@@ -148,8 +147,7 @@ class NaviCell:
 
         conn.request("POST", self.proxy.getURL(), encoded_params, headers)
 
-        if packcount > 0:
-#            print("performing filling", packcount)
+        if packcount > 0: # condition and code useful when sending datatable contents
             fillparams = params
             fillparams['perform'] = 'filling'
             for packnum in reversed(range(packcount)): # testing packing order
@@ -245,9 +243,9 @@ class NaviCell:
     def launchBrowser(self):
         if not self._browser_launcher:
             raise Exception("no launcher configurated")
-        self.session_id = self._gen_session_id()
-        self._browser_launcher.launch(self.session_id)
-        self._waitForReady('')
+        self.session_id = self._gen_session_id() # request nv_proxy.php to get a session ID
+        self._browser_launcher.launch(self.session_id) # launch browser using this session ID
+        self._waitForReady('') # wait until navicell server is ready for further commands
 
     def listSessions(self):
         print(self._send(self._message_id(), {'mode': 'session', 'perform': 'list'}, True), end="")

@@ -1334,7 +1334,11 @@ function nv_manage_timeout(e) {
 }
 
 function nv_manage_command(cmd, base_url, url) {
+	if (SERVER_TRACE) {
+		console.log("NV Server: received length [" + cmd.length + "]");
+	}
 	if (cmd.length == 0) {
+		nv_rcv(base_url, url);
 		return;
 	}
 	if (SERVER_TRACE) {

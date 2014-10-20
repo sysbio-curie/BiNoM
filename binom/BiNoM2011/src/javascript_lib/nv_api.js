@@ -45,11 +45,6 @@ function add_to_datatable_desc_list(dt_desc_list, data) {
 }
 
 function get_datatable_desc_list(type, name, file_elem, url, dt_desc_list, async) {
-	/*
-	for (var key in file_elem) {
-		console.log("file_elem [" + key + "] [" + file_elem[key] + "]");
-	}
-	*/
 	var ready = $.Deferred();
 	if (type == DATATABLE_LIST) {
 		if (url) {
@@ -200,22 +195,25 @@ function nv_scroll(win, xoffset, yoffset)
 
 	if (xoffset == "CENTER") {
 		scrolled_center = win.map_ori_center;
-	} else if (xoffset == "W_CENTER") {
+	} else if (xoffset == "W_CENTER" || xoffset == "WEST_CENTER") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getNorthEast().lng());
-	} else if (xoffset == "E_CENTER") {
+	} else if (xoffset == "E_CENTER" || xoffset == "EAST_CENTER") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getSouthWest().lng());
-	} else if (xoffset == "S_CENTER") {
+	} else if (xoffset == "S_CENTER" || xoffset == "SOUTH_CENTER") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getNorthEast().lat(), win.map_ori_center.lng());
-	} else if (xoffset == "N_CENTER") {
+	} else if (xoffset == "N_CENTER" || xoffset == "NORTH_CENTER") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getSouthWest().lat(), win.map_ori_center.lng());
-	} else if (xoffset == "SW_CENTER") {
+	} else if (xoffset == "SW_CENTER" || xoffset == "SOUTH_WEST_CENTER") {
 		scrolled_center = win.map_ori_bounds.getNorthEast();
-	} else if (xoffset == "NE_CENTER") {
+	} else if (xoffset == "NE_CENTER" || xoffset == "NORTH_EAST_CENTER") {
 		scrolled_center = win.map_ori_bounds.getSouthWest();
 	} else if (typeof xoffset == "number" && typeof yoffset == "number") {
 		scrolled_center = new google.maps.LatLng(center.lat()+yoffset, center.lng()+xoffset, true);
 	} else {
-		scrolled_center = null;
+		if (yoffset) {
+			throw "nv_scroll: unknown directive \"" + xoffset + "," + yoffset + "\"";
+		}
+		throw "nv_scroll: unknown directive \"" + xoffset + "\"";
 	}
 
 	if (scrolled_center != null) {
@@ -1318,7 +1316,8 @@ function nv_init_session(win, url) {
 }
 
 function nv_maybe_timeout_status(e) {
-	return e.status == 500;
+	//return e.status == 500;
+	return true; // in any case, we try to 
 }
 
 function nv_manage_timeout(e) {
@@ -1355,7 +1354,8 @@ function nv_manage_command(cmd, base_url, url) {
 				       },
 				       
 				       error: function() {
-					       console.log("NV Server: got exception #1 [" + e + "]");
+					       var date = new Date();
+					       console.log("NV Server: got exception #1 [" + e + "] " + date.toDateString() + " " + date.toLocaleTimeString());
 					       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
 				       }
 			       }
@@ -1367,7 +1367,8 @@ function nv_manage_command(cmd, base_url, url) {
 		nv_cumul_error_cnt = 0;
 	} catch(e) {
 		nv_cumul_error_cnt++;
-		console.log("NV Server: got exception #2 [" + e + "]");
+		var date = new Date();
+		console.log("NV Server: got exception #2 [" + e + "] " + date.toDateString() + " " + date.toLocaleTimeString());
 		console.log("DATA [" + cmd.length + "]");
 		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
 	}
@@ -1380,7 +1381,8 @@ function nv_manage_command(cmd, base_url, url) {
 
 function nv_manage_error(e, base_url, url) {
 	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
-	console.log("NV Server: got exception #3 [" + e + "]");
+	var date = new Date();
+	console.log("NV Server: got exception #3 [" + e.status + "] " + date.toDateString() + " " + date.toLocaleTimeString());
 	if (!nv_maybe_timeout_status(e)) {
 		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
 		return;
@@ -1418,13 +1420,17 @@ function nv_rcv(base_url, url) {
 function nv_server(win, id) {
 	var href = window.location.href;
 	var idx = href.indexOf('/navicell/');
-	if (id) {
-		var base_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?id=" + id;
-		var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
-		nv_rcv(base_url, url);
-	} else {
-		var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=genid";
-		nv_init_session(win, url);
+	try {
+		if (id) {
+			var base_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?id=" + id;
+			var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
+			nv_rcv(base_url, url);
+		} else {
+			var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=genid";
+			nv_init_session(win, url);
+		}
+	} catch(e) {
+		console.log("NV Server: got exception #4 [" + e.status + "] " + date.toDateString() + " " + date.toLocaleTimeString());
 	}
 }
 

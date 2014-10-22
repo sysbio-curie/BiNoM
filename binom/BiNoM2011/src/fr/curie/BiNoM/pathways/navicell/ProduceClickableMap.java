@@ -5498,11 +5498,11 @@ public class ProduceClickableMap
 				out.println("    if (!command) {");
 				out.println("      command = '<?php echo $_GET[\"command\"]; ?>';");
 				out.println("    }");
+				out.println("    console.log(\"COMMAND [\" + command + \"]\");");
 				out.println("    if (command) {");
 				out.println("      nv_decode(command);");
 				out.println("    }");
-				out.println("    var mode = '<?php echo $_GET[\"mode\"]; ?>';");
-				out.println("    if (navicell.id || mode == \"server\") {");
+				out.println("    if (navicell.id) {");
 				out.println("      nv_server(window, navicell.id);");
 				out.println("    }");
 			}
@@ -5832,11 +5832,23 @@ public class ProduceClickableMap
 		System.out.println("model4: " + (model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray() == null ? "null" : "ok"));
 		for (CelldesignerSpeciesDocument.CelldesignerSpecies cs : model.getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
 			ComplexSpecies complexSpecies = getComplexSpecies(Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerComplexSpecies()));
+			if(complexSpecies==null){
+				Utils.eclipseErrorln("ERROR: for included species: "+cs.getId()+" no complex species is defined.");
+			}else{
+				
+				String notes = "";
+				if(cs.getCelldesignerNotes()==null){
+					Utils.eclipseErrorln("WARNING: notes=null for "+cs.getId());
+				}else{
+					notes = Utils.getValue(cs.getCelldesignerNotes()).trim();
+				}
+				
 			complexSpecies.addIncludedSpecies(new IncludedSpecies
 							  (cs.getId(), 
 							   Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass()),
 							   getRef(cs.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity()),
-							   Utils.getValue(cs.getCelldesignerNotes()).trim()));
+							   notes));
+			}
 			/*
 			ids.add(cs.getId());
 			out.println("species: " + cs.getId() + " complex id: " + Utils.getValue(cs.getCelldesignerAnnotation().getCelldesignerComplexSpecies()));

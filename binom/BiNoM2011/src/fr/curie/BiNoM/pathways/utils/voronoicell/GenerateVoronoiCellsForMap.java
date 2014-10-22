@@ -95,17 +95,18 @@ public class GenerateVoronoiCellsForMap {
 	public static void main(String[] args) {
 		try{
 			
-			/*Vector<String> vs = Utils.guessProteinIdentifiers("TP53");
-			for(String s: vs) System.out.println(s);
-			System.exit(0);*/
 			
-			String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master_17032014.xml";
-			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master_17032014.xml";
+			String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/test.xml";
 			//fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo scales = new fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo(height, height, height, height, height, height, height, height, writeFiles);
 			//getVoronoiCellsForCellDesignerMap();
 			//System.out.println(getVoronoiCellsForCellDesignerMap("C:/Datas/BiNoMTest/VoronoiCell/M-Phase2.xml"));
+			
+			getVoronoiCellsForCellDesignerMap(fn, null);
+			System.exit(0);
+			
 			GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();
 			//gvc.loadMap("C:/Datas/BiNoMTest/VoronoiCell/M-Phase2.xml");
 			//gvc.loadMap("C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml");
@@ -341,7 +342,7 @@ public class GenerateVoronoiCellsForMap {
 			//System.out.println(c.coord(0)+"\t"+c.coord(1));
 			Pnt polygon[] = polygons.get(i);
 			if (polygon == null) {
-				System.err.println("warning: voronoi polygon is null at " + i);
+				System.err.println("warning: voronoi polygon is null at " + i+", alias = "+aliases.get(i));
 				continue;
 			}
 				Pnt polygon_rescaled[] = rescaledPolygon(polygon, c);

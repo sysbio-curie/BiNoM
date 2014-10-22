@@ -303,11 +303,13 @@ public class XGMML {
       }
     }
     for(int i=0;i<gr.Edges.size();i++){
-      Edge n = (Edge)gr.Edges.get(i);
-      GraphicEdge gn = xgr.getGraph().addNewEdge();
-      gn.setId(n.Id); gn.setName(n.Id); gn.setLabel(n.EdgeLabel);
-      gn.setSource(n.Node1.Id);
-      gn.setTarget(n.Node2.Id);
+    	Edge n = null;
+      try{
+          n = (Edge)gr.Edges.get(i);
+          GraphicEdge gn = xgr.getGraph().addNewEdge();
+          gn.setId(n.Id); gn.setName(n.Id); gn.setLabel(n.EdgeLabel);
+          gn.setSource(n.Node1.Id);
+          gn.setTarget(n.Node2.Id);
       for(int j=0;j<n.Attributes.size();j++){
         //AttDocument.Att at = gn.addNewAtt();
         Attribute ga = (Attribute)n.Attributes.get(j);
@@ -319,7 +321,15 @@ public class XGMML {
         }
       }
   	  //Utils.setAttribute(gn,"interaction","interaction",n.EdgeLabel,ObjectType.STRING);
-      
+      }catch(Exception e){
+    	  String source = null;
+    	  String target = null;
+    	  if(n.Node1!=null)
+    		  source = n.Node1.Id;
+    	  if(n.Node2!=null)
+    		  target = n.Node2.Id;
+    	  System.out.println("ERROR: Bad edge "+n.Id+" source="+source+" target="+target);
+      }
     }
     return xgr;
   }

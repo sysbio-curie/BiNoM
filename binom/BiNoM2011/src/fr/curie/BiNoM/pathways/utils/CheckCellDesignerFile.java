@@ -28,8 +28,8 @@ public class CheckCellDesignerFile {
 		CheckCellDesignerFile cf = new CheckCellDesignerFile();
 		//String nameCD = "C:/Datas/binomtest/problems";
 		//String nameCD = "C:/Datas/NaviCell2.2/dnarepair_src_2014/dnarepair_FANCONI";
-		//String nameCD = "C:/Datas/NaviCell2.2/test/test";
-		String nameCD = "C:/Datas/acsn/assembly/survival_src/survival_HEDGEHOG"; 
+		String nameCD = "C:/Datas/NaviCell2.2/iron_metabolism_src/master";
+		//String nameCD = "C:/Datas/acsn/assembly/survival_src/survival_HEDGEHOG"; 
 		cf.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		cf.checkIfReactionConnectedToIncludedSpecies();
 		cf.checkIfSpeciesIsWithoutAlias();

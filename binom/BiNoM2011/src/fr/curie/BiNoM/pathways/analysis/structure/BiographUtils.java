@@ -1246,10 +1246,10 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 				  if(!names.contains(products.get(s)))
 					  names.add(products.get(s));
 
-			  System.out.print("Regulators for "+reactionNetwork.Nodes.get(i).Id+" :");
-			  for(int k=0;k<namesReg.size();k++) System.out.print(namesReg.get(k)+"\t"); System.out.println();
-			  System.out.print("Regulated entities for "+reactionNetwork.Nodes.get(i).Id+" :");
-			  for(int k=0;k<names.size();k++) System.out.print(names.get(k)+"\t"); System.out.println();
+			  //System.out.print("Regulators for "+reactionNetwork.Nodes.get(i).Id+" :");
+			  //for(int k=0;k<namesReg.size();k++) System.out.print(namesReg.get(k)+"\t"); System.out.println();
+			  //System.out.print("Regulated entities for "+reactionNetwork.Nodes.get(i).Id+" :");
+			  //for(int k=0;k<names.size();k++) System.out.print(names.get(k)+"\t"); System.out.println();
 
 			  
 			  for(int k=0;k<names.size();k++)for(int l=0;l<namesReg.size();l++){

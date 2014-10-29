@@ -46,7 +46,6 @@ import org.sbml.x2001.ns.celldesigner.HtmlDocument;
 import org.sbml.x2001.ns.celldesigner.NotesDocument;
 
 import vdaoengine.data.VDataTable;
-import vdaoengine.data.io.VDatReadWrite;
 import vdaoengine.utils.Algorithms;
 import vdaoengine.utils.VSimpleFunctions;
 import edu.rpi.cs.xgmml.*;
@@ -57,10 +56,6 @@ import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.biopax.*;
 
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.util.*;
-import com.hp.hpl.jena.shared.*;
-import com.sun.image.codec.jpeg.*;
 
 import java.net.*;
 

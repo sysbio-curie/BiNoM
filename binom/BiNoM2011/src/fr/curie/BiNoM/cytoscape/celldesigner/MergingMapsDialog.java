@@ -31,11 +31,9 @@ import javax.swing.table.DefaultTableModel;
 public class MergingMapsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	private static Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 	private JFileChooser fc;
-	private JTextField field1;
-	private JTextField field2;
 	private JCheckBox mergeImages;
+	private JCheckBox mergeSpecies;
 	private JTextField imageZoomLevel;
 	private JLabel lab1;
 	private JButton b1;
@@ -182,6 +180,15 @@ public class MergingMapsDialog extends JDialog {
 		c.insets = new Insets(10,10,10,10);
 		p.add(imageZoomLevel,c);
 		
+		mergeSpecies = new JCheckBox("Merge species");
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 7;
+		c.anchor = GridBagConstraints.WEST;
+		c.insets = new Insets(10,10,10,10);
+		mergeSpecies.setSelected(true);
+		p.add(mergeSpecies,c);
+		
 		final MergingMapsTask.MergingMapsOptions options = new MergingMapsTask(null,null,null).new MergingMapsOptions();
 		
 		mergeImages.setSelected(options.mergeImages);
@@ -197,6 +204,7 @@ public class MergingMapsDialog extends JDialog {
 	            setVisible(false);			
 	            options.mergeImages = mergeImages.isSelected();
 	            options.zoomLevel = Integer.parseInt(imageZoomLevel.getText());
+	            options.mergeSpecies = mergeSpecies.isSelected();
 	            MergingMapsTask task = new MergingMapsTask(field1.getText(), field2.getText(), options);
 	  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
 

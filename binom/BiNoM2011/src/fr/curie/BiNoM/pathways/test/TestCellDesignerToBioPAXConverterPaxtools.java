@@ -1,6 +1,7 @@
 package fr.curie.BiNoM.pathways.test;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.sbml.x2001.ns.celldesigner.AnnotationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfModificationsDocument;
@@ -19,19 +20,43 @@ public class TestCellDesignerToBioPAXConverterPaxtools {
 
 	public static void main(String[] args) {
 
-		File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
+		//File cellDesignerFile = new File("/Users/eric/wk/agilent_pathways/cc_maps/cellcycle_master.xml");
 		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/survival_master.xml");
 		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/acsn_master.xml");
 		//File cellDesignerFile = new File("/Users/eric/wk/acsn_maps/emtcellmotility_ECM.xml");
-		CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());
+		//CellDesignerToCytoscapeConverter.Graph graph = CellDesignerToCytoscapeConverter.convert(cellDesignerFile.getAbsolutePath());
 
-		//printSpeciesList(graph.sbml.getSbml());
+		
+//		CellDesignerToBioPAXConverterPaxtools c2b = new CellDesignerToBioPAXConverterPaxtools();
+//		c2b.setCellDesigner(graph.sbml);
+//		c2b.convert();
+//		c2b.saveBioPAXModel("/Users/eric/test.owl");
 		
 		
-		CellDesignerToBioPAXConverterPaxtools c2b = new CellDesignerToBioPAXConverterPaxtools();
-		c2b.setCellDesigner(graph.sbml);
-		c2b.convert();
-		c2b.saveBioPAXModel("/Users/eric/test.owl");
+		/*
+		 * Convert a bunch of files
+		 */
+		
+		
+		ArrayList<String> l = new ArrayList<String>();
+		l.add("/Users/eric/wk/acsn_maps/acsn_master.xml");
+		l.add("/Users/eric/wk/acsn_maps/apoptosis_master.xml");
+		l.add("/Users/eric/wk/acsn_maps/cellcycle_master.xml");
+		l.add("/Users/eric/wk/acsn_maps/dnarepair_master.xml");
+		l.add("/Users/eric/wk/acsn_maps/emtcellmotility_master.xml");
+		l.add("/Users/eric/wk/acsn_maps/survival_master.xml");
+		
+		for (String fn : l) {
+			String output_fn = fn;
+			output_fn = output_fn.replace("master.xml", "v1.0.owl");
+			//System.out.println(fn+"\n"+output_fn);
+			CellDesignerToCytoscapeConverter.Graph graph = 
+					CellDesignerToCytoscapeConverter.convert(fn);
+			CellDesignerToBioPAXConverterPaxtools c2b = new CellDesignerToBioPAXConverterPaxtools();
+			c2b.setCellDesigner(graph.sbml);
+			c2b.convert();
+			c2b.saveBioPAXModel(output_fn);
+		}
 	}
 
 	

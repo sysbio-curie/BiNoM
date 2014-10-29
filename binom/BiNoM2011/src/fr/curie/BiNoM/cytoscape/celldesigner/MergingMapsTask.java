@@ -18,6 +18,7 @@ public class MergingMapsTask implements Task {
 	
 	public class MergingMapsOptions{
 		public boolean mergeImages = false;
+		public boolean mergeSpecies = true;
 		public int zoomLevel = 3;
 		public int numberOfTimesToScale = 0;
 	}
@@ -37,6 +38,7 @@ public class MergingMapsTask implements Task {
 		try {
 			MergingMapsProcessor mm = new MergingMapsProcessor();
 			mm.loadConfigFile(configFileName);
+			mm.doMergeSpecies = options.mergeSpecies;
 			mm.mergeAll(outputFileName);
 			
 			if(options.mergeImages){

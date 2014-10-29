@@ -27,21 +27,17 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGateMemberDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerCompartmentAliasDocument.CelldesignerLayerCompartmentAlias;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerLayerDocument.CelldesignerLayer;
 import org.sbml.x2001.ns.celldesigner.CelldesignerLayerFreeLineDocument.CelldesignerLayerFreeLine;
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfFreeLinesDocument.CelldesignerListOfFreeLines;
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfSquaresDocument.CelldesignerListOfSquares;
-import org.sbml.x2001.ns.celldesigner.CelldesignerListOfTextsDocument.CelldesignerListOfTexts;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationResidueDocument.CelldesignerModificationResidue;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
-import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
@@ -127,12 +123,16 @@ public class MergingMapsProcessor {
 	 * List of species ID2
 	 */
 	private ArrayList<String> speciesIdList;
+	private ArrayList<String> includedSpeciesIdList;
 
 	/**
 	 * map species 2 ID --> sp1 ID
 	 */
 	private HashMap<String,String> speciesMap = new HashMap<String, String>();
+	private HashMap<String, String> includedSpeciesMap = new HashMap<String, String>();
 
+	public boolean doMergeSpecies = false;
+	
 	/**
 	 * Simple class to store file name and coordinates for the maps to be merged.
 	 */
@@ -172,7 +172,7 @@ public class MergingMapsProcessor {
 	/** 
 	 * Print extended informations while merging elements
 	 */
-	public boolean verbose = true;
+	public boolean verbose = false;
 	public int prefixLength = 4;
 	
 	/**
@@ -184,15 +184,6 @@ public class MergingMapsProcessor {
 	
 	public static void main(String args[]){
 
-		/*Vector<String> ids = new Vector<String>();
-		ids.add("re1");
-		ids.add("re12");
-		ids.add("re2");
-		ids.add("sa123");
-		String text = "some words and \"re1\" \"sa123\" and after >re1< and\nsuddenly \"re2,\n\"re12\" after.everything.goes.until.point.";
-		System.out.println(replaceCellDesignerPrefixList(text, ids, "test_"));
-		System.exit(0);*/
-		
 		String configFile = "";
 		String outputFileName = "";
 		
@@ -264,7 +255,7 @@ public class MergingMapsProcessor {
 	 * @param deltaX upper-left X coordinate of the map on the merged map.
 	 * @param deltaY upper-left Y coordinate of the map on the merged map.
 	 */
-	public void addMap(String fileName, int coordX, int coordY) {
+	private void addMap(String fileName, int coordX, int coordY) {
 		mapList.add(new MapData(fileName,coordX,coordY));
 	}
 	
@@ -274,7 +265,7 @@ public class MergingMapsProcessor {
 	 * @param X
 	 * @param Y
 	 */
-	public void setMapSize(int X, int Y) {
+	private void setMapSize(int X, int Y) {
 		sizeX = Integer.toString(X);
 		sizeY = Integer.toString(Y);
 	}
@@ -292,7 +283,6 @@ public class MergingMapsProcessor {
 		System.out.println("=======   Merge maps    ======");		
 		System.out.println("==============================");		
 		
-		
 		int nbFiles = mapList.size();
 		
 		// load file 1 and add prefix
@@ -305,7 +295,6 @@ public class MergingMapsProcessor {
 		cdFileString = text;
 		setIdsAndSave(mapList.get(0).fileName);
 		this.cd1 = CellDesigner.loadCellDesignerFromText(text);
-		//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(sizeX);
 		this.cd1.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(sizeY);
 		shiftCoordinates(cd1,mapList.get(0).deltaX, mapList.get(0).deltaY);
@@ -314,17 +303,10 @@ public class MergingMapsProcessor {
 		time = new Date();
 		System.out.println("merging file "+mapList.get(1).fileName+"...");
 		shiftCoordinates(cd2, mapList.get(1).deltaX, mapList.get(1).deltaY);
-		//System.out.println(" shift "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		produceCandidateMergeLists();
-		//System.out.println(" candidate "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		setIdsAndSave(mapList.get(1).fileName);
-		//System.out.println(" setids "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		mergeDiagrams();
-		//System.out.println(" merge diagrams "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 		mergeElements();
-		//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
-		Utils.printUsedMemory();
-		
 
 		for (int i=2;i<nbFiles;i++) {
 			// set new file 2 name
@@ -338,16 +320,12 @@ public class MergingMapsProcessor {
 			// merge maps
 			mergeDiagrams();
 			mergeElements();
-			//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
-			Utils.printUsedMemory();
 		}
 		
 		formatLayers();
 		time = new Date();
 		System.out.println("saving merged file "+outputFileName+"...");
 		CellDesigner.saveCellDesigner(cd1, outputFileName);
-		System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
-		
 		updateMapAll();
 	}
 	
@@ -365,7 +343,6 @@ public class MergingMapsProcessor {
 		text = addPrefixToIds(text);
 		this.cdFileString = text;
 		this.cd2 = CellDesigner.loadCellDesignerFromText(text);
-		//System.out.println(" took "+(int)(((new Date()).getTime()-time.getTime())*0.001f)+" sec");
 	}
 	
 	/**
@@ -512,24 +489,20 @@ public class MergingMapsProcessor {
 	 * @return string the whole modified map as a string
 	 */
 	private String addPrefixToIds(String text){
-		//System.out.println("---- add prefix to IDs");
 		
 		/*
 		 * find out model ID, we don't want to add a prefix to this ID.
 		 */
-		//Pattern pat = Pattern.compile("model\\s+\\S+\\s+id=\"(\\S+)\"");
 		Pattern pat = Pattern.compile("model\\s+metaid=\"(\\S+)\"\\s+id=\"(\\S+)\"");
 		Matcher mat = pat.matcher(text);
 		String id1 = "";
 		String id2 = "";
 		if(mat.find()) {
-			//System.out.println(">>>pat: "+mat.group(0)+" "+mat.group(1));
 			id1 = mat.group(1);
 			id2 = mat.group(2);
 		}
 		
 		Vector<String> ids = Utils.extractAllStringBetween(text, "id=\"", "\"");
-		//System.out.println("ids = "+ids.size());
 		Vector<String> newids = new Vector<String>();
 		for(int i=0;i<ids.size();i++) {
 			if(!ids.get(i).equals(id1) && !ids.get(i).equals(id2) && ids.get(i).equals("default") == false && isNumeric(ids.get(i)) == false) {
@@ -583,10 +556,10 @@ public class MergingMapsProcessor {
 		return text;
 	}
 	
-	public static String replaceCellDesignerPrefixList(String text, Vector<String> ids, String prefix){
+	private static String replaceCellDesignerPrefixList(String text, Vector<String> ids, String prefix){
 		char ctext[] = text.toCharArray();
 		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
-		// some hashing of ids by first two letters
+		// some hashing of IDs by first two letters
 		HashMap<String, Vector<char[]>> hash = new HashMap<String, Vector<char[]>>();
 		int maxidlength = 0;
 		for(String s: ids){
@@ -671,9 +644,7 @@ public class MergingMapsProcessor {
 		return res;
 	}
 	
-	
-	
-	public static String replaceCellDesignerPrefix(String text, String id, String prefix){
+	private static String replaceCellDesignerPrefix(String text, String id, String prefix){
 		//text = text.replaceAll("\""+ids.get(i)+"\"", "\""+prefix+""+ids.get(i)+"\"");
 		//text = text.replaceAll(">"+ids.get(i)+"<", ">"+prefix+""+ids.get(i)+"<");
 		//text = text.replaceAll("\""+ids.get(i)+",", "\""+prefix+ids.get(i)+",");
@@ -732,7 +703,7 @@ public class MergingMapsProcessor {
 		return res;
 	}
 	
-	public static String replaceCellDesignerByList(String text, HashMap<String, String> map){
+	private static String replaceCellDesignerByList(String text, HashMap<String, String> map){
 		char ctext[] = text.toCharArray();
 		char ctextnew[] = new char[ctext.length+(int)(ctext.length*2)];
 		// some hashing of ids by first two letters
@@ -896,7 +867,6 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			proteinNames.put(Utils.getValue(p.getName()), p.getId());
-			//System.out.println("Names: "+Utils.getValue(p.getName())+"\t"+p.getId());
 		}
 		this.proteinMap = new HashMap<String, String>();
 		this.proteinIdList = new ArrayList<String>();
@@ -904,8 +874,6 @@ public class MergingMapsProcessor {
 			CelldesignerProteinDocument.CelldesignerProtein p = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
 			String name = Utils.getValue(p.getName());
 			if(proteinNames.containsKey(name)){
-				//proteinMap.add(proteinNames.get(name)+"\t"+name+"\t"+p.getId()+"\t"+name);
-				//System.out.println(name+"id2: "+p.getId());
 				this.proteinMap.put(p.getId(), proteinNames.get(name));
 				this.proteinIdList.add(p.getId());
 			}
@@ -922,7 +890,6 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++){
 		  CelldesignerGeneDocument.CelldesignerGene g = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
 		  if (geneNames.containsKey(g.getName())) {
-			  //System.out.println(">>>duplicated gene name: "+g.getName() + " id: " + g.getId());
 			  this.geneMap.put(g.getId(), geneNames.get(g.getName()));
 			  this.geneIdList.add(g.getId());
 		  }
@@ -939,7 +906,6 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().sizeOfCelldesignerRNAArray();i++){
 			CelldesignerRNADocument.CelldesignerRNA rna = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
 			if (rnaNames.containsKey(rna.getName())) {
-				//System.out.println(">>>duplicated RNA gene name: "+rna.getName() + " id: " + rna.getId());
 				this.rnaMap.put(rna.getId(), rnaNames.get(rna.getName()));
 				this.rnaIdList.add(rna.getId());
 			}
@@ -950,52 +916,71 @@ public class MergingMapsProcessor {
 		for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asRna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			asRnaNames.put(asRna.getName(), asRna.getId());
-			//System.out.println("asRNA file 1: "+asRna.getName() + " id: "+ asRna.getId());
 		}
 		this.asRnaMap = new HashMap<String, String>();
 		this.asRnaIdList = new ArrayList<String>();
 		for(int i=0;i<cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++){
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asRna = cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			if (asRnaNames.containsKey(asRna.getName())) {
-				//System.out.println(">>>duplicated asRNA name: "+asRna.getName() + " id: " + asRna.getId());
 				this.asRnaMap.put(asRna.getId(), asRnaNames.get(asRna.getName()));
 				this.asRnaIdList.add(asRna.getId());
 			}
 		}
 
-		// Merge species
-		
 		/*
+		 * Merge species
+		 * 
 		 * Species name build with CellDesignerToCytoscape object to get complete and meaningful names
+		 * Matching is done on this name
 		 * 
 		 */
 		boolean temp = CellDesignerToCytoscapeConverter.alwaysMentionCompartment;
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = true;
 		
+		// build map of CD1 species meaningful names
 		HashMap<String, String> speciesNames = new HashMap<String, String>();
+		HashMap<String, String> includedSpeciesNames = new HashMap<String, String>();
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd1.getSbml());
+		
 		for (SpeciesDocument.Species sp : cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1, sp.getId(), true, true);
 			speciesNames.put(name, sp.getId());
-			//System.out.println(">>> id="+sp.getId()+"\nc2 name="+name+"\ncd name="+Utils.getValue(sp.getName()));
 		}
+		
+		// add included species
+		for (int i=0; i<cd1.getSbml().getModel().getAnnotation()
+				.getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray(); i++) {
+			CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1, sp.getId(), true, true);
+			includedSpeciesNames.put(name,  sp.getId());
+		}
+		
 		speciesMap = new HashMap<String, String>();
+		includedSpeciesMap = new HashMap<String, String>();
 		speciesIdList = new ArrayList<String>();
+		includedSpeciesIdList = new ArrayList<String>();
+		
 		// From species IDs to all corresponding aliases
 		CellDesigner.entities = CellDesigner.getEntities(cd2);
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd2.getSbml());
 		for (SpeciesDocument.Species sp : cd2.getSbml().getModel().getListOfSpecies().getSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
 			if (speciesNames.containsKey(name)) {
-				//System.out.println("common species: "+name+" id1: "+speciesNames.get(name)+" id2: "+sp.getId());
-				this.speciesMap.put(sp.getId(), speciesNames.get(name));
-				this.speciesIdList.add(sp.getId());
-				//System.out.println(">>>"+sp.getId());
+				speciesMap.put(sp.getId(), speciesNames.get(name));
+				speciesIdList.add(sp.getId());
 			}
 		}
+		
+		for (CelldesignerSpeciesDocument.CelldesignerSpecies sp : cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
+			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
+			if (includedSpeciesNames.containsKey(name)) {
+				includedSpeciesMap.put(sp.getId(), includedSpeciesNames.get(name));
+				includedSpeciesIdList.add(sp.getId());
+			}
+		}
+		
 		CellDesignerToCytoscapeConverter.alwaysMentionCompartment = temp;
-
 	}
 
 
@@ -1010,116 +995,10 @@ public class MergingMapsProcessor {
 		XmlString xs = XmlString.Factory.newInstance();
 		
 		/*
-		 * Deal with species
-		 */
-		
-		boolean doMergeSpecies = true;
-		if (doMergeSpecies){
-			
-			System.out.println("merging species...");
-			
-			/*
-			 * Change redundant species in species aliases
-			 */
-			for (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias al : cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()) {
-				//String al_id = al.getId();
-				String al_species_id = al.getSpecies();
-				//System.out.println("alias id="+al_id+" species id="+al_species_id);
-				String species_id1 = speciesMap.get(al_species_id); 
-				if (species_id1 != null) {
-					al.setSpecies(species_id1);
-				}
-			}
-			
-			/*
-			 * Loop over reactions, change redundant species in reactants, base reactants, products, base products
-			 * modifiers, base products. 
-			 */
-			if(cd1.getSbml().getModel().getListOfReactions()!=null)
-			for (ReactionDocument.Reaction re : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
-
-				for(int j=0;j<re.getListOfReactants().sizeOfSpeciesReferenceArray();j++){
-					String species_id = re.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
-					String new_id = speciesMap.get(species_id);
-					if (new_id != null)
-						re.getListOfReactants().getSpeciesReferenceArray(j).setSpecies(new_id);
-				}
-
-				for(int j=0;j<re.getAnnotation().getCelldesignerBaseReactants().sizeOfCelldesignerBaseReactantArray();j++){
-					CelldesignerBaseReactantDocument.CelldesignerBaseReactant cr = re.getAnnotation().getCelldesignerBaseReactants().getCelldesignerBaseReactantArray(j);
-					String species_id = Utils.getValue(cr.getSpecies());
-					String new_id = speciesMap.get(species_id);
-					if(new_id != null) {
-						xs.setStringValue(new_id);
-						cr.setSpecies(xs);
-					}
-				}
-
-				for(int j=0;j<re.getListOfProducts().sizeOfSpeciesReferenceArray();j++){
-					String species_id = re.getListOfProducts().getSpeciesReferenceArray(j).getSpecies();
-					String new_id = speciesMap.get(species_id);
-					if(new_id != null)
-						re.getListOfProducts().getSpeciesReferenceArray(j).setSpecies(new_id);
-				}
-
-				for(int j=0;j<re.getAnnotation().getCelldesignerBaseProducts().sizeOfCelldesignerBaseProductArray();j++){
-					CelldesignerBaseProductDocument.CelldesignerBaseProduct cr = re.getAnnotation().getCelldesignerBaseProducts().getCelldesignerBaseProductArray(j);
-					String species_id = Utils.getValue(cr.getSpecies());
-					String new_id = speciesMap.get(species_id);
-					if(new_id!=null){
-						xs.setStringValue(new_id);
-						cr.setSpecies(xs);
-					}
-				}
-
-
-				if(re.getListOfModifiers()!=null) {
-					for(int j=0;j<re.getListOfModifiers().sizeOfModifierSpeciesReferenceArray();j++){
-						String species_id = re.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
-						String new_id = speciesMap.get(species_id);
-						if(new_id != null)
-							re.getListOfModifiers().getModifierSpeciesReferenceArray(j).setSpecies(new_id);
-					}
-				}
-
-				if(re.getAnnotation().getCelldesignerListOfModification()!=null) {
-					for(int j=0;j<re.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
-						CelldesignerModificationDocument.CelldesignerModification cr = re.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
-						String species_id = cr.getModifiers();
-						String new_id = speciesMap.get(species_id);
-						if(new_id != null){
-							cr.setModifiers(new_id);
-							if (cr.getCelldesignerLinkTarget() != null)
-								cr.getCelldesignerLinkTarget().setSpecies(new_id);
-						}
-					}
-				}
-
-			}
-
-			/*
-			 *  remove redundant species from map 2
-			 */
-			int idx=0; 
-			int numberOfSpecies = cd1.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray(); 
-			while(idx<numberOfSpecies){
-				SpeciesDocument.Species sp = cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray(idx);
-				if(speciesIdList.indexOf(sp.getId())>=0){
-					numberOfSpecies--;
-					cd1.getSbml().getModel().getListOfSpecies().removeSpecies(idx);        
-				}else{
-					idx++;
-				}
-			}
-		}// doMergeSpecies
-		
-		/*
 		 *  Deal with redundant proteins, genes and rnas
 		 */
 		
-		/*
-		 * Process included species (species within complexes)
-		 */
+		// Process included species (species within complexes)
 		CellDesigner.entities = CellDesigner.getEntities(cd1);
 		if(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null) {
 			for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
@@ -1204,8 +1083,7 @@ public class MergingMapsProcessor {
 						xs.setStringValue(getAsRNA(cd1,asRnaMap.get(asrna)).getName()); 
 						csp.setName(xs);
 						if (verbose)
-							System.out.println("Changed asrna reference in "+csp.getId()+" from "+asrna+" ("+getRNA(cd1,asrna).getName()+") to "+asRnaMap.get(asrna)+" ("+getAsRNA(cd1,asRnaMap.get(asrna)).getName()+")");
-						//CellDesigner.entities = CellDesigner.getEntities(cd1);
+							System.out.println("Changed asrna reference in "+csp.getId()+" from "+asrna+" ("+getAsRNA(cd1,asrna).getName()+") to "+asRnaMap.get(asrna)+" ("+getAsRNA(cd1,asRnaMap.get(asrna)).getName()+")");
 						if (verbose) {
 							System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,Utils.getValue(csp.getCelldesignerAnnotation().getCelldesignerComplexSpecies()), true, true));
 							System.out.println();
@@ -1225,12 +1103,10 @@ public class MergingMapsProcessor {
 				String pr = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
 				if(proteinMap.get(pr)!=null){
 					xs.setStringValue(proteinMap.get(pr));
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
 					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference().set(xs);
 					if (verbose)
 						System.out.println("Changed protein reference in "+csp.getId()+" from "+pr+" ("+Utils.getValue(getProtein(cd1,pr).getName())+") to "+proteinMap.get(pr)+" ("+Utils.getValue(getProtein(cd1,proteinMap.get(pr)).getName())+")");
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					if (verbose) {
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
 						System.out.println();
@@ -1241,12 +1117,10 @@ public class MergingMapsProcessor {
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference());
 				if(geneMap.get(str)!=null){
 					xs.setStringValue(geneMap.get(str));
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
 					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerGeneReference().set(xs);
 					if (verbose)
 						System.out.println("Changed gene reference in "+csp.getId()+" from "+str+" ("+getGene(cd1,str).getName()+") to "+geneMap.get(str)+" ("+getGene(cd1,geneMap.get(str)).getName()+")");
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					if (verbose) {
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
 						System.out.println();
@@ -1257,12 +1131,10 @@ public class MergingMapsProcessor {
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference());
 				if(rnaMap.get(str)!=null){
 					xs.setStringValue(rnaMap.get(str));
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
 					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerRnaReference().set(xs);
 					if (verbose)
 						System.out.println("Changed RNA reference in "+csp.getId()+" from "+str+" ("+getRNA(cd1,str).getName()+") to "+rnaMap.get(str)+" ("+getRNA(cd1,rnaMap.get(str)).getName()+")");
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					if (verbose) {
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
 					}
@@ -1272,18 +1144,180 @@ public class MergingMapsProcessor {
 				String str = Utils.getValue(csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference());
 				if(asRnaMap.get(str)!=null){
 					xs.setStringValue(asRnaMap.get(str));
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					String cspname = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true);
 					csp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerAntisensernaReference().set(xs);
 					if (verbose)
 						System.out.println("Changed Antisense RNA reference in "+csp.getId()+" from "+str+" ("+getAsRNA(cd1,str).getName()+") to "+asRnaMap.get(str)+" ("+getAsRNA(cd1,asRnaMap.get(str)).getName()+")");
-					//CellDesigner.entities = CellDesigner.getEntities(cd1);
 					if (verbose)
 						System.out.println("Species "+cspname+" -> "+CellDesignerToCytoscapeConverter.convertSpeciesToName(cd1,csp.getId(), true, true));
 				}
 			}
 		}
 
+		
+		//Deal with species
+		if (doMergeSpecies) {
+			
+			/*
+			 * Change redundant species in species aliases
+			 */
+			for (CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias al : cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray()) {
+				String al_species_id = al.getSpecies();
+				String species_id1 = speciesMap.get(al_species_id); 
+				if (species_id1 != null) {
+					if (verbose)
+						System.out.println("Changed species reference in species alias "+ al.getId() + " from " + al_species_id + " to " + species_id1);
+					al.setSpecies(species_id1);
+				}
+				
+				species_id1 = null;
+				species_id1 = includedSpeciesMap.get(al_species_id);
+				if (species_id1 != null) {
+					if (verbose)
+						System.out.println("Changed species reference in species alias "+ al.getId() + " from " + al_species_id + " to included species " + species_id1);
+					al.setSpecies(species_id1);
+				}
+			}
+			
+			
+			for (CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias al : cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray()) {
+				String al_species_id = al.getSpecies();
+				String species_id1 = speciesMap.get(al_species_id);
+				if (species_id1 != null) {
+					if (verbose)
+						System.out.println("Changed species reference in complex species alias "+ al.getId() + " from " + al_species_id + " to " + species_id1);
+					al.setSpecies(species_id1);
+				}
+				species_id1 = null;
+				species_id1 = includedSpeciesMap.get(al_species_id);
+				if (species_id1 != null) {
+					if (verbose)
+						System.out.println("Changed species reference in complex species alias "+ al.getId() + " from " + al_species_id + " to " + species_id1);
+					al.setSpecies(species_id1);
+				}
+			}
+			
+			// change reference to ComplexSpecies in included species
+			for (int i=0; i<cd1.getSbml().getModel().getAnnotation()
+					.getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray(); i++) {
+				CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+				
+				String complex_species_id = Utils.getText(sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies());
+				
+				if (speciesMap.get(complex_species_id) != null) {
+					String csp = speciesMap.get(complex_species_id);
+					if (verbose)
+						System.out.println("Changed reference to ComplexSpecies in included species "+ sp.getId() + " from " + complex_species_id + " to " + csp);
+					XmlString xstr = XmlString.Factory.newInstance();
+					xstr.set(csp);
+					sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies().set(xstr);
+				}
+			}
+			
+			
+			/*
+			 * Loop over reactions, change reference to redundant species in reactants, base reactants, products, base products
+			 * modifiers, base products. 
+			 */
+			if(cd1.getSbml().getModel().getListOfReactions()!=null)
+			for (ReactionDocument.Reaction re : cd1.getSbml().getModel().getListOfReactions().getReactionArray()) {
+
+				for(int j=0;j<re.getListOfReactants().sizeOfSpeciesReferenceArray();j++){
+					String species_id = re.getListOfReactants().getSpeciesReferenceArray(j).getSpecies();
+					String new_id = speciesMap.get(species_id);
+					if (new_id != null) {
+						if (verbose)
+							System.out.println("Changed species ref in reaction " + re.getId() + " from " + species_id +" to "+ new_id);
+						re.getListOfReactants().getSpeciesReferenceArray(j).setSpecies(new_id);
+					}
+				}
+
+				for(int j=0;j<re.getAnnotation().getCelldesignerBaseReactants().sizeOfCelldesignerBaseReactantArray();j++){
+					CelldesignerBaseReactantDocument.CelldesignerBaseReactant cr = re.getAnnotation().getCelldesignerBaseReactants().getCelldesignerBaseReactantArray(j);
+					String species_id = Utils.getValue(cr.getSpecies());
+					String new_id = speciesMap.get(species_id);
+					if(new_id != null) {
+						xs.setStringValue(new_id);
+						cr.setSpecies(xs);
+					}
+				}
+
+				for(int j=0;j<re.getListOfProducts().sizeOfSpeciesReferenceArray();j++){
+					String species_id = re.getListOfProducts().getSpeciesReferenceArray(j).getSpecies();
+					String new_id = speciesMap.get(species_id);
+					if(new_id != null)
+						re.getListOfProducts().getSpeciesReferenceArray(j).setSpecies(new_id);
+				}
+
+				for(int j=0;j<re.getAnnotation().getCelldesignerBaseProducts().sizeOfCelldesignerBaseProductArray();j++){
+					CelldesignerBaseProductDocument.CelldesignerBaseProduct cr = re.getAnnotation().getCelldesignerBaseProducts().getCelldesignerBaseProductArray(j);
+					String species_id = Utils.getValue(cr.getSpecies());
+					String new_id = speciesMap.get(species_id);
+					if(new_id!=null){
+						xs.setStringValue(new_id);
+						cr.setSpecies(xs);
+					}
+				}
+
+				if(re.getListOfModifiers()!=null) {
+					for(int j=0;j<re.getListOfModifiers().sizeOfModifierSpeciesReferenceArray();j++){
+						String species_id = re.getListOfModifiers().getModifierSpeciesReferenceArray(j).getSpecies();
+						String new_id = speciesMap.get(species_id);
+						if(new_id != null)
+							re.getListOfModifiers().getModifierSpeciesReferenceArray(j).setSpecies(new_id);
+					}
+				}
+
+				if(re.getAnnotation().getCelldesignerListOfModification()!=null) {
+					for(int j=0;j<re.getAnnotation().getCelldesignerListOfModification().sizeOfCelldesignerModificationArray();j++){
+						CelldesignerModificationDocument.CelldesignerModification cr = re.getAnnotation().getCelldesignerListOfModification().getCelldesignerModificationArray(j);
+						String species_id = cr.getModifiers();
+						String new_id = speciesMap.get(species_id);
+						if(new_id != null){
+							cr.setModifiers(new_id);
+							if (cr.getCelldesignerLinkTarget() != null)
+								cr.getCelldesignerLinkTarget().setSpecies(new_id);
+						}
+					}
+				}
+
+			}
+
+			
+			/*
+			 *  remove redundant species from map 2
+			 */
+			int idx=0; 
+			int numberOfSpecies = cd1.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray(); 
+			while(idx<numberOfSpecies){
+				SpeciesDocument.Species sp = cd1.getSbml().getModel().getListOfSpecies().getSpeciesArray(idx);
+				if (speciesIdList.indexOf(sp.getId()) >= 0) {
+					numberOfSpecies--;
+					cd1.getSbml().getModel().getListOfSpecies().removeSpecies(idx);   
+				}
+				else {
+					idx++;
+				}
+			}
+			
+			// included species
+			idx =0;
+			numberOfSpecies = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();
+			while (idx < numberOfSpecies) {
+				CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(idx);
+				if (includedSpeciesIdList.indexOf(sp.getId()) >= 0) {
+					numberOfSpecies--;
+					cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().removeCelldesignerSpecies(idx);
+				}
+				else {
+					idx++;
+				}
+			}
+			
+		} // end doMergeSpecies
+		
+		
+		
 		/*
 		 * Remove redundancy for reference elements
 		 * Process annotations and modifications
@@ -1399,7 +1433,7 @@ public class MergingMapsProcessor {
 		
 		i=0; 
 		int numberOfAsRNAs = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();
-		while(i<numberOfAsRNAs){
+		while (i < numberOfAsRNAs) {
 			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asrna = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
 			if(asRnaIdList.indexOf(asrna.getId())>=0){
 				String asRnaStr = asRnaMap.get(asrna.getId());
@@ -1420,6 +1454,7 @@ public class MergingMapsProcessor {
 			else 
 				i++;
 		}
+		
 	}
 
 	private CelldesignerProteinDocument.CelldesignerProtein getProtein(SbmlDocument cd, String id){
@@ -1763,7 +1798,7 @@ public class MergingMapsProcessor {
 	}
 	
 	
-	public void updateAnnotations(SbmlDocument target, SbmlDocument source){
+	private void updateAnnotations(SbmlDocument target, SbmlDocument source){
 
 		ModifyCellDesignerNotes mns = new ModifyCellDesignerNotes();
 		mns.generateReadableNamesForReactionsAndSpecies = false;
@@ -1918,7 +1953,7 @@ public class MergingMapsProcessor {
 	}
 	
 	
-	public void preProcessMergedMaps(){
+	private void preProcessMergedMaps(){
 		
 		System.out.println("==============================");
 		System.out.println("=======  Preprocessing  ======");		
@@ -1955,7 +1990,7 @@ public class MergingMapsProcessor {
 
 	}
 	
-	public void postProcessMergedMap(String outputFileName) throws Exception{
+	private void postProcessMergedMap(String outputFileName) throws Exception{
 		
 		System.out.println("==============================");
 		System.out.println("=======  Postprocessing  =====");		
@@ -2000,15 +2035,15 @@ public class MergingMapsProcessor {
 	/**
 	 * User specific script for manipulating map
 	 */
-	public void runScript() {
-		//addMap("bioinfo/users/ebonnet/MAPK01.xml",60,0);
-		String text = Utils.loadString("/bioinfo/users/ebonnet/MAPK01.xml");
-		makePrefix(text);
-		text = addPrefixToIds(text);
-		SbmlDocument cd = CellDesigner.loadCellDesignerFromText(text);
-		this.shiftCoordinates(cd, 60, 0);
-		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("4352");
-		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY("2304");
-		CellDesigner.saveCellDesigner(cd, "/bioinfo/users/ebonnet/MAPK01_new.xml");
-	}
+//	public void runScript() {
+//		//addMap("bioinfo/users/ebonnet/MAPK01.xml",60,0);
+//		String text = Utils.loadString("/bioinfo/users/ebonnet/MAPK01.xml");
+//		makePrefix(text);
+//		text = addPrefixToIds(text);
+//		SbmlDocument cd = CellDesigner.loadCellDesignerFromText(text);
+//		this.shiftCoordinates(cd, 60, 0);
+//		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX("4352");
+//		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY("2304");
+//		CellDesigner.saveCellDesigner(cd, "/bioinfo/users/ebonnet/MAPK01_new.xml");
+//	}
 }

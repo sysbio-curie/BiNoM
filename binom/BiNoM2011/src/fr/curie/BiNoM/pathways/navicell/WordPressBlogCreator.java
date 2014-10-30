@@ -136,6 +136,7 @@ public class WordPressBlogCreator extends BlogCreator
 	public WordPressBlogCreator(String wordpress_server, String wordpress_blogname, String wordpress_user, String wordpress_passwd, boolean ssl, boolean wordpress_xmlrpc_patched, ProduceClickableMap.AtlasInfo atlasInfo) throws NaviCellException
 	{
 		url = wordpress_server + "/" + wordpress_blogname;
+		System.out.println("WordPressBlogCreator: " + url + " " + wordpress_user);
 		wp = open_wordpress(url, wordpress_user, wordpress_passwd);
 		this.ssl = ssl;
 		String[] ids = read_categories(wp, entities, modules);

@@ -439,6 +439,18 @@ public class ProduceClickableMap
 			Utils.eclipseErrorln(i + " exceptions");
 	}
 
+	private static String getProperty(Properties properties, String name, String defValue) {
+		String value = properties.getProperty(name, defValue);
+		if (value != null) {
+			return value.trim();
+		}
+		return null;
+	}
+
+	private static String getProperty(Properties properties, String name) {
+		return getProperty(properties, name, null);
+	}
+
 	public static void main(String args[])
 	{
 		
@@ -558,11 +570,11 @@ public class ProduceClickableMap
 			xrefs = null;
 		}
 
-		String info = configuration.getProperty("atlasInfo", null);
+		String info = getProperty(configuration, "atlasInfo", null);
 		AtlasInfo atlasInfo = info != null ? parseAtlasInfo(info) : null;
 		
 		if (project_name == null) {
-			project_name = configuration.getProperty("name", base);
+			project_name = getProperty(configuration, "name", base);
 		}
 		
 		final String wordpress_server;
@@ -584,14 +596,14 @@ public class ProduceClickableMap
 		{
 			
 			final Properties wordpress_cfg = load_config(wordpress_cfg_file);
-			wordpress_server = wordpress_cfg.getProperty("server", "localhost");
-			wordpress_passwd = wordpress_cfg.getProperty("password");
-			wordpress_user = wordpress_cfg.getProperty("user");
-			wordpress_blogname = wordpress_cfg.getProperty("blog", project_name);
-			String patched = wordpress_cfg.getProperty("xmlrpc_patched");
+			wordpress_server = getProperty(wordpress_cfg, "server", "localhost");
+			wordpress_passwd = getProperty(wordpress_cfg, "password");
+			wordpress_user = getProperty(wordpress_cfg, "user");
+			wordpress_blogname = getProperty(wordpress_cfg, "blog", project_name);
+			String patched = getProperty(wordpress_cfg, "xmlrpc_patched");
 			wordpress_xmlrpc_patched = patched == null ? false : Boolean.valueOf(patched);
 			Utils.eclipsePrintln("wordpress.xmlrpc_patched [" + patched + "] " + wordpress_xmlrpc_patched);
-			String ssl = wordpress_cfg.getProperty("ssl");
+			String ssl = getProperty(wordpress_cfg, "ssl");
 			wordpress_ssl = ssl == null ? false : Boolean.valueOf(ssl);
 			Utils.eclipsePrintln("wordpress.ssl [" + ssl + "] " + wordpress_ssl);
 			if (wordpress_passwd == null)
@@ -603,9 +615,9 @@ public class ProduceClickableMap
 		}		
 	
 		if (show_default_compartement_name == null)
-			show_default_compartement_name = "true".equalsIgnoreCase(configuration.getProperty("showDefaultCompartmentName", "false"));
+			show_default_compartement_name = "true".equalsIgnoreCase(getProperty(configuration, "showDefaultCompartmentName", "false"));
 
-		if (base == null && (base = configuration.getProperty("base")) == null)
+		if (base == null && (base = getProperty(configuration, "base")) == null)
 			fatal_error("no base on the command line or in the configuration file");
 		if (source_directory == null)
 			source_directory = config.getParentFile();

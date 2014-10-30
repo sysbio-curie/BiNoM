@@ -23,10 +23,11 @@
 var nv_open_bubble = false;
 var nv_decoding = false;
 var nv_cumul_error_cnt = 0;
-var nv_timeout_ts = 0;
+var nv_last_proxy_error_ts = 0;
+var nv_server_id = 0;
 
 // constants
-var SERVER_TRACE = 0;
+var SERVER_TRACE = 1;
 var NV_MAX_CUMUL_ERROR_CNT = 20;
 var ESCAPE_LINE_BREAK = /\\n/g;
 var ESCAPE_QUOTE = /\\"/g;
@@ -1163,6 +1164,10 @@ function nv_mydata_perform(win, command, arg1, arg2)
 	return null;
 }
 
+// -------------------------------------------------------------------------------------------------------
+// Server part, must be moved to [nv_]server.js
+// -------------------------------------------------------------------------------------------------------
+
 function nv_now()
 {
 	var date = new Date();
@@ -1230,10 +1235,6 @@ function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 	return ret;
 }
 
-//
-// encode/decode
-//
-
 var nv_CMD_MARK = "@COMMAND";
 
 function nv_push_arg(args, arg)
@@ -1279,7 +1280,7 @@ function nv_rsp(url, data, msg_id) {
 		       data: {msg_id: msg_id, data: nv_encode_data(data)},
 		       success: function(ret) {
 			       if (SERVER_TRACE) {
-				       console.log("NV Server: response has been succesfully send [" + ret + "]");
+				       console.log("NV Server: response has been succesfully sent [" + ret + "]");
 			       }
 		       },
 		       
@@ -1315,22 +1316,34 @@ function nv_init_session(win, url) {
 	       });
 }
 
-function nv_maybe_timeout_status(e) {
-	//return e.status == 500;
-	return true; // in any case, we try to 
+function nv_reset_session(win)
+{
+	if (!nv_server_id) {
+		return;
+	}
+	var href = win.location.href;
+	var idx = href.indexOf('/navicell/');
+	var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=reset&id=" + nv_server_id;
+	$.ajax(url,
+	       {
+		       async: false,
+		       cache: false, // don't work without cache off
+		       dataType: 'text',
+		       timeout: -1,
+		       success: function(id) {
+			       nv_server_id = 0;
+		       }
+	       });
 }
 
-function nv_manage_timeout(e) {
-	if (nv_maybe_timeout_status(e)) {
-		var date = new Date();
-		var timeout_ts = date.getTime()/1000;
-		if (nv_timeout_ts && timeout_ts - nv_timeout_ts < 5) {
-			return false;
-		}
-		nv_timeout_ts = timeout_ts;
-		return true;
+function nv_check_proxy_errors(e) {
+	var date = new Date();
+	var last_proxy_error_ts = date.getTime()/1000;
+	if (nv_last_proxy_error_ts && last_proxy_error_ts - nv_last_proxy_error_ts < 5) {
+		return false;
 	}
-	return false;
+	nv_last_proxy_error_ts = last_proxy_error_ts;
+	return true;
 }
 
 function nv_manage_command(cmd, base_url, url) {
@@ -1340,9 +1353,6 @@ function nv_manage_command(cmd, base_url, url) {
 	if (cmd.length == 0) {
 		nv_rcv(base_url, url);
 		return;
-	}
-	if (SERVER_TRACE) {
-		console.log("NV Server: received [" + cmd + "]");
 	}
 	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
 	try {
@@ -1357,27 +1367,24 @@ function nv_manage_command(cmd, base_url, url) {
 					       nv_rcv_perform(rsp_url, cmd);
 				       },
 				       
-				       error: function() {
-					       var date = new Date();
-					       console.log("NV Server: got exception #1 [" + e + "] " + date.toDateString() + " " + date.toLocaleTimeString());
-					       nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
+				       error: function(e) {
+					       nv_manage_error(e, base_url, url);
 				       }
 			       }
 			      );
 		} else {
-			console.log("DATA LEN [" + cmd.length + "]");
 			nv_rcv_perform(rsp_url, cmd);
 		}
 		nv_cumul_error_cnt = 0;
 	} catch(e) {
 		nv_cumul_error_cnt++;
 		var date = new Date();
-		console.log("NV Server: got exception #2 [" + e + "] " + date.toDateString() + " " + date.toLocaleTimeString());
-		console.log("DATA [" + cmd.length + "]");
+		console.log("NV Server: got exception [" + e + "] at " + date.toDateString() + " " + date.toLocaleTimeString() + " while performing command " + cmd);
 		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
 	}
 	if (nv_cumul_error_cnt > NV_MAX_CUMUL_ERROR_CNT) {
 		console.log("NV Server: too many errors: exiting server mode");
+		nv_server_id = 0;
 	} else {
 		nv_rcv(base_url, url);
 	}
@@ -1386,39 +1393,39 @@ function nv_manage_command(cmd, base_url, url) {
 function nv_manage_error(e, base_url, url) {
 	var rsp_url = base_url + "&mode=srv2cli&perform=rsp";
 	var date = new Date();
-	console.log("NV Server: got exception #3 [" + e.status + "] " + date.toDateString() + " " + date.toLocaleTimeString());
-	if (!nv_maybe_timeout_status(e)) {
-		nv_rsp(rsp_url, {status: 1, data: e.toString()}, -1);
-		return;
-	}
+	console.log("NV Server: got proxy exception [" + e.status + "] at " + date.toDateString() + " " + date.toLocaleTimeString());
 
-	if (!nv_manage_timeout(e)) {
-		console.log("NV Server: too many timeout errors: exiting server mode");
+	if (!nv_check_proxy_errors(e)) {
+		console.log("NV Server: too many proxy errors: exiting server mode");
+		nv_server_id = 0;
 	} else {
-		console.log("NV Server: timeout detected: continue server mode");
+		console.log("NV Server: proxy error detected (may be timeout): continue server mode");
 		nv_rcv(base_url, url);
 	}
 }
 
 function nv_rcv(base_url, url) {
-	if (SERVER_TRACE) {
-		console.log("NV Server: nv_rcv(" + url + ")");
-	}
-	$.ajax(url,
-	       {
-		       async: true,
-		       cache: false, // don't work without cache off
-		       dataType: 'text',
-		       timeout: -1,
-		       success: function(cmd) {
-			       nv_manage_command(cmd.trim(), base_url, url);
-		       },
-		       
-		       error: function(e) {
-			       nv_manage_error(e, base_url, url);
+	// as nv_rcv is called recursively, the ajax call is encapsulated in a timeout to avoid stack overflow
+	setTimeout(function() {
+		if (SERVER_TRACE) {
+			console.log("NV Server: nv_rcv(" + url + ")");
+		}
+		$.ajax(url,
+		       {
+			       async: true,
+			       cache: false, // don't work without cache off
+			       dataType: 'text',
+			       timeout: -1,
+			       success: function(cmd) {
+				       nv_manage_command(cmd.trim(), base_url, url);
+			       },
+			       
+			       error: function(e) {
+				       nv_manage_error(e, base_url, url);
+			       }
 		       }
-	       }
-	      );
+		      )},
+		   10);
 }
 
 function nv_server(win, id) {
@@ -1426,6 +1433,7 @@ function nv_server(win, id) {
 	var idx = href.indexOf('/navicell/');
 	try {
 		if (id) {
+			nv_server_id = id;
 			var base_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?id=" + id;
 			var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
 			nv_rcv(base_url, url);
@@ -1434,17 +1442,12 @@ function nv_server(win, id) {
 			nv_init_session(win, url);
 		}
 	} catch(e) {
-		console.log("NV Server: got exception #4 [" + e.status + "] " + date.toDateString() + " " + date.toLocaleTimeString());
+		console.log("NV Server: got exception at upper level [" + e.status + "] at " + date.toDateString() + " " + date.toLocaleTimeString() + ": exiting server mode");
 	}
 }
 
-//
-// to be moved to nv_decode.js ?
-//
-
 var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
-// decode
 function nv_decode(str)
 {
 	var o_decoding = nv_decoding;

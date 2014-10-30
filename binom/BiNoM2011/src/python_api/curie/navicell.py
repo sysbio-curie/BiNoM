@@ -126,7 +126,7 @@ class NaviCell:
         return self._msg_id
 
     def _send(self, msg_id, params, straight=False):
-        if not self.session_id:
+        if not straight and self.session_id == "1":
             raise Exception('navicell session is not active')
 
         packcount = 0 # useful when sending datatable contents
@@ -165,9 +165,12 @@ class NaviCell:
 
         response = conn.getresponse()
         data = response.read()
-#        print (response.status, response.reason, data)
+#        print ("status", response.status, "reason", response.reason, "data", data)
         conn.close()
 
+        if response.status != 200:
+            raise Exception('navicell error', response.reason);
+            
         if data:
             if straight:
                 return data.decode('utf-8')
@@ -184,7 +187,7 @@ class NaviCell:
         return self._send(self._message_id(), {'mode': 'session', 'perform': 'genid'}, True)
 
     def _reset_current_session(self):
-        self._send(self._message_id(), {'mode': 'session', 'perform': 'reset'});
+        self._send(self._message_id(), {'mode': 'session', 'perform': 'reset'}, True);
 
     def _check_session(self, session_id):
         checked = self._send(self._message_id(), {'mode': 'session', 'perform': 'check'}, True)
@@ -272,7 +275,7 @@ class NaviCell:
 
     def reset(self):
         self._reset_current_session()
-        self.session_id = 0
+        self.session_id = "1"
 
 ### utility data methods
     def makeData(self, data):

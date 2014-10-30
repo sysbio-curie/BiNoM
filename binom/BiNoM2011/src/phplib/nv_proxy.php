@@ -1,6 +1,6 @@
 <?php
 /*
- * nv_protocol.php
+ * nv_proxy.php
  *
  * Eric Viara copyright(c) Institut Curie
  * August-October 2014
@@ -15,6 +15,11 @@ $FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
 $SESSION_FILE = $LOCAL_TMPDIR . "/nv_sessions.dat";
 $SESSION_LOCK_FILE = $LOCAL_TMPDIR . "/nv_sessions.lck";
 
+function mydie($str) {
+  header("HTTP/1.1 500 " . $str);
+  exit(1);
+}
+
 function logfile($id) {
   global $FILE_PREFIX;
   return $FILE_PREFIX . $id . ".log";
@@ -22,12 +27,12 @@ function logfile($id) {
 
 function write_session($id) {
   global $SESSION_FILE, $SESSION_LOCK_FILE;
-  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    die("cannot lock file " . $SESSION_LOCK_FILE);
+    mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
-  $fd = fopen($SESSION_FILE, "a") or die("cannot append to file " . $SESSION_FILE);
+  $fd = fopen($SESSION_FILE, "a") or mydie("cannot append to file " . $SESSION_FILE);
   fwrite($fd, "$id\t" . $_SERVER['REMOTE_ADDR'] . "\t" . date('jS F Y h:i:s A (T)', time()) . "\n");
   fclose($fd);
 
@@ -37,10 +42,10 @@ function write_session($id) {
 
 function list_sessions() {
   global $SESSION_FILE, $SESSION_LOCK_FILE;
-  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    die("cannot lock file " . $SESSION_LOCK_FILE);
+    mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
   print file_get_contents($SESSION_FILE);
 
@@ -50,12 +55,12 @@ function list_sessions() {
 
 function clear_sessions() {
   global $SESSION_FILE, $SESSION_LOCK_FILE;
-  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    die("cannot lock file " . $SESSION_LOCK_FILE);
+    mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
-  $fd = fopen($SESSION_FILE, "r") or die("cannot append to file " . $SESSION_FILE);
+  $fd = fopen($SESSION_FILE, "r") or mydie("cannot append to file " . $SESSION_FILE);
   while ($line = fgets($fd)) {
     $fields = explode("\t", $line);
     $id = $fields[0];
@@ -76,15 +81,15 @@ function list_session($which) {
   } else if ($which[0] == "@") {
     $referer = substr($which, 1);
   } else {
-    die("unknown which value $which");
+    mydie("unknown which value $which");
   }
-  $fdlck = fopen($SESSION_LOCK_FILE, "w") or die("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    die("cannot lock file " . $SESSION_LOCK_FILE);
+    mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
   $lines = array();
-  $fd = fopen($SESSION_FILE, "r") or die("cannot append to file " . $SESSION_FILE);
+  $fd = fopen($SESSION_FILE, "r") or mydie("cannot append to file " . $SESSION_FILE);
   while ($line = fgets($fd)) {
     $lines[] = $line;
   }
@@ -107,7 +112,7 @@ function logmsg($id, $msg) {
   $MAXMSGLEN = 150;
   $file = logfile($id);
   //$fdlck = lock($id);
-  $fd = fopen($file, "a") or die("cannot append to file " . $file);
+  $fd = fopen($file, "a") or mydie("cannot append to file " . $file);
   if (strlen($msg) > $MAXMSGLEN) {
     $msg = substr($msg, 0, $MAXMSGLEN) + "...";
   }
@@ -117,12 +122,41 @@ function logmsg($id, $msg) {
 }
 
 function reset_session($id, $check) {
+  global $SESSION_FILE, $SESSION_LOCK_FILE;
+
   delfile(logfile($id), $check);
   delfile(lockfile($id), $check);
   delfile(cmdfile($id), $check);
   delfile(rspfile($id), $check);
   delfile(datafile($id), $check);
   delfile(packnumfile($id), $check);
+
+  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+  $wouldblock = 1;
+  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+    mydie("cannot lock file " . $SESSION_LOCK_FILE);
+  }
+  $fd = fopen($SESSION_FILE, "r") or mydie("cannot read file " . $SESSION_FILE);
+  $sessions = array();
+  while ($line = fgets($fd)) {
+    $fields = explode("\t", $line);
+    if ($fields[0] != $id) {
+      $sessions[] = $line;
+    }
+  }
+
+  fclose($fd);
+
+  $fd = fopen($SESSION_FILE, "w") or mydie("cannot write to file " . $SESSION_FILE);
+  ftruncate($fd, 0);
+  $count = count($sessions);
+  for ($nn = 0; $nn < $count; ++$nn) {
+    fputs($fd, $sessions[$nn]);
+  }
+  fclose($fd);
+
+  flock($fdlck, LOCK_UN);
+  fclose($fdlck);
 }
 
 function get_post_var($param) {
@@ -185,7 +219,7 @@ function waitfordata($id, $file) {
 }
 
 function creatfile($file) {
-  $fd = fopen($file, "w") or die("cannot create file " . $file);
+  $fd = fopen($file, "w") or mydie("cannot create file " . $file);
   ftruncate($fd, 0);
   fclose($fd);
 }
@@ -194,7 +228,7 @@ function delfile($file, $check) {
   if (!$check) {
     unlink($file);
   } else {
-    unlink($file) or die("cannot delete file " . $file);
+    unlink($file) or mydie("cannot delete file " . $file);
   }
 }
 
@@ -224,16 +258,16 @@ function packnumfile($id) {
 }
 
 function checkfile($file) {
-  $fd = fopen($file, "r") or die("cannot open file " . $file . " for reading");
+  $fd = fopen($file, "r") or mydie("cannot open file " . $file . " for reading");
   fclose($fd);
 }
 
 function lock($id) {
   $file = lockfile($id);
-  $fdlck = fopen($file, "r") or die("cannot open file " . $file . " for reading");
+  $fdlck = fopen($file, "r") or mydie("cannot open file " . $file . " for reading");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    die("cannot lock file " . $file);
+    mydie("cannot lock file " . $file);
   }
   return $fdlck;
 }
@@ -325,7 +359,7 @@ if ($mode == "session") {
 	$packstr = "0";
       }
       if (intval($packnum) == intval($packstr)+1) {
-	$fd = fopen($datafile, "a") or die("cannot append to file " . $file);
+	$fd = fopen($datafile, "a") or mydie("cannot append to file " . $file);
 	fwrite($fd, get_post_var("data"));
 	fclose($fd);
 	file_put_contents($packnumfile, $packnum);

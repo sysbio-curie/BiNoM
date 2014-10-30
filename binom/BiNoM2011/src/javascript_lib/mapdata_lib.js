@@ -5334,12 +5334,18 @@ function navicell_init() {
 				$(win).bind("beforeunload", function(e) { 
 					return "Warning: closing " + map_name + " tab will make NaviCell instable";
 				});
+				console.log("unload should reset session");
 				$(win).unload(function() {
 					delete maps[win.document.map_name];
 					_navicell.syncWindows();
+					nv_reset_session(win);
 				});
 			} else {
 				$(win).unbind("beforeunload");
+				console.log("unload should reset session");
+				$(win).unload(function() {
+					nv_reset_session(win);
+				});
 			}
 		}
 	},

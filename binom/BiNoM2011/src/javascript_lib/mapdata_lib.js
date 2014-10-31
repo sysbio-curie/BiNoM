@@ -489,6 +489,7 @@ Mapdata.prototype = {
 	module_classes: {},
 	module_modif_map: {},
 	module_shape_map: {},
+	module_rev_shape_map: {},
 	class_list: {},
 
 	// Hashmap from hugo name to entity information (including positions)
@@ -896,6 +897,7 @@ Mapdata.prototype = {
 
 		var modif_map = {};
 		var shape_map = {};
+		var rev_shape_map = {};
 		for (var ii = 0; ii < module_mapdata.length; ++ii) {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
@@ -962,10 +964,19 @@ Mapdata.prototype = {
 										var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
 										modif_map[modif.id].push(box);
 									}
-									if (!pos.said) {
-										console.log("position.said " + modif.id + " " + pos.said);
+									if (pos.said) {
+										shape_map[pos.said] = pos;
+										if (rev_shape_map[modif.id]) {
+											console.log("rev_shape_map already set for " + modif.id + " to " + rev_shape_map[modif.id] + " vs. " + pos.said);
+										}
+										rev_shape_map[modif.id] = pos.said;
+										//console.log("setting rev_shape_map " + modif.id + " to " + pos.said);
 									}
-									shape_map[pos.said] = pos;
+									/*
+									if (pos.cid) {
+										console.log("CID1: " + pos.cid + " " + pos.said);
+									}
+									*/
 								}
 							}
 						}
@@ -976,6 +987,7 @@ Mapdata.prototype = {
 	
 		this.module_modif_map[module_name] = modif_map;
 		this.module_shape_map[module_name] = shape_map;
+		this.module_rev_shape_map[module_name] = rev_shape_map;
 		return !--this.to_load_count;
 	},
 
@@ -1120,6 +1132,7 @@ function Dataset(name) {
 	this.modifs_id = {};
 
 	this.gene_shape_map = {};
+	this.gene_set_shape_map = {};
 	this.module_arrpos = {};
 }
 
@@ -1202,9 +1215,16 @@ Dataset.prototype = {
 		return null;
 	},
 
-	getGeneByShapeId: function(module_name, shape_id) {
+	getGenesByShapeId: function(module_name, shape_id) {
 		if (this.gene_shape_map[module_name]) {
 			return this.gene_shape_map[module_name][shape_id];
+		}
+		return null;
+	},
+
+	getGeneSetByShapeId: function(module_name, shape_id) {
+		if (this.gene_set_shape_map[module_name]) {
+			return this.gene_set_shape_map[module_name][shape_id];
 		}
 		return null;
 	},
@@ -1212,10 +1232,12 @@ Dataset.prototype = {
 	syncModifs: function() {
 		this.modifs_id = {};
 		this.gene_shape_map = {};
+		this.gene_set_shape_map = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
 			var module_name = navicell.module_names[jj];
 			this.modifs_id[module_name] = {};
 			this.gene_shape_map[module_name] = {};
+			this.gene_set_shape_map[module_name] = {};
 			for (var gene_name in this.genes) {
 				var gene = this.genes[gene_name];
 				var hugo_module_map = this.genes[gene_name].hugo_module_map;
@@ -1236,8 +1258,22 @@ Dataset.prototype = {
 									var pos = positions[kk];
 									arrpos.push({id : modif.id, p : new google.maps.Point(pos.x, pos.y), gene_name: gene_name, said: pos.said});
 									if (pos.said) {
-										this.gene_shape_map[module_name][pos.said] = gene_name;
+										if (!this.gene_shape_map[module_name][pos.said]) {
+											this.gene_shape_map[module_name][pos.said] = [];
+										}
+										this.gene_shape_map[module_name][pos.said].push(gene_name);
 										gene.addShapeId(module_name, pos.said);
+									}
+									if (pos.cid) {
+										//console.log("CID " + pos.cid + " => " + navicell.mapdata.module_rev_shape_map[module_name][pos.cid]);
+										var cid_said = navicell.mapdata.module_rev_shape_map[module_name][pos.cid];
+										if (cid_said) {
+											if (!this.gene_shape_map[module_name][cid_said]) {
+												this.gene_shape_map[module_name][cid_said] = [];
+												//console.log("gene_shape_map already set for " + cid_said + " " + this.gene_shape_map[module_name][cid_said] + " vs. " + gene_name);
+											}
+											this.gene_shape_map[module_name][cid_said].push(gene_name);
+										}
 									}
 								}
 							}

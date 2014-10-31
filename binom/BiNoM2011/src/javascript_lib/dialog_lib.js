@@ -3166,26 +3166,48 @@ function draw_voronoi(module, context, div)
 	var voronoi_shape_map = navicell.mapdata.getVoronoiCells(module).getShapeMap();
 	context.lineWidth = 1;
 	context.globalAlpha = slider2alpha(mapStainingConfig.getTransparency());
-	context.font = "normal 12px";
+//	context.font = "normal 12px";
+	context.font = "normal 14px";
 	context.strokeStyle = "#000000";
 	// TBD: for complexes, need to compute value (then color) in a different way: average of colors (not values)
 	var map_pos = get_map_pos(module);
 	var map_pos_size = mapSize(map_pos);
 
 	for (var shape_id in voronoi_shape_map) {
-		var gene_name = navicell.dataset.getGeneByShapeId(module, shape_id);
+		var gene_names = navicell.dataset.getGenesByShapeId(module, shape_id);
 		if (map_pos && !map_pos[shape_id]) {
 			continue;
 		}
 		var color;
-		if (!gene_name) {
-			color = "888888";
+		if (!gene_names) {
+			//console.log("no gene for shape_id: " + shape_id);
+			//color = "888888";
+			continue;
 		} else {
-			if (sel_sample) {
-				var sample_name = sel_sample.name;
-				color = sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_name);
+			if (gene_names.length == 1) {
+				if (sel_sample) {
+					var sample_name = sel_sample.name;
+					color = sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_names[0]);
+				} else {
+					color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_names[0]);
+				}
 			} else {
-				color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
+				var red = 0;
+				var green = 0;
+				var blue = 0;
+				for (var nn = 0; nn < gene_names.length; ++nn) {
+					var cl;
+					if (sel_sample) {
+						var sample_name = sel_sample.name;
+						cl = RGBColor.fromHex(sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_names[nn]));
+					} else {
+						cl = RGBColor.fromHex(sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_names[nn]));
+					}
+					red += cl.getRed();
+					green += cl.getGreen();
+					blue += cl.getBlue();
+				}
+				color = (new RGBColor(red/gene_names.length, green/gene_names.length, blue/gene_names.length)).getRGBValue();
 			}
 		}
 		context.fillStyle = "#" + color;

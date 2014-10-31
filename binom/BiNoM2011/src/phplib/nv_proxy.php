@@ -64,7 +64,7 @@ function clear_sessions() {
   while ($line = fgets($fd)) {
     $fields = explode("\t", $line);
     $id = $fields[0];
-    reset_session($id, false);
+    reset_session($id, false, true);
   }
   fclose($fd);
 
@@ -121,7 +121,7 @@ function logmsg($id, $msg) {
   fclose($fd);
 }
 
-function reset_session($id, $check) {
+function reset_session($id, $check, $nolock) {
   global $SESSION_FILE, $SESSION_LOCK_FILE;
 
   delfile(logfile($id), $check);
@@ -131,10 +131,12 @@ function reset_session($id, $check) {
   delfile(datafile($id), $check);
   delfile(packnumfile($id), $check);
 
-  $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
-  $wouldblock = 1;
-  if (!flock($fdlck, LOCK_EX, $wouldblock)) {
-    mydie("cannot lock file " . $SESSION_LOCK_FILE);
+  if (!$nolock) {
+    $fdlck = fopen($SESSION_LOCK_FILE, "w") or mydie("cannot open file " . $SESSION_LOCK_FILE . " for writing");
+    $wouldblock = 1;
+    if (!flock($fdlck, LOCK_EX, $wouldblock)) {
+      mydie("cannot lock file " . $SESSION_LOCK_FILE);
+    }
   }
   $fd = fopen($SESSION_FILE, "r") or mydie("cannot read file " . $SESSION_FILE);
   $sessions = array();
@@ -155,7 +157,9 @@ function reset_session($id, $check) {
   }
   fclose($fd);
 
-  flock($fdlck, LOCK_UN);
+  if (!$nolock) {
+    flock($fdlck, LOCK_UN);
+  }
   fclose($fdlck);
 }
 
@@ -328,7 +332,7 @@ if ($mode == "session") {
   }
   if ($perform == "reset") { // or delete
     $id = get("id", "");
-    reset_session($id, false);
+    reset_session($id, false, false);
     return;
   }
   if ($perform == "list") {
@@ -377,7 +381,9 @@ if ($mode == "session") {
 
     if ($data) {
       $file = cmdfile($id);
+      logmsg($id, "cli2srv: waitingforlock $id $msg_id\n");
       $fdlck = waitandlock($id, $file);
+      logmsg($id, "cli2srv: waitforlock $id done\n");
       $lockfile = lockfile($id);
 
       $packcount = get_url_var("packcount");
@@ -385,8 +391,6 @@ if ($mode == "session") {
 	logmsg($id, "cli2srv: multipart $packcount\n");
 	$packnumfile = packnumfile($id);
 	$datafile = datafile($id);
-	//creatfile($datafile); // ??
-	//creatfile($packnumfile); // ??
 	checkfile($packnumfile);
 	for (;;) {
 	  $packstr = file_get_contents($packnumfile);

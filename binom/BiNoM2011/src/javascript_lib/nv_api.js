@@ -1084,11 +1084,18 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 	} else if (command == "import") {
 		var url = arg1;
 		var file = arg2;
+		var data;
+		if (url && url.match(/^@DATA\n/)) {
+			data = url.substring(6);
+			url = null;
+		} else {
+			data = null;
+		}
 		var interactive = arg3;
-		var status = $("#dt_import_status", win.document);
+		var status = $("#dt_sample_annot_status", win.document);
 
-		if (!url && !file) {
-			if (interative) {
+		if (!url && !file && !data) {
+			if (interactive) {
 				error_dialog("Importing Sample Annotations", "no file neither url given", win);
 				return;
 			} else {
@@ -1096,7 +1103,7 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 			}
 		}
 		if (url && file) {
-			if (interative) {
+			if (interactive) {
 				error_dialog("Importing Sample Annotations", "cannot specify both file and URL", win);
 				return;
 			} else {
@@ -1105,8 +1112,10 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		}
 		if (url) {
 			navicell.annot_factory.readurl(url);
-		} else {
+		} else if (file) {
 			navicell.annot_factory.readfile(file, function(file) {status.html("<span class=\"error-message\">Cannot read file " + file + "</span>");});
+		} else {
+			navicell.annot_factory.readdata(data);
 		}
 
 		navicell.annot_factory.ready.then(function() {

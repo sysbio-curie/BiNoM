@@ -3585,7 +3585,6 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 
 	if (url) {
 		if (url.match(/^@DATA\n/)) {
-			//console.log("@DATA found !");
 			datatable.loadData(url.substring(6), ready, win); // TBD: change 6 to "@DATA".length+1
 		} else {
 			$.ajax(url,
@@ -4589,6 +4588,14 @@ AnnotationFactory.prototype = {
 		reader.onerror = function(e) {  // If anything goes wrong
 			error_dialog("Loading Sample Annotations", "Cannot load file " + file.name, window);
 		}
+	},
+
+	readdata: function(data) {
+		var ready = this.ready = $.Deferred();
+		var lines = data.split(LINE_BREAK_REGEX);
+		console.log("READDATA: " + lines.length);
+		array_push_all(this.all_line_read, lines);
+		this.readannots(ready);
 	},
 
 	getAnnotation : function(name) {

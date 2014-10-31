@@ -182,7 +182,7 @@ class NaviCell:
             return ''
         return data
 
-### session management
+### private methods for session management
     def _gen_session_id(self):
         return self._send(self._message_id(), {'mode': 'session', 'perform': 'genid'}, True)
 
@@ -308,12 +308,35 @@ class NaviCell:
                     ret += line + "\n"
             return "@DATA\n" + ret
 
-### datatable data: methods do not depend on module
-    def importDatatables(self, datatable_url_list, datatable_name, datatable_type, params={}):
-        self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_list, params])
+    def makeAnnotationData(self, data):
+            lines = data.split('\n')
+            ret = lines[0]
 
-    def sampleAnnotationImport(self, sample_annotation_url):
-        self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url])
+            for line in lines:
+                arr = line.split('\t')
+                ret += line + "\n"
+            return "@DATA\n" + ret
+
+    def makeAnnotationDataFromFile(self, filename):
+        with open(filename) as f:
+
+            ret = ''
+            for line in f:
+                ret = line + "\n"
+                break
+
+            for line in f:
+                arr = line.split('\t')
+                ret += line + "\n"
+            return "@DATA\n" + ret
+
+### datatable data: methods do not depend on module
+    def importDatatables(self, datatable_url_or_data, datatable_name, datatable_type, params={}):
+        self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_or_data, params])
+
+    def sampleAnnotationImport(self, sample_annotation_url_or_data):
+        self.sampleAnnotationOpen()
+        self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data])
 
     def sampleAnnotationOpen(self):
         self._cli2srv('nv_sample_annotation_perform', '', ['open'])
@@ -339,7 +362,7 @@ class NaviCell:
     def getDatatableSampleList(self):
         return self._cli2srv('nv_get_datatable_sample_list', '', [], 'send_and_rcv')
 
-###
+### entity search and select
     def findEntities(self, module, search, hints = {}, open_bubble = False):
         if hints:
             mod_list = []

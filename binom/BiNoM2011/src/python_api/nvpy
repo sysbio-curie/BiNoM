@@ -30,7 +30,7 @@ parser.add_option("--attach-session", help="attach the given session", metavar="
 parser.add_option("--attach-last-session", action="store_true", help="attach the last session")
 parser.add_option("--attach-referer-session", help="attach the last session from this referer", metavar="REFERER_IP")
 parser.add_option("--list-sessions", action="store_true", help="list active sessions and exit")
-parser.add_option("--clean-sessions", action="store_true", help="clean all active sessions and exit")
+parser.add_option("--clear-sessions", action="store_true", help="clear all active sessions and exit")
 parser.add_option("--navicell-varname", help="name of python variable for navicell [%default]", metavar="VARNAME")
     
 try:
@@ -38,16 +38,16 @@ try:
 except:
     os._exit(0)
 
-if options.list_sessions and options.clean_sessions:
-    print("--list-sessions and --clean-sessions are exclusive options")
+if options.list_sessions and options.clear_sessions:
+    print("--list-sessions and --clear-sessions are exclusive options")
     os._exit(1)
 
 if options.list_sessions and options.attach_session:
     print("--list-sessions and --attach-session are exclusive options")
     os._exit(1)
 
-if options.clean_sessions and options.attach_session:
-    print("--clean-sessions and --attach-session are exclusive options")
+if options.clear_sessions and options.attach_session:
+    print("--clear-sessions and --attach-session are exclusive options")
     os._exit(1)
 
 try:
@@ -56,8 +56,8 @@ try:
     if options.list_sessions:
         globals()[_nv_varname].listSessions()
         os._exit(0)
-    elif options.clean_sessions:
-        globals()[_nv_varname].cleanSessions()
+    elif options.clear_sessions:
+        globals()[_nv_varname].clearSessions()
         os._exit(0)
     elif options.attach_session:
         globals()[_nv_varname].attachSession(options.attach_session)

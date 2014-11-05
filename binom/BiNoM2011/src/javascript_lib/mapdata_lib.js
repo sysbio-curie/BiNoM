@@ -22,6 +22,7 @@ var GLYPH_COUNT = 5;
 var DISPLAY_TIMEOUT = 500;
 var MAX_DISCRETE_VALUES = 30;
 var DATATABLE_LIST = 'Datatable list';
+var MULTI_REV_SHAPE_MAP = true;
 
 if (!window.console) {
 	window.console = new function()
@@ -902,6 +903,7 @@ Mapdata.prototype = {
 			var maps = module_mapdata[ii].maps;
 			var modules = module_mapdata[ii].modules;
 			var entities = module_mapdata[ii].entities;
+			var entity_class = module_mapdata[ii]["class"];
 			var postinf = module_mapdata[ii]["postinf"];
 			if (module_mapdata[ii]["class"]) {
 				this.class_list[module_mapdata[ii]["class"]] = true;
@@ -966,17 +968,22 @@ Mapdata.prototype = {
 									}
 									if (pos.said) {
 										shape_map[pos.said] = pos;
-										if (rev_shape_map[modif.id]) {
-											console.log("rev_shape_map already set for " + modif.id + " to " + rev_shape_map[modif.id] + " vs. " + pos.said);
+										if (entity_class == "COMPLEX") {
+											//console.log("COMPLEX FOUND " + pos.said);
+											if (MULTI_REV_SHAPE_MAP) {
+												if (!rev_shape_map[modif.id]) {
+													rev_shape_map[modif.id] = [];
+												}
+												rev_shape_map[modif.id].push(pos.said);
+											} else {
+												if (rev_shape_map[modif.id]) {
+													console.log("rev_shape_map already set for " + modif.id + " to " + rev_shape_map[modif.id] + " vs. " + pos.said);
+												}
+												rev_shape_map[modif.id] = pos.said;
+											}
 										}
-										rev_shape_map[modif.id] = pos.said;
 										//console.log("setting rev_shape_map " + modif.id + " to " + pos.said);
 									}
-									/*
-									if (pos.cid) {
-										console.log("CID1: " + pos.cid + " " + pos.said);
-									}
-									*/
 								}
 							}
 						}
@@ -1265,17 +1272,31 @@ Dataset.prototype = {
 										gene.addShapeId(module_name, pos.said);
 									}
 									if (pos.cid) {
-										//console.log("CID " + pos.cid + " => " + navicell.mapdata.module_rev_shape_map[module_name][pos.cid]);
-										var cid_said = navicell.mapdata.module_rev_shape_map[module_name][pos.cid];
-										if (cid_said) {
-											if (!this.gene_shape_map[module_name][cid_said]) {
-												this.gene_shape_map[module_name][cid_said] = [];
-												//console.log("gene_shape_map already set for " + cid_said + " " + this.gene_shape_map[module_name][cid_said] + " vs. " + gene_name);
+										if (MULTI_REV_SHAPE_MAP) {
+											var cid_said_arr = navicell.mapdata.module_rev_shape_map[module_name][pos.cid];
+											if (cid_said_arr) {
+												for (var ll = 0; ll < cid_said_arr.length; ++ll) {
+													var cid_said = cid_said_arr[ll];
+													if (!this.gene_shape_map[module_name][cid_said]) {
+														this.gene_shape_map[module_name][cid_said] = [];
+													}
+													this.gene_shape_map[module_name][cid_said].push(gene_name);
+												}
 											}
-											this.gene_shape_map[module_name][cid_said].push(gene_name);
+										} else {
+											var cid_said = navicell.mapdata.module_rev_shape_map[module_name][pos.cid];
+											if (cid_said) {
+												if (!this.gene_shape_map[module_name][cid_said]) {
+													this.gene_shape_map[module_name][cid_said] = [];
+												}
+												this.gene_shape_map[module_name][cid_said].push(gene_name);
+											}
 										}
 									}
 								}
+							}
+							if (this.modifs_id[module_name][modif.id]) {
+								console.log("modifs_id already set for " + modif.id + " " + this.modifs_id[module_name][modif.id][0].name + " " + gene_name);
 							}
 							this.modifs_id[module_name][modif.id] = [gene, arrpos];
 						}

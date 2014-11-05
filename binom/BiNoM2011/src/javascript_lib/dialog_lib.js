@@ -18,6 +18,38 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+var CANCEL_CLOSES = false;
+
+var SEARCH_DIALOG_WIDTH = 450;
+var SEARCH_DIALOG_HEIGHT = 860;
+var IMPORT_DIALOG_WIDTH = 550;
+var IMPORT_DIALOG_HEIGHT = 900;
+var STATUS_TABS_WIDTH = 800;
+var STATUS_TABS_HEIGHT = 680;
+var DRAWING_CONFIG_WIDTH = 420;
+var DRAWING_CONFIG_HEIGHT = 750;
+
+var SAMPLE_ANNOT_WIDTH = 850;
+var SAMPLE_ANNOT_HEIGHT = 950;
+
+var HEATMAP_EDITOR_WIDTH = 850;
+var HEATMAP_EDITOR_HEIGHT = 580;
+var BARPLOT_EDITOR_WIDTH = 750;
+var BARPLOT_EDITOR_HEIGHT = 600;
+var GLYPH_EDITOR_WIDTH = 750;
+var GLYPH_EDITOR_HEIGHT = 718;
+var MAP_STAINING_EDITOR_WIDTH = 750;
+var MAP_STAINING_EDITOR_HEIGHT = 660;
+var COMMAND_DIALOG_WIDTH = 1030;
+var COMMAND_DIALOG_HEIGHT = 770;
+
+var DATATABLE_COLOR_SIZE_CONFIG_WIDTH_UNORDERED = 760;
+var DATATABLE_COLOR_SIZE_CONFIG_WIDTH = 500;
+var DATATABLE_COLOR_CONFIG_WIDTH_UNORDERED = 700;
+var DATATABLE_COLOR_CONFIG_WIDTH = 440;
+var DATATABLE_CONFIG_WIDTH = 400;
+var DATATABLE_CONFIG_HEIGHT = 670;
+
 function nv1() {
 	$("#datatable_input").css("display", "none");
 	$("#right_tabs").css("height", "100%");
@@ -104,7 +136,15 @@ function notice_dialog(header, msg, win, position, width, height)
 	display_info_dialog('Notice', header, msg, win, position, width, height);
 }
 
-var CANCEL_CLOSES = false;
+function get_dialog_width(width) {
+	var window_width = window.innerWidth-100;
+	return width > window_width ? window_width : width;
+}
+
+function get_dialog_height(height) {
+	var window_height = window.innerHeight-100;
+	return height > window_height ? window_height : height;
+}
 
 $(function() {
 	$('body').append("<div id='foo'></div>");
@@ -158,8 +198,8 @@ $(function() {
 
 	$("#search_dialog").dialog({
 		autoOpen: false,
-		width: 450,
-		height: 860,
+		width: get_dialog_width(SEARCH_DIALOG_WIDTH),
+		height: get_dialog_height(SEARCH_DIALOG_HEIGHT),
 		modal: false,
 		buttons: {
 			"Search": function() {
@@ -222,10 +262,10 @@ $(function() {
 		}
 	});
 	
-	$("#dt_import_dialog" ).dialog({
+	$("#dt_import_dialog").dialog({
 		autoOpen: false,
-		width: 550,
-		height: 900,
+		width: get_dialog_width(IMPORT_DIALOG_WIDTH),
+		height: get_dialog_height(IMPORT_DIALOG_HEIGHT),
 		modal: false,
 		buttons: {
 			"Import": function() {
@@ -294,15 +334,15 @@ $(function() {
 
 	$("#dt_status_tabs").dialog({
 		autoOpen: false,
-		width: 800,
-		height: 680,
+		width: get_dialog_width(STATUS_TABS_WIDTH),
+		height: get_dialog_height(STATUS_TABS_HEIGHT),
 		modal: false
 	});
 
 	$("#drawing_config_div").dialog({
 		autoOpen: false,
-		width: 420,
-		height: 750,
+		width: get_dialog_width(DRAWING_CONFIG_WIDTH),
+		height: get_dialog_height(DRAWING_CONFIG_HEIGHT),
 		modal: false,
 
 		buttons: {
@@ -315,7 +355,6 @@ $(function() {
 			},
 			"OK": function() {
 				nv_perform("nv_drawing_config_perform", window, "apply_and_close");
-				//$(this).dialog('close');
 			}
 		}
 	});
@@ -335,8 +374,8 @@ $(function() {
 
 	$("#dt_sample_annot").dialog({
 		autoOpen: false,
-		width: 850,
-		height: 950,
+		width: get_dialog_width(SAMPLE_ANNOT_WIDTH),
+		height: get_dialog_height(SAMPLE_ANNOT_HEIGHT),
 		modal: false,
 		buttons: [
 			{
@@ -387,10 +426,13 @@ $(function() {
 	});
 
 	if (DATATABLE_HAS_TABS) {
+		var datatable_tabs_width = 850;
+		var datatable_tabs_height = 550;
+
 		$("#dt_datatable_tabs").dialog({
 			autoOpen: false,
-			width: 850,
-			height: 550,
+			width: get_dialog_width(DATATABLE_TABS_WIDTH),
+			height: get_dialog_height(DATATABLE_TABS_HEIGHT),
 			modal: false
 		});
 
@@ -406,8 +448,8 @@ $(function() {
 
 	$("#heatmap_editor_div").dialog({
 		autoOpen: false,
-		width: 850,
-		height: 580,
+		width: get_dialog_width(HEATMAP_EDITOR_WIDTH),
+		height: get_dialog_height(HEATMAP_EDITOR_HEIGHT),
 		modal: false,
 		buttons: {
 			"Apply": function() {
@@ -420,15 +462,14 @@ $(function() {
 
 			"OK": function() {
 				nv_perform("nv_heatmap_editor_perform", window, "apply_and_close", true);
-				//$(this).dialog('close');
 			}
 		}
 	});
 
 	$("#barplot_editor_div" ).dialog({
 		autoOpen: false,
-		width: 750,
-		height: 600,
+		width: get_dialog_width(BARPLOT_EDITOR_WIDTH),
+		height: get_dialog_height(BARPLOT_EDITOR_HEIGHT),
 		modal: false,
 		buttons: {
 			"Apply": function() {
@@ -441,7 +482,6 @@ $(function() {
 
 			"OK": function() {
 				nv_perform("nv_barplot_editor_perform", window, "apply_and_close", true);
-				//$(this).dialog('close');
 			}
 
 		}
@@ -451,8 +491,8 @@ $(function() {
 	for (var num = 1; num <= GLYPH_COUNT; ++num) {
 		$("#glyph_editor_div_" + num).data('num', num).dialog({
 			autoOpen: false,
-			width: 750,
-			height: 718,
+			width: get_dialog_width(GLYPH_EDITOR_WIDTH),
+			height: get_dialog_height(GLYPH_EDITOR_HEIGHT),
 			modal: false,
 
 			buttons: {
@@ -468,7 +508,6 @@ $(function() {
 				"OK": function() {
 					var num = $(this).data('num');
 					nv_perform("nv_glyph_editor_perform", window, "apply_and_close", num, true);
-					//$(this).dialog('close');
 				}
 
 			}
@@ -477,8 +516,8 @@ $(function() {
 
 	$("#map_staining_editor_div").dialog({
 		autoOpen: false,
-		width: 750,
-		height: 660,
+		width: get_dialog_width(MAP_STAINING_EDITOR_WIDTH),
+		height: get_dialog_height(MAP_STAINING_EDITOR_HEIGHT),
 		modal: false,
 
 		buttons: {
@@ -491,15 +530,14 @@ $(function() {
 			},
 			"OK": function() {
 				nv_perform("nv_map_staining_editor_perform", window, "apply_and_close", true);
-				//$(this).dialog('close');
 			}
 		}
 	});
 
 	$("#command-dialog").dialog({
 		autoOpen: false,
-		width: 1030,
-		height: 770,
+		width: get_dialog_width(COMMAND_DIALOG_WIDTH),
+		height: get_dialog_height(COMMAND_DIALOG_HEIGHT),
 		modal: false,
 
 		buttons: {
@@ -1406,20 +1444,19 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 	if (div) {
 		var datatable_id = this.getId();
 		var width;
+
 		if (what == COLOR_SIZE_CONFIG) {
-			width = this.biotype.isUnorderedDiscrete() ? 760 : 500;
+			width = this.biotype.isUnorderedDiscrete() ? DATATABLE_COLOR_SIZE_CONFIG_WIDTH_UNORDERED : DATATABLE_COLOR_SIZE_CONFIG_WIDTH;
 		} else if (what == 'color') {
-			width = this.biotype.isUnorderedDiscrete() ? 700 : 440;
+			width = this.biotype.isUnorderedDiscrete() ? DATATABLE_COLOR_CONFIG_WIDTH_UNORDERED : DATATABLE_COLOR_CONFIG_WIDTH;
 		} else if (what == 'shape') {
-			width = 400;
-		} else {
-			width = 400;
+			width = DATATABLE_CONFIG_WIDTH;
 		}
 		if (!div.built) {
 			div.dialog({
 				autoOpen: false,
-				width: width,
-				height: 670,
+				width: doc.win.get_dialog_width(width),
+				height: doc.win.get_dialog_height(DATATABLE_CONFIG_HEIGHT),
 				modal: false,
 
 				buttons: {
@@ -1535,7 +1572,6 @@ function drawing_config_chart() {
 	var doc = window.document;
 	var val = $("#drawing_config_chart_type", doc).val();
 	if (val == "Heatmap") {
-		//$("#heatmap_editor_div", doc).dialog("open");
 		nv_perform("nv_heatmap_editor_perform", window, "open");
 	} else if (val == "Barplot") {
 		$("#barplot_editor_div", doc).dialog("open");
@@ -1699,15 +1735,12 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var html = "";
 	html += "<tbody>";
 	html += "<tr>";
-//	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\")") + "&nbsp;&nbsp;&nbsp;";
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>" + make_button("Clear Samples", "heatmap_clear_samples", "heatmap_sample_action(\"clear_samples\", \"" + map_name + "\")") + "&nbsp;&nbsp;&nbsp;";
 	html += "</td><td colspan='1' style='" + empty_cell_style + "'>";
 
-	//html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\")");
 	html += make_button("All samples", "heatmap_all_samples", "heatmap_sample_action(\"all_samples\", \"" + map_name + "\")");
 	html += "&nbsp;&nbsp;";
 	if (group_cnt) {
-		//html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\")");
 		html += "&nbsp;&nbsp;" + make_button("All groups", "heatmap_all_groups", "heatmap_sample_action(\"all_groups\", \"" + map_name + "\")");
 	}
 	html += "</td>";
@@ -1715,7 +1748,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	if (drawing_config.getBarplotConfig().getSampleOrGroupCount()) {
 		var label = (group_cnt ? "Samples and Groups" : "Samples") + " from Barplot";
 		html += "<tr><td style='" + empty_cell_style + "'>&nbsp;</td><td style='" + empty_cell_style + "'>&nbsp;</td><td colspan='1' style='" + empty_cell_style + "'>";
-		//html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\")");
 		html += make_button(label, "heatmap_from_barplot", "heatmap_sample_action(\"from_barplot\", \"" + map_name + "\")");
 		html += "</td></tr>";
 	}
@@ -1724,7 +1756,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 
 	var select_title = group_cnt ? 'Select a sample or group' : 'Select a sample';
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
-		//html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_editor_set_editing(true, undefined, \"" + map_name + "\")'>\n";
 		html += "<td style='border: 0px'><select id='heatmap_editor_gs_" + idx + "' onchange='heatmap_select_sample(" + idx + ", \"" + map_name + "\")'>\n";
 		html += "<option value='_none_'>" + select_title + "</option>\n";
 		var sel_group = heatmapConfig.getGroupAt(idx);
@@ -1756,7 +1787,6 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		var sel_datatable = heatmapConfig.getDatatableAt(idx);
 		html += "<tr>";
 		html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='heatmap_step_display_config(" + idx + ",\"" + map_name + "\")'><span id='heatmap_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
-		//html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_editor_set_editing(true," + idx + ", \"" + map_name + "\")'>\n";
 		html += "<td><select id='heatmap_editor_datatable_" + idx + "' onchange='heatmap_select_datatable(" + idx + ", \"" + map_name + "\")'>\n";
 		html += "<option value='_none_'>Select a datatable</option>\n";
 		for (var datatable_name in navicell.dataset.datatables) {
@@ -2091,7 +2121,6 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "<tr>\n";
 	html += "<td style='border: none; text-decoration: underline; font-size: 9px'><a href='#' onclick='barplot_step_display_config(" + idx + ", \"" + map_name + "\")'><span id='barplot_editor_datatable_config_" + idx + "' class='" + (sel_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
 
-//	html += "<td><select id='barplot_editor_datatable_" + idx + "' onchange='barplot_editor_set_editing(true," + idx + ")'>\n";
 	html += "<td><select id='barplot_editor_datatable_" + idx + "' onchange='barplot_select_datatable(" + idx + ", \"" + map_name + "\")'>\n";
 	html += "<option value='_none_'>Select a datatable</option>\n";
 	for (var datatable_name in navicell.dataset.datatables) {
@@ -2137,7 +2166,6 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	var select_title = group_cnt ? 'Select a group or sample' : 'Select a sample';
 	for (var idx = 0; idx < sample_group_cnt; ++idx) {
-		//html += "<td style='border: 0px'><select id='barplot_editor_gs_" + idx + "' onchange='barplot_editor_set_editing(true)'>\n";
 		html += "<td style='border: 0px'><select id='barplot_editor_gs_" + idx + "' onchange='barplot_select_sample(" + idx + ", \"" + map_name + "\")'>\n";
 		html += "<option value='_none_'>" + select_title + "</option>\n";
 		var sel_group = barplotConfig.getGroupAt(idx);
@@ -2211,7 +2239,6 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	slider.slider({
 		slide: function( event, ui ) {
 			nv_perform("nv_barplot_editor_perform", get_win(map_name), "set_transparency", ui.value);
-			//$("#barplot_editing", doc).html(EDITING_CONFIGURATION);
 		}
 	});
 
@@ -2576,7 +2603,6 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	html += "<td colspan='2' style='" + empty_cell_style + "'>";
 	var sel_group = glyphConfig.getGroup();
 	var sel_sample = glyphConfig.getSample();
-//	html += sample_or_group_select("glyph_editor_gs_" + num, 'glyph_editor_set_editing(' + num + ', true, "sample", "' + map_name + '")', sel_group, sel_sample);
 	html += sample_or_group_select("glyph_editor_gs_" + num, 'glyph_select_sample(' + num + ', "' + map_name + '")', sel_group, sel_sample);
 	html += "</td>";
 	html += "</tr>";
@@ -2586,7 +2612,6 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 
 	html += "<td style='" + empty_cell_style + "'>";
 	var sel_shape_datatable = glyphConfig.getShapeDatatable();
-	//html += datatable_select("glyph_editor_datatable_shape_" + num, 'glyph_editor_set_editing(' + num + ', true, "shape", "' + map_name + '")', sel_shape_datatable);
 	html += datatable_select("glyph_editor_datatable_shape_" + num, 'glyph_select_datatable_shape(' + num + ', "' + map_name + '")', sel_shape_datatable);
 	html += "</td>";
 
@@ -2597,7 +2622,6 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 
 	html += "<td style='" + empty_cell_style + "'>";
 	var sel_color_datatable = glyphConfig.getColorDatatable();
-	//html += datatable_select("glyph_editor_datatable_color_" + num, 'glyph_editor_set_editing(' + num + ', true, "color", "' + map_name + '")', sel_color_datatable);
 	html += datatable_select("glyph_editor_datatable_color_" + num, 'glyph_select_datatable_color(' + num + ', "' + map_name + '")', sel_color_datatable);
 	html += "</td>";
 
@@ -2608,7 +2632,6 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	html += "<tr><td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Size</span></td>";
 	html += "<td style='" + empty_cell_style + "'>";
 	var sel_size_datatable = glyphConfig.getSizeDatatable();
-	//html += datatable_select("glyph_editor_datatable_size_" + num, 'glyph_editor_set_editing(' + num + ', true, "size", "' + map_name + '")', sel_size_datatable);
 	html += datatable_select("glyph_editor_datatable_size_" + num, 'glyph_select_datatable_size(' + num + ', "' + map_name + '")', sel_size_datatable);
 	html += "</td>";
 
@@ -2638,8 +2661,6 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	slider.slider({
 		slide: function(event, ui) {
 			nv_perform("nv_glyph_editor_perform", get_win(map_name), "set_transparency", num, ui.value);
-			//$("#glyph_editing_" + num, doc).html(EDITING_CONFIGURATION);
-			//glyphConfig.setTransparency(ui.value);
 			draw_glyph_in_canvas(module, glyphConfig, doc);
 		}
 	});
@@ -3018,7 +3039,6 @@ function update_map_staining_editor(doc, params, mapStainingConfig) {
 	html += "<td colspan='2' style='" + empty_cell_style + "'>";
 	var sel_group = mapStainingConfig.getGroup();
 	var sel_sample = mapStainingConfig.getSample();
-	//html += sample_or_group_select("map_staining_editor_gs", 'map_staining_editor_set_editing(true, "sample", "' + map_name + '")', sel_group, sel_sample);
 	html += sample_or_group_select("map_staining_editor_gs", 'map_staining_select_sample("' + map_name + '")', sel_group, sel_sample);
 	html += "</td>";
 	html += "</tr>";
@@ -3029,7 +3049,6 @@ function update_map_staining_editor(doc, params, mapStainingConfig) {
 	html += "<td style='" + empty_cell_style + "'>";
 
 	var sel_color_datatable = mapStainingConfig.getColorDatatable();
-	//html += datatable_select("map_staining_editor_datatable_color", 'map_staining_editor_set_editing(true, "color", "' + map_name + '")', sel_color_datatable);
 	html += datatable_select("map_staining_editor_datatable_color", 'map_staining_select_datatable("' + map_name + '")', sel_color_datatable);
 	html += "</td>";
 
@@ -3143,8 +3162,38 @@ function get_map_pos(module) {
 	return mappos;
 }
 
+function get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group)
+{
+	var display_config = sel_color_datatable.getDisplayConfig(module);
+	var sample_name = sel_sample.name;
+	if (gene_names.length == 1) {
+		if (sel_sample) {
+			return display_config.getColorSample(sample_name, gene_names[0]);
+		}
+		return display_config.getColorGroup(sel_group, gene_names[0]);
+	}
+	var red = 0;
+	var green = 0;
+	var blue = 0;
+	var len = gene_names.length;
+	console.log("get_voronoi_color: complex ? " + gene_names.length);
+	for (var nn = 0; nn < len; ++nn) {
+		var color;
+		if (sel_sample) {
+			color = RGBColor.fromHex(display_config.getColorSample(sample_name, gene_names[nn]));
+		} else {
+			color = RGBColor.fromHex(display_config.getColorGroup(sel_group, gene_names[nn]));
+		}
+		red += color.getRed();
+		green += color.getGreen();
+		blue += color.getBlue();
+	}
+	return (new RGBColor(red/gene_names.length, green/gene_names.length, blue/gene_names.length)).getRGBValue();
+}
+
 function draw_voronoi(module, context, div)
 {
+	var VORONOI_DEBUG = true;
 	var drawing_config = navicell.getDrawingConfig(module);
 	var mapStainingConfig = drawing_config.getMapStainingConfig();
 	var sel_color_datatable = mapStainingConfig.getColorDatatable();
@@ -3169,7 +3218,6 @@ function draw_voronoi(module, context, div)
 //	context.font = "normal 12px";
 	context.font = "normal 14px";
 	context.strokeStyle = "#000000";
-	// TBD: for complexes, need to compute value (then color) in a different way: average of colors (not values)
 	var map_pos = get_map_pos(module);
 	var map_pos_size = mapSize(map_pos);
 
@@ -3182,35 +3230,13 @@ function draw_voronoi(module, context, div)
 		if (!gene_names) {
 			//console.log("no gene for shape_id: " + shape_id);
 			//color = "888888";
-			continue;
+			color = 0;
 		} else {
-			if (gene_names.length == 1) {
-				if (sel_sample) {
-					var sample_name = sel_sample.name;
-					color = sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_names[0]);
-				} else {
-					color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_names[0]);
-				}
-			} else {
-				var red = 0;
-				var green = 0;
-				var blue = 0;
-				for (var nn = 0; nn < gene_names.length; ++nn) {
-					var cl;
-					if (sel_sample) {
-						var sample_name = sel_sample.name;
-						cl = RGBColor.fromHex(sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_names[nn]));
-					} else {
-						cl = RGBColor.fromHex(sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_names[nn]));
-					}
-					red += cl.getRed();
-					green += cl.getGreen();
-					blue += cl.getBlue();
-				}
-				color = (new RGBColor(red/gene_names.length, green/gene_names.length, blue/gene_names.length)).getRGBValue();
+			if (gene_names.length > 1) {
+				console.log("shape_id: " + shape_id);
 			}
-		}
-		context.fillStyle = "#" + color;
+			color = get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group);
+		}		
 		var points = voronoi_shape_map[shape_id][0];
 		context.beginPath();
 		var min_x = Number.MAX_NUMBER;
@@ -3244,10 +3270,21 @@ function draw_voronoi(module, context, div)
 			}
 		}
 		context.closePath();
-		//context.stroke();
-		context.fill();
+		if (color) {
+			context.fillStyle = "#" + color;
+			context.fill();
 
-		// debug mode
-		context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
+			if (VORONOI_DEBUG) {
+				context.strokeStyle = "#000000";
+			}
+		} else {
+			if (VORONOI_DEBUG) {
+				context.stroke();
+				context.strokeStyle = "#FF0000";
+			}
+		}
+		if (VORONOI_DEBUG) {
+			context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
+		}
 	}		
 }

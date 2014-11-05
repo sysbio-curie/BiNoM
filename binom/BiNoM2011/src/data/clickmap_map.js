@@ -449,7 +449,7 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	var element = document.getElementById(map_elementId);
 
 	map = new google.maps.Map(element, {
-        copyright_owner: 'Institut Curie',
+		copyright_owner: 'Institut Curie',
 		center : new google.maps.LatLng(10, 10),
 		disableDefaultUI: true,
 		zoomControl: true,
@@ -463,6 +463,17 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	});
 
 	map.setOptions({draggableCursor:'default', draggingCursor: 'move'});
+
+	google.maps.event.addListener(map, 'zoom_changed', function() {
+		nv_record_action(window, "nv_set_zoom", map.getZoom());
+	});
+
+
+	google.maps.event.addListener(map, 'center_changed', function() {
+		var center = map.getCenter();
+		nv_record_action(window, "nv_set_center", "absolute", center.lng(), center.lat());
+	});
+
 
 	window.map = map;
 

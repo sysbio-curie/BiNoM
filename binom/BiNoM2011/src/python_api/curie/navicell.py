@@ -388,8 +388,8 @@ class NaviCell:
     def setZoom(self, module, zoom):
         self._cli2srv('nv_set_zoom', module, [zoom])
 
-    def scroll(self, module, xscroll, yscroll=0):
-        self._cli2srv('nv_scroll', module, [xscroll, yscroll])
+    def setCenter(self, module, where, lng=0, lat=0):
+        self._cli2srv('nv_set_center', module, [where, lng, lat])
 
 ### notice dialog
     def noticeMessage(self, module, header, msg, position='left top', width=0, height=0):

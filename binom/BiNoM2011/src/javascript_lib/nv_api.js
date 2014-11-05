@@ -186,35 +186,41 @@ function nv_uncheck_all_entities(win)
 	return null;
 }
 
-function nv_scroll(win, xoffset, yoffset)
+function nv_set_center(win, where, posx, posy)
 {
 	var map = win.map;
-	//console.log("nv_scroll " + xoffset + " " + yoffset);
+	//console.log("nv_set_center " + posx + " " + posy);
 
 	var center = map.getCenter();
 	var scrolled_center;
 
-	if (xoffset == "CENTER") {
+	if (where == "MAP_CENTER") { // should be MAP_CENTER
 		scrolled_center = win.map_ori_center;
-	} else if (xoffset == "W_CENTER" || xoffset == "WEST_CENTER") {
+	} else if (where == "MAP_WEST") { // MAP_WEST_CENTER
 		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getNorthEast().lng());
-	} else if (xoffset == "E_CENTER" || xoffset == "EAST_CENTER") {
+	} else if (where == "MAP_EAST") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_center.lat(), win.map_ori_bounds.getSouthWest().lng());
-	} else if (xoffset == "S_CENTER" || xoffset == "SOUTH_CENTER") {
+	} else if (where == "MAP_SOUTH") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getNorthEast().lat(), win.map_ori_center.lng());
-	} else if (xoffset == "N_CENTER" || xoffset == "NORTH_CENTER") {
+	} else if (where == "MAP_NORTH") {
 		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getSouthWest().lat(), win.map_ori_center.lng());
-	} else if (xoffset == "SW_CENTER" || xoffset == "SOUTH_WEST_CENTER") {
+	} else if (where == "MAP_SOUTH_WEST") {
 		scrolled_center = win.map_ori_bounds.getNorthEast();
-	} else if (xoffset == "NE_CENTER" || xoffset == "NORTH_EAST_CENTER") {
+	} else if (where == "MAP_NORTH_EAST") {
 		scrolled_center = win.map_ori_bounds.getSouthWest();
-	} else if (typeof xoffset == "number" && typeof yoffset == "number") {
-		scrolled_center = new google.maps.LatLng(center.lat()+yoffset, center.lng()+xoffset, true);
+	} else if (where == "MAP_SOUTH_EAST") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getNorthEast().lat(), win.map_ori_bounds.getSouthWest().lng());
+	} else if (where == "MAP_NORTH_WEST") {
+		scrolled_center = new google.maps.LatLng(win.map_ori_bounds.getSouthWest().lat(), win.map_ori_bounds.getNorthEast().lng()); 
+	} else if ((where == "RELATIVE") && typeof posx == "number" && typeof posy == "number") {
+		scrolled_center = new google.maps.LatLng(center.lat()+posy, center.lng()+posx, true);
+	} else if ((where == "ABSOLUTE") && typeof posx == "number" && typeof posy == "number") {
+		scrolled_center = new google.maps.LatLng(posy, posx, true);
 	} else {
-		if (yoffset) {
-			throw "nv_scroll: unknown directive \"" + xoffset + "," + yoffset + "\"";
+		if (posy) {
+			throw "nv_set_center: unknown directive \"" + where + ", " + posx + "," + posy + "\"";
 		}
-		throw "nv_scroll: unknown directive \"" + xoffset + "\"";
+		throw "nv_set_center: unknown directive \"" + where + "\"";
 	}
 
 	if (scrolled_center != null) {
@@ -1199,6 +1205,10 @@ function nv_record(win, to_encode) {
 	$("#command-history", win.document).val((history ? history + "\n\n" : "") + cmd);
 }
 
+function nv_record_action(win, action, arg1, arg2, arg3, arg4, arg5, arg6) {
+	nv_record(win, nv_encode_action(action, win, arg1, arg2, arg3, arg4, arg5, arg6));
+}
+ 
 var nv_handlers = {
 	"nv_is_ready": nv_is_ready,
 
@@ -1207,7 +1217,7 @@ var nv_handlers = {
 	"nv_select_entity": nv_select_entity,
 	"nv_set_zoom": nv_set_zoom,
 	"nv_uncheck_all_entities": nv_uncheck_all_entities,
-	"nv_scroll": nv_scroll,
+	"nv_set_center": nv_set_center,
 
 	"nv_import_datatables": nv_import_datatables,
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,

@@ -237,25 +237,59 @@ USGSOverlay.prototype.onAdd = function() {
 		var y = e.pixel.y;
 		var doc = overlay.win.document;
 		var module = overlay.win.document.navicell_module_name;
-		console.log("click on " + x + " " + y + " module " + module);
+		console.log("click at " + x + " " + y + " module " + module);
 		for (var nn = 0; nn < overlay.boundBoxes.length; ++nn) {
 			var box = overlay.boundBoxes[nn][0];
 			if (x >= box[0] && x <= box[0]+box[2] && y >= box[1] && y <= box[1]+box[3]) {
+				//console.log("found : x=" + box[0] + ", w=" + box[2] + ", y=" + box[1] + ", h=" + box[3]);
 				var gene_name = overlay.boundBoxes[nn][1];
+				var m_gene_names = "";
+				var modif_id = overlay.boundBoxes[nn][4];
+				var gene_id;
+				var info = navicell.dataset.getGeneInfoByModifId(module, modif_id);
+				if (info) {
+					var genes = info[0];
+					if (genes.length > 1) {
+						for (var nn = 0; nn < genes.length; ++nn) {
+							if (nn > 0) {
+								m_gene_names += ", ";
+							}
+							m_gene_names += genes[nn].name;
+						}
+						m_gene_names += " (" + modif_id + ")";
+						gene_name = m_gene_names;
+						gene_id = "";
+					} else {
+						gene_id = navicell.dataset.getGeneByName(gene_name).id;
+					}
+				}
 				var type = overlay.boundBoxes[nn][2];
 				var hint = overlay.boundBoxes[nn][3];
-				console.log("click on: " + gene_name + " " + navicell.dataset.getGeneByName(gene_name).id + " " + type);
+				console.log("click on: " + gene_name + " " + gene_id + " " + type + " " + modif_id);
 				if (type == "heatmap") {
-					$("#heatmap_select_gene", doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#heatmap_select_gene", doc).val(gene_id);
+					if (m_gene_names) {
+						$("#heatmap_select_m_genes", doc).html(m_gene_names);
+					} else {
+						$("#heatmap_select_m_genes", doc).html("");
+					}
+
+					$("#heatmap_select_modif_id", doc).html(modif_id);
 					$("#heatmap_editor_div", doc).dialog("open");
 					update_heatmap_editor(doc);
 				} else if (type == "barplot") {
-					$("#barplot_select_gene", doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#barplot_select_gene", doc).val(gene_id);
+					if (m_gene_names) {
+						$("#barplot_select_m_genes", doc).html(m_gene_names);
+					} else {
+						$("#barplot_select_m_genes", doc).html("");
+					}
+
+					$("#barplot_select_modif_id", doc).html(modif_id);
 					$("#barplot_editor_div", doc).dialog("open");
 					update_barplot_editor(doc);
 				} else if (type == "glyph") {
-					console.log("HINT " + hint);
-					$("#glyph_select_gene_" + hint, doc).val(navicell.dataset.getGeneByName(gene_name).id);
+					$("#glyph_select_gene_" + hint, doc).val(gene_id);
 					$("#glyph_editor_div_" + hint, doc).dialog("open");
 					update_glyph_editor(doc, null, hint);
 				}
@@ -398,6 +432,8 @@ USGSOverlay.prototype.draw = function(module) {
 		var MARGIN = 30;
 		var div_width = div.width;
 		var div_height = div.height+MARGIN;
+		cache_value_cnt = 0;
+		no_cache_value_cnt = 0;
 		for (var nn = 0; nn < arrpos.length; ++nn) {
 			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
@@ -405,10 +441,11 @@ USGSOverlay.prototype.draw = function(module) {
 			var pos_y = pix.y - div.top;
 			if (pos_x > -MARGIN && pos_x < div_width &&
 			    pos_y >= 0 && pos_y < div_height) {
-				navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+				navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].id, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
 			} else {
 			}
 		}
+		//console.log("CACHE_VALUE_CNT " + cache_value_cnt + " " + no_cache_value_cnt);
 	}
 }
 
@@ -416,8 +453,8 @@ USGSOverlay.prototype.reset = function() {
 	this.arrpos = [];
 }
 
-USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type, hint) {
-	this.boundBoxes.push([box, gene_name, chart_type, hint]);
+USGSOverlay.prototype.addBoundBox = function(box, gene_name, chart_type, hint, modif_id) {
+	this.boundBoxes.push([box, gene_name, chart_type, hint, modif_id]);
 }
 
 USGSOverlay.prototype.remove_old = function(rm_arrpos) {

@@ -1091,6 +1091,7 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		var url = arg1;
 		var file = arg2;
 		var data;
+		console.log("import: " + url + " " + file + " " + data);
 		if (url && url.match(/^@DATA\n/)) {
 			data = url.substring(6);
 			url = null;
@@ -1141,12 +1142,15 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		var annot_name = arg1;
 		var checked = arg2;
 		var annot = navicell.annot_factory.getAnnotation(annot_name);
+		console.log("annotation selected: " + annot_name + " " + annot);
 		if (annot) {
 			if (checked) {
 				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
 			} else {
 				$("#cb_annot_" + annot.id, win.document).removeAttr("checked");
 			}
+		} else {
+			throw "nv_sample_annotation_perform: annotation \"" + annot + "\" not found";
 		}
 	} else {
 		throw "nv_sample_annotation_perform: unknown command \"" + command + "\"";

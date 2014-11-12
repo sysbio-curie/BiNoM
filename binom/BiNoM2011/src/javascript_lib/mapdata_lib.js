@@ -24,6 +24,9 @@ var MAX_DISCRETE_VALUES = 30;
 var DATATABLE_LIST = 'Datatable list';
 var MULTI_REV_SHAPE_MAP = true;
 
+var cache_value_cnt = 0;
+var no_cache_value_cnt = 0;
+
 if (!window.console) {
 	window.console = new function()
 	{
@@ -267,6 +270,15 @@ jxtree_mapfun_map['right_label'] = function(datanode) {
 }
 
 jxtree_mapfun_map['data'] = function(datanode) {
+	/*
+	console.log("mapfun data: data=" + datanode.data + ", id=" + datanode.id + ", modifs=" + (datanode.modifs ? datanode.modifs.length : -1) + ", name=" + datanode.name);
+	
+	if (datanode.modifs) {
+		for (var nn = 0; nn < datanode.modifs.length; ++nn) {
+			console.log("  " + datanode.modifs[nn].id);
+		}
+	}
+	*/
 	if (datanode.data) {
 		return datanode.data;
 	}
@@ -322,9 +334,13 @@ function jxtree_get_node_class(node, included) {
 // searching perharps not in the good place, and, at least, jxtree find is not correct with nodes
 // must compare to jstree searching !
 
+/*
 function jxtree_user_find(matcher, node) {
 	var data = node.getUserData();
 	if (data && data.id) {
+		if (data.modifs) {
+			console.log("data " + data.id + " has modifs");
+		}
 		if ((matcher.search_in & JXTreeMatcher.IN_ANNOT) != 0) {
 			var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
 			if (info) {
@@ -346,7 +362,9 @@ function jxtree_user_find(matcher, node) {
 	}
 	return false;
 }
+*/
 
+/*
 function jxtree_user_find_id(matcher, node) {
         var data = node.getUserData();
         if (data && data.id) {
@@ -356,10 +374,14 @@ function jxtree_user_find_id(matcher, node) {
         }
         return false;
 }
+*/
 
 function jxtree_user_find_regex(matcher, regex, node) {
 	var data = node.getUserData();
 	if (data && data.id) {
+		if (jxtree_user_find_id_regex(matcher, regex, node)) {
+			return true;
+		}
 		if ((matcher.search_in & JXTreeMatcher.IN_ANNOT) != 0) {
 			var info = navicell.mapdata.getInfo(node.jxtree.module_name, data.id);
 			if (info) {
@@ -388,6 +410,16 @@ function jxtree_user_find_id_regex(matcher, regex, node) {
 		if (data.id.match(regex)) {
                         return true;
                 }
+		/*
+		if (data.modifs) {
+			for (var nn = 0; nn < data.modifs.length; ++nn) {
+				if (data.modifs[nn].id.match(regex)) {
+					console.log("found modif " + data.modifs[nn].id);
+					return true;
+				}
+			}
+		}
+		*/
         }
         return false;
 }
@@ -1139,7 +1171,8 @@ function Dataset(name) {
 	this.modifs_id = {};
 
 	this.gene_shape_map = {};
-	this.gene_set_shape_map = {};
+	this.gene_shape_modif_map = {};
+	this.gene_set_shape_map = {}; // ???
 	this.module_arrpos = {};
 }
 
@@ -1229,6 +1262,13 @@ Dataset.prototype = {
 		return null;
 	},
 
+	getModifsByShapeId: function(module_name, shape_id) {
+		if (this.gene_shape_modif_map[module_name]) {
+			return this.gene_shape_modif_map[module_name][shape_id];
+		}
+		return null;
+	},
+
 	getGeneSetByShapeId: function(module_name, shape_id) {
 		if (this.gene_set_shape_map[module_name]) {
 			return this.gene_set_shape_map[module_name][shape_id];
@@ -1239,11 +1279,13 @@ Dataset.prototype = {
 	syncModifs: function() {
 		this.modifs_id = {};
 		this.gene_shape_map = {};
+		this.gene_shape_modif_map = {};
 		this.gene_set_shape_map = {};
 		for (var jj = 0; jj < navicell.module_names.length; ++jj) {
 			var module_name = navicell.module_names[jj];
 			this.modifs_id[module_name] = {};
 			this.gene_shape_map[module_name] = {};
+			this.gene_shape_modif_map[module_name] = {};
 			this.gene_set_shape_map[module_name] = {};
 			for (var gene_name in this.genes) {
 				var gene = this.genes[gene_name];
@@ -1269,6 +1311,10 @@ Dataset.prototype = {
 											this.gene_shape_map[module_name][pos.said] = [];
 										}
 										this.gene_shape_map[module_name][pos.said].push(gene_name);
+										if (!this.gene_shape_modif_map[module_name][pos.said]) {
+											this.gene_shape_modif_map[module_name][pos.said] = {};
+										}
+										this.gene_shape_modif_map[module_name][pos.said][modif.id] = true;
 										gene.addShapeId(module_name, pos.said);
 									}
 									if (pos.cid) {
@@ -1281,6 +1327,10 @@ Dataset.prototype = {
 														this.gene_shape_map[module_name][cid_said] = [];
 													}
 													this.gene_shape_map[module_name][cid_said].push(gene_name);
+													if (!this.gene_shape_modif_map[module_name][cid_said]) {
+														this.gene_shape_modif_map[module_name][cid_said] = {};
+													}
+													this.gene_shape_modif_map[module_name][cid_said][modif.id] = true;
 												}
 											}
 										} else {
@@ -1295,10 +1345,27 @@ Dataset.prototype = {
 									}
 								}
 							}
-							if (this.modifs_id[module_name][modif.id]) {
-								console.log("modifs_id already set for " + modif.id + " " + this.modifs_id[module_name][modif.id][0].name + " " + gene_name);
+							if (!this.modifs_id[module_name][modif.id]) {
+								this.modifs_id[module_name][modif.id] = [[gene], arrpos];
+							} else {
+								var genes = this.modifs_id[module_name][modif.id][0];
+								var found = false;
+								for (var zz = 0; zz < genes.length; ++zz) {
+									if (genes[zz] == gene) {
+										found = true;
+										break;
+									}
+								}
+								if (!found) {
+									this.modifs_id[module_name][modif.id][0].push(gene);
+								} else {
+									var x_arrpos = this.modifs_id[module_name][modif.id][1];
+									if (arrpos[0].p.x != x_arrpos[0].p.x || arrpos[0].p.y != x_arrpos[0].p.y) {
+										console.log("BAD POS " + arrpos[0].p.x + " vs. " +  x_arrpos[0].p.x + " " +  arrpos[0].p.y + " vs. " +  x_arrpos[0].p.y);
+									}
+								}
 							}
-							this.modifs_id[module_name][modif.id] = [gene, arrpos];
+							//this.modifs_id[module_name][modif.id] = [gene, arrpos];
 						}
 					}
 				}
@@ -1436,7 +1503,7 @@ Dataset.prototype = {
 		return true;
 	},
 
-	drawDLO: function(module, overlay, context, scale, gene_name, topx, topy) {
+	drawDLO: function(module, overlay, context, scale, modif_id, gene_name, topx, topy) {
 		var size = 2;
 		var bound = null;
 		var drawing_config = navicell.getDrawingConfig(module);
@@ -1452,10 +1519,10 @@ Dataset.prototype = {
 			topx -= 6;
 		}
 		if (drawing_config.displayHeatmaps()) {
-			draw_heatmap(module, overlay, context, scale, gene_name, topx, topy);
+			draw_heatmap(module, overlay, context, scale, modif_id, gene_name, topx, topy);
 		}
 		if (drawing_config.displayBarplots()) {
-			draw_barplot(module, overlay, context, scale, gene_name, topx, topy);
+			draw_barplot(module, overlay, context, scale, modif_id, gene_name, topx, topy);
 		}
 	},
 
@@ -1505,6 +1572,7 @@ DisplayContinuousConfig.DEFAULT_STEP_COUNT = 5;
 function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 	this.datatable = datatable;
 	this.win = win;
+	this.module = get_module(win);
 	this.discrete_ordered = {}
 	this.discrete_ordered['sample'] = discrete_ordered;
 	this.discrete_ordered['group'] = false;
@@ -1563,9 +1631,16 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 	}
 
 	this.group_method = {};
+	this.sample_method = {};
 	this.setGroupMethod('color', Group.CONTINUOUS_AVERAGE);
 	this.setGroupMethod('shape', Group.CONTINUOUS_AVERAGE);
 	this.setGroupMethod('size', Group.CONTINUOUS_AVERAGE);
+
+	var def_sample_method = this.datatable.minval < 0 ? Group.CONTINUOUS_ABS_MAXVAL: Group.CONTINUOUS_MAXVAL;
+	this.setSampleMethod('color', def_sample_method);
+	this.setSampleMethod('shape', def_sample_method);
+	this.setSampleMethod('size', def_sample_method);
+
 	this.divs = {};
 	this.buildDiv('color');
 	this.buildDiv('shape');
@@ -1757,6 +1832,10 @@ DisplayContinuousConfig.prototype = {
 		return Math.abs(value);
 	},
 
+	setSampleMethod: function(config, sample_method) {
+		this.sample_method[config] = sample_method;
+	},
+
 	setGroupMethod: function(config, group_method) {
 		this.group_method[config] = group_method;
 		this.use_absval['group'][config] = 
@@ -1802,8 +1881,26 @@ DisplayContinuousConfig.prototype = {
 		return " style='text-align: center'";
 	},
 
+	getHeatmapStyleSampleByModifId: function(sample_name, modif_id) {
+		var color = this.getColorSampleByModifId(sample_name, modif_id);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return " style='text-align: center'";
+	},
+
 	getHeatmapStyleGroup: function(group, gene_name) {
 		var color = this.getColorGroup(group, gene_name);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return " style='text-align: center'";
+	},
+
+	getHeatmapStyleGroupByModifId: function(group, modif_id) {
+		var color = this.getColorGroupByModifId(group, modif_id);
 		if (color) {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
@@ -1815,8 +1912,16 @@ DisplayContinuousConfig.prototype = {
 		return this.getHeatmapStyleSample(sample_name, gene_name);
 	},
 
+	getBarplotStyleSampleByModifId: function(sample_name, modif_id) {
+		return this.getHeatmapStyleSampleByModifId(sample_name, modif_id);
+	},
+
 	getBarplotStyleGroup: function(group, gene_name) {
 		return this.getHeatmapStyleGroup(group, gene_name);
+	},
+
+	getBarplotStyleGroupByModifId: function(group, modif_id) {
+		return this.getHeatmapStyleGroupByModifId(group, modif_id);
 	},
 
 	_getBarplotHeight: function(tabname, value, max) {
@@ -1834,8 +1939,18 @@ DisplayContinuousConfig.prototype = {
 		return this._getBarplotHeight('sample', value, max);
 	},
 
+	getBarplotSampleHeightByModifId: function(sample_name, modif_id, max) {
+		var value = this.getColorSizeSampleValueByModifId(sample_name, modif_id);
+		return this._getBarplotHeight('sample', value, max);
+	},
+
 	getBarplotGroupHeight: function(group, gene_name, max) {
-		var value = group.getValue(this.datatable, gene_name, this.group_method['color']);
+		var value = group.getValue(this.module, this.datatable, gene_name, null, this.group_method['color']);
+		return this._getBarplotHeight('group', value, max);
+	},
+
+	getBarplotGroupHeightByModifId: function(group, modif_id, max) {
+		var value = group.getValue(this.module, this.datatable, null, modif_id, this.group_method['color']);
 		return this._getBarplotHeight('group', value, max);
 	},
 
@@ -1932,11 +2047,18 @@ DisplayContinuousConfig.prototype = {
 		return html;
 	},
 
-	makeSelectGroupMethod: function(config) {
+	makeSelectMultiGeneMethod: function(config, type) {
 		var datatable = this.datatable;
-		var method = this.group_method[config];
+		var method;
 		var selected;
-		var str = "<select id='group_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+		var str = "";
+		if (type == 'group') {
+			method = this.group_method[config];
+			str = "<select id='group_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+		} else if (type == 'sample') {
+			method = this.sample_method[config];
+			str = "<select id='sample_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setSampleMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+		}
 		selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
 		str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
 		selected = (method == Group.CONTINUOUS_MEDIAN) ? " selected" : "";
@@ -1966,24 +2088,56 @@ DisplayContinuousConfig.prototype = {
 		return this.getDatatableValue(config, tabname, value);
 	},
 
+	getValueByModifId: function(config, tabname, sample_name, modif_id) {
+		// should be replaced by:
+		var value = this.datatable.getValueByModifId(this.module, sample_name, modif_id, this.sample_method[config]);
+		return this.getDatatableValue(config, tabname, value);
+		/*
+		var info = navicell.dataset.getGeneInfoByModifId(this.module, modif_id);
+		if (info) {
+			var genes = info[0];
+			var total_value = 0.;
+			// if average !
+			for (var nn = 0; nn < genes.length; ++nn) {
+				var gene_name = genes[nn].name;
+				total_value += this.datatable.getValue(sample_name, gene_name)*1.;
+			}
+			return this.getDatatableValue(config, tabname, total_value / genes.length);
+		}
+		return 0;
+		*/
+	},
+
 	getShapeSampleValue: function(sample_name, gene_name) {
 		return this.getValue('shape', 'sample', sample_name, gene_name);
 	},
 
 	getShapeGroupValue: function(group, gene_name) {
-		return group.getValue(this.datatable, gene_name, this.group_method['shape']);
+		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['shape']);
 	},
 
 	getColorSampleValue: function(sample_name, gene_name) {
 		return this.getValue('color', 'sample', sample_name, gene_name);
 	},
 
+	getColorSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getValueByModifId('color', 'sample', sample_name, modif_id);
+	},
+
 	getColorGroupValue: function(group, gene_name) {
-		return group.getValue(this.datatable, gene_name, this.group_method['color']);
+		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['color']);
+	},
+
+	getColorGroupValueByModifId: function(group, modif_id) {
+		return group.getValue(this.module, this.datatable, null, modif_id, this.group_method['color']);
 	},
 
 	getColorSizeSampleValue: function(sample_name, gene_name) {
 		return this.getColorSampleValue(sample_name, gene_name);
+	},
+
+	getColorSizeSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getColorSampleValueByModifId(sample_name, modif_id);
 	},
 
 	getColorSizeGroupValue: function(group, gene_name) {
@@ -1995,7 +2149,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getSizeGroupValue: function(sample_name, gene_name) {
-		return group.getValue(this.datatable, gene_name, this.group_method['size']);
+		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['size']);
 	},
 
 	getShapeSample: function(sample_name, gene_name) {
@@ -2013,13 +2167,27 @@ DisplayContinuousConfig.prototype = {
 		return this._getColor(value, 'sample');
 	},
 
+	getColorSampleByModifId: function(sample_name, modif_id) {
+		var value = this.getColorSampleValueByModifId(sample_name, modif_id);
+		return this._getColor(value, 'sample');
+	},
+
 	getColorGroup: function(group, gene_name) {
 		var value = this.getColorGroupValue(group, gene_name);
 		return this._getColor(value, 'group');
 	},
 
+	getColorGroupByModifId: function(group, modif_id) {
+		var value = this.getColorGroupValueByModifId(group, modif_id);
+		return this._getColor(value, 'group');
+	},
+
 	getColorSizeSample: function(sample_name, gene_name) {
 		return this.getColorSample(sample_name, gene_name);
+	},
+
+	getColorSizeSampleByModifId: function(sample_name, modif_id) {
+		return this.getColorSampleByModifId(sample_name, modif_id);
 	},
 
 	getColorSizeGroup: function(group, gene_name) {
@@ -2136,8 +2304,15 @@ DisplayContinuousConfig.prototype = {
 			html += "<td width='10px'>&nbsp;</td>";
 		}
 		if (tabname == 'sample') {
-			if (!this.discrete_ordered[tabname] && this.datatable.minval < 0) {
-				html += "<td width='" + width + "'rowspan='2'><span class='config-label'>&nbsp;&nbsp;Use&nbsp;abs&nbsp;values&nbsp;</span><input id='step_config_absval_" + id_suffix + "' type='checkbox' onchange='DisplayContinuousConfig.setSampleAbsval(\"" + config + "\", \"" + id + "\")'" + (use_absval ? " checked" : "") + "></input></td>"
+			if (!this.discrete_ordered[tabname]) {
+				if (this.datatable.minval < 0) {
+					html += "<td width='" + width + "'rowspan='2'><span class='config-label'>&nbsp;&nbsp;Use&nbsp;abs&nbsp;values&nbsp;</span><input id='step_config_absval_" + id_suffix + "' type='checkbox' onchange='DisplayContinuousConfig.setSampleAbsval(\"" + config + "\", \"" + id + "\")'" + (use_absval ? " checked" : "") + "></input></td>"
+					html += "</tr><tr>";
+				}
+				/*
+				// multiple hugo
+				//
+				*/
 			} else {
 				html += "<td width='" + width + "'>&nbsp;</td>";
 			}
@@ -2151,7 +2326,18 @@ DisplayContinuousConfig.prototype = {
 		}
 		if (tabname == 'group') {
 			html += "<td width='10px'>&nbsp;</td>";
-			html += "<td width='" + width + "' style='text-align: center'>" + this.makeSelectGroupMethod(config) + "</td>";
+			html += "<td width='" + width + "' style='text-align: center'>" + this.makeSelectMultiGeneMethod(config, 'group') + "</td>";
+		} else if (!this.discrete_ordered[tabname]) {
+			// multiple hugo
+			html += "</tr><tr>";
+			html += "<tr><td>&nbsp;</td></tr>";
+			//html += "<td width='10px'>&nbsp;</td>";
+			html += "<td colspan='4' width='" + width + "' style='text-align: center'><span class='config-label' style='text-align: center'>MultiGene&nbsp;Gene&nbsp;Method</span></td>";
+			html += "</tr><tr>";
+			//html += "<td></td><td></td><td width='10px'>&nbsp;</td>";
+			//html += "<td width='10px'>&nbsp;</td>";
+			html += "<td colspan='4' width='" + width + "' style='text-align: center'>" + this.makeSelectMultiGeneMethod(config, 'sample') + "</td>";
+			//
 		}
 		html += "</tr>";
 		html += "</tbody>";
@@ -2240,6 +2426,23 @@ DisplayContinuousConfig.setSampleAbsval = function(config, id) {
 	if (datatable) {
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setUseAbsValue(config, checked == 'checked');
+		var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
+		if (displayContinuousConfig.use_gradient[config]) {
+			step_cnt--;
+		}
+		displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
+		DisplayContinuousConfig.setEditing(id, true, config);
+	}
+}
+
+DisplayContinuousConfig.setSampleMethod = function(config, id) {
+	var datatable = navicell.getDatatableById(id);
+	var win = window;
+	var module = get_module();
+	if (datatable) {
+		var obj = $("#sample_method_" + config + '_' + id, win.document);
+		var displayContinuousConfig = datatable.getDisplayConfig(module);
+		displayContinuousConfig.setSampleMethod(config, obj.val());
 		var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
 		if (displayContinuousConfig.use_gradient[config]) {
 			step_cnt--;
@@ -2581,6 +2784,12 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.values_idx[value];
 	},
 
+	// WARNING: DisplayUnorderedDiscreteConfig.*ByModifId is only partly implemented, missing getValueByModifId
+	getValueIndexByModifId: function(sample_name, modif_id) {
+		var value = this.getValueByModifId(sample_name, modif_id);
+		return this.values_idx[value];
+	},
+
 	getColorSampleValue: function(sample_name, gene_name) {
 		return this.getValue(sample_name, gene_name);
 	},
@@ -2630,7 +2839,15 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return max * (size/maxsize);
 	},
 
-	getAcceptedCondition: function(group, gene_name, config, raw) {
+	// WARNING: DisplayUnorderedDiscreteConfig.*ByModifId is only partly implemented, missing some methods...
+	getBarplotSampleHeightByModifId: function(sample_name, modif_id, max) {
+		var idx = this.getValueIndexByModifId(sample_name, modif_id);
+		var size = this.getSizeAt(idx, COLOR_SIZE_CONFIG, 'sample') * 1.;
+		var maxsize = STEP_MAX_SIZE/2;
+		return max * (size/maxsize);
+	},
+
+	_getAcceptedCondition_perform: function(group, gene_name, modif_id, config, raw) {
 		var conds = this.conds['group'][config];
 		var id_suffix = 'group_' + config + '_' + this.datatable.getId();
 		var doc = this.win.document;
@@ -2640,12 +2857,12 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				if (idx2 != undefined) {
 					if (idx2 == -1) {
 						for (var idx3 = 0; idx3 < this.values.length; ++idx3) {
-							if (group.acceptCondition(this.datatable, gene_name, this.values[idx3], conds[idx])) {
+							if (group.acceptCondition(this.module, this.datatable, gene_name, modif_id, this.values[idx3], conds[idx])) {
 								return raw ? -(idx+1) : idx;
 							}
 						}
 					} else {
-						if (group.acceptCondition(this.datatable, gene_name, this.values[idx2], conds[idx])) {
+						if (group.acceptCondition(this.module, this.datatable, gene_name, modif_id, this.values[idx2], conds[idx])) {
 							return idx;
 						}
 					}
@@ -2653,6 +2870,14 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			}
 		}
 		return conds.length-1;
+	},
+
+	getAcceptedCondition: function(group, gene_name, config, raw) {
+		return this._getAcceptedCondition_perform(group, gene_name, null, config, raw);
+	},
+
+	getAcceptedConditionByModifId: function(group, modif_id, config, raw) {
+		return this._getAcceptedCondition_perform(group, null, modif_id, config, raw);
 	},
 
 	condString: function(idx, config) {
@@ -2709,8 +2934,18 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.getColorAt(idx, 'color', 'group');
 	},
 
+	getColorGroupByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, 'color');
+		return this.getColorAt(idx, 'color', 'group');
+	},
+
 	getColorSizeGroup: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, COLOR_SIZE_CONFIG);
+		return this.getColorAt(idx, COLOR_SIZE_CONFIG, 'group');
+	},
+
+	getColorSizeGroupByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, COLOR_SIZE_CONFIG);
 		return this.getColorAt(idx, COLOR_SIZE_CONFIG, 'group');
 	},
 
@@ -2726,6 +2961,15 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 	getHeatmapStyleGroup: function(group, gene_name) {
 		var color = this.getColorGroup(group, gene_name);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return '';
+	},
+
+	getHeatmapStyleGroupByModifId: function(group, modif_id) {
+		var color = this.getColorGroupByModifId(group, modif_id);
 		if (color) {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
@@ -4092,6 +4336,85 @@ Datatable.prototype = {
 		return undefined;
 	},
 
+	getValueByModifId: function(module, sample_name, modif_id, method) {
+		var info = navicell.dataset.getGeneInfoByModifId(module, modif_id);
+		if (info) {
+			var genes = info[0];
+			if (genes.length == 1) {
+				return this.getValue(sample_name, genes[0].name)*1.;
+			}
+			if (method == Group.CONTINUOUS_MEDIAN) {
+				var values = [];
+				for (var nn = 0; nn < genes.length; ++nn) {
+
+					var gene_name = genes[nn].name;
+					var value = this.getValue(sample_name, gene_name)*1.;
+					values.push(value);
+				}
+				var len = values.length;
+				values.sort(cmp=function(x, y) {return x-y;});
+				var len2 = Math.floor(len/2);
+				if (0 == (len & 1)) {
+					return values[len2];
+				}
+				return (values[len2-1]+values[len2])/2;
+				
+			}
+			if (method == Group.CONTINUOUS_AVERAGE || method == Group.CONTINUOUS_ABS_AVERAGE) {
+				var total_value = 0.;
+				var total_absvalue = 0;
+				for (var nn = 0; nn < genes.length; ++nn) {
+					var gene_name = genes[nn].name;
+					var value = this.getValue(sample_name, gene_name)*1.;
+					total_value += value;
+					total_absvalue += Math.abs(value);
+				}
+				if (method == Group.CONTINUOUS_AVERAGE) {
+					return total_value / genes.length;
+				}
+				return total_absvalue / genes.length;
+			}
+			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MINVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
+				var max = Number.MIN_NUMBER;
+				var absmax = Number.MIN_NUMBER;
+				var min = Number.MAX_NUMBER;
+				var absmin = Number.MAX_NUMBER;
+				for (var nn = 0; nn < genes.length; ++nn) {
+
+					var gene_name = genes[nn].name;
+					var value = this.getValue(sample_name, gene_name)*1.;
+					var absvalue = Math.abs(value);
+					if (value < min) {
+						min = value;
+					}
+					if (absvalue < absmin) {
+						absmin = absvalue;
+					}
+					if (value > max) {
+						max = value;
+					}
+					if (absvalue > absmax) {
+						absmax = absvalue;
+					}
+				}
+				if (method == Group.CONTINUOUS_MINVAL) {
+					return min;
+				}
+				if (method == Group.CONTINUOUS_MAXVAL) {
+					return max;
+				}
+				if (method == Group.CONTINUOUS_ABS_MINVAL) {
+					return absmin;
+				}
+				if (method == Group.CONTINUOUS_ABS_MAXVAL) {
+					return absmax;
+				}
+				return undefined; // never reached
+			}
+		}
+		return undefined;
+	},
+
 	makeDataTable_samples: function(module) {
 		this.switch_button[module].val("Switch to Genes / Samples");
 		var str = "<thead><th>Samples</th>";
@@ -4779,6 +5102,24 @@ function Group(annots, values, id) {
 	for (var nn = 0; nn < annots.length; ++nn) {
 		this.html_name += (this.html_name.length > 0 ? "<br>" : "") + '<span class="group_name">' + annots[nn].replace(/ /g, '&nbsp;') + ':</span>&nbsp;<span class="group_value">' + values[nn].replace(/ /g, '&nbsp;')  + '</span>';
 	}
+
+	// must complete cache to other methods: median, max abs value etc.
+	this.gene_average = {};
+	this.gene_abs_average = {};
+	this.gene_median = {};
+	this.gene_median = {};
+	this.gene_minval = {};
+	this.gene_maxval = {};
+	this.gene_abs_minval = {};
+	this.gene_abs_maxval = {};
+
+	this.modif_average = {};
+	this.modif_abs_average = {};
+	this.modif_median = {};
+	this.modif_minval = {};
+	this.modif_maxval = {};
+	this.modif_abs_minval = {};
+	this.modif_abs_maxval = {};
 }
 
 Group.CONTINUOUS_AVERAGE = "1";
@@ -4817,13 +5158,13 @@ Group.prototype = {
 		return this.id;
 	},
 
-	acceptCondition: function(datatable, gene_name, cond_value, cond) {
+	acceptCondition: function(module, datatable, gene_name, modif_id, cond_value, cond) {
 		if (cond == Group.DISCRETE_IGNORE) {
 			return false;
 		}
 		var eq_cnt = 0;
 		for (var sample_name in this.samples) {
-			var value = datatable.getValue(sample_name, gene_name);
+			var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 			var eq = (cond_value == value);
 			if (eq) {
 				if (cond == Group.DISCRETE_EQ_0) {
@@ -4851,7 +5192,42 @@ Group.prototype = {
 		return false;
 	},
 
-	getValue: function(datatable, gene_name, method) {
+	getCacheValue: function(datatable, gene_cache_arr, gene_name, modif_cache_arr, modif_id) {
+		if (gene_name) {
+			if (!gene_cache_arr[datatable.id]) {
+				gene_cache_arr[datatable.id] = {};
+				no_cache_value_cnt++;
+				return undefined;
+			}
+			if (gene_cache_arr[datatable.id][gene_name] != undefined) {
+				cache_value_cnt++;
+				return gene_cache_arr[datatable.id][gene_name];
+			}
+		} else {
+			if (!modif_cache_arr[datatable.id]) {
+				modif_cache_arr[datatable.id] = {};
+				no_cache_value_cnt++;
+				return undefined;
+			}
+			if (modif_cache_arr[datatable.id][modif_id] != undefined) {
+				cache_value_cnt++;
+				return modif_cache_arr[datatable.id][modif_id];
+			}
+		}
+		no_cache_value_cnt++;
+		return undefined;
+	},
+
+	setCacheValue: function(datatable, gene_cache_arr, gene_name, modif_cache_arr, modif_id, value) {
+		if (gene_name) {
+			gene_cache_arr[datatable.id][gene_name] = value;
+		} else {
+			modif_cache_arr[datatable.id][modif_id] = value;
+		}
+		return value;
+	},
+
+	getValue: function(module, datatable, gene_name, modif_id, method) {
 		if (!method) {
 			method = this.getMethod(datatable);
 		}
@@ -4859,7 +5235,8 @@ Group.prototype = {
 			if (method == Group.CONTINUOUS_MEDIAN) {
 				var values = [];
 				for (var sample_name in this.samples) {
-					var value = datatable.getValue(sample_name, gene_name);
+					//var value = datatable.getValue(sample_name, gene_name);
+					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == '') {
 						continue;
 					}
@@ -4879,6 +5256,18 @@ Group.prototype = {
 				
 			}
 			if (method == Group.CONTINUOUS_AVERAGE || method == Group.CONTINUOUS_ABS_AVERAGE) {
+				var retval;
+				if (method == Group.CONTINOUS_AVERAGE) {
+					retval = this.getCacheValue(datatable, this.gene_average, gene_name, this.modif_average, modif_id);
+					if (retval != undefined) {
+						return retval;
+					}
+				} else {
+					retval = this.getCacheValue(datatable, this.gene_abs_average, gene_name, this.modif_abs_average, modif_id);
+					if (retval != undefined) {
+						return retval;
+					}
+				}
 				// could use a cache:
 				// this.average[datatable.id][gene_name]
 				// this.abs_average[datatable.id][gene_name]
@@ -4887,7 +5276,8 @@ Group.prototype = {
 				var total_absvalue = 0;
 				var cnt = 0;
 				for (var sample_name in this.samples) {
-					var value = datatable.getValue(sample_name, gene_name);
+					//var value = datatable.getValue(sample_name, gene_name);
+					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == '') {
 						continue;
 					}
@@ -4900,7 +5290,11 @@ Group.prototype = {
 					}
 				}
 				if (cnt) {
-					return method == Group.CONTINUOUS_AVERAGE ? total_value/cnt : total_absvalue/cnt;
+					var retval = (method == Group.CONTINUOUS_AVERAGE ? total_value/cnt : total_absvalue/cnt);
+					if (method == Group.CONTINOUS_AVERAGE) {
+						return this.setCacheValue(datatable, this.gene_average, gene_name, this.modif_average, modif_id, retval);
+					}
+					return this.setCacheValue(datatable, this.gene_abs_average, gene_name, this.modif_abs_average, modif_id, retval);
 				}
 				return undefined;
 			}
@@ -4914,7 +5308,8 @@ Group.prototype = {
 				var absmin_set = false;
 				var absmax_set = false;
 				for (var sample_name in this.samples) {
-					var value = datatable.getValue(sample_name, gene_name);
+					//var value = datatable.getValue(sample_name, gene_name);
+					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == '') {
 						continue;
 					}
@@ -4961,7 +5356,8 @@ Group.prototype = {
 		var value_cnt = 0;
 		var sample_cnt = 0;
 		for (var sample_name in this.samples) {
-			var value = datatable.getValue(sample_name, gene_name);
+			//var value = datatable.getValue(sample_name, gene_name);
+			var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 			if (value == method_value) {
 				value_cnt++;
 			}

@@ -335,23 +335,23 @@ class NaviCell:
         self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_or_data, params])
 
     def sampleAnnotationImport(self, sample_annotation_url_or_data):
-        self.sampleAnnotationOpen()
+#        self.sampleAnnotationOpen()
         self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data])
 
-    def sampleAnnotationOpen(self):
-        self._cli2srv('nv_sample_annotation_perform', '', ['open'])
+    def sampleAnnotationOpen(self, module):
+        self._cli2srv('nv_sample_annotation_perform', module, ['open'])
 
-    def sampleAnnotationClose(self):
-        self._cli2srv('nv_sample_annotation_perform', '', ['close'])
+    def sampleAnnotationClose(self, module):
+        self._cli2srv('nv_sample_annotation_perform', module, ['close'])
 
-    def sampleAnnotationApply(self):
-        self._cli2srv('nv_sample_annotation_perform', '', ['apply'])
+    def sampleAnnotationApply(self, module):
+        self._cli2srv('nv_sample_annotation_perform', module, ['apply'])
 
-    def sampleAnnotationCancel(self):
-        self._cli2srv('nv_sample_annotation_perform', '', ['cancel'])
+    def sampleAnnotationCancel(self, module):
+        self._cli2srv('nv_sample_annotation_perform', module, ['cancel'])
 
-    def sampleAnnotationSelectAnnotation(self, annot, select=True):
-        self._cli2srv('nv_sample_annotation_perform', '', ['select_annotation', annot, select])
+    def sampleAnnotationSelectAnnotation(self, module, annot, select=True):
+        return self._cli2srv('nv_sample_annotation_perform', module, ['select_annotation', annot, select])
 
     def getDatatableList(self):
         return self._cli2srv('nv_get_datatable_list', '', [], 'send_and_rcv')
@@ -656,6 +656,11 @@ class NaviCell:
         print("")
 
         print('nv.sampleAnnotationImport("http://localhost/~eviara/data/cancer_cell_line_broad/SampleAnnotations.txt")')
+        print("")
+        print('nv.sampleAnnotationOpen("")')
+        print('nv.sampleAnnotationImport("https://acsn.curie.fr/navicell/demo/data/SampleAnnotations.txt")')
+        print('nv.sampleAnnotationSelectAnnotation("", "Tissue")')
+        print('nv.sampleAnnotationApply("")')
         print("")
 
         print('nv.findEntities("", "A*", {"in": "annot", "token": "word"}, False)')

@@ -50,6 +50,8 @@ var DATATABLE_COLOR_CONFIG_WIDTH = 440;
 var DATATABLE_CONFIG_WIDTH = 400;
 var DATATABLE_CONFIG_HEIGHT = 670;
 
+var USE_MODIF_ID_FOR_COLORS = true;
+
 function nv1() {
 	$("#datatable_input").css("display", "none");
 	$("#right_tabs").css("height", "100%");
@@ -1706,7 +1708,7 @@ function heatmap_select_datatable(idx, map_name)
 }
 
 // TBD: class HeatmapEditor
-function update_heatmap_editor(doc, params, heatmapConfig) {
+function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) {
 	//console.log("update_heatmap_editor");
 	var module = get_module_from_doc(doc);
 	var drawing_config = navicell.getDrawingConfig(module);
@@ -1723,6 +1725,8 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	var table = $("#heatmap_editor_table", doc);
 	var sel_gene_id = $("#heatmap_select_gene", doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#heatmap_select_modif_id").html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#heatmap_select_m_genes").html());
 
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -1795,20 +1799,30 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 			html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
-		if (sel_gene && sel_datatable) {
+		if ((sel_gene || sel_modif_id) && sel_datatable) {
 			var displayConfig = sel_datatable.getDisplayConfig(module);
-			var gene_name = sel_gene.name;
+			var gene_name = (sel_gene ? sel_gene.name : "");
 			for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 				var sel_group = heatmapConfig.getGroupAt(idx2);
 				var sel_sample = heatmapConfig.getSampleAt(idx2);
 				var style = undefined;
 				var value = undefined;
 				if (sel_sample) {
-					style = displayConfig.getHeatmapStyleSample(sel_sample.name, gene_name);
-					value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+					if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+						style = displayConfig.getHeatmapStyleSampleByModifId(sel_sample.name, sel_modif_id);
+						value = displayConfig.getColorSampleValueByModifId(sel_sample.name, sel_modif_id);
+					} else {
+						style = displayConfig.getHeatmapStyleSample(sel_sample.name, gene_name);
+						value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+					}
 				} else if (sel_group) {
-					style = displayConfig.getHeatmapStyleGroup(sel_group, gene_name);
-					value = displayConfig.getColorGroupValue(sel_group, gene_name);
+					if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+						style = displayConfig.getHeatmapStyleGroupByModifId(sel_group, sel_modif_id);
+						value = displayConfig.getColorGroupValueByModifId(sel_group, sel_modif_id);
+					} else {
+						style = displayConfig.getHeatmapStyleGroup(sel_group, gene_name);
+						value = displayConfig.getColorGroupValue(sel_group, gene_name);
+					}
 				}
 				if (style != undefined && value != undefined && value != INVALID_VALUE) {
 					if (!value) {
@@ -1873,7 +1887,7 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 	drawing_config.getEditingHeatmapConfig().setSlider(slider);
 	drawing_config.getHeatmapConfig().setSlider(slider);
 
-	html = "Apply this configuration to gene:&nbsp;";
+	html = "Apply this configuration to gene" + (sel_m_genes ? "s" : "") + ":&nbsp;";
 	html += "<select id='heatmap_select_gene' onchange='update_heatmap_editor(window.document, null, navicell.getDrawingConfig(\"" + module + "\").getEditingHeatmapConfig())'>\n";
 	html += "<option value='_none_'></option>\n";
 	var sorted_gene_names = navicell.dataset.getSortedGeneNames();
@@ -1881,18 +1895,25 @@ function update_heatmap_editor(doc, params, heatmapConfig) {
 		var gene_name = sorted_gene_names[idx];
 		var gene = navicell.dataset.genes[gene_name];
 		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
-		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
+	}
+	if (sel_m_genes && !sel_gene) {
+		html += "<option value='" + sel_m_genes + "' selected>" + (sel_m_genes ? sel_m_genes : "") + "</option>\n";
 	}
 	html += "</select>";
+	html += "<div id='heatmap_select_m_genes'>" + (sel_m_genes ? sel_m_genes : "") + "</div>";
+	html += "<div id='heatmap_select_modif_id'>" + (sel_modif_id ? sel_modif_id : "") + "</div>";
 
 	$("#heatmap_gene_choice", doc).html(html);
+	$("#heatmap_select_m_genes").css("display", "none");
+	$("#heatmap_select_modif_id").css("display", "none");
 
         $("#heatmap_clear_samples").css("font-size", "10px");
         $("#heatmap_all_samples").css("font-size", "10px");
         $("#heatmap_all_groups").css("font-size", "10px");
 }
 
-function draw_heatmap(module, overlay, context, scale, gene_name, topx, topy)
+function draw_heatmap(module, overlay, context, scale, modif_id, gene_name, topx, topy)
 {
 	if (!module) {
 		module = get_module();
@@ -1942,22 +1963,36 @@ function draw_heatmap(module, overlay, context, scale, gene_name, topx, topy)
 			var bg = undefined;
 			var value = undefined;
 			if (sel_sample) {
-				bg = displayConfig.getColorSample(sel_sample.name, gene_name);
-				value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+				if (USE_MODIF_ID_FOR_COLORS) {	
+					bg = displayConfig.getColorSampleByModifId(sel_sample.name, modif_id);
+					value = displayConfig.getColorSampleValueByModifId(sel_sample.name, modif_id);
+					var bg2 = displayConfig.getColorSample(sel_sample.name, gene_name);
+					var value2 = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+				} else {
+					bg = displayConfig.getColorSample(sel_sample.name, gene_name);
+					value = displayConfig.getColorSampleValue(sel_sample.name, gene_name);
+				}
 			} else if (sel_group) {
-				bg = displayConfig.getColorGroup(sel_group, gene_name);
-				value = displayConfig.getColorGroupValue(sel_group, gene_name);
+				if (USE_MODIF_ID_FOR_COLORS) {	
+					bg = displayConfig.getColorGroupByModifId(sel_group, modif_id);
+					value = displayConfig.getColorGroupValueByModifId(sel_group, modif_id);
+				} else {
+					bg = displayConfig.getColorGroup(sel_group, gene_name);
+					value = displayConfig.getColorGroupValue(sel_group, gene_name);
+				}
+			} else {
+				break; // EV: added 2014-11-10
 			}
 			if (bg != undefined && value != undefined && value != INVALID_VALUE) {
 				var fg = getFG_from_BG(bg);
 				context.fillStyle = "#" + bg;
 				fillStrokeRect(context, start_x, start_y, cell_w, cell_h);
+				start_x += cell_w;
 			}
-			start_x += cell_w;
 		}
 		start_y += cell_h;
 	}
-	overlay.addBoundBox([topx, topy, start_x-topx, start_y-topy], gene_name, "heatmap");
+	overlay.addBoundBox([topx, topy, start_x-topx, start_y-topy], gene_name, "heatmap", undefined, modif_id);
 }
 
 function barplot_editor_set_editing(val, idx) {
@@ -2043,7 +2078,7 @@ function barplot_select_datatable(idx, map_name)
 }
 
 // TBD: class BarplotEditor
-function update_barplot_editor(doc, params, barplotConfig) {
+function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) {
 	var module = get_module_from_doc(doc);
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!barplotConfig) {
@@ -2056,6 +2091,8 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	var table = $("#barplot_editor_table", doc);
 	var sel_gene_id = $("#barplot_select_gene", doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#barplot_select_modif_id").html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#barplot_select_m_genes").html());
 
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -2088,19 +2125,30 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	var MAX_BARPLOT_HEIGHT = 100.;
-	if (sel_gene && sel_datatable) {
+	console.log("sel_gene " + sel_gene + " -- " + sel_modif_id);
+	if ((sel_gene || sel_modif_id) && sel_datatable) {
 		var displayConfig = sel_datatable.getDisplayConfig(module);
-		var gene_name = sel_gene.name;
+		var gene_name = (sel_gene ? sel_gene.name : "");
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 			var sel_group = barplotConfig.getGroupAt(idx2);
 			var sel_sample = barplotConfig.getSampleAt(idx2);
 			var style = undefined, height = undefined;
 			if (sel_sample) {
-				style = displayConfig.getBarplotStyleSample(sel_sample.name, gene_name);
-				height = "height: " + displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
+				if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+					style = displayConfig.getBarplotStyleSampleByModifId(sel_sample.name, sel_modif_id);
+					height = "height: " + displayConfig.getBarplotSampleHeightByModifId(sel_sample.name, sel_modif_id, MAX_BARPLOT_HEIGHT) + "px;";
+				} else {
+					style = displayConfig.getBarplotStyleSample(sel_sample.name, gene_name);
+					height = "height: " + displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
+				}
 			} else if (sel_group) {
-				style = displayConfig.getBarplotStyleGroup(sel_group, gene_name);
-				height = "height: " + displayConfig.getBarplotGroupHeight(sel_group, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
+				if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+					style = displayConfig.getBarplotStyleGroupByModifId(sel_group, sel_modif_id);
+					height = "height: " + displayConfig.getBarplotGroupHeightByModifId(sel_group, sel_modif_id, MAX_BARPLOT_HEIGHT) + "px;";
+				} else {
+					style = displayConfig.getBarplotStyleGroup(sel_group, gene_name);
+					height = "height: " + displayConfig.getBarplotGroupHeight(sel_group, gene_name, MAX_BARPLOT_HEIGHT) + "px;";
+				}
 			}
 			if (style != undefined) {
 				style += height + "width: 100%;";
@@ -2130,18 +2178,26 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	}
 	html += "</select></td>";
 
-	if (sel_gene && sel_datatable) {
+	if ((sel_gene || sel_modif_id) && sel_datatable) {
 		var config = sel_datatable.biotype.isUnorderedDiscrete() ? COLOR_SIZE_CONFIG : 'color';
-		var gene_name = sel_gene.name;
+		var gene_name = (sel_gene ? sel_gene.name : "");
 		var displayConfig = sel_datatable.getDisplayConfig(module);
 		for (var idx2 = 0; idx2 < sample_group_cnt; ++idx2) {
 			var sel_group = barplotConfig.getGroupAt(idx2);
 			var sel_sample = barplotConfig.getSampleAt(idx2);
 			var value = undefined;
 			if (sel_sample) {
-				value = displayConfig.getColorSizeSampleValue(sel_sample.name, gene_name);
+				if (USE_MODIF_ID_FOR_COLORS && sel_modif_id) {
+					value = displayConfig.getColorSizeSampleValueByModifId(sel_sample.name, sel_modif_id);
+				} else {
+					value = displayConfig.getColorSizeSampleValue(sel_sample.name, gene_name);
+				}
 			} else if (sel_group) {
-				value = displayConfig.getColorSizeGroupValue(sel_group, gene_name);
+				if (USE_MODIF_ID_FOR_COLORS && sel_modif_id) {
+					value = displayConfig.getColorSizeGroupValueByModifId(sel_group, sel_modif_id);
+				} else {
+					value = displayConfig.getColorSizeGroupValue(sel_group, gene_name);
+				}
 			}
 			if (value != undefined && value != INVALID_VALUE) {
 				var style = "style='text-align: center;'";
@@ -2247,25 +2303,32 @@ function update_barplot_editor(doc, params, barplotConfig) {
 	drawing_config.getEditingBarplotConfig().setSlider(slider);
 	drawing_config.getBarplotConfig().setSlider(slider);
 
-	html = "Apply this configuration to gene:&nbsp;";
-	html += "<select id='barplot_select_gene' onchange='update_barplot_editor(window.document, null, navicell.getDrawingConfig(\"" + module + "\").getEditingBarplotConfig())'>\n";
+	html = "Apply this configuration to gene" + (sel_m_genes ? "s" : "") + ":&nbsp;";
+	html += "<select id='barplot_select_gene' onchange='update_barplot_editor(window.document, null, navicell.getDrawingConfig(\"" + module + "\").getEditingBarplotConfig(), true)'>\n";
 	html += "<option value='_none_'></option>\n";
 	var sorted_gene_names = navicell.dataset.getSortedGeneNames();
 	for (var idx in sorted_gene_names) {
 		var gene_name = sorted_gene_names[idx];
 		var gene = navicell.dataset.genes[gene_name];
 		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
-		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
+	}
+	if (sel_m_genes && !sel_gene) {
+		html += "<option value='" + sel_m_genes + "' selected>" + (sel_m_genes ? sel_m_genes : "") + "</option>\n";
 	}
 	html += "</select>";
+	html += "<div id='barplot_select_m_genes'>" + (sel_m_genes ? sel_m_genes : "") + "</div>";
+	html += "<div id='barplot_select_modif_id'>" + (sel_modif_id ? sel_modif_id : "") + "</div>";
 	$("#barplot_gene_choice", doc).html(html);
+	$("#barplot_select_m_genes").css("display", "none");
+	$("#barplot_select_modif_id").css("display", "none");
 
         $("#barplot_clear_samples").css("font-size", "10px");
         $("#barplot_all_samples").css("font-size", "10px");
         $("#barplot_all_groups").css("font-size", "10px");
 }
 
-function draw_barplot(module, overlay, context, scale, gene_name, topx, topy)
+function draw_barplot(module, overlay, context, scale, modif_id, gene_name, topx, topy)
 {
 	if (!module) {
 		module = get_module();
@@ -2305,21 +2368,35 @@ function draw_barplot(module, overlay, context, scale, gene_name, topx, topy)
 		var bg = undefined;
 		var height = undefined;
 		if (sel_sample) {
-			bg = displayConfig.getColorSizeSample(sel_sample.name, gene_name);
-			height = displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, maxy);
+			if (USE_MODIF_ID_FOR_COLORS) {
+				bg = displayConfig.getColorSizeSampleByModifId(sel_sample.name, modif_id);
+				height = displayConfig.getBarplotSampleHeightByModifId(sel_sample.name, modif_id, maxy);
+				var bg2 = displayConfig.getColorSizeSample(sel_sample.name, gene_name);
+				var height2 = displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, maxy);
+			} else {
+				bg = displayConfig.getColorSizeSample(sel_sample.name, gene_name);
+				height = displayConfig.getBarplotSampleHeight(sel_sample.name, gene_name, maxy);
+			}
 		} else if (sel_group) {
-			bg = displayConfig.getColorSizeGroup(sel_group, gene_name);
-			height = displayConfig.getBarplotGroupHeight(sel_group, gene_name, maxy);
+			if (USE_MODIF_ID_FOR_COLORS) {
+				bg = displayConfig.getColorSizeGroupByModifId(sel_group, modif_id);
+				height = displayConfig.getBarplotGroupHeightByModifId(sel_group, modif_id, maxy);
+			} else {
+				bg = displayConfig.getColorSizeGroup(sel_group, gene_name);
+				height = displayConfig.getBarplotGroupHeight(sel_group, gene_name, maxy);
+			}
+		} else {
+			break; // EV: added 2014-11-10
 		}
 		if (bg != undefined && height != undefined) {
 			var fg = getFG_from_BG(bg);
 			context.fillStyle = "#" + bg;
 			fillStrokeRect(context, start_x, start_y-height, cell_w, height);
+			start_x += cell_w;
 		}
-		start_x += cell_w;
 	}
 
-	overlay.addBoundBox([topx, start_y-maxy, start_x-topx, maxy], gene_name, "barplot");
+	overlay.addBoundBox([topx, start_y-maxy, start_x-topx, maxy], gene_name, "barplot", undefined, modif_id);
 }
 
 function datatable_select(id, onchange, sel_datatable) {
@@ -3020,6 +3097,7 @@ function update_map_staining_editor(doc, params, mapStainingConfig) {
 	if (!mapStainingConfig) {
 		mapStainingConfig = drawing_config.getEditingMapStainingConfig();
 	}
+	var map_staining_display_labels = $("#map_staining_display_labels").attr("checked") == "checked";
 	var map_name = doc ? doc.map_name : "";
 	var div = $("#map_staining_editor_div", doc);
 	var topdiv = div.parent().parent();
@@ -3055,6 +3133,11 @@ function update_map_staining_editor(doc, params, mapStainingConfig) {
 	html += "<td style='border: none; text-decoration: underline; font-size: 9px; text-align: left;" + empty_cell_style + "'><a href='#' onclick='map_staining_step_display_config(\"color\", \"" + map_name + "\")'><span id='map_staining_editor_datatable_config_color' class='" + (sel_color_datatable ? "" : "zz-hidden") + "'>config</span></a></td>";
 
 	html += "</tr>";
+
+	html += "<tr><td style='" + empty_cell_style + "'></td></tr>";
+	html += "<tr><td style='text-align: right; " + empty_cell_style + "'><span style='font-size: small; font-weight: bold'>Display labels</span></td>";
+
+	html += "<td style='" + empty_cell_style + "'><input id='map_staining_display_labels' type='checkbox' " + (map_staining_display_labels ? "checked" : "") + "></input></td>";
 
 	html += "</table>";
 	html += "</td>";
@@ -3162,7 +3245,7 @@ function get_map_pos(module) {
 	return mappos;
 }
 
-function get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group)
+function old_get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group)
 {
 	var display_config = sel_color_datatable.getDisplayConfig(module);
 	var sample_name = sel_sample.name;
@@ -3191,9 +3274,31 @@ function get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, 
 	return (new RGBColor(red/gene_names.length, green/gene_names.length, blue/gene_names.length)).getRGBValue();
 }
 
+function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, sel_group)
+{
+	var display_config = sel_color_datatable.getDisplayConfig(module);
+	var sample_name = sel_sample.name;
+	var red = 0;
+	var green = 0;
+	var blue = 0;
+	var len = mapSize(modifs_id);
+	for (var modif_id in modifs_id) {
+		var color;
+		if (sel_sample) {
+			color = RGBColor.fromHex(display_config.getColorSampleByModifId(sample_name, modif_id));
+		} else {
+			color = RGBColor.fromHex(display_config.getColorGroupByModifId(sel_group, modif_id));
+		}
+		red += color.getRed();
+		green += color.getGreen();
+		blue += color.getBlue();
+	}
+	return (new RGBColor(red/len, green/len, blue/len)).getRGBValue();
+}
+
 function draw_voronoi(module, context, div)
 {
-	var VORONOI_DEBUG = true;
+	var map_staining_display_labels = $("#map_staining_display_labels").attr("checked") == "checked";
 	var drawing_config = navicell.getDrawingConfig(module);
 	var mapStainingConfig = drawing_config.getMapStainingConfig();
 	var sel_color_datatable = mapStainingConfig.getColorDatatable();
@@ -3222,20 +3327,19 @@ function draw_voronoi(module, context, div)
 	var map_pos_size = mapSize(map_pos);
 
 	for (var shape_id in voronoi_shape_map) {
-		var gene_names = navicell.dataset.getGenesByShapeId(module, shape_id);
 		if (map_pos && !map_pos[shape_id]) {
 			continue;
 		}
+		var modifs_id = navicell.dataset.getModifsByShapeId(module, shape_id);
+		//var gene_names = navicell.dataset.getGenesByShapeId(module, shape_id);
+		//console.log("voronoi len: " + shape_id + " " + (gene_names ? gene_names.length : -1) + " " + (modifs_id ? mapSize(modifs_id) : -1));
 		var color;
-		if (!gene_names) {
+		if (!modifs_id) {
 			//console.log("no gene for shape_id: " + shape_id);
 			//color = "888888";
 			color = 0;
 		} else {
-			if (gene_names.length > 1) {
-				console.log("shape_id: " + shape_id);
-			}
-			color = get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group);
+			color = get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, sel_group);
 		}		
 		var points = voronoi_shape_map[shape_id][0];
 		context.beginPath();
@@ -3274,16 +3378,16 @@ function draw_voronoi(module, context, div)
 			context.fillStyle = "#" + color;
 			context.fill();
 
-			if (VORONOI_DEBUG) {
+			if (map_staining_display_labels) {
 				context.strokeStyle = "#000000";
 			}
 		} else {
-			if (VORONOI_DEBUG) {
+			if (map_staining_display_labels) {
 				context.stroke();
 				context.strokeStyle = "#FF0000";
 			}
 		}
-		if (VORONOI_DEBUG) {
+		if (map_staining_display_labels) {
 			context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
 		}
 	}		

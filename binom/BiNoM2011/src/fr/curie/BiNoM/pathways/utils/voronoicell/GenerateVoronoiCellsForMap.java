@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
@@ -87,8 +88,8 @@ public class GenerateVoronoiCellsForMap {
 	Triangle initialTriangle = null;
 	Triangulation dt = null;
 	public Vector<Pnt[]> polygons = new Vector<Pnt[]>();
-	public float maximalDist = 500f;
-	public float maximalDistAsFractionOfSize = 0.05f;
+	public float maximalDist = 800f;
+	public float maximalDistAsFractionOfSize = 0.02f;
 	
 	public boolean writeFiles = true;
 	
@@ -96,15 +97,17 @@ public class GenerateVoronoiCellsForMap {
 		try{
 			
 			
-			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master_17032014.xml";
-			String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
+			String fn = "C:/Datas/BiNoMTest/VoronoiCell/acsn_master.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/test.xml";
 			//fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo scales = new fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo(height, height, height, height, height, height, height, height, writeFiles);
 			//getVoronoiCellsForCellDesignerMap();
 			//System.out.println(getVoronoiCellsForCellDesignerMap("C:/Datas/BiNoMTest/VoronoiCell/M-Phase2.xml"));
 			
-			getVoronoiCellsForCellDesignerMap(fn, null);
+			String s = getVoronoiCellsForCellDesignerMap(fn, null);
+			//System.out.println(s);
 			System.exit(0);
 			
 			GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();
@@ -123,17 +126,20 @@ public class GenerateVoronoiCellsForMap {
 	public static String getVoronoiCellsForCellDesignerMap(String fn, fr.curie.BiNoM.pathways.navicell.ProduceClickableMap.ImagesInfo scales){
 		String descr = "";
 		try{
-		GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();
+		GenerateVoronoiCellsForMap gvc = new GenerateVoronoiCellsForMap();	
 		gvc.writeFiles = false;
 		gvc.loadMap(fn);
 		gvc.calcTriangles();
 		gvc.calcVoronoiCells();
-        for(int k=0;k<gvc.points.size();k++)if(!gvc.aliases.equals("NONE")){
+        for(int k=0;k<gvc.points.size();k++)if(!gvc.aliases.get(k).equals("NONE"))if(gvc.neighbours.get(k)!=null){
         	Pnt[] pol = gvc.polygons.get(k);
         	descr+=gvc.aliases.get(k);
         	for(int i=0;i<pol.length;i++) {
         		descr+="\t"+scales.getX(pol[i].coord(0))+"\t"+scales.getY(pol[i].coord(1));
-		}
+			}
+        	//if(gvc.neighbours.get(k)==null){
+        	//	System.out.println(gvc.aliases.get(k)+" - neighbours list is null");
+        	//}
         	for(int i=0;i<gvc.neighbours.get(k).size();i++) {
         		descr+="\t"+gvc.neighbours.get(k).get(i);
         	}
@@ -165,14 +171,15 @@ public class GenerateVoronoiCellsForMap {
 		//points = new float[nspecies][2];
 		points = new Vector<Pnt>();
 		aliases = new Vector<String>();
+		Random r = new Random();
 		for(int i=0;i<cdgraph.Nodes.size();i++){
 			Node n = cdgraph.Nodes.get(i);
 			if(n.getFirstAttribute("CELLDESIGNER_SPECIES")!=null)
 				if(!n.getFirstAttribute("CELLDESIGNER_SPECIES").equals("")){
 					/*points[i][0] = n.x;
 					points[i][1] = n.y;*/
-					float x = n.x+n.w/2f;
-					float y = n.y+n.h/2f;
+					float x = n.x+n.w/2f+r.nextFloat();
+					float y = n.y+n.h/2f+r.nextFloat();
 					points.add(new Pnt(x, y));
 					aliases.add(n.getFirstAttributeValue("CELLDESIGNER_ALIAS"));
 				}
@@ -180,10 +187,10 @@ public class GenerateVoronoiCellsForMap {
 		folder = (new File(fn)).getParentFile().getAbsolutePath();
 		//System.out.println(folder);
 		
-		maximalDist = width*maximalDistAsFractionOfSize;
+		//maximalDist = width*maximalDistAsFractionOfSize;
 		
 		// Write fictitious points to avoid large polygons
-		/*int currentNumberOfPoints = points.size();
+		int currentNumberOfPoints = points.size();
 		for(float x=1;x<width;x+=maximalDist)
 			for(float y=1;y<height;y+=maximalDist)if((x==1f)||(y==1f)||(!checkClosePoints(x,y,currentNumberOfPoints))){
 				points.add(new Pnt(x,y));
@@ -196,7 +203,7 @@ public class GenerateVoronoiCellsForMap {
 		for(float y=1;y<height;y+=maximalDist){
 			points.add(new Pnt(width-1,y));
 			aliases.add("NONE");
-		}*/
+		}
 		
 		
 		writePoints(folder);

@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
@@ -172,17 +174,41 @@ public class GenerateVoronoiCellsForMap {
 				}
 		}*/
 		
+		
+		HashSet<String> includedSpecies = new HashSet<String>();
+		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
+			CelldesignerSpeciesDocument.CelldesignerSpecies cs = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+			includedSpecies.add(cs.getId());
+		}
+		
 		cdgraph = new fr.curie.BiNoM.pathways.analysis.structure.Graph();
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+			String species = csa.getSpecies();
+			if(!includedSpecies.contains(species)){
 			Node n = cdgraph.getCreateNode(csa.getId());
 			n.x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 			n.y = Float.parseFloat(csa.getCelldesignerBounds().getY());
 			n.w = Float.parseFloat(csa.getCelldesignerBounds().getW());
 			n.h = Float.parseFloat(csa.getCelldesignerBounds().getH());
-			n.setAttributeValueUnique("CELLDESIGNER_SPECIES", csa.getSpecies(), Attribute.ATTRIBUTE_TYPE_STRING);
+			n.setAttributeValueUnique("CELLDESIGNER_SPECIES", species, Attribute.ATTRIBUTE_TYPE_STRING);
 			n.setAttributeValueUnique("CELLDESIGNER_ALIAS", csa.getId(), Attribute.ATTRIBUTE_TYPE_STRING);
+			}
 		}
+		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
+			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+			String species = csa.getSpecies();
+			if(!includedSpecies.contains(species)){
+			Node n = cdgraph.getCreateNode(csa.getId());
+			n.x = Float.parseFloat(csa.getCelldesignerBounds().getX());
+			n.y = Float.parseFloat(csa.getCelldesignerBounds().getY());
+			n.w = Float.parseFloat(csa.getCelldesignerBounds().getW());
+			n.h = Float.parseFloat(csa.getCelldesignerBounds().getH());
+			n.setAttributeValueUnique("CELLDESIGNER_SPECIES", species, Attribute.ATTRIBUTE_TYPE_STRING);
+			n.setAttributeValueUnique("CELLDESIGNER_ALIAS", csa.getId(), Attribute.ATTRIBUTE_TYPE_STRING);
+			}
+		}
+		
 		
 		//points = new float[nspecies][2];
 		points = new Vector<Pnt>();

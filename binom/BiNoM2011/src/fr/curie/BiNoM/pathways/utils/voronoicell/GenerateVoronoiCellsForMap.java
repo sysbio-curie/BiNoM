@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
+import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
 import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
@@ -99,6 +101,7 @@ public class GenerateVoronoiCellsForMap {
 			
 			String fn = "C:/Datas/BiNoMTest/VoronoiCell/acsn_master.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_master.xml";
+			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/survival_master.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/dnarepair_FANCONI.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/merged_master.xml";
 			//String fn = "C:/Datas/BiNoMTest/VoronoiCell/test.xml";
@@ -158,7 +161,7 @@ public class GenerateVoronoiCellsForMap {
 		CellDesigner.entities = CellDesigner.getEntities(sbml);
 		width = Integer.parseInt(sbml.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeX());
 		height = Integer.parseInt(sbml.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeY());
-		cdgraph = XGMML.convertXGMMLToGraph(CellDesignerToCytoscapeConverter.getXGMMLGraph("test", sbml.getSbml()));
+		/*cdgraph = XGMML.convertXGMMLToGraph(CellDesignerToCytoscapeConverter.getXGMMLGraph("test", sbml.getSbml()));
 		//XGMML.saveToXGMML(cdgraph, fn+".xgmml");
 		int nspecies = 0;
 		for(int i=0;i<cdgraph.Nodes.size();i++){
@@ -167,24 +170,46 @@ public class GenerateVoronoiCellsForMap {
 				if(!n.getFirstAttribute("CELLDESIGNER_SPECIES").equals("")){
 					nspecies++;
 				}
+		}*/
+		
+		cdgraph = new fr.curie.BiNoM.pathways.analysis.structure.Graph();
+		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
+			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+			Node n = cdgraph.getCreateNode(csa.getId());
+			n.x = Float.parseFloat(csa.getCelldesignerBounds().getX());
+			n.y = Float.parseFloat(csa.getCelldesignerBounds().getY());
+			n.w = Float.parseFloat(csa.getCelldesignerBounds().getW());
+			n.h = Float.parseFloat(csa.getCelldesignerBounds().getH());
+			n.setAttributeValueUnique("CELLDESIGNER_SPECIES", csa.getSpecies(), Attribute.ATTRIBUTE_TYPE_STRING);
+			n.setAttributeValueUnique("CELLDESIGNER_ALIAS", csa.getId(), Attribute.ATTRIBUTE_TYPE_STRING);
 		}
+		
 		//points = new float[nspecies][2];
 		points = new Vector<Pnt>();
 		aliases = new Vector<String>();
 		Random r = new Random();
 		for(int i=0;i<cdgraph.Nodes.size();i++){
 			Node n = cdgraph.Nodes.get(i);
-			if(n.getFirstAttribute("CELLDESIGNER_SPECIES")!=null)
-				if(!n.getFirstAttribute("CELLDESIGNER_SPECIES").equals("")){
+			String species = n.getFirstAttributeValue("CELLDESIGNER_SPECIES");
+			if(n.Id.startsWith("p53"))
+				System.out.println(n.Id+"\t"+species);
+			if(species!=null)
+				if(!species.equals("")){
 					/*points[i][0] = n.x;
 					points[i][1] = n.y;*/
 					float x = n.x+n.w/2f+r.nextFloat();
 					float y = n.y+n.h/2f+r.nextFloat();
 					points.add(new Pnt(x, y));
-					aliases.add(n.getFirstAttributeValue("CELLDESIGNER_ALIAS"));
+					String alias = n.getFirstAttributeValue("CELLDESIGNER_ALIAS");
+					//if(species.equals("s_mpk1_s787")){
+					//	System.out.println("For species "+species+" CELLDESIGNER_ALIAS = "+alias);
+					//}
+					aliases.add(alias);
 				}
 		}
 		folder = (new File(fn)).getParentFile().getAbsolutePath();
+		
+		//System.out.println("Loaded...");
 		//System.out.println(folder);
 		
 		//maximalDist = width*maximalDistAsFractionOfSize;

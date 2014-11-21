@@ -5515,7 +5515,8 @@ public class ProduceClickableMap
 				out.println("    if (command) {");
 				out.println("      nv_decode(command);");
 				out.println("    }");
-				out.println("    if (navicell.id) {");
+				out.println("    var mode = '<?php echo $_GET[\"mode\"]; ?>'\n");
+				out.println("    if (navicell.id || mode == \"server\") {");
 				out.println("      nv_server(window, navicell.id);");
 				out.println("    }");
 			}

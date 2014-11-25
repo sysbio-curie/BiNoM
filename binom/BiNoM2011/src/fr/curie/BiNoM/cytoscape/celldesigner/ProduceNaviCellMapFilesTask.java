@@ -51,8 +51,9 @@ public class ProduceNaviCellMapFilesTask implements Task {
     private boolean provideSourceFiles = true;
     private String xrefFile = null;
     private boolean nv2;
+    private boolean demo;
 
-	public ProduceNaviCellMapFilesTask(String _configFileName, String _wordPressURL, String _wordPressUser, String _wordPressPassword, boolean _produceBOversion, boolean _provideSourceFiles, String _xrefFile, boolean _nv2){
+	public ProduceNaviCellMapFilesTask(String _configFileName, String _wordPressURL, String _wordPressUser, String _wordPressPassword, boolean _produceBOversion, boolean _provideSourceFiles, String _xrefFile, boolean _nv2, boolean _demo){
     	configFileName = _configFileName;
     	wordPressURL = _wordPressURL;
     	wordPressUser = _wordPressUser;
@@ -61,6 +62,7 @@ public class ProduceNaviCellMapFilesTask implements Task {
     	provideSourceFiles = _provideSourceFiles;
     	xrefFile = _xrefFile;
 	nv2 = _nv2;
+	demo = _demo;
     }
     
     public void run() {
@@ -102,9 +104,9 @@ public class ProduceNaviCellMapFilesTask implements Task {
     			
     			try{
     			if(produceBOversion)	
-    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, null, null, null, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles, nv2);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, null, null, null, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles, nv2, demo);
     			else
-    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles, nv2);
+    				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles, nv2, demo);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
             	    taskMonitor.setPercentCompleted(99);

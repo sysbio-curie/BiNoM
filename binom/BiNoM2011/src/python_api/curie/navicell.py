@@ -27,7 +27,7 @@ import http.client, urllib.request, urllib.parse, urllib.error
 import datetime
 from time import sleep
 
-PACKSIZE = 500000
+NV_PACKSIZE = 500000
 
 class Proxy:
 
@@ -109,6 +109,9 @@ class NaviCell:
         self._hugo_list = []
         self._hugo_map = {}
 
+        self.trace = False
+        self.packsize = NV_PACKSIZE
+
     #
     # private methods
     #
@@ -135,8 +138,10 @@ class NaviCell:
 
         if 'data' in params:
             datalen = len(params['data']) # useful when sending datatable contents
-            if datalen > PACKSIZE: # condition and code useful when sending datatable contents
-                packcount = int(datalen/PACKSIZE)+1
+            if self.trace:
+                print(params['data'])
+            if datalen > self.packsize: # condition and code useful when sending datatable contents
+                packcount = int(datalen/self.packsize)+1
                 params['packcount'] = packcount
                 data = params['data']
                 params['data'] = "@@"
@@ -153,8 +158,8 @@ class NaviCell:
             for packnum in reversed(range(packcount)): # testing packing order
 #            for packnum in range(packcount):
                 fillparams['packnum'] = packnum+1
-                beg = packnum*PACKSIZE
-                end = (packnum+1)*PACKSIZE
+                beg = packnum*self.packsize
+                end = (packnum+1)*self.packsize
                 if end > datalen:
                     end = datalen
                 fillparams['data'] = data[beg:end]
@@ -278,6 +283,9 @@ class NaviCell:
         self.session_id = "1"
 
 ### utility data methods
+    def setTrace(self, trace):
+        self.trace = trace
+
     def makeData(self, data):
             self.getHugoList()
             hugo_map = self._hugo_map

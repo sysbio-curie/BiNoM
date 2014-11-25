@@ -1733,6 +1733,7 @@ DisplayContinuousConfig.prototype = {
 
 
 	setStepInfo: function(config, tabname, idx, value, color, size, shape) {
+		//console.log("setStepInfo: " + config + " " + idx + " " + value + " " + color);
 		if (value != Number.MIN_NUMBER) {
 			var idx_1 = this.use_gradient[config] ? idx : idx+1;
 			this.values[tabname][config][idx_1] = value;
@@ -1767,7 +1768,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getStepIndex: function(config, tabname, value, gradient_mode) {
-		if (value == '') {
+		if (value == undefined || value.toString() == '') {
 			return 0;
 		}
 		var ivalue = parseFloat(value);
@@ -1818,7 +1819,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	getDatatableValue: function(config, tabname, value) {
-		if (value == undefined || value == '') {
+		if (value == undefined || value.toString() == '') {
 			return value;
 		}
 		var ivalue = parseFloat(value);
@@ -1925,7 +1926,7 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	_getBarplotHeight: function(tabname, value, max) {
-		if (value) {
+		if (value != undefined && value.toString() != '') {
 			value *= 1.;
 			var minval = this.getDatatableMinval('color', tabname);
 			var maxval = this.getDatatableMaxval('color', tabname);
@@ -2085,12 +2086,14 @@ DisplayContinuousConfig.prototype = {
 
 	getValue: function(config, tabname, sample_name, gene_name) {
 		var value = this.datatable.getValue(sample_name, gene_name);
+		//console.log("getValueByGene: " + gene_name + " value1=" + value + ", value2=" + this.getDatatableValue(config, tabname, value));
 		return this.getDatatableValue(config, tabname, value);
 	},
 
 	getValueByModifId: function(config, tabname, sample_name, modif_id) {
 		// should be replaced by:
 		var value = this.datatable.getValueByModifId(this.module, sample_name, modif_id, this.sample_method[config]);
+		//console.log("getValueByModifId: " + modif_id + " value1=" + value + ", value2=" + this.getDatatableValue(config, tabname, value));
 		return this.getDatatableValue(config, tabname, value);
 		/*
 		var info = navicell.dataset.getGeneInfoByModifId(this.module, modif_id);
@@ -2332,7 +2335,7 @@ DisplayContinuousConfig.prototype = {
 			html += "</tr><tr>";
 			html += "<tr><td>&nbsp;</td></tr>";
 			//html += "<td width='10px'>&nbsp;</td>";
-			html += "<td colspan='4' width='" + width + "' style='text-align: center'><span class='config-label' style='text-align: center'>MultiGene&nbsp;Gene&nbsp;Method</span></td>";
+			html += "<td colspan='4' width='" + width + "' style='text-align: center'><span class='config-label' style='text-align: center'>Select&nbsp;value&nbsp;for&nbsp;a<br/>group&nbsp;of&nbsp;genes&nbsp;by</span></td>";
 			html += "</tr><tr>";
 			//html += "<td></td><td></td><td width='10px'>&nbsp;</td>";
 			//html += "<td width='10px'>&nbsp;</td>";
@@ -2567,6 +2570,7 @@ DisplayContinuousConfig.tablabels = {'sample' : 'Sample Configuration', 'group' 
 function DisplayUnorderedDiscreteConfig(datatable, win) {
 	this.datatable = datatable;
 	this.win = win;
+	this.module = get_module(win);
 	this.advanced = false;
 	this.has_empty_values = datatable.hasEmptyValues();
 	this.values = [];
@@ -2779,6 +2783,21 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.datatable.getValue(sample_name, gene_name);
 	},
 
+	getValueByModifId: function(sample_name, modif_id) {
+		//return this.datatable.getValueByModifId(this.module, sample_name, modif_id, Group.CONTINUOUS_ABS_MAXVAL);
+		var info = navicell.dataset.getGeneInfoByModifId(this.module, modif_id);
+		//console.log("getValueByModifId: " + this.module + " " + modif_id);
+		if (info) { // TBD WRONG: should use something else (getAcceptedConditionByModifId???)
+			var genes = info[0];
+			/*if (this.getValue(sample_name, genes[0].name))*/ {
+				//console.log("getValueByModifId -> [" + sample_name + "], [" + genes[0].name + "], [" + this.getValue(sample_name, genes[0].name) + "]");
+			}
+			return this.getValue(sample_name, genes[0].name);
+		}
+		//console.log("getValueByModifId: undefined");
+		return undefined;
+	},
+
 	getValueIndex: function(sample_name, gene_name) {
 		var value = this.getValue(sample_name, gene_name);
 		return this.values_idx[value];
@@ -2794,8 +2813,16 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.getValue(sample_name, gene_name);
 	},
 
+	getColorSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getValueByModifId(sample_name, modif_id);
+	},
+
 	getColorSizeSampleValue: function(sample_name, gene_name) {
 		return this.getValue(sample_name, gene_name);
+	},
+
+	getColorSizeSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getValueByModifId(sample_name, modif_id);
 	},
 
 	getColorSample: function(sample_name, gene_name) {
@@ -2812,6 +2839,23 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 	getSizeSample: function(sample_name, gene_name) {
 		return this.getSizeAt(this.getValueIndex(sample_name, gene_name), 'size', 'sample');
+	},
+
+	getColorSampleByModifId: function(sample_name, modif_id) {
+		//console.log("getColorSampleByModifId: " + this.getValueIndexByModifId(sample_name, modif_id));
+		return this.getColorAt(this.getValueIndexByModifId(sample_name, modif_id), 'color', 'sample');
+	},
+
+	getColorSizeSampleByModifId: function(sample_name, modif_id) {
+		return this.getColorAt(this.getValueIndexByModifId(sample_name, modif_id), COLOR_SIZE_CONFIG, 'sample');
+	},
+
+	getShapeSampleByModifId: function(sample_name, modif_id) {
+		return this.getShapeAt(this.getValueIndexByModifId(sample_name, modif_id), 'shape', 'sample');
+	},
+
+	getSizeSamplByModifId: function(sample_name, modif_id) {
+		return this.getSizeAt(this.getValueIndexByModifId(sample_name, modif_id), 'size', 'sample');
 	},
 
 	getHeatmapStyleSample: function(sample_name, gene_name) {
@@ -2837,6 +2881,24 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var size = this.getSizeAt(idx, COLOR_SIZE_CONFIG, 'sample') * 1.;
 		var maxsize = STEP_MAX_SIZE/2;
 		return max * (size/maxsize);
+	},
+
+	getHeatmapStyleSampleByModifId: function(sample_name, modif_id) {
+		var color = this.getColorSampleByModifId(sample_name, modif_id);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return " style='text-align: center'";
+	},
+
+	getBarplotStyleSampleByModifId: function(sample_name, modif_id) {
+		var color = this.getColorSizeSampleByModifId(sample_name, modif_id);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return " style='text-align: center'";
 	},
 
 	// WARNING: DisplayUnorderedDiscreteConfig.*ByModifId is only partly implemented, missing some methods...
@@ -2921,8 +2983,24 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.condString(idx, 'color');
 	},
 
+	getColorGroupValueByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, 'color', true);
+		if (idx == this.values.length) {
+			return "no matching condition";
+		}
+		return this.condString(idx, 'color');
+	},
+
 	getColorSizeGroupValue: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, COLOR_SIZE_CONFIG, true);
+		if (idx == this.values.length) {
+			return "no matching condition";
+		}
+		return this.condString(idx, COLOR_SIZE_CONFIG);
+	},
+
+	getColorSizeGroupValueByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedCondition(group, modif_id, COLOR_SIZE_CONFIG, true);
 		if (idx == this.values.length) {
 			return "no matching condition";
 		}
@@ -2954,8 +3032,18 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.getShapeAt(idx, 'shape', 'group');
 	},
 
+	getShapeGroupByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, 'shape');
+		return this.getShapeAt(idx, 'shape', 'group');
+	},
+
 	getSizeGroup: function(group, gene_name) {
 		var idx = this.getAcceptedCondition(group, gene_name, 'size');
+		return this.getSizeAt(idx, 'size', 'group');
+	},
+
+	getSizeGroupByModifId: function(group, modif_id) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, 'size');
 		return this.getSizeAt(idx, 'size', 'group');
 	},
 
@@ -2986,8 +3074,24 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return '';
 	},
 
+	getBarplotStyleGroupByModifId: function(group, modif_id) {
+		var color = this.getColorSizeGroup(group, modif_id);
+		if (color) {
+			var fg = getFG_from_BG(color);
+			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
+		}
+		return '';
+	},
+
 	getBarplotGroupHeight: function(group, gene_name, max) {
 		var idx = this.getAcceptedCondition(group, gene_name, COLOR_SIZE_CONFIG);
+		var size = this.getSizeAt(idx, COLOR_SIZE_CONFIG, 'group');
+		var maxsize = STEP_MAX_SIZE/2;
+		return max * (size/maxsize);
+	},
+
+	getBarplotGroupHeightByModifId: function(group, modif_id, max) {
+		var idx = this.getAcceptedConditionByModifId(group, modif_id, COLOR_SIZE_CONFIG);
 		var size = this.getSizeAt(idx, COLOR_SIZE_CONFIG, 'group');
 		var maxsize = STEP_MAX_SIZE/2;
 		return max * (size/maxsize);
@@ -3099,7 +3203,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 					}
 					html += "</select></td>";
 				} else {
-					if (value == '') {
+					if (value == undefined || value.toString() == '') {
 						html += "<td><span style='text-align: center'>" + prefix + "NA</span></td>";
 					} else {
 						html += "<td>" + prefix + value + "</td>";
@@ -4377,8 +4481,12 @@ Datatable.prototype = {
 			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MINVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
 				var max = Number.MIN_NUMBER;
 				var absmax = Number.MIN_NUMBER;
+				var absmax_s = Number.MIN_NUMBER;
+
 				var min = Number.MAX_NUMBER;
 				var absmin = Number.MAX_NUMBER;
+				var absmin_s = Number.MAX_NUMBER;
+
 				for (var nn = 0; nn < genes.length; ++nn) {
 
 					var gene_name = genes[nn].name;
@@ -4389,25 +4497,27 @@ Datatable.prototype = {
 					}
 					if (absvalue < absmin) {
 						absmin = absvalue;
+						absmin_s = value;
 					}
 					if (value > max) {
 						max = value;
 					}
 					if (absvalue > absmax) {
 						absmax = absvalue;
+						absmax_s = value;
 					}
 				}
 				if (method == Group.CONTINUOUS_MINVAL) {
-					return min;
+					return min == Number.MAX_NUMBER ? '' : min;
 				}
 				if (method == Group.CONTINUOUS_MAXVAL) {
-					return max;
+					return max == Number.MIN_NUMBER ? '' : max;
 				}
 				if (method == Group.CONTINUOUS_ABS_MINVAL) {
-					return absmin;
+					return absmin_s == Number.MAX_NUMBER ? '' : absmin_s;
 				}
 				if (method == Group.CONTINUOUS_ABS_MAXVAL) {
-					return absmax;
+					return absmax_s == Number.MIN_NUMBER ? '' : absmax_s;
 				}
 				return undefined; // never reached
 			}
@@ -5237,7 +5347,7 @@ Group.prototype = {
 				for (var sample_name in this.samples) {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
-					if (value == '') {
+					if (value == undefined || value.toString() == '') {
 						continue;
 					}
 					value *= 1.;
@@ -5278,7 +5388,7 @@ Group.prototype = {
 				for (var sample_name in this.samples) {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
-					if (value == '') {
+					if (value == undefined || value.toString() == '') {
 						continue;
 					}
 					value *= 1.;
@@ -5310,7 +5420,7 @@ Group.prototype = {
 				for (var sample_name in this.samples) {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
-					if (value == '') {
+					if (value == undefined || value.toString() == '') {
 						continue;
 					}
 					value *= 1.;

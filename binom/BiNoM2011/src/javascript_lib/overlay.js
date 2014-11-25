@@ -21,6 +21,8 @@
 var MAX_SCREEN_WIDTH = 2500;
 var MAX_SCREEN_HEIGHT = 2000;
 var ESP_LATLNG = 0.01;
+var CENTER_HIGHLIGHT_SHAPE = true;
+var CENTER_HIGHLIGHT_CIRCLE = !CENTER_HIGHLIGHT_SHAPE;
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
@@ -51,13 +53,22 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 	var overlayProjection = overlay.getProjection();
 	var mapProjection = overlay.map_.getProjection();
 
-	var is_checked = node.isChecked();
-	if (is_checked) {
-		node.checkSubtree(JXTree.UNCHECKED);
-	} else {
+	console.log("click_node: " + mode);
+	if (mode == 'toggle') {
+		var is_checked = node.isChecked();
+		if (is_checked) {
+			node.checkSubtree(JXTree.UNCHECKED);
+		} else {
+			node.checkSubtree(JXTree.CHECKED);
+			node.openSupertree(JXTree.OPEN);
+		}
+	} else if (mode == 'select') {
 		node.checkSubtree(JXTree.CHECKED);
 		node.openSupertree(JXTree.OPEN);
+	} else if (mode == 'unselect') {
+		node.checkSubtree(JXTree.UNCHECKED);
 	}
+
 	is_checked = node.isChecked();
 	var clickmap_tree_node = node.getUserData().clickmap_tree_node;
 
@@ -82,7 +93,9 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 			}
 			if (!latlng || (diff_lat <= ESP_LATLNG && diff_lng <= ESP_LATLNG)) {
 				if (mode == "select") {
-					bubble_open(this);
+					if (overlay.win.nv_open_bubble) {
+						bubble_open(this);
+					}
 					if (center) {
 						var bounds = new google.maps.LatLngBounds();
 						extend(bounds, this);
@@ -92,7 +105,9 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 					bubble_close(this);
 				} else if (mode == "toggle") {
 					if (is_checked) {
-						bubble_open(this);
+						if (overlay.win.nv_open_bubble) {
+							bubble_open(this);
+						}
 						if (center) {
 							var bounds = new google.maps.LatLngBounds();
 							extend(bounds, this);
@@ -110,6 +125,11 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
+	var event = overlay.win.event;
+	if (type == 'mouseup') {
+		console.log("alt " + event.altKey + " " + event.ctrlKey + " " + event.shiftKey);
+	}
+	var button = (event ? event.button : -1);
 
 	var overlayProjection = overlay.getProjection();
 	var mapProjection = overlay.map_.getProjection();
@@ -123,6 +143,8 @@ function event_ckmap(e, e2, type, overlay) {
 	var modif_map = navicell.mapdata.getModifMap(module);
 	var clicked_node = null;
 	var clicked_boundbox = null;
+	var clicked_latlng = null;
+	var clicked_center_box = null;
 	for (var id in modif_map) {
 		var boxes = modif_map[id];
 		for (var kk = 0; kk < boxes.length; ++kk) {
@@ -137,27 +159,28 @@ function event_ckmap(e, e2, type, overlay) {
 			var bw = box[1]*scale;
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
-				if (type == 'click') {
-					var said = box[4];
-					console.log("click ID " + id + " said=" + said + " in " + module);
-					var node = jxtree.getNodeByUserId(id);
-					if (node) {
-						if (clicked_boundbox) {
-							if (!is_included(box, clicked_boundbox)) {
-								continue;
+				if (type == 'click' || type == 'mouseup') {
+					if (type != 'mouseup' || button == 2) {
+						var said = box[4];
+						console.log("click ID " + id + " said=" + said + " in " + module + " " + button);
+						var node = jxtree.getNodeByUserId(id);
+						if (node) {
+							if (clicked_boundbox) {
+								if (!is_included(box, clicked_boundbox)) {
+									continue;
+								}
+							}
+							clicked_boundbox = box;
+							clicked_node = node;
+							clicked_latlng = latlng;
+							if (type == 'mouseup') {
+								clicked_center_box = [pix.x, bw, pix.y, bh];
 							}
 						}
-						clicked_boundbox = box;
-						clicked_node = node;
 					}
 				} else if (type == 'mouseover') {
 					found = true;
 					break;
-				} else if (type == 'mouseup') {
-					var button = overlay.event ? overlay.event.button : 0;
-					if (button == 2) {
-						console.log("right button");
-					}
 				}
 			}
 		}
@@ -169,39 +192,20 @@ function event_ckmap(e, e2, type, overlay) {
 	if (type == 'click') {
 		console.log("clicked_node: " + clicked_node);
 	}
+	//overlay.clicked_center_box = clicked_center_box;
 	if (clicked_node) {
-		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, "toggle", false, clicked_boundbox);
-		//click_node(overlay, clicked_node, "toggle", clicked_boundbox);
-
-		/*
-		var node = clicked_node;
-		var is_checked = node.isChecked();
-		if (is_checked) {
-			node.checkSubtree(JXTree.UNCHECKED);
-		} else {
-			node.checkSubtree(JXTree.CHECKED);
-			node.openSupertree(JXTree.OPEN);
+		var o_open_bubble = overlay.win.nv_open_bubble;
+		overlay.win.nv_open_bubble = (type == 'click'); // center ??
+		var mode = (type == 'click' ? 'toggle' : 'select');
+		if (!event.ctrlKey) {
+			nv_perform("nv_uncheck_all_entities", overlay.win);
 		}
-		is_checked = node.isChecked();
-		var clickmap_tree_node = node.getUserData().clickmap_tree_node;
-		var latlng = mapProjection.fromPointToLatLng(clicked_boundbox.gpt);
-		console.log("clickmap_tree_node: " + clickmap_tree_node);
-		if (clickmap_tree_node) {
-			$.each(clickmap_tree_node.markers, function() {
-				var diff_lat = Math.abs(latlng.lat() - this.getPosition().lat());
-				var diff_lng = Math.abs(latlng.lng() - this.getPosition().lng());
-				
-				if (diff_lat <= ESP_LATLNG && diff_lng <= ESP_LATLNG) {
-					if (is_checked) {
-						bubble_open(this);
-					} else {
-						bubble_close(this);
-					}
-				} else {
-				}
-			});
+		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, mode, false, clicked_boundbox);
+		overlay.win.nv_open_bubble = o_open_bubble;
+		if (type == 'mouseup') {
+			overlay.clicked_center_box = clicked_center_box;
+			overlay.win.map.setCenter(clicked_latlng); // just testing
 		}
-		*/
 	}
 
 	var map_name = overlay.map_.map_name;
@@ -224,9 +228,17 @@ USGSOverlay.prototype.onAdd = function() {
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
 
 	var overlay = this;
+	/*
 	this.getMap().getDiv().onclick = function(event) {
 		overlay.event = event;
+		console.log("onclick: " + event.button);
 	}
+
+	this.getMap().getDiv().onmouseup = function(event) {
+		overlay.event = event;
+		console.log("onmouseup: " + event.button);
+	}
+	*/
 
 	google.maps.event.addListener(this.getMap(), 'mouseup', function(e, e2) {
 		event_ckmap(e, e2, 'mouseup', overlay);
@@ -407,6 +419,40 @@ USGSOverlay.prototype.draw = function(module) {
 		module = get_module();
 	}
 
+	if (this.clicked_center_box) {
+		var context = this.context;
+		context.fillStyle = "#FFFFFF";
+		context.globalAlpha = 0.65;
+		context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+		console.log("YES");
+		var div = this.div_;
+		var x = this.clicked_center_box[0] - div.left;
+		var y = this.clicked_center_box[2] - div.top;
+		var w = this.clicked_center_box[1];
+		var h = this.clicked_center_box[3];
+		if (CENTER_HIGHLIGHT_SHAPE) {
+			//context.clearRect(x, y, w, h);
+			context.clearRect(x-1, y-1, w+2, h+2);
+		} else if (CENTER_HIGHLIGHT_CIRCLE) {
+			var radius = w;
+			if (h > radius) {
+				radius = h;
+			}
+			/*
+			if (radius < 100) {
+				radius = 100;
+			}
+			*/
+			context.save();
+			context.globalAlpha = 1;
+			context.beginPath();
+			context.arc(x+w/2, y+h/2, radius, 0, 2*Math.PI);
+			context.clip();
+			context.clearRect(x - radius - 1, y - radius - 1, radius * 2 + 2, radius * 2 + 2);
+			context.restore();
+		}
+	}
+
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!drawing_config.displayDLOs()) {
 		return;
@@ -450,6 +496,7 @@ USGSOverlay.prototype.draw = function(module) {
 }
 
 USGSOverlay.prototype.reset = function() {
+	this.clicked_center_box = null;
 	this.arrpos = [];
 }
 

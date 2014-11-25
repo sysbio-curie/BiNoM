@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-var CANCEL_CLOSES = false;
+var CANCEL_CLOSES = true;
 
 var SEARCH_DIALOG_WIDTH = 450;
 var SEARCH_DIALOG_HEIGHT = 860;
@@ -51,6 +51,8 @@ var DATATABLE_CONFIG_WIDTH = 400;
 var DATATABLE_CONFIG_HEIGHT = 670;
 
 var USE_MODIF_ID_FOR_COLORS = true;
+//var USE_MODIF_ID_FOR_COLORS = false;
+var DISPLAY_MODIF_ID = false;
 
 function nv1() {
 	$("#datatable_input").css("display", "none");
@@ -73,7 +75,7 @@ function close_info_dialog(win)
 	$("#info_dialog", win.document).dialog("close");
 }
 
-function display_info_dialog(title, header, msg, win, position, width, height)
+function display_info_dialog(title, header, msg, win, position, width, height, command)
 {
 	var dialog = $("#info_dialog", win.document);
 //	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
@@ -101,6 +103,7 @@ function display_info_dialog(title, header, msg, win, position, width, height)
 			height = 800;
 		}
 	}
+	console.log("display+info_dialog [" + command + "]");
 	dialog.dialog({
 		autoOpen: false,
 		width: width,
@@ -109,7 +112,12 @@ function display_info_dialog(title, header, msg, win, position, width, height)
 		title: title,
 		buttons: {
 			"OK": function() {
-				$(this).dialog("close");
+				console.log("OK: " + command);
+				if (command) {
+					nv_execute_commands(win, nv_CMD_MARK + ' ' + command);
+				} else {
+					$(this).dialog("close");
+				}
 			}
 		}
 	});
@@ -133,9 +141,9 @@ function error_dialog(header, msg, win)
 	display_info_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
 }
 
-function notice_dialog(header, msg, win, position, width, height)
+function notice_dialog(header, msg, win, position, width, height, command)
 {
-	display_info_dialog('Notice', header, msg, win, position, width, height);
+	display_info_dialog('Notice', header, msg, win, position, width, height, command);
 }
 
 function get_dialog_width(width) {
@@ -425,6 +433,11 @@ $(function() {
 		if (navicell.dataset.datatableCount()) {
 			$("#drawing_config_div").dialog("open");
 		}
+	});
+
+	$("#demo").button().click(function() {
+		nv_execute_commands(window, null, "launch_demo.nvc");
+		$("#demo").button("disable");
 	});
 
 	if (DATATABLE_HAS_TABS) {
@@ -1825,7 +1838,7 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 					}
 				}
 				if (style != undefined && value != undefined && value != INVALID_VALUE) {
-					if (!value) {
+					if (value.toString() == '') {
 						value = 'NA';
 					}
 					html += "<td class='heatmap_cell' " + style + ">" + value + "</td>";
@@ -1895,7 +1908,7 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 		var gene_name = sorted_gene_names[idx];
 		var gene = navicell.dataset.genes[gene_name];
 		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
-		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (DISPLAY_MODIF_ID && selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
 	}
 	if (sel_m_genes && !sel_gene) {
 		html += "<option value='" + sel_m_genes + "' selected>" + (sel_m_genes ? sel_m_genes : "") + "</option>\n";
@@ -2025,7 +2038,7 @@ function barplot_step_display_config(idx, map_name) {
 		var datatable = navicell.getDatatableById(val);
 		if (datatable) {
 			var doc = (map_name && maps ? maps[map_name].document : null);
-			datatable.showDisplayConfig(doc, !datatable.biotype.isContinuous() ? COLOR_SIZE_CONFIG : 'color');
+			datatable.showDisplayConfig(doc, datatable.biotype.isUnorderedDiscrete() ? COLOR_SIZE_CONFIG : 'color');
 		}
 	}
 }
@@ -2201,7 +2214,7 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 			}
 			if (value != undefined && value != INVALID_VALUE) {
 				var style = "style='text-align: center;'";
-				if (!value) {
+				if (value.toString() == '') {
 					value = 'NA';
 				}
 				html += "<td class='barplot_cell' " + style + ">" + value + "</td>";
@@ -2311,7 +2324,7 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 		var gene_name = sorted_gene_names[idx];
 		var gene = navicell.dataset.genes[gene_name];
 		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
-		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (DISPLAY_MODIF_ID && selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
 	}
 	if (sel_m_genes && !sel_gene) {
 		html += "<option value='" + sel_m_genes + "' selected>" + (sel_m_genes ? sel_m_genes : "") + "</option>\n";
@@ -2388,6 +2401,7 @@ function draw_barplot(module, overlay, context, scale, modif_id, gene_name, topx
 		} else {
 			break; // EV: added 2014-11-10
 		}
+
 		if (bg != undefined && height != undefined) {
 			var fg = getFG_from_BG(bg);
 			context.fillStyle = "#" + bg;

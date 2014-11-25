@@ -88,6 +88,8 @@ import fr.curie.BiNoM.pathways.utils.voronoicell.GenerateVoronoiCellsForMap;
 public class ProduceClickableMap
 {
 	private static boolean NV2 = false;
+	private static boolean DEMO = false;
+	private static int demo_display_cnt = 0;
 	private static boolean USE_JXTREE = true;
 	private static File config = null;
 	private static boolean USE_EXT_JSON = true;
@@ -511,6 +513,7 @@ public class ProduceClickableMap
 		boolean only_tiles = false;
 		boolean provide_sources = false;
 		boolean nv2 = false;
+		boolean demo = false;
 
 		String project_name = null;
 		
@@ -543,6 +546,8 @@ public class ProduceClickableMap
 				make_tiles = !b.booleanValue();
 			else if ((b = options.booleanOption("nv2", "Navicell2 file generation")) != null)
 				nv2 = b.booleanValue();
+			else if ((b = options.booleanOption("demo", "generate demo button on master")) != null)
+				demo = b.booleanValue();
 			else if ((b = options.booleanOption("jxtree", "Use jxtree")) != null)
 				USE_JXTREE = b.booleanValue();
 			else if ((b = options.booleanOption("nojxtree", "Use jxtree")) != null)
@@ -625,7 +630,7 @@ public class ProduceClickableMap
 		try
 		{
 			run(base, source_directory, make_tiles, only_tiles, project_name, atlasInfo, xrefs, show_default_compartement_name, wordpress_server,
-			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_ssl, wordpress_xmlrpc_patched, root, provide_sources, nv2);
+			    wordpress_passwd, wordpress_user, wordpress_blogname, wordpress_ssl, wordpress_xmlrpc_patched, root, provide_sources, nv2, demo);
 		}
 		catch (NaviCellException e)
 		{
@@ -642,6 +647,7 @@ public class ProduceClickableMap
 	}
 	static final String data_directory = "/data";
 	static final String rightpanel_include_file = data_directory + "/rightpanel.inc.html";
+	static final String rightpanel_demo_include_file = data_directory + "/rightpanel_demo.inc.html";
 	static final String mainpanel_include_file = data_directory + "/mainpanel.inc.html";
 	static final String default_xref_file = data_directory + "/xrefs_default.txt";
 	static String directory_suffix = "";
@@ -664,10 +670,12 @@ public class ProduceClickableMap
 		final boolean wordpress_xmlrpc_patched,
 		final File root,
 		final boolean provide_sources,
-		final boolean nv2
+		final boolean nv2,
+		final boolean demo
 	 ) throws NaviCellException, IOException
 	{
 		NV2 = nv2;
+		DEMO = demo;
 
 		System.out.println("ProduceClickableMap: NV2: " + nv2 + " " + root);
 		if (root.toString().endsWith("_light")) {
@@ -5599,7 +5607,12 @@ public class ProduceClickableMap
 
 
 		if (NV2) {
-			out.println(file_contents(rightpanel_include_file, true));
+			if (DEMO && demo_display_cnt < 2 && map_name.equals(master_map_name)) {
+				out.println(file_contents(rightpanel_demo_include_file, true));
+				demo_display_cnt++; // to avoid multiple demo buttons
+			} else {
+				out.println(file_contents(rightpanel_include_file, true));
+			}
 		}
 
 		right_div.close();

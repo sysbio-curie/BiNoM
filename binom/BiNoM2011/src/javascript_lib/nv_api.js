@@ -118,11 +118,6 @@ function nv_get_command_history(win)
 	return $("#command-history", win.document).val();
 }
 
-function nv_execute_commands(win, cmd)
-{
-	return win.nv_decode(cmd);
-}
-
 // ------------------------------------------------------------------------------------------------------
 // nv_find_entities
 //
@@ -136,11 +131,12 @@ function nv_execute_commands(win, cmd)
 //    nv_find_entities(window, "AK.*");
 // ------------------------------------------------------------------------------------------------------
 
-function nv_notice_perform(win, command, header, msg, position, width, height)
+function nv_notice_perform(win, command, header, msg, position, width, height, commands)
 {
 	win = nv_win(win);
+	console.log("notice [" + commands + "]");
 	if (command == "set_message_and_open") {
-		win.notice_dialog(header, msg, win, position, width, height);
+		win.notice_dialog(header, msg, win, position, width, height, commands);
 	} else if (command == "open") {
 		open_info_dialog(win);
 	} else if (command == "close") {
@@ -996,7 +992,7 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 					} else {
 						var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
 						value = $(id, doc).val();
-						if (!value) {
+						if (value == undefined || value == '') {
 							value = $(id, doc).text();
 						}
 					}
@@ -1209,8 +1205,8 @@ function nv_record(win, to_encode) {
 	$("#command-history", win.document).val((history ? history + "\n\n" : "") + cmd);
 }
 
-function nv_record_action(win, action, arg1, arg2, arg3, arg4, arg5, arg6) {
-	nv_record(win, nv_encode_action(action, win, arg1, arg2, arg3, arg4, arg5, arg6));
+function nv_record_action(win, action, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+	nv_record(win, nv_encode_action(action, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
  
 var nv_handlers = {
@@ -1244,17 +1240,18 @@ var nv_handlers = {
 
 	"nv_get_command_history": nv_get_command_history,
 	"nv_execute_commands": nv_execute_commands
+//	"nv_demo": nv_demo
 };
 
-function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
+function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 {
 	var action = nv_handlers[action_str];
 	if (!action) {
 		win.console.log("nv_perform: error no action \"" + action_str + "\"");
 		return;
 	}
-	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6);
-	nv_record(win, nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6));
+	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+	nv_record(win, nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 	return ret;
 }
 
@@ -1272,7 +1269,7 @@ function nv_encode_data(data)
 	return JSON.stringify(data);
 }
 
-function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
+function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 {
 	var map = {};
 	var args = [];
@@ -1282,6 +1279,7 @@ function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 	nv_push_arg(args, arg4);
 	nv_push_arg(args, arg5);
 	nv_push_arg(args, arg6);
+	nv_push_arg(args, arg7);
 	var now = nv_now();
 	map["action"] = action_str;
 	map["module"] = get_module(win);
@@ -1291,6 +1289,9 @@ function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6)
 }
 
 function nv_rsp(url, data, msg_id) {
+	if (!url) {
+		return;
+	}
 	if (SERVER_TRACE) {
 		console.log("NV Server: nv_rsp(" + url + ", " + data + ", " + msg_id + ")");
 	}
@@ -1369,6 +1370,27 @@ function nv_check_proxy_errors(e) {
 	return true;
 }
 
+function nv_execute_commands(win, cmd, relurl) {
+	if (cmd) {
+		return win.nv_decode(cmd);
+	}
+	var href = win.location.href;
+	var idx = href.indexOf('/navicell/');
+	var url = href.substr(0, idx) + '/navicell/' + relurl;
+	//console.log("executing URL " + url);
+	$.ajax(url,
+	       {
+		       async: false,
+		       cache: false, // don't work without cache off
+		       dataType: 'text',
+		       success: function(cmd) {
+			       //console.log("successfull [" + cmd + "]");
+			       nv_execute_commands(win, cmd);
+		       },
+	       }
+	      );
+}
+
 function nv_manage_command(cmd, base_url, url) {
 	if (SERVER_TRACE) {
 		console.log("NV Server: received length [" + cmd.length + "]");
@@ -1392,6 +1414,7 @@ function nv_manage_command(cmd, base_url, url) {
 				       
 				       error: function(e) {
 					       nv_manage_error(e, base_url, url);
+					       nv_rsp(rsp_url, {status: 1, data: "invalid URL " + dataurl}, -1);
 				       }
 			       }
 			      );
@@ -1452,7 +1475,7 @@ function nv_rcv(base_url, url) {
 }
 
 function nv_server(win, id) {
-	var href = window.location.href;
+	var href = win.location.href;
 	var idx = href.indexOf('/navicell/');
 	try {
 		if (id) {
@@ -1470,6 +1493,12 @@ function nv_server(win, id) {
 }
 
 var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
+
+function nv_deferred_perform(win, timeout, action_str, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+	setTimeout(function() { // breaking closure
+		nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+	}, timeout);
+}
 
 function nv_decode(str)
 {
@@ -1490,12 +1519,18 @@ function nv_decode(str)
 		var module = action_map.module;
 		var args = action_map.args;
 		var win = module ? get_win(module) : window;
+		var timeout = action_map.timeout;
 		if (!win) {
 			console.log("NV Server: nv_decode: unknown module " + module);
 			continue;
 		}
 		msg_id = action_map.msg_id;
-		ret = nv_perform(action_str, win, args[0], args[1], args[2], args[3], args[4], args[5]);
+		console.log("action: " + action_str);
+		if (timeout) {
+			nv_deferred_perform(win, timeout, action_str, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+		} else {
+			ret = nv_perform(action_str, win, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+		}
 	}
 
 	nv_decoding = o_decoding;

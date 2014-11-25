@@ -56,6 +56,7 @@ function CHECK_NO_JXTREE(fun) {
 	}
 }
 
+// obsolete
 function panMapToBounds_jxtree(map, bounds)
 {
 	var map_bound = map.getBounds();
@@ -66,6 +67,13 @@ function panMapToBounds_jxtree(map, bounds)
 			}
 		}
 		map.panToBounds(bounds[0]);
+	}
+}
+
+function center_marker_position(map, marker_positions)
+{
+	if (marker_positions.length > 0) {
+		map.setCenter(marker_positions[0]);
 	}
 }
 
@@ -1018,6 +1026,7 @@ function uncheck_all_entities(win)
 		this.close();
 	});
 
+	overlay.reset(); // ??
 	overlay.draw(win.document.navicell_module_name);
 }
 
@@ -1116,10 +1125,12 @@ function ClickmapTreeNode(map, module_name, id, cls, name, _positions, mapdata)
 
 function tree_context_prologue(tree_context) {
 	tree_context.marker_bounds = [];
+	tree_context.marker_positions = [];
 }
 
 function tree_context_epilogue(tree_context) {
-	panMapToBounds_jxtree(tree_context.win.map, tree_context.marker_bounds);
+	//panMapToBounds_jxtree(tree_context.win.map, tree_context.marker_bounds);
+	center_marker_position(tree_context.win.map, tree_context.marker_positions);
 }
 
 function tree_node_click_before(tree_context, checked) {
@@ -1145,10 +1156,13 @@ function tree_node_state_changed(tree_context, tree_node, checked) {
 			if (nv_open_bubble) {
 				bubble_open(this);
 			}
-			if (tree_context.marker_bounds) {
+			if (tree_context.marker_bounds) { // obsolete
 				var marker_bound = new google.maps.LatLngBounds();
 				extend(marker_bound, this);
 				tree_context.marker_bounds.push(marker_bound);
+			}
+			if (tree_context.marker_positions) {
+				tree_context.marker_positions.push(this.getPosition());
 			}
 		} else {
 			this.setVisible(false);

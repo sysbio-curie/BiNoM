@@ -125,8 +125,8 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
-	var event = overlay.win.event;
-	if (type == 'mouseup') {
+	var event = (overlay.win.event ? overlay.win.event : overlay.event);
+	if (type == 'mouseup' && event) {
 		console.log("alt " + event.altKey + " " + event.ctrlKey + " " + event.shiftKey);
 	}
 	var button = (event ? event.button : -1);
@@ -197,7 +197,7 @@ function event_ckmap(e, e2, type, overlay) {
 		var o_open_bubble = overlay.win.nv_open_bubble;
 		overlay.win.nv_open_bubble = (type == 'click'); // center ??
 		var mode = (type == 'click' ? 'toggle' : 'select');
-		if (!event.ctrlKey) {
+		if (event && !event.ctrlKey) {
 			nv_perform("nv_uncheck_all_entities", overlay.win);
 		}
 		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, mode, false, clicked_boundbox);
@@ -228,17 +228,16 @@ USGSOverlay.prototype.onAdd = function() {
 	google.maps.event.addListener(this.getMap(), 'center_changed', simpleBindShim(this, this.draw));
 
 	var overlay = this;
-	/*
+
 	this.getMap().getDiv().onclick = function(event) {
 		overlay.event = event;
-		console.log("onclick: " + event.button);
+		//console.log("onclick: " + event.button);
 	}
 
 	this.getMap().getDiv().onmouseup = function(event) {
 		overlay.event = event;
-		console.log("onmouseup: " + event.button);
+		//console.log("onmouseup: " + event.button);
 	}
-	*/
 
 	google.maps.event.addListener(this.getMap(), 'mouseup', function(e, e2) {
 		event_ckmap(e, e2, 'mouseup', overlay);

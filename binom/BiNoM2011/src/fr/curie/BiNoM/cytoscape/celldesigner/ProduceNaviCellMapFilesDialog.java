@@ -312,9 +312,9 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
-			boolean nv2 = true; // TBD: 2013-09-18: nv2 must be set according to a dialog choice I suppose
-			boolean demo = false;
-			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected(), provideSourceFiles.isSelected(), xrefFile.getText(), nv2, false);
+			boolean nv2 = true;
+			boolean demo = false; // 2014-12-01: should we control this parameter with a button in the dialog ?
+			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected(), provideSourceFiles.isSelected(), xrefFile.getText(), nv2, demo);
   		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
                 }
            });

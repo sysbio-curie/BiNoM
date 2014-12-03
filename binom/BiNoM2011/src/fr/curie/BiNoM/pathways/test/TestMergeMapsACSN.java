@@ -13,9 +13,10 @@ public class TestMergeMapsACSN {
 		try {
 			//mm.loadConfigFile("/Users/eric/wk/merge_maps_bug2014-10/survival_config.txt");
 			//mm.loadConfigFile("/Users/eric/wk/test_merge/wnt/module_wnt_canonical2.txt");
-			//mm.loadConfigFile("/Users/eric/wk/test_merge/simple_example/config.txt");
+			mm.loadConfigFile("/Users/eric/wk/test_merge/simple_example/config.txt");
 			//mm.loadConfigFile("/Users/eric/wk/test_merge/toy_config.txt");
-			mm.loadConfigFile("/Users/eric/wk/test_merge/survival/config2.txt");
+			//mm.loadConfigFile("/Users/eric/wk/test_merge/survival/config2.txt");
+			//mm.loadConfigFile("/Users/eric/wk/test_merge/survival/survival_configEB.txt");
 		}
 		catch (Exception e) {
 			e.printStackTrace();

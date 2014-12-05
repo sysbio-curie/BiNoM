@@ -394,6 +394,14 @@ class NaviCell:
 
 ### navigation
     def setZoom(self, module, zoom):
+        """ Set the zoom level of a map to a given level.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param zoom (int): zoom level.
+        
+        """
+
         self._cli2srv('nv_set_zoom', module, [zoom])
 
     def setCenter(self, module, where, lng=0, lat=0):

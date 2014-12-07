@@ -479,7 +479,7 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 
 	google.maps.event.addListener(map, 'center_changed', function() {
 		var center = map.getCenter();
-		nv_record_action(window, "nv_set_center", "absolute", center.lng(), center.lat());
+		nv_record_action(window, "nv_set_center", "ABSOLUTE", center.lng(), center.lat());
 	});
 
 

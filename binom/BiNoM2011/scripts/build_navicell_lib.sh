@@ -53,7 +53,7 @@ fi
 
 cd $tmpdir
 
-tar $opts $tarfile lib map_icons
+tar $opts $tarfile --exclude='*~' lib map_icons
 
 echo "navicell lib tarfile: " $tarfile
 

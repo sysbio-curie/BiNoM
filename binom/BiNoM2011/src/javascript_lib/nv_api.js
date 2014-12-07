@@ -1064,6 +1064,7 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 			var checkbox = $("#cb_annot_" + annot.id, win.document);
 			var checked = checkbox.attr("checked");
 			
+			console.log("checked : " + checked);
 			annot_ids.push(annot.id);
 			annot.setIsGroup(checked);
 		}
@@ -1138,7 +1139,7 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		var annot_name = arg1;
 		var checked = arg2;
 		var annot = navicell.annot_factory.getAnnotation(annot_name);
-		console.log("annotation selected: " + annot_name + " " + annot);
+		console.log("annotation selected: " + annot_name + " " + (annot ? annot.id : "null"));
 		if (annot) {
 			if (checked) {
 				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
@@ -1259,7 +1260,7 @@ var nv_CMD_MARK = "@COMMAND";
 
 function nv_push_arg(args, arg)
 {
-	if (arg != undefined) {
+	/*if (arg != undefined) */ {
 		args.push(arg);
 	}
 }
@@ -1525,7 +1526,7 @@ function nv_decode(str)
 			continue;
 		}
 		msg_id = action_map.msg_id;
-		console.log("action: " + action_str);
+		//console.log("action: " + action_str);
 		if (timeout) {
 			nv_deferred_perform(win, timeout, action_str, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
 		} else {

@@ -2151,7 +2151,7 @@ DisplayContinuousConfig.prototype = {
 		return this.getValue('size', 'sample', sample_name, gene_name);
 	},
 
-	getSizeGroupValue: function(sample_name, gene_name) {
+	getSizeGroupValue: function(group, gene_name) {
 		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['size']);
 	},
 

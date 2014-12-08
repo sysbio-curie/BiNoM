@@ -2608,26 +2608,37 @@ DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win, ca
 	}
 }
 
-DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
+DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(datatable_id, config, checked, called_from_api) {
+	var tabname = 'group';
+	var id_suffix = tabname + '_' + config + "_" + datatable_id;
+	var obj = $("#discrete_color_advanced_" + id_suffix);
+	if (!called_from_api) {
+		checked = obj.attr("checked");
+		nv_perform("nv_display_unordered_discrete_config_perform", window, "set_advanced_configuration", datatable_id, config, checked);
+		return;
+	}
 	//var datatable = navicell.dataset.datatables_id[id];
-	var datatable = navicell.dataset.getDatatableByCanonName(id);
+	var datatable = navicell.dataset.getDatatableByCanonName(datatable_id);
 	var module = get_module();
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
-	var tabname = 'group';
-	var id_suffix = tabname + '_' + config + "_" + id;
-	var checked = $("#discrete_color_advanced_" + id_suffix).attr("checked");
+	//var checked = $("#discrete_color_advanced_" + id_suffix).attr("checked");
+	if (checked) {
+		obj.attr("checked", "checked");
+	} else {
+		obj.removeAttr("checked");
+	}
 	displayUnorderedConfig.advanced = (checked == "checked");
 	displayUnorderedConfig.update_config(config, tabname, {checked: checked});
 }
 
-DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
+DisplayUnorderedDiscreteConfig.setColors = function(datatable_id, config, same_color, called_from_api) {
+	// TBD: must use nv_perform and use called_from_api
 	//var datatable = navicell.dataset.datatables_id[id];
-	var datatable = navicell.dataset.getDatatableByCanonName(id);
+	var datatable = navicell.dataset.getDatatableByCanonName(datatable_id);
 	var module = get_module();
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'sample';
-	var id_suffix = tabname + '_' + config + "_" + id;
-	//DisplayUnorderedDiscreteConfig.setEditing(datatable.id, true, config);
+	var id_suffix = tabname + '_' + config + "_" + datatable_id;
 	DisplayUnorderedDiscreteConfig.setEditing(datatable.getCanonName(), true, config);
 	var checked = $("#discrete_color_same_" + id_suffix).attr("checked");
 	var color = $("#discrete_color_same_color_" + id_suffix).val();
@@ -2651,6 +2662,69 @@ DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
 			displayUnorderedConfig.update_colors(config, tabname, {checked: "gradient", color: color, beg_gradient: beg_gradient, end_gradient: end_gradient});
 		}
 	}
+}
+
+DisplayUnorderedDiscreteConfig.setDiscreteCond = function(datatable_id, config, tabname, idx, cond, called_from_api) {
+	var win = window;
+	var obj = $("#discrete_cond_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", win, "set_discrete_cond", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(cond);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayUnorderedDiscreteConfig.setDiscreteValue = function(datatable_id, config, tabname, idx, value, called_from_api) {
+	var win = window;
+	var obj = $("#discrete_value_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", win, "set_discrete_value", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(value);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayUnorderedDiscreteConfig.setDiscreteColor = function(datatable_id, config, tabname, idx, color, called_from_api) {
+	var win = window;
+	var obj = $("#discrete_color_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", win, "set_discrete_color", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(color);
+	var fg = getFG_from_BG(color);
+	obj.css("background-color", "#" + color);
+	obj.css("color", "#" + fg);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayUnorderedDiscreteConfig.setDiscreteSize = function(datatable_id, config, tabname, idx, size, called_from_api) {
+	var win = window;
+	var obj = $("#discrete_size_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", win, "set_discrete_size", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(size);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayUnorderedDiscreteConfig.setDiscreteShape = function(datatable_id, config, tabname, idx, shape, called_from_api) {
+	var win = window;
+	var obj = $("#discrete_shape_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", win, "set_discrete_shape", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(shape);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable_id, true, config);
 }
 
 DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, win) {
@@ -3313,7 +3387,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				var value = this.getValueAt(idx-beg, config, tabname);
 				if (!is_sample) {
 					var selcond = this.getConditionAt(idx, config);
-					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+//					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setDiscreteCond(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 					if (false && this.advanced) {
 						html += "<option value='" + Group.DISCRETE_IGNORE + "' " + (selcond == Group.DISCRETE_IGNORE ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>ignore</span></option>";
 					}
@@ -3322,7 +3397,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 					html += "<option value='" + Group.DISCRETE_EQ_ALL + "' " + (selcond == Group.DISCRETE_EQ_ALL ? "selected" : "") + ">All group elements equals</option>";
 					html += "</select></td>";
 
-					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+					//html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setDiscreteValue(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 					var beg2;
 					if (tabname == 'sample' && this.has_empty_values) {
 						var value2 = this.getValueAt(0, config, tabname);
@@ -3348,10 +3424,12 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			}
 			if (config == 'color' || config == COLOR_SIZE_CONFIG) {
 				var color = (idx == step_last ?  this.getColorAt(step_cnt, config, tabname) : this.getColorAt(idx, config, tabname));
-				html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'></input></td>";
+				//html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'></input></td>";
+				html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setDiscreteColor(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 			}
 			if (config == 'size' || config == COLOR_SIZE_CONFIG) {
-				html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+				//html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+				html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setDiscreteSize(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 				var selsize = this.getSizeAt(idx, config, tabname);
 				if (idx == step_cnt) {
 					selsize = 4;
@@ -3364,7 +3442,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				html += "</select></td>";
 			}
 			if (config == 'shape') {
-				html += "<td><select id='discrete_shape_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+				//html += "<td><select id='discrete_shape_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+				html += "<td><select id='discrete_shape_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setDiscreteShape(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 				var selshape = this.getShapeAt(idx, config, tabname);
 				if (selshape > navicell.shapes.length) {
 					selshape = navicell.shapes.length-1;
@@ -3379,8 +3458,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		}
 
 		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && is_sample && !this.datatable.biotype.isSet()) {
-			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", \"" + id + "\")'";
-			var onchange2 = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", \"" + id + "\", true)'";
+			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + id + "\", \"" + config + "\")'";
+			var onchange2 = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + id + "\", \"" + config + "\", true)'";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'><table>";
 			html += "<tr><td class='config-label'>&nbsp;</td></tr>";
 			var checked = "";
@@ -3432,7 +3511,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			html += "</table></td></tr>";
 		}
 		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && !is_sample) {
-			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + config + "\", \"" + id + "\")'";
+			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + id + "\", \"" + config + "\")'";
 			var checked = params ? params.checked : "";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'>&nbsp;</td></tr>";
 			html += "<tr><td class='config-label'><input id='discrete_color_advanced_" + id_suffix + "' type='checkbox' " + checked + " " + onchange + ">&nbsp;Avanced configuration</td></tr>";
@@ -3451,17 +3530,25 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	}
 };
 
-DisplayUnorderedDiscreteConfig.switch_sample_tab = function(suffix, doc) {
+DisplayUnorderedDiscreteConfig.switch_sample_tab = function(suffix, doc, called_from_api) {
 	if (!doc) {
 		doc = window.document;
+	}
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_sample_tab", suffix);
+		return;
 	}
 	$("#discrete_config_sample_" + suffix, doc).css("display", "block");
 	$("#discrete_config_group_" + suffix, doc).css("display", "none");
 }
 
-DisplayUnorderedDiscreteConfig.switch_group_tab = function(suffix, doc) {
+DisplayUnorderedDiscreteConfig.switch_group_tab = function(suffix, doc, called_from_api) {
 	if (!doc) {
 		doc = window.document;
+	}
+	if (!called_from_api) {
+		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_group_tab", suffix);
+		return;
 	}
 	$("#discrete_config_sample_" + suffix, doc).css("display", "none")
 	$("#discrete_config_group_" + suffix, doc).css("display", "block");

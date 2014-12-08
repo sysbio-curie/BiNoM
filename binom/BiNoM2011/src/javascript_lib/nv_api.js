@@ -736,22 +736,68 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var active = div.tabs("option", "active");
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
-		var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
+		var value_cnt = displayConfig.getValueCount();
 		if (tabname == 'group') {
 			value_cnt++;
 		}
-		var advanced = displayUnorderedDiscreteConfig.advanced;
+		var advanced = displayConfig.advanced;
 		for (var idx = 0; idx < value_cnt; ++idx) {
 			var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			if (!advanced && idx > 0) {idx = value_cnt-1;}
-			displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+			displayConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
 		}
 		DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
 		doc.win.clickmap_refresh(true);
 		update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+	} else if (command == "set_advanced_configuration") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var checked = arg3;
+		DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(datatable_id, config, checked, true);
+	} else if (command == "set_discrete_value") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var value = arg5;
+		DisplayUnorderedDiscreteConfig.setDiscreteValue(datatable_id, config, tabname, idx, value, true);
+	} else if (command == "set_discrete_color") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var color = arg5;
+		DisplayUnorderedDiscreteConfig.setDiscreteColor(datatable_id, config, tabname, idx, color, true);
+	} else if (command == "set_discrete_size") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var size = arg5;
+		DisplayUnorderedDiscreteConfig.setDiscreteSize(datatable_id, config, tabname, idx, size, true);
+	} else if (command == "set_discrete_shape") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var shape = arg5;
+		DisplayUnorderedDiscreteConfig.setDiscreteShape(datatable_id, config, tabname, idx, shape, true);
+	} else if (command == "set_discrete_cond") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var cond = arg5;
+		DisplayUnorderedDiscreteConfig.setDiscreteCond(datatable_id, config, tabname, idx, cond, true);
+	} else if (command == "switch_sample_tab") {
+		var suffix = arg1;
+		DisplayUnorderedDiscreteConfig.switch_sample_tab(suffix, win.document, true);
+	} else if (command == "switch_group_tab") {
+		var suffix = arg1;
+		DisplayUnorderedDiscreteConfig.switch_group_tab(suffix, win.document, true);
 	} else {
 		throw "nv_display_unordered_discrete_config_perform: unknown command \"" + command + "\"";
 	}

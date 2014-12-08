@@ -1529,7 +1529,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						if (displayContinuousConfig) {
 							nv_perform("nv_display_continuous_config_perform", doc.win, "apply", datatable_id, what);
 						} else if (displayUnorderedDiscreteConfig) {
-							nv_perform("nv_display_unordered_discrete_perform", doc.win, "apply", datatable_id, what);
+							nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "apply", datatable_id, what);
 						}
 						/*
 						var active = div.tabs("option", "active");
@@ -1608,7 +1608,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						if (displayContinuousConfig) {
 							nv_perform("nv_display_continuous_config_perform", doc.win, "cancel", datatable_id, what);
 						} else if (displayUnorderedDiscreteConfig) {
-							nv_perform("nv_display_unordered_discrete_perform", doc.win, "cancel", datatable_id, what);
+							nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "cancel", datatable_id, what);
 						}
 						/*
 						var active = div.tabs("option", "active");
@@ -1635,7 +1635,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						if (displayContinuousConfig) {
 							nv_perform("nv_display_continuous_config_perform", doc.win, "close", datatable_id, what);
 						} else if (displayUnorderedDiscreteConfig) {
-							nv_perform("nv_display_unordered_discrete_perform", doc.win, "close", datatable_id, what);
+							nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "close", datatable_id, what);
 						}
 						/*
 						$(this).dialog('close');
@@ -1650,7 +1650,7 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		if (displayContinuousConfig) {
 			nv_perform("nv_display_continuous_config_perform", doc.win, "open", datatable_id, what);
 		} else if (displayUnorderedDiscreteConfig) {
-			nv_perform("nv_display_unordered_discrete_perform", doc.win, "open", datatable_id, what);
+			nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "open", datatable_id, what);
 		}
 		//div.dialog("open");
 	}
@@ -1672,18 +1672,21 @@ function drawing_config_chart() {
 	if (val == "Heatmap") {
 		nv_perform("nv_heatmap_editor_perform", window, "open");
 	} else if (val == "Barplot") {
-		$("#barplot_editor_div", doc).dialog("open");
+		nv_perform("nv_barplot_editor_perform", window, "open");
+		//$("#barplot_editor_div", doc).dialog("open");
 	}
 }
 
 function drawing_config_glyph(num) {
-	var doc = window.document;
-	$("#glyph_editor_div_" + num, doc).dialog("open");
+	nv_perform("nv_glyph_editor_perform", window, "open", num);
+	//var doc = window.document;
+	//$("#glyph_editor_div_" + num, doc).dialog("open");
 }
 
 function drawing_config_map_staining() {
-	var doc = window.document;
-	$("#map_staining_editor_div", doc).dialog("open");
+	nv_perform("nv_map_staining_editor_perform", window, "open");
+	//var doc = window.document;
+	//$("#map_staining_editor_div", doc).dialog("open");
 }
 
 function drawing_editing(val) {

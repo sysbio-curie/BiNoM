@@ -470,9 +470,10 @@ function _nv_get_datatable_tag(arg)
 		var datatable_num = 1;
 		var datatables = navicell.dataset.datatables;
 		for (var datatable_name in navicell.dataset.datatables) {
-			if (selected_datatable == datatable_num || selected_datatable == datatable_name) {
-				var datatable = datatables[datatable_name];
-				return datatable.getId();
+			var datatable = datatables[datatable_name];
+			if (selected_datatable == datatable_num || selected_datatable == datatable_name || selected_datatable == datatable.getCanonName()) {
+				//return datatable.getId();
+				return datatable.getCanonName();
 			}
 			datatable_num++;
 		}
@@ -489,7 +490,8 @@ function _nv_get_sample_tag(arg)
 	for (var group_num in group_names) {
 		var group_name = group_names[group_num];
 		var group = navicell.group_factory.group_map[group_name];
-		var group_tag = "g_" + group.getId();
+		//var group_tag = "g_" + group.getId();
+		var group_tag = "g_" + group.getCanonName();
 		if (selected_sample == group_num || selected_sample == group_name || selected_sample == group_tag) {
 			return group_tag;
 		}
@@ -498,7 +500,8 @@ function _nv_get_sample_tag(arg)
 	for (var sample_num in sample_names) {
 		var sample_name = sample_names[sample_num];
 		var sample = navicell.dataset.samples[sample_name];
-		var sample_tag = "s_" + sample.getId();
+		//var sample_tag = "s_" + sample.getId();
+		var sample_tag = "s_" + sample.getCanonName();
 		if (selected_sample == sample_num || selected_sample == sample_name || selected_sample == sample_tag) {
 			return sample_tag;
 		}
@@ -526,6 +529,232 @@ function _nv_get_datatable(arg)
 		datatable_num++;
 	}
 	return null;
+}
+
+function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, arg4, arg5)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	if (command == "open") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		div.dialog('open');
+	} else if (command == "close") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		div.dialog('close');
+	} else if (command == "cancel") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		displayConfig.update();
+		DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
+		div.dialog('close');
+	} else if (command == "apply") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+		var active = div.tabs("option", "active");
+		var tabname = DisplayContinuousConfig.tabnames[active];
+
+		var prev_value = datatable.minval;
+		var error = 0;
+
+		var step_cnt = displayConfig.getStepCount(what, tabname);
+		if (displayConfig.has_empty_values) {
+			step_cnt++;
+		}
+
+		var use_gradient = displayConfig.use_gradient[what];
+		for (var idx = 0; idx < step_cnt; ++idx) {
+			var value;
+			if (idx == step_cnt-1 && !use_gradient) {
+				value = datatable.maxval;
+			} else {
+				value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
+			}
+			value *= 1.;
+			if (value <= prev_value) {
+				error = 1;
+				break;
+			}
+			prev_value = value;
+		}
+		
+		if (!error) {
+			for (var idx = 0; idx < step_cnt; ++idx) {
+				var value;
+				if (idx == step_cnt-1 && !use_gradient) {
+					value = datatable.maxval;
+				} else {
+					var id = "#step_value_" + tabname + '_' + what + '_' + datatable_id + "_" + idx;
+					value = $(id, doc).val();
+					if (!value) {
+						value = $(id, doc).text();
+					}
+				}
+				var color = $("#step_config_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				var size = $("#step_size_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				var shape = $("#step_shape_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+				displayConfig.setStepInfo(what, tabname, idx, value, color, size, shape);
+			}
+			DisplayContinuousConfig.setEditing(datatable_id, false, what, doc.win);
+		}
+		doc.win.clickmap_refresh(true);
+		update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+	} else if (command == "step_count_change") {
+		var tabname = arg1;
+		var config = arg2;
+		var id = arg3;
+		var step_cnt = arg4;
+		DisplayContinuousConfig.stepCountChange(tabname, config, id, step_cnt, true);
+	} else if (command == "set_sample_absval") {
+		var config = arg1;
+		var id = arg2;
+		var checked = arg3;
+		DisplayContinuousConfig.setSampleAbsval(config, id, checked, true);
+	} else if (command == "set_sample_method") {
+		var config = arg1;
+		var id = arg2;
+		var method = arg3;
+		DisplayContinuousConfig.setSampleMethod(config, id, method, true);
+	} else if (command == "set_group_method") {
+		var config = arg1;
+		var id = arg2;
+		var method = arg3;
+		DisplayContinuousConfig.setGroupMethod(config, id, method, true);
+	} else if (command == "set_editing") {
+		var datatable_id = arg1;
+		var val = arg2;
+		var config = arg3;
+		DisplayContinuousConfig.setEditing(datatable_id, val, config, win, true);
+	} else if (command == "set_input_value") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var value = arg5;
+		DisplayContinuousConfig.setInputValue(datatable_id, config, tabname, idx, value, true);
+	} else if (command == "set_input_color") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var color = arg5;
+		DisplayContinuousConfig.setInputColor(datatable_id, config, tabname, idx, color, true);
+	} else if (command == "set_select_size") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var size = arg5;
+		DisplayContinuousConfig.setSelectSize(datatable_id, config, tabname, idx, size, true);
+	} else if (command == "set_select_shape") {
+		var datatable_id = arg1;
+		var config = arg2;
+		var tabname = arg3;
+		var idx = arg4;
+		var shape = arg5;
+		DisplayContinuousConfig.setSelectShape(datatable_id, config, tabname, idx, shape, true);
+	} else if (command == "switch_sample_tab") {
+		var suffix = arg1;
+		DisplayContinuousConfig.switch_sample_tab(suffix, win.document, true);
+	} else if (command == "switch_group_tab") {
+		var suffix = arg1;
+		DisplayContinuousConfig.switch_group_tab(suffix, win.document, true);
+	} else {
+		throw "nv_display_continuous_config_perform: unknown command \"" + command + "\"";
+	}
+}
+
+function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, arg3, arg4, arg5)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	var drawing_config = navicell.getDrawingConfig(module);
+	if (command == "open") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		div.dialog('open');
+	} else if (command == "close") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		div.dialog('close');
+	} else if (command == "cancel") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+
+		displayConfig.update();
+		DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
+		div.dialog('close');
+	} else if (command == "apply") {
+		var datatable_id = arg1;
+		var what = arg2;
+		var doc = win.document;
+
+		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		var displayConfig = datatable.getDisplayConfig(module);
+		var div = displayConfig.getDiv(what);
+		var active = div.tabs("option", "active");
+		var tabname = DisplayContinuousConfig.tabnames[active];
+
+		var value_cnt = displayUnorderedDiscreteConfig.getValueCount();
+		if (tabname == 'group') {
+			value_cnt++;
+		}
+		var advanced = displayUnorderedDiscreteConfig.advanced;
+		for (var idx = 0; idx < value_cnt; ++idx) {
+			var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+			var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+			var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+			var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
+			if (!advanced && idx > 0) {idx = value_cnt-1;}
+			displayUnorderedDiscreteConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
+		}
+		DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
+		doc.win.clickmap_refresh(true);
+		update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+	} else {
+		throw "nv_display_unordered_discrete_config_perform: unknown command \"" + command + "\"";
+	}
 }
 
 function nv_heatmap_editor_perform(win, command, arg1, arg2)
@@ -893,7 +1122,8 @@ function _nv_datatable_config_build(win, div, datatable, what)
 	if (div.built) {
 		return;
 	}
-	var datatable_id = datatable.getId();
+	//var datatable_id = datatable.getId();
+	var datatable_id = datatable.getCanonName();
 	var width;
 	if (what == COLOR_SIZE_CONFIG) {
 		width = datatable.biotype.isUnorderedDiscrete() ? 760 : 500;
@@ -946,7 +1176,8 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 
 	_nv_datatable_config_build(win, div, datatable, what);
 
-	var datatable_id = datatable.getId();
+	//var datatable_id = datatable.getId();
+	var datatable_id = datatable.getCanonName();
 	var doc = win.document;
 
 	if (command == "open") {
@@ -1060,11 +1291,11 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		var annot_ids = [];
 		var checkeds = [];
 		for (var annot_name in annots) {
-			var annot = navicell.annot_factory.getAnnotation(annot_name);
-			var checkbox = $("#cb_annot_" + annot.id, win.document);
+			var annot = navicell.annot_factory.getAnnotation(annot_name, true);
+			//var checkbox = $("#cb_annot_" + annot.id, win.document);
+			var checkbox = $("#cb_annot_" + annot.getCanonName(), win.document);
 			var checked = checkbox.attr("checked");
 			
-			console.log("checked : " + checked);
 			annot_ids.push(annot.id);
 			annot.setIsGroup(checked);
 		}
@@ -1077,10 +1308,17 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 		var annots = navicell.annot_factory.annots_per_name;
 		for (var annot_name in annots) {
 			var annot = navicell.annot_factory.getAnnotation(annot_name);
+			/*
 			if (annot.isGroup()) {
 				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
 			} else {
 				$("#cb_annot_" + annot.id, win.document).removeAttr("checked");
+			}
+			*/
+			if (annot.isGroup()) {
+				$("#cb_annot_" + annot.getCanonName(), win.document).attr("checked", "checked");
+			} else {
+				$("#cb_annot_" + annot.getCanonName(), win.document).removeAttr("checked");
 			}
 		}
 		group_editing(false);
@@ -1138,16 +1376,23 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 	} else if (command == "select_annotation") {
 		var annot_name = arg1;
 		var checked = arg2;
-		var annot = navicell.annot_factory.getAnnotation(annot_name);
-		console.log("annotation selected: " + annot_name + " " + (annot ? annot.id : "null"));
+		var annot = navicell.annot_factory.getAnnotationPerCanonName(annot_name);
+		console.log("annotation selected: " + annot_name + " " + checked + " " + (annot ? annot.id : "null"));
 		if (annot) {
+			/*
 			if (checked) {
 				$("#cb_annot_" + annot.id, win.document).attr("checked", "checked");
 			} else {
 				$("#cb_annot_" + annot.id, win.document).removeAttr("checked");
 			}
+			*/
+			if (checked) {
+				$("#cb_annot_" + annot.getCanonName(), win.document).attr("checked", "checked");
+			} else {
+				$("#cb_annot_" + annot.getCanonName(), win.document).removeAttr("checked");
+			}
 		} else {
-			throw "nv_sample_annotation_perform: annotation \"" + annot + "\" not found";
+			throw "nv_sample_annotation_perform: annotation \"" + annot_name + "\" not found";
 		}
 	} else {
 		throw "nv_sample_annotation_perform: unknown command \"" + command + "\"";
@@ -1231,6 +1476,9 @@ var nv_handlers = {
 	"nv_sample_annotation_perform": nv_sample_annotation_perform,
 	"nv_datatable_config_perform": nv_datatable_config_perform,
 	"nv_notice_perform": nv_notice_perform,
+
+	"nv_display_continuous_config_perform": nv_display_continuous_config_perform,
+	"nv_display_unordered_discrete_config_perform": nv_display_unordered_discrete_config_perform,
 
 	"nv_get_module_list": nv_get_module_list,
 	"nv_get_datatable_list": nv_get_datatable_list,

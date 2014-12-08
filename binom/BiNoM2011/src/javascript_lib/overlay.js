@@ -423,7 +423,6 @@ USGSOverlay.prototype.draw = function(module) {
 		context.fillStyle = "#FFFFFF";
 		context.globalAlpha = 0.65;
 		context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
-		console.log("YES");
 		var div = this.div_;
 		var x = this.clicked_center_box[0] - div.left;
 		var y = this.clicked_center_box[2] - div.top;

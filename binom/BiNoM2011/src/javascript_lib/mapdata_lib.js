@@ -487,6 +487,7 @@ function Mapdata(to_load_count) {
 	this.module_postid = {};
 }
 
+var CANON_REGEX = new RegExp(" ", "g");
 var CLEAN_HTML_REGEX = new RegExp("<[^<>]+>|&nbsp;", "g");
 var TAG_REGEX = new RegExp(">\\w+:\\w+</a>|&nbsp;(\\w| )+&nbsp;", "g");
 var TAG_CLEAN_REGEX = new RegExp("</a>|&nbsp;|>", "g");
@@ -495,6 +496,11 @@ var LINE_BREAK_REGEX_G = new RegExp("\r\n?|\n", "g");
 var SEP_REGEX = new RegExp("[ \t;,\.\-]", "g");
 var NUM_REGEX = new RegExp("^-?[0-9]+(\.[0-9]*)?$");
 var INT_REGEX = new RegExp("^-?[0-9]+$");
+
+function canon_name(str) {
+	//console.log("canon [" + str + "] -> [" + str.replace(CANON_REGEX, '_') + "]");
+	return str.replace(CANON_REGEX, '_');
+}
 
 function is_number(str)
 {
@@ -1163,9 +1169,11 @@ function Dataset(name) {
 	this.datatable_id = 1;
 	this.datatables = {};
 	this.datatables_id = {};
+	this.datatables_canon_name = {};
 
 	this.sample_id = 1;
 	this.samples = {};
+	this.samples_canon_name = {};
 	this.samples_id = {};
 
 	this.modifs_id = {};
@@ -1180,6 +1188,7 @@ Dataset.prototype = {
 	name: "",
 	datatables: {},
 	datatables_id: {},
+	datatables_canon_name: {},
 	genes: {},
 	samples: {},
 
@@ -1213,6 +1222,7 @@ Dataset.prototype = {
 	addDatatable: function(datatable) {
 		this.datatables[datatable.name] = datatable;
 		this.datatables_id[datatable.getId()] = datatable;
+		this.datatables_canon_name[datatable.getCanonName()] = datatable;
 	},
 
 	getDatatableByName: function(name) {
@@ -1223,6 +1233,10 @@ Dataset.prototype = {
 		return this.datatables_id[id];
 	},
 
+	getDatatableByCanonName: function(canon_name) {
+		return this.datatables_canon_name[canon_name];
+	},
+
 	removeDatatable: function(datatable) {
 		if (this.datatables[datatable.name] == datatable) {
 			for (var sample_name in datatable.sample_index) {
@@ -1230,6 +1244,7 @@ Dataset.prototype = {
 				if (!--sample.refcnt) {
 					delete this.samples_id[sample.id];
 					delete this.samples[sample_name];
+					delete this.samples_canon_name[sample.getCanonName()];
 				}
 			}
 			for (var gene_name in datatable.gene_index) {
@@ -1439,11 +1454,16 @@ Dataset.prototype = {
 		return this.samples_id[sample_id];
 	},
 	
+	getSampleByCanonName: function(sample_canon_name) {
+		return this.samples_canon_name[sample_canon_name];
+	},
+	
 	// behaves as a sample factory
 	addSample: function(sample_name) {
 		if (!this.samples[sample_name]) {
 			var sample = new Sample(sample_name, this.sample_id++);
 			this.samples[sample_name] = sample;
+			this.samples_canon_name[sample.getCanonName()] = sample;
 			this.samples_id[sample.id] = sample;
 		} else {
 			this.samples[sample_name].refcnt++;
@@ -1655,7 +1675,6 @@ var KSUFFIX = 1;
 
 DisplayContinuousConfig.LT_MIN = 1;
 DisplayContinuousConfig.GT_MAX = 2;
-
 
 DisplayContinuousConfig.prototype = {
 
@@ -2015,16 +2034,19 @@ DisplayContinuousConfig.prototype = {
 		if (this.discrete_ordered[tabname]) {
 			return "<td id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "'>" + this.getValueAt(config, tabname, idx) + "</td>";
 		}
-		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+//		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayContinuousConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'></input></td>";
+		return "<td><input type='text' class='input-value' id='step_value_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getValueAt(config, tabname, idx) + "' onchange='DisplayContinuousConfig.setInputValue(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'></input></td>";
 	},
 
 	makeColorInput: function(id, config, tabname, idx) {
-		return "<td><input id='step_config_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, tabname, idx) + "' class='color input-value' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+		//return "<td><input id='step_config_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, tabname, idx) + "' class='color input-value' onchange='DisplayContinuousConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'></input></td>";
+		return "<td><input id='step_config_" + tabname + '_' + config + '_' + id + "_" + idx + "' value='" + this.getColorAt(config, tabname, idx) + "' class='color input-value' onchange='DisplayContinuousConfig.setInputColor(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'></input></td>";
 	},
 
 	makeSelectSize: function(id, config, tabname, idx) {
 		var selsize = this.getSizeAt(config, tabname, idx);
-		var html = "<td><select id='step_size_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
+		//var html = "<td><select id='step_size_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
+		var html = "<td><select id='step_size_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setSelectSize(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
 		var maxsize = STEP_MAX_SIZE/2;
 		for (var size = 0; size < maxsize; size += 1) {
 			var size2 = 2*size;
@@ -2036,7 +2058,8 @@ DisplayContinuousConfig.prototype = {
 
 	makeSelectShape: function(id, config, tabname, idx) {
 		var selshape = this.getShapeAt(config, tabname, idx);
-		var html = "<td><select id='step_shape_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setEditing(" + id + ", true, \"" + config + "\")''>";
+		//var html = "<td><select id='step_shape_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setEditing(\"" + id + "\", true, \"" + config + "\")''>";
+		var html = "<td><select id='step_shape_" + tabname + '_' + config + '_' + id + "_" + idx + "' onchange='DisplayContinuousConfig.setSelectShape(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")''>";
 		if (selshape >= navicell.shapes.length) {
 			selshape = navicell.shapes.length-1;
 		}
@@ -2053,12 +2076,14 @@ DisplayContinuousConfig.prototype = {
 		var method;
 		var selected;
 		var str = "";
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		if (type == 'group') {
 			method = this.group_method[config];
-			str = "<select id='group_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+			str = "<select id='group_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", \"" + id + "\")'>\n";
 		} else if (type == 'sample') {
 			method = this.sample_method[config];
-			str = "<select id='sample_method_" + config + '_' + datatable.getId() + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setSampleMethod(\"" + config + "\", " + datatable.getId() + ")'>\n";
+			str = "<select id='sample_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setSampleMethod(\"" + config + "\", \"" + id + "\")'>\n";
 		}
 		selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
 		str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
@@ -2220,7 +2245,8 @@ DisplayContinuousConfig.prototype = {
 		var minval = this.getDatatableMinval(config, tabname);
 		var maxval = this.getDatatableMaxval(config, tabname);
 		var mod = config + '_';
-		var id = this.datatable.getId();
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		var id_suffix = tabname + '_' + mod + id 
 		var doc = this.win.document;
 		var table = $("#step_config_table_" + id_suffix, doc);
@@ -2358,7 +2384,8 @@ DisplayContinuousConfig.prototype = {
 	buildDiv: function(config) {
 		var doc = this.win.document;
 		var mod = config + '_';
-		var id = this.datatable.getId();
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		var ksuffix = "";
 		var div_id = "step_config_" + mod + id + ksuffix;
 		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
@@ -2383,7 +2410,7 @@ DisplayContinuousConfig.prototype = {
 			
 			if (!this.discrete_ordered[tabname]) {
 				html += "<br/><span class='config-small-label'>Step Count</span>\n";
-				html += "<select style='font-size: 70%' id='step_config_count_" + id_suffix + "' onchange='DisplayContinuousConfig.stepCountChange(\"" + tabname + "\", \"" + config + "\", " + id + ")'>";
+				html += "<select style='font-size: 70%' id='step_config_count_" + id_suffix + "' onchange='DisplayContinuousConfig.stepCountChange(\"" + tabname + "\", \"" + config + "\", \"" + id + "\")'>";
 				for (var step = 1; step <= 10; ++step) {
 					html += "<option value='" + step + "' " + (step == default_step_cnt ? "selected" : "") + ">" + step + "</option>";
 				}
@@ -2409,22 +2436,45 @@ DisplayContinuousConfig.prototype = {
 	}
 };
 
-DisplayContinuousConfig.stepCountChange = function(tabname, config, id) {
-	var datatable = navicell.dataset.datatables_id[id];
-	var module = get_module();
+DisplayContinuousConfig.stepCountChange = function(tabname, config, id, step_cnt, called_from_api) {
 	var win = window;
+	var obj = $("#step_config_count_" + tabname + '_' + config + '_' + id, win.document);
+	if (!called_from_api) {
+		//var step_cnt = $(elem_name, win.document).val();
+		var step_cnt = obj.val();
+		nv_perform("nv_display_continuous_config_perform", win, "step_count_change", tabname, config, id, step_cnt);
+		return;
+	}
+	//var datatable = navicell.dataset.datatables_id[id];
+	var datatable = navicell.dataset.getDatatableByCanonName(id);
 	if (datatable) {
-		var step_cnt = $("#step_config_count_" + tabname + '_' + config + '_' + id, win.document).val();
+		var module = get_module();
+		//var step_cnt = $("#step_config_count_" + tabname + '_' + config + '_' + id, win.document).val();
+		//$(elem_name, win.document).val(step_cnt);
+		obj.val(step_cnt);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setStepCount_config(step_cnt, config, tabname);
-		DisplayContinuousConfig.setEditing(datatable.id, true, config);
+		DisplayContinuousConfig.setEditing(datatable.getCanonName(), true, config);
 	}
 }
 
-DisplayContinuousConfig.setSampleAbsval = function(config, id) {
+DisplayContinuousConfig.setSampleAbsval = function(config, id, checked, called_from_api) {
 	var win = window;
-	var checked = $("#step_config_absval_sample_" + config + '_' + id, win.document).attr("checked");
-	var datatable = navicell.dataset.getDatatableById(id);
+	var obj = $("#step_config_absval_sample_" + config + '_' + id, window.document);
+	if (!called_from_api) {
+		//var checked = $(elem_name, win.document).attr("checked");
+		var checked = obj.attr("checked");
+		nv_perform("nv_display_continuous_config_perform", window, "set_sample_absval", config, id, checked);
+		return;
+	}
+	if (checked) {
+		obj.attr("checked", "checked");
+	} else {
+		obj.removeAttr("checked");
+	}
+	//var checked = $("#step_config_absval_sample_" + config + '_' + id, win.document).attr("checked");
+	//var datatable = navicell.dataset.getDatatableById(id);
+	var datatable = navicell.dataset.getDatatableByCanonName(id);
 	var module = get_module();
 	if (datatable) {
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
@@ -2438,12 +2488,19 @@ DisplayContinuousConfig.setSampleAbsval = function(config, id) {
 	}
 }
 
-DisplayContinuousConfig.setSampleMethod = function(config, id) {
-	var datatable = navicell.getDatatableById(id);
+DisplayContinuousConfig.setSampleMethod = function(config, id, method, called_from_api) {
 	var win = window;
+	var obj = $("#sample_method_" + config + '_' + id, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", window, "set_sample_method", config, id, obj.val());
+		return;
+	}
+	//var datatable = navicell.getDatatableById(id);
+	var datatable = navicell.getDatatableByCanonName(id);
 	var module = get_module();
 	if (datatable) {
-		var obj = $("#sample_method_" + config + '_' + id, win.document);
+		//var obj = $("#sample_method_" + config + '_' + id, win.document);
+		obj.val(method);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setSampleMethod(config, obj.val());
 		var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
@@ -2455,12 +2512,18 @@ DisplayContinuousConfig.setSampleMethod = function(config, id) {
 	}
 }
 
-DisplayContinuousConfig.setGroupMethod = function(config, id) {
-	var datatable = navicell.getDatatableById(id);
+DisplayContinuousConfig.setGroupMethod = function(config, id, method, called_from_api) {
 	var win = window;
+	var obj = $("#group_method_" + config + '_' + id, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", window, "set_group_method", config, id, obj.val());
+		return;
+	}
+	//var datatable = navicell.getDatatableById(id);
+	var datatable = navicell.getDatatableByCanonName(id);
 	var module = get_module();
 	if (datatable) {
-		var obj = $("#group_method_" + config + '_' + id, win.document);
+		obj.val(method);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setGroupMethod(config, obj.val());
 		var step_cnt = displayContinuousConfig.getStepCount(config, 'group');
@@ -2472,11 +2535,67 @@ DisplayContinuousConfig.setGroupMethod = function(config, id) {
 	}
 }
 
-DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win) {
-	var datatable = navicell.getDatatableById(datatable_id);
+DisplayContinuousConfig.setInputValue = function(datatable_id, config, tabname, idx, value, called_from_api) {
+	var win = window;
+	var obj = $("#step_value_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", win, "set_input_value", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(value);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayContinuousConfig.setInputColor = function(datatable_id, config, tabname, idx, color, called_from_api) {
+	var win = window;
+	var obj = $("#step_config_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", win, "set_input_color", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(color);
+	var fg = getFG_from_BG(color);
+	obj.css("background-color", "#" + color);
+	obj.css("color", "#" + fg);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayContinuousConfig.setSelectSize = function(datatable_id, config, tabname, idx, size, called_from_api) {
+	var win = window;
+	var obj = $("#step_size_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", win, "set_select_size", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(size);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayContinuousConfig.setSelectShape = function(datatable_id, config, tabname, idx, shape, called_from_api) {
+	var win = window;
+	var obj = $("#step_shape_" + tabname + '_' + config + '_' + datatable_id + "_" + idx, win.document);
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", win, "set_select_shape", datatable_id, config, tabname, idx, obj.val());
+		return;
+	}
+
+	obj.val(shape);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+}
+
+DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win, called_from_api) {
 	if (!win) {
 		win = window;
 	}
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", win, "set_editing", datatable_id, val, config);
+		return;
+	}
+	//var datatable = navicell.getDatatableById(datatable_id);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
 	var module = get_module(win);
 	var div = datatable.getDisplayConfig(module).getDiv(config);
 
@@ -2490,7 +2609,8 @@ DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win) {
 }
 
 DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
-	var datatable = navicell.dataset.datatables_id[id];
+	//var datatable = navicell.dataset.datatables_id[id];
+	var datatable = navicell.dataset.getDatatableByCanonName(id);
 	var module = get_module();
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'group';
@@ -2501,12 +2621,14 @@ DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(config, id) {
 }
 
 DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
-	var datatable = navicell.dataset.datatables_id[id];
+	//var datatable = navicell.dataset.datatables_id[id];
+	var datatable = navicell.dataset.getDatatableByCanonName(id);
 	var module = get_module();
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	var tabname = 'sample';
 	var id_suffix = tabname + '_' + config + "_" + id;
-	DisplayUnorderedDiscreteConfig.setEditing(datatable.id, true, config);
+	//DisplayUnorderedDiscreteConfig.setEditing(datatable.id, true, config);
+	DisplayUnorderedDiscreteConfig.setEditing(datatable.getCanonName(), true, config);
 	var checked = $("#discrete_color_same_" + id_suffix).attr("checked");
 	var color = $("#discrete_color_same_color_" + id_suffix).val();
 	var beg_gradient = $("#discrete_color_beg_gradient_" + id_suffix).val();
@@ -2532,7 +2654,8 @@ DisplayUnorderedDiscreteConfig.setColors = function(config, id, same_color) {
 }
 
 DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, win) {
-	var datatable = navicell.getDatatableById(datatable_id);
+	//var datatable = navicell.getDatatableById(datatable_id);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
 	if (!win) {
 		win = window;
 	}
@@ -2548,17 +2671,25 @@ DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, 
 	}
 }
 
-DisplayContinuousConfig.switch_sample_tab = function(suffix, doc) {
+DisplayContinuousConfig.switch_sample_tab = function(suffix, doc, called_from_api) {
 	if (!doc) {
 		doc = window.document;
+	}
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_sample_tab", suffix);
+		return;
 	}
 	$("#step_config_sample_" + suffix, doc).css("display", "block");
 	$("#step_config_group_" + suffix, doc).css("display", "none");
 }
 
-DisplayContinuousConfig.switch_group_tab = function(suffix, doc) {
+DisplayContinuousConfig.switch_group_tab = function(suffix, doc, called_from_api) {
 	if (!doc) {
 		doc = window.document;
+	}
+	if (!called_from_api) {
+		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_group_tab", suffix);
+		return;
 	}
 	$("#step_config_sample_" + suffix, doc).css("display", "none")
 	$("#step_config_group_" + suffix, doc).css("display", "block");
@@ -2603,7 +2734,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	buildDiv: function(config) {
 		var mod = config + '_';
 		var doc = this.win.document;
-		var id = this.datatable.getId();
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		var div_id = "discrete_config_" + mod + id;
 		var html = "<div align='center' class='discrete-config' id='" + div_id + "'>\n";
 
@@ -2911,7 +3043,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 	_getAcceptedCondition_perform: function(group, gene_name, modif_id, config, raw) {
 		var conds = this.conds['group'][config];
-		var id_suffix = 'group_' + config + '_' + this.datatable.getId();
+		//var id_suffix = 'group_' + config + '_' + this.datatable.getId();
+		var id_suffix = 'group_' + config + '_' + this.datatable.getCanonName();
 		var doc = this.win.document;
 		for (var idx in conds) {
 			if (conds[idx]) {
@@ -2950,7 +3083,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			label = "#Any Value (but not NA)";
 		} else {
 			var doc = this.win.document;
-			var id_suffix = 'group_' + config + '_' + this.datatable.getId();
+			//var id_suffix = 'group_' + config + '_' + this.datatable.getId();
+			var id_suffix = 'group_' + config + '_' + this.datatable.getCanonName();
 			var idx2 = $("#discrete_value_" + id_suffix + "_" + idx, doc).val();
 			var value = this.values[idx2];
 			if (!value) {
@@ -3103,7 +3237,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 	update_colors: function(config, tabname, params) {
 		var mod = config + '_';
-		var id = this.datatable.getId();
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		var id_suffix = tabname + '_' + mod + id 
 		var doc = this.win.document;
 		var is_sample = tabname == 'sample';
@@ -3121,7 +3256,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 	update_config: function(config, tabname, params) {
 		var mod = config + '_';
-		var id = this.datatable.getId();
+		//var id = this.datatable.getId();
+		var id = this.datatable.getCanonName();
 		var id_suffix = tabname + '_' + mod + id 
 		var doc = this.win.document;
 		var table = $("#discrete_config_table_" + id_suffix, doc);
@@ -3177,7 +3313,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				var value = this.getValueAt(idx-beg, config, tabname);
 				if (!is_sample) {
 					var selcond = this.getConditionAt(idx, config);
-					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
+					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
 					if (false && this.advanced) {
 						html += "<option value='" + Group.DISCRETE_IGNORE + "' " + (selcond == Group.DISCRETE_IGNORE ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>ignore</span></option>";
 					}
@@ -3186,7 +3322,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 					html += "<option value='" + Group.DISCRETE_EQ_ALL + "' " + (selcond == Group.DISCRETE_EQ_ALL ? "selected" : "") + ">All group elements equals</option>";
 					html += "</select></td>";
 
-					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
+					html += "<td><select id='discrete_value_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
 					var beg2;
 					if (tabname == 'sample' && this.has_empty_values) {
 						var value2 = this.getValueAt(0, config, tabname);
@@ -3212,10 +3348,10 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			}
 			if (config == 'color' || config == COLOR_SIZE_CONFIG) {
 				var color = (idx == step_last ?  this.getColorAt(step_cnt, config, tabname) : this.getColorAt(idx, config, tabname));
-				html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'></input></td>";
+				html += "<td><input id='discrete_color_" + id_suffix + "_" + idx + "' value='" + color + "' class='color' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'></input></td>";
 			}
 			if (config == 'size' || config == COLOR_SIZE_CONFIG) {
-				html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
+				html += "<td><select id='discrete_size_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
 				var selsize = this.getSizeAt(idx, config, tabname);
 				if (idx == step_cnt) {
 					selsize = 4;
@@ -3228,7 +3364,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				html += "</select></td>";
 			}
 			if (config == 'shape') {
-				html += "<td><select id='discrete_shape_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(" + id + ", true, \"" + config + "\")'>";
+				html += "<td><select id='discrete_shape_" + id_suffix + "_" + idx + "' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
 				var selshape = this.getShapeAt(idx, config, tabname);
 				if (selshape > navicell.shapes.length) {
 					selshape = navicell.shapes.length-1;
@@ -3243,8 +3379,8 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		}
 
 		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && is_sample && !this.datatable.biotype.isSet()) {
-			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", " + id + ")'";
-			var onchange2 = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", " + id + ", true)'";
+			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", \"" + id + "\")'";
+			var onchange2 = " onchange='DisplayUnorderedDiscreteConfig.setColors(\"" + config + "\", \"" + id + "\", true)'";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'><table>";
 			html += "<tr><td class='config-label'>&nbsp;</td></tr>";
 			var checked = "";
@@ -3296,7 +3432,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			html += "</table></td></tr>";
 		}
 		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && !is_sample) {
-			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + config + "\", " + id + ")'";
+			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + config + "\", \"" + id + "\")'";
 			var checked = params ? params.checked : "";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'>&nbsp;</td></tr>";
 			html += "<tr><td class='config-label'><input id='discrete_color_advanced_" + id_suffix + "' type='checkbox' " + checked + " " + onchange + ">&nbsp;Avanced configuration</td></tr>";
@@ -4028,6 +4164,8 @@ Datatable.prototype = {
 	dataset: null,
 	biotype: null,
 	name: "",
+	canon_name: "",
+	html_name: "",
 	gene_index: {},
 	sample_index: {},
 	data: [],
@@ -4204,10 +4342,25 @@ Datatable.prototype = {
 
 	setName: function(name) {
 		this.name = name;
+		this.canon_name = canon_name(name);
 		this.html_name = name.replace(/ /g, "&nbsp;");
 	},
 
-	getId: function() {return this.id;},
+	getId: function() {
+		return this.id;
+	},
+
+	getName: function() {
+		return this.name;
+	},
+
+	getCanonName: function() {
+		return this.canon_name;
+	},
+
+	getHTMLName: function() {
+		return this.html_name;
+	},
 
 	hasEmptyValues: function() {
 		return this.empty_value_cnt > 0;
@@ -4869,6 +5022,7 @@ function switch_view(id) {
 
 function Annotation(name, id) {
 	this.name = name;
+	this.canon_name = canon_name(name);
 	this.is_group = false;
 	this.id = id;
 }
@@ -4885,6 +5039,19 @@ Annotation.prototype = {
 	isGroup: function() {
 		return this.is_group;
 	},
+
+	getId: function() {
+		return this.id;
+	},
+
+	getName: function() {
+		return this.name;
+	},
+
+	getCanonName: function() {
+		return this.canon_name;
+	},
+
 	getClass: function() {return "Annotation";}
 };
 
@@ -4899,6 +5066,7 @@ function AnnotationFactory() {
 
 AnnotationFactory.prototype = {
 	annots_per_name: {},
+	annots_per_canon_name: {},
 	annots_per_id: {},
 	ready: null,
 	sample_read: 0,
@@ -5088,14 +5256,19 @@ AnnotationFactory.prototype = {
 		this.readannots(ready);
 	},
 
-	getAnnotation : function(name) {
-		if (!this.annots_per_name[name]) {
+	getAnnotation : function(name, no_create) {
+		if (!this.annots_per_name[name] && !no_create) {
 			var annot = new Annotation(name, this.annot_id);
 			this.annots_per_name[name] = annot;
+			this.annots_per_canon_name[annot.canon_name] = annot;
 			this.annots_per_id[this.annot_id] = annot;
 			this.annot_id++;
 		}
 		return this.annots_per_name[name];
+	},
+
+	getAnnotationPerCanonName : function(canon_name) {
+		return this.annots_per_canon_name[canon_name];
 	},
 
 	getAnnotationPerId : function(annot_id) {
@@ -5113,6 +5286,7 @@ AnnotationFactory.prototype = {
 
 function Sample(name, id) {
 	this.name = name;
+	this.canon_name = canon_name(name);
 	this.id = id;
 	this.annots = {};
 	this.refcnt = 1;
@@ -5121,6 +5295,7 @@ function Sample(name, id) {
 
 Sample.prototype = {
 	name: "",
+	canon_name: "",
 	annots: {},
 	groups: {},
 
@@ -5150,6 +5325,14 @@ Sample.prototype = {
 
 	getId: function() {
 		return this.id;
+	},
+
+	getName: function() {
+		return this.name;
+	},
+
+	getCanonName: function() {
+		return this.canon_name;
 	},
 
 	hasAnnots: function() {
@@ -5207,6 +5390,7 @@ function Group(annots, values, id) {
 	this.samples = {};
 	this.id = id;
 	this.name = navicell.group_factory.buildName(annots, values);
+	this.canon_name = canon_name(this.name);
 	this.methods = navicell.group_factory.getSavedMethods(this.name);
 	this.html_name = "";
 	for (var nn = 0; nn < annots.length; ++nn) {
@@ -5250,6 +5434,7 @@ Group.prototype = {
 	values: [],
 	samples: {},
 	name: "",
+	canon_name: "",
 	html_name: "",
 
 	isGroup: function() {
@@ -5266,6 +5451,14 @@ Group.prototype = {
 
 	getId: function() {
 		return this.id;
+	},
+
+	getName: function() {
+		return this.name;
+	},
+
+	getCanonName: function() {
+		return this.canon_name;
 	},
 
 	acceptCondition: function(module, datatable, gene_name, modif_id, cond_value, cond) {
@@ -5498,6 +5691,7 @@ function GroupFactory() {
 
 GroupFactory.prototype = {
 	group_map: {},
+	group_canon_map: {},
 	group_id_map: {},
 
 	buildName: function(group_annots, group_values) {
@@ -5513,6 +5707,7 @@ GroupFactory.prototype = {
 		if (!this.group_map[group_name]) {
 			var group = new Group(group_annots, group_values, this.group_id++);
 			this.group_map[group_name] = group;
+			this.group_canon_map[group.getCanonName()] = group;
 			this.group_id_map[group.getId()] = group;
 		}
 		return this.group_map[group_name];
@@ -5525,6 +5720,10 @@ GroupFactory.prototype = {
 
 	getGroupById: function(group_id) {
 		return this.group_id_map[group_id];
+	},
+
+	getGroupByCanonName: function(group_canon_name) {
+		return this.group_canon_map[group_canon_name];
 	},
 
 	getId: function() {
@@ -5876,6 +6075,10 @@ function navicell_init() {
 	}
 	_navicell.getDatatableById = function(id) {
 		return this.dataset.getDatatableById(id);
+	}
+
+	_navicell.getDatatableByCanonName = function(canon_name) {
+		return this.dataset.getDatatableByCanonName(canon_name);
 	}
 
 	_navicell.isModuleInit = function(module) {

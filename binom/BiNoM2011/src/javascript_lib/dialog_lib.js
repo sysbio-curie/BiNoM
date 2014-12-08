@@ -628,12 +628,22 @@ function heatmap_editor_apply(heatmap_config)
 			heatmap_config.setSampleOrGroupAt(idx, undefined);
 		} else {
 			var prefix = val.substr(0, 2);
+			/*
 			var id = val.substr(2);
 			if (prefix == 'g_') {
 				var group = navicell.group_factory.getGroupById(id);
 				heatmap_config.setSampleOrGroupAt(idx, group);
 			} else {
 				var sample = navicell.dataset.getSampleById(id);
+				heatmap_config.setSampleOrGroupAt(idx, sample);
+			}
+			*/
+			var canon_name = val.substr(2);
+			if (prefix == 'g_') {
+				var group = navicell.group_factory.getGroupByCanonName(canon_name);
+				heatmap_config.setSampleOrGroupAt(idx, group);
+			} else {
+				var sample = navicell.dataset.getSampleByCanonName(canon_name);
 				heatmap_config.setSampleOrGroupAt(idx, sample);
 			}
 		}
@@ -644,7 +654,8 @@ function heatmap_editor_apply(heatmap_config)
 		if (val == "_none_") {
 			heatmap_config.setDatatableAt(idx, undefined);
 		} else {
-			var datatable = navicell.getDatatableById(val);
+			//var datatable = navicell.getDatatableById(val);
+			var datatable = navicell.getDatatableByCanonName(val);
 			heatmap_config.setDatatableAt(idx, datatable);
 		}
 	}
@@ -671,12 +682,22 @@ function barplot_editor_apply(barplot_config)
 			barplot_config.setSampleOrGroupAt(idx, undefined);
 		} else {
 			var prefix = val.substr(0, 2);
+			/*
 			var id = val.substr(2);
 			if (prefix == 'g_') {
 				var group = navicell.group_factory.getGroupById(id);
 				barplot_config.setSampleOrGroupAt(idx, group);
 			} else {
 				var sample = navicell.dataset.getSampleById(id);
+				barplot_config.setSampleOrGroupAt(idx, sample);
+			}
+			*/
+			var canon_name = val.substr(2);
+			if (prefix == 'g_') {
+				var group = navicell.group_factory.getGroupByCanonName(canon_name);
+				barplot_config.setSampleOrGroupAt(idx, group);
+			} else {
+				var sample = navicell.dataset.getSampleByCanonName(canon_name);
 				barplot_config.setSampleOrGroupAt(idx, sample);
 			}
 		}
@@ -687,7 +708,8 @@ function barplot_editor_apply(barplot_config)
 		if (val == "_none_") {
 			barplot_config.setDatatableAt(idx, undefined);
 		} else {
-			var datatable = navicell.getDatatableById(val);
+			//var datatable = navicell.getDatatableById(val);
+			var datatable = navicell.getDatatableByCanonName(val);
 			barplot_config.setDatatableAt(idx, datatable);
 		}
 	}
@@ -704,6 +726,7 @@ function glyph_editor_apply(num, glyph_config)
 		glyph_config.setSampleOrGroup(undefined);
 	} else {
 		var prefix = val.substr(0, 2);
+		/*
 		var id = val.substr(2);
 		if (prefix == 'g_') {
 			var group = navicell.group_factory.getGroupById(id);
@@ -712,13 +735,23 @@ function glyph_editor_apply(num, glyph_config)
 			var sample = navicell.dataset.getSampleById(id);
 			glyph_config.setSampleOrGroup(sample);
 		}
+		*/
+		var canon_name = val.substr(2);
+		if (prefix == 'g_') {
+			var group = navicell.group_factory.getGroupByCanonName(canon_name);
+			glyph_config.setSampleOrGroup(group);
+		} else {
+			var sample = navicell.dataset.getSampleByCanonName(canon_name);
+			glyph_config.setSampleOrGroup(sample);
+		}
 	}
 
 	val = $("#glyph_editor_datatable_shape_" + num).val();
 	if (val == "_none_") {
 		glyph_config.setShapeDatatable(undefined);
 	} else {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		glyph_config.setShapeDatatable(datatable);
 	}
 
@@ -726,7 +759,8 @@ function glyph_editor_apply(num, glyph_config)
 	if (val == "_none_") {
 		glyph_config.setColorDatatable(undefined);
 	} else {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		glyph_config.setColorDatatable(datatable);
 	}
 
@@ -734,7 +768,8 @@ function glyph_editor_apply(num, glyph_config)
 	if (val == "_none_") {
 		glyph_config.setSizeDatatable(undefined);
 	} else {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		glyph_config.setSizeDatatable(datatable);
 	} 
 
@@ -808,6 +843,7 @@ function update_sample_status_table(doc, params) {
 	table.tablesorter();
 }
 
+/*
 function annot_set_group_old(annot_id, doc) {
 	var checkbox = $("#cb_annot_" + annot_id);
 	var checked = checkbox.attr("checked");
@@ -815,6 +851,7 @@ function annot_set_group_old(annot_id, doc) {
 
 	annot.setIsGroup(checked);
 }
+*/
 
 function is_annot_group(annot_id) {
 	var annot = navicell.annot_factory.getAnnotationPerId(annot_id);
@@ -827,7 +864,9 @@ function update_sample_annot_table_style(doc, params) {
 
 	for (var idx in annot_ids) {
 		var annot_id = annot_ids[idx];
-		var checkbox = $("#cb_annot_" + annot_id);
+		var annot = navicell.annot_factory.getAnnotationPerId(annot_id);
+		var checkbox = $("#cb_annot_" + annot.getCanonName()); // was annot_id
+		//var checkbox = $("#cb_annot_" + annot_id);
 		var checked = checkbox.attr("checked");
 		var td_tochange = $("#dt_sample_annot_table .annot_" + annot_id, doc);
 		if (checked) {
@@ -865,9 +904,10 @@ function update_sample_annot_table(doc, params) {
 		}
 		str += '<tr><td style="text-align: right; font-size: smaller; font-style: italic;">' + '&nbsp;' + '</td>';
 		for (var annot_name in annots) {
-			var annot = navicell.annot_factory.getAnnotation(annot_name);
+			var annot = navicell.annot_factory.getAnnotation(annot_name, true);
 			var annot_id = annot.id;
-			str += "<td style='text-align: center;'><input id='cb_annot_" + annot_id + "' type='checkbox' " + is_annot_group(annot_id) + " onchange='group_editing(true)'></input></td>";
+			//str += "<td style='text-align: center;'><input id='cb_annot_" + annot_id + "' type='checkbox' " + is_annot_group(annot_id) + " onchange='group_editing(true)'></input></td>";
+			str += "<td style='text-align: center;'><input id='cb_annot_" + annot.getCanonName() + "' type='checkbox' " + is_annot_group(annot_id) + " onchange='select_sample_annot(\"" + annot.getCanonName() + "\")'></input></td>";
 		}
 		str += "</tr>";
 		str += "<tr><th>Samples (" + annotated_sample_cnt + ")</th>";
@@ -890,7 +930,7 @@ function update_sample_annot_table(doc, params) {
 			str += "<tr>";
 			str += "<td>" + sample_name + "</td>";
 			for (var annot_name in annots) {
-				var annot = navicell.annot_factory.getAnnotation(annot_name);
+				var annot = navicell.annot_factory.getAnnotation(annot_name, true);
 				var annot_value = sample.annots[annot_name];
 				str += "<td class='" + (annot.is_group ? "group_annot" : " non_group_annot") + " annot_" + annot.id + "'>";
 				if (annot_value) {
@@ -1457,7 +1497,11 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 		div = displayConfig.getDiv(what);
 	}
 	if (div) {
-		var datatable_id = this.getId();
+		//var datatable_id = this.getId();
+		var datatable = this;
+		var displayContinuousConfig = datatable.displayContinuousConfig[module];
+		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+		var datatable_id = this.getCanonName();
 		var width;
 
 		if (what == COLOR_SIZE_CONFIG) {
@@ -1476,9 +1520,18 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 
 				buttons: {
 					"Apply": function() {
-						var datatable = navicell.getDatatableById(datatable_id);
+						//var datatable = navicell.getDatatableById(datatable_id);
+						/*
+						var datatable = navicell.getDatatableByCanonName(datatable_id);
 						var displayContinuousConfig = datatable.displayContinuousConfig[module];
 						var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+						*/
+						if (displayContinuousConfig) {
+							nv_perform("nv_display_continuous_config_perform", doc.win, "apply", datatable_id, what);
+						} else if (displayUnorderedDiscreteConfig) {
+							nv_perform("nv_display_unordered_discrete_perform", doc.win, "apply", datatable_id, what);
+						}
+						/*
 						var active = div.tabs("option", "active");
 						var tabname = DisplayContinuousConfig.tabnames[active];
 						if (displayContinuousConfig) {
@@ -1542,12 +1595,22 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						}
 						doc.win.clickmap_refresh(true);
 						update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
+						*/
 					},
 
 					"Cancel": function() {
-						var datatable = navicell.getDatatableById(datatable_id);
+						//var datatable = navicell.getDatatableById(datatable_id);
+						/*
+						var datatable = navicell.getDatatableByCanonName(datatable_id);
 						var displayContinuousConfig = datatable.displayContinuousConfig[module];
 						var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+						*/
+						if (displayContinuousConfig) {
+							nv_perform("nv_display_continuous_config_perform", doc.win, "cancel", datatable_id, what);
+						} else if (displayUnorderedDiscreteConfig) {
+							nv_perform("nv_display_unordered_discrete_perform", doc.win, "cancel", datatable_id, what);
+						}
+						/*
 						var active = div.tabs("option", "active");
 						var tabname = DisplayContinuousConfig.tabnames[active];
 						if (displayContinuousConfig) {
@@ -1561,15 +1624,35 @@ Datatable.prototype.showDisplayConfig = function(doc, what) {
 						if (CANCEL_CLOSES) {
 							$(this).dialog('close');
 						}
+						*/
 					},
 					"OK": function() {
+						/*
+						var datatable = navicell.getDatatableByCanonName(datatable_id);
+						var displayContinuousConfig = datatable.displayContinuousConfig[module];
+						var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+						*/
+						if (displayContinuousConfig) {
+							nv_perform("nv_display_continuous_config_perform", doc.win, "close", datatable_id, what);
+						} else if (displayUnorderedDiscreteConfig) {
+							nv_perform("nv_display_unordered_discrete_perform", doc.win, "close", datatable_id, what);
+						}
+						/*
 						$(this).dialog('close');
+						*/
 					}
 				}
 			});
 			div.built = true;
 		}
-		div.dialog("open");
+		//var displayContinuousConfig = datatable.displayContinuousConfig[module];
+		//var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
+		if (displayContinuousConfig) {
+			nv_perform("nv_display_continuous_config_perform", doc.win, "open", datatable_id, what);
+		} else if (displayUnorderedDiscreteConfig) {
+			nv_perform("nv_display_unordered_discrete_perform", doc.win, "open", datatable_id, what);
+		}
+		//div.dialog("open");
 	}
 }
 
@@ -1607,6 +1690,16 @@ function drawing_editing(val) {
 	$("#drawing_editing").html(val ? EDITING_CONFIGURATION : "");
 }
 
+function select_sample_annot(annot_name) {
+	console.log("select_sample_annot(" + annot_name + ")");
+	var annot = navicell.annot_factory.getAnnotationPerCanonName(annot_name);
+	//var annot_id = annot.id;
+	var checkbox = $("#cb_annot_" + annot.getCanonName()); // was annot.id
+	var checked = checkbox.attr("checked") == "checked";
+	nv_perform("nv_sample_annotation_perform", window, "select_annotation", annot_name, checked);
+	group_editing(true);
+}
+
 function group_editing(val) {
 	$("#group_editing").html(val ? EDITING_CONFIGURATION : "");
 }
@@ -1641,7 +1734,8 @@ function heatmap_step_display_config(idx, map_name) {
 	var doc = (map_name && maps ? maps[map_name].document : null);
 	var val = $("#heatmap_editor_datatable_" + idx, doc).val();
 	if (val != '_none_') {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		if (datatable) {
 			datatable.showDisplayConfig(doc, 'color');
 		}
@@ -1782,7 +1876,8 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 			var group_name = group_names[group_idx];
 			var group = navicell.group_factory.group_map[group_name];
 			var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
-			html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
+			//html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
+			html += "<option value='g_" + group.getCanonName() + "'" + selected + ">" + group.name + "</option>";
 		}
 		var sel_sample = heatmapConfig.getSampleAt(idx);
 		var sample_names = get_sample_names();
@@ -1790,7 +1885,8 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 			var sample_name = sample_names[sample_idx];
 			var sample = navicell.dataset.samples[sample_name];
 			var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
-			html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>";
+			//html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>";
+			html += "<option value='s_" + sample.getCanonName() + "'" + selected + ">" + sample_name + "</option>";
 		}
 		html += "</select>";
 		html += "</td>";
@@ -1809,7 +1905,8 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
 			var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-			html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
+			//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
+			html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
 		if ((sel_gene || sel_modif_id) && sel_datatable) {
@@ -2035,7 +2132,8 @@ function barplot_editor_set_editing(val, idx) {
 function barplot_step_display_config(idx, map_name) {
 	var val = $("#barplot_editor_datatable_" + idx).val();
 	if (val != '_none_') {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		if (datatable) {
 			var doc = (map_name && maps ? maps[map_name].document : null);
 			datatable.showDisplayConfig(doc, datatable.biotype.isUnorderedDiscrete() ? COLOR_SIZE_CONFIG : 'color');
@@ -2187,7 +2285,8 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-		html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
+		//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
+		html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>";
 	}
 	html += "</select></td>";
 
@@ -2244,7 +2343,8 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 			var group_name = group_names[group_idx];
 			var group = navicell.group_factory.group_map[group_name];
 			var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
-			html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
+			//html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>";
+			html += "<option value='g_" + group.getCanonName() + "'" + selected + ">" + group.name + "</option>";
 		}
 		var sel_sample = barplotConfig.getSampleAt(idx);
 		var sample_names = get_sample_names();
@@ -2252,7 +2352,8 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 			var sample_name = sample_names[sample_idx];
 			var sample = navicell.dataset.samples[sample_name];
 			var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
-			html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>";
+			//html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>";
+			html += "<option value='s_" + sample.getCanonName() + "'" + selected + ">" + sample_name + "</option>";
 		}
 		html += "</select>";
 		html += "</td>";
@@ -2420,7 +2521,8 @@ function datatable_select(id, onchange, sel_datatable) {
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-		html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>\n";
+		//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>\n";
+		html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>\n";
 	}
 	return html + "</select>";
 }
@@ -2437,7 +2539,8 @@ function sample_or_group_select(id, onchange, sel_group, sel_sample) {
 			var group_name = group_names[idx];
 			var group = navicell.group_factory.group_map[group_name];
 			var selected = sel_group && sel_group.getId() == group.getId() ? " selected": "";
-			html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>\n";
+			//html += "<option value='g_" + group.getId() + "'" + selected + ">" + group.name + "</option>\n";
+			html += "<option value='g_" + group.getCanonName() + "'" + selected + ">" + group.name + "</option>\n";
 		}
 	}
 	var sample_names = get_sample_names();
@@ -2445,7 +2548,8 @@ function sample_or_group_select(id, onchange, sel_group, sel_sample) {
 		var sample_name = sample_names[idx];
 		var sample = navicell.dataset.samples[sample_name];
 		var selected = sel_sample && sel_sample.getId() == sample.getId() ? " selected": "";
-		html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>\n";
+		//html += "<option value='s_" + sample.getId() + "'" + selected + ">" + sample_name + "</option>\n";
+		html += "<option value='s_" + sample.getCanonName() + "'" + selected + ">" + sample_name + "</option>\n";
 	}
 
 	return html + "</select>";
@@ -2602,7 +2706,8 @@ function glyph_editor_set_editing(num, val, what) {
 function glyph_step_display_config(what, num, map_name) {
 	var val = $("#glyph_editor_datatable_" + what + "_" + num).val();
 	if (val != '_none_') {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		if (datatable) {
 			var doc = (map_name && maps ? maps[map_name].document : null);
 			datatable.showDisplayConfig(doc, what);
@@ -2988,7 +3093,8 @@ function show_search_dialog()
 function map_staining_step_display_config(what, map_name) {
 	var val = $("#map_staining_editor_datatable_" + what).val();
 	if (val != '_none_') {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		if (datatable) {
 			var doc = (map_name && maps ? maps[map_name].document : null);
 			datatable.showDisplayConfig(doc, what);
@@ -3014,6 +3120,7 @@ function map_staining_editor_apply(map_staining_config)
 		map_staining_config.setSampleOrGroup(undefined);
 	} else {
 		var prefix = val.substr(0, 2);
+		/*
 		var id = val.substr(2);
 		if (prefix == 'g_') {
 			var group = navicell.group_factory.getGroupById(id);
@@ -3022,13 +3129,23 @@ function map_staining_editor_apply(map_staining_config)
 			var sample = navicell.dataset.getSampleById(id);
 			map_staining_config.setSampleOrGroup(sample);
 		}
+		*/
+		var canon_name = val.substr(2);
+		if (prefix == 'g_') {
+			var group = navicell.group_factory.getGroupByCanonName(canon_name);
+			map_staining_config.setSampleOrGroup(group);
+		} else {
+			var sample = navicell.dataset.getSampleByCanonName(canon_name);
+			map_staining_config.setSampleOrGroup(sample);
+		}
 	}
 
 	val = $("#map_staining_editor_datatable_color").val();
 	if (val == "_none_") {
 		map_staining_config.setColorDatatable(undefined);
 	} else {
-		var datatable = navicell.getDatatableById(val);
+		//var datatable = navicell.getDatatableById(val);
+		var datatable = navicell.getDatatableByCanonName(val);
 		map_staining_config.setColorDatatable(datatable);
 	}
 	map_staining_config.setTransparency(map_staining_config.getSlider().slider("value"));

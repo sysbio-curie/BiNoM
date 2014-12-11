@@ -1530,7 +1530,7 @@ Dataset.prototype = {
 		var drawing_config = navicell.getDrawingConfig(module);
 		for (var num = 1; num <= GLYPH_COUNT; ++num) {
 			if (drawing_config.displayGlyphs(num)) {
-				bound = draw_glyph(module, num, overlay, context, scale, gene_name, topx, topy);
+				bound = draw_glyph(module, num, overlay, context, scale, modif_id, gene_name, topx, topy);
 				if (bound) {
 					topx = bound[0] + bound[2] - 2;
 				}
@@ -2223,6 +2223,10 @@ DisplayContinuousConfig.prototype = {
 		return this.getColorGroup(group, gene_name);
 	},
 
+	getColorSizeGroupByModifId: function(group, modif_id) {
+		return this.getColorGroupByModifId(group, modif_id);
+	},
+
 	getSizeSample: function(sample_name, gene_name) {
 		var value = this.getSizeSampleValue(sample_name, gene_name);
 		return this._getSize(value, 'sample');
@@ -2455,17 +2459,17 @@ DisplayContinuousConfig.stepCountChange = function(tabname, config, id, step_cnt
 		obj.val(step_cnt);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setStepCount_config(step_cnt, config, tabname);
-		DisplayContinuousConfig.setEditing(datatable.getCanonName(), true, config);
+		DisplayContinuousConfig.setEditing(datatable.getCanonName(), true, config, win);
 	}
 }
 
 DisplayContinuousConfig.setSampleAbsval = function(config, id, checked, called_from_api) {
 	var win = window;
-	var obj = $("#step_config_absval_sample_" + config + '_' + id, window.document);
+	var obj = $("#step_config_absval_sample_" + config + '_' + id, win.document);
 	if (!called_from_api) {
 		//var checked = $(elem_name, win.document).attr("checked");
 		var checked = obj.attr("checked");
-		nv_perform("nv_display_continuous_config_perform", window, "set_sample_absval", config, id, checked);
+		nv_perform("nv_display_continuous_config_perform", win, "set_sample_absval", config, id, checked);
 		return;
 	}
 	if (checked) {
@@ -2487,7 +2491,7 @@ DisplayContinuousConfig.setSampleAbsval = function(config, id, checked, called_f
 			}
 			displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		}
-		DisplayContinuousConfig.setEditing(id, true, config);
+		DisplayContinuousConfig.setEditing(id, true, config, win);
 	}
 }
 
@@ -2495,7 +2499,7 @@ DisplayContinuousConfig.setSampleMethod = function(config, id, method, called_fr
 	var win = window;
 	var obj = $("#sample_method_" + config + '_' + id, win.document);
 	if (!called_from_api) {
-		nv_perform("nv_display_continuous_config_perform", window, "set_sample_method", config, id, obj.val());
+		nv_perform("nv_display_continuous_config_perform", win, "set_sample_method", config, id, obj.val());
 		return;
 	}
 	//var datatable = navicell.getDatatableById(id);
@@ -2513,7 +2517,7 @@ DisplayContinuousConfig.setSampleMethod = function(config, id, method, called_fr
 			}
 			displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		}
-		DisplayContinuousConfig.setEditing(id, true, config);
+		DisplayContinuousConfig.setEditing(id, true, config, win);
 	}
 }
 
@@ -2521,7 +2525,7 @@ DisplayContinuousConfig.setGroupMethod = function(config, id, method, called_fro
 	var win = window;
 	var obj = $("#group_method_" + config + '_' + id, win.document);
 	if (!called_from_api) {
-		nv_perform("nv_display_continuous_config_perform", window, "set_group_method", config, id, obj.val());
+		nv_perform("nv_display_continuous_config_perform", win, "set_group_method", config, id, obj.val());
 		return;
 	}
 	//var datatable = navicell.getDatatableById(id);
@@ -2538,7 +2542,7 @@ DisplayContinuousConfig.setGroupMethod = function(config, id, method, called_fro
 			}
 			displayContinuousConfig.setStepCount_config(step_cnt, config, 'group');
 		}
-		DisplayContinuousConfig.setEditing(id, true, config);
+		DisplayContinuousConfig.setEditing(id, true, config, win);
 	}
 }
 
@@ -2551,7 +2555,7 @@ DisplayContinuousConfig.setInputValue = function(datatable_id, config, tabname, 
 	}
 
 	obj.val(value);
-	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config, win);
 }
 
 DisplayContinuousConfig.setInputColor = function(datatable_id, config, tabname, idx, color, called_from_api) {
@@ -2566,7 +2570,7 @@ DisplayContinuousConfig.setInputColor = function(datatable_id, config, tabname, 
 	var fg = getFG_from_BG(color);
 	obj.css("background-color", "#" + color);
 	obj.css("color", "#" + fg);
-	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config, win);
 }
 
 DisplayContinuousConfig.setSelectSize = function(datatable_id, config, tabname, idx, size, called_from_api) {
@@ -2578,7 +2582,7 @@ DisplayContinuousConfig.setSelectSize = function(datatable_id, config, tabname, 
 	}
 
 	obj.val(size);
-	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config, win);
 }
 
 DisplayContinuousConfig.setSelectShape = function(datatable_id, config, tabname, idx, shape, called_from_api) {
@@ -2590,17 +2594,20 @@ DisplayContinuousConfig.setSelectShape = function(datatable_id, config, tabname,
 	}
 
 	obj.val(shape);
-	DisplayContinuousConfig.setEditing(datatable_id, true, config);
+	DisplayContinuousConfig.setEditing(datatable_id, true, config, win);
 }
 
-DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win, called_from_api) {
+DisplayContinuousConfig.setEditing = function(datatable_id, val, config, win) {
 	if (!win) {
 		win = window;
 	}
+	/*
+	  // non sense
 	if (!called_from_api) {
 		nv_perform("nv_display_continuous_config_perform", win, "set_editing", datatable_id, val, config);
 		return;
 	}
+	*/
 	//var datatable = navicell.getDatatableById(datatable_id);
 	var datatable = navicell.getDatatableByCanonName(datatable_id);
 	var module = get_module(win);
@@ -2901,7 +2908,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	setValueInfo: function(config, tabname, idx, color, size, shape, cond) {
 		if (idx < this.colors[tabname][config].length) {
 			this.colors[tabname][config][idx] = color;
-			//console.log("setValueInfo size " + idx + " -> " + size + " " + config + " " + tabname);
+			//console.log("setValueInfo shape etc. " + idx + " -> " + shape + " " + color + " " + size + " " + config + " " + tabname);
 			this.sizes[tabname][config][idx] = size;
 			this.shapes[tabname][config][idx] = shape;
 			this.conds[tabname][config][idx] = cond;
@@ -3131,10 +3138,13 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			if (conds[idx]) {
 				var idx2 = $("#discrete_value_" + id_suffix + "_" + idx, doc).val();
 				if (idx2 != undefined) {
+					//console.log("idx2: " + idx2 + " " + conds[idx] + " " + this.values[idx2] + ", raw=" + raw);
 					if (idx2 == -1) {
 						for (var idx3 = 0; idx3 < this.values.length; ++idx3) {
-							if (group.acceptCondition(this.module, this.datatable, gene_name, modif_id, this.values[idx3], conds[idx])) {
-								return raw ? -(idx+1) : idx;
+							if (this.values[idx3]) {
+								if (group.acceptCondition(this.module, this.datatable, gene_name, modif_id, this.values[idx3], conds[idx])) {
+									return raw ? -(idx+1) : idx;
+								}
 							}
 						}
 					} else {
@@ -3290,7 +3300,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	},
 
 	getBarplotStyleGroupByModifId: function(group, modif_id) {
-		var color = this.getColorSizeGroup(group, modif_id);
+		var color = this.getColorSizeGroupByModifId(group, modif_id); // EV 2014-12-11
 		if (color) {
 			var fg = getFG_from_BG(color);
 			return " style='background: #" + color + "; color: #" + fg + "; text-align: center;'";
@@ -4678,6 +4688,11 @@ Datatable.prototype = {
 	getValue: function(sample_name, gene_name) {
 		var gene_idx = this.gene_index[gene_name];
 		var sample_idx = this.sample_index[sample_name];
+		/*
+		if (this.data[gene_idx][sample_idx]) {
+			console.log("getValue: " + sample_name + " " + gene_name + " " + gene_idx + " " + sample_idx + " -> " + this.data[gene_idx][sample_idx]);
+		}
+		*/
 		if (gene_idx != undefined && sample_idx != undefined) {
 			return this.data[gene_idx][sample_idx];
 		}
@@ -4691,6 +4706,9 @@ Datatable.prototype = {
 		var info = navicell.dataset.getGeneInfoByModifId(module, modif_id);
 		if (info) {
 			var genes = info[0];
+			if (method == Group.DISCRETE_VALUE) {
+				return this.getValue(sample_name, genes[0].name); // warning: only one gene is taken into account
+			}
 			if (genes.length == 1) {
 				return this.getValue(sample_name, genes[0].name)*1.;
 			}
@@ -4772,6 +4790,7 @@ Datatable.prototype = {
 				return undefined; // never reached
 			}
 		}
+		console.log("no gene info for " + modif_id);
 		return undefined;
 	},
 
@@ -5525,6 +5544,7 @@ Group.DISCRETE_IGNORE = 0;
 Group.DISCRETE_EQ_0 = 1;
 Group.DISCRETE_GT_0 = 2;
 Group.DISCRETE_EQ_ALL = 3;
+Group.DISCRETE_VALUE = 4;
 
 Group.prototype = {
 	annots: [],
@@ -5564,9 +5584,10 @@ Group.prototype = {
 		}
 		var eq_cnt = 0;
 		for (var sample_name in this.samples) {
-			var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
+			var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id, Group.DISCRETE_VALUE) : datatable.getValue(sample_name, gene_name);
 			var eq = (cond_value == value);
 			if (eq) {
+				console.log("equals == [" + value + "] [" + cond_value + "] " + modif_id + " ?");
 				if (cond == Group.DISCRETE_EQ_0) {
 					return false;
 				}

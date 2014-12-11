@@ -190,6 +190,8 @@ function nv_set_center(win, where, posx, posy)
 	var center = map.getCenter();
 	var scrolled_center;
 
+	where = where.trim().toUpperCase();
+
 	if (where == "MAP_CENTER") { // should be MAP_CENTER
 		scrolled_center = win.map_ori_center;
 	} else if (where == "MAP_WEST") { // MAP_WEST_CENTER
@@ -221,7 +223,7 @@ function nv_set_center(win, where, posx, posy)
 
 	if (scrolled_center != null) {
 		map.setCenter(scrolled_center);
-		console.log("has scrolled to center [" + scrolled_center + "]");
+		//console.log("has scrolled to center [" + scrolled_center + "]");
 	}
 	return null;
 }
@@ -539,12 +541,14 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var datatable_id = arg1;
 		var what = arg2;
 		var doc = win.document;
-
 		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		datatable.showDisplayConfig_perform(doc, what);
+		/*
 		var displayConfig = datatable.getDisplayConfig(module);
 		var div = displayConfig.getDiv(what);
 
 		div.dialog('open');
+		*/
 	} else if (command == "close") {
 		var datatable_id = arg1;
 		var what = arg2;
@@ -644,11 +648,13 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var id = arg2;
 		var method = arg3;
 		DisplayContinuousConfig.setGroupMethod(config, id, method, true);
+/*
 	} else if (command == "set_editing") {
 		var datatable_id = arg1;
 		var val = arg2;
 		var config = arg3;
 		DisplayContinuousConfig.setEditing(datatable_id, val, config, win, true);
+*/
 	} else if (command == "set_input_value") {
 		var datatable_id = arg1;
 		var config = arg2;
@@ -699,10 +705,13 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var doc = win.document;
 
 		var datatable = navicell.getDatatableByCanonName(datatable_id);
+		datatable.showDisplayConfig_perform(doc, what);
+		/*
 		var displayConfig = datatable.getDisplayConfig(module);
 		var div = displayConfig.getDiv(what);
 
 		div.dialog('open');
+		*/
 	} else if (command == "close") {
 		var datatable_id = arg1;
 		var what = arg2;
@@ -737,16 +746,17 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
 		var value_cnt = displayConfig.getValueCount();
-		if (tabname == 'group') {
+		var is_group = tabname == 'group';
+		if (is_group) {
 			value_cnt++;
 		}
-		var advanced = displayConfig.advanced;
+		var advanced = is_group && displayConfig.advanced;
 		for (var idx = 0; idx < value_cnt; ++idx) {
 			var cond = $("#discrete_cond_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var color = $("#discrete_color_" + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var size = $("#discrete_size_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
 			var shape = $("#discrete_shape_"  + tabname + '_' + what + '_' + datatable_id + "_" + idx, doc).val();
-			if (!advanced && idx > 0) {idx = value_cnt-1;}
+			if (is_group && !advanced && idx > 0) {idx = value_cnt-1;}
 			displayConfig.setValueInfo(what, tabname, idx, color, size, shape, cond);
 		}
 		DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
@@ -1820,7 +1830,6 @@ function nv_decode(str)
 			continue;
 		}
 		msg_id = action_map.msg_id;
-		//console.log("action: " + action_str);
 		if (timeout) {
 			nv_deferred_perform(win, timeout, action_str, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
 		} else {

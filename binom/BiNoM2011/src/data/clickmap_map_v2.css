@@ -94,9 +94,8 @@ html, body {
     right: 0;
     padding: 0;
     width: 100%;
-/*    height: 59.5%;*/
-/*    height: 64.5%; */
-    height: 74.5%;
+/*    height: 74.5%; */
+    height: 64.5%; /* if demo */
     border-bottom: solid;
     border-left: solid;
     border-width: 1px;
@@ -213,22 +212,18 @@ html, body {
 /* NaviCell version 2 */
 
 #datatable_input {
-/*    top: 60%; */
-/*    top: 65%; */
-    top: 75%;
+/*    top: 75%;  */
+    top: 65%; /* if demo: */
     position: absolute;
     right: 0;
     padding: 0;
     width: 100%;
-/*    height: 40%; */
-/*    height: 35%; */
     height: 45%;
     border-bottom: solid;
     border-top: solid;
     border-left: solid;
     border-width: 2px;
     border-color: gray;
-/*    background-color: rgb(255, 238, 195); */
     background-color: white;
     padding-top: 5px;
 }
@@ -972,4 +967,8 @@ div.tablesorterPager input {
 
 #command-history {
     margin-right: 25px;
+}
+
+#demo {
+    color: red;
 }

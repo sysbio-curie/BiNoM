@@ -26,6 +26,7 @@ var MULTI_REV_SHAPE_MAP = true;
 
 var cache_value_cnt = 0;
 var no_cache_value_cnt = 0;
+var NO_CHANGE_STEP_COUNT = true;
 
 if (!window.console) {
 	window.console = new function()
@@ -2479,11 +2480,13 @@ DisplayContinuousConfig.setSampleAbsval = function(config, id, checked, called_f
 	if (datatable) {
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setUseAbsValue(config, checked == 'checked');
-		var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
-		if (displayContinuousConfig.use_gradient[config]) {
-			step_cnt--;
+		if (!NO_CHANGE_STEP_COUNT) {
+			var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
+			if (displayContinuousConfig.use_gradient[config]) {
+				step_cnt--;
+			}
+			displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		}
-		displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		DisplayContinuousConfig.setEditing(id, true, config);
 	}
 }
@@ -2503,11 +2506,13 @@ DisplayContinuousConfig.setSampleMethod = function(config, id, method, called_fr
 		obj.val(method);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setSampleMethod(config, obj.val());
-		var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
-		if (displayContinuousConfig.use_gradient[config]) {
-			step_cnt--;
+		if (!NO_CHANGE_STEP_COUNT) {
+			var step_cnt = displayContinuousConfig.getStepCount(config, 'sample');
+			if (displayContinuousConfig.use_gradient[config]) {
+				step_cnt--;
+			}
+			displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		}
-		displayContinuousConfig.setStepCount_config(step_cnt, config, 'sample');
 		DisplayContinuousConfig.setEditing(id, true, config);
 	}
 }
@@ -2526,11 +2531,13 @@ DisplayContinuousConfig.setGroupMethod = function(config, id, method, called_fro
 		obj.val(method);
 		var displayContinuousConfig = datatable.getDisplayConfig(module);
 		displayContinuousConfig.setGroupMethod(config, obj.val());
-		var step_cnt = displayContinuousConfig.getStepCount(config, 'group');
-		if (displayContinuousConfig.use_gradient[config]) {
-			step_cnt--;
+		if (!NO_CHANGE_STEP_COUNT) {
+			var step_cnt = displayContinuousConfig.getStepCount(config, 'group');
+			if (displayContinuousConfig.use_gradient[config]) {
+				step_cnt--;
+			}
+			displayContinuousConfig.setStepCount_config(step_cnt, config, 'group');
 		}
-		displayContinuousConfig.setStepCount_config(step_cnt, config, 'group');
 		DisplayContinuousConfig.setEditing(id, true, config);
 	}
 }
@@ -4687,6 +4694,9 @@ Datatable.prototype = {
 			if (genes.length == 1) {
 				return this.getValue(sample_name, genes[0].name)*1.;
 			}
+			if (!method) {
+				method = this.minval < 0 ? Group.CONTINUOUS_ABS_MAXVAL: Group.CONTINUOUS_MAXVAL;
+			}
 			if (method == Group.CONTINUOUS_MEDIAN) {
 				var values = [];
 				for (var nn = 0; nn < genes.length; ++nn) {
@@ -5669,15 +5679,14 @@ Group.prototype = {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == undefined || value.toString() == '') {
+						console.log("NO value for " + sample_name + " " + modif_id);
 						continue;
 					}
 					value *= 1.;
 					var absvalue = Math.abs(value);
-					if (value) {
-						total_value += value;
-						total_absvalue += absvalue;
-						cnt++;
-					}
+					total_value += value;
+					total_absvalue += absvalue;
+					cnt++;
 				}
 				if (cnt) {
 					var retval = (method == Group.CONTINUOUS_AVERAGE ? total_value/cnt : total_absvalue/cnt);

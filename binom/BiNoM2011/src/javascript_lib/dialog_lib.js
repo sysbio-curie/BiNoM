@@ -2239,7 +2239,7 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	html += "<td style='" + empty_cell_style + "'>&nbsp;</td>";
 	var MAX_BARPLOT_HEIGHT = 100.;
-	console.log("sel_gene " + sel_gene + " -- " + sel_modif_id);
+	//console.log("sel_gene " + sel_gene + " -- " + sel_modif_id);
 	if ((sel_gene || sel_modif_id) && sel_datatable) {
 		var displayConfig = sel_datatable.getDisplayConfig(module);
 		var gene_name = (sel_gene ? sel_gene.name : "");
@@ -3411,7 +3411,7 @@ function old_get_voronoi_color(module, gene_names, sel_color_datatable, sel_samp
 function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, sel_group)
 {
 	var display_config = sel_color_datatable.getDisplayConfig(module);
-	var sample_name = sel_sample.name;
+	var sample_name = (sel_sample ? sel_sample.name : '');
 	var red = 0;
 	var green = 0;
 	var blue = 0;
@@ -3423,10 +3423,23 @@ function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, s
 		} else {
 			color = RGBColor.fromHex(display_config.getColorGroupByModifId(sel_group, modif_id));
 		}
+		if (!color) {
+			console.log("null voronoi color");
+		} else if (color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0) {
+			console.log("#000000 voronoi color");
+			if (sel_group) {
+				console.log("value: " + display_config.getColorGroupValueByModifId(sel_group, modif_id));
+			}
+		}
 		red += color.getRed();
 		green += color.getGreen();
 		blue += color.getBlue();
 	}
+	/*
+	if (len > 1) {
+		console.log("get_voronoi_color: " + red + ", " + green + ", " + blue + " [" + len + "]");
+	}
+	*/
 	return (new RGBColor(red/len, green/len, blue/len)).getRGBValue();
 }
 
@@ -3465,12 +3478,8 @@ function draw_voronoi(module, context, div)
 			continue;
 		}
 		var modifs_id = navicell.dataset.getModifsByShapeId(module, shape_id);
-		//var gene_names = navicell.dataset.getGenesByShapeId(module, shape_id);
-		//console.log("voronoi len: " + shape_id + " " + (gene_names ? gene_names.length : -1) + " " + (modifs_id ? mapSize(modifs_id) : -1));
 		var color;
 		if (!modifs_id) {
-			//console.log("no gene for shape_id: " + shape_id);
-			//color = "888888";
 			color = 0;
 		} else {
 			color = get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, sel_group);

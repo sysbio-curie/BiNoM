@@ -1679,6 +1679,14 @@ DisplayContinuousConfig.GT_MAX = 2;
 
 DisplayContinuousConfig.prototype = {
 
+	getActiveTab: function() {
+		return this.active;
+	},
+
+	setActiveTab: function(active) {
+		this.active = active;
+	},
+
 	setStepCount: function() {
 		this.values = {};
 		this.colors = {};
@@ -1789,7 +1797,8 @@ DisplayContinuousConfig.prototype = {
 
 	getStepIndex: function(config, tabname, value, gradient_mode) {
 		if (value == undefined || value.toString() == '') {
-			return 0;
+			//return 0;
+			return -1;
 		}
 		var ivalue = parseFloat(value);
 		if (isNaN(ivalue)) {
@@ -2396,8 +2405,8 @@ DisplayContinuousConfig.prototype = {
 		var html = "<div align='center' class='step-config' id='" + div_id + "'>\n";
 		html += "<h3 id='step_config_title_" + mod + id + "'></h3>";
 		html += "<ul>";
-		html += "<li><a class='ui-button-text' href='#step_config_sample_" + mod + id + ksuffix + "' onclick='DisplayContinuousConfig.switch_sample_tab(\"" + mod + id + "\")'>Samples</a></li>";
-		html += "<li><a class='ui-button-text' href='#step_config_group_" + mod + id + ksuffix + "' onclick='DisplayContinuousConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
+		html += "<li><a class='ui-button-text' href='#step_config_sample_" + mod + id + ksuffix + "' onclick='DisplayContinuousConfig.switch_sample_tab(\"" + id + "\", \"" + config + "\")'>Samples</a></li>";
+		html += "<li><a class='ui-button-text' href='#step_config_group_" + mod + id + ksuffix + "' onclick='DisplayContinuousConfig.switch_group_tab(\"" + id + "\", \"" + config + "\")'>Groups</a></li>";
 		html += "</ul>";
 
 		for (var tab in DisplayContinuousConfig.tabnames) {
@@ -2429,7 +2438,12 @@ DisplayContinuousConfig.prototype = {
 		var div = $("#" + div_id, doc);
 		this.divs[config] = div;
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
-		DisplayContinuousConfig.switch_sample_tab(mod + id, doc);
+
+		//DisplayContinuousConfig.switch_sample_tab(id, config, doc);
+		var suffix = mod + id;
+		this.setActiveTab(0);
+		$("#step_config_sample_" + suffix, doc).css("display", "block");
+		$("#step_config_group_" + suffix, doc).css("display", "none");
 	},
 
 	getDiv: function(config) {
@@ -2759,27 +2773,49 @@ DisplayUnorderedDiscreteConfig.setEditing = function(datatable_id, val, config, 
 	}
 }
 
-DisplayContinuousConfig.switch_sample_tab = function(suffix, doc, called_from_api) {
+DisplayContinuousConfig.switch_sample_tab = function(datatable_id, config, doc, called_from_api) {
+	var win = window;
+
 	if (!doc) {
-		doc = window.document;
+		doc = win.document;
 	}
+
 	if (!called_from_api) {
-		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_sample_tab", suffix);
+		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_sample_tab", datatable_id, config);
 		return;
 	}
+
+	var module = get_module(win);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
+	var displayConfig = datatable.getDisplayConfig(module);
+	
+	displayConfig.setActiveTab(0);
+
+	var suffix = config + '_' + datatable_id;
 	$("#step_config_sample_" + suffix, doc).css("display", "block");
 	$("#step_config_group_" + suffix, doc).css("display", "none");
 }
 
-DisplayContinuousConfig.switch_group_tab = function(suffix, doc, called_from_api) {
+DisplayContinuousConfig.switch_group_tab = function(datatable_id, config, doc, called_from_api) {
+	var win = window;
+
 	if (!doc) {
 		doc = window.document;
 	}
+
 	if (!called_from_api) {
-		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_group_tab", suffix);
+		nv_perform("nv_display_continuous_config_perform", doc.win, "switch_group_tab", datatable_id, config);
 		return;
 	}
-	$("#step_config_sample_" + suffix, doc).css("display", "none")
+
+	var module = get_module(win);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
+	var displayConfig = datatable.getDisplayConfig(module);
+
+	displayConfig.setActiveTab(1);
+
+	var suffix = config + '_' + datatable_id;
+	$("#step_config_sample_" + suffix, doc).css("display", "none");
 	$("#step_config_group_" + suffix, doc).css("display", "block");
 }
 
@@ -2811,6 +2847,14 @@ function DisplayUnorderedDiscreteConfig(datatable, win) {
 
 DisplayUnorderedDiscreteConfig.prototype = {
 	
+	getActiveTab: function() {
+		return this.active;
+	},
+
+	setActiveTab: function(active) {
+		this.active = active;
+	},
+
 	buildDivs: function() {
 		this.divs = {};
 		this.buildDiv('color');
@@ -2829,9 +2873,9 @@ DisplayUnorderedDiscreteConfig.prototype = {
 
 		html += "<h3 id='discrete_config_title_" + mod + id + "'></h3>";
 		html += "<ul>";
-		html += "<li><a class='ui-button-text' href='#discrete_config_sample_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_sample_tab(\"" + mod + id + "\")'>Samples</a></li>";
+		html += "<li><a class='ui-button-text' href='#discrete_config_sample_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_sample_tab(\"" + id + "\", \"" + config + "\")'>Samples</a></li>";
 		if (!this.biotype_is_set) {
-			html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_group_tab(\"" + mod + id + "\")'>Groups</a></li>";
+			html += "<li><a class='ui-button-text' href='#discrete_config_group_" + mod + id + "' onclick='DisplayUnorderedDiscreteConfig.switch_group_tab(\"" + id + "\", \"" + config + "\")'>Groups</a></li>";
 		}
 		html += "</ul>";
 
@@ -2857,7 +2901,11 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var div = $("#" + div_id, doc);
 		this.divs[config] = div;
 		div.tabs({beforeLoad: function( event, ui ) { event.preventDefault(); return; } }); 
-		DisplayUnorderedDiscreteConfig.switch_sample_tab(mod + id, doc);
+		//DisplayUnorderedDiscreteConfig.switch_sample_tab(mod + id, doc);
+		var suffix = mod + id;
+		this.setActiveTab(0);
+		$("#discrete_config_sample_" + suffix, doc).css("display", "block");
+		$("#discrete_config_group_" + suffix, doc).css("display", "none");
 	},
 
 	getDatatableValue: function(config, value) {
@@ -3547,26 +3595,42 @@ DisplayUnorderedDiscreteConfig.prototype = {
 	}
 };
 
-DisplayUnorderedDiscreteConfig.switch_sample_tab = function(suffix, doc, called_from_api) {
+DisplayUnorderedDiscreteConfig.switch_sample_tab = function(datatable_id, config, doc, called_from_api) {
+	var win = window;
 	if (!doc) {
-		doc = window.document;
+		doc = win.document;
 	}
 	if (!called_from_api) {
-		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_sample_tab", suffix);
+		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_sample_tab", datatable_id, config);
 		return;
 	}
+	var module = get_module(win);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
+	var displayConfig = datatable.getDisplayConfig(module);
+	
+	displayConfig.setActiveTab(0);
+
+	var suffix = config + '_' + datatable_id;
 	$("#discrete_config_sample_" + suffix, doc).css("display", "block");
 	$("#discrete_config_group_" + suffix, doc).css("display", "none");
 }
 
-DisplayUnorderedDiscreteConfig.switch_group_tab = function(suffix, doc, called_from_api) {
+DisplayUnorderedDiscreteConfig.switch_group_tab = function(datatable_id, config, doc, called_from_api) {
+	var win = window;
 	if (!doc) {
-		doc = window.document;
+		doc = win.document;
 	}
 	if (!called_from_api) {
-		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_group_tab", suffix);
+		nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "switch_group_tab", datatable_id, config);
 		return;
 	}
+	var module = get_module(win);
+	var datatable = navicell.getDatatableByCanonName(datatable_id);
+	var displayConfig = datatable.getDisplayConfig(module);
+	
+	displayConfig.setActiveTab(1);
+
+	var suffix = config + '_' + datatable_id;
 	$("#discrete_config_sample_" + suffix, doc).css("display", "none")
 	$("#discrete_config_group_" + suffix, doc).css("display", "block");
 }
@@ -5587,7 +5651,7 @@ Group.prototype = {
 			var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id, Group.DISCRETE_VALUE) : datatable.getValue(sample_name, gene_name);
 			var eq = (cond_value == value);
 			if (eq) {
-				console.log("equals == [" + value + "] [" + cond_value + "] " + modif_id + " ?");
+				//console.log("equals == [" + value + "] [" + cond_value + "] " + modif_id + " ?");
 				if (cond == Group.DISCRETE_EQ_0) {
 					return false;
 				}
@@ -5700,7 +5764,7 @@ Group.prototype = {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == undefined || value.toString() == '') {
-						console.log("NO value for " + sample_name + " " + modif_id);
+						//console.log("NO value for " + sample_name + " " + modif_id);
 						continue;
 					}
 					value *= 1.;

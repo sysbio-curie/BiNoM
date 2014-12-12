@@ -5515,6 +5515,13 @@ public class ProduceClickableMap
 			out.println("    map_staining_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    overlay_init(map);");
 			if (is_php) {
+				out.println("    var demo = '<?php echo $_GET[\"demo\"]; ?>';");
+				out.println("    if (demo != '') {");
+				out.println("      $('#demo').css('display', 'block');");
+				out.println("      if (demo != 'on' && demo != 'default') {");
+				out.println("        nv_demo_file = demo;");
+				out.println("      }");
+				out.println("    }");
 				out.println("    var command = '<?php echo $_POST[\"command\"]; ?>';");
 				out.println("    if (!command) {");
 				out.println("      command = '<?php echo $_GET[\"command\"]; ?>';");
@@ -5527,6 +5534,10 @@ public class ProduceClickableMap
 				out.println("    if (navicell.id || mode == \"server\") {");
 				out.println("      nv_server(window, navicell.id);");
 				out.println("    }");
+			} else {
+				if (DEMO && demo_display_cnt < 2 && map_name.equals(master_map_name)) {
+					out.println("    $('#demo').css('display', 'block');");
+				}
 			}
 		}
 		out.println("  });\n");
@@ -5607,12 +5618,15 @@ public class ProduceClickableMap
 
 
 		if (NV2) {
+			/*
 			if (DEMO && demo_display_cnt < 2 && map_name.equals(master_map_name)) {
 				out.println(file_contents(rightpanel_demo_include_file, true));
 				demo_display_cnt++; // to avoid multiple demo buttons
 			} else {
 				out.println(file_contents(rightpanel_include_file, true));
 			}
+			*/
+			out.println(file_contents(rightpanel_demo_include_file, true));
 		}
 
 		right_div.close();

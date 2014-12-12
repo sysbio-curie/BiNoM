@@ -438,6 +438,7 @@ $(function() {
 
 	$("#status_tabs").button().click(function() {
 		if (navicell.dataset.datatableCount()) {
+			//nv_perform("nv_mydata_perform", window, "open"); // To be tested and continue
 			$("#dt_status_tabs").dialog("open");
 		}
 	});
@@ -449,7 +450,8 @@ $(function() {
 	});
 
 	$("#demo").button().click(function() {
-		nv_execute_commands(window, null, "launch_demo.nvc");
+		var suffix = nv_demo_file.match(/\.nvc$/) ? "" : ".nvc";
+		nv_execute_commands(window, null, nv_demo_file + suffix);
 		$("#demo").button("disable");
 	});
 
@@ -1504,6 +1506,7 @@ function cancel_datatables() {
 
 Datatable.prototype.showDisplayConfig = function(doc, what) {
 	var module = get_module_from_doc(doc);
+	this.getDisplayConfig(module); // to initialize displayconfiguration if necessary
 	var displayContinuousConfig = this.displayContinuousConfig[module];
 	var displayUnorderedDiscreteConfig = this.displayUnorderedDiscreteConfig[module];
 	var datatable_id = this.getCanonName();
@@ -3305,6 +3308,7 @@ function get_map_pos(module) {
 	return mappos;
 }
 
+/*
 function old_get_voronoi_color(module, gene_names, sel_color_datatable, sel_sample, sel_group)
 {
 	var display_config = sel_color_datatable.getDisplayConfig(module);
@@ -3333,6 +3337,7 @@ function old_get_voronoi_color(module, gene_names, sel_color_datatable, sel_samp
 	}
 	return (new RGBColor(red/gene_names.length, green/gene_names.length, blue/gene_names.length)).getRGBValue();
 }
+*/
 
 function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, sel_group)
 {
@@ -3343,20 +3348,21 @@ function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, s
 	var blue = 0;
 	var len = mapSize(modifs_id);
 	for (var modif_id in modifs_id) {
-		var color;
+		var value;
 		if (sel_sample) {
-			color = RGBColor.fromHex(display_config.getColorSampleByModifId(sample_name, modif_id));
+			value = display_config.getColorSampleByModifId(sample_name, modif_id);
+
 		} else {
-			color = RGBColor.fromHex(display_config.getColorGroupByModifId(sel_group, modif_id));
+			value = display_config.getColorGroupByModifId(sel_group, modif_id);
 		}
-		if (!color) {
-			console.log("null voronoi color");
-		} else if (color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0) {
-			console.log("#000000 voronoi color");
-			if (sel_group) {
-				console.log("value: " + display_config.getColorGroupValueByModifId(sel_group, modif_id));
-			}
+		if (value == undefined || value.toString() == '') {
+			//console.log("null value for " + modif_id);
+			len--;
+			continue;
 		}
+
+		var color = RGBColor.fromHex(value);
+		
 		red += color.getRed();
 		green += color.getGreen();
 		blue += color.getBlue();
@@ -3366,7 +3372,12 @@ function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, s
 		console.log("get_voronoi_color: " + red + ", " + green + ", " + blue + " [" + len + "]");
 	}
 	*/
-	return (new RGBColor(red/len, green/len, blue/len)).getRGBValue();
+	/*
+	if (len != 0 && red == 0 && green == 0 && blue == 0) {
+		console.log("color is black but len is " + len + " " + not_null_value + " " + modif_id);
+	}
+	*/
+	return len == 0 ? 0 : (new RGBColor(red/len, green/len, blue/len)).getRGBValue();
 }
 
 function draw_voronoi(module, context, div)

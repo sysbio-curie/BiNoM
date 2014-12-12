@@ -25,6 +25,7 @@ var nv_decoding = false;
 var nv_cumul_error_cnt = 0;
 var nv_last_proxy_error_ts = 0;
 var nv_server_id = 0;
+var nv_demo_file = "demo/launch_demo";
 
 // constants
 var SERVER_TRACE = 1;
@@ -579,7 +580,9 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var datatable = navicell.getDatatableByCanonName(datatable_id);
 		var displayConfig = datatable.getDisplayConfig(module);
 		var div = displayConfig.getDiv(what);
-		var active = div.tabs("option", "active");
+		//var active = div.tabs("option", "active");
+		var active = displayConfig.getActiveTab();
+		console.log("Active1 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
 		var prev_value = datatable.minval;
@@ -684,11 +687,13 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var shape = arg5;
 		DisplayContinuousConfig.setSelectShape(datatable_id, config, tabname, idx, shape, true);
 	} else if (command == "switch_sample_tab") {
-		var suffix = arg1;
-		DisplayContinuousConfig.switch_sample_tab(suffix, win.document, true);
+		var datatable_id = arg1;
+		var config = arg2;
+		DisplayContinuousConfig.switch_sample_tab(datatable_id, config, win.document, true);
 	} else if (command == "switch_group_tab") {
-		var suffix = arg1;
-		DisplayContinuousConfig.switch_group_tab(suffix, win.document, true);
+		var datatable_id = arg1;
+		var config = arg2;
+		DisplayContinuousConfig.switch_group_tab(datatable_id, config, win.document, true);
 	} else {
 		throw "nv_display_continuous_config_perform: unknown command \"" + command + "\"";
 	}
@@ -742,7 +747,9 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var datatable = navicell.getDatatableByCanonName(datatable_id);
 		var displayConfig = datatable.getDisplayConfig(module);
 		var div = displayConfig.getDiv(what);
-		var active = div.tabs("option", "active");
+		//var active = div.tabs("option", "active");
+		var active = displayConfig.getActiveTab();
+		console.log("Active2 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
 		var value_cnt = displayConfig.getValueCount();
@@ -803,11 +810,13 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var cond = arg5;
 		DisplayUnorderedDiscreteConfig.setDiscreteCond(datatable_id, config, tabname, idx, cond, true);
 	} else if (command == "switch_sample_tab") {
-		var suffix = arg1;
-		DisplayUnorderedDiscreteConfig.switch_sample_tab(suffix, win.document, true);
+		var datatable_id = arg1;
+		var config = arg2;
+		DisplayUnorderedDiscreteConfig.switch_sample_tab(datatable_id, config, win.document, true);
 	} else if (command == "switch_group_tab") {
-		var suffix = arg1;
-		DisplayUnorderedDiscreteConfig.switch_group_tab(suffix, win.document, true);
+		var datatable_id = arg1;
+		var config = arg2;
+		DisplayUnorderedDiscreteConfig.switch_group_tab(datatable_id, config, win.document, true);
 	} else {
 		throw "nv_display_unordered_discrete_config_perform: unknown command \"" + command + "\"";
 	}
@@ -1094,22 +1103,23 @@ function nv_drawing_config_perform(win, command, arg1, arg2)
 	} else if (command == "select_heatmap") {
 		// TBD: action to be called from mouse event (onchange on drawing_config_map_char*)
 		var checked = arg1;
+		console.log("SELECT_HEATMAP " + checked);
 		if (checked) {
-			$("#drawing_config_map_chart_display", win.document).attr("checked", "checked");
+			$("#drawing_config_chart_display", win.document).attr("checked", "checked");
 			drawing_config.displayCharts(checked, "Heatmap");
 			$("#drawing_config_chart_type", win.document).val(drawing_config.displayCharts());
 		} else {
-			$("#drawing_config_map_chart_display", win.document).removeAttr("checked");
+			$("#drawing_config_chart_display", win.document).removeAttr("checked");
 		}
 	} else if (command == "select_barplot") {
 		// TBD: action to be called from mouse event (onchange on drawing_config_map_char*)
 		var checked = arg1;
 		if (checked) {
 			drawing_config.displayCharts(checked, "Barplot");
-			$("#drawing_config_map_chart_display", win.document).attr("checked", "checked");
+			$("#drawing_config_chart_display", win.document).attr("checked", "checked");
 			$("#drawing_config_chart_type", win.document).val(drawing_config.displayCharts());
 		} else {
-			$("#drawing_config_map_chart_display", win.document).removeAttr("checked");
+			$("#drawing_config_chart_display", win.document).removeAttr("checked");
 		}
 	} else if (command == "select_glyph") {
 		// TBD: action to be called from mouse event (onchange on drawing_config_map_char*)
@@ -1246,7 +1256,9 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 	} else if (command == "apply") {
 		var displayContinuousConfig = datatable.displayContinuousConfig[module];
 		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
-		var active = div.tabs("option", "active");
+		//var active = div.tabs("option", "active");
+		var active = displayConfig.getActiveTab();
+		console.log("Active3 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 		if (displayContinuousConfig) {
 			var prev_value = datatable.minval;

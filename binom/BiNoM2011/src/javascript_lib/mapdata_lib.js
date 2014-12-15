@@ -2150,8 +2150,16 @@ DisplayContinuousConfig.prototype = {
 		return this.getValue('shape', 'sample', sample_name, gene_name);
 	},
 
+	getShapeSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getValueByModifId('shape', 'sample', sample_name, modif_id);
+	},
+
 	getShapeGroupValue: function(group, gene_name) {
 		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['shape']);
+	},
+
+	getShapeGroupValueByModifId: function(group, modif_id) {
+		return group.getValue(this.module, this.datatable, null, modif_id, this.group_method['shape']);
 	},
 
 	getColorSampleValue: function(sample_name, gene_name) {
@@ -2186,8 +2194,16 @@ DisplayContinuousConfig.prototype = {
 		return this.getValue('size', 'sample', sample_name, gene_name);
 	},
 
+	getSizeSampleValueByModifId: function(sample_name, modif_id) {
+		return this.getValueByModifId('size', 'sample', sample_name, modif_id);
+	},
+
 	getSizeGroupValue: function(group, gene_name) {
 		return group.getValue(this.module, this.datatable, gene_name, null, this.group_method['size']);
+	},
+
+	getSizeGroupValueByModifId: function(group, modif_id) {
+		return group.getValue(this.module, this.datatable, null, modif_id, this.group_method['size']);
 	},
 
 	getShapeSample: function(sample_name, gene_name) {
@@ -2195,8 +2211,18 @@ DisplayContinuousConfig.prototype = {
 		return this._getShape(value, 'sample');
 	},
 
+	getShapeSampleByModifId: function(sample_name, modif_id) {
+		var value = this.getShapeSampleValueByModifId(sample_name, modif_id);
+		return this._getShape(value, 'sample');
+	},
+
 	getShapeGroup: function(group, gene_name) {
 		var value = this.getShapeGroupValue(group, gene_name);
+		return this._getShape(value, 'group');
+	},
+
+	getShapeGroupByModifId: function(group, modif_id) {
+		var value = this.getShapeGroupValueByModifId(group, modif_id);
 		return this._getShape(value, 'group');
 	},
 
@@ -2241,8 +2267,18 @@ DisplayContinuousConfig.prototype = {
 		return this._getSize(value, 'sample');
 	},
 
+	getSizeSampleByModifId: function(sample_name, modif_id) {
+		var value = this.getSizeSampleValueByModifId(sample_name, modif_id);
+		return this._getSize(value, 'sample');
+	},
+
 	getSizeGroup: function(group, gene_name) {
 		var value = this.getSizeGroupValue(group, gene_name);
+		return this._getSize(value, 'group');
+	},
+
+	getSizeGroupByModifId: function(group, modif_id) {
+		var value = this.getSizeGroupValueByModifId(group, modif_id);
 		return this._getSize(value, 'group');
 	},
 
@@ -3122,7 +3158,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		return this.getShapeAt(this.getValueIndexByModifId(sample_name, modif_id), 'shape', 'sample');
 	},
 
-	getSizeSamplByModifId: function(sample_name, modif_id) {
+	getSizeSampleByModifId: function(sample_name, modif_id) {
 		return this.getSizeAt(this.getValueIndexByModifId(sample_name, modif_id), 'size', 'sample');
 	},
 
@@ -5744,12 +5780,12 @@ Group.prototype = {
 				var retval;
 				if (method == Group.CONTINOUS_AVERAGE) {
 					retval = this.getCacheValue(datatable, this.gene_average, gene_name, this.modif_average, modif_id);
-					if (retval != undefined) {
+					if (retval != undefined && retval.toString() != '') {
 						return retval;
 					}
 				} else {
 					retval = this.getCacheValue(datatable, this.gene_abs_average, gene_name, this.modif_abs_average, modif_id);
-					if (retval != undefined) {
+					if (retval != undefined && retval.toString() != '') {
 						return retval;
 					}
 				}
@@ -5780,6 +5816,7 @@ Group.prototype = {
 					}
 					return this.setCacheValue(datatable, this.gene_abs_average, gene_name, this.modif_abs_average, modif_id, retval);
 				}
+				console.log("UNDEFINED for " + this.canon_name);
 				return undefined;
 			}
 			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MINVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {

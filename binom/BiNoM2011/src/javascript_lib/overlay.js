@@ -267,7 +267,9 @@ USGSOverlay.prototype.onAdd = function() {
 							}
 							m_gene_names += genes[nn].name;
 						}
-						m_gene_names += " (" + modif_id + ")";
+						if (DISPLAY_MODIF_ID) {
+							m_gene_names += " (" + modif_id + ")";
+						}
 						gene_name = m_gene_names;
 						gene_id = "";
 					} else {
@@ -301,6 +303,13 @@ USGSOverlay.prototype.onAdd = function() {
 					update_barplot_editor(doc);
 				} else if (type == "glyph") {
 					$("#glyph_select_gene_" + hint, doc).val(gene_id);
+					if (m_gene_names) {
+						$("#glyph_select_m_genes_" + hint, doc).html(m_gene_names);
+					} else {
+						$("#glyph_select_m_genes_" + hint, doc).html("");
+					}
+
+					$("#glyph_select_modif_id_" + hint, doc).html(modif_id);
 					$("#glyph_editor_div_" + hint, doc).dialog("open");
 					update_glyph_editor(doc, null, hint);
 				}

@@ -78,8 +78,7 @@ function close_info_dialog(win)
 function display_info_dialog(title, header, msg, win, position, width, height, command)
 {
 	var dialog = $("#info_dialog", win.document);
-//	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px; background: white'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
-	dialog.html("<br/><div style='text-align: center; font-weight: bold'>" + header + "</div><br/><div style='text-align: vertical-center; padding: 10px; margin: 10px'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
+	dialog.html("<br/>" + (header ? ("<div style='text-align: center; font-weight: bold'>" + header + "</div><br/>") : "") + "<div style='text-align: vertical-center; padding: 10px; margin: 10px'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
 	var lines = msg.split(LINE_BREAK_REGEX);
 	var maxlen = 0;
 	for (var ii = 0; ii < lines.length; ++ii) {
@@ -343,6 +342,8 @@ $(function() {
 			},
 
 			Clear: function() {
+				// TBD:
+				//nv_perform("nv_import_dialog_perform", window, "clear");
 				name.val("");
 				file.val("");
 				url.val("");
@@ -351,6 +352,8 @@ $(function() {
 			},
 
 			Done: function() {
+				// TBD:
+				//nv_perform("nv_import_dialog_perform", window, "done");
 				$(this).dialog('close');
 			}
 		}});
@@ -393,6 +396,8 @@ $(function() {
 			}
 		}
 		$("#dt_import_dialog").dialog("open");
+		// TBD:
+		//nv_perform("nv_import_dialog_perform", window, "open");
 	});
 
 	$("#dt_sample_annot").dialog({
@@ -430,7 +435,8 @@ $(function() {
 	$("#import_annot_status").button().click(function() {
 		// TBD: use nv_perform
 		if (navicell.dataset.datatableCount()) {
-			$("#dt_sample_annot").dialog("open");
+			//$("#dt_sample_annot").dialog("open");
+			nv_perform("nv_sample_annotation_perform", window, "open");
 		}
 	});
 
@@ -438,14 +444,15 @@ $(function() {
 
 	$("#status_tabs").button().click(function() {
 		if (navicell.dataset.datatableCount()) {
-			//nv_perform("nv_mydata_perform", window, "open"); // To be tested and continue
-			$("#dt_status_tabs").dialog("open");
+			nv_perform("nv_mydata_perform", window, "open");
+			//$("#dt_status_tabs").dialog("open");
 		}
 	});
 
 	$("#drawing_config").button().click(function() {
 		if (navicell.dataset.datatableCount()) {
-			$("#drawing_config_div").dialog("open");
+			//$("#drawing_config_div").dialog("open");
+			nv_perform("nv_drawing_config_perform", window, "open");
 		}
 	});
 
@@ -1763,8 +1770,8 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 	var table = $("#heatmap_editor_table", doc);
 	var sel_gene_id = $("#heatmap_select_gene", doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
-	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#heatmap_select_modif_id").html());
-	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#heatmap_select_m_genes").html());
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#heatmap_select_modif_id", doc).html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#heatmap_select_m_genes", doc).html());
 
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -1929,7 +1936,7 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 	drawing_config.getHeatmapConfig().setSlider(slider);
 
 	html = "Apply this configuration to gene" + (sel_m_genes ? "s" : "") + ":&nbsp;";
-	html += "<select id='heatmap_select_gene' onchange='update_heatmap_editor(window.document, null, navicell.getDrawingConfig(\"" + module + "\").getEditingHeatmapConfig())'>\n";
+	html += "<select id='heatmap_select_gene' onchange='update_heatmap_editor(window.document, null, navicell.getDrawingConfig(\"" + module + "\").getEditingHeatmapConfig(), true)'>\n";
 	html += "<option value='_none_'></option>\n";
 	var sorted_gene_names = navicell.dataset.getSortedGeneNames();
 	for (var idx in sorted_gene_names) {
@@ -1946,12 +1953,12 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 	html += "<div id='heatmap_select_modif_id'>" + (sel_modif_id ? sel_modif_id : "") + "</div>";
 
 	$("#heatmap_gene_choice", doc).html(html);
-	$("#heatmap_select_m_genes").css("display", "none");
-	$("#heatmap_select_modif_id").css("display", "none");
+	$("#heatmap_select_m_genes", doc).css("display", "none");
+	$("#heatmap_select_modif_id", doc).css("display", "none");
 
-        $("#heatmap_clear_samples").css("font-size", "10px");
-        $("#heatmap_all_samples").css("font-size", "10px");
-        $("#heatmap_all_groups").css("font-size", "10px");
+        $("#heatmap_clear_samples", doc).css("font-size", "10px");
+        $("#heatmap_all_samples", doc).css("font-size", "10px");
+        $("#heatmap_all_groups", doc).css("font-size", "10px");
 }
 
 function draw_heatmap(module, overlay, context, scale, modif_id, gene_name, topx, topy)
@@ -2127,14 +2134,14 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 		barplotConfig = drawing_config.getEditingBarplotConfig();
 	}
 	var map_name = doc ? doc.map_name : "";
-	var div = $("#barplot_editor_div");
+	var div = $("#barplot_editor_div", doc);
 	var topdiv = div.parent().parent();
 	var empty_cell_style = "background: " + topdiv.css("background") + "; border: none;";
 	var table = $("#barplot_editor_table", doc);
 	var sel_gene_id = $("#barplot_select_gene", doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
-	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#barplot_select_modif_id").html());
-	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#barplot_select_m_genes").html());
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#barplot_select_modif_id", doc).html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#barplot_select_m_genes", doc).html());
 
 	var sample_cnt = mapSize(navicell.dataset.samples);
 	var group_cnt = mapSize(navicell.group_factory.group_map);
@@ -2365,12 +2372,12 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 	html += "<div id='barplot_select_m_genes'>" + (sel_m_genes ? sel_m_genes : "") + "</div>";
 	html += "<div id='barplot_select_modif_id'>" + (sel_modif_id ? sel_modif_id : "") + "</div>";
 	$("#barplot_gene_choice", doc).html(html);
-	$("#barplot_select_m_genes").css("display", "none");
-	$("#barplot_select_modif_id").css("display", "none");
+	$("#barplot_select_m_genes", doc).css("display", "none");
+	$("#barplot_select_modif_id", doc).css("display", "none");
 
-        $("#barplot_clear_samples").css("font-size", "10px");
-        $("#barplot_all_samples").css("font-size", "10px");
-        $("#barplot_all_groups").css("font-size", "10px");
+        $("#barplot_clear_samples", doc).css("font-size", "10px");
+        $("#barplot_all_samples", doc).css("font-size", "10px");
+        $("#barplot_all_groups", doc).css("font-size", "10px");
 }
 
 function draw_barplot(module, overlay, context, scale, modif_id, gene_name, topx, topy)
@@ -2646,7 +2653,7 @@ function glyph_step_display_config(what, num, map_name) {
 	}
 }
 
-function draw_glyph_in_canvas(module, glyphConfig, doc)
+function draw_glyph_in_canvas(module, glyphConfig, ignore_sel_modif_id, doc)
 {
 	var num = glyphConfig.num;
 	var sel_shape_datatable = glyphConfig.getShapeDatatable();
@@ -2654,20 +2661,34 @@ function draw_glyph_in_canvas(module, glyphConfig, doc)
 	var sel_size_datatable = glyphConfig.getSizeDatatable();
 	var sel_gene_id = $("#glyph_select_gene_" + num, doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#glyph_select_modif_id_" + num, doc).html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#glyph_select_m_genes_" + num, doc).html());
 	var sel_group = glyphConfig.getGroup();
 	var sel_sample = glyphConfig.getSample();
-	if (sel_gene && sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
+	if ((sel_gene || sel_modif_id) && sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
 		var shape, color, size;
-		var gene_name = sel_gene.name;
+		var gene_name = (sel_gene ? sel_gene.name : '');
 		if (sel_sample) {
 			var sample_name = sel_sample.name;
-			shape = sel_shape_datatable.getDisplayConfig(module).getShapeSample(sample_name, gene_name);
-			color = sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_name);
-			size = sel_size_datatable.getDisplayConfig(module).getSizeSample(sample_name, gene_name);
+			if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeSampleByModifId(sample_name, sel_modif_id);
+				color = sel_color_datatable.getDisplayConfig(module).getColorSampleByModifId(sample_name, sel_modif_id);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeSampleByModifId(sample_name, sel_modif_id);
+			} else {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeSample(sample_name, gene_name);
+				color = sel_color_datatable.getDisplayConfig(module).getColorSample(sample_name, gene_name);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeSample(sample_name, gene_name);
+			}
 		} else {
-			shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroup(sel_group, gene_name);
-			color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
-			size = sel_size_datatable.getDisplayConfig(module).getSizeGroup(sel_group, gene_name);
+			if (sel_modif_id && USE_MODIF_ID_FOR_COLORS) {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroupByModifId(sel_group, sel_modif_id);
+				color = sel_color_datatable.getDisplayConfig(module).getColorGroupByModifId(sel_group, sel_modif_id);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeGroupByModifId(sel_group, sel_modif_id);
+			} else {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroup(sel_group, gene_name);
+				color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeGroup(sel_group, gene_name);
+			}
 		}
 
 		var drawing_canvas = glyphConfig.getDrawingCanvas();
@@ -2705,7 +2726,8 @@ function glyph_select_datatable_size(glyph_num, map_name)
 	nv_perform("nv_glyph_editor_perform", get_win(map_name), "select_datatable_size", glyph_num, $("#glyph_editor_datatable_size_" + glyph_num, doc).val());
 }
 
-function update_glyph_editor(doc, params, num, glyphConfig) {
+function update_glyph_editor(doc, params, num, glyphConfig, ignore_sel_modif_id) {
+	// TBD: take modif_id into account
 	var module = get_module_from_doc(doc);
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (!glyphConfig) {
@@ -2718,6 +2740,8 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	var table = $("#glyph_editor_table_" + num, doc);
 	var sel_gene_id = $("#glyph_select_gene_" + num, doc).val();
 	var sel_gene = sel_gene_id ? navicell.dataset.getGeneById(sel_gene_id) : null;
+	var sel_modif_id = (ignore_sel_modif_id ? "" : $("#glyph_select_modif_id_" + num, doc).html());
+	var sel_m_genes = (ignore_sel_modif_id ? "" : $("#glyph_select_m_genes_" + num, doc).html());
 
 	table.children().remove();
 	var html = "";
@@ -2788,7 +2812,7 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	slider.slider({
 		slide: function(event, ui) {
 			nv_perform("nv_glyph_editor_perform", get_win(map_name), "set_transparency", num, ui.value);
-			draw_glyph_in_canvas(module, glyphConfig, doc);
+			draw_glyph_in_canvas(module, glyphConfig, ignore_sel_modif_id, doc);
 		}
 	});
 
@@ -2817,7 +2841,7 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 	drawing_config.getEditingGlyphConfig(num).setCanvasAndSlider(draw_canvas, slider);
 	drawing_config.getGlyphConfig(num).setCanvasAndSlider(draw_canvas, slider);
 
-	if (!draw_glyph_in_canvas(module, glyphConfig, doc) && context) {
+	if (!draw_glyph_in_canvas(module, glyphConfig, ignore_sel_modif_id, doc) && context) {
 		context.clearRect(0, 0, CANVAS_W, CANVAS_H);
 	}
 
@@ -2848,23 +2872,36 @@ function update_glyph_editor(doc, params, num, glyphConfig) {
 
 	$("#glyph_editor_size_div_" + num, doc).html(html);
 
-	html = "Apply this configuration to gene:&nbsp;";
-	html += "<select id='glyph_select_gene_" + num + "' onchange='update_glyph_editor(document, null, " + num + ", navicell.getDrawingConfig(\"" + module + "\").getEditingGlyphConfig( + " + num + "))'>\n";
+	//html = "Apply this configuration to gene:&nbsp;";
+	html = "Apply this configuration to gene" + (sel_m_genes ? "s" : "") + ":&nbsp;";
+	html += "<select id='glyph_select_gene_" + num + "' onchange='update_glyph_editor(document, null, " + num + ", navicell.getDrawingConfig(\"" + module + "\").getEditingGlyphConfig( + " + num + "), true)'>\n";
 	html += "<option value='_none_'></option>\n";
 	var sorted_gene_names = navicell.dataset.getSortedGeneNames();
 	for (var idx in sorted_gene_names) {
 		var gene_name = sorted_gene_names[idx];
 		var gene = navicell.dataset.genes[gene_name];
 		var selected = sel_gene && sel_gene.getId() == gene.getId() ? " selected": "";
-		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+		//html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + "</option>\n";
+		html += "<option value='" + navicell.dataset.genes[gene_name].getId() + "'" + selected + ">" + gene_name + (DISPLAY_MODIF_ID && selected && sel_modif_id ? (" (" + sel_modif_id + ")") : "") + "</option>\n";
+	}
+	if (sel_m_genes && !sel_gene) {
+		html += "<option value='" + sel_m_genes + "' selected>" + (sel_m_genes ? sel_m_genes : "") + "</option>\n";
 	}
 	html += "</select>";
+
+	html += "<div id='glyph_select_m_genes_" + num + "'>" + (sel_m_genes ? sel_m_genes : "") + "</div>";
+	html += "<div id='glyph_select_modif_id_" + num + "'>" + (sel_modif_id ? sel_modif_id : "") + "</div>";
+
 	$("#glyph_gene_choice_" + num, doc).html(html);
+
+	$("#glyph_select_m_genes_" + num, doc).css("display", "none");
+	$("#glyph_select_modif_id_" + num, doc).css("display", "none");
 }
 
 
 function draw_glyph(module, num, overlay, context, scale, modif_id, gene_name, topx, topy)
 {
+	// TBD: take modif_id into account
 	if (!module) {
 		module = get_module();
 	}
@@ -2886,13 +2923,25 @@ function draw_glyph(module, num, overlay, context, scale, modif_id, gene_name, t
 	if (sel_shape_datatable && sel_color_datatable && sel_size_datatable && (sel_group || sel_sample)) {
 		var shape, color, size;
 		if (sel_sample) {
-			shape = sel_shape_datatable.getDisplayConfig(module).getShapeSample(sel_sample.name, gene_name);
-			color = sel_color_datatable.getDisplayConfig(module).getColorSample(sel_sample.name, gene_name);
-			size = sel_size_datatable.getDisplayConfig(module).getSizeSample(sel_sample.name, gene_name);
+			if (modif_id && USE_MODIF_ID_FOR_COLORS) {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeSampleByModifId(sel_sample.name, modif_id);
+				color = sel_color_datatable.getDisplayConfig(module).getColorSampleByModifId(sel_sample.name, modif_id);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeSampleByModifId(sel_sample.name, modif_id);
+			} else {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeSample(sel_sample.name, gene_name);
+				color = sel_color_datatable.getDisplayConfig(module).getColorSample(sel_sample.name, gene_name);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeSample(sel_sample.name, gene_name);
+			}
 		} else {
-			shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroup(sel_group, gene_name);
-			color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
-			size = sel_size_datatable.getDisplayConfig(module).getSizeGroup(sel_group, gene_name);
+			if (modif_id && USE_MODIF_ID_FOR_COLORS) {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroupByModifId(sel_group, modif_id);
+				color = sel_color_datatable.getDisplayConfig(module).getColorGroupByModifId(sel_group, modif_id);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeGroupByModifId(sel_group, modif_id);
+			} else {
+				shape = sel_shape_datatable.getDisplayConfig(module).getShapeGroup(sel_group, gene_name);
+				color = sel_color_datatable.getDisplayConfig(module).getColorGroup(sel_group, gene_name);
+				size = sel_size_datatable.getDisplayConfig(module).getSizeGroup(sel_group, gene_name);
+			}
 			//console.log("group: " + gene_name + " " + sel_group.getId() + " " + shape + " " + color + " " + size);
 		}
 
@@ -2902,7 +2951,7 @@ function draw_glyph(module, num, overlay, context, scale, modif_id, gene_name, t
 		bound = draw_glyph_perform(context, start_x, start_y, shape, color, (size*g_size)/4, 1, false, glyphConfig.getTransparency());
 	}
 	if (bound) {
-		overlay.addBoundBox(bound, gene_name, "glyph", num);
+		overlay.addBoundBox(bound, gene_name, "glyph", num, modif_id);
 	}
 	return bound;
 }
@@ -3267,11 +3316,10 @@ function update_map_staining_editor(doc, params, mapStainingConfig) {
 		var last_points = null;
 		for (var shape_id in sel_gene.getShapeIds(module)) {
 			var voronoi_shape = voronoi_shape_map[shape_id];
-			if (voronoi_shape) {
+			if (voronoi_shape && color != undefined && color.toString() != '') {
 				var points = voronoi_shape[0];
 				last_points = points;
 				draw_map_staining_perform(context, CANVAS_W, CANVAS_H, points, color);
-			} else {
 			}
 		}
 	} else if (context) {
@@ -3351,7 +3399,6 @@ function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, s
 		var value;
 		if (sel_sample) {
 			value = display_config.getColorSampleByModifId(sample_name, modif_id);
-
 		} else {
 			value = display_config.getColorGroupByModifId(sel_group, modif_id);
 		}

@@ -132,12 +132,12 @@ function nv_get_command_history(win)
 //    nv_find_entities(window, "AK.*");
 // ------------------------------------------------------------------------------------------------------
 
-function nv_notice_perform(win, command, header, msg, position, width, height, commands)
+function nv_notice_perform(win, command, header, msg, position, width, height, commands, ok_name)
 {
 	win = nv_win(win);
-	console.log("notice [" + commands + "]");
+	//console.log("notice [" + commands + "] [" + ok_name + "]");
 	if (command == "set_message_and_open") {
-		win.notice_dialog(header, msg, win, position, width, height, commands);
+		win.notice_dialog(header, msg, win, position, width, height, commands, ok_name);
 	} else if (command == "open") {
 		open_info_dialog(win);
 	} else if (command == "close") {
@@ -582,7 +582,7 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var div = displayConfig.getDiv(what);
 		//var active = div.tabs("option", "active");
 		var active = displayConfig.getActiveTab();
-		console.log("Active1 == " + active);
+		//console.log("Active1 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
 		var prev_value = datatable.minval;
@@ -749,7 +749,7 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		var div = displayConfig.getDiv(what);
 		//var active = div.tabs("option", "active");
 		var active = displayConfig.getActiveTab();
-		console.log("Active2 == " + active);
+		//console.log("Active2 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 
 		var value_cnt = displayConfig.getValueCount();
@@ -1258,7 +1258,7 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
 		//var active = div.tabs("option", "active");
 		var active = displayConfig.getActiveTab();
-		console.log("Active3 == " + active);
+		//console.log("Active3 == " + active);
 		var tabname = DisplayContinuousConfig.tabnames[active];
 		if (displayContinuousConfig) {
 			var prev_value = datatable.minval;
@@ -1519,8 +1519,8 @@ function nv_record(win, to_encode) {
 	$("#command-history", win.document).val((history ? history + "\n\n" : "") + cmd);
 }
 
-function nv_record_action(win, action, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-	nv_record(win, nv_encode_action(action, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+function nv_record_action(win, action, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+	nv_record(win, nv_encode_action(action, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
  
 var nv_handlers = {
@@ -1560,15 +1560,15 @@ var nv_handlers = {
 //	"nv_demo": nv_demo
 };
 
-function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+function nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 {
 	var action = nv_handlers[action_str];
 	if (!action) {
 		win.console.log("nv_perform: error no action \"" + action_str + "\"");
 		return;
 	}
-	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-	nv_record(win, nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+	var ret = action(win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+	nv_record(win, nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 	return ret;
 }
 
@@ -1586,7 +1586,7 @@ function nv_encode_data(data)
 	return JSON.stringify(data);
 }
 
-function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 {
 	var map = {};
 	var args = [];
@@ -1597,6 +1597,7 @@ function nv_encode_action(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, a
 	nv_push_arg(args, arg5);
 	nv_push_arg(args, arg6);
 	nv_push_arg(args, arg7);
+	nv_push_arg(args, arg8);
 	var now = nv_now();
 	map["action"] = action_str;
 	map["module"] = get_module(win);
@@ -1811,9 +1812,9 @@ function nv_server(win, id) {
 
 var COMMENT_REGEX = new RegExp("##.*(\r\n?|\n)", "g");
 
-function nv_deferred_perform(win, timeout, action_str, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+function nv_deferred_perform(win, timeout, action_str, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
 	setTimeout(function() { // breaking closure
-		nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+		nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 	}, timeout);
 }
 
@@ -1843,9 +1844,9 @@ function nv_decode(str)
 		}
 		msg_id = action_map.msg_id;
 		if (timeout) {
-			nv_deferred_perform(win, timeout, action_str, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+			nv_deferred_perform(win, timeout, action_str, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
 		} else {
-			ret = nv_perform(action_str, win, args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+			ret = nv_perform(action_str, win, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
 		}
 	}
 

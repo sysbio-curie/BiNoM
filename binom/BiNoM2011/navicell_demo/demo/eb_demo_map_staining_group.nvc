@@ -34,5 +34,5 @@
 
 @COMMAND {"action":"nv_drawing_config_perform","module":"cellcycle:master","args":["apply_and_close",null,null,null,null,null,null],"timestamp":1418379274030}
 
-@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>Here we see the map staining values automatically averaged for all the samples labeled as “Proliferative”.<br/><br/>Click OK to continue or Cancel to exit.</span>", "left center", 380, 300, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_map_staining_group_bis.nvc\"], \"module\": \"\"}"], "module": "", "timeout": 0}
+@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>Here we see the map staining values automatically averaged for all the samples labeled as “Proliferative”.<br/><br/>Click Next to continue or Cancel to exit.</span>", "left center", 380, 300, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_map_staining_group_bis.nvc\"], \"module\": \"\"}", "Next"], "module": "", "timeout": 0}
 

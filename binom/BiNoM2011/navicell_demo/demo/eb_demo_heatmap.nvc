@@ -41,5 +41,5 @@
 
 ## @COMMAND {"action": "nv_execute_commands", "args": ["", "demo/eb_demo_3.nvc"], "module": "", "timeout": 0}
 
-@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>We have selected two samples and adapted the color gradient for the different copy-number values.<br/><br/>Click OK to continue or Cancel to exit.</span>", "left center", 380, 300, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_heatmap_bis.nvc\"], \"module\": \"\"}"], "module": "", "timeout": 0}
+@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>We have selected two samples and adapted the color gradient for the different copy-number values.<br/><br/>Click Next to continue or Cancel to exit.</span>", "left center", 380, 300, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_heatmap_bis.nvc\"], \"module\": \"\"}", "Next"], "module": "", "timeout": 0}
 

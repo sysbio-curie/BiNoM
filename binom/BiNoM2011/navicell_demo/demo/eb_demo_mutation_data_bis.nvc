@@ -40,4 +40,4 @@
 
 @COMMAND {"action":"nv_set_center","module":"cellcycle:master","args":["absolute",-0.677490234375,17.7978515625,null,null,null,null],"timestamp":1418398444796}
 
-@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>Here we see p53 mutated genes for this sample on this region of the map.<br/><br/>Now we will use map staining to visualize expression data on the map.<br/><br/>Click OK to continue or Cancel to exit.</span>", "left center", 380, 320, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_map_staining.nvc\"], \"module\": \"\"}"], "module": "", "timeout": 0}
+@COMMAND {"action": "nv_notice_perform", "args": ["set_message_and_open", "", "<span style='font-size: 14px'>Here we see p53 mutated genes for this sample on this region of the map.<br/><br/>Now we will use map staining to visualize expression data on the map.<br/><br/>Click Next to continue or Cancel to exit.</span>", "left center", 380, 320, "{\"action\": \"nv_execute_commands\", \"args\": [\"\", \"demo/eb_demo_map_staining.nvc\"], \"module\": \"\"}", "Next"], "module": "", "timeout": 0}

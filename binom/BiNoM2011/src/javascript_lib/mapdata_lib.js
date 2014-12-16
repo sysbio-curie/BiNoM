@@ -505,12 +505,12 @@ function canon_name(str) {
 
 function is_number(str)
 {
-	return str.match(NUM_REGEX);
+	return str.toString().match(NUM_REGEX);
 }
 
 function is_int(str)
 {
-	return str.match(INT_REGEX);
+	return str.toString().match(INT_REGEX);
 }
 
 var time_cnt = 0;
@@ -5761,6 +5761,9 @@ Group.prototype = {
 					if (value == undefined || value.toString() == '') {
 						continue;
 					}
+					if (!is_number(value)) {
+						continue;
+					}
 					value *= 1.;
 					values.push(value);
 				}
@@ -5793,14 +5796,17 @@ Group.prototype = {
 				// this.average[datatable.id][gene_name]
 				// this.abs_average[datatable.id][gene_name]
 				// etc.
-				var total_value = 0;
-				var total_absvalue = 0;
-				var cnt = 0;
+				var total_value = 0.;
+				var total_absvalue = 0.;
+				var cnt = 0.;
 				for (var sample_name in this.samples) {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == undefined || value.toString() == '') {
 						//console.log("NO value for " + sample_name + " " + modif_id);
+						continue;
+					}
+					if (!is_number(value)) {
 						continue;
 					}
 					value *= 1.;
@@ -5811,12 +5817,13 @@ Group.prototype = {
 				}
 				if (cnt) {
 					var retval = (method == Group.CONTINUOUS_AVERAGE ? total_value/cnt : total_absvalue/cnt);
+					//console.log("retval " + retval + " " + total_value + " " + total_absvalue + " " + cnt);
 					if (method == Group.CONTINOUS_AVERAGE) {
 						return this.setCacheValue(datatable, this.gene_average, gene_name, this.modif_average, modif_id, retval);
 					}
 					return this.setCacheValue(datatable, this.gene_abs_average, gene_name, this.modif_abs_average, modif_id, retval);
 				}
-				console.log("UNDEFINED for " + this.canon_name);
+				//console.log("UNDEFINED for " + this.canon_name);
 				return undefined;
 			}
 			if (method == Group.CONTINUOUS_MINVAL || method == Group.CONTINUOUS_MAXVAL || method == Group.CONTINUOUS_ABS_MINVAL || method == Group.CONTINUOUS_ABS_MAXVAL) {
@@ -5832,6 +5839,9 @@ Group.prototype = {
 					//var value = datatable.getValue(sample_name, gene_name);
 					var value = modif_id ? datatable.getValueByModifId(module, sample_name, modif_id) : datatable.getValue(sample_name, gene_name);
 					if (value == undefined || value.toString() == '') {
+						continue;
+					}
+					if (!is_number(value)) {
 						continue;
 					}
 					value *= 1.;

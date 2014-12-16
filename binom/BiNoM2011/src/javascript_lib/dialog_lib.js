@@ -75,7 +75,7 @@ function close_info_dialog(win)
 	$("#info_dialog", win.document).dialog("close");
 }
 
-function display_info_dialog(title, header, msg, win, position, width, height, command)
+function display_info_dialog(title, header, msg, win, position, width, height, command, ok_name)
 {
 	var dialog = $("#info_dialog", win.document);
 	dialog.html("<br/>" + (header ? ("<div style='text-align: center; font-weight: bold'>" + header + "</div><br/>") : "") + "<div style='text-align: vertical-center; padding: 10px; margin: 10px'>" + "<br/>" + msg.replace(LINE_BREAK_REGEX_G, "<br/>") + "</div>");
@@ -102,7 +102,10 @@ function display_info_dialog(title, header, msg, win, position, width, height, c
 			height = 800;
 		}
 	}
-	console.log("display+info_dialog [" + command + "]");
+	if (!ok_name) {
+		ok_name = "OK";
+	}
+	//console.log("display+info_dialog [" + command + "]");
 	if (command) {
 		dialog.dialog({
 			autoOpen: false,
@@ -110,14 +113,20 @@ function display_info_dialog(title, header, msg, win, position, width, height, c
 			height: height,
 			modal: false,
 			title: title,
-			buttons: {
-				"Cancel": function() {
-					$(this).dialog("close");
+			buttons: [
+				{
+					text: "Cancel",
+					click: function() {
+						$(this).dialog("close");
+					},
 				},
-				"OK": function() {
-					nv_execute_commands(win, nv_CMD_MARK + ' ' + command);
+				{
+					text: ok_name,
+					click: function() {
+						nv_execute_commands(win, nv_CMD_MARK + ' ' + command);
+					}
 				}
-			}
+			]
 		});
 	} else {
 		dialog.dialog({
@@ -126,11 +135,14 @@ function display_info_dialog(title, header, msg, win, position, width, height, c
 			height: height,
 			modal: false,
 			title: title,
-			buttons: {
-				"OK": function() {
-					$(this).dialog("close");
+			buttons: [
+				{
+					text: ok_name,
+					click: function() {
+						$(this).dialog("close");
+					}
 				}
-			}
+			]
 		});
 	}
 	if (position) {
@@ -153,9 +165,9 @@ function error_dialog(header, msg, win)
 	display_info_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
 }
 
-function notice_dialog(header, msg, win, position, width, height, command)
+function notice_dialog(header, msg, win, position, width, height, command, ok_name)
 {
-	display_info_dialog('Notice', header, msg, win, position, width, height, command);
+	display_info_dialog('Notice', header, msg, win, position, width, height, command, ok_name);
 }
 
 function get_dialog_width(width) {
@@ -460,6 +472,7 @@ $(function() {
 		var suffix = nv_demo_file.match(/\.nvc$/) ? "" : ".nvc";
 		nv_execute_commands(window, null, nv_demo_file + suffix);
 		$("#demo").button("disable");
+		//$("#demo").css("display", "none");
 	});
 
 	if (DATATABLE_HAS_TABS) {

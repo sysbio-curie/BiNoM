@@ -480,6 +480,9 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	google.maps.event.addListener(map, 'center_changed', function() {
 		var center = map.getCenter();
 		nv_record_action(window, "nv_set_center", "ABSOLUTE", center.lng(), center.lat());
+		if (!window.map_ori_center) {
+			window.map_ori_center = map.getCenter();
+		}
 	});
 
 
@@ -518,7 +521,7 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	bounds.extend(map_type.projection.fromPointToLatLng(new google.maps.Point(xshift, yshift)));
 	map.fitBounds(bounds);
 
-	window.map_ori_center = map.getCenter();
+	window.map_ori_center = null;
 	window.map_ori_bounds = bounds;
 
 	return { map : map, projection : map_type.projection};

@@ -167,7 +167,8 @@ function error_dialog(header, msg, win)
 
 function notice_dialog(header, msg, win, position, width, height, command, ok_name)
 {
-	display_info_dialog('Notice', header, msg, win, position, width, height, command, ok_name);
+	//display_info_dialog('Notice', header, msg, win, position, width, height, command, ok_name);
+	display_info_dialog("Notice", header, msg, win, position, width, height, command, ok_name);
 }
 
 function get_dialog_width(width) {

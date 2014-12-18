@@ -1411,6 +1411,9 @@ function update_status_tables(params) {
 			continue;
 		}
 		var win = doc.win;
+		if (!win) {
+			continue;
+		}
 		if (!params || !params.no_sample_status_table) {
 			win.update_sample_status_table(doc, params);
 		}

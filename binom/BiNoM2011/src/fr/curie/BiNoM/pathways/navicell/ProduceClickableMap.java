@@ -5535,8 +5535,9 @@ public class ProduceClickableMap
 				out.println("      nv_server(window, navicell.id);");
 				out.println("    }");
 			} else {
-				if (DEMO && demo_display_cnt < 2 && map_name.equals(master_map_name)) {
+				if (DEMO && demo_display_cnt == 0  && map_name.equals(master_map_name)) {
 					out.println("    $('#demo').css('display', 'block');");
+					demo_display_cnt++; // to avoid multiple demo buttons
 				}
 			}
 		}

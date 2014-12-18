@@ -19,11 +19,14 @@ if [ $? = 0 ]; then dir=$(pwd)/$dir; fi
 tmpdir=/tmp/build_navicell_lib.$$
 trap "echo | rm -rf $tmpdir" 0 1 2 3
 
-libdir=lib.$(date "+%Y-%m-%d")
+ext=.$(date "+%Y-%m-%d")
+
+libdir=lib${ext}
 tmplibdir=$tmpdir/$libdir
 mkdir -p $tmplibdir
 
-tmpicondir=$tmpdir/map_icons
+mapicondir=map_icons${ext}
+tmpicondir=$tmpdir/$mapicondir
 mkdir -p $tmpicondir
 
 cd $dir/../navicell_lib
@@ -54,7 +57,7 @@ fi
 
 cd $tmpdir
 
-tar $opts $tarfile --exclude='*~' $libdir map_icons
+tar $opts $tarfile --exclude='*~' $libdir $mapicondir
 
 echo "navicell lib tarfile: " $tarfile
 

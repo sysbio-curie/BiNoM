@@ -12,26 +12,37 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-# written by: Eric Viara (eric.viara@curie.fr)
-#
-# curie.navicell package
+# written by NaviCell Team at Institut Curie 26 rue d'Ulm, France
+# Eric Viara (eric.viara@curie.fr)
+# Eric Bonnet (eric.bonnet@curie.fr)
 #
 # Python Binding for NaviCell
 #
-# August-October 2014
+# package: curie.navicell
+# version: 1.2
+# date: December 2014
 #
+
+r"""
+This module implements the Python Binding for NaviCell
+"""
+
+__version__ = '1.2'
+__author__ = ['Eric Viara <eric.viara@curie.fr>', 'Eric Bonnet <eric.bonnet@curie.fr>']
 
 import subprocess, sys, os
 import json
 import http.client, urllib.request, urllib.parse, urllib.error
-import datetime
-from time import sleep
+import datetime, time
 
-NV_PACKSIZE = 500000
+_NV_PACKSIZE = 500000
 
 class Proxy:
+    """
+    class used to communicate with NaviCell proxy on web server side
+    """
 
-    def __init_attrs__(self, proxy_url, is_https, str = ''):
+    def _init_attrs__(self, proxy_url, is_https, str = ''):
         self._is_https = is_https
         if not str:
             url = proxy_url
@@ -50,13 +61,13 @@ class Proxy:
 
         idx = proxy_url.find("http://")
         if idx != -1:
-            self.__init_attrs__(proxy_url, False, "http://")
+            self._init_attrs__(proxy_url, False, "http://")
         else:
             idx = proxy_url.find("https://")
             if idx != -1:
-                self.__init_attrs__(proxy_url, True, "https://")
+                self._init_attrs__(proxy_url, True, "https://")
             else:                
-                self.__init_attrs__(proxy_url, False)
+                self._init_attrs__(proxy_url, False)
 
     def getURL(self):
         return self._url
@@ -110,7 +121,7 @@ class NaviCell:
         self._hugo_map = {}
 
         self.trace = False
-        self.packsize = NV_PACKSIZE
+        self.packsize = _NV_PACKSIZE
 
     #
     # private methods
@@ -200,7 +211,7 @@ class NaviCell:
 
     def _waitForReady(self, module):
         while not self._isReady(module):
-            sleep(0.05)
+            time.sleep(0.05)
         return True
 
     def _isReady(self, module):

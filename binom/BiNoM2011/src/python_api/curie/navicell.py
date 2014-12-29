@@ -24,7 +24,54 @@
 #
 
 r"""
-This module implements the Python Binding for NaviCell
+This module implements the Python Binding for NaviCell.
+
+It can be used as a module or by using the "nvpy" python companion script.
+
+As a module, for instance:
+from curie.navicell import NaviCell, Options
+
+options = Options()
+options.browser_command = 'open -a Safari' # on MacOS
+options.proxy_url = 'https://navicell.curie.fr/cgi-bin/nv_proxy.php'
+options.map_url = 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
+
+# instantiate a NaviCell client handle
+nv = NaviCell(options)
+
+# launch browser
+nv.launchBrowser()
+
+# command interaction examples
+nv.setZoom('', 10)
+nv.getHugoList()
+nv.getBiotypeList()
+
+At the command line, using nvpy:
+nvpy --browser-command 'open -a Safari' --proxy-url 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' --map-url 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php' --launch-browser
+or:
+python3 -i nvpy ...
+
+To make things easier, the browser command, proxy URL and map URL can be put in environment variables as follows:
+export NV_BROWSER_COMMAND='open -a Safari' # on MacOS
+export NV_PROXY_URL='https://navicell.curie.fr/cgi-bin/nv_proxy.php'
+export NV_MAP_URL='https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
+
+Then:
+nvpy --launch-browser
+
+What is displayed:
+===================================
+ Welcome in NaviCell python client
+===================================
+
+Use python variable 'nv' as the NaviCell object
+Type 'nv.examples()' to get examples
+>>> # then, you can type interaction commands:
+>>> nv.setZoom('', 10)
+>>> nv.getHugoList()
+
+
 """
 
 __version__ = '1.2'
@@ -39,7 +86,8 @@ _NV_PACKSIZE = 500000
 
 class Proxy:
     """
-    class used to communicate with NaviCell proxy on web server side
+    class used to communicate with NaviCell proxy on web server side.
+    Generally speaking, for internal use by NaviCell class only.
     """
 
     def _init_attrs__(self, proxy_url, is_https, str = ''):
@@ -56,6 +104,12 @@ class Proxy:
             raise Exception("invalid format " + proxy_url)
 
     def __init__(self, proxy_url = ''):
+        """ Instantiate a Proxy client to communicate with the NaviCell proxy server.
+
+        Args:
+            :param proxy_url (string): the proxy URL using HTTP or HTTPS protocol
+        """
+
         if not proxy_url:
             raise Exception("empty proxy URL")
 
@@ -70,27 +124,40 @@ class Proxy:
                 self._init_attrs__(proxy_url, False)
 
     def getURL(self):
+        """ Return the Proxy URL. """
         return self._url
 
     def getHost(self):
+        """ Return the Proxy Host. """
         return self._host
 
     def isHttps(self):
+        """ Return True if the protocol is HTTPS based. """
         return self._is_https
 
     def getProtocol(self):
+        """ Return the protocol: HTTP or HTTPS. """
         if self._is_https:
             return "https";
         return "http";
 
     def newConnection(self):
+        """ Creates a new connexion to the HTTP server. """
         if self._is_https:
             return http.client.HTTPSConnection(self._host)
         return http.client.HTTPConnection(self._host)
 
 class BrowserLauncher:
+    """ Utility class to launch a browser and display a given NaviCell map. """
 
     def __init__(self, browser_command, map_url):
+        """ Instantiate a BrowserLauncher.
+
+        Args:
+            :param browser_command (string): the full browser command
+            :param map_url (string): the URL of the NaviCell map
+        """
+
         if not browser_command:
             raise Exception("browser command is not set")
         if not map_url:
@@ -101,13 +168,56 @@ class BrowserLauncher:
             self.cmd.append(item)
 
     def launch(self, session_id):
-        self.cmd.append(self.map_url + "?id=" + session_id)
+        """ Launchs the browser with the given session ID.
+
+        Args:
+            :param session_id (string): the NaviCell session ID
+
+        """
+
+        if self.map_url[len(self.map_url)-1] != '&':
+            suffix = '?'
+        else:
+            suffix = ''
+
+        self.cmd.append(self.map_url + suffix + "id=" + session_id)
         subprocess.check_call(self.cmd)
 
+class Options:
+    """ Option wrapper to be given to NaviCell constructor.
+
+    options = Options()
+    options.browser_command = ...
+    options.proxy_url = ...
+    options.map_url = ...
+
+    nv = NaviCell(options)
+    
+    """
+    def __init__(self):
+        """ Instantiate an NaviCell option wrapper. """
+
+        self.map_url = ''
+        self.proxy_url = ''
+        self.browser_command = ''
+
 class NaviCell:
+    """ NaviCell handle used to communicate with the NaviCell Web Service. """
 
     def __init__(self, options):
+        """ Instantiate a NaviCell handle.
 
+        Args:
+            :param options(curie.navicell.Options): browser_commmand, proxy_url and map_url to be used.
+
+            Notices:
+            - options.map_url has to be set. options.browser_command and options.map_url can be set (respectively)
+              to False and empty string.
+            - options can be an instance of any class as soon as browser_commmand, proxy_url and
+              map_url attributes are provided. For instance, when used with nvpy, options is actually
+              an instance of optparse.Values.
+
+        """
         self.proxy = Proxy(options.proxy_url)
 
         if options.map_url and options.browser_command:
@@ -248,7 +358,8 @@ class NaviCell:
     def _datatable_config_perform(self, module, action, datatable, what, arg1='', arg2=''):
         self._cli2srv('nv_datatable_config_perform', module, [action, datatable, what, arg1, arg2])
 
-    def get_session_id(self):
+    def getSessionId(self):
+        """ Return the session ID. """
         return self.session_id
 
     def _is_https(self):
@@ -260,6 +371,8 @@ class NaviCell:
 
 ### session management
     def launchBrowser(self):
+        """ Launchs the client browser according to options given at NaviCell instantation. """
+
         if not self._browser_launcher:
             raise Exception("no launcher configurated")
         self.session_id = self._gen_session_id() # request nv_proxy.php to get a session ID
@@ -267,12 +380,26 @@ class NaviCell:
         self._waitForReady('') # wait until navicell server is ready for further commands
 
     def listSessions(self):
+        """ Display all active NaviCell Web Service sessions.
+        Action granted according to security conditions defined in the Web Service configuration.
+        """
+
         print(self._send(self._message_id(), {'mode': 'session', 'perform': 'list'}, True), end="")
 
     def clearSessions(self):
+        """ Clear all active NaviCell Web Service sessions.
+        Action granted according to security conditions defined in the Web Service configuration.
+        """
         print(self._send(self._message_id(), {'mode': 'session', 'perform': 'clear'}, True), end="")
 
     def attachSession(self, session_id):
+        """ Attach NaviCell handle to an existing NaviCell Web Service session.
+        Action granted according to security conditions defined in the Web Service configuration.
+
+        Args:
+            :param session_id(string): session ID to which NaviCell handle must be attached
+        """
+
         if self.session_id != "1":
             raise Exception("session id already set");
         o_session_id = self.session_id
@@ -282,36 +409,67 @@ class NaviCell:
             raise Exception("session id " + session_id + " is invalid");
 
     def attachLastSession(self):
+        """ Attach NaviCell handle to the last existing NaviCell Web Service session.
+        Action granted according to security conditions defined in the Web Service configuration.
+        """
+
         session_id = self._send(self._message_id(), {'mode': 'session', 'perform': 'get', 'which' : '@@'}, True);
         self.attachSession(session_id)
 
     def attachRefererSession(self, referer):
+        """ Attach NaviCell handle to the last existing NaviCell Web Service session launched from
+        a given referer (IP client).
+        Action granted according to security conditions defined in the Web Service configuration.
+
+        Args:
+            :param referer(string): IP client address of the referer
+        """
+
         session_id = self._send(self._message_id(), {'mode': 'session', 'perform': 'get', 'which' : '@' + referer}, True);
         self.attachSession(session_id)
 
     def reset(self):
+        """ Resets the current session. NaviCell handle cannot communicate anymore with the Web Service. """
+
         self._reset_current_session()
         self.session_id = "1"
 
 ### utility data methods
     def setTrace(self, trace):
+        """ For debug only. Activates / Desactivates traces according to the trace argument. """
         self.trace = trace
 
     def makeData(self, data):
-            self.getHugoList()
-            hugo_map = self._hugo_map
+        """ Builds a string suitable for NaviCell Web Service from a python matrix of gene/sample values.
 
-            lines = data.split('\n')
-            ret = lines[0]
+        Matrix format:
+        - first line is: GENE word followed by a tab separated list of sample names,
+        - each line begins with an gene name and must be followed by a tab separated list of gene/sample values.
 
-            for line in lines:
-                arr = line.split('\t')
-                if arr[0] in hugo_map:
-                    ret += line + "\n"
-            return "@DATA\n" + ret
+        Eliminates genes not present in the NaviCell map.
+        """
+        self.getHugoList()
+        hugo_map = self._hugo_map
 
+        lines = data.split('\n')
+        ret = lines[0]
+
+        for line in lines:
+            arr = line.split('\t')
+            if arr[0] in hugo_map:
+                ret += line + "\n"
+        return "@DATA\n" + ret
 
     def makeDataFromFile(self, filename):
+        """ Builds a string suitable for NaviCell Web Service from a matrix of gene/sample values contained in a file.
+
+        Matrix format:
+        - first line is: GENE word followed by a tab separated list of sample names,
+        - each line begins with an gene name and must be followed by a tab separated list of gene/sample values.
+
+        Eliminates genes not present in the NaviCell map.
+        """
+
         with open(filename) as f:
             self.getHugoList()
             hugo_map = self._hugo_map
@@ -328,15 +486,31 @@ class NaviCell:
             return "@DATA\n" + ret
 
     def makeAnnotationData(self, data):
-            lines = data.split('\n')
-            ret = lines[0]
+        """ Builds a string suitable for NaviCell Web Service from a python sample/annotation matrix.
 
-            for line in lines:
-                arr = line.split('\t')
-                ret += line + "\n"
-            return "@DATA\n" + ret
+        Matrix format:
+        - first line is: NAME word followed by a tab separated list of annotation names.
+        - each line begins with an sample name and must be followed by a tab separated list of
+          sample/annotation values.
+
+        """
+        lines = data.split('\n')
+        ret = lines[0]
+
+        for line in lines:
+            arr = line.split('\t')
+            ret += line + "\n"
+        return "@DATA\n" + ret
 
     def makeAnnotationDataFromFile(self, filename):
+        """ Builds a string suitable for NaviCell Web Service from a python sample/annotation matrix contained in a file.
+
+        Matrix format:
+        - first line is: NAME word followed by a tab separated list of annotation names.
+        - each line begins with an sample name and must be followed by a tab separated list of
+          sample/annotation values.
+
+        """
         with open(filename) as f:
 
             ret = ''
@@ -350,39 +524,144 @@ class NaviCell:
             return "@DATA\n" + ret
 
 ### datatable data: methods do not depend on module
-    def importDatatables(self, datatable_url_or_data, datatable_name, datatable_type, params={}):
-        self._cli2srv('nv_import_datatables', '', [datatable_type, datatable_name, '', datatable_url_or_data, params])
+    def importDatatables(self, datatable_url_or_data, datatable_name, datatable_biotype, params={}):
+        """ Import one or several datatables.
+
+        Args:
+            :param datatable_url_or_data (string): datatable(s) to be imported:
+             URL or data returned from makeData or makeDataFromFile expected.
+            :param datatable_name (string): name of the datatable that will appear in the NaviCell session.
+            :param datatable_biotype (string): biotype of the datatable file.
+            :param params (map): opening hints.
+        """
+        self._cli2srv('nv_import_datatables', '', [datatable_biotype, datatable_name, '', datatable_url_or_data, params])
 
     def sampleAnnotationImport(self, sample_annotation_url_or_data):
+        """ Import the given annotation data or URL.
+        
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param sample_annotation_url_or_data (string): sample annotation to be imported:
+             URL or data returned from makeAnnotationData or makeAnnotationDataFromFile expected.
+        """
 #        self.sampleAnnotationOpen()
         self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data])
 
     def sampleAnnotationOpen(self, module):
+        """ Open the sample annotation dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._cli2srv('nv_sample_annotation_perform', module, ['open'])
 
     def sampleAnnotationClose(self, module):
+        """ Close the sample annotation dialog.
+        Similar to a click on the 'Close' button of the sample annotation dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._cli2srv('nv_sample_annotation_perform', module, ['close'])
 
     def sampleAnnotationApply(self, module):
+        """ Apply the changes in the sample annotation dialog.
+        Similar to a click on the 'Apply' button of the sample annotation dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._cli2srv('nv_sample_annotation_perform', module, ['apply'])
 
     def sampleAnnotationCancel(self, module):
+        """ Cancel the changes in the sample annotation dialog and close the window.
+        Similar to a click on the 'Cancel' button of the sample annotation dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._cli2srv('nv_sample_annotation_perform', module, ['cancel'])
 
     def sampleAnnotationSelectAnnotation(self, module, annot, select=True):
+        """ Select/unselect an annotation.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param annot (annot): annotation name
+            :param select (boolean): select annotation if True, unselect otherwise
+        """
         return self._cli2srv('nv_sample_annotation_perform', module, ['select_annotation', annot, select])
 
     def getDatatableList(self):
+        """ Return the datatables imported in the NaviCell map. """
         return self._cli2srv('nv_get_datatable_list', '', [], 'send_and_rcv')
 
     def getDatatableGeneList(self):
+        """ Return the list of genes of the imported datatables which have been found in the map. """
         return self._cli2srv('nv_get_datatable_gene_list', '', [], 'send_and_rcv')
 
     def getDatatableSampleList(self):
+        """ Return the list of samples of the imported datatables. """
         return self._cli2srv('nv_get_datatable_sample_list', '', [], 'send_and_rcv')
 
 ### entity search and select
-    def findEntities(self, module, search, hints = {}, open_bubble = False):
+    def findEntities(self, module, pattern, hints = {}, open_bubble = False):
+        """ Find and select entities in the map.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param pattern (string): search pattern.
+            :param hints (map): hint modifier. Valid keys are in, class, op, token.
+            :param open_bubble (boolean): if True open associated bubbles, otherwise don't.
+
+        For instance:
+            findEntities('', 'rbx', {'token' : 'regex', 'in': 'label,tag,annot'}, True)
+            which is equivalent to:
+            findEntities('', 'rbx /token=regex;in=label,tag,annot', True)
+
+	Complete search syntax is as follows:
+	
+	PATTERN [/MOD]
+	
+	where PATTERN is a sequence of regular expressions
+	- if regex are separated by comma, OR search is performed
+	- if regex are separated by space, AND search is performed
+	
+	where MOD is a semi-colon separated list of MOD_ITEM
+	
+	where MOD_ITEM is under the form
+	
+	in=label
+	in=tag
+	in=annot
+	in=all
+	
+	token=word
+	token=regex
+	
+	op=eq
+	op=neq
+	
+	class=all
+	class=all_included
+	class=all_but_included
+	class=class_name,class_name,...
+	class!=class_name,class_name,...
+	
+	Default is: /in=label;in=tag;token=word;op=eq;class=all_but_included
+	
+	Examples:
+	rbx
+	xp rbx
+	xp,rbx
+	xp rbx /in=label
+	xp rbx /in=label;class=protein
+	xp rbx /class=protein,gene
+	xp rbx /class!=protein,gene
+	xp rbx /op=neq;in=label;class=protein,gene
+	xp rxb /token=regex;in=all
+
+        """
         if hints:
             mod_list = []
             for hint in ["in", "class", "op", "token"]:
@@ -394,13 +673,24 @@ class NaviCell:
                     if ind > 0:
                         mod += ";"
                     mod += mod_list[ind]
-                search += " " + mod
-        return self._cli2srv('nv_find_entities', module, [search, open_bubble])
+                pattern += " " + mod
+        return self._cli2srv('nv_find_entities', module, [pattern, open_bubble])
 
     def uncheckAllEntities(self, module):
+        """ Unselect all entities in the map.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._cli2srv('nv_uncheck_all_entities', module, [])
 
     def selectEntity(self, module, entity_name):
+        """ Select a given entity.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param entity_name (string): name of the entity to be selected
+        """
         return self._cli2srv('nv_find_entities', module, [entity_name])
 
 ### navigation
@@ -416,235 +706,712 @@ class NaviCell:
         self._cli2srv('nv_set_zoom', module, [zoom])
 
     def setCenter(self, module, where, lng=0, lat=0):
+        """ Set the center of the map.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param where(string): the location of center, valid values are:
+              MAP_CENTER
+              MAP_NORTH
+              MAP_WEST
+              MAP_EAST
+              MAP_SOUTH
+              MAP_NORTH_WEST
+              MAP_NORTH_EAST
+              MAP_SOUTH_WEST
+              MAP_SOUTH_EAST
+              RELATIVE
+              ABSOLUTE
+           :param lng(double): longitude if center is set to RELATIVE or ABSOLUTE, ignored otherwise
+           :param lat(double): latitude if center is set to RELATIVE or ABSOLUTE, ignored otherwise
+
+        """
         self._cli2srv('nv_set_center', module, [where, lng, lat])
 
 ### notice dialog
     def noticeMessage(self, module, header, msg, position='left top', width=0, height=0):
+        """ Open the notice dialog and display a message.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param header (string): message header (title)
+            :param msg (string): html message
+            :param position (string): (optional) CSS position of the dialog, for instance 'left top', 'right top' etc.
+            :param width (int): (optional) width in pixel
+            :param height (int): (optional) height in pixel
+        """
         self._notice_perform(module, 'set_message_and_open', header, msg, position, width, height)
 
     def noticeOpen(self, module):
+        """ Open the notice dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._notice_perform(module, 'open')
 
     def noticeClose(self, module):
+        """ Close the notice dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._notice_perform(module, 'close')
 
 ### mydata dialog
     def myDataOpen(self, module):
+        """ Open the MyData dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._mydata_perform(module, 'open')
 
     def myDataClose(self, module):
+        """ Close the MyData dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._mydata_perform(module, 'close')
 
-    def myDataSelectDatatables(self, module):
-        self._mydata_perform(module, 'select_datatables')
+    def myDataSelectDatatableTab(self, module):
+        """ Select the 'Datatable' Tab in the MyData dialog.
 
-    def myDataSelectSamples(self, module):
-        self._mydata_perform(module, 'select_samples')
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
+        self._mydata_perform(module, 'select_datatables') # TBD: change select_datatables to select_datatable_tab here and in nv_api.js
 
-    def myDataSelectGenes(self, module):
-        self._mydata_perform(module, 'select_genes')
+    def myDataSelectSampleTab(self, module):
+        """ Select the 'Sample' Tab in the MyData dialog.
 
-    def myDataSelectGroups(self, module):
-        self._mydata_perform(module, 'select_groups')
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
+        self._mydata_perform(module, 'select_samples') # TBD: ditto
 
-    def myDataSelectModules(self, module):
-        self._mydata_perform(module, 'select_modules')
+    def myDataSelectGeneTab(self, module):
+        """ Select the 'Gene' Tab in the MyData dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
+        self._mydata_perform(module, 'select_genes') # TBD: ditto
+
+    def myDataSelectGroupTab(self, module):
+        """ Select the 'Group' Tab in the MyData dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
+        self._mydata_perform(module, 'select_groups') # TBD: ditto
+
+    def myDataSelectModuleTab(self, module):
+        """ Select the 'Module' Tab in the MyData dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
+        self._mydata_perform(module, 'select_modules') # TBD: ditto
 
 ### heatmap editor
     def heatmapEditorOpen(self, module):
+        """ Open the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'open')
 
     def heatmapEditorClose(self, module):
+        """ Close the heatmap editor.
+        Similar to a click on the 'Close' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'close')
 
     def heatmapEditorApply(self, module):
+        """ Apply the changes in the heatmap editor.
+        Similar to a click on the 'Apply' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'apply')
 
     def heatmapEditorApplyAndClose(self, module):
+        """ Apply the changes in the heatmap editor and close the window.
+        Similar to a click on the 'OK' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'apply_and_close')
 
     def heatmapEditorCancel(self, module):
+        """ Cancel the changes in the heatmap editor and close the window.
+        Similar to a click on the 'Cancel' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'cancel')
 
     def heatmapEditorClearSamples(self, module):
+        """ Clear all samples and groups in the heatmap editor.
+        Similar to a click on the 'Clear Samples' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'clear_samples')
 
     def heatmapEditorAllSamples(self, module):
+        """ Select all samples in the heatmap editor.
+        Similar to a click on the 'All Samples' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'all_samples')
 
     def heatmapEditorAllGroups(self, module):
+        """ Select all groups in the heatmap editor.
+        Similar to a click on the 'All Groups' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'all_groups')
 
     def heatmapEditorFromBarplot(self, module):
+        """ Report samples and groups selected in the barplot editor to the heatmap editor.
+        Similar to a click on the 'From Barplot' button of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._heatmap_editor_perform(module, 'from_barplot')
 
     def heatmapEditorSetTransparency(self, module, value):
+        """ Set the transparency in the heatmap editor.
+        Similar to a change of the transparency slider of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param value (double): transparency value.
+        """
         self._heatmap_editor_perform(module, 'set_transparency', value)
 
     def heatmapEditorSelectSample(self, module, where, sample):
+        """ Select a sample in the heatmap editor.
+        Similar to a selection in a 'Select a sample' list of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param where (int): 0-based sample position in the heatmap.
+            :param sample (string): sample name to be selected.
+        """
         self._heatmap_editor_perform(module, 'select_sample', where, sample)
 
     def heatmapEditorSelectDatatable(self, module, where, datatable):
+        """ Select a datatable in the heatmap editor.
+        Similar to a selection in a 'Select a Datatable' list of the heatmap editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param where (int): 0-based datatable position in the heatmap.
+            :param datatable (string): datatable name to be selected.
+        """
         self._heatmap_editor_perform(module, 'select_datatable', where, datatable)
 
 ### barplot editor
     def barplotEditorOpen(self, module):
+        """ Open the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'open')
 
     def barplotEditorClose(self, module):
+        """ Close the barplot editor.
+        Similar to a click on the 'Close' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'close')
 
     def barplotEditorApply(self, module):
+        """ Apply the changes in the barplot editor.
+        Similar to a click on the 'Apply' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'apply')
 
     def barplotEditorApplyAndClose(self, module):
+        """ Apply the changes in the barplot editor and close the window.
+        Similar to a click on the 'OK' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'apply_and_close')
 
     def barplotEditorCancel(self, module):
+        """ Cancel the changes in the barplot editor and close the window.
+        Similar to a click on the 'Cancel' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'cancel')
 
     def barplotEditorClearSamples(self, module):
+        """ Clear all samples and groups in the barplot editor.
+        Similar to a click on the 'Clear Samples' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'clear_samples')
 
     def barplotEditorAllSamples(self, module):
+        """ Select all samples in the barplot editor.
+        Similar to a click on the 'All Samples' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'all_samples')
 
     def barplotEditorAllGroups(self, module):
+        """ Select all groups in the barplot editor.
+        Similar to a click on the 'All Groups' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'all_groups')
 
     def barplotEditorFromHeatmap(self, module):
+        """ Report samples and groups selected in the heatmap editor to the barplot editor.
+        Similar to a click on the 'From Heatmap' button of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._barplot_editor_perform(module, 'from_heatmap')
 
     def barplotEditorSetTransparency(self, module, value):
+        """ Set the transparency in the barplot editor.
+        Similar to a change of the transparency slider of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param value (double): transparency value.
+        """
         self._barplot_editor_perform(module, 'set_transparency', value)
 
     def barplotEditorSelectSample(self, module, where, sample):
+        """ Select a sample in the barplot editor.
+        Similar to a selection in a 'Select a sample' list of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param where (int): 0-based sample position in the barplot.
+            :param sample (string): sample name to be selected.
+        """
         self._barplot_editor_perform(module, 'select_sample', where, sample)
 
     def barplotEditorSelectDatatable(self, module, datatable):
+        """ Select the datatable in the barplot editor.
+        Similar to a selection in the 'Select a datatable' list of the barplot editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name to be selected.
+        """
         self._barplot_editor_perform(module, 'select_datatable', datatable)
 
 ### glyph editor
     def glyphEditorOpen(self, module, num):
+        """ Open the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+        """
         self._glyph_editor_perform(module, 'open', num)
 
     def glyphEditorClose(self, module, num):
+        """ Close the glyph editor.
+        Similar to a click on the 'Close' button of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+        """
         self._glyph_editor_perform(module, 'close', num)
 
     def glyphEditorApply(self, module, num):
+        """ Apply the changes in the glyph editor.
+        Similar to a click on the 'Apply' button of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+        """
         self._glyph_editor_perform(module, 'apply', num)
 
     def glyphEditorApplyAndClose(self, module, num):
+        """ Apply the changes in the glyph editor and close the window.
+        Similar to a click on the 'OK' button of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+        """
         self._glyph_editor_perform(module, 'apply_and_close', num)
 
     def glyphEditorCancel(self, module, num):
+        """ Cancel the changes in the glyph editor and close the window.
+        Similar to a click on the 'Cancel' button of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+        """
         self._glyph_editor_perform(module, 'cancel', num)
 
     def glyphEditorSetTransparency(self, module, num, value):
+        """ Set the transparency in the glyph editor.
+        Similar to a change of the transparency slider of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+            :param value (double): transparency value.
+        """
         self._glyph_editor_perform(module, 'set_transparency', num, value)
 
     def glyphEditorSelectSample(self, module, num, sample):
+        """ Select a sample in the glyph editor.
+        Similar to a selection in the 'Select a sample' list of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+            :param sample (string): sample name to be selected.
+        """
         self._glyph_editor_perform(module, 'select_sample', num, sample)
 
     def glyphEditorSelectShapeDatatable(self, module, num, datatable):
+        """ Select the shape datatable (eg. used to select a shape) in the glyph editor.
+        Similar to a selection in the 'Select a datatable' Shape list of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+            :param datatable (string): datatable name to be selected.
+        """
         self._glyph_editor_perform(module, 'select_datatable_shape', num, datatable)
 
     def glyphEditorSelectColorDatatable(self, module, num, datatable):
+        """ Select the color datatable (eg. used to select a color) in the glyph editor.
+        Similar to a selection in the 'Select a datatable' Color list of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+            :param datatable (string): datatable name to be selected.
+        """
         self._glyph_editor_perform(module, 'select_datatable_color', num, datatable)
 
     def glyphEditorSelectSizeDatatable(self, module, num, datatable):
+        """ Select the size datatable (eg. used to select a size) in the glyph editor.
+        Similar to a selection in the 'Select a datatable' Size list of the glyph editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph editor number; valid values are 1 to 5.
+            :param datatable (string): datatable name to be selected.
+        """
         self._glyph_editor_perform(module, 'select_datatable_size', num, datatable)
 
 ### map staining editor
     def mapStainingEditorOpen(self, module):
+        """ Open the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._map_staining_editor_perform(module, 'open')
 
     def mapStainingEditorClose(self, module):
+        """ Close the map staining editor.
+        Similar to a click on the 'Close' button of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._map_staining_editor_perform(module, 'close')
 
     def mapStainingEditorApply(self, module):
+        """ Apply the changes in the map staining editor.
+        Similar to a click on the 'Apply' button of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._map_staining_editor_perform(module, 'apply')
 
     def mapStainingEditorApplyAndClose(self, module):
+        """ Apply the changes in the map staining editor and close the window.
+        Similar to a click on the 'OK' button of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._map_staining_editor_perform(module, 'apply_and_close')
 
     def mapStainingEditorCancel(self, module):
+        """ Cancel the changes in the map staining editor and close the window.
+        Similar to a click on the 'Cancel' button of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._map_staining_editor_perform(module, 'cancel')
 
     def mapStainingEditorSetTransparency(self, module, value):
+        """ Set the transparency in the map staining editor.
+        Similar to a change of the transparency slider of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param value (double): transparency value.
+        """
         self._map_staining_editor_perform(module, 'set_transparency', value)
 
     def mapStainingEditorSelectSample(self, module, sample):
+        """ Select the sample in the map staining editor.
+        Similar to a selection in the 'Select a sample' list of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param sample (string): sample name to be selected.
+        """
         self._map_staining_editor_perform(module, 'select_sample', sample)
 
     def mapStainingEditorSelectDatatable(self, module, datatable):
+        """ Select the datatable used for colors in the map staining editor.
+        Similar to a selection in the 'Select a datatable' Color list of the map staining editor.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name to be selected.
+        """
         self._map_staining_editor_perform(module, 'select_datatable', datatable)
 
 ### drawing configuration
     def drawingConfigOpen(self, module):
+        """ Open the drawing configuration dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'open')
 
     def drawingConfigClose(self, module):
+        """ Close the drawing configuration dialog.
+        Similar to a click on the 'Close' button of the drawing configuration dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'close')
 
     def drawingConfigApply(self, module):
+        """ Apply the changes in the drawing configuration dialog.
+        Similar to a click on the 'Apply' button of the drawing configuration dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'apply')
 
     def drawingConfigApplyAndClose(self, module):
+        """ Apply the changes in the drawing configuration dialog and close the window.
+        Similar to a click on the 'OK' button of the drawing configuration dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'apply_and_close')
 
     def drawingConfigCancel(self, module):
+        """ Cancel the changes in the drawing configuration dialog and close the window.
+        Similar to a click on the 'Cancel' button of the drawing configuration dialog.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'cancel')
 
     def drawingConfigSelectHeatmap(self, module, select=True):
+        """ Select/unselect a heatmap chart.
+        Similar to:
+        - a selection/unselection of the 'Display' checkbox in the 'Chart' section, and:
+         - a 'Heatmap' selection/unselection in the 'Chart Type' list
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param select (boolean): select Heatmap if True, unselect otherwise 
+        """
         self._drawing_config_perform(module, 'select_heatmap', select)
 
     def drawingConfigSelectBarplot(self, module, select=True):
+        """ Select/unselect a barplot chart.
+        Similar to:
+        - a selection/unselection of the 'Display' checkbox in the 'Chart' section, and:
+        - a 'Barplot' selection/unselection in the 'Chart Type' list
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param select (boolean): select Barplot if True, unselect otherwise 
+        """
         self._drawing_config_perform(module, 'select_barplot', select)
 
     def drawingConfigSelectGlyph(self, module, num, select=True):
+        """ Select/unselect a given glyph.
+        Similar to a selection/unselection of one of the 'Display' checkbox in the 'Glyphs' section
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param num (int): glyph number; valid values are 1 to 5.
+            :param select (boolean): select the Glyph if True, unselect otherwise
+        """
         self._drawing_config_perform(module, 'select_glyph', num, select)
 
     def drawingConfigSelectMapStaining(self, module, select=True):
+        """ Select/unselect the map staining.
+        Similar to a selection/unselection of the 'Display' checkbox in the 'Map Staining' section
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param select (boolean): select Map Staining if True, unselect otherwise
+        """
         self._drawing_config_perform(module, 'select_map_staining', select)
 
     def drawingConfigDisplayAllGenes(self, module):
+        """ Will display DLOs for all genes.
+        Similar to the selection of the 'All Genes' checkbox in the 'Display DLOs' section
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'display_all_genes')
 
     def drawingConfigDisplaySelectedGenes(self, module):
+        """ Will display DLOs for selected genes only.
+        Similar to the selection of the 'Selected Genes' checkbox in the 'Display DLOs' section.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         self._drawing_config_perform(module, 'display_selected_genes')
 
 ### datatable config
-    def datatableConfigOpen(self, module, datatable, what):
-        self._datatable_config_perform(module, 'open', datatable, what)
+    # EV: 2014-12-29: disconnected for now
 
-    def datatableConfigClose(self, module, datatable, what):
-        self._datatable_config_perform(module, 'close', datatable, what)
+##    def datatableConfigOpen(self, module, datatable, what):
+##        self._datatable_config_perform(module, 'open', datatable, what)
 
-    def datatableConfigApply(self, module, datatable, what):
-        self._datatable_config_perform(module, 'apply', datatable, what)
+##    def datatableConfigClose(self, module, datatable, what):
+##        self._datatable_config_perform(module, 'close', datatable, what)
 
-    def datatableConfigCancel(self, module, datatable, what):
-        self._datatable_config_perform(module, 'cancel', datatable, what)
+##    def datatableConfigApply(self, module, datatable, what):
+##        self._datatable_config_perform(module, 'apply', datatable, what)
+
+##    def datatableConfigCancel(self, module, datatable, what):
+##        self._datatable_config_perform(module, 'cancel', datatable, what)
 
 ###
-    def prepareImportDialog(self, module, filename, name, filetype):
-        self._cli2srv('nv_prepare_import_dialog', module, [filename, name, filetype])
+    def prepareImportDialog(self, module, filename, name, biotype):
+        """ Fill the import dialog fields.
+        Data (datatable, gene list etc.) can then be imported by a user click on the Import button:
+        the import itself cannot be trigged from javascript for security reasons, that's why a user
+        action is required.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param filename (string): path of the data file
+            :param name (string): name of the data to be imported
+            :param biotype (string): biotype of the data file.
+        """
+        self._cli2srv('nv_prepare_import_dialog', module, [filename, name, biotype])
 
     def getCommandHistory(self, module):
+        """ Get the command history of the NaviCell Web Service.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+        """
         return self._cli2srv('nv_get_command_history', module, [], 'send_and_rcv')
 
     def executeCommands(self, module, commands):
+        """ Execute a set of commands encoded in the NaviCell WS protocol. """
         return self._send(self._message_id(), {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': commands});
 
 ### get methods
     def getModuleList(self):
+        """ Return the module list of the NaviCell map.
+        
+        For instance, the module list returned from the CellCycle map:
+        [{'name': 'E2F1', 'id': 'E2F1'},
+        {'name': 'P21CIP', 'id': 'P21CIP'},
+        {'name': 'CYCLIND', 'id': 'CYCLIND'},
+        {'name': 'CYCLINE', 'id': 'CYCLINE'},
+        {'name': 'E2F4', 'id': 'E2F4'},
+        {'name': 'E2F6', 'id': 'E2F6'},
+        {'name': 'CYCLINH', 'id': 'CYCLINH'},
+        {'name': 'RB', 'id': 'RB'},
+        {'name': 'INK4', 'id': 'INK4'},
+        {'name': 'P27KIP', 'id': 'P27KIP'},
+        {'name': 'APOPTOSIS_ENTRY', 'id': 'APOPTOSIS_ENTRY'},
+        {'name': 'WEE', 'id': 'WEE'},
+        {'name': 'CDC25', 'id': 'CDC25'},
+        {'name': 'CYCLINA', 'id': 'CYCLINA'},
+        {'name': 'CYCLINC', 'id': 'CYCLINC'},
+        {'name': 'CYCLINB', 'id': 'CYCLINB'},
+        {'name': 'APC', 'id': 'APC'}]
+        """
         return self._cli2srv('nv_get_module_list', '', [], 'send_and_rcv')
 
     def getBiotypeList(self):
+        """ Return the list of biotypes understood by NaviCell Web Service.
+        
+        In the current version, the returned biotype list is as follows:
+        [{'name': 'mRNA expression data', 'subtype': 'CONTINUOUS', 'type': 'EXPRESSION'},
+        {'name': 'microRNA expression data', 'subtype': 'CONTINUOUS', 'type': 'EXPRESSION'},
+        {'name': 'Protein expression data', 'subtype': 'CONTINUOUS', 'type': 'EXPRESSION'},
+        {'name': 'Discrete Copy number data', 'subtype': 'ORDERED_DISCRETE', 'type': 'COPYNUMBER'},
+        {'name': 'Continuous copy number data', 'subtype': 'CONTINUOUS', 'type': 'COPYNUMBER'},
+        {'name': 'Mutation data', 'subtype': 'UNORDERED_DISCRETE', 'type': 'MUTATION'},
+        {'name': 'Gene list', 'subtype': 'SET', 'type': 'GENELIST'}]
+        """
         return self._cli2srv('nv_get_biotype_list', '', [], 'send_and_rcv')
 
     def getHugoList(self):
+        """ Return the list of HUGOs (gene names) of the NaviCell map.
+        """
         module = ''
         if not self._hugo_list:
             self._hugo_list = self._cli2srv('nv_get_hugo_list', '', [], 'send_and_rcv')
@@ -656,10 +1423,18 @@ class NaviCell:
         return self._hugo_list
 
     def openModule(self, module2open):
+        """ Open a module.
+        This method works only under some conditions of the security configuration of the client browser (popup configuration).
+
+        Args:
+            :param module2open (string): module to be opened
+        """
         self._cli2srv('nv_open_module', '', [module2open, []])
 
 ###
     def examples(self):
+        """ Display some examples. """
+
         protocol = self.proxy.getProtocol()
         if self.proxy.isHttps():
             datalist_url = "datatable_list_url_secure.txt"

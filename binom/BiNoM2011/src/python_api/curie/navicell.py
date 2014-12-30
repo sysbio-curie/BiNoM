@@ -32,7 +32,7 @@ As a module, for instance:
 from curie.navicell import NaviCell, Options
 
 options = Options()
-options.browser_command = 'open -a Safari' # on MacOS
+options.browser_command = 'open -a Safari %s' # on MacOS
 options.proxy_url = 'https://navicell.curie.fr/cgi-bin/nv_proxy.php'
 options.map_url = 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
 
@@ -53,7 +53,7 @@ or:
 python3 -i nvpy ...
 
 To make things easier, the browser command, proxy URL and map URL can be put in environment variables as follows:
-export NV_BROWSER_COMMAND='open -a Safari' # on MacOS
+export NV_BROWSER_COMMAND='open -a Safari %s' # on MacOS
 export NV_PROXY_URL='https://navicell.curie.fr/cgi-bin/nv_proxy.php'
 export NV_MAP_URL='https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
 
@@ -81,6 +81,7 @@ import subprocess, sys, os
 import json
 import http.client, urllib.request, urllib.parse, urllib.error
 import datetime, time
+import webbrowser
 
 _NV_PACKSIZE = 500000
 
@@ -158,14 +159,15 @@ class BrowserLauncher:
             :param map_url (string): the URL of the NaviCell map
         """
 
-        if not browser_command:
-            raise Exception("browser command is not set")
+#        if not browser_command:
+#            raise Exception("browser command is not set")
         if not map_url:
             raise Exception("map url is not set")
         self.map_url = map_url
-        self.cmd = []
-        for item in browser_command.split(" "):
-            self.cmd.append(item)
+        self.browser_command = browser_command
+#        self.cmd = []
+#        for item in browser_command.split(" "):
+#            self.cmd.append(item)
 
     def launch(self, session_id):
         """ Launchs the browser with the given session ID.
@@ -180,8 +182,15 @@ class BrowserLauncher:
         else:
             suffix = ''
 
-        self.cmd.append(self.map_url + suffix + "id=" + session_id)
-        subprocess.check_call(self.cmd)
+        if self.browser_command:
+            controller = webbrowser.get(self.browser_command)
+        else:
+            controller = webbrowser
+
+        controller.open(self.map_url + suffix + "id=" + session_id)
+
+        #self.cmd.append(self.map_url + suffix + "id=" + session_id)
+        #subprocess.check_call(self.self)
 
 class Options:
     """ Option wrapper to be given to NaviCell constructor.
@@ -220,7 +229,7 @@ class NaviCell:
         """
         self.proxy = Proxy(options.proxy_url)
 
-        if options.map_url and options.browser_command:
+        if options.map_url: #and options.browser_command:
             self._check_urls(options.proxy_url, options.map_url)
             self._browser_launcher = BrowserLauncher(options.browser_command, options.map_url)
 

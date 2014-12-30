@@ -29,33 +29,40 @@ This module implements the Python Binding for NaviCell.
 It can be used as a module or by using the "nvpy" python companion script.
 
 As a module, for instance:
+
 from curie.navicell import NaviCell, Options
 
+# 1. Instantiate and set Options:
 options = Options()
-options.browser_command = 'open -a Safari %s' # on MacOS
 options.proxy_url = 'https://navicell.curie.fr/cgi-bin/nv_proxy.php'
 options.map_url = 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
 
-# instantiate a NaviCell client handle
+# If you want to specify a particular Web Browser, you have to set options.browser_command, otherwise the default browser will be used.
+# For instance, to use firefox on MacOS:
+options.browser_command = 'open -a Firefox %s'
+# To use google chrome on Linux:
+options.browser_command = '/usr/bin/google-chrome %s'
+
+# 2. Instantiate a NaviCell client handle
 nv = NaviCell(options)
 
-# launch browser
+# 3. Launch browser
 nv.launchBrowser()
 
-# command interaction examples
+# 4. Command interaction examples:
 nv.setZoom('', 10)
 nv.getHugoList()
 nv.getBiotypeList()
 
 At the command line, using nvpy:
-nvpy --browser-command 'open -a Safari' --proxy-url 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' --map-url 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php' --launch-browser
+nvpy --browser-command 'open -a Firefox %s' --proxy-url 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' --map-url 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php' --launch-browser
 or:
 python3 -i nvpy ...
 
-To make things easier, the browser command, proxy URL and map URL can be put in environment variables as follows:
-export NV_BROWSER_COMMAND='open -a Safari %s' # on MacOS
+To make things easier, the proxy URL, the map URL and the browser command can be put in environment variables as follows:
 export NV_PROXY_URL='https://navicell.curie.fr/cgi-bin/nv_proxy.php'
 export NV_MAP_URL='https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
+export NV_BROWSER_COMMAND='open -a Firefox %s' # on MacOS
 
 Then:
 nvpy --launch-browser

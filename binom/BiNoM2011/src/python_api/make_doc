@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# make_doc
+#
+# Eric Viara, 30 December 2014
+# Institut Curie
+
+cd $(dirname $0)
+../../scripts/curie_pydoc3 curie.navicell

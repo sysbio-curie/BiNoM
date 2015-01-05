@@ -1588,9 +1588,9 @@ Datatable.prototype.showDisplayConfig_perform = function(doc, what) {
 					},
 					"OK": function() {
 						if (displayContinuousConfig) {
-							nv_perform("nv_display_continuous_config_perform", doc.win, "close", datatable_id, what);
+							nv_perform("nv_display_continuous_config_perform", doc.win, "apply_and_close", datatable_id, what);
 						} else if (displayUnorderedDiscreteConfig) {
-							nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "close", datatable_id, what);
+							nv_perform("nv_display_unordered_discrete_config_perform", doc.win, "apply_and_close", datatable_id, what);
 						}
 					}
 				}

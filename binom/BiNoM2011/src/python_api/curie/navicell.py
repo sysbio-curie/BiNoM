@@ -78,10 +78,9 @@ Type 'nv.examples()' to get examples
 >>> nv.setZoom('', 10)
 >>> nv.getHugoList()
 
-
 """
 
-__version__ = '1.2'
+__version__ = '1.3'
 __author__ = ['Eric Viara <eric.viara@curie.fr>', 'Eric Bonnet <eric.bonnet@curie.fr>']
 
 import subprocess, sys, os
@@ -91,6 +90,8 @@ import datetime, time
 import webbrowser
 
 _NV_PACKSIZE = 500000
+_NV_CONTINUOUS = 'CONTINUOUS'
+_NV_UNORDERED_DISCRETE = 'UNORDERED_DISCRETE'
 
 class Proxy:
     """
@@ -219,6 +220,35 @@ class Options:
 
 class NaviCell:
     """ NaviCell handle used to communicate with the NaviCell Web Service. """
+
+    TABNAME_SAMPLES = 'sample'
+    TABNAME_GROUPS = 'group'
+
+    CONFIG_COLOR = 'color'
+    CONFIG_SHAPE = 'shape'
+    CONFIG_SIZE = 'size'
+    CONFIG_COLOR_SIZE = 'color_size'
+
+    METHOD_CONTINUOUS_AVERAGE = 1
+    METHOD_CONTINUOUS_MEDIAN = 2
+    METHOD_CONTINUOUS_MINVAL = 3
+    METHOD_CONTINUOUS_MAXVAL = 4
+    METHOD_CONTINUOUS_ABS_AVERAGE = 5
+    METHOD_CONTINUOUS_ABS_MINVAL = 6
+    METHOD_CONTINUOUS_ABS_MAXVAL = 7
+
+    COND_DISCRETE_IGNORE = 0
+    COND_DISCRETE_NO_ELEMENT = 1
+    COND_DISCRETE_AT_LEAST_ONE_ELEMENT = 2
+    COND_DISCRETE_ALL_ELEMENTS = 3
+    COND_DISCRETE_VALUE = 4
+
+    SHAPE_TRIANGLE = 0
+    SHAPE_SQUARE = 1
+    SHAPE_RECTANGLE = 2
+    SHAPE_DIAMOND = 3
+    SHAPE_HEXAGON = 4
+    SHAPE_CIRCLE = 5
 
     def __init__(self, options):
         """ Instantiate a NaviCell handle.
@@ -371,8 +401,14 @@ class NaviCell:
     def _map_staining_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_map_staining_editor_perform', module, [action, arg1, arg2, arg3])
 
-    def _datatable_config_perform(self, module, action, datatable, what, arg1='', arg2=''):
-        self._cli2srv('nv_datatable_config_perform', module, [action, datatable, what, arg1, arg2])
+#    def _datatable_config_perform(self, module, action, datatable, config_type, arg1='', arg2=''):
+#        self._cli2srv('nv_datatable_config_perform', module, [action, datatable, config_type, arg1, arg2])
+
+    def _display_continuous_config_perform(self, module, action, datatable, config_type, arg1='', arg2='', arg3='', arg4='', arg5=''):
+        self._cli2srv('nv_display_continuous_config_perform', module, [action, datatable, config_type, arg1, arg2, arg3, arg4, arg5])
+
+    def _display_unordered_discrete_config_perform(self, module, action, datatable, config_type, arg1='', arg2='', arg3='', arg4='', arg5=''):
+        self._cli2srv('nv_display_unordered_discrete_config_perform', module, [action, datatable, config_type, arg1, arg2, arg3, arg4, arg5])
 
     def getSessionId(self):
         """ Return the session ID. """
@@ -380,6 +416,20 @@ class NaviCell:
 
     def _is_https(self):
         return self.protocol == 'https'
+
+    def _get_datatable_config_type(self, datatable):
+        biotype = None
+        for dt in self.getDatatableList():
+            if dt[0] == datatable:
+                biotype = dt[1]
+                break
+
+        if biotype:
+            for bt in self.getBiotypeList():
+                if biotype == bt['name']:
+                    return bt['subtype']
+
+        return None
 
     #
     # public API
@@ -1345,6 +1395,402 @@ class NaviCell:
         self._drawing_config_perform(module, 'display_selected_genes')
 
 ### datatable config
+
+    def datatableConfigOpen(self, module, datatable, config_type):
+        """ Open the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'open', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'open', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigClose(self, module, datatable, config_type):
+        """ Close the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'close', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'close', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigCancel(self, module, datatable, config_type):
+        """ Cancel changes and close the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'cancel', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'cancel', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigApply(self, module, datatable, config_type):
+        """ Apply changes the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'apply', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'apply', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigApplyAndClose(self, module, datatable, config_type):
+        """ Apply changes and close the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        # for now, could use apply_and_close command when deployed
+        self.datatableConfigApply(module, datatable, config_type)
+        self.datatableConfigClose(module, datatable, config_type)
+
+    def datatableConfigSetStepCount(self, module, datatable, config_type, tabname, step_count):
+        """ Set the step count of the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param step_count (int): step count
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'step_count_change', tabname, config_type, datatable, step_count)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            raise Exception("cannot set step count on datatable " + datatable + " unordered discrete configuration")
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetSampleAbsoluteValue(self, module, datatable, config_type, checked):
+        """ Set the sample absolute value mode of the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param checked (boolean): set/unset sample absolute value mode
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_sample_absval', config_type, datatable, checked)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            raise Exception("cannot set sample absolute value on datatable " + datatable + " unordered discrete configuration")
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetSampleMethod(self, module, datatable, config_type, method):
+        """ Set the sample method of the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param method (int): method name; must be NaviCell.METHOD_CONTINUOUS_AVERAGE, NaviCell.METHOD_CONTINUOUS_MEDIAN,
+             NaviCell.METHOD_CONTINUOUS_MINVAL, NaviCell.METHOD_CONTINUOUS_MAXVAL, NaviCell.METHOD_CONTINUOUS_ABS_AVERAGE,
+             NaviCell.METHOD_CONTINUOUS_ABS_MINVAL or NaviCell.METHOD_CONTINUOUS_ABS_MAXVAL
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_sample_method', config_type, datatable, method)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            raise Exception("cannot set sample method on datatable " + datatable + " unordered discrete configuration")
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetGroupMethod(self, module, datatable, config_type, method):
+        """ Set the group method of the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param method (int): method name; must be NaviCell.METHOD_CONTINUOUS_AVERAGE, NaviCell.METHOD_CONTINUOUS_MEDIAN,
+             NaviCell.METHOD_CONTINUOUS_MINVAL, NaviCell.METHOD_CONTINUOUS_MAXVAL, NaviCell.METHOD_CONTINUOUS_ABS_AVERAGE,
+             NaviCell.METHOD_CONTINUOUS_ABS_MINVAL or NaviCell.METHOD_CONTINUOUS_ABS_MAXVAL
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_group_method', config_type, datatable, method)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            raise Exception("cannot set group method on datatable " + datatable + " unordered discrete configuration")
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetColorAt(self, module, datatable, config_type, tabname, idx, color):
+        """
+        Set color at a specified index in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param idx (int): color index
+            :param color (string): hexa RGB color
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_input_color', datatable, config_type, tabname, idx, color)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_discrete_color', datatable, config_type, tabname, idx, color)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetValueAt(self, module, datatable, config_type, tabname, idx, value):
+        """
+        Set value at a specified index in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param idx (int): value index
+            :param value (double): value
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_input_value', datatable, config_type, tabname, idx, value)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_discrete_value', datatable, config_type, tabname, idx, value)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetSizeAt(self, module, datatable, config_type, tabname, idx, size):
+        """
+        Set size at a specified index in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param idx (int): size index
+            :param size (int): size value
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_select_size', datatable, config_type, tabname, idx, size)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_discrete_size', datatable, config_type, tabname, idx, size)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetShapeAt(self, module, datatable, config_type, tabname, idx, shape):
+        """
+        Set shape at a specified index in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param idx (int): shape index
+            :param shape (int): shape; must be NaviCell.SHAPE_TRIANGLE, NaviCell.SHAPE_SQUARE,
+             NaviCell.SHAPE_RECTANGLE, NaviCell.SHAPE_DIAMOND, NaviCell.SHAPE_HEXAGON or
+             NaviCell.SHAPE_CIRCLE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'set_select_shape', datatable, config_type, tabname, idx, shape)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_discrete_shape', datatable, config_type, tabname, idx, shape)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSetCondAt(self, module, datatable, config_type, tabname, idx, cond):
+        """
+        Set condition at a specified index in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param tabname (string): tab name in the configuration dialog;
+             must be NaviCell.TABNAME_SAMPLES or NaviCell.TABNAME_GROUPS
+            :param idx (int): condition index
+            :param shape (int): condition; must be NaviCell.COND_DISCRETE_IGNORE,
+             NaviCell.COND_DISCRETE_NO_ELEMENT, NaviCell.COND_DISCRETE_AT_LEAST_ONE_ELEMENT,
+             NaviCell.COND_DISCRETE_ALL_ELEMENTS or NaviCell.COND_DISCRETE_VALUE
+
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            raise Exception("cannot set group method on datatable " + datatable + " continuous configuration")
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_discrete_cond', datatable, config_type, tabname, idx, cond)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    # note: work only on color config, so maybe that 'config_type' argument is useless...
+
+    def datatableConfigSetGroupAdvancedConfiguration(self, module, datatable, config_type, checked):
+        """
+        Set group advanced configuration in the datatable configuration dialog for the given type.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+            :param checked (boolean): set/unset advanced configuration
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            raise Exception("cannot set group advanced configuration on datatable " + datatable + " continuous configuration")
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'set_advanced_configuration', datatable, config_type, checked)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSwitchSampleTab(self, module, datatable, config_type):
+        """
+        Switch the datatable configuration dialog for the given type to the Samples tab.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'switch_sample_tab', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'switch_sample_tab', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
+    def datatableConfigSwitchGroupTab(self, module, datatable, config_type):
+        """
+        Switch the datatable configuration dialog for the given type to the Groups tab.
+
+        Args:
+            :param module (string): module on which to apply the command; empty string for current map.
+            :param datatable (string): datatable name
+            :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
+             NaviCell.CONFIG_SHAPE, NaviCell.CONFIG_SIZE or NaviCell.CONFIG_COLOR_SIZE
+        """
+        subtype = self._get_datatable_config_type(datatable)
+        if not subtype:
+            raise Exception("unknown datatable " + datatable)
+
+        if subtype == _NV_CONTINUOUS:
+            return self._display_continuous_config_perform(module, 'switch_group_tab', datatable, config_type)
+
+        if subtype == _NV_UNORDERED_DISCRETE:
+            return self._display_unordered_discrete_config_perform(module, 'switch_group_tab', datatable, config_type)
+
+        raise Exception("unknown datatable subtype " + datatable + " " + subtype)
+
     # EV: 2014-12-29: disconnected for now
 
 ##    def datatableConfigOpen(self, module, datatable, what):

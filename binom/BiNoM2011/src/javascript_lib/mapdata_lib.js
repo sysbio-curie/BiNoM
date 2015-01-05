@@ -167,7 +167,7 @@ if (!Number.MIN_NUMBER) {
 }
 
 var INPUT_SEPS = ["\t", ";", ",", " "];
-var COLOR_SIZE_CONFIG = "color_size";
+ovar COLOR_SIZE_CONFIG = "color_size";
 var EDITING_CONFIGURATION = "configuration not applied...";
 var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[gene&nbsp;list]</span>";
 var GENE_SET = "[GENE]";
@@ -2090,10 +2090,10 @@ DisplayContinuousConfig.prototype = {
 		var id = this.datatable.getCanonName();
 		if (type == 'group') {
 			method = this.group_method[config];
-			str = "<select id='group_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", \"" + id + "\")'>\n";
+			str = "<select id='group_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setGroupMethod(\"" + config + "\", \"" + id + "\", \"" + method + "\")'>\n";
 		} else if (type == 'sample') {
 			method = this.sample_method[config];
-			str = "<select id='sample_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setSampleMethod(\"" + config + "\", \"" + id + "\")'>\n";
+			str = "<select id='sample_method_" + config + '_' + id + "' style='font-size: 70%' onchange='DisplayContinuousConfig.setSampleMethod(\"" + config + "\", \"" + id + "\", \"" + method + "\")'>\n";
 		}
 		selected = (method == Group.CONTINUOUS_AVERAGE) ? " selected" : "";
 		str += "<option value='" + Group.CONTINUOUS_AVERAGE + "'" + selected + ">Average</option>\n";
@@ -2555,6 +2555,7 @@ DisplayContinuousConfig.setSampleMethod = function(config, id, method, called_fr
 	//var datatable = navicell.getDatatableById(id);
 	var datatable = navicell.getDatatableByCanonName(id);
 	var module = get_module();
+	console.log("setSampleMethod: " + datatable + " " + config + " " + id + " " + method + " " + obj.val());
 	if (datatable) {
 		//var obj = $("#sample_method_" + config + '_' + id, win.document);
 		obj.val(method);
@@ -2686,12 +2687,14 @@ DisplayUnorderedDiscreteConfig.setAdvancedConfiguration = function(datatable_id,
 	var module = get_module();
 	var displayUnorderedConfig = datatable.getDisplayConfig(module);
 	//var checked = $("#discrete_color_advanced_" + id_suffix).attr("checked");
+	console.log("setSampleMethod: " + datatable + " " + config + " " + datatable_id + " " + checked);
 	if (checked) {
 		obj.attr("checked", "checked");
 	} else {
 		obj.removeAttr("checked");
 	}
-	displayUnorderedConfig.advanced = (checked == "checked");
+	//displayUnorderedConfig.advanced = (checked == "checked");
+	displayUnorderedConfig.advanced = checked;
 	displayUnorderedConfig.update_config(config, tabname, {checked: checked});
 }
 
@@ -3489,7 +3492,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 				if (!is_sample) {
 					var selcond = this.getConditionAt(idx, config);
 //					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setEditing(\"" + id + "\", true, \"" + config + "\")'>";
-					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setDiscreteCond(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ")'>";
+					html += "<td><select id='discrete_cond_" + id_suffix + "_" + idx + "' style='font-size: smaller' onchange='DisplayUnorderedDiscreteConfig.setDiscreteCond(\"" + id + "\", \"" + config + "\", \"" + tabname + "\", " + idx + ", \"" + selcond + "\")'>";
 					if (false && this.advanced) {
 						html += "<option value='" + Group.DISCRETE_IGNORE + "' " + (selcond == Group.DISCRETE_IGNORE ? "selected" : "") + "><span style='font-style: italic; font-size: 60%'>ignore</span></option>";
 					}
@@ -3612,10 +3615,10 @@ DisplayUnorderedDiscreteConfig.prototype = {
 			html += "</table></td></tr>";
 		}
 		if ((config == 'color' || config == COLOR_SIZE_CONFIG) && !is_sample) {
-			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + id + "\", \"" + config + "\")'";
 			var checked = params ? params.checked : "";
+			var onchange = " onchange='DisplayUnorderedDiscreteConfig.setAdvancedConfiguration(\"" + id + "\", \"" + config + "\", " + (checked ? "True" : "False") + ")'";
 			html += "<tr><td colspan='2' style='background: #EEEEEE;'>&nbsp;</td></tr>";
-			html += "<tr><td class='config-label'><input id='discrete_color_advanced_" + id_suffix + "' type='checkbox' " + checked + " " + onchange + ">&nbsp;Avanced configuration</td></tr>";
+			html += "<tr><td class='config-label'><input id='discrete_color_advanced_" + id_suffix + "' type='checkbox' " + (checked ? "checked" : "") + " " + onchange + ">&nbsp;Avanced configuration</td></tr>";
 		}
 		html += "</tbody>";
 		table.append(html);

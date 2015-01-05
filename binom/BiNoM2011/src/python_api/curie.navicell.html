@@ -6,7 +6,7 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#ff8500">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a><font color="#ffffff">curie</font></a>.navicell</strong></big></big> (version 1.2)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a><font color="#ffffff">curie</font></a>.navicell</strong></big></big> (version 1.3)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href="."></a><br><a href="file:/bioinfo/users/eviara/workspace/BiNoM2011/src/python_api/curie/navicell.py"></a></font></td></tr></table>
     <p><tt>This&nbsp;module&nbsp;implements&nbsp;the&nbsp;Python&nbsp;Binding&nbsp;for&nbsp;<a href="#NaviCell">NaviCell</a>.<br>
@@ -242,6 +242,177 @@ Args:<br>
 
 <dl><dt><a name="NaviCell-clearSessions"><strong>clearSessions</strong></a>(self)</dt><dd><tt>Clear&nbsp;all&nbsp;active&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;Web&nbsp;Service&nbsp;sessions.<br>
 Action&nbsp;granted&nbsp;according&nbsp;to&nbsp;security&nbsp;conditions&nbsp;defined&nbsp;in&nbsp;the&nbsp;Web&nbsp;Service&nbsp;configuration.</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigApply"><strong>datatableConfigApply</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Apply&nbsp;changes&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigApplyAndClose"><strong>datatableConfigApplyAndClose</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Apply&nbsp;changes&nbsp;and&nbsp;close&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigCancel"><strong>datatableConfigCancel</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Cancel&nbsp;changes&nbsp;and&nbsp;close&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigClose"><strong>datatableConfigClose</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Close&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigOpen"><strong>datatableConfigOpen</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Open&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetColorAt"><strong>datatableConfigSetColorAt</strong></a>(self, module, datatable, config_type, tabname, idx, color)</dt><dd><tt>Set&nbsp;color&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;idx&nbsp;(int):&nbsp;color&nbsp;index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;color&nbsp;(string):&nbsp;hexa&nbsp;RGB&nbsp;color</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetCondAt"><strong>datatableConfigSetCondAt</strong></a>(self, module, datatable, config_type, tabname, idx, cond)</dt><dd><tt>Set&nbsp;condition&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;idx&nbsp;(int):&nbsp;condition&nbsp;index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;shape&nbsp;(int):&nbsp;condition;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.COND_DISCRETE_IGNORE,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.COND_DISCRETE_NO_ELEMENT,&nbsp;<a href="#NaviCell">NaviCell</a>.COND_DISCRETE_AT_LEAST_ONE_ELEMENT,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.COND_DISCRETE_ALL_ELEMENTS&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.COND_DISCRETE_VALUE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetGroupAdvancedConfiguration"><strong>datatableConfigSetGroupAdvancedConfiguration</strong></a>(self, module, datatable, config_type, checked)</dt><dd><tt>Set&nbsp;group&nbsp;advanced&nbsp;configuration&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;checked&nbsp;(boolean):&nbsp;set/unset&nbsp;advanced&nbsp;configuration</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetGroupMethod"><strong>datatableConfigSetGroupMethod</strong></a>(self, module, datatable, config_type, method)</dt><dd><tt>Set&nbsp;the&nbsp;group&nbsp;method&nbsp;of&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;method&nbsp;(int):&nbsp;method&nbsp;name;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_AVERAGE,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MEDIAN,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MINVAL,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MAXVAL,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_AVERAGE,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_MINVAL&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_MAXVAL</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetSampleAbsoluteValue"><strong>datatableConfigSetSampleAbsoluteValue</strong></a>(self, module, datatable, config_type, checked)</dt><dd><tt>Set&nbsp;the&nbsp;sample&nbsp;absolute&nbsp;value&nbsp;mode&nbsp;of&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;checked&nbsp;(boolean):&nbsp;set/unset&nbsp;sample&nbsp;absolute&nbsp;value&nbsp;mode</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetSampleMethod"><strong>datatableConfigSetSampleMethod</strong></a>(self, module, datatable, config_type, method)</dt><dd><tt>Set&nbsp;the&nbsp;sample&nbsp;method&nbsp;of&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;method&nbsp;(int):&nbsp;method&nbsp;name;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_AVERAGE,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MEDIAN,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MINVAL,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_MAXVAL,&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_AVERAGE,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_MINVAL&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.METHOD_CONTINUOUS_ABS_MAXVAL</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetShapeAt"><strong>datatableConfigSetShapeAt</strong></a>(self, module, datatable, config_type, tabname, idx, shape)</dt><dd><tt>Set&nbsp;shape&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;idx&nbsp;(int):&nbsp;shape&nbsp;index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;shape&nbsp;(int):&nbsp;shape;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_TRIANGLE,&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_SQUARE,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_RECTANGLE,&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_DIAMOND,&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_HEXAGON&nbsp;or<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.SHAPE_CIRCLE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetSizeAt"><strong>datatableConfigSetSizeAt</strong></a>(self, module, datatable, config_type, tabname, idx, size)</dt><dd><tt>Set&nbsp;size&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;idx&nbsp;(int):&nbsp;size&nbsp;index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;size&nbsp;(int):&nbsp;size&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetStepCount"><strong>datatableConfigSetStepCount</strong></a>(self, module, datatable, config_type, tabname, step_count)</dt><dd><tt>Set&nbsp;the&nbsp;step&nbsp;count&nbsp;of&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;step_count&nbsp;(int):&nbsp;step&nbsp;count</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSetValueAt"><strong>datatableConfigSetValueAt</strong></a>(self, module, datatable, config_type, tabname, idx, value)</dt><dd><tt>Set&nbsp;value&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;tabname&nbsp;(string):&nbsp;tab&nbsp;name&nbsp;in&nbsp;the&nbsp;configuration&nbsp;dialog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_SAMPLES&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.TABNAME_GROUPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;idx&nbsp;(int):&nbsp;value&nbsp;index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;value&nbsp;(double):&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSwitchGroupTab"><strong>datatableConfigSwitchGroupTab</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Switch&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type&nbsp;to&nbsp;the&nbsp;Groups&nbsp;tab.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-datatableConfigSwitchSampleTab"><strong>datatableConfigSwitchSampleTab</strong></a>(self, module, datatable, config_type)</dt><dd><tt>Switch&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type&nbsp;to&nbsp;the&nbsp;Samples&nbsp;tab.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SHAPE,&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_SIZE&nbsp;or&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR_SIZE</tt></dd></dl>
 
 <dl><dt><a name="NaviCell-drawingConfigApply"><strong>drawingConfigApply</strong></a>(self, module)</dt><dd><tt>Apply&nbsp;the&nbsp;changes&nbsp;in&nbsp;the&nbsp;drawing&nbsp;configuration&nbsp;dialog.<br>
 Similar&nbsp;to&nbsp;a&nbsp;click&nbsp;on&nbsp;the&nbsp;'Apply'&nbsp;button&nbsp;of&nbsp;the&nbsp;drawing&nbsp;configuration&nbsp;dialog.<br>
@@ -824,6 +995,56 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>COND_DISCRETE_ALL_ELEMENTS</strong> = 3</dl>
+
+<dl><dt><strong>COND_DISCRETE_AT_LEAST_ONE_ELEMENT</strong> = 2</dl>
+
+<dl><dt><strong>COND_DISCRETE_IGNORE</strong> = 0</dl>
+
+<dl><dt><strong>COND_DISCRETE_NO_ELEMENT</strong> = 1</dl>
+
+<dl><dt><strong>COND_DISCRETE_VALUE</strong> = 4</dl>
+
+<dl><dt><strong>CONFIG_COLOR</strong> = 'color'</dl>
+
+<dl><dt><strong>CONFIG_COLOR_SIZE</strong> = 'color_size'</dl>
+
+<dl><dt><strong>CONFIG_SHAPE</strong> = 'shape'</dl>
+
+<dl><dt><strong>CONFIG_SIZE</strong> = 'size'</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_ABS_AVERAGE</strong> = 5</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_ABS_MAXVAL</strong> = 7</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_ABS_MINVAL</strong> = 6</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_AVERAGE</strong> = 1</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_MAXVAL</strong> = 4</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_MEDIAN</strong> = 2</dl>
+
+<dl><dt><strong>METHOD_CONTINUOUS_MINVAL</strong> = 3</dl>
+
+<dl><dt><strong>SHAPE_CIRCLE</strong> = 5</dl>
+
+<dl><dt><strong>SHAPE_DIAMOND</strong> = 3</dl>
+
+<dl><dt><strong>SHAPE_HEXAGON</strong> = 4</dl>
+
+<dl><dt><strong>SHAPE_RECTANGLE</strong> = 2</dl>
+
+<dl><dt><strong>SHAPE_SQUARE</strong> = 1</dl>
+
+<dl><dt><strong>SHAPE_TRIANGLE</strong> = 0</dl>
+
+<dl><dt><strong>TABNAME_GROUPS</strong> = 'group'</dl>
+
+<dl><dt><strong>TABNAME_SAMPLES</strong> = 'sample'</dl>
+
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#f3efeb">

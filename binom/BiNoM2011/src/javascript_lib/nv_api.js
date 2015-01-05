@@ -560,6 +560,9 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var div = displayConfig.getDiv(what);
 
 		div.dialog('close');
+	} else if (command == "apply_and_close") {
+		nv_display_continuous_config_perform(win, 'apply', arg1, arg2);
+		nv_display_continuous_config_perform(win, 'close', arg1, arg2);
 	} else if (command == "cancel") {
 		var datatable_id = arg1;
 		var what = arg2;
@@ -633,24 +636,24 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 	} else if (command == "step_count_change") {
 		var tabname = arg1;
 		var config = arg2;
-		var id = arg3;
+		var datatable_id = arg3;
 		var step_cnt = arg4;
-		DisplayContinuousConfig.stepCountChange(tabname, config, id, step_cnt, true);
+		DisplayContinuousConfig.stepCountChange(tabname, config, datatable_id, step_cnt, true);
 	} else if (command == "set_sample_absval") {
 		var config = arg1;
-		var id = arg2;
+		var datatable_id = arg2;
 		var checked = arg3;
-		DisplayContinuousConfig.setSampleAbsval(config, id, checked, true);
+		DisplayContinuousConfig.setSampleAbsval(config, datatable_id, checked, true);
 	} else if (command == "set_sample_method") {
 		var config = arg1;
-		var id = arg2;
+		var datatable_id = arg2;
 		var method = arg3;
-		DisplayContinuousConfig.setSampleMethod(config, id, method, true);
+		DisplayContinuousConfig.setSampleMethod(config, datatable_id, method, true);
 	} else if (command == "set_group_method") {
 		var config = arg1;
-		var id = arg2;
+		var datatable_id = arg2;
 		var method = arg3;
-		DisplayContinuousConfig.setGroupMethod(config, id, method, true);
+		DisplayContinuousConfig.setGroupMethod(config, datatable_id, method, true);
 /*
 	} else if (command == "set_editing") {
 		var datatable_id = arg1;
@@ -658,7 +661,17 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var config = arg3;
 		DisplayContinuousConfig.setEditing(datatable_id, val, config, win, true);
 */
+
 	} else if (command == "set_input_value") {
+		/* 1.
+		   command names must be homogeneous:
+		   set_value_at
+		   set_color_at
+		   set_size_at
+		   set_input_at
+		   2. is config really necessary when setting color, size or shape ?
+		   => yes, because of COLOR_SIZE configuration ? thought about that...
+		*/
 		var datatable_id = arg1;
 		var config = arg2;
 		var tabname = arg3;
@@ -739,6 +752,9 @@ function nv_display_unordered_discrete_config_perform(win, command, arg1, arg2, 
 		displayConfig.update();
 		DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, doc.win);
 		div.dialog('close');
+	} else if (command == "apply_and_close") {
+		nv_display_unordered_discrete_config_perform(win, 'apply', arg1, arg2);
+		nv_display_unordered_discrete_config_perform(win, 'close', arg1, arg2);
 	} else if (command == "apply") {
 		var datatable_id = arg1;
 		var what = arg2;
@@ -1183,6 +1199,7 @@ function nv_drawing_config_perform(win, command, arg1, arg2)
 	}
 }
 
+/*
 function _nv_datatable_config_build(win, div, datatable, what)
 {
 	if (div.built) {
@@ -1323,26 +1340,13 @@ function nv_datatable_config_perform(win, command, dtarg, what, arg3)
 		update_status_tables({no_sample_status_table: true, no_gene_status_table: true, no_module_status_table: true, no_datatable_status_table: true, no_group_status_table: true, no_sample_annot_table: true, doc: doc});
 	} else if (command == "cancel") {
 		// Cancel does not currently work, but keep the following code.
-		/*
-		var displayContinuousConfig = datatable.displayContinuousConfig[module];
-		var displayUnorderedDiscreteConfig = datatable.displayUnorderedDiscreteConfig[module];
-		var active = div.tabs("option", "active");
-		var tabname = DisplayContinuousConfig.tabnames[active];
-		if (displayContinuousConfig) {
-			displayContinuousConfig.update();
-			DisplayContinuousConfig.setEditing(datatable_id, false, what, win);
-		}
-		if (displayUnorderedDiscreteConfig) {
-			displayUnorderedDiscreteConfig.update();
-			DisplayUnorderedDiscreteConfig.setEditing(datatable_id, false, what, win);
-		}
-		*/
 		div.dialog('close');
 	} else {
 		throw "nv_datatable_config_perform: unknown command \"" + command + "\"";
 	}
 	return null;
 }
+*/
 
 function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 {
@@ -1542,7 +1546,7 @@ var nv_handlers = {
 	"nv_map_staining_editor_perform": nv_map_staining_editor_perform,
 	"nv_drawing_config_perform": nv_drawing_config_perform,
 	"nv_sample_annotation_perform": nv_sample_annotation_perform,
-	"nv_datatable_config_perform": nv_datatable_config_perform,
+//	"nv_datatable_config_perform": nv_datatable_config_perform,
 	"nv_notice_perform": nv_notice_perform,
 
 	"nv_display_continuous_config_perform": nv_display_continuous_config_perform,

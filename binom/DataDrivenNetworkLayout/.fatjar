@@ -1,14 +1,14 @@
 #Fat Jar Configuration File
-#Mon Mar 31 18:05:41 CEST 2014
+#Wed Jan 14 16:26:12 CET 2015
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
-jarname=DataDrivenNetworkLayout_fat.jar
+jarname=DataDrivenNetworkLayout_fat_eb.jar
 manifest.mergeall=true
 manifest.mainclass=
 manifest.file=MANIFEST.MF
 jarname.isextern=false
 onejar.expand=
-excludes=<jar|cytoscape-swing-app-api-3.1.0.jar>;<jar|ocap-api-1.2.jar>
+excludes=<po|DataDrivenNetworkLayout>~.svn/;<jar|cytoscape-swing-app-api-3.1.0.jar>;<jar|ocap-api-1.2.jar>
 includes=

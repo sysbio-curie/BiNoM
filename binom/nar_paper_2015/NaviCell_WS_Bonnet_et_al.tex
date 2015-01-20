@@ -1,0 +1,234 @@
+\documentclass[a4,center,fleqn]{NAR}
+
+% Enter dates of publication
+\copyrightyear{2008}
+\pubdate{31 July 2009}
+\pubyear{2009}
+\jvolume{37}
+\jissue{12}
+
+%\articlesubtype{This is the article type (optional)}
+
+
+\begin{document}
+
+\title{NaviCell Web service for Network-based Data Visualization}
+
+
+\author{%
+Eric Bonnet\,$^{1,2,3}$,
+Eric Viara\,$^{4}$,
+Inna Kuperstein\,$^{1,2,3}$,
+Laurence Calzone\,$^{1,2,3}$,
+David PA Cohen\,$^{1,2,3}$,
+Emmanuel Barillot\,$^{1,2,3}$,
+Andrei Zinovyev\,$^{1,2,3}$%
+\footnote{To whom correspondence should be addressed.
+Tel: +33 (0)1 56 24 69 89; Fax: +33 (0)1 56 24 69 11; Email: andrei.zinovyev@curie.fr}}
+
+
+%\author{%
+%Corresponding Author\,$^{1,*}$,
+%First Co-Author\,$^{2}$
+%and Second Co-Author\,$^2$%
+%\footnote{To whom correspondence should be addressed.
+%Tel: +44 000 0000000; Fax: +44 000 0000000; Email: xxx@yyyy.ac.zz}}
+
+\address{%
+$^{1}$Institut Curie, 26 rue d'Ulm, 75248 Paris, France, 
+$^{2}$INSERM U900, 75248 Paris, France,
+$^{3}$Mines ParisTech, 77300 Fontainebleau, France,
+$^{4}$Sysra, 91330 Yerres, France.
+}
+% Affiliation must include:
+% Department name, institution name, full road and district address,
+% state, Zip or postal code, country
+
+\history{%
+Received January 1, 2009;
+Revised February 1, 2009;
+Accepted March 1, 2009}
+
+
+\bibliographystyle{nar}
+\maketitle
+
+\begin{abstract}
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+\end{abstract}
+
+
+\section{Introduction}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+%\begin{align*}
+%&\mathrm{Ascorbate} + \mathrm{EDTA} \cdot \mathrm{Fe}^{3+} \to
+%\hbox{Oxidized ascorbate}
+%\\
+%&\mathrm{EDTA} \cdot \mathrm{Fe}^{2+} + \mathrm{H}_2
+%\mathrm{O}_2 \to
+%\mathrm{EDTA} \cdot \mathrm{Fe}^{3+} + \cdot
+%\mathrm{OH} + \mathrm{OH}^-
+%\end{align*}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+% **************************************************************
+% Keep this command to avoid text of first page running into the
+% first page footnotes
+%\enlargethispage{-65.1pt}
+% **************************************************************
+
+Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text.
+Text 
+
+\section{ALGORITHMS AND SOFTWARE}
+
+\subsection{Implementation}
+
+The NaviCell software tool is implementing a set of JavaScript functions on a
+web interface, allowing an easy and intuitive navigation of large-scale
+molecular maps of biological networks \cite{kuperstein2013navicell}. We
+conceived the NaviCell Web Service data visualization tool as an extension of
+NaviCell allowing users to visualize and analyze different types of "omics"
+data. The Web Service is implemented at two different functional levels that are
+interconnected. The first level corresponds to the interactive, windows-based,
+usage of the web interface to load and visualize data. This level is implemented
+as a specific set of JavaScript functions linked to a button-based menu located
+in the right-hand panel of the web interface. The second level corresponds to a
+programmatic usage of the service, which allow users to write programs that will
+communicate with the NaviCell \emph{server} in order to automate all the
+visualization operations. This level is implemented as a REST 
+
+
+\subsubsection{Materials subsubsection one.}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text:
+%\begin{align}
+%\mathrm{LD}^r = \frac{\mathrm{LD}}{A_\mathrm{iso}}
+%= 1.5 S \left( 3 \cos^2 \alpha_i - 1 \right)
+%\end{align}
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+
+\section{RESULTS}
+
+\subsection{Results subsection one}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+\section{DISCUSSION}
+
+\subsection{Discussion subsection one}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+\subsection{Discussion subsection two}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+\section{CONCLUSION}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+\section{ACKNOWLEDGEMENTS}
+
+Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+
+
+\subsubsection{Conflict of interest statement.} None declared.
+\newpage
+
+\bibliography{biblio}
+
+%\begin{thebibliography}{4}
+%
+%% Format for article
+%\bibitem{1}
+%Author,A.B. and Author,C. (1992)
+%Article title.
+%\textit{Abbreviated Journal Name}, \textbf{5}, 300--330.
+%
+%% Format for book
+%\bibitem{2}
+%Author,D., Author,E.F. and Author,G. (1995)
+%\textit{Book Title}.
+%Publisher Name, Publisher Address.
+%
+%% Format for chapter in book
+%\bibitem{3}
+%Author,H. and Author,I. (2005)
+%Chapter title.
+%In
+%Editor,A. and Editor,B. (eds),
+%\textit{Book Title},
+%Publisher Name, Publisher Address,
+%pp.\ 60--80.
+%
+%% Another article
+%\bibitem{4}
+%Author,Y. and Author,Z. (2002)
+%Article title.
+%\textit{Abbreviated Journal Name}, \textbf{53}, 500--520.
+%
+%\end{thebibliography}
+%
+
+\end{document}

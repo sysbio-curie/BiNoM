@@ -127,7 +127,9 @@ the Garuda Alliance web platform, which aims to be a one-stop service for
 bioinformatics and systems biology \cite{ghosh2011software}. The Figure 1 is
 summarizing the NaviCell \emph{server} architecture and information flow.
 
+\subsection{Input data types}
 
+\subsection{Graphical data representation}
 
 \section{RESULTS}
 
@@ -173,8 +175,15 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 \section{FIGURE LEGENDS}
 
 \textbf{Figure 1.} General architecture of the NaviCell Web service
-\emph{server}. Client software communicate with the server through standard HTTP
-calls using the standard JSON format to encode data.
+\emph{server}. Client software (light blue layer) communicates with the server
+(red layer) through standard HTTP requests using the standard JSON format to
+encode data (RESTful web service, dark blue layer). A session (with a unique ID)
+is established between the server and the client browser (yellow layer) through
+Ajax communication channel to visualize the results of the commands send by the
+client. It is worth noticing that communication channels are bidirectional, i.e.
+the client software can send data (e.g. an expression data matrix) to the
+server, but it can also receive data from the server (e.g. a list of gene HUGO
+codes contained in a map).
 
 
 \end{document}

@@ -113,7 +113,20 @@ as a specific set of JavaScript functions linked to a button-based menu located
 in the right-hand panel of the web interface. The second level corresponds to a
 programmatic usage of the service, which allow users to write programs that will
 communicate with the NaviCell \emph{server} in order to automate all the
-visualization operations. This level is implemented as a RESTful web servcice, meaning that  
+visualization operations. This functional level is implemented as a RESTful web
+service, using standard web protocol HTTP operations and data encoding (JSON)
+to perform all the necessary operations \cite{fielding2002principled}.
+RESTful web service are very popular and have the advantage of being
+lightweight, efficient and simple to use. In our case, they also have the benefit of
+being relatively easy to implement in many different programming language and
+software packages. At the moment we have a full API ready for Python, and
+upcoming APIs for R and Java. Of course, those APIs will facilitate the
+integration of NaviCell services in other applications, and for instance we
+have started a collaboration to offer our data visualization services through
+the Garuda Alliance web platform, which aims to be a one-stop service for
+bioinformatics and systems biology \cite{ghosh2011software}. The Figure 1 is
+summarizing the NaviCell \emph{server} architecture and information flow.
+
 
 
 \section{RESULTS}
@@ -157,37 +170,5 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \bibliography{biblio}
 
-%\begin{thebibliography}{4}
-%
-%% Format for article
-%\bibitem{1}
-%Author,A.B. and Author,C. (1992)
-%Article title.
-%\textit{Abbreviated Journal Name}, \textbf{5}, 300--330.
-%
-%% Format for book
-%\bibitem{2}
-%Author,D., Author,E.F. and Author,G. (1995)
-%\textit{Book Title}.
-%Publisher Name, Publisher Address.
-%
-%% Format for chapter in book
-%\bibitem{3}
-%Author,H. and Author,I. (2005)
-%Chapter title.
-%In
-%Editor,A. and Editor,B. (eds),
-%\textit{Book Title},
-%Publisher Name, Publisher Address,
-%pp.\ 60--80.
-%
-%% Another article
-%\bibitem{4}
-%Author,Y. and Author,Z. (2002)
-%Article title.
-%\textit{Abbreviated Journal Name}, \textbf{53}, 500--520.
-%
-%\end{thebibliography}
-%
 
 \end{document}

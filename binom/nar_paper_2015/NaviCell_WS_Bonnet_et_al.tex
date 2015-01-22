@@ -72,12 +72,6 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
-% **************************************************************
-% Keep this command to avoid text of first page running into the
-% first page footnotes
-%\enlargethispage{-65.1pt}
-% **************************************************************
-
 Text. Text. Text. Text. Text. Text.
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
@@ -127,17 +121,48 @@ the Garuda Alliance web platform, which aims to be a one-stop service for
 bioinformatics and systems biology \cite{ghosh2011software}. The Figure 1 is
 summarizing the NaviCell \emph{server} architecture and information flow.
 
+% **************************************************************
+% Keep this command to avoid text of first page running into the
+% first page footnotes
+\enlargethispage{-65.1pt}
+% **************************************************************
+
+
 \subsection{Input data types}
 
 We have designed the NaviCell data visualization service to be able to accept
-several types of "omics" data. The complete list is provided in table
-\ref{table:01}. 
+several types of "omics" data. The complete list of data types that are
+currently accepted for input is provided in table \ref{table:01}. The different
+types are mapped to internal representations that determine what kind of
+treatment will be done and what type of options will be possible to visualize
+the data.
 
+For instance, a mRNA expression data matrix will be associated to a
+"continuous" internal representation. Thus, if the user is choosing to display
+this data with a heatmap, a color gradient will be chosen by default, with the
+appropriate options for modifying this representation. On the other hand, when a
+matrix with discrete copy-number data is loaded, it is associated with a
+"discrete unordered" internal representation, and this time a color palette will
+be used for visualization, with a distinct color associated to each copy-number
+value.
+
+Users can also load annotation files to specify how samples can be grouped (e.g.
+disease vs control, as a simple tab-delimited text file with sample names as rows and
+grouping factors as columns). Then, an appropriate method will be used to summarize the
+values of all the samples contained in a group, defined by the internal
+representation. For instance, expression values will be averaged by default
+("continuous" type), and the user will have the option to use the median, the
+minimum value, the maximum value, etc. For mutation data ("discrete unordered"
+type), taking the average does not make sense and instead the grouping method
+will default to "at least one element of the group is mutated". 
 
 %\begin{table}[b]
 \begin{table}
 \tableparts{%
-\caption{List of input data types for the :NaviCell data visualization  }
+\caption{List of current input data types for NaviCell data visualization. The
+first column list the types as they appear in the NaviCell interface. The
+second column list the internal representations that are used to determine what
+type of data treatment will be applied for visualization.}
 \label{table:01}%
 }{%
 \begin{tabular*}{\columnwidth}{@{}ll@{}}
@@ -164,10 +189,14 @@ Gene list & set
 \botrule
 \end{tabular*}%
 }
-{This is a table footnote}
+{The input format is standard tab-delimited text files, with samples as columns
+and gene symbols (HUGO) as rows.}
 \end{table}
 
-\subsection{Graphical data representation}
+\subsection{Graphical data representations}
+
+We have included a serie of 
+
 
 \section{RESULTS}
 

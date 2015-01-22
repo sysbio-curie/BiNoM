@@ -129,6 +129,44 @@ summarizing the NaviCell \emph{server} architecture and information flow.
 
 \subsection{Input data types}
 
+We have designed the NaviCell data visualization service to be able to accept
+several types of "omics" data. The complete list is provided in table
+\ref{table:01}. 
+
+
+%\begin{table}[b]
+\begin{table}
+\tableparts{%
+\caption{List of input data types for the :NaviCell data visualization  }
+\label{table:01}%
+}{%
+\begin{tabular*}{\columnwidth}{@{}ll@{}}
+\toprule
+"Omics" data type &  Internal representation
+%\\
+%& (\%) & (s$^{-1}$) & (\%) & (s$^{-1}$)
+\\
+\colrule
+mRNA expression data & continuous
+\\
+microRNA expression data & continuous
+\\
+Protein expression data & continuous
+\\
+Discrete copy number data & discrete ordered 
+\\
+Continuous copy number data & continuous
+\\
+Mutation data & discrete unordered 
+\\
+Gene list & set 
+\\
+\botrule
+\end{tabular*}%
+}
+{This is a table footnote}
+\end{table}
+
 \subsection{Graphical data representation}
 
 \section{RESULTS}

@@ -167,7 +167,7 @@ if (!Number.MIN_NUMBER) {
 }
 
 var INPUT_SEPS = ["\t", ";", ",", " "];
-ovar COLOR_SIZE_CONFIG = "color_size";
+var COLOR_SIZE_CONFIG = "color_size";
 var EDITING_CONFIGURATION = "configuration not applied...";
 var NO_SAMPLE = "<span style='font-style: italic; font-size: smaller'>[gene&nbsp;list]</span>";
 var GENE_SET = "[GENE]";
@@ -5382,7 +5382,7 @@ AnnotationFactory.prototype = {
 			if (!line[line.length-1]) {
 				--line_cnt;
 			}
-			if (line_cnt < 2) {
+			if (line_cnt < 1) {
 				continue;
 			}
 			if (line_cnt > annot_cnt) {

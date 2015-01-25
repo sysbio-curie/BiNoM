@@ -226,9 +226,25 @@ data value. Barplots can be very efficient to visually distinguish between two
 or more groups of conditions (e.g. disease/control).  
 
 \item \emph{Glyphs} are graphical representation using basic geometrical shapes
-(triangle, square, rectangle, diamond, hexagon). The user can specify  
+(triangle, square, rectangle, diamond, hexagon). The user can specify datasets
+for the shape, the size and the color of the glyph. This type of representation
+is particularly useful to visually combine different types of data. For
+example, one might consider using matched data for copy-number and expression
+on a set of samples. In this case, the shape of the glyphs could be assigned to
+the copy-number values, while the expression data would be used for the color of
+the glyph. Users can appreciate the two data types values at the same time on
+the glyph.
 
-\item Map staining 
+\item \emph{Map staining} is a novel data representation where pre-defined areas
+(or territories) around each entity are colored according to the data value. The
+areas are defined on the map using Voronoi's diagrams. This geometrical
+algorithm divides a surface into a finite set of convex polygons
+\cite{aurenhammer1991voronoi}. In our case, we use all the entities present on a
+molecular map as the seeds from which the polygons (or cells) are defined, and
+that we will use to color the map, according to the data values attached to each
+entity. The polygons are pre-calculated for each map, and colored dynamically on
+the web interface according to the values of the data sets and the options
+defined by the user.
 \end{itemize}
 
 \section{RESULTS}

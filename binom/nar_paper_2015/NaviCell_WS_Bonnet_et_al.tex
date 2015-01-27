@@ -220,12 +220,12 @@ display continuous data types such as expression values, or discrete data such
 as copy-number or mutation values. The user can arrange the display to have
 several samples or group of samples displayed, and/or different experiments. 
 
-\item \emph{Barplots} are chart with rectangular bars proportional to the values
+\item \textbf{Barplots} are chart with rectangular bars proportional to the values
 they represent. On our web interface, they are also colored according to the
 data value. Barplots can be very efficient to visually distinguish between two
 or more groups of conditions (e.g. disease/control).  
 
-\item \emph{Glyphs} are graphical representation using basic geometrical shapes
+\item \textbf{Glyphs} are graphical representation using basic geometrical shapes
 (triangle, square, rectangle, diamond, hexagon). The user can specify datasets
 for the shape, the size and the color of the glyph. This type of representation
 is particularly useful to visually combine different types of data. For
@@ -235,7 +235,7 @@ the copy-number values, while the expression data would be used for the color of
 the glyph. Users can appreciate the two data types values at the same time on
 the glyph.
 
-\item \emph{Map staining} is a novel data representation where pre-defined areas
+\item \textbf{Map staining} is a novel data representation where pre-defined areas
 (or territories) around each entity are colored according to the data value. The
 areas are defined on the map using Voronoi's diagrams. This geometrical
 algorithm divides a surface into a finite set of convex polygons
@@ -248,8 +248,6 @@ defined by the user.
 \end{itemize}
 
 \section{RESULTS}
-
-\subsection{Results subsection one}
 
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
@@ -266,10 +264,19 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \section{DISCUSSION}
 
+We have compared the features of the NaviCell Web Service for data visualization
+with similar tools. We selected a number of web-based tools that are providing
+similar functionalities, i.e. easy pathway browsing functions and interactive data
+visualization capabilities. For the comparison, we have focused on the features
+related to map navigation, molecular data types and graphical representations,
+and programmatic access. Table \ref{table:02} display the results. NaviCell Web
+Service offers richer features in terms  
+
+
 %\begin{table}[b]
 \begin{table}
 \tableparts{%
-\caption{Comparison of the NaviCell Web Service for data visualization features with other tools.
+\caption{Comparison of the NaviCell Web Service features with similar web sites for pathway-based data visualization.
 }
 \label{table:02}%
 }{%
@@ -280,11 +287,11 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text.
 %& (\%) & (s$^{-1}$) & (\%) & (s$^{-1}$)
 \\
 \colrule
-Map: navigation & $\bullet$ & $\bullet$ & & $\bullet$ & & $\bullet$ 
+Map: navigation & $\bullet$ & $\bullet$ & & $\bullet$ & $\bullet$ & $\bullet$ 
 \\
 Map: simple zooming & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &  $\bullet$ 
 \\
-Map: semantic zooming & $\bullet$ & $\bullet$ & & & &
+Map: semantic zooming & $\bullet$ & & & & &
 \\
 Visualization: node coloring & & $\bullet$ & & & & $\bullet$ 
 \\
@@ -317,18 +324,10 @@ Programmatic access: data visual. & $\bullet$ & & & & &
 }
 {Abbreviations: Na: NaviCell Web Service, Re: Reactome\cite{croft2010reactome},
 KE: KEGG\cite{kanehisa2000kegg}, iP: iPath\cite{letunic2008ipath}, Bc:
-BioCyc\cite{karp2005expansion}, Pa: Patika\cite{demir2002patika}.
+BioCyc\cite{karp2005expansion}, Pa: PATIKAweb\cite{demir2002patika}.
 }
 \end{table}
 
-
-\subsection{Discussion subsection one}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-
-\subsection{Discussion subsection two}
-
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \section{CONCLUSION}
 
@@ -344,7 +343,7 @@ Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
 
 \bibliography{biblio}
 
-\section{TABLE AND FIGURE LEGENDS}
+\section{FIGURE LEGENDS}
 
 \textbf{Figure 1.} General architecture of the NaviCell Web service
 \emph{server}. Client software (light blue layer) communicates with the server

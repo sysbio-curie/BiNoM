@@ -95,7 +95,7 @@ Text
 
 \subsection{Implementation}
 
-The NaviCell software tool is implementing a set of JavaScript functions on a
+The NaviCell software tool implements a set of JavaScript functions on a
 web interface, allowing an easy and intuitive navigation of large-scale
 molecular maps of biological networks \cite{kuperstein2013navicell}. We
 conceived the NaviCell Web Service Data Visualization tool as an extension of
@@ -132,7 +132,7 @@ summarizing the NaviCell \emph{server} architecture and information flow.
 
 We have designed the NaviCell data visualization service to be able to accept
 several types of "omics" data. The complete list of data types that are
-currently accepted for input is provided in table \ref{table:01}. The different
+currently accepted for input is provided in Table \ref{table:01}. The different
 types are mapped to internal representations that determine what kind of
 treatment will be done and what type of options will be possible to visualize
 the data.
@@ -146,15 +146,22 @@ matrix with discrete copy-number data is loaded, it is associated with a
 be used for visualization, with a distinct color associated to each copy-number
 value.
 
+The input format for data sets is standard tab-delimited text files, with rows
+representing genes and columns representing samples (or experiments, or time
+points). Genes in the first column should be represented by their HUGO (HGNC)
+gene symbols, that will be associated to the different entities (genes,
+proteins, complexes) of the map.  
+
 Users can also load annotation files to specify how samples can be grouped (e.g.
-disease vs control, as a simple tab-delimited text file with sample names as rows and
-grouping factors as columns). Then, an appropriate method will be used to summarize the
-values of all the samples contained in a group, defined by the internal
-representation. For instance, expression values will be averaged by default
-("continuous" type), and the user will have the option to use the median, the
-minimum value, the maximum value, etc. For mutation data ("discrete unordered"
-type), taking the average does not make sense and instead the grouping method
-will default to "at least one element of the group is mutated". 
+disease vs control, as a simple tab-delimited text file with sample names as
+rows and grouping factors as columns). Then, an appropriate method will be used
+to summarize the values of all the samples contained in a group, defined by the
+internal representation. For instance, expression values for a group of samples
+will be averaged by default for the "continuous" type, and the user will have
+the option to change the defult method and use the median, the minimum value,
+the maximum value, etc. For mutation data ("discrete unordered" type), taking
+the average does not make sense and instead the grouping method will default to
+"at least one element of the group is mutated". 
 
 %\begin{table}[b]
 \begin{table}
@@ -189,25 +196,27 @@ Gene list & set
 \botrule
 \end{tabular*}%
 }
-{The input format is standard tab-delimited text files, with samples as columns
-and gene symbols (HUGO) as rows.}
+{
+}
 \end{table}
 
 \subsection{Graphical data representations}
 
 Biology is a scientific discipline deeply grounded in visual representations,
-that are important vectors to communicate results and ideas. 
-[ interactive web visualizations are important and more and more used ]
+that are important vectors to communicate results and ideas. Moreover, there is
+a strong incentive to provide visual representations that are
+\emph{interactive}, particularly on web-sites, where users can easily play with
+different options to tweak and adapt the representation to their needs.
 
 We have included in the NaviCell web service for data visualization a number of
 different graphical representations. Some of them are rather standard
 and broadly used in biology (heatmaps, barplots), while others (glyphs, map
-staining) have not been previously employed in the context of network-based
-visualization as far as we know. 
+staining) have not been previously employed (to our knowledge) in the context of network-based
+visualization. 
 
 \begin{itemize}
 
-\item \textbf{Simple markers} are simle pictograms (similar to the ones found in Goggle Maps
+\item \textbf{Simple markers} are pictograms (similar to the ones found in Goggle Maps
 to indicate geographical locations) that are draw on the map at the location
 of a given species (protein, gene, complex). They are used to display the
 results of a search done by the user or to display a list of genes of interest
@@ -215,36 +224,36 @@ uploaded on the map.
 
 \item \textbf{Heatmaps} display individual values of a matrix as
 colors. They are very often used in biology, especially to display expression
-data measured from microarray experiments. In NaviCell, heatmaps can be used to
+data measured for example from microarray experiments. In NaviCell, heatmaps can be used to
 display continuous data types such as expression values, or discrete data such
 as copy-number or mutation values. The user can arrange the display to have
 several samples or group of samples displayed, and/or different experiments. 
 
-\item \textbf{Barplots} are chart with rectangular bars proportional to the values
+\item \textbf{Barplots} are charts with rectangular bars proportional to the values
 they represent. On our web interface, they are also colored according to the
-data value. Barplots can be very efficient to visually distinguish between two
-or more groups of conditions (e.g. disease/control).  
+data value. Barplots can be very efficient to visually distinguish different
+values between two or more groups of conditions (e.g. disease/control).  
 
-\item \textbf{Glyphs} are graphical representation using basic geometrical shapes
-(triangle, square, rectangle, diamond, hexagon). The user can specify datasets
-for the shape, the size and the color of the glyph. This type of representation
-is particularly useful to visually combine different types of data. For
-example, one might consider using matched data for copy-number and expression
-on a set of samples. In this case, the shape of the glyphs could be assigned to
-the copy-number values, while the expression data would be used for the color of
-the glyph. Users can appreciate the two data types values at the same time on
-the glyph.
+\item \textbf{Glyphs} are graphical representation using basic geometrical
+shapes (triangle, square, rectangle, diamond, hexagon). The user can specify
+which datasets to use for the shape, the size and the color of the glyph. This
+type of representation is particularly useful to visually combine different
+types of data. For example, one might consider using matched data for
+copy-number and expression on a set of samples. In this case, the shape of the
+glyphs could be assigned to the copy-number values, while the expression data
+would be used for the color of the glyph. Like this, users can quickly
+appreciate the two data types values at the same time on the glyph.
 
-\item \textbf{Map staining} is a novel data representation where pre-defined areas
-(or territories) around each entity are colored according to the data value. The
-areas are defined on the map using Voronoi's diagrams. This geometrical
-algorithm divides a surface into a finite set of convex polygons
-\cite{aurenhammer1991voronoi}. In our case, we use all the entities present on a
-molecular map as the seeds from which the polygons (or cells) are defined, and
-that we will use to color the map, according to the data values attached to each
-entity. The polygons are pre-calculated for each map, and colored dynamically on
-the web interface according to the values of the data sets and the options
-defined by the user.
+\item \textbf{Map staining} is a novel data representation where pre-defined
+areas (or territories) around each entity are colored according to the data
+value. The areas are defined on the map using Voronoi's diagrams. This
+geometrical algorithm divides a surface into a finite set of convex polygons
+\cite{aurenhammer1991voronoi}, using a set of points (seeds) to define the
+polygons' shape. In our case, we use all the entities present on a molecular map
+as the seeds. The polygons are pre-calculated for each map by an algorithm, and
+are colored dynamically on the web interface according to the values of the data
+sets and the options defined by the user.  
+
 \end{itemize}
 
 \section{RESULTS}
@@ -268,7 +277,7 @@ We have compared the features of the NaviCell Web Service for data visualization
 with similar tools. We selected a number of web-based tools that are providing
 similar functionalities, i.e. easy pathway browsing functions and interactive data
 visualization capabilities. For the comparison, we have focused on the features
-related to map navigation, molecular data types and graphical representations,
+related to map navigation, molecular data types, graphical representations,
 and programmatic access. Table \ref{table:02} display the results. NaviCell Web
 Service offers more features than other tools in terms of map navigation, for
 data visualization with additional graphical representations (such as map

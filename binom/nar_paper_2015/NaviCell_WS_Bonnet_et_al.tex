@@ -258,18 +258,43 @@ sets and the options defined by the user.
 
 \section{RESULTS}
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
-Text. Text. Text. Text. Text. Text. Text. Text. Text.
+As an illustration of the use of maps in comparing two types of tumors, we
+selected two prostate cancer cell lines from the Cancer Cell Line Encyclopedia
+\cite{barretina2012cancer}): a prostate hormone-sensitive
+tumor cell line (LNCAP), and a prostate hormone-resistant tumor cell line
+(DU145). We gathered gene expression, copy number and mutation data from
+the two cell lines and mapped them onto our cell cycle map
+\cite{calzone2008comprehensive}.
+
+If we consider the cell line data as the mean expression of genes of a
+population of asynchronous cells, most LNCAP cells seem to be expressing genes
+from the early state G1 (Figure 2A, upper-right area) and the G1-S checkpoint
+(Figure 2A, lower-left area) while most DU145 cells express genes from the
+later stages of the cell cycle (Figure 2a, G1-late, S-phase and G2-phase
+areas).  We notice that relatively few genes are mutated, amplified or lost
+in these two cell lines (Figure 2A and 2B, square and triangle glyphs). 
+
+By zooming on the map, we can determine that for the LNCAP cells, the most
+important gene alterations are: the amplification of DP1 (present in most
+complexes involving E2F1), and the homozygous loss of E2F2, transcription
+factor. The mutations concern mainly genes from the apoptotic pathway: ATR or
+CHEK2. As for the expression, the more noticeable trend is that the expression
+of the cell cycle inhibitors, such as RBL2, p21, CDC25C, is still high, whereas
+the expression of the G2 cyclin, for instance, CyclinA is low.
+
+For the DU145 cells, genes involved in later stages of the cell cycle seem to
+be more expressed compared to the LNCAP cells. It can be that if the cells were
+arrested in LNCAP, they are more advanced in the cycle in DU145 cells by
+overpassing the G1/S checkpoint and are arrested at the spindle checkpoint.
+They are more prone to proliferate than the LNCAP cells. The expression of some
+cyclins seems to confirm this fact: CyclinB, CyclinD and CyclinH are higher
+than in LNCAP. Some means to stop the cycle seem to be kept though, with Cdc20
+and Cdc25 expression high. 
+
+We verified the expression of KI-67, a marker of proliferation, and its
+expression is indeed higher in DU145 than in LNCAP cellsi, which tends to
+confirm our hypothesis that DU145 are more proliferative than LNCAP cells.
+
 
 \section{DISCUSSION}
 

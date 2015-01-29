@@ -46,7 +46,15 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+We developed NaviCell Web Service for network-based visualization of ``omics" data, using Google Maps API 
+for browsing large maps of molecular interactions and RESTfull web service with available Python binding 
+to automate the data visualization tasks. NaviCell Web Service implements a number of data visual representation
+methods including the novel map staining technique which allows grasping large-scale trends in 
+numerical values (such as whole transcriptome) projected on top of the pathway map. We provide several
+case studies using the pathway maps created by different research groups in which data visualization
+serves for getting new insights into molecular mechanisms involved in systemic disease progression such as cancer
+and neurodegenerative diseases.
+
 \end{abstract}
 
 
@@ -86,7 +94,7 @@ software packages. At the moment we have a full API ready for Python, and
 APIs for R and Java in development. These APIs will facilitate the
 integration of NaviCell Web Service in other applications: among them, there exists an ongoing work on providing
 the data visualization services through the Garuda Alliance web platform, which aims to be a one-stop service for
-bioinformatics and systems biology \cite{ghosh2011software} and GeneSpring software \cite{XXX}. Figure~\ref{fig1} is
+bioinformatics and systems biology \cite{ghosh2011software} and GeneSpring software \cite{Chu2001}. Figure~\ref{fig1} is
 summarizing the NaviCell \emph{server} architecture and information flow.
 
 % **************************************************************
@@ -97,7 +105,13 @@ summarizing the NaviCell \emph{server} architecture and information flow.
 
 \subsection{Input data types}
 
-We have designed the NaviCell data visualization service to be able to process
+The pathway maps which can be used for NaviCell Web Serivce data visualization 
+are to be prepared using CellDesigner tool\cite{XXX}, which is widely used in systems biology
+community and implements a subset of Systems Biology Graphical Notation standard \cite{XXX}
+for representing biological networks. These pathway maps are converted into web-based
+interactive Google Maps-based interfaces via NaviCell tool\cite{kuperstein2013navicell}.
+
+NaviCell data visualization web service is able to process
 several types of ``omics" data. The complete list of data types that are
 currently accepted for input is provided in Table \ref{table:01}. The different biological data
 types are mapped into various internal representations that determine what methods
@@ -283,8 +297,6 @@ confirm our hypothesis that DU145 are more proliferative than LNCAP cells.
 
 \section{DISCUSSION}
 
-The novelty of NaviCell Web Service consists in (1) application of Google Maps API and semantic zooming for browsing large networks together with data mapped on top of them; (2) advanced novel methods for omics data visualization in the context of biological network maps; (3) programmatic manipulation of NaviCell functions and interface via Python language; (4) access to the growing list of detailed network maps from \href{http://navicell.curie.fr}.
-
 We have compared the features of the NaviCell Web Service for data visualization
 with similar tools. We selected a number of web-based tools that are providing
 similar functionalities, i.e. easy pathway browsing functions and interactive data
@@ -295,7 +307,6 @@ Service offers more features than other tools in terms of map navigation, for
 data visualization with additional graphical representations (such as map
 staining) and more data types, and finally extended support for programmatic
 access from different computer languages.
-
 
 To extend the scope of NaviCell Web Service, we are currently working on porting some of the
 most used pathway databases into the CellDesigner format which can be used after for displaying
@@ -360,10 +371,9 @@ BioCyc\cite{karp2005expansion}, Pa: PATIKAweb\cite{demir2002patika}.
 
 \section{CONCLUSION}
 
-Text. Text. Text. Text. Text. Text. Text. Text. Text. Text. Text.
+NaviCell Web Service should contribute to the growing set of highly demanded tools for molecular biology allowing visualization of ``omics" data in the context of biological network maps.
 
 \section{ACKNOWLEDGEMENTS}
-
 
 Agilent. PIC SysBio. INVADE. COMET.
 

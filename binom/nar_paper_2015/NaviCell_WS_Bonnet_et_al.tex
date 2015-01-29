@@ -46,10 +46,10 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-We developed NaviCell Web Service for network-based visualization of ``omics" data, using Google Maps API 
-for browsing large maps of molecular interactions and RESTfull web service with available Python binding 
+We developed NaviCell Web Service for network-based visualization of ``omics" data, using Google Maps API
+for browsing large maps of molecular interactions and RESTfull web service with available Python binding
 to automate the data visualization tasks. NaviCell Web Service implements a number of data visual representation
-methods including the novel map staining technique which allows grasping large-scale trends in 
+methods including the novel map staining technique which allows grasping large-scale trends in
 numerical values (such as whole transcriptome) projected on top of the pathway map. We provide several
 case studies using the pathway maps created by different research groups in which data visualization
 serves for getting new insights into molecular mechanisms involved in systemic disease progression such as cancer
@@ -66,9 +66,9 @@ When a user is faced with necessity to visualize the ``omics" data on top of bio
 
 Available network-based methods for data visualization have several common limitations. First, most of them do not provide possibility of data abstraction, allowing to visualize coarse-grained trends in the omics data. This is needed if, for example, there is a wish to visualize the whole transcriptome of a cell or a group of samples on top of a large network, representing a big part of cellular interactome. Current methods usually attach some elements of standard scientific graphics (gradient color, heatmaps, barplots) to the individual elements of pathway maps, which makes the visualization hardly readable at higher levels of zoom as well as the map content itself. Second, most of data visualization tools are specific to a particular pathway database structure, format and the way of graphical pathway representation. This limits the use of data visualization on top of user-defined pathway maps. Third, APIs for programmatic web-based data visualization are practically non-existent.
 
-To fill this niche, we've developed NaviCell Web Service tool. It allows visualizing omics data via GUI and flexible API using standard and advanced methods of data visualization including a possibility to perceive the data structure at different network scales. The NaviCell Web Service allows exploiting pathway maps created by users themselves or from existing databases, including very large maps (for example, representing the content of a whole pathway database). The NaviCell Web Service for Network-based Data Visualization is a combination of 1) user-friendly NaviCell JavaScript-based web interface \cite{kuperstein2013navicell}, allowing browsing very large maps of biological networks using Google Maps API using \emph{semantic zooming} principle and visualize ``omics" data on top of them (\href{http://navicell.curie.fr}); 2) large collection of maps available for data visualization including the Atlas of Cancer Signaling Network (ACSN) (\href{http://acsn.curie.fr}) and other detailed network maps created by many research groups for a particular subject (Toll-like receptor signalling, EGFR and mTOR pathways, mast cell activation, dendritic cells, iron metabolism, Alzheimer disease and others); 3) REST API allowing programmatic use of all data visualization functions and manipulating the web interface, with available Python binding and upcoming R and Java bindings.
+To fill this niche, we've developed NaviCell Web Service tool. It allows visualizing omics data via GUI and flexible API using standard and advanced methods of data visualization including a possibility to perceive the data structure at different network scales. The NaviCell Web Service allows exploiting pathway maps created by users themselves or from existing databases, including very large maps (for example, representing the content of a whole pathway database). The NaviCell Web Service for Network-based Data Visualization is a combination of 1) user-friendly NaviCell JavaScript-based web interface \cite{kuperstein2013navicell}, allowing browsing very large maps of biological networks using Google Maps API using \emph{semantic zooming} principle and visualize ``omics" data on top of them (\href{http://navicell.curie.fr});; 2) large collection of maps available for data visualization including the Atlas of Cancer Signaling Network (ACSN) (\href{http://acsn.curie.fr}))  and other detailed network maps created by many research groups for a particular subject (Toll-like receptor signalling, EGFR and mTOR pathways, mast cell activation, dendritic cells, iron metabolism, Alzheimer disease and others); 3) REST API allowing programmatic use of all data visualization functions and manipulating the web interface, with available Python binding and upcoming R and Java bindings.
 
-Quick live example which \emph{automatically} uploads a sample dataset from TCGA database and illustrates all basic data visualization capabilities of NaviCell Web Service is provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html} . Sample Python code for quick start on using NaviCell Web Service API is available from the same page in ``Python API and data files" section.
+Quick live example which \emph{automatically} uploads a sample dataset from TCGA database and illustrates all basic data visualization capabilities of NaviCell Web Service is provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. Sample Python code for quick start on using NaviCell Web Service API is available from the same page in ``Python API and data files" section.
 
 \section{ALGORITHMS AND SOFTWARE}
 
@@ -105,10 +105,10 @@ summarizing the NaviCell \emph{server} architecture and information flow.
 
 \subsection{Input data types}
 
-The pathway maps which can be used for NaviCell Web Serivce data visualization 
+The pathway maps which can be used for NaviCell Web Serivce data visualization
 are to be prepared using CellDesigner tool\cite{Funahashi2008}, which is widely used in systems biology
 community and implements the Systems Biology Graphical Notation standard \cite{LeNovere2009}
-for representing biological networks. These pathway maps are converted into 
+for representing biological networks. These pathway maps are converted into
 interactive Google Maps-based web-interfaces via NaviCell tool\cite{kuperstein2013navicell}.
 
 NaviCell data visualization web service is able to process
@@ -221,16 +221,16 @@ appreciate the two data types values at the same time on the glyph.
 
 \item \textbf{Map staining} is a novel network-based data visualization method where
 background areas (or territories) around each molecular entity are colored according to the data
-value associated to this entity. The area occupied by a particular map element is defined as the Voronoi's cells
-associated to this element. The Voronoi' cell is a convex polygon containing all the points
-of the territory which are closer for the chosen element than to any other element
+value associated to this entity. The area occupied by a particular map element is defined as the Voronoi's cell
+associated to this element. The Voronoi's cell is a convex polygon containing all the points
+of the territory which are closer to a chosen element than to any other element
 \cite{aurenhammer1991voronoi}. In our case, we use all the entities present on a molecular map
 for defining the Voronoi's cells. The polygons are pre-computed for each map and post-processed
 to avoid too large polygons, and are colored according to the data values and the options
 defined by the user. In map staining, the colorful decorations of the pathway map
 are replaced by a black-and-white background in order to avoid mixing the colors.
 Using map staining allows to appreciate large-scale trends in molecular data mapped
-onto biological networks, when observed ``from far".
+onto biological networks, when observed ``from far" (see example in Figure~\ref{fig2}).
 
 \end{itemize}
 
@@ -243,22 +243,22 @@ in several case studies:
 
 (1) comparing two prostate cancer cell lines using the cell cycle pathway map and transcriptomics and mutation data;
 
-(2) using a large map of Atlas of Cancer Signalling Network (\href{http://acsn.curie.fr}) \cite{Kuperstein2015} for visualizing ovary cancer data downloaded from The Cancer Genome Atlas \cite{TCGA2011Ovarian} (shown in Supplementary Text ???);
+(2) using a large map of Atlas of Cancer Signalling Network \cite{Kuperstein2015} for visualizing ovary cancer data downloaded from The Cancer Genome Atlas \cite{TCGA2011Ovarian} (shown in Supplementary Text ???);
 
 (3) using the map of molecular interactions involved in Alzheimer disease \cite{Mizuno2012} for visualizing the transcriptome data collected for different brain areas \cite{Hokama2014}.
 
 More examples of using NaviCell Web Service for data visualization can be found in NaviCell Web Service user guide and case studies
-provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.
+provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}..
 
 
 \subsection{Comparing transcriptomes of prostate cancer cell lines}
 
 As an illustration of the use of maps in comparing two cancer genomic profiles, we
 selected two prostate cancer cell lines from the Cancer Cell Line Encyclopedia
-\cite{barretina2012cancer}): a prostate hormone-sensitive
+\cite{barretina2012cancer}: a prostate hormone-sensitive
 tumor cell line (LNCAP), and a prostate hormone-resistant tumor cell line
-(DU145). We gathered gene expression, copy number and mutation data from
-the two cell lines and mapped them onto the cell cycle map
+(DU145). We gathered gene expression, copy number and mutation data for
+these two cell lines and mapped them onto the cell cycle map
 \cite{calzone2008comprehensive}.
 
 If we consider the cell line data as the mean expression of genes of a
@@ -266,7 +266,7 @@ population of asynchronous cells, most LNCAP cells seem to be expressing genes
 from the early state G1 (Figure~\ref{fig2}A, upper-right area) and the G1-S checkpoint
 (Figure~\ref{fig2}A, lower-left area) while most DU145 cells express genes from the
 later stages of the cell cycle (Figure 2a, G1-late, S-phase and G2-phase
-areas).  We notice that relatively few genes are mutated, amplified or lost
+areas).  We notice that relatively few cell cycle genes are mutated, amplified or lost
 in these two cell lines (Figure~\ref{fig2}A and ~\ref{fig2}B, square and triangle glyphs).
 
 By zooming on the map, we can determine that for the LNCAP cells, the most
@@ -286,7 +286,7 @@ cyclins seems to confirm this fact: CyclinB, CyclinD and CyclinH are higher
 than in LNCAP. Some means to stop the cycle seem to be kept though, with Cdc20
 and Cdc25 expression high.
 
-We verified {\bf: AZ: This sounds like experimental validation using Q-PCR and misleading} 
+We verified {\bf: AZ: This sounds like experimental validation using Q-PCR and misleading}
 the expression of KI-67, a marker of proliferation, and its
 expression is indeed higher in DU145 than in LNCAP cells, which tends to
 confirm our hypothesis that DU145 are more proliferative than LNCAP cells.

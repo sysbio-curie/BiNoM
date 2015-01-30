@@ -103,7 +103,7 @@ representation. This limits the use of data visualization on top of
 user-defined pathway maps. Third, APIs for programmatic web-based data
 visualization are practically non-existent.
 
-To fill this niche, we have developed NaviCell Web Service tool. It allows
+To fullfill this need, we have developed NaviCell Web Service tool. It allows
 visualizing omics data via GUI and flexible API using standard and advanced
 methods of data visualization including a possibility to perceive the data
 structure at different network scales. The NaviCell Web Service allows
@@ -123,16 +123,16 @@ pathway database).
 
 
 The NaviCell Web Service for Network-based Data
-Visualization is a combination of 1) user-friendly NaviCell JavaScript-based
+Visualization is a combination of (1) user-friendly NaviCell JavaScript-based
 web interface \cite{kuperstein2013navicell}, allowing browsing very large maps
 of biological networks using Google Maps API using \emph{semantic zooming}
 principle and visualize ``omics" data on top of them
-(\href{https://navicell.curie.fr}); 2) large collection of maps available for
+(\href{https://navicell.curie.fr}); (2) large collection of maps available for
 data visualization including the Atlas of Cancer Signaling Network (ACSN)
 (\href{https://acsn.curie.fr}))  and other detailed network maps created by many
 research groups for a particular subject (Toll-like receptor signalling, EGFR
 and mTOR pathways, mast cell activation, dendritic cells, iron metabolism,
-Alzheimer disease and others); 3) REST API allowing programmatic use of all
+Alzheimer disease and others); (3) REST API allowing programmatic use of all
 data visualization functions and manipulating the web interface, with available
 Python binding and upcoming R and Java bindings.
 
@@ -167,7 +167,7 @@ software packages. At the moment we have a full API ready for Python, and
 APIs for R and Java in development. These APIs will facilitate the
 integration of NaviCell Web Service in other applications: among them, there exists an ongoing work on providing
 the data visualization services through the Garuda Alliance web platform, which aims to be a one-stop service for
-bioinformatics and systems biology \cite{ghosh2011software} and GeneSpring software \cite{Chu2001}. Figure~\ref{fig1} is
+bioinformatics and systems biology \cite{ghosh2011software} and GeneSpring software \cite{Chu2001}. Figure 1 is
 summarizing the NaviCell \emph{server} architecture and information flow.
 \subsection{Input data types}
 
@@ -188,7 +188,7 @@ For instance, a mRNA expression data matrix is associated to a
 this data with a heatmap, mapping to a color gradient will applied by default, with a possibility
 for modifying the default setting. On the other hand, when a
 matrix with discrete copy-number data is loaded, it is associated with a
-``discrete unordered" {\bf AZ: WHY UNORDERED, should be ORDERED???} internal representation for which
+``discrete ordered" internal representation for which
 a specific color palette is applied for visualization,
 with a distinct color associated to each discrete copy-number state.
 
@@ -296,7 +296,7 @@ to avoid too large polygons, and are colored according to the data values and th
 defined by the user. In map staining, the colorful decorations of the pathway map
 are replaced by a black-and-white background in order to avoid mixing the colors.
 Using map staining allows to appreciate large-scale trends in molecular data mapped
-onto biological networks, when observed ``from far" (see example in Figure~\ref{fig2}).
+onto biological networks, when observed ``from far" (see example in Figure 2).
 
 \end{itemize}
 
@@ -329,11 +329,11 @@ these two cell lines and mapped them onto the cell cycle map
 
 If we consider the cell line data as the mean expression of genes of a
 population of asynchronous cells, most LNCAP cells seem to be expressing genes
-from the early state G1 (Figure~\ref{fig2}A, upper-right area) and the G1-S checkpoint
-(Figure~\ref{fig2}A, lower-left area) while most DU145 cells express genes from the
+from the early state G1 (Figure2A, upper-right area) and the G1-S checkpoint
+(Figure2A, lower-left area) while most DU145 cells express genes from the
 later stages of the cell cycle (Figure 2a, G1-late, S-phase and G2-phase
 areas).  We notice that relatively few cell cycle genes are mutated, amplified or lost
-in these two cell lines (Figure~\ref{fig2}A and ~\ref{fig2}B, square and triangle glyphs).
+in these two cell lines (Figureg2A and 2B, square and triangle glyphs).
 
 By zooming on the map, we can determine that for the LNCAP cells, the most
 important gene alterations are: the amplification of DP1 (present in most

@@ -69,7 +69,7 @@ representing in a meaningfull way numerous ``omics" data collected in
 large-scale experiments. Visualizing quantitative ``omics" data in the context
 of biological networks provides insights into the molecular mechanisms in
 healthy tissues and disease \cite{Gehlenborg2010,Barillot2012}. This is one of
-the most demanded features of existing pathway databases such as KEGG PATHWAY
+the most demanded features of existing pathway databases such as KEGG 
 and Reactome \cite{Kanehisa2012, Croft2014}. To answer this need, many tools
 have been developed allowing mapping ``omics" data on top of the biological
 networks \cite{Arakawa2005,vanIersel2008,Luo2013, Nishida2014}. These tools use
@@ -78,13 +78,13 @@ through dedicated APIs. In addition, some pathway databases provide graphical
 user interfaces (GUI) to perform the task of data visualization, on top of
 their interactive pathway maps.
 
-When a user is faced with necessity to visualize the ``omics" data on top of
+When a user is faced with the necessity to visualize the ``omics" data on top of
 biological networks, there are currently two options available: either to use
 GUI of a suitable pathway database, which can be a tedious manual work, or use
 one of the available standalone or web-based tools for creating static images
 of colored pathways which are not interactive anymore and do not allow browsing
 the molecular interactions. Currently, there exist no well-developed APIs
-allowing programmatically apply data visualization on top of biological
+that allow to programmatically apply data visualization on top of biological
 networks such that the omics data can be browsed simultaneously with the
 pathway information.
 
@@ -123,25 +123,25 @@ pathway database).
 
 
 The NaviCell Web Service for Network-based Data
-Visualization is a combination of (1) user-friendly NaviCell JavaScript-based
+Visualization is a combination of 1) a user-friendly NaviCell JavaScript-based
 web interface \cite{kuperstein2013navicell}, allowing browsing very large maps
 of biological networks using Google Maps API using \emph{semantic zooming}
 principle and visualize ``omics" data on top of them
-(\href{https://navicell.curie.fr}); (2) large collection of maps available for
+(\href{https://navicell.curie.fr})); 2) a large collection of maps available for
 data visualization including the Atlas of Cancer Signaling Network (ACSN)
 (\href{https://acsn.curie.fr}))  and other detailed network maps created by many
 research groups for a particular subject (Toll-like receptor signalling, EGFR
 and mTOR pathways, mast cell activation, dendritic cells, iron metabolism,
-Alzheimer disease and others); (3) REST API allowing programmatic use of all
+Alzheimer disease and others); 3) a REST API allowing programmatic use of all
 data visualization functions and manipulating the web interface, with available
 Python binding and upcoming R and Java bindings.
 
-Quick live example which \emph{automatically} uploads a sample dataset from
+A quick live example which \emph{automatically} uploads a sample dataset from
 TCGA database and illustrates all basic data visualization capabilities of
 NaviCell Web Service is provided at
 \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. Sample Python
 code for quick start on using NaviCell Web Service API is available from the
-same page in ``Python API and data files" section.
+same page in the ``Python API and data files" section.
 
 \section{ALGORITHMS AND SOFTWARE}
 
@@ -251,12 +251,12 @@ Gene list & set
 We have included in the NaviCell Web Service for network-based data visualization several methods
 for graphical representation of molecular data. Some of them are standard
 and broadly used in molecular biology (heatmaps and barplots), while others (glyphs and map
-stainings) have not been previously employed (to our knowledge) in the context of network-based
+staining) have not been previously employed (to our knowledge) in the context of network-based
 data visualization.
 
 \begin{itemize}
 
-\item \textbf{Simple markers} are pictograms (similar to the ones used in Goggle Maps
+\item \textbf{Simple markers} are pictograms (similar to the ones used in Google Maps
 to indicate the geographical locations) are drawn on the pathway map at the location
 of a given molecular species (protein, gene, complex, phenotype). They are used to display the
 results of a search performed by the user or to display a list of genes of interest
@@ -352,10 +352,10 @@ cyclins seems to confirm this fact: CyclinB, CyclinD and CyclinH are higher
 than in LNCAP. Some means to stop the cycle seem to be kept though, with Cdc20
 and Cdc25 expression high.
 
-We verified {\bf: AZ: This sounds like experimental validation using Q-PCR and misleading}
-the expression of KI-67, a marker of proliferation, and its
-expression is indeed higher in DU145 than in LNCAP cells, which tends to
-confirm our hypothesis that DU145 are more proliferative than LNCAP cells.
+We checked the expression levels of KI-67, a marker of proliferation, in the
+dataset and its expression is indeed higher in DU145 than in LNCAP cells, which
+tends to confirm our hypothesis that DU145 are more proliferative than LNCAP
+cells.
 
 \subsection{Creating molecular portrait of Alzheimer's disease}
 

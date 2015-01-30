@@ -19,7 +19,7 @@ import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class FindNeighbours {
 
-	public static void main(String[] args) {
+	public static void test_main(String[] args) {
 		try{
 			
 			//SbmlDocument sbml = CellDesigner.loadCellDesigner("C:/Datas/BinomTest/M-phase2.xml");

@@ -162,6 +162,7 @@ public class ProduceClickableMap
 	
 	private HashMap<String,Vector<Place>> placeMap = new HashMap<String,Vector<Place>>();
 	public SbmlDocument cd = null;
+	public GraphNeighbours graphNeighbours;
 	public String voronoiCells;
 	private final HashMap<String, XmlObject> species = new HashMap<String, XmlObject>(); // not used
 	private final HashMap<String, Vector<String>> speciesAliases = new HashMap<String, Vector<String>>();
@@ -1441,6 +1442,7 @@ public class ProduceClickableMap
 	{
 		cd = CellDesigner.loadCellDesigner(fn);
 		CellDesigner.entities = CellDesigner.getEntities(cd);
+		graphNeighbours = new GraphNeighbours(cd);
 	}
 	
 	/* Function to find all coordinate information.
@@ -2350,6 +2352,21 @@ public class ProduceClickableMap
 			else
 			{
 				outjson.print("\"id\" : \"" + m.getId() + "\",");
+				SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(m.getId());
+				if (sp != null) {
+					// insert species neighbours here
+					Vector<String> speciesNeighbours = graphNeighbours.getSpeciesNeighbours(sp);
+					if (speciesNeighbours.size() > 0) {
+						System.out.println("species name: " + m.getName() + " -> " + speciesNeighbours.size());
+						outjson.print("\"species_neighbours\": [");
+						int nn = 0;
+						for (String neighbourg : speciesNeighbours) {
+							outjson.print((nn > 0 ? "," : "") + "\"" + neighbourg + "\"");
+							nn++;
+						}
+						outjson.print("],");
+					}
+				}
 				String bubble;
 				if (ent.getPost() != null) {
 					bubble = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
@@ -2374,6 +2391,20 @@ public class ProduceClickableMap
 			//System.out.println("-----> : " + hugoNames.get(nn));
 		}
 		outjson.print("],");
+		// -----
+		// insert entity neighbourgs here
+		// -----
+		Vector<String> entityNeighbours = graphNeighbours.getEntityNeighbours(ent.getId());
+		if (entityNeighbours.size() > 0) {
+			System.out.println("name: " + ent.getName() + " -> " + entityNeighbours.size());
+			outjson.print("\"entity_neighbours\": [");
+			int nn = 0;
+			for (String neighbourg : entityNeighbours) {
+				outjson.print((nn > 0 ? "," : "") + "\"" + neighbourg + "\"");
+				nn++;
+			}
+			outjson.print("],");
+		}
 		outjson.print("\"postid\" : \"" + ent.getPostId() + "\"");
 		if (ent.getComment() != null) {
 			//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");

@@ -171,11 +171,14 @@ RESTful web services are very popular and have the advantage of being
 lightweight, efficient and simple to use. They also have the benefit of
 relatively ease of implementation in many different programming languages and
 software packages. At the moment we have a full API ready for Python, and
-APIs for R and Java in development. These APIs will facilitate the
-integration of NaviCell Web Service in other applications: among them, there exists an ongoing work on providing
-the data visualization services through the Garuda Alliance web platform, which aims to be a one-stop service for
-bioinformatics and systems biology \cite{ghosh2011software} and GeneSpring software \cite{Chu2001}. Figure 1 is
-summarizing the NaviCell \emph{server} architecture and information flow.
+APIs for R and Java in development. These APIs will facilitate the integration
+of NaviCell Web Service in other applications: among them, there exists an
+ongoing work on providing the data visualization services through the Garuda
+Alliance web platform, which aims to be a one-stop service for bioinformatics
+and systems biology \cite{ghosh2011software} and GeneSpring software
+\cite{Chu2001}. Figure 1 is summarizing the NaviCell \emph{server} architecture
+and information flow.  
+
 \subsection{Input data types}
 
 The pathway maps which can be used for NaviCell Web Serivce data visualization
@@ -382,15 +385,14 @@ with similar tools. We selected a number of web-based tools that are providing
 similar functionalities, i.e. easy pathway browsing functions and interactive data
 visualization capabilities. For the comparison, we have focused on the features
 related to map navigation, molecular data types, graphical representations,
-and programmatic access. Table \ref{table:02} display the results. NaviCell Web
-Service offers more features than other tools in terms of map navigation, for
-data visualization with additional graphical representations (such as map
-staining) and more data types, and finally extended support for programmatic
-access from different computer languages.
-
-To extend the scope of NaviCell Web Service, we are currently working on porting some of the
-most used pathway databases into the CellDesigner format which can be used after for displaying
-in NaviCell, with a possibility of data visualization.
+and programmatic access. Table \ref{table:02} display the results. 
+We can see from this table that NaviCell Web Service strength are related to
+increased possibilities for graphical representations, suppport of multiple
+data types and extended possibilities for programmatic access from different
+computer languages.  To extend the scope of NaviCell Web Service, we are
+currently working on porting some of the most used pathway databases into the
+CellDesigner format which can be used after for displaying in NaviCell, with a
+possibility of data visualization.
 
 
 %\begin{table}[b]
@@ -451,7 +453,9 @@ BioCyc\cite{karp2005expansion}, Pa: PATIKAweb\cite{demir2002patika}.
 
 \section{CONCLUSION}
 
-NaviCell Web Service should contribute to the growing set of highly demanded tools for molecular biology allowing visualization of ``omics" data in the context of biological network maps.
+NaviCell Web Service should contribute to the growing set of highly demanded
+tools for molecular biology allowing visualization of ``omics" data in the
+context of biological network maps.
 
 \section{ACKNOWLEDGEMENTS}
 
@@ -475,5 +479,17 @@ the client software can send data (e.g. an expression data matrix) to the
 server, but it can also receive data from the server (e.g. a list of gene HUGO
 codes contained in a map).
 
+\textbf{Figure 2.} Examples of data visualization using the NaviCell Web
+Service. Prostate cancer data types (transcriptomics, gene copy-number and gene
+mutation, \cite{barretina2012cancer}) are mapped on the Cell Cycle map. (A) hormone-sensitive prostate
+cancer cell line (LNCAP). (B) hormone-resistant prostate cancer cell line
+(DU145). Expression data from post-mortem brain samples of Alzheimer disease
+patients \cite{hokama2013altered} are mapped on Alzheimer's map (C,D). Expression data is visualized by
+using the map staining technique, i.e. colored territories around entities,
+ranging from low  (dark purple) to high expression values (dark red).
+Copy-number values are represented by glyphs (squares) with blue color
+indicating gene loss (values of -1 and lower) and yellow color indicating
+amplification (values of 1 and higher). Mutated genes are depicted by cyan
+triangles. 
 
 \end{document}

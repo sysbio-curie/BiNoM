@@ -46,14 +46,21 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-We developed NaviCell Web Service for network-based visualization of ``omics" data, using Google Maps API
-for browsing large maps of molecular interactions and RESTfull web service with available Python binding
-to automate the data visualization tasks. NaviCell Web Service implements a number of data visual representation
-methods including the novel map staining technique which allows grasping large-scale trends in
-numerical values (such as whole transcriptome) projected on top of the pathway map. We provide several
-case studies using the pathway maps created by different research groups in which data visualization
-serves for getting new insights into molecular mechanisms involved in systemic disease progression such as cancer
-and neurodegenerative diseases.
+NaviCell is a web tool using Google Maps API for easy and intuitive navigation
+of large maps of molecular interactions. Here, we present the NaviCell Web
+Service for network-based visualization of  ``omics" data, a major extension of
+NaviCell current functionalities.  NaviCell Web Service implements a number of
+data visual representation methods, including the novel map staining technique
+which allows grasping large-scale trends in numerical values (such as whole
+transcriptome) projected on top of the pathway map. The service also provides a
+server mode, which allows to automate visualization tasks and retrieve data
+from maps via RESTfull (standard HTTP) calls.  For convenience, complete
+bindings to the Python programming languages are provided, with upcoming
+bindings to other languages (R, Java).  We illustrate the interest of the tool
+with  two case studies using pathway maps created by different research groups,
+in which data visualization serves for getting new insights into molecular
+mechanisms involved in systemic disease progression (cancer and
+neurodegenerative disease).
 
 \end{abstract}
 
@@ -304,17 +311,24 @@ onto biological networks, when observed ``from far" (see example in Figure 2).
 
 \section{RESULTS}
 
-We show that NaviCell Web Service can be used for simultaneous analysis of different types of high-throughput data
-in several case studies:
+We show that NaviCell Web Service can be used for simultaneous analysis of
+different types of high-throughput data in two case studies:
+\begin{enumerate}
+\item comparing two prostate cancer cell lines using the cell cycle pathway map
+and transcriptomics and mutation data.
 
-(1) comparing two prostate cancer cell lines using the cell cycle pathway map and transcriptomics and mutation data;
+\item using the map of molecular interactions involved in Alzheimer disease
+\cite{Mizuno2012} for visualizing the transcriptome data collected for
+different brain areas \cite{Hokama2014}.
+\end{enumerate}
 
-(2) using a large map of Atlas of Cancer Signalling Network \cite{Kuperstein2015} for visualizing ovary cancer data downloaded from The Cancer Genome Atlas \cite{TCGA2011Ovarian} (shown in Supplementary Text ???);
-
-(3) using the map of molecular interactions involved in Alzheimer disease \cite{Mizuno2012} for visualizing the transcriptome data collected for different brain areas \cite{Hokama2014}.
-
-More examples of using NaviCell Web Service for data visualization can be found in NaviCell Web Service user guide and case studies
-provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}..
+Furthermore, several examples of using NaviCell Web Service for data
+visualization can be found in NaviCell Web Service user guide and case studies
+provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. For
+instance, we have mapped ovary cancer data downloaded from The Cancer Genome
+Atlas \cite{TCGA2011Ovarian} on a  large map of Atlas of Cancer Signalling
+Network \cite{Kuperstein2015}, and a complete description of this analysis is
+available as supplementary material. 
 
 
 \subsection{Comparing transcriptomes of prostate cancer cell lines}

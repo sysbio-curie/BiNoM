@@ -353,6 +353,7 @@ function show_markers(markers)
 
 function jstree_uncheck_all()
 {
+	// never reached
 	CHECK_NO_JXTREE("jstree_uncheck_all");
 	hide_all_markers();
 	jtree.jstree("uncheck_all");
@@ -998,7 +999,7 @@ function show_map_and_markers(map_name, ids)
 	}
 }
 
-function uncheck_all_entities(win)
+function uncheck_all_entities(win, partial)
 {
 	if (!win) {
 		win = window;
@@ -1029,7 +1030,7 @@ function uncheck_all_entities(win)
 		this.close();
 	});
 
-	overlay.reset(); // ??
+	overlay.reset(!partial); // ??
 	overlay.draw(win.document.navicell_module_name);
 }
 

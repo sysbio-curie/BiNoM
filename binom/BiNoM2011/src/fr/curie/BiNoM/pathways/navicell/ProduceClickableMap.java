@@ -96,6 +96,8 @@ public class ProduceClickableMap
 	private static boolean NO_BUBBLE = false;
 	private static boolean NEW_REACTION_MANAGEMENT = true;
 	private static boolean INCLUDE_REACTIONS = true;
+	private static int DEFAULT_REACTION_W = 0;
+	private static int DEFAULT_REACTION_H = 0;
 
 	public static class NaviCellException extends java.lang.Exception
 	{
@@ -2484,12 +2486,24 @@ public class ProduceClickableMap
 								outjson.print("\"id\" : \"" + r.getId() + "\","); // kludge
 								outjson.print("\"name\" : \"" + r.getId() + "\",");// kludge
 								outjson.print("\"positions\" : [{");
-								outjson.print("\"x\" : " + toDouble(scales.getX(x)) + ", ");
-								outjson.print("\"y\" : " + toDouble(scales.getY(y)) + ", ");
-								outjson.print("\"w\" : " + toDouble(scales.getL(0)) + ", ");
-								outjson.print("\"h\" : " + toDouble(scales.getL(0)));
-								//outjson.print("\"said\" : \"XAID__" + r.getId() + "\""); // shape id to be ignored
+								outjson.print("\"x\" : " + toDouble(scales.getX(x-DEFAULT_REACTION_W/2)) + ", ");
+								outjson.print("\"y\" : " + toDouble(scales.getY(y-DEFAULT_REACTION_H/2)) + ", ");
+								outjson.print("\"w\" : " + toDouble(scales.getL(DEFAULT_REACTION_W)) + ", ");
+								outjson.print("\"h\" : " + toDouble(scales.getL(DEFAULT_REACTION_H)));
 								outjson.print("}]"); // same kludge
+								//outjson.print("\"said\" : \"XAID__" + r.getId() + "\""); // shape id to be ignored
+								Vector<String> speciesNeighbours = graphNeighbours.getReactionGraphNeighbourSpecies(r);
+								if (speciesNeighbours.size() > 0) {
+									System.out.println("reaction name: " + r.getId() + " -> " + speciesNeighbours.size());
+									outjson.print(", \"species_neighbours\": [");
+									int nn = 0;
+									for (String neighbourg : speciesNeighbours) {
+										outjson.print((nn > 0 ? "," : "") + "\"" + neighbourg + "\"");
+										nn++;
+									}
+									outjson.print("]");
+								}
+
 								outjson.print("}]");
 								outjson.print("}");
 								entity_size++;

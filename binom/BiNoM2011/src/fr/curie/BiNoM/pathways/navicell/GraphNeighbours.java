@@ -49,4 +49,9 @@ public class GraphNeighbours {
 		}
 		return new Vector<String>();
 	}
+
+	Vector<String> getReactionGraphNeighbourSpecies(ReactionDocument.Reaction re) {
+		String reid = re.getId();
+		return FindNeighbours.getReactionGraphNeighbourSpecies(reactionGraph, speciesId2name, name2speciesId, reid);
+	}
 }

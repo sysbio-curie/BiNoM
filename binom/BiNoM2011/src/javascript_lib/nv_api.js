@@ -177,9 +177,9 @@ function nv_set_zoom(win, zoom)
 	return null;
 }
 
-function nv_uncheck_all_entities(win)
+function nv_uncheck_all_entities(win, partial)
 {
-	win.uncheck_all_entities(win);
+	win.uncheck_all_entities(win, partial);
 	return null;
 }
 

@@ -664,9 +664,11 @@ Mapdata.prototype = {
 
 			if (!no_ext) {
 				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+			} else if (hints.result_title) {
+				$("#result_tree_header", win.document).html(hints.result_title);
 			}
 
-			uncheck_all_entities(win);
+			uncheck_all_entities(win, hints.select_neighbours);
 
 			res_jxtree.context = {win: win};
 
@@ -717,9 +719,13 @@ Mapdata.prototype = {
 				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints, open_bubble);
 			} else {
 				mapdata.searchFor(win, to_find, hints.div);
+				// EV: 2015-02-02, don't remember why setTimeout ? maybe clockwise cursor...Trying without timeout.
+				mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints, open_bubble);
+				/*
 				setTimeout(function() {
 					mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints, open_bubble);
 				}, 20);
+				*/
 			}
 
 			return;
@@ -995,7 +1001,7 @@ Mapdata.prototype = {
 					if (modif_arr) {
 						for (var kk = 0; kk < modif_arr.length; ++kk) {
 							var modif = modif_arr[kk];
-							var o_modif = this.module_mapdata_by_id[module_name][modif.id];
+							//var o_modif = this.module_mapdata_by_id[module_name][modif.id];
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
 							if (modif.positions) {
 								modif_map[modif.id] = [];

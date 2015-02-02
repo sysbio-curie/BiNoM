@@ -23,6 +23,7 @@ var MAX_SCREEN_HEIGHT = 2000;
 var ESP_LATLNG = 0.01;
 var CENTER_HIGHLIGHT_SHAPE = true;
 var CENTER_HIGHLIGHT_CIRCLE = !CENTER_HIGHLIGHT_SHAPE;
+var DEAL_CENTER = false;
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
@@ -122,6 +123,67 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 	}
 }
 
+function scaled_boxes_from_boxes(overlay, boxes) {
+	var overlayProjection = overlay.getProjection();
+	var mapProjection = overlay.map_.getProjection();
+	var scale = Math.pow(2, overlay.map_.zoom);
+	var div = overlay.div_;
+	var array = [];
+	for (var idx in boxes) {
+		var box = boxes[idx];
+		//var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
+		//console.log("box[0] " + box[0] + " " + box[2] + " " + box[1] + " " + box[3]);
+		if (!box.gpt) {
+			box.gpt = new google.maps.Point(box[0], box[2]);
+		}
+		var latlng = mapProjection.fromPointToLatLng(box.gpt);
+		var pix = overlayProjection.fromLatLngToDivPixel(latlng);
+		var bx = pix.x - div.left;
+		var by = pix.y - div.top;
+		var bw = box[1]*scale;
+		var bh = box[3]*scale;
+		array.push([pix.x, bw, pix.y, bh]);
+		//console.log("box -> " + [pix.x, bw, pix.y, bh]);
+	}
+	return array;
+}
+
+function boxes_from_positions(overlay, positions) {
+	// no need of overlay
+	var array = [];
+	for (var idx in positions) {
+		var pos = positions[idx];
+		var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
+		array.push(box);
+	}
+	return array;
+}
+
+function box_from_positions_old(overlay, positions) {
+	var overlayProjection = overlay.getProjection();
+	var mapProjection = overlay.map_.getProjection();
+	var scale = Math.pow(2, overlay.map_.zoom);
+	var div = overlay.div_;
+	var array = [];
+	for (var idx in positions) {
+		var pos = positions[idx];
+		var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
+		//console.log("box[0] " + box[0] + " " + box[2] + " " + box[1] + " " + box[3]);
+		if (!box.gpt) {
+			box.gpt = new google.maps.Point(box[0], box[2]);
+		}
+		var latlng = mapProjection.fromPointToLatLng(box.gpt);
+		var pix = overlayProjection.fromLatLngToDivPixel(latlng);
+		var bx = pix.x - div.left;
+		var by = pix.y - div.top;
+		var bw = box[1]*scale;
+		var bh = box[3]*scale;
+		array.push([pix.x, bw, pix.y, bh]);
+		//console.log("box -> " + [pix.x, bw, pix.y, bh]);
+	}
+	return array;
+}
+
 function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
@@ -174,7 +236,8 @@ function event_ckmap(e, e2, type, overlay) {
 							clicked_node = node;
 							clicked_latlng = latlng;
 							if (type == 'mouseup') {
-								clicked_center_box = [pix.x, bw, pix.y, bh];
+								//clicked_center_box = [pix.x, bw, pix.y, bh];
+								clicked_center_box = box;
 							}
 						}
 					}
@@ -203,8 +266,55 @@ function event_ckmap(e, e2, type, overlay) {
 		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, mode, false, clicked_boundbox);
 		overlay.win.nv_open_bubble = o_open_bubble;
 		if (type == 'mouseup') {
-			overlay.clicked_center_box = clicked_center_box;
-			overlay.win.map.setCenter(clicked_latlng); // just testing
+			if (DEAL_CENTER) {
+				overlay.clicked_center_box = clicked_center_box;
+			} else {
+			//overlay.win.map.setCenter(clicked_latlng); // just testing
+			// neighbours
+			var info = navicell.mapdata.getMapdataById(module, clicked_node.user_id);
+			if (info) {
+				var boxes = [];
+				var str = "";
+				console.log("nb: " + info.id);
+				//array_push_all(boxes, box_from_positions(overlay, info.positions));
+				array_push_all(boxes, boxes_from_positions(overlay, info.positions));
+				var select_entity_arr = [];
+				select_entity_arr.push(info.id);
+				if (info.species_neighbours) {
+					for (var idx in info.species_neighbours) {
+						var neighbour = info.species_neighbours[idx];
+						select_entity_arr.push(neighbour);
+						str += (str.length > 0 ? ", " : "") + neighbour;
+						var info2 = navicell.mapdata.getMapdataById(module, neighbour);
+						if (info2) {
+							console.log("nb: " + info2.id);
+							//array_push_all(boxes, box_from_positions(overlay, info2.positions));
+							array_push_all(boxes, boxes_from_positions(overlay, info2.positions));
+							if (info2.species_neighbours) {
+								for (var idx2 in info2.species_neighbours) {
+									var neighbour2 = info2.species_neighbours[idx2];
+									select_entity_arr.push(neighbour2);
+									str += (str.length > 0 ? ", " : "") + neighbour2;
+									var info3 = navicell.mapdata.getMapdataById(module, neighbour2);
+									if (info3 && info3.id != info.id) {
+										console.log("nb: " + info3.id);
+										//array_push_all(boxes, box_from_positions(overlay, info3.positions));
+										array_push_all(boxes, boxes_from_positions(overlay, info3.positions));
+									}
+								}
+							}
+						}
+					}
+				}
+				console.log("neighbourgs of " + clicked_node.user_id + " : " + str);
+				overlay.highlight_boxes = boxes;
+				navicell.mapdata.findJXTree(overlay.win, select_entity_arr, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: "\"" + info.name + "\" + graph&nbsp;reaction&nbsp;neighbours (" + (boxes.length-1) + ")"});
+				$("#right_tabs", window.document).tabs("option", "active", 1);
+			}
+			}
+			if (DEAL_CENTER) {
+				overlay.win.map.setCenter(clicked_latlng); // just testing
+			}
 		}
 	}
 
@@ -409,6 +519,29 @@ USGSOverlay.prototype.resize = function() {
 	}
 }
 
+USGSOverlay.prototype.initHighlight = function() {
+	var context = this.context;
+	context.fillStyle = "#FFFFFF";
+	context.globalAlpha = 0.65;
+	context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+}
+
+USGSOverlay.prototype.highlight = function(boxes) {
+	boxes = scaled_boxes_from_boxes(this, boxes);
+	this.initHighlight();
+	var context = this.context;
+	var div = this.div_;
+	console.log("hightlight " + boxes.length);
+	for (var idx in boxes) {
+		var box = boxes[idx];
+		var x = box[0] - div.left;
+		var y = box[2] - div.top;
+		var w = box[1];
+		var h = box[3];
+		context.clearRect(x-1, y-1, w+2, h+2);
+	}
+}
+
 USGSOverlay.prototype.draw = function(module) {
 
 	if (this.div_ == null) {
@@ -427,29 +560,37 @@ USGSOverlay.prototype.draw = function(module) {
 		module = get_module();
 	}
 
-	if (this.clicked_center_box) {
+	if (this.highlight_boxes) {
+		//console.log("HIGHTLIGHT");
+		this.highlight(this.highlight_boxes);
+	} else if (this.clicked_center_box) {
+		//console.log("CENTER");
 		var context = this.context;
+		this.initHighlight();
+		/*
 		context.fillStyle = "#FFFFFF";
 		context.globalAlpha = 0.65;
 		context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+		*/
 		var div = this.div_;
+		/*
 		var x = this.clicked_center_box[0] - div.left;
 		var y = this.clicked_center_box[2] - div.top;
 		var w = this.clicked_center_box[1];
 		var h = this.clicked_center_box[3];
+		*/
+		var scaled_box = scaled_boxes_from_boxes(this, [this.clicked_center_box])[0];
+		var x = scaled_box[0] - div.left;
+		var y = scaled_box[2] - div.top;
+		var w = scaled_box[1];
+		var h = scaled_box[3];
 		if (CENTER_HIGHLIGHT_SHAPE) {
-			//context.clearRect(x, y, w, h);
 			context.clearRect(x-1, y-1, w+2, h+2);
 		} else if (CENTER_HIGHLIGHT_CIRCLE) {
 			var radius = w;
 			if (h > radius) {
 				radius = h;
 			}
-			/*
-			if (radius < 100) {
-				radius = 100;
-			}
-			*/
 			context.save();
 			context.globalAlpha = 1;
 			context.beginPath();
@@ -458,6 +599,8 @@ USGSOverlay.prototype.draw = function(module) {
 			context.clearRect(x - radius - 1, y - radius - 1, radius * 2 + 2, radius * 2 + 2);
 			context.restore();
 		}
+	} else {
+		//console.log("NOP");
 	}
 
 	var drawing_config = navicell.getDrawingConfig(module);
@@ -502,8 +645,11 @@ USGSOverlay.prototype.draw = function(module) {
 	}
 }
 
-USGSOverlay.prototype.reset = function() {
-	this.clicked_center_box = null;
+USGSOverlay.prototype.reset = function(full) {
+	if (full) {
+		this.clicked_center_box = null;
+		this.highlight_boxes = null;
+	}
 	this.arrpos = [];
 }
 

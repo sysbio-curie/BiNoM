@@ -5412,7 +5412,8 @@ public class ProduceClickableMap
 		boolean NV1_2 = true;
 		if (NV1_2) {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_dir + "/themes/base/jquery.ui.all.css\"/>");
-			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery.ui.theme.css\"/>");
+			//out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery.ui.theme.css\"/>");
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + jquery_ui_themes_dir + "/themes/humanity/jquery-ui.css\"/>");
 		}
 		if (NV2) {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + "_v2.css\"/>");
@@ -5459,6 +5460,15 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jquery_ui_dir + "/ui/jquery.ui.effect.js\"></script>");
 			out.println("<script src=\"" + jslib_dir + "/jquery.tablesorter.js\"></script>");
 			out.println("<script src=\"" + jslib_dir + "/jscolor/jscolor.js\"></script>");
+
+			out.println("<script src=\"../../../lib/jquery-contextmenu/src/jquery.ui.position.js\" type=\"text/javascript\"></script>");
+			out.println("<script src=\"../../../lib/jquery-contextmenu/src/jquery.contextMenu.js\" type=\"text/javascript\"></script>");
+			out.println("<script src=\"../../../lib/jquery-contextmenu/prettify/prettify.js\" type=\"text/javascript\"></script>");
+			out.println("<script src=\"../../../lib/jquery-contextmenu/screen.js\" type=\"text/javascript\"></script>");
+
+			out.println("<link href=\"../../../lib/jquery-contextmenu/src/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\"/>");
+			out.println("<link href=\"../../../lib/jquery-contextmenu/screen.css\" rel=\"stylesheet\" type=\"text/css\"/>");
+			out.println("<link href=\"../../../lib/jquery-contextmenu/prettify/prettify.sunburst.css\" rel=\"stylesheet\" type=\"text/css\"/>\n");
 		}
 
 		final String map_div_name = "map"; // see css

@@ -46,21 +46,20 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-NaviCell is a web tool using Google Maps API for easy and intuitive navigation
-of large maps of molecular interactions. Here, we present the NaviCell Web
-Service for network-based visualization of  ``omics" data, a major extension of
-NaviCell current functionalities.  NaviCell Web Service implements a number of
+We present the NaviCell Web
+Service for network-based visualization of  ``omics" data.  
+NaviCell Web Service implements a number of
 data visual representation methods, including the novel map staining technique
 which allows grasping large-scale trends in numerical values (such as whole
 transcriptome) projected on top of the pathway map. The service also provides a
 server mode, which allows to automate visualization tasks and retrieve data
-from maps via RESTfull (standard HTTP) calls.  For convenience, complete
-bindings to the Python programming languages are provided, with upcoming
-bindings to other languages (R, Java).  We illustrate the interest of the tool
+from maps via RESTfull (standard HTTP) calls.  
+Bindings to the different programming languages are provided
+(Python, R, Java).  We illustrate the interest of the tool
 with  two case studies using pathway maps created by different research groups,
 in which data visualization serves for getting new insights into molecular
 mechanisms involved in systemic disease progression (cancer and
-neurodegenerative disease).
+neurodegenerative disease).  
 
 \end{abstract}
 
@@ -76,7 +75,7 @@ representing in a meaningfull way numerous ``omics" data collected in
 large-scale experiments. Visualizing quantitative ``omics" data in the context
 of biological networks provides insights into the molecular mechanisms in
 healthy tissues and disease \cite{Gehlenborg2010,Barillot2012}. This is one of
-the most demanded features of existing pathway databases such as KEGG 
+the most demanded features of existing pathway databases such as KEGG
 and Reactome \cite{Kanehisa2012, Croft2014}. To answer this need, many tools
 have been developed allowing mapping ``omics" data on top of the biological
 networks \cite{Arakawa2005,vanIersel2008,Luo2013, Nishida2014}. These tools use
@@ -132,12 +131,12 @@ pathway database).
 The NaviCell Web Service for Network-based Data
 Visualization is a combination of 1) a user-friendly NaviCell JavaScript-based
 web interface \cite{kuperstein2013navicell}, allowing browsing very large maps
-of biological networks using Google Maps API using \emph{semantic zooming}
+of biological networks using Google Maps API and \emph{semantic zooming}
 principle and visualize ``omics" data on top of them
 (\href{https://navicell.curie.fr})); 2) a large collection of maps available for
 data visualization including the Atlas of Cancer Signaling Network (ACSN)
 (\href{https://acsn.curie.fr}))  and other detailed network maps created by many
-research groups for a particular subject (Toll-like receptor signalling, EGFR
+research groups for particular topics (Toll-like receptor signalling, EGFR
 and mTOR pathways, mast cell activation, dendritic cells, iron metabolism,
 Alzheimer disease and others); 3) a REST API allowing programmatic use of all
 data visualization functions and manipulating the web interface, with available
@@ -155,8 +154,8 @@ same page in the ``Python API and data files" section.
 \subsection{Implementation}
 
 We conceived the NaviCell Web Service for Network-based Data Visualization
-as a significant development of NaviCell tool \cite{kuperstein2013navicell} allowing
-users to visualize and analyze different types of ``omics" data. The web service
+as a significant development of NaviCell \cite{kuperstein2013navicell} 
+allowing users to visualize and analyze different types of ``omics" data. The web service
 is implemented at two interconnected functional levels.
 The first level corresponds to the interactive dialog-based
 use of the web interface to load and visualize data. This level is implemented
@@ -177,7 +176,7 @@ ongoing work on providing the data visualization services through the Garuda
 Alliance web platform, which aims to be a one-stop service for bioinformatics
 and systems biology \cite{ghosh2011software} and GeneSpring software
 \cite{Chu2001}. Figure 1 is summarizing the NaviCell \emph{server} architecture
-and information flow.  
+and information flow.
 
 \subsection{Input data types}
 
@@ -208,7 +207,7 @@ points). Genes in the first column should be labeled by their standard HUGO (HGN
 gene symbols, that will be associated to the different entities (genes,
 proteins, complexes) on the pathway map.
 
-Users can also upload sample annotation files to specify how samples can organized into meaningfull groups
+Users can also upload sample annotation files to specify how samples can be organized into meaningfull groups
 (e.g., disease vs control), as a simple tab-delimited text file with sample names in
 rows and annotation fields as columns. Then, an appropriate method will be used
 to summarize the values of all the samples contained in a group, defined by the
@@ -260,7 +259,7 @@ Gene list & set
 
 We have included in the NaviCell Web Service for network-based data visualization several methods
 for graphical representation of molecular data. Some of them are standard
-and broadly used in molecular biology (heatmaps and barplots), while others (glyphs and map
+and broadly used in molecular biology (heatmaps and barplots), while others (such as map
 staining) have not been previously employed (to our knowledge) in the context of network-based
 data visualization.
 
@@ -331,7 +330,7 @@ provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. For
 instance, we have mapped ovary cancer data downloaded from The Cancer Genome
 Atlas \cite{TCGA2011Ovarian} on a  large map of Atlas of Cancer Signalling
 Network \cite{Kuperstein2015}, and a complete description of this analysis is
-available as supplementary material. 
+available as supplementary material.
 
 
 \subsection{Comparing transcriptomes of prostate cancer cell lines}
@@ -385,7 +384,7 @@ with similar tools. We selected a number of web-based tools that are providing
 similar functionalities, i.e. easy pathway browsing functions and interactive data
 visualization capabilities. For the comparison, we have focused on the features
 related to map navigation, molecular data types, graphical representations,
-and programmatic access. Table \ref{table:02} display the results. 
+and programmatic access. The results of this comparison are reported in Table~\ref{table:02}. 
 We can see from this table that NaviCell Web Service strength are related to
 increased possibilities for graphical representations, suppport of multiple
 data types and extended possibilities for programmatic access from different
@@ -484,12 +483,12 @@ Service. Prostate cancer data types (transcriptomics, gene copy-number and gene
 mutation, \cite{barretina2012cancer}) are mapped on the Cell Cycle map. (A) hormone-sensitive prostate
 cancer cell line (LNCAP). (B) hormone-resistant prostate cancer cell line
 (DU145). Expression data from post-mortem brain samples of Alzheimer disease
-patients \cite{hokama2013altered} are mapped on Alzheimer's map (C,D). Expression data is visualized by
+patients \cite{Hokama2014} are mapped on Alzheimer's map (C,D). Expression data is visualized by
 using the map staining technique, i.e. colored territories around entities,
 ranging from low  (dark purple) to high expression values (dark red).
 Copy-number values are represented by glyphs (squares) with blue color
 indicating gene loss (values of -1 and lower) and yellow color indicating
 amplification (values of 1 and higher). Mutated genes are depicted by cyan
-triangles. 
+triangles.
 
 \end{document}

@@ -231,6 +231,37 @@ $(function() {
 		status.html(html + "<span class=\"status-message\">" + message + "</span>");
 	}
 
+	$.contextMenu({
+		selector: '#inner_map', 
+		export_contextmenu_data: nv_set_contextmenu_data,
+		width_offset: -300, // hard coded value: should depend on right_panel width
+		//width_offset: -500, // hard coded value: should depend on right_panel width
+		//width_offset: 0, // hard coded value: should depend on right_panel width
+		callback: contextmenu_callback,
+		items: {
+			"title":  {"name": "&nbsp;", className: 'species-contextmenu-data-title'},
+			"sep0": "---------",
+			"center": {"name": "Center on Species"},
+			"center_highlight": {"name": "Center on Species and Highlight"},
+			"sep1": "---------",
+			"reaction_neighbours": {
+				"name": "Reaction Graph Neighbours", 
+				"items": {
+					"reaction_select": {"name": "Select Neighbours"},
+					"reaction_select_highlight": {"name": "Select and Highlight Neighbours"}
+				}
+			},
+			"sep2": "---------",
+			"interact_entities": {
+				"name": "Interacting Entities", 
+				"items": {
+					"interact_select": {"name": "Select Entities"},
+					"interact_select_highlight": {"name": "Select and Highlight Entities"}
+				}
+			}
+		}
+	});
+
 	$("#search_dialog").dialog({
 		autoOpen: false,
 		width: get_dialog_width(SEARCH_DIALOG_WIDTH),

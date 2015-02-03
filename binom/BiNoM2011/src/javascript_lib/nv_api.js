@@ -159,14 +159,14 @@ function nv_find_entities(win, search, open_bubble)
 	//return navicell.mapdata.getBubbleContents(get_module(win));
 }
 
-function nv_select_entity(win, id, mode, center, clicked_boundbox)
+function nv_select_entity(win, id, mode, center, clicked_boundbox, was_checked)
 {
 	win = nv_win(win);
 	var module = get_module(win);
 	var jxtree = navicell.mapdata.getJXTree(module);
 	var node = jxtree.getNodeByUserId(id);
 	if (node) {
-		win.click_node(win.overlay, node, mode, center, clicked_boundbox);
+		win.click_node(win.overlay, node, mode, center, clicked_boundbox, was_checked);
 	}
 	return null;
 }

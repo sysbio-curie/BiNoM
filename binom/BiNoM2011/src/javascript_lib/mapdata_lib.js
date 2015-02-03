@@ -271,15 +271,6 @@ jxtree_mapfun_map['right_label'] = function(datanode) {
 }
 
 jxtree_mapfun_map['data'] = function(datanode) {
-	/*
-	console.log("mapfun data: data=" + datanode.data + ", id=" + datanode.id + ", modifs=" + (datanode.modifs ? datanode.modifs.length : -1) + ", name=" + datanode.name);
-	
-	if (datanode.modifs) {
-		for (var nn = 0; nn < datanode.modifs.length; ++nn) {
-			console.log("  " + datanode.modifs[nn].id);
-		}
-	}
-	*/
 	if (datanode.data) {
 		return datanode.data;
 	}
@@ -411,16 +402,6 @@ function jxtree_user_find_id_regex(matcher, regex, node) {
 		if (data.id.match(regex)) {
                         return true;
                 }
-		/*
-		if (data.modifs) {
-			for (var nn = 0; nn < data.modifs.length; ++nn) {
-				if (data.modifs[nn].id.match(regex)) {
-					console.log("found modif " + data.modifs[nn].id);
-					return true;
-				}
-			}
-		}
-		*/
         }
         return false;
 }
@@ -519,6 +500,7 @@ Mapdata.prototype = {
 	// Mapdata for each module
 	module_mapdata: {},
 	module_mapdata_by_id: {},
+	module_mapdata_by_entity_id: {},
 	module_desc: {},
 	module_info: {},
 	module_tag_map: {},
@@ -714,6 +696,7 @@ Mapdata.prototype = {
 					to_find_str += to_find[nn];
 				}
 				to_find_str += ")$";
+				to_find_str += " /class=all";
 				hints.case_sensitive = true;
 				mapdata.searchFor(win, to_find_str, hints.div);
 				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints, open_bubble);
@@ -935,11 +918,16 @@ Mapdata.prototype = {
 		return this.module_mapdata_by_id[module_name][modif_id];
 	},
 
+	getMapdataByEntityId: function(module_name, entity_id) {
+		return this.module_mapdata_by_entity_id[module_name][entity_id];
+	},
+
 	// Adds a module mapdata: fills the hugo_map hashmap
 	addModuleMapdata: function(module_name, module_mapdata) {
 
 		this.module_mapdata[module_name] = module_mapdata;
 		this.module_mapdata_by_id[module_name] = {};
+		this.module_mapdata_by_entity_id[module_name] = {};
 
 		var modif_map = {};
 		var shape_map = {};
@@ -1002,7 +990,9 @@ Mapdata.prototype = {
 						for (var kk = 0; kk < modif_arr.length; ++kk) {
 							var modif = modif_arr[kk];
 							//var o_modif = this.module_mapdata_by_id[module_name][modif.id];
+							modif.entity = entity_map;
 							this.module_mapdata_by_id[module_name][modif.id] = modif;
+							this.module_mapdata_by_entity_id[module_name][entity_map.id] = modif;
 							if (modif.positions) {
 								modif_map[modif.id] = [];
 								for (var ll = 0; ll < modif.positions.length; ++ll) {

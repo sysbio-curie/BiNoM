@@ -27,6 +27,12 @@ var DEAL_CENTER = false;
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
+var contextmenu_data = null;
+
+function nv_set_contextmenu_data(ctx_data) {
+	contextmenu_data = ctx_data;
+}
+
 function overlay_init(map) {
 	overlay = new USGSOverlay(map);
 }
@@ -50,13 +56,14 @@ function is_included(box, clicked_boundbox) {
 		box[1] >= clicked_boundbox[1] && box[1]+box[3] <= clicked_boundbox[1]+clicked_boundbox[3];
 }
 
-function click_node(overlay, node, mode, center, clicked_boundbox) {
+function click_node(overlay, node, mode, center, clicked_boundbox, was_checked) {
 	var overlayProjection = overlay.getProjection();
 	var mapProjection = overlay.map_.getProjection();
 
 	console.log("click_node: " + mode);
+	var is_checked = false;
 	if (mode == 'toggle') {
-		var is_checked = node.isChecked();
+		is_checked = node.isChecked() || was_checked;
 		if (is_checked) {
 			node.checkSubtree(JXTree.UNCHECKED);
 		} else {
@@ -71,6 +78,7 @@ function click_node(overlay, node, mode, center, clicked_boundbox) {
 	}
 
 	is_checked = node.isChecked();
+	//is_checked = node.isChecked();
 	var clickmap_tree_node = node.getUserData().clickmap_tree_node;
 
 	var latlng;
@@ -184,15 +192,165 @@ function box_from_positions_old(overlay, positions) {
 	return array;
 }
 
+function collect_neighbours(info, get_info, get_neighbours, get_positions, level, select_entities, boxes) {
+	var module = overlay.win.document.navicell_module_name;
+	var str = "";
+	console.log("nb: " + info.id);
+	array_push_all(boxes, boxes_from_positions(overlay, get_positions(info)));
+	select_entities.push(info.id);
+	var neighbours = get_neighbours(info);
+	if (neighbours) {
+		for (var idx in neighbours) {
+			var neighbour = neighbours[idx];
+			select_entities.push(neighbour);
+			str += (str.length > 0 ? ", " : "") + neighbour;
+			//var info2 = navicell.mapdata.getMapdataById(module, neighbour);
+			var info2 = get_info(module, neighbour);
+			if (info2) {
+				console.log("nb: " + info2.id);
+				array_push_all(boxes, boxes_from_positions(overlay, get_positions(info2)));
+				if (level > 1) {
+					var neighbours2 = get_neighbours(info2);
+					if (neighbours2) {
+						for (var idx2 in neighbours2) {
+							var neighbour2 = neighbours2[idx2];
+							select_entities.push(neighbour2);
+							str += (str.length > 0 ? ", " : "") + neighbour2;
+							//var info3 = navicell.mapdata.getMapdataById(module, neighbour2);
+							var info3 = get_info(module, neighbour2);
+							if (info3 && info3.id != info.id) {
+								console.log("nb: " + info3.id);
+								array_push_all(boxes, boxes_from_positions(overlay, get_positions(info3)));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return str;
+}
+
+function contextmenu_callback(key, options) {
+	var m = "clicked: " + key;
+	var module = overlay.win.document.navicell_module_name;
+	window.console.log(m + " " + overlay.clicked_node_ctxmenu);
+	if (key == "center" || key == "center_highlight") {
+		$.each(overlay.win.bubble_list, function() {
+			this.close();
+		});
+		overlay.win.map.setCenter(overlay.clicked_latlng_ctxmenu);
+		nv_perform("nv_select_entity", overlay.win, overlay.clicked_node_ctxmenu.user_id, "select", false, overlay.clicked_boundbox_ctxmenu);
+	} else if (key == "reaction_select" || key == "reaction_select_highlight") {
+		var info = navicell.mapdata.getMapdataById(module, overlay.clicked_node_ctxmenu.user_id);
+
+		if (info) {
+			var boxes = [];
+			var select_entities = [];
+			var str = collect_neighbours(info,
+						     function(module, id) {return navicell.mapdata.getMapdataById(module, id);},
+						     function(info) {return info.species_neighbours;},
+						     function(info) {return info.positions;}, 2, select_entities, boxes);
+			/*
+			var str = "";
+			console.log("nb: " + info.id);
+			//array_push_all(boxes, box_from_positions(overlay, info.positions));
+			array_push_all(boxes, boxes_from_positions(overlay, info.positions));
+			select_entities.push(info.id);
+			if (info.species_neighbours) {
+				for (var idx in info.species_neighbours) {
+					var neighbour = info.species_neighbours[idx];
+					select_entities.push(neighbour);
+					str += (str.length > 0 ? ", " : "") + neighbour;
+					var info2 = navicell.mapdata.getMapdataById(module, neighbour);
+					if (info2) {
+						console.log("nb: " + info2.id);
+						//array_push_all(boxes, box_from_positions(overlay, info2.positions));
+						array_push_all(boxes, boxes_from_positions(overlay, info2.positions));
+						if (info2.species_neighbours) {
+							for (var idx2 in info2.species_neighbours) {
+								var neighbour2 = info2.species_neighbours[idx2];
+								select_entities.push(neighbour2);
+								str += (str.length > 0 ? ", " : "") + neighbour2;
+								var info3 = navicell.mapdata.getMapdataById(module, neighbour2);
+								if (info3 && info3.id != info.id) {
+									console.log("nb: " + info3.id);
+									//array_push_all(boxes, box_from_positions(overlay, info3.positions));
+									array_push_all(boxes, boxes_from_positions(overlay, info3.positions));
+								}
+							}
+						}
+					}
+				}
+			}
+			*/
+			console.log("neighbourgs of " + overlay.clicked_node_ctxmenu.user_id + " : " + str);
+			overlay.highlight_boxes = key == "reaction_select_highlight" ? boxes : null;
+			navicell.mapdata.findJXTree(overlay.win, select_entities, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: "\"" + info.name + "\" + reaction&nbsp;graph&nbsp;neighbours (" + (boxes.length-1) + ")"});
+			$("#right_tabs", window.document).tabs("option", "active", 1);
+		}
+	} else if (key == "interact_select" || key == "interact_select_highlight") {
+		var info = navicell.mapdata.getMapdataById(module, overlay.clicked_node_ctxmenu.user_id);
+
+		console.log("interact? " + info.positions + " " + info.entity.postid + " " + info['entity']['postid']);
+		if (info && info.entity) {
+			var boxes = [];
+			var select_entities = [];
+			var str = collect_neighbours(info,
+						     function(module, id) {return navicell.mapdata.getMapdataByEntityId(module, id);},
+						     function(info) {return info.entity.entity_neighbours;},
+						     function(info) {
+							     var positions = [];
+							     console.log("MODIFS: " + info.entity.modifs.length);
+							     for (var idx1 in info.entity.modifs) {
+								     var modif = info.entity.modifs[idx1];
+								     console.log("POSITIONS: " + modif.positions.length);
+								     for (var idx2 in modif.positions) {
+									     positions.push(modif.positions[idx2]);
+								     }
+							     }
+							     console.log("positions.length: " + positions.length);
+							     return positions;
+						     },
+						     1, select_entities, boxes);
+			overlay.highlight_boxes = key == "interact_select_highlight" ? boxes : null;
+			var select_entities2 = [];
+			var str = "";
+			for (var idx1 in select_entities) {
+				var id = select_entities[idx1];
+				var modif = navicell.mapdata.getMapdataByEntityId(module, id);
+				if (modif) {
+					for (var idx2 in modif.entity.modifs) {
+						var modif2 = modif.entity.modifs[idx2];
+						select_entities2.push(modif2.id);
+						str += (str.length > 0 ? ", " : "") + modif2.id;
+					}
+				} else {
+					select_entities2.push(id);
+					str += (str.length > 0 ? ", " : "") + id;
+				}
+			}
+			console.log("interacting neighbours of " + overlay.clicked_node_ctxmenu.user_id + " : " + str + " " + boxes.length);
+			navicell.mapdata.findJXTree(overlay.win, select_entities2, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: "\"" + info.name + "\" + interacting&nbsp;entities (" + (select_entities.length-1) + ")"});
+			$("#right_tabs", window.document).tabs("option", "active", 1);
+		}
+	}
+
+	overlay.clicked_center_box = key == "center_highlight" ? overlay.clicked_center_box_ctxmenu : null;
+	overlay.draw(module);
+}
+
 function event_ckmap(e, e2, type, overlay) {
 	var x = e.pixel.x;
 	var y = e.pixel.y;
 	var event = (overlay.win.event ? overlay.win.event : overlay.event);
 	if (type == 'mouseup' && event) {
-		console.log("alt " + event.altKey + " " + event.ctrlKey + " " + event.shiftKey);
+		//console.log("alt " + event.altKey + " " + event.ctrlKey + " " + event.shiftKey);
 	}
 	var button = (event ? event.button : -1);
-
+	if (type != 'mouseover' && event) {
+		console.log("type=" + type + " alt " + event.altKey + " " + event.ctrlKey + " " + event.shiftKey + " button=" + button);
+	}
 	var overlayProjection = overlay.getProjection();
 	var mapProjection = overlay.map_.getProjection();
 	var scale = Math.pow(2, overlay.map_.zoom);
@@ -222,7 +380,8 @@ function event_ckmap(e, e2, type, overlay) {
 			var bh = box[3]*scale;
 			if (x >= bx && x <= bx+bw && y >= by && y <= by+bh) {
 				if (type == 'click' || type == 'mouseup') {
-					if (type != 'mouseup' || button == 2) {
+					//if (type != 'mouseup' || button == 2) {
+					if (type != 'click') {
 						var said = box[4];
 						console.log("click ID " + id + " said=" + said + " in " + module + " " + button);
 						var node = jxtree.getNodeByUserId(id);
@@ -255,23 +414,58 @@ function event_ckmap(e, e2, type, overlay) {
 	if (type == 'click') {
 		console.log("clicked_node: " + clicked_node);
 	}
-	//overlay.clicked_center_box = clicked_center_box;
+	overlay.clicked_center_box_ctxmenu = clicked_center_box;
+	overlay.clicked_latlng_ctxmenu = clicked_latlng;
+	overlay.clicked_node_ctxmenu = clicked_node;
+	overlay.clicked_boundnox_ctxmenu = clicked_boundbox;
 	if (clicked_node) {
-		var o_open_bubble = overlay.win.nv_open_bubble;
-		overlay.win.nv_open_bubble = (type == 'click'); // center ??
-		var mode = (type == 'click' ? 'toggle' : 'select');
-		if (event && !event.ctrlKey) {
-			nv_perform("nv_uncheck_all_entities", overlay.win);
+		console.log("type: " + type);
+		//if (type != 'mouseup') {
+		if (button <= 0) {
+			var o_open_bubble = overlay.win.nv_open_bubble;
+			//overlay.win.nv_open_bubble = (type == 'click'); // center ??
+			overlay.win.nv_open_bubble = true;
+			//var mode = (type == 'click' ? 'toggle' : 'select');
+			var mode = 'toggle';
+			var was_checked = false;
+			if (mode == 'toggle') {
+				var jxtree = navicell.mapdata.getJXTree(module);
+				var node = jxtree.getNodeByUserId(clicked_node.user_id);
+				was_checked = node.isChecked();
+			}
+			if (event && !event.ctrlKey) {
+				nv_perform("nv_uncheck_all_entities", overlay.win);
+			}
+			console.log("was_checked: " + was_checked);
+			nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, mode, false, clicked_boundbox, was_checked);
+			overlay.win.nv_open_bubble = o_open_bubble;
 		}
-		nv_perform("nv_select_entity", overlay.win, clicked_node.user_id, mode, false, clicked_boundbox);
-		overlay.win.nv_open_bubble = o_open_bubble;
-		if (type == 'mouseup') {
+		if (type == 'mouseup' && button == 2) {
+			var info = navicell.mapdata.getMapdataById(module, clicked_node.user_id);
+
+			if (info) {
+				var name = info.name;
+				if (name.length > 24) {
+					name = info.name.substr(0, 24) + "...";
+				} else {
+					name = info.name;
+				}
+				$('.species-contextmenu-data-title').attr('data-menutitle', name);
+				event.data = contextmenu_data;
+				$.contextMenu.handle.contextmenu(event);
+			}
+
+			// ---------------------------------------------------------------------------
+			// TBD: all this code will be moved to contextual menu handler
+			// TBD: encapsulate all actions (center, neighbour*) in nv_perform() asap
+			// ---------------------------------------------------------------------------
+
+			/*
 			if (DEAL_CENTER) {
 				overlay.clicked_center_box = clicked_center_box;
 			} else {
 			//overlay.win.map.setCenter(clicked_latlng); // just testing
 			// neighbours
-			var info = navicell.mapdata.getMapdataById(module, clicked_node.user_id);
 			if (info) {
 				var boxes = [];
 				var str = "";
@@ -308,13 +502,14 @@ function event_ckmap(e, e2, type, overlay) {
 				}
 				console.log("neighbourgs of " + clicked_node.user_id + " : " + str);
 				overlay.highlight_boxes = boxes;
-				navicell.mapdata.findJXTree(overlay.win, select_entity_arr, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: "\"" + info.name + "\" + graph&nbsp;reaction&nbsp;neighbours (" + (boxes.length-1) + ")"});
+				navicell.mapdata.findJXTree(overlay.win, select_entity_arr, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: "\"" + info.name + "\" + reaction&nbsp;graph&nbsp;neighbours (" + (boxes.length-1) + ")"});
 				$("#right_tabs", window.document).tabs("option", "active", 1);
 			}
 			}
 			if (DEAL_CENTER) {
 				overlay.win.map.setCenter(clicked_latlng); // just testing
 			}
+			*/
 		}
 	}
 
@@ -454,6 +649,7 @@ USGSOverlay.prototype.onAdd = function() {
 	this.setMap(this.map_);
 
 	var div = document.createElement('div');
+	div.id = "innermap";
 	div.style.borderStyle = 'none';
 	div.style.borderWidth = '0px';
 	div.style.width = '100%';
@@ -466,6 +662,7 @@ USGSOverlay.prototype.onAdd = function() {
 	div.style.top = '0px';
 
 	var draw_canvas = document.createElement('canvas');
+//	draw_canvas.id = "map_canvas";
 	draw_canvas.style.left = '0px';
 	draw_canvas.style.top = '0px';
 
@@ -485,6 +682,7 @@ USGSOverlay.prototype.onAdd = function() {
 	}
 
 	var panes = this.getPanes();
+	console.log("panes.overlayLayer: " + panes.overlayLayer.style.width);
 	panes.overlayLayer.appendChild(div);
 
 	this.draw();
@@ -523,6 +721,7 @@ USGSOverlay.prototype.initHighlight = function() {
 	var context = this.context;
 	context.fillStyle = "#FFFFFF";
 	context.globalAlpha = 0.65;
+//	context.globalAlpha = 0.70;
 	context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
 }
 
@@ -531,7 +730,6 @@ USGSOverlay.prototype.highlight = function(boxes) {
 	this.initHighlight();
 	var context = this.context;
 	var div = this.div_;
-	console.log("hightlight " + boxes.length);
 	for (var idx in boxes) {
 		var box = boxes[idx];
 		var x = box[0] - div.left;

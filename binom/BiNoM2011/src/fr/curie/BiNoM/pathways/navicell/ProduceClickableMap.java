@@ -5464,10 +5464,10 @@ public class ProduceClickableMap
 			out.println("<script src=\"../../../lib/jquery-contextmenu/src/jquery.ui.position.js\" type=\"text/javascript\"></script>");
 			out.println("<script src=\"../../../lib/jquery-contextmenu/src/jquery.contextMenu.js\" type=\"text/javascript\"></script>");
 			out.println("<script src=\"../../../lib/jquery-contextmenu/prettify/prettify.js\" type=\"text/javascript\"></script>");
-			out.println("<script src=\"../../../lib/jquery-contextmenu/screen.js\" type=\"text/javascript\"></script>");
+			//out.println("<script src=\"../../../lib/jquery-contextmenu/screen.js\" type=\"text/javascript\"></script>");
 
 			out.println("<link href=\"../../../lib/jquery-contextmenu/src/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\"/>");
-			out.println("<link href=\"../../../lib/jquery-contextmenu/screen.css\" rel=\"stylesheet\" type=\"text/css\"/>");
+			//out.println("<link href=\"../../../lib/jquery-contextmenu/screen.css\" rel=\"stylesheet\" type=\"text/css\"/>");
 			out.println("<link href=\"../../../lib/jquery-contextmenu/prettify/prettify.sunburst.css\" rel=\"stylesheet\" type=\"text/css\"/>\n");
 		}
 

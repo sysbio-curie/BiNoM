@@ -235,28 +235,68 @@ $(function() {
 		selector: '#inner_map', 
 		export_contextmenu_data: nv_set_contextmenu_data,
 		width_offset: -300, // hard coded value: should depend on right_panel width
-		//width_offset: -500, // hard coded value: should depend on right_panel width
-		//width_offset: 0, // hard coded value: should depend on right_panel width
 		callback: contextmenu_callback,
 		items: {
 			"title":  {"name": "&nbsp;", className: 'species-contextmenu-data-title'},
 			"sep0": "---------",
 			"center": {"name": "Center on Species"},
-			"center_highlight": {"name": "Center on Species and Highlight"},
+			"highlight": {"name": "Highlight Species"},
+			"unhighlight": {"name": "UnHighlight Species"},
 			"sep1": "---------",
 			"reaction_neighbours": {
-				"name": "Reaction Graph Neighbours", 
-				"items": {
-					"reaction_select": {"name": "Select Neighbours"},
-					"reaction_select_highlight": {"name": "Select and Highlight Neighbours"}
+				"name": "Reaction Graph Neighbours",
+				className: 'context-menu',
+				items: {
+					interact_title: {
+						name: "&nbsp;",
+						className: "species-contextmenu-reaction-neighbours",
+					},
+					"sep3": "---------",
+					reaction_select_highlight: {
+						"name": "Select and Highlight Neighbours",
+						disabled: function(key, opt) {
+							if (getOverlay()) {
+								return getOverlay().RGN_select_entities.length == 1;
+							}
+						}
+					},
+					reaction_select: {
+						"name": "Select Neighbours",
+						disabled: function(key, opt) {
+							if (getOverlay()) {
+								return getOverlay().RGN_select_entities.length == 1;
+							}
+						}
+					}
 				}
 			},
 			"sep2": "---------",
 			"interact_entities": {
-				"name": "Interacting Entities", 
-				"items": {
-					"interact_select": {"name": "Select Entities"},
-					"interact_select_highlight": {"name": "Select and Highlight Entities"}
+				name: "Interacting Entities", 
+				className: 'context-menu',
+				items: {
+					interact_title: {
+						name: "&nbsp;",
+						className: "species-contextmenu-interacting-entity",
+					},
+					"sep4": "---------",
+					interact_select_highlight: {
+						name: "Select and Highlight Entities",
+						disabled: function(key, opt) {
+							if (getOverlay()) {
+								return getOverlay().IE_select_entities.length == 1;
+							}
+						}
+					},
+					interact_select: {
+						name: "Select Entities",
+						disabled: function(key, opt) {
+							if (getOverlay()) {
+								return getOverlay().IE_select_entities.length == 1;
+							}
+							return false;
+						}
+					}
 				}
 			}
 		}

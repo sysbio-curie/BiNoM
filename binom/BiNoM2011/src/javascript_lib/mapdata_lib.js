@@ -36,6 +36,10 @@ if (!window.console) {
 	};
 }
 
+function getOverlay() {
+	return overlay;
+}
+
 function Debug()
 {
 }
@@ -650,7 +654,10 @@ Mapdata.prototype = {
 				$("#result_tree_header", win.document).html(hints.result_title);
 			}
 
-			uncheck_all_entities(win, hints.select_neighbours);
+			if (!hints.select_neighbours) {
+				//uncheck_all_entities(win, hints.select_neighbours);
+				uncheck_all_entities(win);
+			}
 
 			res_jxtree.context = {win: win};
 

@@ -974,6 +974,10 @@ div.tablesorterPager input {
     display: none;
 }
 
+.context-menu {
+    margin-right: 15px;
+}
+
 .species-contextmenu-data-title:before {
     content: attr(data-menutitle);
     display: block;
@@ -981,10 +985,31 @@ div.tablesorterPager input {
     position: absolute;
     right: 0;
     left: 0;
-//    background: #DDD;
-//    padding: 3px;
 
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 11px;
     font-weight: bold;
 }
+
+.species-contextmenu-interacting-entity:before {
+    content: attr(interacting-menutitle);
+    display: block;
+    text-align: center;
+    position: absolute;
+    right: 0;
+    left: 0;
+
+    font-weight: bold;
+}
+
+.species-contextmenu-reaction-neighbours:before {
+    content: attr(neighbours-menutitle);
+    display: block;
+    text-align: center;
+    position: absolute;
+    right: 0;
+    left: 0;
+
+    font-weight: bold;
+}
+

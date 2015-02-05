@@ -20,8 +20,10 @@
 
 var CANCEL_CLOSES = true;
 
-var SEARCH_DIALOG_WIDTH = 450;
-var SEARCH_DIALOG_HEIGHT = 860;
+//var SEARCH_DIALOG_WIDTH = 450;
+//var SEARCH_DIALOG_HEIGHT = 860;
+var SEARCH_DIALOG_WIDTH = 480;
+var SEARCH_DIALOG_HEIGHT = 900;
 var IMPORT_DIALOG_WIDTH = 550;
 var IMPORT_DIALOG_HEIGHT = 900;
 var STATUS_TABS_WIDTH = 800;
@@ -237,14 +239,15 @@ $(function() {
 		width_offset: -300, // hard coded value: should depend on right_panel width
 		callback: contextmenu_callback,
 		items: {
-			"title":  {"name": "&nbsp;", className: 'species-contextmenu-data-title'},
-			"sep0": "---------",
-			"center": {"name": "Center on Species"},
-			"highlight": {"name": "Highlight Species"},
-			"unhighlight": {"name": "UnHighlight Species"},
-			"sep1": "---------",
-			"reaction_neighbours": {
-				"name": "Reaction Graph Neighbours",
+			title:  {name: "&nbsp;", className: 'species-contextmenu-data-title'},
+			sep0: "---------",
+			center: {name: "Center on Species"},
+			highlight: {name: "&nbsp;",
+				    className: "species-contextmenu-highlight"
+				   },
+			sep: "---------",
+			reaction_neighbours: {
+				name: "Reaction Graph Neighbours",
 				className: 'context-menu',
 				items: {
 					interact_title: {
@@ -253,7 +256,7 @@ $(function() {
 					},
 					"sep3": "---------",
 					reaction_select_highlight: {
-						"name": "Select and Highlight Neighbours",
+						name: "Select and Highlight Neighbours",
 						disabled: function(key, opt) {
 							if (getOverlay()) {
 								return getOverlay().RGN_select_entities.length == 1;
@@ -261,7 +264,7 @@ $(function() {
 						}
 					},
 					reaction_select: {
-						"name": "Select Neighbours",
+						name: "Select Neighbours",
 						disabled: function(key, opt) {
 							if (getOverlay()) {
 								return getOverlay().RGN_select_entities.length == 1;
@@ -270,14 +273,14 @@ $(function() {
 					}
 				}
 			},
-			"sep2": "---------",
-			"interact_entities": {
+			sep2: "---------",
+			interact_entities: {
 				name: "Interacting Entities", 
 				className: 'context-menu',
 				items: {
 					interact_title: {
 						name: "&nbsp;",
-						className: "species-contextmenu-interacting-entity",
+						className: "species-contextmenu-interacting-entities",
 					},
 					"sep4": "---------",
 					interact_select_highlight: {
@@ -325,6 +328,7 @@ $(function() {
 				var all_classes_included = $("#search_dialog_class_all_included").attr("checked") == "checked";
 				var select_classes = $("#search_dialog_class_select").attr("checked") == "checked";
 				var open_bubble = $("#search_dialog_open_bubble").attr("checked") == "checked";
+				var highlight = $("#search_dialog_highlight").attr("checked") == "checked";
 				var search = "";
 				var op;
 
@@ -348,6 +352,10 @@ $(function() {
 					search += "in=" + $(selected).val() + ";";
 				});
 									    
+				if (highlight) {
+					search += " highlight=on;";
+				}
+				
 				if (all_classes) {
 					search += "class=all"
 				} else if (all_classes_but_included) {

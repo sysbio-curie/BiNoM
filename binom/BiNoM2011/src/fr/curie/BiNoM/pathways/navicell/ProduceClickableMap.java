@@ -132,6 +132,7 @@ public class ProduceClickableMap
 	private static final String map_icon = icons_directory + "/map.png";
 
 	private static final String reset_icon = icons_directory + "/eraser.png";
+	private static final String unhighlight_icon = icons_directory + "/unhighlight.png";
 	private static final String mapsymbols_icon = icons_directory + "/mapsymbols.png";
 	private static final String sources_icon = icons_directory + "/sources.png";
 	private static final String help_icon = icons_directory + "/help.png";	
@@ -5303,13 +5304,20 @@ public class ProduceClickableMap
 		class_name_to_human_name_entities = Collections.unmodifiableMap(map2);
 	}
 
-	private static PrintStream create_reset_button(final PrintStream out)
+	private static PrintStream create_reset_buttons(final PrintStream out)
 	{
+		out.print(onclick_before);
+		out.print("nv_perform(\"nv_unhighlight_all_entities\", window)");
+		out.print(onclick_after);
+		out.print(" title='Unhighlight all entities'>");
+		out.print("<img border='0' width='14' height='14' src=\""+unhighlight_icon+"\" />");
+		out.print("</a>");
+		out.println();
+
 		out.print(onclick_before);
 		out.print("nv_perform(\"nv_uncheck_all_entities\", window)");
 		out.print(onclick_after);
 		out.print(" title='Uncheck all entities'>");
-		//out.print("reset");
 		out.print("<img border='0' width='16' height='16' src=\""+reset_icon+"\" />");
 		out.print("</a>");
 		out.println();
@@ -5638,7 +5646,7 @@ public class ProduceClickableMap
 
 		out.println("&nbsp;<input type='text' size='32' id='query_text' style='font-size: small'/>");
 		out.println("&nbsp;<a href='#'><img border='0' src='" + search_icon + "' width='16' height='16' onclick='show_search_dialog()' title='Advanced search'/></a>&nbsp;");
-		create_reset_button(out);
+		create_reset_buttons(out);
 		header_right.close();
 		header.close();
 

@@ -170,31 +170,6 @@ function boxes_from_positions(overlay, positions) {
 	return array;
 }
 
-function box_from_positions_old(overlay, positions) {
-	var overlayProjection = overlay.getProjection();
-	var mapProjection = overlay.map_.getProjection();
-	var scale = Math.pow(2, overlay.map_.zoom);
-	var div = overlay.div_;
-	var array = [];
-	for (var idx in positions) {
-		var pos = positions[idx];
-		var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
-		//console.log("box[0] " + box[0] + " " + box[2] + " " + box[1] + " " + box[3]);
-		if (!box.gpt) {
-			box.gpt = new google.maps.Point(box[0], box[2]);
-		}
-		var latlng = mapProjection.fromPointToLatLng(box.gpt);
-		var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-		var bx = pix.x - div.left;
-		var by = pix.y - div.top;
-		var bw = box[1]*scale;
-		var bh = box[3]*scale;
-		array.push([pix.x, bw, pix.y, bh]);
-		//console.log("box -> " + [pix.x, bw, pix.y, bh]);
-	}
-	return array;
-}
-
 function collect_neighbours(info, get_info, get_neighbours, get_positions, level, select_entities, boxes) {
 	var module = overlay.win.document.navicell_module_name;
 	var str = info.id;
@@ -217,11 +192,6 @@ function collect_neighbours(info, get_info, get_neighbours, get_positions, level
 					if (neighbours2) {
 						for (var idx2 in neighbours2) {
 							var neighbour2 = neighbours2[idx2];
-							/*
-							if (neighbour2 != info.id) {
-							}
-							*/
-							//var info3 = navicell.mapdata.getMapdataById(module, neighbour2);
 							var info3 = get_info(module, neighbour2);
 							if (info3 && info3.id != info.id) {
 								select_entities.push(neighbour2);
@@ -295,6 +265,73 @@ function compute_neighbours() {
 }
 
 function contextmenu_callback(key, options) {
+	var m = "NEW clicked: " + key;
+	var module = overlay.win.document.navicell_module_name;
+	window.console.log(m + " " + overlay.clicked_node_ctxmenu);
+	$.each(overlay.win.bubble_list, function() {
+		this.close();
+	});
+	if (key == "center") {
+		overlay.win.map.setCenter(overlay.clicked_latlng_ctxmenu);
+		nv_perform("nv_select_entity", overlay.win, overlay.clicked_node_ctxmenu.user_id, "select", false, overlay.clicked_boundbox_ctxmenu);
+	} else if (key == "reaction_select" || key == "reaction_select_highlight") {
+		if (key == "reaction_select_highlight") {
+			array_push_all(overlay.highlight_boxes, overlay.RGN_highlight_boxes);
+		}
+		navicell.mapdata.findJXTree(overlay.win, overlay.RGN_select_entities, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: ' '});
+		$("#right_tabs", window.document).tabs("option", "active", 1);
+	} else if (key == "interact_select" || key == "interact_select_highlight") {
+		if (key == "interact_select_highlight") {
+			array_push_all(overlay.highlight_boxes, overlay.IE_highlight_boxes);
+		}
+		navicell.mapdata.findJXTree(overlay.win, overlay.IE_select_entities2, true, 'subtree', {div: $("#result_tree_contents", overlay.win.document).get(0), select_neighbours: true, result_title: ' '});
+		$("#right_tabs", window.document).tabs("option", "active", 1);
+	} else if (key == "highlight") {
+		if (!is_selected_species_highlighted()) {
+			overlay.highlight_boxes.push(overlay.clicked_center_box_ctxmenu);
+		} else {
+			var boxes = [];
+			for (var idx in overlay.highlight_boxes) {
+				var box = overlay.highlight_boxes[idx];
+				var equals = true;
+				for (var nn = 0; nn < 4; ++nn) {
+					if (box[nn] != overlay.clicked_center_box_ctxmenu[nn]) {
+						equals = false;
+						break;
+					}
+				}
+				if (!equals) {
+					boxes.push(box);
+				}
+			}
+			overlay.highlight_boxes = boxes;
+		}
+	}
+	overlay.clicked_center_box = null;
+	overlay.draw(module);
+}
+
+function is_selected_species_highlighted() {
+	if (overlay) {
+		var species_box = overlay.clicked_center_box_ctxmenu;
+		for (var idx in overlay.highlight_boxes) {
+			var box = overlay.highlight_boxes[idx];
+			var equals = true;
+			for (var nn = 0; nn < 4; ++nn) {
+				if (box[nn] != species_box[nn]) {
+					equals = false;
+					break;
+				}
+			}
+			if (equals) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+function contextmenu_callback_old(key, options) {
 	// TBD: already computed by compute_neighbours:
 	// 1. must use this information and deal with it
 	// 2. suppress messages in result panel
@@ -507,21 +544,22 @@ function event_ckmap(e, e2, type, overlay) {
 				}
 				compute_neighbours();
 				$('.species-contextmenu-data-title').attr('data-menutitle', name);
-//				$('.species-contextmenu-interacting-entity').attr('interacting-menutitle', "Interacting Entities (" + (overlay.IE_select_entities.length-1) + ")");
+				$('.species-contextmenu-highlight').attr('highlight-menutitle',
+									 (is_selected_species_highlighted() ? "Unhighlight" : "Highlight") + " Species");
 				var cnt = overlay.IE_select_entities.length-1;
-				if (cnt) {
-					$('.species-contextmenu-interacting-entity').attr('interacting-menutitle', "Entities (" + cnt + ")");
+				if (cnt > 0) {
+					$('.species-contextmenu-interacting-entities').attr('interacting-menutitle', "Entities (" + cnt + ")");
 				} else {
-					$('.species-contexmenu-interacting-entity').attr('interacting-menutitle', "No Entities");
+					$('.species-contextmenu-interacting-entities').attr('interacting-menutitle', "No Entities");
 				}
-				//$('.species-contextmenu-reaction-neighbours').attr('neighbours-menutitle', "Reaction Graph Neighbours (" + (overlay.RGN_select_entities.length-1) + ")");
 				cnt = overlay.RGN_select_entities.length-1;
-				if (cnt) {
+				if (cnt > 0) {
 					$('.species-contextmenu-reaction-neighbours').attr('neighbours-menutitle', "Neighbours (" + cnt + ")");
 				} else {
 					$('.species-contextmenu-reaction-neighbours').attr('neighbours-menutitle', "No Neighbours");
 				}
 				event.data = contextmenu_data;
+				// TBD: highlight and unhighlight must be enable/disable according to state
 				$.contextMenu.handle.contextmenu(event);
 			}
 		}
@@ -772,88 +810,47 @@ USGSOverlay.prototype.draw = function(module) {
 		module = get_module();
 	}
 
-	if (this.highlight_boxes.length > 0) {
-		//console.log("HIGHLIGHT");
-		this.highlight(this.highlight_boxes);
-	} else if (this.clicked_center_box) {
-		//console.log("CENTER");
-		var context = this.context;
-		this.initHighlight();
-		/*
-		context.fillStyle = "#FFFFFF";
-		context.globalAlpha = 0.65;
-		context.fillRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
-		*/
-		var div = this.div_;
-		/*
-		var x = this.clicked_center_box[0] - div.left;
-		var y = this.clicked_center_box[2] - div.top;
-		var w = this.clicked_center_box[1];
-		var h = this.clicked_center_box[3];
-		*/
-		var scaled_box = scaled_boxes_from_boxes(this, [this.clicked_center_box])[0];
-		var x = scaled_box[0] - div.left;
-		var y = scaled_box[2] - div.top;
-		var w = scaled_box[1];
-		var h = scaled_box[3];
-		if (CENTER_HIGHLIGHT_SHAPE) {
-			context.clearRect(x-1, y-1, w+2, h+2);
-		} else if (CENTER_HIGHLIGHT_CIRCLE) {
-			var radius = w;
-			if (h > radius) {
-				radius = h;
-			}
-			context.save();
-			context.globalAlpha = 1;
-			context.beginPath();
-			context.arc(x+w/2, y+h/2, radius, 0, 2*Math.PI);
-			context.clip();
-			context.clearRect(x - radius - 1, y - radius - 1, radius * 2 + 2, radius * 2 + 2);
-			context.restore();
-		}
-	} else {
-		//console.log("NOP");
-	}
-
 	var drawing_config = navicell.getDrawingConfig(module);
-	if (!drawing_config.displayDLOs()) {
-		return;
-	}
-	if (drawing_config.displayMapStaining()) {
-		draw_voronoi(module, this.context, this.div_);
-	}
-
-	var arrpos = null;
-	if (drawing_config.displayDLOsOnAllGenes()) {
-		this.arrpos = navicell.dataset.getArrayPos(module);
-	} else {
-		this.arrpos = navicell.dataset.getSelectedArrayPos(module);
-	}
-
-	var arrpos = this.arrpos;
-	if (arrpos && arrpos.length) {
-		var div = this.div_;
-		var overlayProjection = this.getProjection();
-		var mapProjection = this.map_.getProjection();
-		var scale = Math.pow(2, this.map_.zoom);
-
-		var MARGIN = 30;
-		var div_width = div.width;
-		var div_height = div.height+MARGIN;
-		cache_value_cnt = 0;
-		no_cache_value_cnt = 0;
-		for (var nn = 0; nn < arrpos.length; ++nn) {
-			var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
-			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			var pos_x = pix.x - div.left;
-			var pos_y = pix.y - div.top;
-			if (pos_x > -MARGIN && pos_x < div_width &&
-			    pos_y >= 0 && pos_y < div_height) {
-				navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].id, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
-			} else {
-			}
+	if (drawing_config.displayDLOs()) {
+		if (drawing_config.displayMapStaining()) {
+			draw_voronoi(module, this.context, this.div_);
 		}
-		//console.log("CACHE_VALUE_CNT " + cache_value_cnt + " " + no_cache_value_cnt);
+
+		var arrpos = null;
+		if (drawing_config.displayDLOsOnAllGenes()) {
+			this.arrpos = navicell.dataset.getArrayPos(module);
+		} else {
+			this.arrpos = navicell.dataset.getSelectedArrayPos(module);
+		}
+
+		var arrpos = this.arrpos;
+		if (arrpos && arrpos.length) {
+			var div = this.div_;
+			var overlayProjection = this.getProjection();
+			var mapProjection = this.map_.getProjection();
+			var scale = Math.pow(2, this.map_.zoom);
+
+			var MARGIN = 30;
+			var div_width = div.width;
+			var div_height = div.height+MARGIN;
+			cache_value_cnt = 0;
+			no_cache_value_cnt = 0;
+			for (var nn = 0; nn < arrpos.length; ++nn) {
+				var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
+				var pix = overlayProjection.fromLatLngToDivPixel(latlng);
+				var pos_x = pix.x - div.left;
+				var pos_y = pix.y - div.top;
+				if (pos_x > -MARGIN && pos_x < div_width &&
+				    pos_y >= 0 && pos_y < div_height) {
+					navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].id, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+				} else {
+				}
+			}
+			//console.log("CACHE_VALUE_CNT " + cache_value_cnt + " " + no_cache_value_cnt);
+		}
+	}
+	if (this.highlight_boxes.length > 0) {
+		this.highlight(this.highlight_boxes);
 	}
 }
 

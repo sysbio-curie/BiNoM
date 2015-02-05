@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=label\nin=tag\nin=annot\nin=all\n\ntoken=word\ntoken=regex\n\nop=eq\nop=neq\n\nclass=all\nclass=all_included\nclass=all_but_included\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nDefault is: /in=label;in=tag;token=word;op=eq;class=all_but_included\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=label\nxp rbx /in=label;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=label;class=protein,gene\nxp rxb /token=regex;in=all";
+var JXTREE_HELP = "Search syntax is as follows:\n\nPATTERN [/MOD]\n\nwhere PATTERN is a sequence of regular expressions\n- if regex are separated by comma, OR search is performed\n- if regex are separated by space, AND search is performed\n\nwhere MOD is a semi-colon separated list of MOD_ITEM\n\n where MOD_ITEM is under the form\n\nin=label\nin=tag\nin=annot\nin=all\n\ntoken=word\ntoken=regex\n\nop=eq\nop=neq\n\nclass=all\nclass=all_included\nclass=all_but_included\nclass=<i>class_name</i>,<i>class_name</i>,...\nclass!=<i>class_name</i>,<i>class_name</i>,...\n\nhighlight=off\nhighlight=on\n\nDefault is: /in=label;in=tag;token=word;op=eq;class=all_but_included;highlight=off\n\nExamples:\nrbx\nxp rbx\nxp,rbx\nxp rbx /in=label\nxp rbx /in=label;class=protein\nxp rbx /class=protein,gene\nxp rbx /class!=protein,gene\nxp rbx /op=neq;in=label;class=protein,gene\nxp rxb /token=regex;in=all";
 
 function JXTreeMatcher(pattern, hints) {
 	pattern = pattern.trim();
@@ -33,6 +33,7 @@ function JXTreeMatcher(pattern, hints) {
 	}
 
 	this.hints = hints;
+	this.hints.highlight = false;
 	this.search_cs = "i";
 	this.search_token = 0;
 	this.search_in = 0;
@@ -94,6 +95,15 @@ function JXTreeMatcher(pattern, hints) {
 					this.search_in |= JXTreeMatcher.IN_ALL;
 				} else {
 					this.error = "\"/" + ori_mod_pattern + "\" : expected name, annot or all after in=, got " + what;
+					break;
+				}
+			} else if (mod == "HIGHLIGHT") {
+				if (what == "ON") {
+					this.hints.highlight = true;
+				} else if (what == "OFF") {
+					this.hints.highlight = false;
+				} else {
+					this.error = "\"/" + ori_mod_pattern + "\" : expected on or off after highlight=, got " + what;
 					break;
 				}
 			} else {

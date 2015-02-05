@@ -183,6 +183,17 @@ function nv_uncheck_all_entities(win, partial)
 	return null;
 }
 
+function nv_unhighlight_all_entities(win)
+{
+	win = nv_win(win);
+	var module = get_module(win);
+	if (win.overlay && win.overlay.highlight_boxes.length > 0) {
+		win.overlay.highlight_boxes.length = [];
+		win.overlay.draw(module);
+	}
+	return null;
+}
+
 function nv_set_center(win, where, posx, posy)
 {
 	var map = win.map;
@@ -1535,6 +1546,7 @@ var nv_handlers = {
 	"nv_select_entity": nv_select_entity,
 	"nv_set_zoom": nv_set_zoom,
 	"nv_uncheck_all_entities": nv_uncheck_all_entities,
+	"nv_unhighlight_all_entities": nv_unhighlight_all_entities,
 	"nv_set_center": nv_set_center,
 
 	"nv_import_datatables": nv_import_datatables,

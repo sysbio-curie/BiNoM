@@ -975,7 +975,7 @@ div.tablesorterPager input {
 }
 
 .context-menu {
-    margin-right: 15px;
+    margin-right: 20px;
 }
 
 .species-contextmenu-data-title:before {
@@ -991,7 +991,7 @@ div.tablesorterPager input {
     font-weight: bold;
 }
 
-.species-contextmenu-interacting-entity:before {
+.species-contextmenu-interacting-entities:before {
     content: attr(interacting-menutitle);
     display: block;
     text-align: center;
@@ -1011,5 +1011,9 @@ div.tablesorterPager input {
     left: 0;
 
     font-weight: bold;
+}
+
+.species-contextmenu-highlight:before {
+    content: attr(highlight-menutitle);
 }
 

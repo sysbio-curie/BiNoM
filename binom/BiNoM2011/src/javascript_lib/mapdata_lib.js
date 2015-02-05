@@ -597,11 +597,11 @@ Mapdata.prototype = {
 	},
 
 	// no effect... should fixed that
-	searchFor: function(win, what, div) {
+	searchFor: function(win, what, div, display) {
 		if (what.trim() == "/?") {
 			return;
 		}
-		$("#result_tree_header", win.document).html("Searching for \"" + what + "\"...");
+		$("#result_tree_header", win.document).html(display ? "Searching for \"" + what + "\"..." : "");
 		if (div) {
 			$(div, win.document).css("display", "none");
 		}
@@ -666,6 +666,19 @@ Mapdata.prototype = {
 				this.checkSubtree(JXTree.CHECKED);
 				this.showSubtree(JXTree.OPEN);
 			});
+
+			if (hints.highlight) {
+				var scanner = new JXTreeScanner(module_name);
+				res_jxtree.scanTree(scanner);
+				for (var idx1 in scanner.arrid) {
+					var id = scanner.arrid[idx1];
+					var info = navicell.mapdata.getMapdataById(module_name, id);
+					if (info) {
+						array_push_all(win.overlay.highlight_boxes, boxes_from_positions(null, info.positions));
+					}
+				}
+			}
+
 			tree_context_epilogue(res_jxtree.context);
 
 			if (hints.div) {
@@ -674,8 +687,8 @@ Mapdata.prototype = {
 
 			mapdata.module_res_jxtree[module_name] = res_jxtree;
 
-			if (overlay) {
-				overlay.draw(win.document.navicell_module_name);
+			if (win.overlay) {
+				win.overlay.draw(win.document.navicell_module_name);
 			}
 			time_cnt++;
 			$("img.blogfromright", win.document).click(open_blog_click);
@@ -705,10 +718,10 @@ Mapdata.prototype = {
 				to_find_str += ")$";
 				to_find_str += " /class=all";
 				hints.case_sensitive = true;
-				mapdata.searchFor(win, to_find_str, hints.div);
+				mapdata.searchFor(win, to_find_str, hints.div, false);
 				mapdata.findJXTreeContinue(win, to_find_str, no_ext, action, hints, open_bubble);
 			} else {
-				mapdata.searchFor(win, to_find, hints.div);
+				mapdata.searchFor(win, to_find, hints.div, true);
 				// EV: 2015-02-02, don't remember why setTimeout ? maybe clockwise cursor...Trying without timeout.
 				mapdata.findJXTreeContinue(win, to_find, no_ext, action, hints, open_bubble);
 				/*
@@ -1119,9 +1132,9 @@ function mapdata_display_markers(module_name, win, hugo_names)
 
 function JXTreeScanner(module_name) {
 	this.module_name = module_name;
+	this.arrid = [];
 	this.arrpos = [];
 	this.mappos = {};
-	Debug.console(Debug.MAPPOS, "building JXTreeScanner");
 }
 
 JXTreeScanner.prototype = {
@@ -1129,21 +1142,15 @@ JXTreeScanner.prototype = {
 		if (node.isChecked()) {
 			var data = node.getUserData();
 			if (data && data.id) {
+				this.arrid.push(data.id);
 				var pos = navicell.dataset.getGeneInfoByModifId(this.module_name, data.id);
 				if (pos) {
 					array_push_all(this.arrpos, pos[1]);
-					/*
-					for (var nn = 0; nn < pos[1].length; ++nn) {
-						Debug.console(Debug.MAPPOS, "setting said=" + pos[1][nn].said + ", gene=" + pos[1][nn].gene_name);
-						this.mappos[pos[1][nn].said] = true;
-					}
-					*/
 				}
 				var shape_info = navicell.mapdata.getMapByModifId(this.module_name, data.id);
 				if (shape_info) {
 					for (var nn = 0; nn < shape_info.length; ++nn) {
 						var said = shape_info[nn][4];
-						//Debug.console(Debug.MAPPOS, "said=" + said);
 						if (said) {
 							this.mappos[said] = true;
 						}
@@ -1420,29 +1427,11 @@ Dataset.prototype = {
 
 	getSelectedArrayPos: function(module_name) {
 		var jxtreeScanner = this._scanTree(module_name);
-		/*
-		var jxtree = navicell.mapdata.getJXTree(module_name);
-		var jxtreeScanner = new JXTreeScanner(module_name);
-		jxtree.scanTree(jxtreeScanner);
-		var jxrestree = navicell.mapdata.getResJXTree(module_name);
-		if (jxrestree) {
-			jxrestree.scanTree(jxtreeScanner);
-		}
-		*/
 		return jxtreeScanner.getArrayPos();
 	},
 	
 	getSelectedMapPos: function(module_name) {
 		var jxtreeScanner = this._scanTree(module_name);
-		/*
-		var jxtree = navicell.mapdata.getJXTree(module_name);
-		var jxtreeScanner = new JXTreeScanner(module_name);
-		jxtree.scanTree(jxtreeScanner);
-		var jxrestree = navicell.mapdata.getResJXTree(module_name);
-		if (jxrestree) {
-			jxrestree.scanTree(jxtreeScanner);
-		}
-		*/
 		return jxtreeScanner.getMapPos();
 	},
 	

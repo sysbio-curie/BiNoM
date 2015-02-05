@@ -50,16 +50,16 @@ NaviCell Web Service is a tool for network-based visualization of
 ``omics" data.  It implements several data visual representation methods,
 including the novel map staining technique which allows grasping large-scale
 trends in numerical values (such as whole transcriptome) projected on top of a
-pathway map. The service also provides a server mode, which allows to automate
+pathway map. NaviCell Web Service allows combining visualization of different data types.
+It is scalable, based on Google Maps technology allowing working with large pathway maps,
+containing thousands of nodes, using semantic zooming principles.
+NaviCell Web Service can be applied to pathway maps of different
+types represented in various formats in different application fields.
+The web service provides a server mode, which allows automating
 visualization tasks and retrieve data from maps via RESTfull (standard HTTP)
 calls.  Bindings to different programming languages are provided (Python,
-R, Java). NaviCell Web Service allows combining visualization of different data types
-through different tools. It is scalable, based on Google Maps technology allowing working with large pathway maps,
-containing thousands of nodes, using semantic zooming principles. 
-NaviCell Web Service can be applied to pathway maps of different 
-types represented in various formats in different application fields.  
-We illustrate the interest of the tool  with  several case studies using pathway maps created by different research groups, 
-in which data visualization serves for getting new insights into molecular mechanisms 
+R, Java). We illustrate the interest of the tool  with  several case studies using pathway maps created by different research groups,
+in which data visualization serves for getting new insights into molecular mechanisms
 involved in systemic disease progression (cancer and neurodegenerative disease).
 \end{abstract}
 
@@ -84,19 +84,19 @@ through dedicated APIs. In addition, some pathway databases provide graphical
 user interfaces (GUI) to perform the task of data visualization, on top of
 their interactive pathway maps.
 
-When a user is faced with the necessity to visualize the ``omics" data on 
+When a user is faced with the necessity to visualize the ``omics" data on
 biological networks, there are currently two options available: either to use
 a graphical interface of a suitable pathway database, which can be a tedious manual work, or use
 one of the available standalone or web-based tools for creating static images
 of colored pathways which are not interactive anymore and do not allow browsing
 the molecular interactions. Currently, there exist no well-developed APIs
-that allow to programmatically apply data visualization on top of biological
+that allow applying data visualization programmatically on top of biological
 networks such that the ``omics" data can be browsed simultaneously with the
 pathway information.
 
 Available network-based methods for data visualization have several common
 limitations. First, most of them do not provide possibility of data
-abstraction, allowing to visualize coarse-grained trends in the ``omics" data.
+abstraction and do not allow visualizing coarse-grained trends in the ``omics" data.
 This is needed if, for example, there is a wish to visualize the whole
 transcriptome of a cell or a group of samples on a large network,
 representing a big part of the cellular interactome. Current methods usually attach
@@ -142,7 +142,8 @@ TCGA database and illustrates all basic data visualization capabilities of
 NaviCell Web Service is provided at
 \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. Sample Python
 code for quick start on using NaviCell Web Service API is available from the
-same page in the ``Python API and data files" section.
+same link in the ``Python API and data files" section. An example screenshot of NaviCell
+Web Service GUI can be found in the manual located at the same link.
 
 \section{ALGORITHMS AND SOFTWARE}
 
@@ -150,13 +151,13 @@ same page in the ``Python API and data files" section.
 
 We conceived the NaviCell Web Service for Network-based Data Visualization
 as a significant development of NaviCell \cite{kuperstein2013navicell}
-allowing users to visualize and analyze different types of ``omics" data. The web service
+allowing users visualizing and analyzing different types of ``omics" data. The web service
 is implemented at two interconnected functional levels.
 The first level corresponds to the interactive dialog-based
 use of the web interface to load and visualize data. This level is implemented
 as a specific set of JavaScript functions linked to the menu located
 in the right-hand panel of the NaviCell web interface. The second level corresponds to a
-programmatic usage of the service, which allows users to write the code that will
+programmatic usage of the service, which allows users writing the code that will
 communicate with the NaviCell \emph{server} in order to automate all the
 visualization operations. This functional level is implemented as a RESTful web
 service, using standard web protocol HTTP operations and data encoding (JSON)
@@ -165,12 +166,12 @@ RESTful web services are very popular and have the advantage of being
 lightweight, efficient and simple to use. They also have the benefit of
 relatively ease of implementation in many different programming languages and
 software packages. At the moment we have a full API ready for Python, and
-APIs for R and Java in development. These APIs will facilitate the integration
+APIs for R and Java are in development. These APIs will facilitate the integration
 of NaviCell Web Service in other applications: among them, there exists an
 ongoing work on providing the data visualization services through the Garuda
 Alliance web platform, which aims to be a one-stop service for bioinformatics
 and systems biology \cite{ghosh2011software} and GeneSpring software
-\cite{Chu2001}. Figure 1 is summarizing the NaviCell \emph{server} architecture
+\cite{Chu2001}. Figure~1 is summarizing the NaviCell \emph{server} architecture
 and information flow.
 
 \subsection{Input data types}
@@ -181,13 +182,13 @@ community and implements the Systems Biology Graphical Notation standard \cite{L
 for representing biological networks. These pathway maps are converted into
 interactive Google Maps-based web-interfaces via NaviCell tool \cite{kuperstein2013navicell}.
 Other pathway map formats can be used in NaviCell through dedicated converters implemented
-in BiNoM Cytoscape plugin \cite{Zinovyev2008,Bonnet2013}, exploiting the BiNoM-specific text-based representation
-of molecular entities. This method allows using with NaviCell any network that can be imported into Cytoscape environment.
+in BiNoM Cytoscape plugin \cite{Zinovyev2008,Bonnet2013a}.
+This method allows using with NaviCell practically any network that can be imported into Cytoscape environment.
 
 NaviCell data visualization web service is able to process
-several types of ``omics" data. The complete list of data types that are
-currently accepted for input is provided in Table \ref{table:01}. The different biological data
-types are mapped into various internal representations that determine what methods
+several types of ``omics" data. The complete list of data types that can be used in NaviCell Web Service
+is provided in Table~\ref{table:01}. The different biological data
+types are mapped into several internal representations that determine what methods
 of data visualization can be applied.
 
 For instance, an mRNA expression data matrix is associated to a
@@ -203,7 +204,7 @@ The input format for data sets is standard tab-delimited text files, with rows
 representing genes or their products and columns representing samples (or experiments, or time
 points). Genes in the first column should be labeled by their standard HUGO (HGNC)
 gene symbols, that will be associated to the different entities (genes,
-proteins, complexes) on the pathway map. 
+proteins, complexes) on the pathway map.
 
 Users can also upload sample annotation files to specify how samples can be organized into meaningfull groups
 (e.g., disease vs control), as a simple tab-delimited text file with sample names in
@@ -290,8 +291,8 @@ types of data. For example, one might consider using matched data for
 gene copy number and expression. In this case, the shape of the
 glyphs could be assigned to the copy-number values, while the expression data
 would be used for the color of the glyph. Like this, users can quickly
-appreciate the two data types values at the same time on the glyph. It is worth
-mentioning that up to five glyphs can be used at the same time on a given map.
+appreciate the two data types values at the same time on the glyph.
+Up to five glyphs can be attached to the same molecular entity.
 This can be useful to compare two different experimental conditions on the same
 map.
 
@@ -327,11 +328,11 @@ different brain areas \cite{Hokama2014}.
 
 Furthermore, several examples of using NaviCell Web Service for data
 visualization can be found in NaviCell Web Service user guide and case studies
-provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. For
-instance, we have mapped ovary cancer data downloaded from The Cancer Genome
+provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. In addition, in Supplementary
+Materials we provide two case studies demonstrating visualization of ovary cancer data downloaded from The Cancer Genome
 Atlas \cite{TCGA2011Ovarian} on a large map of Atlas of Cancer Signalling
-Network \cite{Kuperstein2015} and a complete description of this analysis is
-available as supplementary material.
+Network \cite{Kuperstein2015} and an example of using non-CellDesigner network map
+of the Ewing's sarcoma signalling network \cite{Stoll2013} for visualizing transcriptomic time series data.
 
 
 \subsection{Comparing two prostate cancer cell lines}
@@ -344,14 +345,12 @@ tumor cell line (LNCaP), and a prostate hormone-refractory tumor cell line
 these two cell lines and mapped them onto the cell cycle map
 \cite{calzone2008comprehensive}.
 
-If we consider the cell line data as the mean expression of genes on a
-population of asynchronous cells, most LNCaP cells seem to be expressing genes
-from the early phase G1 (Figure2A, upper-right area) and the G1-S checkpoint
+Application of map staining data visualization technique allows concluding that
+most LNCaP cells express genes from the early phase G1 (Figure2A, upper-right area) and the G1-S checkpoint
 (Figure2A, lower-left area) while most DU145 cells express genes from the
 later stages of the cell cycle (Figure 2B, G1-late, S-phase and G2-phase
-areas).  We notice that relatively few cell cycle genes are mutated, amplified or lost
+areas). Gene set visualization shows that few cell cycle genes are mutated, amplified or lost
 in these two cell lines (Figure 2A and 2B, square and triangle glyphs, especially in DU145).
-
 By zooming on the map, we can determine that for the LNCaP cells, the most
 important gene alterations are: the amplification of DP1 (present in most
 complexes involving E2F1), and the homozygous loss of E2F2 transcription
@@ -360,48 +359,40 @@ CHEK2. As for the expression, the more noticeable trend is that the expression
 of the cell cycle inhibitors, such as RBL2, p21, CDC25C, is still high, whereas
 the expression of the G2 cyclin, for instance, CyclinA is low.
 
-For the DU145 cells, genes involved in later stages of the cell cycle seem to
-be more expressed compared to the LNCaP cells. It can be that if the cells were
+For the DU145 cells, genes involved in later stages of the cell cycle are more
+expressed compared to the LNCaP cells. It can be that if the cells were
 arrested in LNCaP, they are more advanced in the cycle in DU145 cells by
 overpassing the G1/S checkpoint and are arrested at the spindle checkpoint.
-They are more prone to proliferate than the LNCaP cells. The expression of some
+They are more prone to proliferation than the LNCaP cells. The expression of some
 cyclins seems to confirm this fact: CyclinB, CyclinD and CyclinH are higher
 than in LNCaP. Some means to stop the cycle seem to be kept though, with Cdc20
 and Cdc25 expression high.
 
-We checked the expression levels of KI-67, a marker of proliferation, in the
-dataset and its expression is indeed higher in DU145 than in LNCaP cells, which
-tends to confirm the hypothesis that DU145 are more proliferative than LNCaP
-cells.
+%We checked the expression levels of KI-67, a marker of proliferation, in the
+%dataset and its expression is indeed higher in DU145 than in LNCaP cells, which
+%tends to confirm the hypothesis that DU145 are more proliferative than LNCaP
+%cells.
 
-\subsection{Data visualization for Alzheimer’s disease}
+\subsection{Visualization of transcriptomes of brain cortex regions in Alzheimer's disease}
 
-There is a possibility to combine several modes of data visualization and
-integrate simultaneously multiple types of data on the same map. This
-possibility is unique for NaviCell Web Service and very useful for finding
-correspondence between different data types with respect to a particular
-biological function depicted on the map or concerning an individual entity on
-the map. We used Alzheimer’s map (AD \cite{Mizuno2012}) to demonstrate that
-NaviCell Web Service also allows to visualize data on maps created by different
-research groups. Figure 3 shows simultaneous visualization of expression data
-from AD study \cite{hokama2013altered}  and mutation data on most frequently
+Here we used Alzheimer's disease network map (AD \cite{Mizuno2012}) to visualize
+the expression data from AD study \cite{hokama2013altered} (Figure~3) and mutation data on most frequently
 mutated genes in AD (taken from http://www.alzforum.org,
 http://www.molgen.ua.ac.be). The AD/control expression ratio from
 Thalamocortical area (TC) is visualized as map staining, and glyphs identify
 mutated genes. The data is visualized at the top level view of the map, in
 order to grasp patterns of expression regulation and distribution of mutated
 genes across different molecular mechanisms depicted on the map as functional
-modules (Figure 3A). At the detailed zoom level, the bar plot display mode is
-added above the corresponding map shapes, to compare expression values in
+modules (Figure~3A). At the detailed zoom level, the bar plot display mode is
+used to compare expression values in
 samples from Frontal cortex (FC), Thalamocortical area (TC) and Hippocampus
-(HI) areas (Figure 3B and 3D).  Zoom in on the most deregulated mechanisms in
+(HI) areas (Figures~3B and 3D).  Zoom in on the most deregulated mechanisms in
 AD shows elevated apoptosis signaling as overexpression of caspase cascade
-(Figure 3B) and downregulated cell survival mechanisms as MAPK pathway (Figure
-3D), which are known facts \cite{lukiw2010inflammatory}. In addition, AD
+(Figure~3B) and downregulated cell survival mechanisms as MAPK pathway (Figure~3D),
+which are known facts. In addition, AD
 samples are enriched with vascular inflammatory genes as ICAM1, VCAM1, EDN1 and
 TNF, the evidences of Blood-brain barrier (BBB) breakdown and inflammatory
-immune response activation in the brain tissue (Figure 3C)
-\cite{erickson2013blood}.
+immune response activation in the brain tissue (Figure~3C).
 
 \section{DISCUSSION}
 
@@ -478,18 +469,16 @@ BioCyc\cite{karp2005expansion}, Pa: PATIKAweb\cite{demir2002patika}.
 
 \section{CONCLUSION}
 
-NaviCell Web Service should contribute to the growing set of highly demanded
+NaviCell Web Service shall contribute to the growing set of highly demanded
 tools for molecular biology allowing visualization of ``omics" data in the
 context of biological network maps.
 
 \section{ACKNOWLEDGEMENTS}
 
-Agilent. PIC SysBio. INVADE. COMET.
+This work was supported by Agilent Thought Leader Award \#3273 and by the
+grant ``Projet Incitatif et Collaboratif Computational Systems Biology Approach for Cancer" from Institut Curie.
 
 \subsubsection{Conflict of interest statement.} None declared.
-\newpage
-
-\bibliography{biblio}
 
 \section{FIGURE LEGENDS}
 
@@ -523,6 +512,8 @@ mutation frequency. (B-C-D) represent zoom on known key regulators of (B)
 apoptosis, (C) blood brain barrier and (D) MAPK signaling pathway. Background
 color represent expression values as in (A), while barplots illustrate tissue
 specific expression values for frontal cortex (FC), thalamo-cortical area (TC)
-and hippocampus (HI).   
+and hippocampus (HI).
+
+\bibliography{biblio}
 
 \end{document}

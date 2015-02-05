@@ -46,18 +46,21 @@ Accepted March 1, 2009}
 \maketitle
 
 \begin{abstract}
-We present the NaviCell Web Service for network-based visualization of
-``omics" data.  It implements a number of data visual representation methods,
+NaviCell Web Service is a tool for network-based visualization of
+``omics" data.  It implements several data visual representation methods,
 including the novel map staining technique which allows grasping large-scale
 trends in numerical values (such as whole transcriptome) projected on top of a
 pathway map. The service also provides a server mode, which allows to automate
 visualization tasks and retrieve data from maps via RESTfull (standard HTTP)
 calls.  Bindings to different programming languages are provided (Python,
-R, Java).  We illustrate the interest of the tool with  two case studies using
-pathway maps created by different research groups, in which data visualization
-serves for getting new insights into molecular mechanisms involved in systemic
-disease progression (cancer and neurodegenerative disease).  
-
+R, Java). NaviCell Web Service allows combining visualization of different data types
+through different tools. It is scalable, based on Google Maps technology allowing working with large pathway maps,
+containing thousands of nodes, using semantic zooming principles. 
+NaviCell Web Service can be applied to pathway maps of different 
+types represented in various formats in different application fields.  
+We illustrate the interest of the tool  with  several case studies using pathway maps created by different research groups, 
+in which data visualization serves for getting new insights into molecular mechanisms 
+involved in systemic disease progression (cancer and neurodegenerative disease).
 \end{abstract}
 
 
@@ -68,7 +71,7 @@ serving for communicating results and ideas. Nowadays, there is a strong
 incentive to provide \emph{interactive} web-based visual representations, where
 users can easily play with different options to tweak and adapt them to a particular biological question. Modern
 molecular biology is particularly demanding for development of new tools
-representing in a meaningfull way numerous ``omics" data collected in
+representing in a meaningful way numerous ``omics" data collected in
 large-scale experiments. Visualizing quantitative ``omics" data in the context
 of biological networks provides insights into the molecular mechanisms in
 healthy tissues and in diseases \cite{Gehlenborg2010,Barillot2012}. This is one of
@@ -146,7 +149,7 @@ same page in the ``Python API and data files" section.
 \subsection{Implementation}
 
 We conceived the NaviCell Web Service for Network-based Data Visualization
-as a significant development of NaviCell \cite{kuperstein2013navicell} 
+as a significant development of NaviCell \cite{kuperstein2013navicell}
 allowing users to visualize and analyze different types of ``omics" data. The web service
 is implemented at two interconnected functional levels.
 The first level corresponds to the interactive dialog-based
@@ -177,6 +180,9 @@ are to be prepared using CellDesigner tool\cite{Funahashi2008}, which is widely 
 community and implements the Systems Biology Graphical Notation standard \cite{LeNovere2009}
 for representing biological networks. These pathway maps are converted into
 interactive Google Maps-based web-interfaces via NaviCell tool \cite{kuperstein2013navicell}.
+Other pathway map formats can be used in NaviCell through dedicated converters implemented
+in BiNoM Cytoscape plugin \cite{Zinovyev2008,Bonnet2013}, exploiting the BiNoM-specific text-based representation
+of molecular entities. This method allows using with NaviCell any network that can be imported into Cytoscape environment.
 
 NaviCell data visualization web service is able to process
 several types of ``omics" data. The complete list of data types that are
@@ -404,7 +410,7 @@ with similar tools. We have selected a number of web-based tools that are provid
 similar functionalities, i.e. easy pathway browsing functions and interactive data
 visualization capabilities, and compared them with NaviCell Web service. We have focused on the features
 related to map navigation, molecular data types, graphical representations,
-and programmatic access. The results of this comparison are reported in Table~\ref{table:02}. 
+and programmatic access. The results of this comparison are reported in Table~\ref{table:02}.
 We can see from this table that NaviCell Web Service strength are related to
 increased possibilities for graphical representations, support of multiple
 data types and extended possibilities for programmatic access from different

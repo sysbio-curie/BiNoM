@@ -817,8 +817,12 @@ public class WordPressBlogCreator extends BlogCreator
 					Utils.eclipsePrintln("unable to upload map icon to blog");
 					return;
 				}
-				if (!does_map_icon_exist(url))
+				/*
+				  // EV: 2015-02-05: disconnected check
+				if (!does_map_icon_exist(url)) {
 					throw new NaviCellException("put " + map_icon_base + " into the blog but couldn't find it");
+					}
+				*/
 			}
 			finally
 			{

@@ -649,7 +649,9 @@ Mapdata.prototype = {
 			win.nv_open_bubble = open_bubble;
 
 			if (!no_ext) {
-				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_find + "\"");
+				var idx = to_find.indexOf(" /");
+				var to_display = idx > 0 ? to_find.substring(0, idx) : to_find;
+				$("#result_tree_header", win.document).html(res_jxtree.found + " elements matching \"" + to_display + "\"");
 			} else if (hints.result_title) {
 				$("#result_tree_header", win.document).html(hints.result_title);
 			}

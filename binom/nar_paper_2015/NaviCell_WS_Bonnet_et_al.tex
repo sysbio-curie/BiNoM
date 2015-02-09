@@ -85,25 +85,24 @@ biological networks provides insights into the molecular mechanisms in healthy
 tissues and in diseases \cite{Gehlenborg2010,Barillot2012}. This is one of the
 most demanded features of existing pathway databases such as KEGG and Reactome
 \cite{Kanehisa2012, Croft2014}. To answer this need, many tools have been
-developed allowing mapping ``omics" data on top of the biological networks
+developed allowing mapping ``omics" data on top of biological networks
 \cite{Arakawa2005,vanIersel2008,Luo2013, Nishida2014}. These tools use the
 content of existing pathway databases to retrieve the pathway information
 through dedicated APIs. In addition, some pathway databases provide graphical
-user interfaces (GUI) allowing performing data visualization, on top of
-their interactive pathway maps.
+user interfaces (GUI) allowing performing data visualization, on interactive pathway maps.
 
 When a user faces the necessity to visualize the ``omics" data on
 biological networks, there are currently only two options available: either to use
 a graphical interface of a suitable pathway database, which can be a tedious manual work, or use
 one of the available standalone or web-based tools for creating static images
-of colored pathways which are not interactive anymore and do not allow browsing
+of colored pathways which are not interactive anymore, and do not allow browsing
 the molecular interactions. Currently, there is a lack of well-developed APIs
-that allow applying data visualization programmatically on top of biological
-networks such that the ``omics" data can be browsed simultaneously with the
+that allow to apply data visualization programmatically on biological
+networks, such that the ``omics" data can be browsed simultaneously with the
 pathway information.
 
 Available network-based methods for data visualization have several common
-limitations. First, most of them do not provide possibility of data
+limitations. First, most of them do not provide any possibility of data
 abstraction and do not allow visualizing coarse-grained trends in the ``omics" data.
 This is needed if, for example, there is a wish to visualize the whole
 transcriptome of a cell or a group of samples on a large network,
@@ -113,8 +112,8 @@ barplots) to the individual elements of pathway maps, which makes the
 visualization hardly readable at higher levels of zooming as well as the map
 content itself. Second, most of data visualization tools are specific to a
 particular pathway database structure, format and graphical pathway
-representation. This limits the use of data visualization on top of
-user-defined maps. Third, APIs for programmatic web-based data
+representation. This limits the use of data visualization on user-defined maps.
+Third, APIs for programmatic web-based data
 visualization are very limited or do not exist.
 
 To overcome some of these limitations, we have developed NaviCell Web Service tool. It allows
@@ -136,19 +135,19 @@ Visualization is a combination of 1) a user-friendly NaviCell JavaScript-based
 web interface \cite{kuperstein2013navicell}, allowing browsing large maps
 of biological networks using Google Maps API and \emph{semantic zooming}
 principle and visualize ``omics" data on top of them
-(\href{https://navicell.curie.fr})); 2) a collection of maps available for
+(https://navicell.curie.fr); 2) a collection of maps available for
 data visualization including the Atlas of Cancer Signaling Network (ACSN)
-(\href{https://acsn.curie.fr}))  and other detailed network maps created by other
+(https://acsn.curie.fr)  and other detailed network maps created by other
 research groups for particular topics (Toll-like receptor signalling, EGFR
 and mTOR pathways, mast cell activation, dendritic cells, iron metabolism,
 Alzheimer disease and others); 3) a REST API allowing programmatic use of all
 data visualization functions and manipulating the web interface, with available
 Python binding and upcoming R and Java bindings.
 
-A quick live example which \emph{automatically} uploads a sample dataset from
+A quick ``live example'' which \emph{automatically} uploads a sample dataset from
 TCGA database and illustrates the data visualization capabilities of
 NaviCell Web Service is provided at
-\href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. Sample Python
+http://navicell.curie.fr/pages/nav\_web\_service.html. Sample Python
 code for quick start on using NaviCell Web Service API is available from the
 same link in the ``Python API and data files" section. An example screenshot of NaviCell
 Web Service GUI can be found in the manual located at the same link.
@@ -161,11 +160,11 @@ We conceived the NaviCell Web Service for Network-based Data Visualization
 as a significant development of NaviCell \cite{kuperstein2013navicell}
 for visualizing and analyzing different types of ``omics" data. The web service
 is implemented at two interconnected functional levels.
-The first level corresponds to the interactive dialog-based
+The first level corresponds to the interactive, dialog-based,
 use of the web interface to load and visualize data. This level is implemented
 as a specific set of JavaScript functions linked to the menu located
 in the right-hand panel of the NaviCell web interface. The second level corresponds to a
-programmatic usage of the service, which allows users writing the code that will
+programmatic usage of the service, which allows users writing code that will
 communicate with the NaviCell \emph{server} in order to automate all the
 visualization operations. This functional level is implemented as a RESTful web
 service, using standard web protocol HTTP operations and data encoding (JSON)
@@ -184,7 +183,7 @@ and information flow.
 \subsection{Input data types}
 
 The pathway maps which can be used for NaviCell Web Service data visualization
-are to be prepared using CellDesigner tool \cite{Funahashi2008}, which is widely used in systems biology
+can be prepared using CellDesigner tool \cite{Funahashi2008}, which is widely used in systems biology
 community and implements the Systems Biology Graphical Notation standard \cite{LeNovere2009}
 for representing biological networks. These pathway maps are converted into
 interactive Google Maps-based web-interfaces via NaviCell tool \cite{kuperstein2013navicell}.
@@ -215,7 +214,7 @@ proteins, complexes) on the pathway map.
 
 Users can also upload sample annotation files to specify how samples can be organized into meaningful groups
 (e.g., disease vs control), as a simple tab-delimited text file with sample names in
-rows and annotation fields as columns. Then, an appropriate method will be used
+rows and annotation fields as columns. An appropriate method will be used
 to summarize the values of all the samples contained in a group, defined by the
 internal data representation. For instance, expression values for a group of samples
 is averaged by default for the ``continuous" data type, but the user will have
@@ -289,7 +288,7 @@ several samples or groups of samples from several data sets
 \item \textbf{Barplots} are charts with rectangular bars proportional to the values
 they represent. On NaviCell Web Sevice interface, they are colored according to the
 data value. Barplots can be efficient to visually distinguish numerical
-values between two or more groups of conditions (e.g. disease vs control as in Figure~2B-D).
+values between two or more groups of conditions (e.g. disease vs control as in Figure 3B-D).
 
 \item \textbf{Glyphs} are graphical representations using basic geometrical
 shapes (triangle, square, rectangle, diamond, hexagon, circle) and their attributes
@@ -300,8 +299,8 @@ gene copy number and expression. In this case, the shape of the
 glyphs can be assigned to the copy-number values, while the expression data
 would be used for the color of the glyph. In this manner, users can quickly
 grasp the two data types values mapped on the same glyph.
-Up to five glyphs can be attached to the same molecular entity.
-This can be useful to compare several experimental conditions on the same
+Up to five glyphs can be attached to the same molecular entity,
+which can be useful to compare several experimental conditions on the same
 map.
 
 \item \textbf{Map staining} is a novel network-based data visualization method where
@@ -315,7 +314,7 @@ to avoid too large polygons, and are colored according to the data values and to
 defined by the user. The colorful decorations of the pathway map
 are replaced by a black-and-white background in order to avoid mixing the colors.
 Using map staining allows appreciating large-scale trends in molecular data mapped
-onto biological networks, when observed at the bird's-eye view level (see example in Figure 2).
+onto biological networks, when observed at the bird's-eye view level (see example in Figure 2 and 3).
 
 \end{itemize}
 
@@ -336,7 +335,7 @@ different brain areas \cite{hokama2013altered}.
 
 Furthermore, several examples of using NaviCell Web Service for data
 visualization can be found in NaviCell Web Service user guide and case studies
-provided at \href{http://navicell.curie.fr/pages/nav\_web\_service.html}.. In Supplementary
+provided at http://navicell.curie.fr/pages/nav\_web\_service.html. In Supplementary
 Materials we provide two case studies demonstrating visualization of ovary cancer data obtained from The Cancer Genome
 Atlas \cite{TCGA2011Ovarian} on a large map of Atlas of Cancer Signalling
 Network \cite{Kuperstein2015} and an example of using non-CellDesigner network map
@@ -360,7 +359,7 @@ later stages of the cell cycle (Figure 2B, G1-late, S-phase and G2-phase
 areas). Gene set visualization shows that few cell cycle genes are mutated, amplified or lost
 in these two cell lines (Figure 2A and 2B, square and triangle glyphs, especially in DU145).
 By zooming in on the map, we can determine that for the LNCaP cells, the most
-important gene alterations are: the amplification of DP1 (present in most
+important gene alterations are the amplification of DP1 (present in most
 complexes involving E2F1), and the homozygous loss of E2F2 transcription
 factor. The mutations concern mainly genes from the apoptotic pathway: ATR or
 CHEK2. As for the expression, the more noticeable trend is that the expression

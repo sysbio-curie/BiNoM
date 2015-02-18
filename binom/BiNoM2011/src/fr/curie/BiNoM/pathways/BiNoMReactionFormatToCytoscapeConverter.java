@@ -9,7 +9,6 @@ import fr.curie.BiNoM.pathways.utils.CellDesignerGenerator;
 import fr.curie.BiNoM.pathways.utils.ReactionStructure;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
-
 import vdaoengine.utils.Utils;
 
 public class BiNoMReactionFormatToCytoscapeConverter {
@@ -21,6 +20,8 @@ public class BiNoMReactionFormatToCytoscapeConverter {
 	public Vector<String> statements = null;
 	public CellDesignerGenerator celldesignergenerator = new CellDesignerGenerator();
 	public String name = "";
+	public int map_width = 1500;
+	public int map_height = 1000;
 	
 	
 	public static void main(String[] args) {
@@ -34,10 +35,20 @@ public class BiNoMReactionFormatToCytoscapeConverter {
 		//String prefix = "c:/datas/BinomTest/brf/test";
 		//String prefix = "C:/Users/ZINOVYEV/Desktop/autophagy_1";
 		//String prefix = "c:/datas/BinomTest/M-phase2";
-		String prefix = "c:/datas/BinomTest/Biopax3/test";
+		//String prefix = "c:/datas/BinomTest/Biopax3/test";
+		//String prefix = "C:/Datas/EWING/network/Ewing_influence_nodes";
+		String prefix = "C:/Datas/EWING/network/Ewing_influence_1";
+		brf2c.celldesignergenerator.repositionAliases = false;
+		brf2c.celldesignergenerator.shiftY = 332f;
+		brf2c.celldesignergenerator.shiftX = -15f;
+		brf2c.celldesignergenerator.scaleX = 2*2572f/2640f;
+		brf2c.celldesignergenerator.scaleY = 2f-0.05f;
+		brf2c.celldesignergenerator.defaultProteinWidth = 60;
+		brf2c.celldesignergenerator.defaultProteinHeight = 60;
 		brf2c.loadFile(prefix+".txt");
 		Graph graph = brf2c.convertToGraph();
 		CellDesigner.saveCellDesigner(brf2c.celldesignergenerator.cd, prefix+"_1.xml");
+		//CellDesigner.saveCellDesigner(brf2c.celldesignergenerator.cd, "C:/Datas/NaviCell2.2/maps/ewing_src/master.xml");
 		XGMML.saveToXGMML(graph, prefix+".xgmml");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -55,7 +66,7 @@ public class BiNoMReactionFormatToCytoscapeConverter {
 	
 	public Graph convertToGraph() throws Exception{
 		Graph graph = null;
-		celldesignergenerator.createNewCellDesignerFile(name,1000,1500);
+		celldesignergenerator.createNewCellDesignerFile(name,map_width,map_height);
 		
 		addStatements();
 		celldesignergenerator.processStatements();

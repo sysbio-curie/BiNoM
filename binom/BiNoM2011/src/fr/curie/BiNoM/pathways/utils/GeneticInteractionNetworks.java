@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import vdaoengine.utils.Algorithms;
+import vdaoengine.utils.VSimpleFunctions;
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.analysis.structure.Edge;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
@@ -20,6 +22,56 @@ public class GeneticInteractionNetworks {
 	/**
 	 * @param args
 	 */
+	public static int EPISTASIS_NULL_MODEL_ADDITIVE = 0;
+	public static int EPISTASIS_NULL_MODEL_MULTIPLICATIVE = 1;
+	public static int EPISTASIS_NULL_MODEL_MIN = 2;
+	public static int EPISTASIS_NULL_MODEL_MAX = 3;
+	public static int EPISTASIS_NULL_MODEL_LOG = 4;
+	
+	public static String modelNames[] = {"ADD","MLT","MIN","MAX","LOG"};
+	
+	public static int INTTYPE_NONINTERACTIVE = 0;
+	public static int INTTYPE_SYNTHETIC = 0;
+	public static int INTTYPE_ASYNTHETIC = 0;
+	public static int INTTYPE_SUPPRESSIVE = 0;
+	public static int INTTYPE_EPISTATIC = 0;
+	public static int INTTYPE_CONDITIONAL = 0;
+	public static int INTTYPE_ADDITIVE = 0;
+	public static int INTTYPE_SINGLE_NONMONOTONIC = 0;
+	public static int INTTYPE_DOUBLE_NONMONOTONIC = 0;
+	
+	
+	public static int numberofnullmodels = 5;
+	
+	public static int bestNullEpistasisModel = 0;
+	
+	
+	public Vector<Float> Wx = null; 
+	public Vector<Float> Wy = null;
+	public Vector<Float> Wxy = null;
+	
+	/*
+	 * Here all initial computed null models are stored
+	 */
+	public float nullmodels[][] = null;
+	public float nullmodels_corrected[][] = null;
+	public float alphas[] = null;
+	public float correlations[] = null;
+			
+	public float threshold_positive = 0f;
+	public float threshold_negative = 0f;
+	
+	public Vector<String> interaction_types = new Vector<String>();
+	
+	/*
+	 * Fitness measure of the wild type
+	 */
+	public float Wwildtype = 1;
+	/*
+	 * Minimum difference from which two Ws are considered different numbers
+	 */
+	public float deltaW = 0.2f; 
+	
 	public static void main(String[] args) {
 		try{
 			
@@ -27,11 +79,116 @@ public class GeneticInteractionNetworks {
 			//makeHumanizedBioGrid();
 			//makeSLNetworkFromYeastScreen();
 			//extractBioGridMammalianNetwork();
-			analyzeGeneticInteractionBioGrid();
+			//analyzeGeneticInteractionBioGrid();
+			String ineq = interactionInequality(1.04f,0.49f,1.01f,1f,0.1f);
+			System.out.println(ineq+"\t"+inequalityType(ineq)+"\t"+inequalityDirection(ineq));
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void ChooseBestNullEpistasisModel(Vector<Float> _f1, Vector<Float> _f2, Vector<Float> _f12){
+		ChooseBestNullEpistasisModel(_f1,_f2,_f12,-1);
+	}
+	
+	public void ChooseBestNullEpistasisModel(Vector<Float> _f1, Vector<Float> _f2, Vector<Float> _f12, int forcedModelChoice){
+		Wx = _f1;
+		Wy = _f2;
+		Wxy = _f12;
+		ComputeNullEpistasisModels();
+		correlations = new float[numberofnullmodels];
+		float wxy[] = new float[Wxy.size()];
+		for(int i=0;i<Wxy.size();i++) wxy[i]=Wxy.get(i);
+		bestNullEpistasisModel = 0;
+		float corr = 0f;
+		
+		for(int i=0;i<numberofnullmodels;i++){
+			//correlations[i] = VSimpleFunctions.calcCorrelationCoeffLeaveOneOut(nullmodels[i], wxy, 2f, 0);
+			correlations[i] = VSimpleFunctions.calcCorrelationCoeff(nullmodels[i], wxy);
+			if(correlations[i]>corr){
+				corr = correlations[i];
+				bestNullEpistasisModel = i;
+			}
+		}
+		
+		if(forcedModelChoice!=-1)
+			bestNullEpistasisModel = forcedModelChoice;
+		
+		
+		Vector<Float> posdistV = new Vector<Float>();
+		Vector<Float> negdistV = new Vector<Float>();
+		for(int i=0;i<Wx.size();i++){
+			float v = Wxy.get(i)-nullmodels_corrected[bestNullEpistasisModel][i];
+			if(v>0){
+				posdistV.add(v);
+				posdistV.add(-v);
+			}
+			if(v<0){
+				negdistV.add(v);
+				negdistV.add(-v);
+			}
+		}
+		float posdist[] = new float[posdistV.size()];
+		float negdist[] = new float[negdistV.size()];
+		for(int i=0;i<posdistV.size();i++) posdist[i] = posdistV.get(i);
+		for(int i=0;i<negdistV.size();i++) negdist[i] = negdistV.get(i);
+		threshold_negative = VSimpleFunctions.calcStandardDeviation(negdist);
+		threshold_positive = VSimpleFunctions.calcStandardDeviation(posdist);
+	}
+	
+	public void ComputeNullEpistasisModels(){
+		nullmodels = new float[numberofnullmodels][Wx.size()];
+		for(int i=0;i<Wx.size();i++){
+			float wx = Wx.get(i);
+			float wy = Wy.get(i);
+			float F_ADD = wx+wy;
+			float F_MULT = wx*wy;
+			float F_MIN = Math.min(wx, wy);
+			float F_MAX = Math.max(wx, wy);;
+			float F_LOG = log2((float)((Math.pow(2,wx)-1)*(Math.pow(2,wy)-1)+1));
+			nullmodels[0][i] = F_ADD;
+			nullmodels[1][i] = F_MULT;
+			nullmodels[2][i] = F_MIN;
+			nullmodels[3][i] = F_MAX;
+			nullmodels[4][i] = F_LOG;
+		}
+		// now, correct for bias
+		nullmodels_corrected = new float[numberofnullmodels][Wx.size()];
+		alphas = new float[numberofnullmodels];
+		for(int i=0;i<numberofnullmodels;i++){
+			for(int j=0;j<Wx.size();j++)
+				nullmodels_corrected[i][j] = nullmodels[i][j];
+		}			
+		CorrectNullModelBias();
+		
+	}
+	
+	public void CorrectNullModelBias(){
+		float wxy[] = new float[Wxy.size()];
+		alphas = new float[numberofnullmodels];
+		nullmodels_corrected = new float[numberofnullmodels][Wx.size()];
+		for(int i=0;i<Wxy.size();i++) wxy[i]=Wxy.get(i);
+		
+		for(int i=0;i<numberofnullmodels;i++){
+			alphas[i] = getRegressionCoefficient(nullmodels[i], wxy);
+			for(int j=0;j<Wx.size();j++)
+				nullmodels_corrected[i][j] = alphas[i]*nullmodels[i][j];
+		}		
+	}
+	
+	public static float log2(float x){
+		return (float)Math.log(x)/(float)Math.log(2);
+	}
+	
+	public static float getRegressionCoefficient(float x[], float y[]){
+		float sxy = 0f;
+		float sxx = 0f;
+		for(int i=0;i<y.length;i++){
+			sxy+=x[i]*y[i];
+			sxx+=x[i]*x[i];
+		}
+		return sxy/sxx;
 	}
 
 	/*
@@ -398,6 +555,186 @@ public class GeneticInteractionNetworks {
 			}
 		}
 		fw.close(); fwh.close(); fwhg.close(); fwhg_negative.close(); fw_orf.close(); fw_orf_negative.close();
+	}
+	
+	public static String interactionInequality(float pwt, float pa, float pb, float pab, float thresh){
+		String labels[] = {"1W","2A","3B","4C"};
+		String ineq = "";
+		float nums[] = {pwt,pa,pb,pab};
+		int inds[] = Algorithms.SortMass(nums);
+		ineq = labels[inds[0]];
+		for(int i=1;i<inds.length;i++){
+			String sep = "<";
+			if(Math.abs(nums[inds[i]]-nums[inds[i-1]])<thresh)
+				sep = "=";
+			ineq+=sep+labels[inds[i]];
+		}
+		
+		// normalize inequality by swapping equal label
+		//System.out.println(ineq);
+		while(true){
+			boolean swap = false;
+			String ls[] = {ineq.substring(0,2),ineq.substring(3,5),ineq.substring(6,8),ineq.substring(9,11)};
+			String seps[] = {ineq.substring(2,3),ineq.substring(5,6),ineq.substring(8,9)};
+			for(int i=0;i<seps.length;i++){
+				if(seps[i].equals("=")){
+					if(ls[i].compareTo(ls[i+1])>0){
+						String temp = ls[i+1];
+						ls[i+1] = ls[i];
+						ls[i] = temp;
+						swap = true;
+					}
+				}
+			}
+			ineq = ls[0]+seps[0]+ls[1]+seps[1]+ls[2]+seps[2]+ls[3];
+			//System.out.println(ineq);
+			if(!swap) break;
+		}
+		ineq = Utils.replaceString(ineq, "1W", "WT");
+		ineq = Utils.replaceString(ineq, "2A", "A");
+		ineq = Utils.replaceString(ineq, "3B", "B");
+		ineq = Utils.replaceString(ineq, "4C", "AB");
+		return ineq;
+	}
+	
+	
+	public static String inequalityType(String ineq){
+	String tp = "not_defined";
+		
+	String types[] = { 
+	"A=AB<WT=B","noninteractive",
+	"B=AB<WT=A","noninteractive",
+	"WT=A<B=AB","noninteractive",
+	"WT=B<A=AB","noninteractive",
+	"WT=A=B=AB","noninteractive",
+	"AB<WT=A=B","synthetic",
+	"WT=A=B<AB","synthetic",
+	"A=B=AB<WT","asynthetic",
+	"WT<A=B=AB","asynthetic",
+	"A<WT=B=AB","suppressive",
+	"B<WT=A=AB","suppressive",
+	"WT=A=AB<B","suppressive",
+	"WT=B=AB<A","suppressive",
+	"A<B=AB<WT","epistatic",
+	"B<A=AB<WT","epistatic",
+	"A=AB<B<WT","epistatic",
+	"B=AB<A<WT","epistatic",
+	"A<WT<B=AB","epistatic",
+	"B<WT<A=AB","epistatic",
+	"A=AB<WT<B","epistatic",
+	"B=AB<WT<A","epistatic",
+	"WT<A<B=AB","epistatic",
+	"WT<B<A=AB","epistatic",
+	"WT<A=AB<B","epistatic",
+	"WT<B=AB<A","epistatic",
+	"WT=A<AB<B","conditional",
+	"WT=B<AB<A","conditional",
+	"WT=A<B<AB","conditional",
+	"WT=B<A<AB","conditional",
+	"A<WT=B<AB","conditional",
+	"B<WT=A<AB","conditional",
+	"AB<WT=A<B","conditional",
+	"AB<WT=B<A","conditional",
+	"A<AB<WT=B","conditional",
+	"B<AB<WT=A","conditional",
+	"AB<A<WT=B","conditional",
+	"AB<B<WT=A","conditional",
+	"A<AB<WT<B","additive",
+	"B<AB<WT<A","additive",
+	"A<WT<AB<B","additive",
+	"B<WT<AB<A","additive",
+	"A<WT=AB<B","additive",
+	"B<WT=AB<A","additive",
+	"AB<A<B<WT","additive",
+	"AB<B<A<WT","additive",
+	"WT<A<B<AB","additive",
+	"WT<B<A<AB","additive",
+	"AB<A=B<WT","additive",
+	"WT<A=B<AB","additive",
+	"A<AB<B<WT","single-nonmonotonic",
+	"B<AB<A<WT","single-nonmonotonic",
+	"A<WT<B<AB","single-nonmonotonic",
+	"B<WT<A<AB","single-nonmonotonic",
+	"AB<A<WT<B","single-nonmonotonic",
+	"AB<B<WT<A","single-nonmonotonic",
+	"WT<A<AB<B","single-nonmonotonic",
+	"WT<B<AB<A","single-nonmonotonic",
+	"A<B<AB<WT","double-nonmonotonic",
+	"B<A<AB<WT","double-nonmonotonic",
+	"A<B<WT<AB","double-nonmonotonic",
+	"B<A<WT<AB","double-nonmonotonic",
+	"A<B<WT=AB","double-nonmonotonic",
+	"B<A<WT=AB","double-nonmonotonic",
+	"A=B<AB<WT","double-nonmonotonic",
+	"A=B<WT<AB","double-nonmonotonic",
+	"A=B<WT=AB","double-nonmonotonic",
+	"AB<WT<A<B","double-nonmonotonic",
+	"AB<WT<B<A","double-nonmonotonic",
+	"AB<WT<A=B","double-nonmonotonic",
+	"WT<AB<A<B","double-nonmonotonic",
+	"WT<AB<B<A","double-nonmonotonic",
+	"WT<AB<A=B","double-nonmonotonic",
+	"WT=AB<A<B","double-nonmonotonic",
+	"WT=AB<B<A","double-nonmonotonic",
+	"WT=AB<A=B","double-nonmonotonic"};
+	for(int i=0;i<types.length-1;i++)
+		if(ineq.equals(types[i]))
+			tp = types[i+1];
+	return tp;
+	}
+	
+	/* Direction
+	 * 0 - symmetric
+	 * 1 - A->B
+	 * -1 - A<-B
+	 */
+	public static int inequalityDirection(String ineq){
+	int dir = 0;
+		String asymmetric[] = {
+		"A<WT=B=AB",
+		"WT=B=AB<A",
+		"A<B=AB<WT",
+		"B=AB<A<WT",
+		"A<WT<B=AB",
+		"B=AB<WT<A",
+		"WT<A<B=AB",
+		"WT<B=AB<A",
+		"WT=A<AB<B",
+		"WT=A<B<AB",
+		"B<WT=A<AB",
+		"AB<WT=A<B",
+		"B<AB<WT=A",
+		"AB<B<WT=A",
+		"A<AB<B<WT",
+		"B<WT<A<AB",
+		"AB<A<WT<B",
+		"WT<B<AB<A",
+		"B<WT=A=AB",
+		"WT=A=AB<B",
+		"B<A=AB<WT",
+		"A=AB<B<WT",
+		"B<WT<A=AB",
+		"A=AB<WT<B",
+		"WT<B<A=AB",
+		"WT<A=AB<B",
+		"WT=B<AB<A",
+		"WT=B<A<AB",
+		"A<WT=B<AB",
+		"AB<WT=B<A",
+		"A<AB<WT=B",
+		"AB<A<WT=B",
+		"B<AB<A<WT",
+		"A<WT<B<AB",
+		"AB<B<WT<A",
+		"WT<A<AB<B"};
+		int asymmetric_dirs[] = {
+				-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+				 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,				
+		};
+		for(int i=0;i<asymmetric.length;i++)
+			if(ineq.equals(asymmetric[i]))
+				dir = asymmetric_dirs[i];
+		return dir;
 	}
 	
 

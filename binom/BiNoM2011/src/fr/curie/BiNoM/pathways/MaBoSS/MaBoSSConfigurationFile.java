@@ -16,7 +16,8 @@ public class MaBoSSConfigurationFile {
 	String folder = null;
 	boolean doSingleMutants = true;
 	boolean doDoubleMutants = true;
-	boolean doOverExpression = true;	
+	boolean doOverExpression = true;
+	boolean includeNonInternalVariables = true;
 	Vector<String> excludeVariables = new Vector<String>();
 	
 	
@@ -83,13 +84,13 @@ public class MaBoSSConfigurationFile {
 		for(String line: lines){
 			if(line.contains(".is_internal")){
 				StringTokenizer st = new StringTokenizer(line,"=");
-				String name = st.nextToken();
+				String name = st.nextToken().trim();
 				String value = st.nextToken().trim();
 				if(value.endsWith(";"))
 					value = value.substring(0, value.length()-1);
 				if(name.endsWith(".is_internal"))
 					name = name.substring(0, name.length()-12);
-				if(value.trim().equals("1")){
+				if(value.trim().equals("1")||includeNonInternalVariables){
 					variables.add(name);
 					//System.out.println("Variable "+name);
 				}
@@ -204,15 +205,24 @@ public class MaBoSSConfigurationFile {
 	}
 	
 	public void makeKnockOutMutant(String variable){
+		boolean foundIstate = false;
 		for(String line: lines){
 			if(line.startsWith("$"+variable+"_ko")){
 				String newline = "$"+variable+"_ko=1;";
 				lines.set(lines.indexOf(line), newline);
 			}
+			if(line.startsWith(variable+".istate")){
+				String newline = variable+".istate=0;";
+				lines.set(lines.indexOf(line), newline);
+				foundIstate = true;
+			}
 		}
+		if(!foundIstate)
+			lines.add(variable+".istate=0;");
 	}
 	
 	public void makeOverExpressionMutant(String variable){
+		boolean foundIstate = false;		
 		for(String line: lines){
 			if(line.startsWith("$"+variable+"_up")){
 				String newline = "$"+variable+"_up=1;";
@@ -221,8 +231,11 @@ public class MaBoSSConfigurationFile {
 			if(line.startsWith(variable+".istate")){
 				String newline = variable+".istate=1;";
 				lines.set(lines.indexOf(line), newline);
+				foundIstate = true;
 			}
 		}
+		if(!foundIstate)
+			lines.add(variable+".istate=1;");
 	}
 	
 	public void makeFolderWithAllMutants(String file_bnd){
@@ -237,8 +250,11 @@ public class MaBoSSConfigurationFile {
 		try{
 		FileWriter fw = new FileWriter(mutantFolder+"/run.sh");
 		fw.write("../MaBoSS -c "+fileNamePrefix+".cfg -o "+fileNamePrefix+" "+file_bnd+"\n");
-		fw.write("..\\MaBoSS.exe -c "+fileNamePrefix+".cfg -o "+fileNamePrefix+" "+file_bnd+"\n");		
+		int k = 0;
+		int num = allMutants.size();
 		for(MaBoSSConfigurationFile mutant: allMutants){
+			k++;
+			fw.write("echo \""+k+"/"+num+": "+mutant.fileNamePrefix+"\"\n");
 			fw.write("../MaBoSS -c "+mutant.fileNamePrefix+".cfg -o "+mutant.fileNamePrefix+" "+file_bnd+"\n");
 			mutant.save(mutantFolder+"/"+mutant.fileNamePrefix+".cfg");
 		}

@@ -19,11 +19,12 @@ import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class FindNeighbours {
 
-	public static void test_main(String[] args) {
+	public static void main(String[] args) {
 		try{
 			
 			//SbmlDocument sbml = CellDesigner.loadCellDesigner("C:/Datas/BinomTest/M-phase2.xml");
-			SbmlDocument sbml = CellDesigner.loadCellDesigner("C:/Datas/BinomTest/BioPAXtest/acsn_master.xml");
+			//SbmlDocument sbml = CellDesigner.loadCellDesigner("C:/Datas/BinomTest/BioPAXtest/acsn_master.xml");
+			SbmlDocument sbml = CellDesigner.loadCellDesigner("C:/Datas/acsn/3_NaviCell_Source/survival_src/survival_master.xml");
 			CellDesigner.entities = CellDesigner.getEntities(sbml);
 			
 			Graph reactionGraph = getReactionGraph(sbml);

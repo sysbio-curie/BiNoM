@@ -27,6 +27,7 @@ public class ConnectionToDatabases {
 		public int year = 0;
 		public String firstAuthorName = "";
 		public String allAuthors = "";
+		public boolean isReview = false;
 		public String oneLineCitation(){
 			String res = "";
 			res+=allAuthors;
@@ -53,8 +54,9 @@ public class ConnectionToDatabases {
 			//makeIdentifiersTable("c:/datas/acsn/allnames.txt");
 			//makeIdentifiersTable("c:/datas/acsn/test1.txt");
 			
-			Citation cit = convertPMIDtoCitation("10021362");
+			Citation cit = convertPMIDtoCitation("17334950");
 			System.out.println(cit.oneLineCitation());
+			System.out.println("Review="+cit.isReview);
 			
 			
 		}catch(Exception e){
@@ -247,6 +249,10 @@ public class ConnectionToDatabases {
 			  }
 			  if(s.startsWith("<MedlinePgn>")){
 				  citation.pages = cutBetweenTags(s,"MedlinePgn");
+			  }
+			  if(s.startsWith("<PublicationType")){
+				  if(s.toLowerCase().contains("review"))
+					  citation.isReview = true;
 			  }
 		  }
 		  

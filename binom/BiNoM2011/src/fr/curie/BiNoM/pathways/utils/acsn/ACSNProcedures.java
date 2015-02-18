@@ -80,6 +80,7 @@ public class ACSNProcedures {
 			//doScalePng("C:/Datas/NaviCell/test/merged/merged_master-3_1.png","C:/Datas/NaviCell/test/merged/merged_master-2_1.png");
 			//doScalePng("C:/Datas/acsn/survival_merge/hedgehog-3-1.png", "C:/Datas/acsn/survival_merge/hedgehog-2-1.png");
 			//updateLinks("c:/datas/navicell/test/merge_config","c:/datas/navicell/test/connectionIDs.txt");
+			//makeBibliographyFromXml("C:/Datas/acsn/assembly/cellcycle_src/cellcycle_APC.xml", "C:/Datas/acsn/assembly/cellcycle_src/cellcycle_APC_bib.txt", true);
 			
 			for(int i=0;i<args.length;i++){
 				if(args[i].equals("--xml"))
@@ -196,7 +197,7 @@ public class ACSNProcedures {
 			}
 			
 			if(makeBibliographyFromFile){
-				makeBibliographyFromXml(xmlFileName, bibfile, false);
+				makeBibliographyFromXml(xmlFileName, bibfile, true);
 			}
 				
 			
@@ -510,11 +511,11 @@ public class ACSNProcedures {
     	   int k=0;
     	   for(String pmid: pmids){
     		   ConnectionToDatabases.Citation cit = ConnectionToDatabases.convertPMIDtoCitation(pmid);
-    		   System.out.println((++k)+"\t"+cit.year+"\t"+cit.oneLineCitation());
+    		   System.out.println((++k)+"\t"+cit.year+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":""));
     		   if(addPMIDprefix)
-    			   bib+="PMID:"+pmid+"\t"+cit.oneLineCitation()+"\n";
+    			   bib+="PMID:"+pmid+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":"")+"\n";
     		   else
-    			   bib+=pmid+"\t"+cit.oneLineCitation()+"\n";
+    			   bib+=pmid+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":"")+"\n";
     	   }
     	   return bib;
        }

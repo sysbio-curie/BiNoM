@@ -9,7 +9,9 @@ import java.util.Vector;
 
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
+import fr.curie.BiNoM.pathways.utils.GeneticInteractionNetworks;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
+import fr.curie.BiNoM.pathways.utils.Utils;
 
 public class MaBoSSProbTrajFile {
 
@@ -21,6 +23,12 @@ public class MaBoSSProbTrajFile {
 	SimpleTable table = new SimpleTable();
 	Vector<String> phenotypes = new Vector<String>();
 	Vector<Float> probabilities = new Vector<Float>();
+	
+	public static boolean swapPhenotypesToHaveSameDirection = true;
+	
+	public static float thresholdForDistinctFitness = 0.2f;
+	
+	public static float numberOfStandardDeviations = 1f;
 	
 	public static void main(String[] args) {
 		try{
@@ -34,10 +42,51 @@ public class MaBoSSProbTrajFile {
 		System.out.println(prob.type);*/
 		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/EMT/ModNet_mutants/","ModNet_","C:/Datas/Calzone/EMT/ModNet_mutants.xls");
 		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/EMT/metastasis_mutants/","metastasis_","C:/Datas/Calzone/EMT/metastasis_mutants.xls");
+		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/genetic_interactions/cellfate_mutants/","cellfate_","C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls");
+		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/genetic_interactions/restriction_mutants/","restriction_","C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls");
+		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls", 0.01f);
+		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
 		//VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/EMT/ModNet_mutants.xls.dat");
 		//makeGeneticInteractionTable(vt,"Invasion/Migration/Metastasis/CellCycleArrest","metastasis","C:/Datas/Calzone/EMT/ModNet_mutants");
-		VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/EMT/metastasis_mutants.xls.dat");
-		makeGeneticInteractionTable(vt1,"Invasion/EMT/Migration/Metastasis/CellCycleArrest","metastasis","C:/Datas/Calzone/EMT/metastasis_mutants");
+		//VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/EMT/metastasis_mutants.xls.dat");
+		//VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls.dat");
+		//makeGeneticInteractionTable(vt1,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_mutants/");
+
+		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
+		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
+		makeGeneticInteractionTable(vt,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
+		makeGeneticInteractionTable(vt,"NonACD","necrosis","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
+		
+		prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
+		VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1_mutants_norm.dat");
+		makeGeneticInteractionTable(vt1,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
+		makeGeneticInteractionTable(vt1,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
+		makeGeneticInteractionTable(vt1,"NonACD","necrosis","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);*/
+		
+		prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls", 0.01f, "CycD=CycD+CycB+CycD/CycB");
+		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/restriction_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Rb","cc_arrest","C:/Datas/Calzone/genetic_interactions/restriction_");
+		makeGeneticInteractionTable(vt,"CycD","cc_prolif","C:/Datas/Calzone/genetic_interactions/restriction_");
+		
+		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/mapk_mutants.xls", 0.01f, "Apoptosis=Apoptosis+Apoptosis/Growth_Arrest");
+		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/mapk_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/mapk_");
+		makeGeneticInteractionTable(vt,"Growth_Arrest","ga","C:/Datas/Calzone/genetic_interactions/mapk_");
+		makeGeneticInteractionTable(vt,"Proliferation","proliferation","C:/Datas/Calzone/genetic_interactions/mapk_");*/
+		
+		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
+		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
+		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
+		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_");
+		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_");*/
+		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_");
+		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_");*/
+		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_mutants_norm.dat");
+		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_");
+		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_");*/
 		
 		
 		String folder = "";
@@ -46,7 +95,9 @@ public class MaBoSSProbTrajFile {
 		String phenotype = "";
 		String table = "";
 		String short_name = "";
+		String mergedPhenotypes = null;
 		boolean makeTable = false;
+		boolean normTable = false;
 		boolean computeGeneticInteractions = false;
 		
 		for(int i=0;i<args.length;i++){
@@ -62,8 +113,12 @@ public class MaBoSSProbTrajFile {
 				short_name = args[i+1];
 			if(args[i].equals("-table"))
 				table = args[i+1];
+			if(args[i].equals("-mergedphenotypes"))
+				mergedPhenotypes = args[i+1];
 			if(args[i].equals("-maketable"))
 				makeTable = true;
+			if(args[i].equals("-normtable"))
+				normTable = true;
 			if(args[i].equals("-makeinter"))
 				computeGeneticInteractions = true;
 		}
@@ -71,9 +126,12 @@ public class MaBoSSProbTrajFile {
 		if(makeTable){
 			prob.makeProbabilityTableFromFolder(folder,prefix,out);
 		}
+		if(normTable){
+			prob.normalizeProbabilityTable(table, 0.01f, mergedPhenotypes);
+		}
 		if(computeGeneticInteractions){
-			VDataTable vt = VDatReadWrite.LoadFromVDatFile(table);
-			makeGeneticInteractionTable(vt,phenotype,short_name,out);
+			VDataTable vtable = VDatReadWrite.LoadFromVDatFile(table);
+			makeGeneticInteractionTable(vtable,phenotype,short_name,out);
 		}
 		
 		}catch(Exception e){
@@ -84,8 +142,6 @@ public class MaBoSSProbTrajFile {
 	public void load(String fn, String prefix){
 		String fileName = (new File(fn)).getName();
 		String pair = "";
-		if(fileName.equals("ModNet_probtraj.csv"))
-			System.out.println();
 		if(fileName.endsWith("_probtraj.csv"))
 			pair = fileName.substring(0, fileName.length()-13);
 		if(pair.startsWith(prefix))
@@ -111,6 +167,10 @@ public class MaBoSSProbTrajFile {
 		table.LoadFromSimpleDatFile(fn, true, "\t");
 		int last = table.rowCount-1;
 		int k=5;
+		for(int i=0;i<table.colCount;i++)
+			if(table.fieldNames[i].equals("State")){
+				k = i; break;
+			}
 		while(k<table.colCount-2){
 			String phenotype = table.stringTable[last][k];
 			if(phenotype!=null)if(!phenotype.trim().equals("")){
@@ -190,12 +250,32 @@ public class MaBoSSProbTrajFile {
 	}
 	
 	public static void makeGeneticInteractionTable(VDataTable vt, String phenotype, String phenotype_short, String outfile_prefix) throws Exception{
+		makeGeneticInteractionTable(vt, phenotype, phenotype_short, outfile_prefix, -1);
+	}
+	
+	public static void makeGeneticInteractionTable(VDataTable vt, String phenotype, String phenotype_short, String outfile_prefix, int forcedModelChoice) throws Exception{
+		
+		Vector<String> elementaryPhenotypes = new Vector<String>();
+		StringTokenizer st = new StringTokenizer(phenotype,"+");
+		while(st.hasMoreTokens()){
+			elementaryPhenotypes.add(st.nextToken());
+		}
+		
 		FileWriter fwn = new FileWriter(outfile_prefix+"_"+phenotype_short+"_nodes.txt");
-		fwn.write("INTERACTOR\tINTERACTOR_TYPE1\tP\n");
-		FileWriter fwe = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges.txt");
-		fwe.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tP1\tP2\tP12\tEPS\n");
+		fwn.write("INTERACTOR\tINTERACTOR_TYPE1\tP\tINTERACTOR_NAME\n");
+		FileWriter fwea = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges.txt");
+		FileWriter fwe = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges_nonzero.txt");
+		FileWriter fwes = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges_selected.txt");
+		FileWriter fwess = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges_selected_stringent2.txt");
+		FileWriter fwes3 = new FileWriter(outfile_prefix+"_"+phenotype_short+"_edges_selected_stringent3.txt");
+		  fwe.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
+		 fwes.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
+		 fwea.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
+		fwess.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
+		fwes3.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
 		HashMap<String, Integer> singles = new HashMap<String, Integer>();
 		int wtline = -1;
+		float wt_prob = 1f;
 		Vector<String> singleko = new Vector<String>();
 		Vector<String> singleoe = new Vector<String>();
 		Vector<String> singles_v = new Vector<String>();
@@ -203,7 +283,10 @@ public class MaBoSSProbTrajFile {
 			String type = vt.stringTable[i][vt.fieldNumByName("TYPE")];
 			if(type.equals("SINGLE")){
 				singles.put(vt.stringTable[i][vt.fieldNumByName("ID")], i);
-				fwn.write(vt.stringTable[i][vt.fieldNumByName("ID")]+"\t"+vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")]+"\t"+vt.stringTable[i][vt.fieldNumByName(phenotype)]+"\n");
+				String id1 = vt.stringTable[i][vt.fieldNumByName("ID")];
+				String name = id1.substring(0,id1.length()-3);
+				float P = sumColumns(i,vt,elementaryPhenotypes);
+				fwn.write(vt.stringTable[i][vt.fieldNumByName("ID")]+"\t"+vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")]+"\t"+P+"\t"+name+"\n");
 				if(vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")].equals("KO")){
 					String id = vt.stringTable[i][vt.fieldNumByName("ID")];
 					if(!singleko.contains(id))
@@ -218,8 +301,10 @@ public class MaBoSSProbTrajFile {
 					if(!singles_v.contains(id))
 						singles_v.add(id);
 			}
-			if(type.equals("WT"))
+			if(type.equals("WT")){
 				wtline = i;
+				wt_prob = sumColumns(i,vt,elementaryPhenotypes);
+			}
 		}
 		}
 		
@@ -230,6 +315,13 @@ public class MaBoSSProbTrajFile {
 		float epimatrix_ko[][] = new float[singleko.size()][singleko.size()];
 		float epimatrix_oe[][] = new float[singleoe.size()][singleoe.size()];
 		
+		// 1) Determine the best null model
+		// 2) For each null model, find bias correction factor
+		// 3) Write corrected value into the EPS_BEST column 
+		
+		Vector<Float> P1s = new Vector<Float>();
+		Vector<Float> P2s = new Vector<Float>();
+		Vector<Float> P12s = new Vector<Float>();
 		for(int i=0;i<vt.rowCount;i++){
 			String type = vt.stringTable[i][vt.fieldNumByName("TYPE")];
 			if(type.equals("DOUBLE")){
@@ -237,28 +329,119 @@ public class MaBoSSProbTrajFile {
 				String inter2 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR2")];
 				String inter1_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")];
 				String inter2_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE2")];
-				float P12 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
+				//float P12 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
+				float P12 = sumColumns(i,vt,elementaryPhenotypes);
 				int i1 = singles.get(inter1);
 				int i2 = singles.get(inter2);
-				float P1 = Float.parseFloat(vt.stringTable[i1][vt.fieldNumByName(phenotype)]);
-				float P2 = Float.parseFloat(vt.stringTable[i2][vt.fieldNumByName(phenotype)]);
-				float EPS = (1-P12)-(1-P1)*(1-P2);
-				if(EPS!=0)
-					fwe.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS+"\n");
+				//float P1 = Float.parseFloat(vt.stringTable[i1][vt.fieldNumByName(phenotype)]);
+				float P1 = sumColumns(i1,vt,elementaryPhenotypes);
+				//float P2 = Float.parseFloat(vt.stringTable[i2][vt.fieldNumByName(phenotype)]);
+				float P2 = sumColumns(i2,vt,elementaryPhenotypes);
+				P1s.add(P1);
+				P2s.add(P2);
+				P12s.add(P12);
+			}
+		}
+		
+		GeneticInteractionNetworks gn = new GeneticInteractionNetworks();
+		gn.ChooseBestNullEpistasisModel(P1s, P2s, P12s, forcedModelChoice);
+		System.out.println("\nPhenotype: "+phenotype+" ("+phenotype_short+")");
+		for(int i=0;i<gn.numberofnullmodels;i++){
+			System.out.println(gn.modelNames[i]+":\t corr="+gn.correlations[i]+"\t alpha="+gn.alphas[i]);			
+		}
+		System.out.println("Best model: "+gn.modelNames[gn.bestNullEpistasisModel]);
+		System.out.println("Negative threshold = "+gn.threshold_negative);
+		System.out.println("Positive threshold = "+gn.threshold_positive);
+		
+		
+		for(int i=0;i<vt.rowCount;i++){
+			String type = vt.stringTable[i][vt.fieldNumByName("TYPE")];
+			if(type.equals("DOUBLE")){
+				String inter1 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR1")];
+				String inter2 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR2")];
+				String inter1_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")];
+				String inter2_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE2")];
+				//float P12 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
+				float P12 = sumColumns(i,vt,elementaryPhenotypes);
+				int i1 = singles.get(inter1);
+				int i2 = singles.get(inter2);
+				//float P1 = Float.parseFloat(vt.stringTable[i1][vt.fieldNumByName(phenotype)]);
+				//float P2 = Float.parseFloat(vt.stringTable[i2][vt.fieldNumByName(phenotype)]);
+				float P1 = sumColumns(i1,vt,elementaryPhenotypes);
+				float P2 = sumColumns(i2,vt,elementaryPhenotypes);
+				
+				float EPS_ADD = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_ADDITIVE]*(P1+P2);
+				float EPS_MLT = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MULTIPLICATIVE]*(P1*P2);
+				float EPS_MIN = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MIN]*Math.min(P1,P2);
+				float EPS_MAX = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MAX]*Math.max(P1,P2);
+				float EPS_LOG = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_LOG]*(gn.log2((float)((Math.pow(2,P1)-1)*(Math.pow(2,P2)-1)+1)));
+				
+				float EPS_BEST = 0f;
+				
+				String ineq = gn.interactionInequality(wt_prob, P1, P2, P12, thresholdForDistinctFitness);
+				String ineq_type = gn.inequalityType(ineq);
+				int ineq_dir_i = gn.inequalityDirection(ineq);
+				String ineq_dir = "symmetric";
+				if(ineq_dir_i==1) ineq_dir="A->B";
+				if(ineq_dir_i==-1) ineq_dir="A<-B";
+				
+				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_ADDITIVE) EPS_BEST = EPS_ADD;
+				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MULTIPLICATIVE) EPS_BEST = EPS_MLT;
+				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MIN) EPS_BEST = EPS_MIN;
+				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MAX) EPS_BEST = EPS_MAX;
+				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_LOG) EPS_BEST = EPS_LOG;
+				
+				if(swapPhenotypesToHaveSameDirection){
+					if(ineq_dir_i==-1){
+						String temp = inter1; inter1=inter2; inter2=temp;
+							   temp = inter1_type; inter1_type=inter2_type; inter2_type=temp;
+						float ftemp = P1; P1=P2; P2=ftemp;
+						ineq = Utils.replaceString(ineq, "A", "$");
+						ineq = Utils.replaceString(ineq, "B", "A");
+						ineq = Utils.replaceString(ineq, "$", "B");
+						ineq = Utils.replaceString(ineq, "BA", "AB");
+						ineq_dir = "A->B";
+					}
+				}
+				
+				String interaction_id = inter1+"__"+inter2;
+				if(inter1.compareTo(inter2)<0)
+					interaction_id = inter2+"__"+inter1;
+				float EPS_BEST_NORMALIZED = 0f;
+				if(EPS_BEST>0)
+					EPS_BEST_NORMALIZED = EPS_BEST/gn.threshold_positive;
+				else
+					EPS_BEST_NORMALIZED = EPS_BEST/gn.threshold_negative;
+				
+				
+				fwea.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+interaction_id+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS_ADD+"\t"+EPS_MLT+"\t"+EPS_MIN+"\t"+EPS_MAX+"\t"+EPS_LOG+"\t"+EPS_BEST+"\t"+EPS_BEST_NORMALIZED+"\t"+ineq+"\t"+ineq_type+"\t"+ineq_dir+"\n");
+				if(EPS_BEST!=0){
+						 fwe.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+interaction_id+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS_ADD+"\t"+EPS_MLT+"\t"+EPS_MIN+"\t"+EPS_MAX+"\t"+EPS_LOG+"\t"+EPS_BEST+"\t"+EPS_BEST_NORMALIZED+"\t"+ineq+"\t"+ineq_type+"\t"+ineq_dir+"\n");
+				}
+				if((EPS_BEST>gn.threshold_positive*numberOfStandardDeviations)||(EPS_BEST<-gn.threshold_negative*numberOfStandardDeviations)){
+						fwes.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+interaction_id+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS_ADD+"\t"+EPS_MLT+"\t"+EPS_MIN+"\t"+EPS_MAX+"\t"+EPS_LOG+"\t"+EPS_BEST+"\t"+EPS_BEST_NORMALIZED+"\t"+ineq+"\t"+ineq_type+"\t"+ineq_dir+"\n");
+				}
+				if((EPS_BEST>2*gn.threshold_positive*numberOfStandardDeviations)||(EPS_BEST<-2*gn.threshold_negative*numberOfStandardDeviations)){
+					fwess.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+interaction_id+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS_ADD+"\t"+EPS_MLT+"\t"+EPS_MIN+"\t"+EPS_MAX+"\t"+EPS_LOG+"\t"+EPS_BEST+"\t"+EPS_BEST_NORMALIZED+"\t"+ineq+"\t"+ineq_type+"\t"+ineq_dir+"\n");
+			    }
+				if((EPS_BEST>3*gn.threshold_positive*numberOfStandardDeviations)||(EPS_BEST<-3*gn.threshold_negative*numberOfStandardDeviations)){
+					fwes3.write(inter1+"\t"+inter1_type+"\t"+inter2+"\t"+inter2_type+"\t"+interaction_id+"\t"+P1+"\t"+P2+"\t"+P12+"\t"+EPS_ADD+"\t"+EPS_MLT+"\t"+EPS_MIN+"\t"+EPS_MAX+"\t"+EPS_LOG+"\t"+EPS_BEST+"\t"+EPS_BEST_NORMALIZED+"\t"+ineq+"\t"+ineq_type+"\t"+ineq_dir+"\n");
+			    }				
 				int is1 = singles_v.indexOf(inter1);
 				int is2 = singles_v.indexOf(inter2);
 				int iko1 = singleko.indexOf(inter1);
 				int iko2 = singleko.indexOf(inter2);
 				int ioe1 = singleoe.indexOf(inter1);
 				int ioe2 = singleoe.indexOf(inter2);
-				epimatrix[is1][is2] = EPS;
-				epimatrix[is2][is1] = EPS;
-				if((iko1>=0)&&(iko2>=0)) {epimatrix_ko[iko1][iko2] = EPS; epimatrix_ko[iko1][iko2] = EPS;}
-				if((ioe1>=0)&&(ioe2>=0)) {epimatrix_oe[ioe2][ioe1] = EPS; epimatrix_oe[ioe2][ioe1] = EPS;}
+				epimatrix[is1][is2] = EPS_BEST;
+				epimatrix[is2][is1] = EPS_BEST;
+				if((iko1>=0)&&(iko2>=0)) {epimatrix_ko[iko1][iko2] = EPS_BEST; epimatrix_ko[iko1][iko2] = EPS_BEST;}
+				if((ioe1>=0)&&(ioe2>=0)) {epimatrix_oe[ioe2][ioe1] = EPS_BEST; epimatrix_oe[ioe2][ioe1] = EPS_BEST;}
 			}
 			if(type.equals("SINGLE")){
 				String inter1 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR1")];
-				float P1 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
+				//float P1 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
+				float P1 = sumColumns(i,vt,elementaryPhenotypes);
 				int is1 = singles_v.indexOf(inter1);
 				int iko1 = singleko.indexOf(inter1);
 				int ioe1 = singleoe.indexOf(inter1);
@@ -269,12 +452,18 @@ public class MaBoSSProbTrajFile {
 		}
 		fwn.close();
 		fwe.close();
+		fwea.close();
+		fwes.close();
+		fwess.close();
+		fwes3.close();
 		
 		VDataTable vte = VDatReadWrite.LoadFromSimpleDatFile(outfile_prefix+"_"+phenotype_short+"_edges.txt", true, "\t");
 		vte.fieldTypes[vte.fieldNumByName("P1")] = vt.NUMERICAL;
 		vte.fieldTypes[vte.fieldNumByName("P2")] = vt.NUMERICAL;
 		vte.fieldTypes[vte.fieldNumByName("P12")] = vt.NUMERICAL;
-		vte.fieldTypes[vte.fieldNumByName("EPS")] = vt.NUMERICAL;
+		for(int i=0;i<vte.colCount;i++)
+			if(vte.fieldNames[i].startsWith("EPS_"))
+				vte.fieldTypes[i] = vt.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vte, outfile_prefix+"_"+phenotype_short+"_edges.dat");
 		// Writing down the epistatic profile matrices
 		FileWriter fw = new FileWriter(outfile_prefix+"_"+phenotype_short+"_epi.txt");
@@ -332,6 +521,98 @@ public class MaBoSSProbTrajFile {
 		
 	}
 	
+	public static float sumColumns(int rowNumber, VDataTable vt, Vector<String> columnNames){
+		float res = 0f;
+		for(int i=0;i<columnNames.size();i++){
+			res+=Float.parseFloat(vt.stringTable[rowNumber][vt.fieldNumByName(columnNames.get(i))]);
+		}
+		return res;
+	}
+	
+	
+	/*
+	 * Example of merged phenotypes
+	 * Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis
+	 * Use no spaces!!
+	 */
+	public static void normalizeProbabilityTable(String fn, float thresh, String mergedPhenotypes){
+		VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(fn, true, "\t");
+		String fn1 = fn.substring(0, fn.length()-4)+"_norm";
+		float wt_probs[] = new float[vt.colCount-6];
+		float prob_averages[] = new float[vt.colCount-6];
+		for(int i=0;i<vt.rowCount;i++){
+			String id = vt.stringTable[i][vt.fieldNumByName("ID")];
+			if(id.equals("_")){
+				for(int k=6;k<vt.colCount;k++)
+					wt_probs[k-6] = Float.parseFloat(vt.stringTable[i][k]);
+			break;
+			}
+		}
+		
+		if(mergedPhenotypes==null){
+			
+		for(int i=0;i<vt.rowCount;i++){
+			for(int k=6;k<vt.colCount;k++){
+				float f = Float.parseFloat(vt.stringTable[i][k]);
+				prob_averages[k-6]+=f;
+				if(wt_probs[k-6]<0.01)
+					f = f;
+				else
+					f/=wt_probs[k-6];
+				vt.stringTable[i][k] = ""+f;
+			}
+		}
+		}else{// do merge phenotypes
+		
+			System.out.println("Merging phenotypes: "+mergedPhenotypes);
+			
+			HashMap<String, Vector<String>> phenotypeMap = new HashMap<String, Vector<String>>();
+			StringTokenizer st = new StringTokenizer(mergedPhenotypes,";");
+			while(st.hasMoreTokens()){
+				String eq = st.nextToken();
+				StringTokenizer st1 = new StringTokenizer(eq,"=");
+				String phen = st1.nextToken();
+				String phensum = st1.nextToken();
+				Vector<String> phensumv = new Vector<String>();
+				StringTokenizer st2 = new StringTokenizer(phensum,"+");
+				while(st2.hasMoreTokens())
+					phensumv.add(st2.nextToken());
+				phenotypeMap.put(phen,phensumv);
+			}
+			
+			for(int i=0;i<vt.rowCount;i++){
+				for(int k=6;k<vt.colCount;k++){
+					String phen = vt.fieldNames[k];
+					Vector<String> phenotypes = new Vector<String>();
+					if(phenotypeMap.containsKey(phen))
+						phenotypes = phenotypeMap.get(phen);
+					else
+						phenotypes.add(phen);
+					//float f = Float.parseFloat(vt.stringTable[i][k]);
+					float f = sumColumns(i,vt,phenotypes);
+					
+					float wt_probs_sum = 0f;
+					for(int s=0;s<phenotypes.size();s++)
+						wt_probs_sum+=wt_probs[vt.fieldNumByName(phenotypes.get(s))-6];
+					prob_averages[k-6]+=f;
+					if(wt_probs_sum<0.01)
+						f = f;
+					else
+						f/=wt_probs_sum;
+					vt.stringTable[i][k] = ""+f;
+				}
+			}
+			
+		}
+		
+		for(int k=6;k<vt.colCount;k++)
+			prob_averages[k-6]/=vt.rowCount;
+		VDatReadWrite.saveToSimpleDatFile(vt, fn1+".xls", true);
+		for(int i=6;i<vt.colCount;i++)
+			if(prob_averages[i-6]>thresh)
+				vt.fieldTypes[i] = vt.NUMERICAL;
+		VDatReadWrite.saveToVDatFile(vt, fn1+".dat");
+	}
 	
 
 }

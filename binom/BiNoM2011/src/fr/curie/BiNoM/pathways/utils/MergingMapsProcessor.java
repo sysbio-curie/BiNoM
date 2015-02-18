@@ -190,7 +190,9 @@ public class MergingMapsProcessor {
 		boolean mergeImages = false;
 		boolean mergeMaps = false;
 		boolean preprocess = false;
-		boolean postprocess = false;		
+		boolean postprocess = false;	
+		boolean verbose = false;
+		boolean doMergeSpecies = false;
 		int zoomLevel = 3;
 		int numberOfTimesToScale = 0;
 		int scale = 1;
@@ -217,11 +219,16 @@ public class MergingMapsProcessor {
 				numberOfTimesToScale = Integer.parseInt(args[i+1]);
 			if(args[i].equals("--prefixlength"))
 				preflength = Integer.parseInt(args[i+1]);
-			
+			if(args[i].equals("--verbose"))
+				verbose = true;
+			if(args[i].equals("--mergespecies"))
+				doMergeSpecies = true;
 		}
 		
 		try{
 			MergingMapsProcessor mm = new MergingMapsProcessor();
+			mm.verbose = verbose;
+			mm.doMergeSpecies = doMergeSpecies;
 			mm.prefixLength = preflength;
 			mm.loadConfigFile(configFile);
 

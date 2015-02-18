@@ -54,6 +54,11 @@ public class ICAMining_BitonPaper {
 			
 			//String folder = "C:/Datas/ICA/Anne/GSEA/results/res/";
 			//String gmts = "C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt";
+
+			String folder = "C:/Datas/ICA/Anne/CDK12/results/";
+			String gmts = "C:/Datas/ICA/Anne/CDK12/CDK12.gmt";
+			FilterGSEAResults(folder, 5, 3f, 0.01f, 1f, gmts);
+			
 			/*String folder = "./";
 			String gmts = "msigdb.v4.0.symbols.gmt";
 			gmts = args[1];
@@ -81,7 +86,7 @@ public class ICAMining_BitonPaper {
 			
 			//ExtractStressSignature("C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols_stress.gmt");
 			
-			ComputeTTestDistributionFor2Groups("C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT.txt","C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT_sg4","CHIRURGIE","CYST","RTUV");
+			//ComputeTTestDistributionFor2Groups("C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT.txt","C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT_sg4","CHIRURGIE","CYST","RTUV");
 			//ComputeTTestDistributionFor2Groups("C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT.txt","C:/Datas/ICA/Anne/CIT_analysis/chirurgie_type/CIT_T2","CHIRURGIE","CYST","RTUV");
 			
 			

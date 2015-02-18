@@ -38,19 +38,22 @@ public class OFTENAnalysis {
 			OFTENAnalysis of = new OFTENAnalysis();
 			//of.loadHPRD(pathToHPRD);
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_CIT.txt","CIT");
-			of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/SADP_rda_files/S_CIT.txt","CIT");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/SADP_rda_files/S_CIT.txt","CIT");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/broad/S_CCLE05.txt","CCLE05");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/exon_curie/S_CUEX20.txt","CUEX20");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/OvarianCancer/TCGA/analysis/GSEA/S_OVAFFY.txt","OVAFFY");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/gsea/ica/S_EWING96.txt","S_EWING96");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/ica/rhabdoid_48/S_RHD96.txt","S_RHD96");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/Ivashkine/ZebraFish/repeat/differences.txt","DF");
 			 
-			//
+			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/attractor_metagenes/","C:/Datas/ICA/Anne/attractor_metagenes/attractor_metagenes.gmt","C:/Datas/ICA/Anne/attractor_metagenes/results/");
+			//of.makeGSEABatchFile("C:/Datas/Ivashkine/ZebraFish/repeat/gsea/","C:/Datas/Ivashkine/ZebraFish/repeat/gsea/go_symbol.gmt","C:/Datas/Ivashkine/ZebraFish/repeat/gsea/results/");
 			//of.makeGSEABatchFile("C:/Datas/OvarianCancer/TCGA/analysis/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/OvarianCancer/TCGA/analysis/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/cellline/broad/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/ICA/Anne/cellline/broad/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/MOSAIC/analysis/gsea/ica/results/");
 			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica_rhabdo/","msigdb.v4.0.symbols.gmt","results/");
+			of.makeGSEABatchFile("C:/Datas/ICA/Anne/CDK12/","CDK12.gmt","results/");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABLADDER.txt","TCGABLCA");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABREAST.txt","TCGABREAST");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_COAD.txt","COAD");
@@ -138,11 +141,37 @@ public class OFTENAnalysis {
 				/*fw_plus.write(tab.stringTable[inds[inds.length-1-j]][0]+"\t"+vals[inds[inds.length-1-j]]+"\n");
 				fw_minus.write(tab.stringTable[inds[j]][0]+"\t"+vals[inds[j]]+"\n");
 				fw_abs.write(tab.stringTable[ind_abs[inds.length-1-j]][0]+"\t"+val_abs[ind_abs[inds.length-1-j]]+"\n");*/
-				fw_minus_rnk.write(tab.stringTable[inds[j]][0]+"\t"+vals[inds[j]]+"\n");
 				fw_plus.write(tab.stringTable[inds[inds.length-1-j]][0]+"\n");
 				fw_minus.write(tab.stringTable[inds[j]][0]+"\n");
 				fw_abs.write(tab.stringTable[ind_abs[inds.length-1-j]][0]+"\n");				
 			}
+			
+			HashMap<String, Float> values = new HashMap<String, Float>(); 
+			for(int j=0;j<tab.rowCount;j++){
+				String nm = tab.stringTable[j][0];
+				float f = Float.parseFloat(tab.stringTable[j][i]);
+				Float fv =values.get(nm);
+				if(fv==null)
+					values.put(nm, f);
+				else{
+					if(Math.abs(f)>Math.abs(fv)){
+						values.put(nm, f);
+					}
+				}
+			}
+			float vls[] = new float[values.keySet().size()];
+			String nms[] = new String[values.keySet().size()];
+			int k=0;
+			for(String s: values.keySet()){
+				nms[k] = s;
+				vls[k] = values.get(s);
+				k++;
+			}
+			inds = Algorithms.SortMass(vls);
+			for(int j=0;j<inds.length;j++){
+				fw_minus_rnk.write(nms[inds[j]]+"\t"+vls[inds[j]]+"\n");
+			}
+			
 			fw_plus.close();fw_minus.close();fw_abs.close(); fw_minus_rnk.close();
 		}
 		// make often for all lists
@@ -357,7 +386,7 @@ public class OFTENAnalysis {
 			if(fileName.endsWith(".rnk")){
 				String prefix = f.getName();
 				prefix = prefix.substring(0, prefix.length()-4);
-				String command = "java -cp .;gsea2-2.0.14.jar -Xmx3000m xtools.gsea.GseaPreranked -gmx "+gmtFile+" -collapse false -mode Max_probe -norm meandiv -nperm 1000 -rnk "+fileName+" -scoring_scheme classic -rpt_label "+prefix+" -include_only_symbols true -make_sets true -plot_top_x 200 -rnd_seed timestamp -set_max 200 -set_min 10 -zip_report false -out "+outfolder+prefix+" -gui false";
+				String command = "java -cp .;gsea2-2.0.14.jar -Xmx3000m xtools.gsea.GseaPreranked -gmx "+gmtFile+" -collapse false -mode Max_probe -norm meandiv -nperm 1000 -rnk "+fileName+" -scoring_scheme classic -rpt_label "+prefix+" -include_only_symbols true -make_sets true -plot_top_x 200 -rnd_seed timestamp -set_max 200 -set_min 8 -zip_report false -out "+outfolder+prefix+" -gui false";
 				fw.write(command+"\n");
 			}
 		}

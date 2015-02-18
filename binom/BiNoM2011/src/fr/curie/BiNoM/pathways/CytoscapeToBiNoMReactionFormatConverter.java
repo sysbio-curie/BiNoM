@@ -22,6 +22,12 @@ public class CytoscapeToBiNoMReactionFormatConverter{
 	/**
 	 * @param args
 	 */
+	
+	public float shiftX = 0f;
+	public float shiftY = 0f;
+	public float scaleX = 1f;
+	public float scaleY = 1f;
+	
 
 	public Graph graph = null;
 	
@@ -31,10 +37,11 @@ public class CytoscapeToBiNoMReactionFormatConverter{
 		// TODO Auto-generated method stub
 		CytoscapeToBiNoMReactionFormatConverter c2brf = new CytoscapeToBiNoMReactionFormatConverter();
 		//String prefix = "c:/datas/binomtest/brf/testb";
-		String prefix = "c:/datas/binomtest/biopax3/apoptosis3_";
+		//String prefix = "c:/datas/binomtest/biopax3/apoptosis3_";
 		//String prefix = "c:/datas/binomtest/brf/Apoptosis3";
 		//String prefix = "c:/datas/binomtest/brf/influence_network_example";
 		//String prefix = "c:/users/Zinovyev/desktop/autophagy";
+		String prefix = "C:/Datas/EWING/network/Ewing_influence";
 		c2brf.loadFile(prefix+".xgmml");
 		String text = c2brf.convertToBRF();
 		FileWriter fw = new FileWriter(prefix+"_1.txt");
@@ -73,11 +80,17 @@ public class CytoscapeToBiNoMReactionFormatConverter{
 			//id = Utils.replaceString(id, "|", "_");
 			id = Utils.replaceString(id, "?", "unknown");
 			id = Utils.replaceString(id, " ", "_");
+			id = Utils.replaceString(id, ".", "_");
+			id = Utils.replaceString(id, ",", "_");
 			graph.Nodes.get(i).Id = id;
 		}
 		
 		for(int i=0;i<graph.Nodes.size();i++){
 			Node n = graph.Nodes.get(i);
+			n.x = (n.x-shiftX)*scaleX;
+			n.w = n.w*scaleX;
+			n.y = (n.y-shiftY)*scaleY;
+			n.h = n.h*scaleY;
 			if(n.x<minx) minx = n.x;
 			if(n.y<miny) miny = n.y;
 			if(n.x>maxx) maxx = n.x;
@@ -88,13 +101,13 @@ public class CytoscapeToBiNoMReactionFormatConverter{
 			Node n = graph.Nodes.get(i);
 			if(n.getAttributesWithSubstringInName("REACTION").size()==0){
 				species.add(n.Id);
-				text+=n.Id+"\n";
+				text+=n.Id+"\tX:"+n.x+";Y:"+n.y+";W:"+n.w+";H:"+n.h+"\n";
 			}
 			if(n.getAttributesWithSubstringInName("REACTION").size()>0){
 				Attribute at = n.getAttributesWithSubstringInName("REACTION").get(0);
 				if(at.value.equals("")){
 					species.add(n.Id);
-					text+=n.Id+"\n";
+					text+=n.Id+"\tX:"+n.x+";Y:"+n.y+";W:"+n.w+";H:"+n.h+"\n";
 				}else{
 					reactions.add(n.Id);
 				}

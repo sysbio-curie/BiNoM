@@ -2,12 +2,15 @@ package fr.curie.BiNoM.pathways.test;
 
 import java.io.*;
 import java.util.*;
+
 //import org.sbml.sbml.level2.*;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.wrappers.*;
+import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
+import fr.curie.BiNoM.pathways.analysis.structure.Edge;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.utils.*;
 
@@ -15,9 +18,32 @@ public class test {
   public static void main(String[] args) {
     try{
 
-      GraphDocument xgml = XGMML.loadFromXMGML("c:/datas/binomtest/biopax3/merged_master.xgmml");
+    	
+		Graph graph = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML("C:/Datas/acsn/assembly/acsn_src/acsn_master.xgmml"));
+		FileWriter fw = new FileWriter("C:/Datas/acsn/assembly/acsn_src/acsn_master.names");
+		Graph grres = BiographUtils.convertReactionNetworkIntoEntityNetwork(graph);
+		Vector<String> allProteinNames = BiographUtils.extractProteinNamesFromNodeNames(grres.Nodes);
+		//for(String s: allProteinNames)
+		//	fw.write(s+"\n");
+		for(Edge e: grres.Edges){
+			/*if(e.Node1==null)
+				System.out.println("Null edge source "+e.Id);
+			else if(e.Node2==null)
+				System.out.println("Null edge target "+e.Id);
+			else*/
+			if((e.Node1!=null)&&(e.Node2!=null))
+				fw.write(e.Node1.Id+"\t"+e.getFirstAttributeValue("interaction")+"\t"+e.Node2.Id+"\n");			
+		}
+		fw.flush();
+		fw.close();
+	    GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
+	    XGMML.saveToXGMML(grDoc, "C:/Datas/acsn/assembly/acsn_src/acsn_master_entrel.xgmml");
+	    System.exit(0);
+
+    	
+      /*GraphDocument xgml = XGMML.loadFromXMGML("c:/datas/binomtest/biopax3/merged_master.xgmml");
       Graph gr = XGMML.convertXGMMLToGraph(xgml);
-      XGMML.saveToXGMML(gr, "c:/datas/binomtest/biopax3/merged_master1.xgmml");
+      XGMML.saveToXGMML(gr, "c:/datas/binomtest/biopax3/merged_master1.xgmml");*/
     	
       /*System.out.println("Loading sbmlex...");
       SbmlDocument sbmlex = CellDesigner.loadCellDesigner("c:/datas/calzone/problem7/gene0.xml");

@@ -2,6 +2,8 @@ package fr.curie.BiNoM.pathways.utils;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.xmlbeans.XmlString;
@@ -55,6 +57,8 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
 
+
+
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.utils.SpeciesStructure.SpeciesStructureComponent;
 import fr.curie.BiNoM.pathways.utils.SpeciesStructure.SpeciesStructureComponentModification;
@@ -64,6 +68,13 @@ public class CellDesignerGenerator {
 	
 	public static int SPECIES = 0;
 	public static int REACTION = 1;
+	public boolean repositionAliases = true;
+	
+	public float shiftX = 0f;
+	public float shiftY = 0f;
+	public float scaleX = 1f;
+	public float scaleY = 1f;
+
 
 	
 	public class Statement{
@@ -82,16 +93,16 @@ public class CellDesignerGenerator {
 	HashMap<String,CelldesignerRNADocument.CelldesignerRNA> rnas = new HashMap<String,CelldesignerRNADocument.CelldesignerRNA>();
 	HashMap<String,CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA> antisense_rnas = new HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA>();
 	HashMap<String,CelldesignerGeneDocument.CelldesignerGene> genes = new HashMap<String, CelldesignerGeneDocument.CelldesignerGene>();
-	float defaultProteinWidth = 80;
-	float defaultProteinHeight = 40;
-	float defaultGeneWidth = 70;
-	float defaultGeneHeight = 25;
-	float defaultRNAWidth = 70;
-	float defaultRNAHeight = 25;
-	float defaultAntisenseRNAWidth = 70;
-	float defaultAntisenseRNAHeight = 25;
-	float defaultDegradedWidth = 30;
-	float defaultDegradedHeight = 30;
+	public float defaultProteinWidth = 80;
+	public float defaultProteinHeight = 40;
+	public float defaultGeneWidth = 70;
+	public float defaultGeneHeight = 25;
+	public float defaultRNAWidth = 70;
+	public float defaultRNAHeight = 25;
+	public float defaultAntisenseRNAWidth = 70;
+	public float defaultAntisenseRNAHeight = 25;
+	public float defaultDegradedWidth = 30;
+	public float defaultDegradedHeight = 30;
 	
 	
 	public float sparseGap = 50f; 
@@ -358,6 +369,10 @@ public class CellDesignerGenerator {
 	}
 	
 	public SpeciesDocument.Species createSpeciesFromString(String id, String name, String structuredString, float x, float y){
+		
+		x = (x-shiftX)*scaleX;
+		y = (y-shiftY)*scaleY;
+		
 		SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().addNewSpecies();
 		sp.setId(id);
 		XmlString xs = XmlString.Factory.newInstance(); xs.setStringValue(name);		
@@ -1060,7 +1075,7 @@ public class CellDesignerGenerator {
 		for(Statement st: statements){
 			if(st.statementType==SPECIES){
 				System.out.println(st.statementText);
-				Species sp = processStatements_addSpecies(compartment2SpeciesNames,st.statementText);
+				Species sp = processStatements_addSpecies(compartment2SpeciesNames,st.statementText,st.attributes);
 				speciesIds.add(sp.getId());
 				if(!declaredSpecies.contains(st.statementText))
 					declaredSpecies.add(st.statementText);
@@ -1069,16 +1084,16 @@ public class CellDesignerGenerator {
 				System.out.println(st.statementText);
 				ReactionStructure rs = ReactionStructure.decodeStructuredString(st.statementText, declaredSpecies);
 				for(String s: rs.reactants){
-					Species sp = processStatements_addSpecies(compartment2SpeciesNames,s);
+					Species sp = processStatements_addSpecies(compartment2SpeciesNames,s,null);
 					speciesIds.add(sp.getId());
 				}
 				for(String s: rs.products){
-					Species sp = processStatements_addSpecies(compartment2SpeciesNames,s);
+					Species sp = processStatements_addSpecies(compartment2SpeciesNames,s,null);
 					if(sp!=null)
 						speciesIds.add(sp.getId());
 				}
 				for(ReactionStructure.Regulator r: rs.regulators){
-					Species sp = processStatements_addSpecies(compartment2SpeciesNames,r.name);
+					Species sp = processStatements_addSpecies(compartment2SpeciesNames,r.name,null);
 					speciesIds.add(sp.getId());
 				}
 			}
@@ -1103,8 +1118,29 @@ public class CellDesignerGenerator {
 		totalsquare*=2f;
 		float width = (float)Math.sqrt(totalsquare);
 		if(width<500) width = 500;
+		float height = width;
+
+		Iterator<String> spIds = speciesAliases.keySet().iterator();
+		while(spIds.hasNext()){
+			String sid = spIds.next();
+			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = speciesAliases.get(sid);
+			float x = Float.parseFloat(spa.getCelldesignerBounds().getX());
+			float y = Float.parseFloat(spa.getCelldesignerBounds().getY());
+			if(width<x) width = x+100;
+			if(height<y) height = y+100;
+		}
+		spIds = complexSpeciesAliases.keySet().iterator();
+		while(spIds.hasNext()){
+			String sid = spIds.next();
+			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias spa = complexSpeciesAliases.get(sid);
+			float x = Float.parseFloat(spa.getCelldesignerBounds().getX());
+			float y = Float.parseFloat(spa.getCelldesignerBounds().getY());
+			if(width<x) width = x+100;
+			if(height<y) height = y+100;
+		}		
+		
 		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeX(""+(int)width);
-		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(""+(int)width);
+		cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().setSizeY(""+(int)height);
 		// forth, create the compartment aliases
 		for(String comp: compartment2SpeciesNames.keySet())if(!comp.equals("default")){
 			float square = compartmentSizes.get(comp)*1.1f; // we add 20% for spaces
@@ -1113,6 +1149,7 @@ public class CellDesignerGenerator {
 			processStatements_addCompartmentAlias(comp,compsize);
 		}
 		// fourth, reposition the aliases
+		if(repositionAliases)
 		for(String sid: speciesIds){
 			System.out.println("Positioning "+sid);
 			CelldesignerSpeciesAlias sas = speciesAliases.get(sid+"_alias");
@@ -1133,7 +1170,7 @@ public class CellDesignerGenerator {
 		}
 	}
 	
-	public Species processStatements_addSpecies(HashMap<String, Vector<String>> compartment2SpeciesNames, String text){
+	public Species processStatements_addSpecies(HashMap<String, Vector<String>> compartment2SpeciesNames, String text, Vector<Attribute> attributes){
 		Species sp = null;
 		if(!text.startsWith("null")){
 		SpeciesStructure ss = SpeciesStructure.decodeStructuredString(text);
@@ -1143,8 +1180,19 @@ public class CellDesignerGenerator {
 		if(!spl.contains(ss.toString()))
 			spl.add(ss.toString());
 			sp = species.get(text);
-		if(sp==null)
-			sp = createSpeciesFromString(ss.toString(false), ss.toString(), -1000f, -1000f);
+		if(sp==null){
+			float x = -1000f;
+			float y = -1000f;
+			if(attributes!=null)
+			for(int i=0;i<attributes.size();i++){
+				Attribute att = attributes.get(i);
+				if(att.name.equals("X"))
+					x = Float.parseFloat(att.value);
+				if(att.name.equals("Y"))
+					y = Float.parseFloat(att.value);
+			}
+			sp = createSpeciesFromString(ss.toString(false), ss.toString(), x, y);
+		}
 		}
 		return sp;
 	}

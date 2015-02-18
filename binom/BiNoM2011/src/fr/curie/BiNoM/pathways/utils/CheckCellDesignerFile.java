@@ -28,7 +28,8 @@ public class CheckCellDesignerFile {
 		CheckCellDesignerFile cf = new CheckCellDesignerFile();
 		//String nameCD = "C:/Datas/binomtest/problems";
 		//String nameCD = "C:/Datas/NaviCell2.2/dnarepair_src_2014/dnarepair_FANCONI";
-		String nameCD = "C:/Datas/NaviCell2.2/iron_metabolism_src/master";
+		//String nameCD = "C:/Datas/NaviCell2.2/iron_metabolism_src/master";
+		String nameCD = "C:/Datas/binomtest/mapmerging/test1/merged";
 		//String nameCD = "C:/Datas/acsn/assembly/survival_src/survival_HEDGEHOG"; 
 		cf.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
 		cf.checkIfReactionConnectedToIncludedSpecies();
@@ -36,6 +37,15 @@ public class CheckCellDesignerFile {
 		cf.checkComplexFormationConsistency();
 		CellDesigner.saveCellDesigner(cf.sbmlDoc, nameCD+"_fixed.xml");
 		System.out.println(cf.report);
+		
+		//SpeciesDocument.Species sp = cf.sbmlDoc.getSbml().getModel().getListOfSpecies().getSpeciesArray(0);
+		//sp.getAnnotation()
+		
+		CelldesignerSpeciesDocument.CelldesignerSpecies sp = cf.sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(0);
+		XmlString str = XmlString.Factory.newInstance();
+		str.set("XXX");
+		sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies().set(str);
+		CellDesigner.saveCellDesigner(cf.sbmlDoc, nameCD+"_.xml");
 		
 		}catch(Exception e){
 			e.printStackTrace();
@@ -62,6 +72,7 @@ public class CheckCellDesignerFile {
 			}
 		}
 		
+		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null){
 		System.out.println("Number of reactions = "+sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray());
 		if(sbmlDoc.getSbml().getModel().getListOfReactions()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getListOfReactions().sizeOfReactionArray();i++){
@@ -161,11 +172,12 @@ public class CheckCellDesignerFile {
 					}}
 				}
 			}
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			report+="ERROR: Reaction "+r.getId()+" "+e.getLocalizedMessage()+"\n";
 		}
-		}
+		}}
 	}
 	
 	public void checkIfSpeciesIsWithoutAlias() throws Exception{

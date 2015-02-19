@@ -49,7 +49,7 @@ public class CalcCentralityDirected extends AbstractCyAction {
     public CalcCentralityDirected() {
     	super("Inbetweeness directed",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis.Calc centrality");
     }

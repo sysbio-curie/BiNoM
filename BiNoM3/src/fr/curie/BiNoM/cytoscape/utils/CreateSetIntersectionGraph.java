@@ -17,7 +17,7 @@ public class CreateSetIntersectionGraph extends AbstractCyAction{
 	public CreateSetIntersectionGraph(){
 		super("Create set intersection graph in a folder",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
 	}

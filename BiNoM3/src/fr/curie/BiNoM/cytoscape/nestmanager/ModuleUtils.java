@@ -15,6 +15,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 
 import Main.Launcher;
@@ -213,5 +214,23 @@ public class ModuleUtils {
 		return newNW;
 	}
 	
+	
+	public static ArrayList<CyNode> getSelectedNodes(CyNetwork network){
+		ArrayList<CyNode> array=new ArrayList<CyNode>();
+		array.addAll(CyTableUtil.getNodesInState(network,"selected",true));
+		return array;
+	}
+	
+	
+	public static HashSet<CyNode> getNodeSet(CyNetwork network){
+		HashSet<CyNode> set=new HashSet<CyNode>();
+		set.addAll(network.getNodeList());
+		return set;
+	}
+	public static HashSet<CyEdge> getEdgeSet(CyNetwork network){
+		HashSet<CyEdge> set=new HashSet<CyEdge>();
+		set.addAll(network.getEdgeList());
+		return set;
+	}
 	
 }

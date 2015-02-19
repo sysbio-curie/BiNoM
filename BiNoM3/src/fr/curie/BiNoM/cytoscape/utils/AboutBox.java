@@ -27,7 +27,7 @@ public class AboutBox extends AbstractCyAction {
 	public AboutBox(){
 		super("About BiNoM",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3");
 	}
@@ -64,6 +64,7 @@ public class AboutBox extends AbstractCyAction {
 		addALabel("Eric Viara",content);
 		addALabel("Emmanuel Barillot",content);
 		addALabel("Andrei Zinovyev",content);
+		addALabel("Nadir Sella",content);
 		addALabel("---", content);
 		addALabel("http://binom.curie.fr/", content);
 		addALabel("---", content);

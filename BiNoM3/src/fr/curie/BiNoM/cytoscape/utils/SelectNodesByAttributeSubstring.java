@@ -11,7 +11,7 @@ public class SelectNodesByAttributeSubstring extends AbstractCyAction {
 	public SelectNodesByAttributeSubstring(){
 		super("Select nodes by substring in attribute",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
 	}

@@ -38,9 +38,9 @@ public class createNeighborhoodSets extends AbstractCyAction {
     public createNeighborhoodSets() {
     	super("Create neighborhood sets file...",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis");
+        setPreferredMenu("Plugin.BiNoM 3.Analysis[2260]");
     }
 
     public void actionPerformed(ActionEvent e) {

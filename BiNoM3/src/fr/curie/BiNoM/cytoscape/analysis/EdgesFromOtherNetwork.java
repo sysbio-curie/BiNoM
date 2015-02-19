@@ -38,7 +38,7 @@ public class EdgesFromOtherNetwork extends AbstractCyAction {
 	public EdgesFromOtherNetwork(){
 		super("Update connections from other network",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
 		

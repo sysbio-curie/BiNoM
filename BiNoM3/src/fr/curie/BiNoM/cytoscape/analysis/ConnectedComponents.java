@@ -39,9 +39,9 @@ public class ConnectedComponents extends AbstractCyAction{
 	public ConnectedComponents(){
 		super("Get Connected Components",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis");
+        setPreferredMenu("Plugin.BiNoM 3.Analysis[2]");
 	}
 
 	@Override

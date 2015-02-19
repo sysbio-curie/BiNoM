@@ -40,7 +40,7 @@ public class DoubleNetworkDifference extends AbstractCyAction {
     public DoubleNetworkDifference() {
     	super("Double Network Differences",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
     }

@@ -41,7 +41,7 @@ public class BioPAXClassTree extends AbstractCyAction {
 	public BioPAXClassTree(){
 		super("BioPAX 3 Class Tree...",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Utils");
 	}

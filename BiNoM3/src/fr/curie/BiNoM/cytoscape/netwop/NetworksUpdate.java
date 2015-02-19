@@ -40,7 +40,7 @@ public class NetworksUpdate extends AbstractCyAction {
     public NetworksUpdate() {
     	super("Update Networks",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
     }

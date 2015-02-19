@@ -39,9 +39,9 @@ public class BioPAXPropertyBrowser extends AbstractCyAction {
 	public BioPAXPropertyBrowser(){
 		super("BioPAX 3 Property Editor...",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Utils");
+        setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Utils[4]");
 	}
 
     public void actionPerformed(ActionEvent e) {

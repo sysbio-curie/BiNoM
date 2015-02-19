@@ -41,7 +41,7 @@ public class MergeNetworksAndFilter extends AbstractCyAction {
 	public MergeNetworksAndFilter(){
 		super("Merge Networks and Filter by Frequency",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
 	}

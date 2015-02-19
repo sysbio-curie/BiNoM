@@ -48,7 +48,7 @@ public class ExtractSubnetwork extends AbstractCyAction {
     public ExtractSubnetwork() {
     	super("Extract Subnetwork",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
     }

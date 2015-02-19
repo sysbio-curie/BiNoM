@@ -36,7 +36,7 @@ public class BioPAXStandardQuery extends AbstractCyAction {
     public BioPAXStandardQuery() {
     	super("Standard Query",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Query");
     }

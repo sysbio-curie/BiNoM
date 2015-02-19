@@ -62,32 +62,33 @@ public class ClusterByShortPathTask implements Task{
 				HashSet<CyEdge> edges=ModuleUtils.edgesLinkingNodes(a.currentNW,nodes);
 				
 				
-//				// method 1 
-//				CyNetwork netw = Launcher.getAdapter().getCyNetworkFactory().createNetwork();
-//				org.cytoscape.view.model.CyNetworkView netView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(netw);	
-//				
-//				netw.getRow(netw).set(CyNetwork.NAME, cluster.getName());
-//				
-//				Launcher.getAdapter().getCyNetworkManager().addNetwork(netw);
-//				
-//				Iterator it = nodes.iterator();
-//				while(it.hasNext())
-//					NetworkUtils.addNodeAndReportPosition((CyNode)(it.next()), a.currentNW, fromView, netw, netView);
-//				
-//				it = edges.iterator();
-//				while(it.hasNext())
-//					NetworkUtils.addEdgeAndConnectedNodesAndReportPositions((CyEdge)(it.next()), a.currentNW, fromView, netw, netView);
-//				
-//				Launcher.getAdapter().getCyNetworkViewManager().addNetworkView(netView);
-//							
-//				VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(fromView);			
-//				Launcher.getAdapter().getVisualMappingManager().setVisualStyle(vs, netView);
-//
-//				netView.fitContent();			
-//				netView.updateView();
+				// method 1 				
+				CyNetwork netw = Launcher.getAdapter().getCyNetworkFactory().createNetwork();
+				org.cytoscape.view.model.CyNetworkView netView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(netw);	
 				
-				CyNetwork n2 = Launcher.getAdapter().getCyRootNetworkManager().getRootNetwork(a.currentNW).addSubNetwork(nodes, edges);
-				Launcher.getAdapter().getCyNetworkManager().addNetwork(n2);
+				netw.getRow(netw).set(CyNetwork.NAME, cluster.getName());
+				
+				Launcher.getAdapter().getCyNetworkManager().addNetwork(netw);
+				
+				Iterator it = nodes.iterator();
+				while(it.hasNext())
+					NetworkUtils.addNodeAndReportPosition((CyNode)(it.next()), a.currentNW, fromView, netw, netView);
+				
+				it = edges.iterator();
+				while(it.hasNext())
+					NetworkUtils.addEdgeAndConnectedNodesAndReportPositions((CyEdge)(it.next()), a.currentNW, fromView, netw, netView);
+				
+				Launcher.getAdapter().getCyNetworkViewManager().addNetworkView(netView);
+							
+				VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(fromView);			
+				Launcher.getAdapter().getVisualMappingManager().setVisualStyle(vs, netView);
+
+				netView.fitContent();			
+				netView.updateView();
+				
+				//method 2
+//				CyNetwork n2 = Launcher.getAdapter().getCyRootNetworkManager().getRootNetwork(a.currentNW).addSubNetwork(nodes, edges);//
+//				Launcher.getAdapter().getCyNetworkManager().addNetwork(n2);
 				
 				
 				

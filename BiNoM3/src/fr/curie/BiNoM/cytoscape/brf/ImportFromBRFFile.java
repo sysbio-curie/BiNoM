@@ -25,6 +25,8 @@ public class ImportFromBRFFile extends AbstractCyAction {
             "pippo",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM I/O");
+        this.insertSeparatorAfter();
+        
 	}
 	
     public void actionPerformed(ActionEvent e) {

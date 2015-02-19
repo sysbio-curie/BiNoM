@@ -531,7 +531,9 @@ public class PathConsistencyAnalyzerPathDialog extends JDialog {
 
 		okB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				result = 1; setVisible(false);
+				result = 1; 
+				
+				setVisible(false);
 			}
 		    });
 

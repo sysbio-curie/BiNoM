@@ -37,7 +37,7 @@ public class BioPAXViewQueryLog extends AbstractCyAction {
     public BioPAXViewQueryLog() {
     	super("View Query Log",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Query");
     }

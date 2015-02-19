@@ -37,7 +37,7 @@ public class BioPAXSyncNetworks extends AbstractCyAction {
 	public BioPAXSyncNetworks(){
 		super("Synchronize networks with BioPAX 3...",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Utils");
 	}

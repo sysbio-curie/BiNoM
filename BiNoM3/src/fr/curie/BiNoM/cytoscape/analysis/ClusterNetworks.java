@@ -45,7 +45,7 @@ public class ClusterNetworks extends AbstractCyAction{
     public ClusterNetworks() {
     	super("Cluster networks",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
     }

@@ -38,7 +38,7 @@ public class ExtractReactionNetwork extends AbstractCyAction {
 	public ExtractReactionNetwork(){
 		super("Extract Reaction Network",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

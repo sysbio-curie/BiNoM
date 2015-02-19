@@ -36,11 +36,7 @@ public class NestUtils {
 	public static List<CyNode> getNodeList(CyNetwork network){return network.getNodeList();}
 	public static List<CyEdge> getEdgeList(CyNetwork network){return network.getEdgeList();}
 	
-	public static ArrayList<CyNode> getSelectedNodes(CyNetwork network){
-		ArrayList<CyNode> array=new ArrayList<CyNode>();
-		array.addAll(CyTableUtil.getNodesInState(network,"selected",true));
-		return array;
-	}
+
 	
 	public static HashSet<CyNode> getNodeSet(CyNetwork network){
 		HashSet<CyNode> set=new HashSet<CyNode>();

@@ -11,7 +11,6 @@ import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.Cytoscape;
 
 
 public class PathConsistencyAnalyzer extends AbstractCyAction{
@@ -19,15 +18,15 @@ public class PathConsistencyAnalyzer extends AbstractCyAction{
 	public PathConsistencyAnalyzer(){
 		super("Path Influence Quantification analysis...",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}
 	
     public void actionPerformed(ActionEvent e){
-    	if(Cytoscape.getCurrentNetwork()!=null){
+    	if(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()!=null){
     		
-    		PathConsistencyAnalyzerDialog dialog = new PathConsistencyAnalyzerDialog(Cytoscape.getDesktop(),"Path Influence Quantification analyzer",true);
+    		PathConsistencyAnalyzerDialog dialog = new PathConsistencyAnalyzerDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),"Path Influence Quantification analyzer",true);
     		
     		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
     		
@@ -44,7 +43,7 @@ public class PathConsistencyAnalyzer extends AbstractCyAction{
     		
     		// regular path consistency (piquant) analysis
     		if(dialog.result>0){
-    			PathConsistencyAnalyzerPathDialog dialogPath = new PathConsistencyAnalyzerPathDialog(Cytoscape.getDesktop(),"Path Browser",false);
+    			PathConsistencyAnalyzerPathDialog dialogPath = new PathConsistencyAnalyzerPathDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),"Path Browser",false);
         		dialogPath.analyzer = dialog.analyzer;
         		dialogPath.fillTheData();
         		dialogPath.setVisible(true);

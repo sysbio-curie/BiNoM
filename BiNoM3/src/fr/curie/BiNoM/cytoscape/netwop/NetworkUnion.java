@@ -25,10 +25,15 @@
 */
 package fr.curie.BiNoM.cytoscape.netwop;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.CyNetworkView;
 
+import Main.Launcher;
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
 
 public class NetworkUnion extends NetworkBinaryOperation {
@@ -37,35 +42,53 @@ public class NetworkUnion extends NetworkBinaryOperation {
 	super("Union", "UNION", left, right);
     }
 
-    public void eval(CyNetwork netw) {
+    public CyNetwork eval(CyNetwork netw, CyNetworkView netView) {
 
 	java.util.Iterator i;
+	
+	Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(left);
+	Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+	CyNetworkView fromView =null;
+	while(networkViewIterator.hasNext())
+		fromView = networkViewIterator.next();
 
 	i = left.getNodeList().iterator();
 	while (i.hasNext()) {
 	    CyNode node = (CyNode)i.next();
-	    NetworkUtils.addNodeAndReportPosition(node, left, netw);
+	    if(Launcher.findNodeWithName(netw, left.getRow(node).get(CyNetwork.NAME, String.class)) == null)
+	    	NetworkUtils.addNodeAndReportPosition(node, left, fromView, netw, netView);
 	}
 
 	i = left.getEdgeList().iterator();
 	while (i.hasNext()) {
 	    CyEdge edge = (CyEdge)i.next();
-	    NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, netw);
+	    NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, fromView,  netw, netView);
 	}
 
+	
+	
+	networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(right);
+	networkViewIterator = networkViews.iterator();
+	fromView =null;
+	while(networkViewIterator.hasNext())
+		fromView = networkViewIterator.next();
+	
+	
 	i = right.getNodeList().iterator();
 	while (i.hasNext()) {
 	    CyNode node = (CyNode)i.next();
-	    if (!netw.containsNode(node))
-		NetworkUtils.addNodeAndReportPosition(node, right, netw);
+	    if(Launcher.findNodeWithName(netw, right.getRow(node).get(CyNetwork.NAME, String.class)) == null)
+	    	NetworkUtils.addNodeAndReportPosition(node, right, fromView, netw, netView);
 	}
 
 	i = right.getEdgeList().iterator();
 	while (i.hasNext()) {
 	    CyEdge edge = (CyEdge)i.next();
 	    //if (!netw.containsEdge(edge))
-		NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, right, netw);
+		NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, right, fromView, netw, netView);
 	}
+	
+	return netw;
     }
 
     public void estimate(CyNetwork netw, Estimator estim) {

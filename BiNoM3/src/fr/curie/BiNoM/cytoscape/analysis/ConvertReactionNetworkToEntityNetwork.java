@@ -38,7 +38,7 @@ public class ConvertReactionNetworkToEntityNetwork extends AbstractCyAction {
 	public ConvertReactionNetworkToEntityNetwork(){
 		super("Convert Reaction Network To Entity Network",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

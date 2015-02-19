@@ -51,7 +51,7 @@ public class BioPAXImportFromFile extends AbstractCyAction{
         		Launcher.getAdapter().getCyApplicationManager(),
             "pippo",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM I/O");
+        setPreferredMenu("Plugin.BiNoM 3.BiNoM I/O[1]");
         }
 
 	@Override

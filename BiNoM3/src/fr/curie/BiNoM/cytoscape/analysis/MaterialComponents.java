@@ -52,7 +52,7 @@ public class MaterialComponents extends AbstractCyAction {
 	public MaterialComponents(){
 		super("Get Material Components",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

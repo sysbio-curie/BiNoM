@@ -39,7 +39,7 @@ public class MonoMolecularReactionsAsEdges extends AbstractCyAction {
 	public MonoMolecularReactionsAsEdges(){
 		super("Mono Molecular Reaction As Edges",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

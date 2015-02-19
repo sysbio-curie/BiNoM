@@ -29,7 +29,7 @@ import Main.Launcher;
 public class CreateConnectionsBetweenNests  extends AbstractCyAction{
 	
 	public CreateConnectionsBetweenNests(){
-		super(title,Launcher.getAdapter().getCyApplicationManager(),"pippo",Launcher.getAdapter().getCyNetworkViewManager());		
+		super(title,Launcher.getAdapter().getCyApplicationManager(),"network",Launcher.getAdapter().getCyNetworkViewManager());		
 		setPreferredMenu("Plugin.BiNoM 3.BiNoM Module Manager");
 	}
 	

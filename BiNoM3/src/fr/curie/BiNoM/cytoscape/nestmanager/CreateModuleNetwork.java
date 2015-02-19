@@ -21,7 +21,7 @@ public class CreateModuleNetwork extends AbstractCyAction{
 	
 	public CreateModuleNetwork(){
 		super(title,Launcher.getAdapter().getCyApplicationManager(),"network",Launcher.getAdapter().getCyNetworkViewManager());		
-		setPreferredMenu("Plugin.BiNoM 3.BiNoM Module Manager");
+		setPreferredMenu("Plugin.BiNoM 3.BiNoM Module Manager[3]");
 	}
 	
 	private static final long serialVersionUID = 1L;

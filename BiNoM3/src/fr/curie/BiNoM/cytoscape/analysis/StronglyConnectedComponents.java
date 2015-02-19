@@ -51,7 +51,7 @@ public class StronglyConnectedComponents extends AbstractCyAction {
 	public StronglyConnectedComponents(){
 		super("Get Strongly Connected Components",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

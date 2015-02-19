@@ -40,7 +40,7 @@ public class PasteNodesAndEdges extends AbstractCyAction {
 	public PasteNodesAndEdges(){
 		super("Paste Nodes and Edges from Clipboard",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities.Clipboard");
 	}

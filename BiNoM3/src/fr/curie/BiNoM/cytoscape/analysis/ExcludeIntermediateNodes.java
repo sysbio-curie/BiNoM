@@ -43,7 +43,7 @@ public class ExcludeIntermediateNodes extends AbstractCyAction {
 	public ExcludeIntermediateNodes(){
 		super("Exclude intermediate Nodes",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

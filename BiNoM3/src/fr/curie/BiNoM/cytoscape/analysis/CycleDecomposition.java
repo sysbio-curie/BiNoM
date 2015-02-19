@@ -52,7 +52,7 @@ public class CycleDecomposition extends AbstractCyAction {
 	public CycleDecomposition(){
 		super("Get Cycle Decompositions",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.Analysis");
 	}

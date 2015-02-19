@@ -37,7 +37,7 @@ public class ConvertToUndirectedGraph extends AbstractCyAction {
 	public ConvertToUndirectedGraph(){
 		super("Remove multiple edges",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "pippo",
+            "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
 	}

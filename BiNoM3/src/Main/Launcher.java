@@ -130,7 +130,7 @@ public class Launcher extends AbstractCySwingApp
 		
 		adapter.getCySwingApplication().addAction(new ProduceNaviCellMapFiles());
 		adapter.getCySwingApplication().addAction(new MergingMaps());
-		
+//		
 		
 		
 		
@@ -143,11 +143,8 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(new PathAnalysis());
 		adapter.getCySwingApplication().addAction(new ExtractSubnetwork());
 		adapter.getCySwingApplication().addAction(new CalcCentralityUndirected());
-		adapter.getCySwingApplication().addAction(new CalcCentralityDirected());
-
-		
-		adapter.getCySwingApplication().addAction(new ClusterNetworks());
-		
+		adapter.getCySwingApplication().addAction(new CalcCentralityDirected());	
+		adapter.getCySwingApplication().addAction(new ClusterNetworks());	
 		adapter.getCySwingApplication().addAction(new MonoMolecularReactionsAsEdges());
 		adapter.getCySwingApplication().addAction(new LinearizeNetwork());
 		adapter.getCySwingApplication().addAction(new ExcludeIntermediateNodes());
@@ -160,26 +157,24 @@ public class Launcher extends AbstractCySwingApp
 		//module manager
 		adapter.getCySwingApplication().addAction(new CreateModuleNetwork());
 		adapter.getCySwingApplication().addAction(new CreateConnectionsBetweenNests());
-		adapter.getCySwingApplication().addAction(new PackInModules());
-		
-		adapter.getCySwingApplication().addAction(new ClusterByShortPath());
-		
+		adapter.getCySwingApplication().addAction(new PackInModules());	
+		adapter.getCySwingApplication().addAction(new ClusterByShortPath());	
 		adapter.getCySwingApplication().addAction(new FindCommonNodes());
 		adapter.getCySwingApplication().addAction(new ListNodesByNest());
 		adapter.getCySwingApplication().addAction(new ListEdgesLinkingModules());
 		
+		adapter.getCySwingApplication().addAction(new MergeSelectedNests());
 		
 		
 		
-		//fade menu
-		adapter.getCySwingApplication().addAction(new UpdateInfluenceAttrib());
+		
+//		//fade menu
+//		adapter.getCySwingApplication().addAction(new UpdateInfluenceAttrib());
 		
 		
 		//BioPAX 3 utils menu
 		adapter.getCySwingApplication().addAction(new BioPAXPropertyBrowser());
-		adapter.getCySwingApplication().addAction(new BioPAXClassTree());
-		
-		
+		adapter.getCySwingApplication().addAction(new BioPAXClassTree());	
 		adapter.getCySwingApplication().addAction(new BioPAXToggleNamingService());
 		adapter.getCySwingApplication().addAction(new BioPAXSyncNetworks());
 		
@@ -255,6 +250,12 @@ public class Launcher extends AbstractCySwingApp
 					return net;		
 			}		
 		}
+		return null;
+	}
+	
+	
+	public static CyNode findNodeWithName(CyNetwork net, String name){
+		
 		return null;
 	}
 	

@@ -822,7 +822,9 @@ var // currently active contextMenu trigger
 
             // make sure we're in front
             if (opt.zIndex) {
-                css.zIndex = zindex($trigger) + opt.zIndex;
+		    // EV: 2015-02-11
+                    //css.zIndex = zindex($trigger) + opt.zIndex;
+                css.zIndex = 0 + opt.zIndex;
             }
             
             // add layer

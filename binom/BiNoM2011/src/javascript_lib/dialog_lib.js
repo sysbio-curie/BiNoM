@@ -247,7 +247,8 @@ $(function() {
 				   },
 			sep: "---------",
 			reaction_neighbours: {
-				name: "Reaction Graph Neighbours",
+				//name: "Reaction Graph Neighbours",
+				name: "Show Neighbours",
 				className: 'context-menu',
 				items: {
 					interact_title: {
@@ -273,6 +274,8 @@ $(function() {
 					}
 				}
 			},
+			// EV: 2015-02-11: keep the following code
+			/*
 			sep2: "---------",
 			interact_entities: {
 				name: "Interacting Entities", 
@@ -302,6 +305,7 @@ $(function() {
 					}
 				}
 			}
+			*/
 		}
 	});
 
@@ -547,6 +551,17 @@ $(function() {
 			nv_perform("nv_drawing_config_perform", window, "open");
 		}
 	});
+
+	$("#functional_analysis").button().click(function() {
+		//if (true || navicell.dataset.datatableCount()) {
+		if (navicell.dataset.datatableCount()) {
+			// must be: nv_perform("nv_functional_analysis", window, "open")
+			nv_functional_analysis_perform(window);
+		}
+	});
+
+	// EV: 2015-02-11: for now
+	//$("#functional_analysis").hide();
 
 	$("#demo").button().click(function() {
 		var suffix = nv_demo_file.match(/\.nvc$/) ? "" : ".nvc";
@@ -1477,6 +1492,7 @@ function update_buttons()
 	$("#import_annot_status").button(enable);
 	$("#status_tabs").button(enable);
 	$("#drawing_config").button(enable);
+	$("#functional_analysis").button(enable);
 
 	enable = navicell.annot_factory.getAnnotCount() > 0;
 	$("#dt_sample_annot_apply").button(enable ? "enable" : "disable");
@@ -1510,6 +1526,10 @@ function update_status_tables(params) {
 		}
 		if (!params || !params.no_sample_annot_table) {
 			win.update_sample_annot_table(doc, params);
+		}
+
+		if (!params || !params.no_analysis_table) {
+			win.update_analysis_table(doc, params);
 		}
 
 		win.update_heatmap_editor(doc, params);
@@ -1831,6 +1851,17 @@ function get_sample_names() {
 	return sample_names;
 }
 
+function select_datatable(sel_datatable)
+{
+	var html = "<option value='_none_'>Select a datatable</option>\n";
+	for (var datatable_name in navicell.dataset.datatables) {
+		var datatable = navicell.dataset.datatables[datatable_name];
+		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
+		html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>";
+	}
+	return html;
+}
+
 function heatmap_sample_action(action_str, map_name)
 {
 	nv_perform("nv_heatmap_editor_perform", get_win(map_name), action_str);
@@ -1939,7 +1970,6 @@ function update_heatmap_editor(doc, params, heatmapConfig, ignore_sel_modif_id) 
 		for (var datatable_name in navicell.dataset.datatables) {
 			var datatable = navicell.dataset.datatables[datatable_name];
 			var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-			//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
 			html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>";
 		}
 		html += "</select></td>";
@@ -2319,7 +2349,6 @@ function update_barplot_editor(doc, params, barplotConfig, ignore_sel_modif_id) 
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-		//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>";
 		html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>";
 	}
 	html += "</select></td>";
@@ -2555,7 +2584,6 @@ function datatable_select(id, onchange, sel_datatable) {
 	for (var datatable_name in navicell.dataset.datatables) {
 		var datatable = navicell.dataset.datatables[datatable_name];
 		var selected = sel_datatable && sel_datatable.getId() == datatable.getId() ? " selected": "";
-		//html += "<option value='" + datatable.getId() + "'" + selected + ">" + datatable.name + "</option>\n";
 		html += "<option value='" + datatable.getCanonName() + "'" + selected + ">" + datatable.name + "</option>\n";
 	}
 	return html + "</select>";

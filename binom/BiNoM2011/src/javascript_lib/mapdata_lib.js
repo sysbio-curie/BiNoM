@@ -525,6 +525,14 @@ Mapdata.prototype = {
 		return this.module_desc;
 	},
 
+	getModuleList: function() {
+		var modules = [];
+		for (var module_name in this.module_mapdata) {
+			modules.push(module_name);
+		}
+		return modules;
+	},
+
 	getPostModuleLink: function(postid) {
 		return this.module_postid[postid];
 	},
@@ -596,6 +604,16 @@ Mapdata.prototype = {
 		return hugo_names;
 	},
 
+	getHugoNamesByModule: function(module_name) {
+		var hugo_names = [];
+		for (var hugo_name in this.hugo_map) {
+			if (this.hugo_map[hugo_name][module_name]) {
+				hugo_names.push(hugo_name);
+			}
+		}
+		return hugo_names;
+	},
+
 	// no effect... should fixed that
 	searchFor: function(win, what, div, display) {
 		if (what.trim() == "/?") {
@@ -657,7 +675,6 @@ Mapdata.prototype = {
 			}
 
 			if (!hints.select_neighbours) {
-				//uncheck_all_entities(win, hints.select_neighbours);
 				uncheck_all_entities(win);
 			}
 
@@ -681,7 +698,7 @@ Mapdata.prototype = {
 				}
 			}
 
-			tree_context_epilogue(res_jxtree.context);
+			tree_context_epilogue(res_jxtree.context, hints.select_neighbours);
 
 			if (hints.div) {
 				$(hints.div, win.document).css("display", "block");
@@ -4984,6 +5001,25 @@ Datatable.prototype = {
 		
 		return cnt;
 	},
+
+	getGeneNames: function(module_name) {
+		var gene_names = []
+		var hugo_map = navicell.mapdata.hugo_map;
+		for (var gene_name in this.gene_index) {
+			if (hugo_map[gene_name][module_name]) {
+				gene_names.push(gene_name);
+			}
+		}
+		return gene_names;
+	},
+
+	/*
+	for (var gene_name in navicell.dataset.genes) {
+		if (navicell.mapdata.hugo_map[gene_name][module_name]) {
+			cnt++;
+		}
+	}
+	*/
 
 	getGeneCountPerModule: function(module_name) {
 		if (!module_name) {

@@ -177,9 +177,9 @@ function nv_set_zoom(win, zoom)
 	return null;
 }
 
-function nv_uncheck_all_entities(win, partial)
+function nv_uncheck_all_entities(win)
 {
-	win.uncheck_all_entities(win, partial);
+	win.uncheck_all_entities(win);
 	return null;
 }
 
@@ -187,8 +187,8 @@ function nv_unhighlight_all_entities(win)
 {
 	win = nv_win(win);
 	var module = get_module(win);
-	if (win.overlay && win.overlay.highlight_boxes.length > 0) {
-		win.overlay.highlight_boxes.length = [];
+	if (win.overlay && win.overlay.hasHighlight()) {
+		win.overlay.unhighlight();
 		win.overlay.draw(module);
 	}
 	return null;

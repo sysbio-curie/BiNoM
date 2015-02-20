@@ -56,20 +56,6 @@ function CHECK_NO_JXTREE(fun) {
 	}
 }
 
-// obsolete
-function panMapToBounds_jxtree(map, bounds)
-{
-	var map_bound = map.getBounds();
-	if (bounds && bounds.length > 0 && map_bound) {
-		for (var nn = 0; nn < bounds.length; ++nn) {
-			if (map_bound.intersects(bounds[nn])) {
-				return;
-			}
-		}
-		map.panToBounds(bounds[0]);
-	}
-}
-
 function center_marker_position(map, marker_positions)
 {
 	if (marker_positions.length > 0) {
@@ -680,6 +666,9 @@ function build_jxtree(selector, map, projection, whenloaded, firstEntityName)
 					if (val != "/?") {
 						$("#right_tabs", window.document).tabs("option", "active", 1);
 					}
+					if (window.overlay && window.overlay.hasHighlight()) {
+						val += (val.indexOf(" /") >= 0 ? ";" : " /") + "highlight=on";
+					}
 					nv_perform('nv_find_entities', window, val);
 				}
 			}
@@ -999,7 +988,7 @@ function show_map_and_markers(map_name, ids)
 	}
 }
 
-function uncheck_all_entities(win, partial)
+function uncheck_all_entities(win)
 {
 	if (!win) {
 		win = window;
@@ -1030,7 +1019,7 @@ function uncheck_all_entities(win, partial)
 		this.close();
 	});
 
-	overlay.reset(!partial); // ??
+	overlay.reset();
 	overlay.draw(win.document.navicell_module_name);
 }
 
@@ -1132,9 +1121,10 @@ function tree_context_prologue(tree_context) {
 	tree_context.marker_positions = [];
 }
 
-function tree_context_epilogue(tree_context) {
-	//panMapToBounds_jxtree(tree_context.win.map, tree_context.marker_bounds);
-	center_marker_position(tree_context.win.map, tree_context.marker_positions);
+function tree_context_epilogue(tree_context, dont_center) {
+	if (!dont_center) {
+		center_marker_position(tree_context.win.map, tree_context.marker_positions);
+	}
 }
 
 function tree_node_click_before(tree_context, checked) {

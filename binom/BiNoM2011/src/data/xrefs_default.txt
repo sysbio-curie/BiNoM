@@ -27,6 +27,8 @@ GENECARDS	http://www.genecards.org/cgi-bin/carddisp.pl?gc_id=%GENECARDS%	[A-Z0-9
 ATLASONC	http://atlasgeneticsoncology.org//Genes/%ATLASONC%.html	[A-Za-z0-9_]+
 ATONC	http://atlasgeneticsoncology.org//Genes/%ATONC%.html	[A-Za-z0-9_]+
 
+#CONFIDENCE	<img src='images/confidences/%CONFIDENCE%.png'/>	[0-9_]+
+
 MAP	../../%MAP%_light/master/index.html	[A-Za-z0-9_]+	-	&nbsp;	%MAP%_master	icon
 MODULE	../../%MAP%_light/%MODULE%/index.html	[A-Za-z0-9_]+	 */ *\b(MODULE)(:)	&nbsp;/&nbsp;	%MAP%_%MODULE%	icon
 

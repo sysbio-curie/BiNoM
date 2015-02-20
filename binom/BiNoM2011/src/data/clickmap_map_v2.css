@@ -244,6 +244,7 @@ html, body {
 #dt_import_dialog h3, #dt_sample_annot h3, #search_dialog h3 {
     margin-top: 20px;
     text-align: center;
+    font-size: larger;
 }
 
 #dt_import_dialog input.text, #dt_sample_annot input.text {
@@ -370,6 +371,7 @@ label {font-size: 12px; vertical-align: middle;}
 #dt_sample_status h3, #dt_gene_status h3, #dt_datatable_status h3, #dt_status_tabs h3, #dt_group_status h3, #dt_module_status h3, #right_tabs h3 {
     margin-top: 20px;
     text-align: center;
+    font-size: larger;
 }
 
 .status-message {
@@ -975,7 +977,7 @@ div.tablesorterPager input {
 }
 
 .context-menu {
-    margin-right: 20px;
+    margin-right: 60px;
 }
 
 .species-contextmenu-data-title:before {
@@ -1017,3 +1019,23 @@ div.tablesorterPager input {
     content: attr(highlight-menutitle);
 }
 
+#analysis_dialog {
+    font-size: 75%;
+    font-family: "Arial", "Helvetica", "Verdana", "sans-serif";
+}
+
+#analysis_dialog h3 {
+    margin-top: 20px;
+    text-align: center;
+    font-size: larger;
+}
+
+#analysis_dialog h4 {
+    text-align: center;
+}
+
+#analysis_dialog {overflow: auto;}
+
+.analysis-label {
+    font-weight: bold;
+}

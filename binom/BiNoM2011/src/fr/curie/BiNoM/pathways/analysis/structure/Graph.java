@@ -630,8 +630,10 @@ public class Graph {
     }
     for(int i=0;i<Edges.size();i++){
       Edge e = (Edge)Edges.elementAt(i);
-      e.Node1.outcomingEdges.add(e);
-      e.Node2.incomingEdges.add(e);
+      if (e.Node1 != null && e.Node2 != null) {
+	      e.Node1.outcomingEdges.add(e);
+	      e.Node2.incomingEdges.add(e);
+      }
     }
   }
 

@@ -51,7 +51,7 @@ public class CalcCentralityDirected extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis.Calc centrality");
+        setPreferredMenu(Launcher.appName + ".Analysis.Calc centrality");
     }
 
     public void actionPerformed(ActionEvent e) {

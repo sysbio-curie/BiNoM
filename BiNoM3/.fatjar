@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Thu Feb 19 12:27:14 CET 2015
+#Fri Feb 20 16:22:00 CET 2015
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
@@ -10,5 +10,5 @@ manifest.mainclass=
 manifest.file=app-manifest
 jarname.isextern=false
 onejar.expand=
-excludes=
+excludes=<jar|cytoscape-swing-app-api-3.1.0.jar>;<jar|celldesigner.jar>;<jar|binomlibext.jar>;<jar|imgscalr-lib-3.1.jar>;<jar|imgscalr-lib-3.1-javadoc.jar>;<jar|imgscalr-lib-3.1-sources.jar>;<jar|jwordpress-0.5.jar>
 includes=

@@ -37,7 +37,7 @@ public class BioPAXGenerateIndex extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Query[4]");
+        setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query[4]");
     }
 
     public void actionPerformed(ActionEvent e) {

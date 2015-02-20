@@ -17,7 +17,6 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 import Main.Launcher;
-import fr.curie.BiNoM.cytoscape.nestmanager.NestUtils;
 /**
  * Put the graph from Cytoscape network in practical data structure:
  * arrays of nodes, edges, sources, targets and adjacency
@@ -42,8 +41,8 @@ public class WeightGraphStructure {
 	};
 	void cyLoad(CyNetwork gp){
 		graph=gp;
-		nodes=new ArrayList<CyNode>(NestUtils.getNodeList(graph));
-		edges=new ArrayList<CyEdge>(NestUtils.getEdgeList(graph));
+		nodes=new ArrayList<CyNode>(graph.getNodeList());
+		edges=new ArrayList<CyEdge>(graph.getEdgeList());
 	}
 	
 	public boolean initWeights(){

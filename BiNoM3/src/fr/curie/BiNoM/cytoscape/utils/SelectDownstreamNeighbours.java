@@ -47,7 +47,7 @@ public class SelectDownstreamNeighbours extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities");
+        setPreferredMenu(Launcher.appName + ".BiNoM Utilities");
     }
 
     public void actionPerformed(ActionEvent e) {

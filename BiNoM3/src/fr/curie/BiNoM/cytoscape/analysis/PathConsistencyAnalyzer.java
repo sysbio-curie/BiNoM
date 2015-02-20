@@ -20,7 +20,7 @@ public class PathConsistencyAnalyzer extends AbstractCyAction{
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis");
+        setPreferredMenu(Launcher.appName + ".Analysis");
 	}
 	
     public void actionPerformed(ActionEvent e){

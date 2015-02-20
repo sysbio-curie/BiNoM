@@ -41,7 +41,7 @@ public class ConnectedComponents extends AbstractCyAction{
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis[2]");
+        setPreferredMenu(Launcher.appName + ".Analysis[2]");
 	}
 
 	@Override

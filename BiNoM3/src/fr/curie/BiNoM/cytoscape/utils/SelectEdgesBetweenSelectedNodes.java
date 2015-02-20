@@ -44,7 +44,7 @@ public class SelectEdgesBetweenSelectedNodes extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities[5]");
+        setPreferredMenu(Launcher.appName + ".BiNoM Utilities[5]");
 	}
 
     public void actionPerformed(ActionEvent e) {

@@ -90,9 +90,7 @@ public class NetworksUpdateTask implements Task {
 
 		if (netwSup != null) {
 		    op = new NetworkDifference(netw_old, netwSup);
-		    CyNetwork nullNetw = 
-		    		
-		    		NetworkFactory.getNullEmptyNetwork();
+		    CyNetwork nullNetw = NetworkFactory.getNullEmptyNetwork();
 		    System.out.println(netw.getRow(netw).get(CyNetwork.NAME, String.class) + " before " +
 				       netw.getNodeCount() +
 				       " " + System.currentTimeMillis());

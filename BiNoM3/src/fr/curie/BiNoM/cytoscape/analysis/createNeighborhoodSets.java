@@ -40,7 +40,7 @@ public class createNeighborhoodSets extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.Analysis[2260]");
+        setPreferredMenu(Launcher.appName + ".Analysis");
     }
 
     public void actionPerformed(ActionEvent e) {

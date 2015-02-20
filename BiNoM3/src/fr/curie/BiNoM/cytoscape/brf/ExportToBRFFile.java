@@ -55,7 +55,7 @@ public class ExportToBRFFile extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "pippo",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM I/O");
+        setPreferredMenu(Launcher.appName + ".BiNoM I/O");
 	}
 
     public void actionPerformed(ActionEvent e) {

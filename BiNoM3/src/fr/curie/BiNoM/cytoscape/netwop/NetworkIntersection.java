@@ -42,11 +42,11 @@ public class NetworkIntersection extends NetworkBinaryOperation {
     	super("Intersection", "INTERSECT", left, right);
     }
 
-    public void eval(CyNetwork netw) {
+    public CyNetwork eval(CyNetwork netw, CyNetworkView view) {
 
 	java.util.Iterator i;
 	
-	Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(src_netw);
+	Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(netw);
 	Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
 	CyNetworkView fromView =null;
 	while(networkViewIterator.hasNext())
@@ -56,15 +56,16 @@ public class NetworkIntersection extends NetworkBinaryOperation {
 	while (i.hasNext()) {
 	    CyNode node = (CyNode)i.next();
 	    if (containsNode(right, node))
-		NetworkUtils.addNodeAndReportPosition(node, left, fromView, netw);
+		NetworkUtils.addNodeAndReportPosition(node, left, fromView, netw, view);
 	}
 
 	i = left.getEdgeList().iterator();
 	while (i.hasNext()) {
 	    CyEdge edge = (CyEdge)i.next();
 	    if (containsEdge(right, edge))
-		NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, fromView, netw);
+		NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, fromView, netw, view);
 	}
+	return netw;
     }
 
     public boolean containsNode(CyNetwork netw, CyNode node) {

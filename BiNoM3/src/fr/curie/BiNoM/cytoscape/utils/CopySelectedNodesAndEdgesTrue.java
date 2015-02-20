@@ -46,7 +46,7 @@ public class CopySelectedNodesAndEdgesTrue extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM Utilities.Clipboard");
+        setPreferredMenu(Launcher.appName + ".BiNoM Utilities.Clipboard");
         this.resetCB = resetCB;
 	}
 

@@ -398,18 +398,23 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	    CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 	    CyNetworkView networkView = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
 	    
+	    Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(clipboard.getNetwork());
+		Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+		CyNetworkView fromView =null;
+		while(networkViewIterator.hasNext())
+			fromView = networkViewIterator.next();
 	    
 	    for (int n = 0; n < nodeCB.length; n++) {
 		if (isSelected(nodeCB[n])) {
 		    //network.addNode((CyNode)cbNodeMap.get(nodeCB[n]));
-		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), clipboard.getNetwork(), network, networkView);
+		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), clipboard.getNetwork(), fromView, network, networkView);
 		}
 	    }
 
 	    for (int n = 0; n < edgeNodeCB.length; n++) {
 		if (isSelected(edgeNodeCB[n])) {
 		    //network.addNode((CyNode)cbNodeMap.get(edgeNodeCB[n]));
-		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), clipboard.getNetwork(), network, networkView);
+		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), clipboard.getNetwork(),fromView, network, networkView);
 		}
 	    }
 

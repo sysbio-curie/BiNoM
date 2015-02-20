@@ -361,6 +361,7 @@ public class NetworkFactory {
 	adapter.getCyNetworkManager().addNetwork(netw);
 	adapter.getCyNetworkViewManager().addNetworkView(networkView);
 	networkView.fitContent();
+	
 
 	
 	

@@ -4,17 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 
-
-
-
-
-
-
-
-
-
-
-
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
@@ -43,6 +32,7 @@ import fr.curie.BiNoM.cytoscape.analysis.OptimalCutSetAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.PathAnalysis;
 import fr.curie.BiNoM.cytoscape.analysis.PathConsistencyAnalyzer;
 import fr.curie.BiNoM.cytoscape.analysis.PruneGraph;
+import fr.curie.BiNoM.cytoscape.analysis.SCCinAttribute;
 import fr.curie.BiNoM.cytoscape.analysis.StronglyConnectedComponents;
 import fr.curie.BiNoM.cytoscape.analysis.createNeighborhoodSets;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXAssociateSource;
@@ -73,16 +63,6 @@ import fr.curie.BiNoM.cytoscape.celldesigner.checkCellDesignerFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.pathwayStainingCellDesigner;
-import fr.curie.BiNoM.cytoscape.nestmanager.CreateEdgesBetweenModulesAllFromRef;
-import fr.curie.BiNoM.cytoscape.nestmanager.CreateEdgesBetweenModulesDistinctEdges;
-import fr.curie.BiNoM.cytoscape.nestmanager.CreateModuleNetwork;
-import fr.curie.BiNoM.cytoscape.nestmanager.FindCommonNodes;
-import fr.curie.BiNoM.cytoscape.nestmanager.ListComponents;
-import fr.curie.BiNoM.cytoscape.nestmanager.ListEdges;
-import fr.curie.BiNoM.cytoscape.nestmanager.ListEdgesLinkingModules;
-import fr.curie.BiNoM.cytoscape.nestmanager.ListNodes;
-import fr.curie.BiNoM.cytoscape.nestmanager.PackInModules;
-import fr.curie.BiNoM.cytoscape.nestmanager.SCCinAttribute;
 import fr.curie.BiNoM.cytoscape.netwop.DoubleNetworkDifference;
 import fr.curie.BiNoM.cytoscape.netwop.NetworksUpdate;
 import fr.curie.BiNoM.cytoscape.sbml.SBMLExportToFile;
@@ -92,6 +72,7 @@ import fr.curie.BiNoM.cytoscape.utils.CopySelectedNodesAndEdgesTrue;
 import fr.curie.BiNoM.cytoscape.utils.CreateSetIntersectionGraph;
 import fr.curie.BiNoM.cytoscape.utils.ListAllNodes;
 import fr.curie.BiNoM.cytoscape.utils.ListAllReactions;
+import fr.curie.BiNoM.cytoscape.utils.ListEdges;
 import fr.curie.BiNoM.cytoscape.utils.MergeNetworksAndFilter;
 import fr.curie.BiNoM.cytoscape.utils.PasteNodesAndEdges;
 import fr.curie.BiNoM.cytoscape.utils.SelectDownstreamNeighbours;
@@ -103,6 +84,7 @@ import fr.curie.BiNoM.cytoscape.utils.ShowClipboardContents;
 public class Launcher extends AbstractCySwingApp 
 {
 	private static CySwingAppAdapter adapter;
+	public static String appName = "BiNoM";
 	
 	public Launcher(CySwingAppAdapter adapter)
 	{
@@ -165,28 +147,7 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(new ConvertReactionNetworkToEntityNetwork());
 		adapter.getCySwingApplication().addAction(new PathConsistencyAnalyzer());
 		adapter.getCySwingApplication().addAction(new OptimalCutSetAnalyzer());
-		adapter.getCySwingApplication().addAction(new createNeighborhoodSets());
-		
-		//module manager
-		adapter.getCySwingApplication().addAction(new CreateModuleNetwork());
-		//adapter.getCySwingApplication().addAction(new CreateConnectionsBetweenNests());
-		adapter.getCySwingApplication().addAction(new CreateEdgesBetweenModulesAllFromRef());	
-		adapter.getCySwingApplication().addAction(new CreateEdgesBetweenModulesDistinctEdges());	
-		adapter.getCySwingApplication().addAction(new PackInModules());	
-		//adapter.getCySwingApplication().addAction(new ClusterByShortPath());	
-		adapter.getCySwingApplication().addAction(new ListNodes());
-		adapter.getCySwingApplication().addAction(new ListEdgesLinkingModules());
-		adapter.getCySwingApplication().addAction(new FindCommonNodes());	
-		
-		adapter.getCySwingApplication().addAction(new ListComponents());	
-		
-		//adapter.getCySwingApplication().addAction(new MergeSelectedNests());
-		
-		
-		
-		
-//		//fade menu
-//		adapter.getCySwingApplication().addAction(new UpdateInfluenceAttrib());
+		adapter.getCySwingApplication().addAction(new createNeighborhoodSets());	
 		
 		
 		//BioPAX 3 utils menu

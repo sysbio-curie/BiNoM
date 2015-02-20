@@ -38,7 +38,7 @@ public class BioPAXToggleNamingService extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3.BiNoM BioPAX 3 Utils");
+        setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Utils");
 	}
 
     public void actionPerformed(ActionEvent e) {

@@ -29,7 +29,7 @@ public class AboutBox extends AbstractCyAction {
         		Launcher.getAdapter().getCyApplicationManager(),
             "none",
             Launcher.getAdapter().getCyNetworkViewManager());
-        setPreferredMenu("Plugin.BiNoM 3");
+        setPreferredMenu(Launcher.appName);
 	}
 	
 	public void actionPerformed(ActionEvent e) { 

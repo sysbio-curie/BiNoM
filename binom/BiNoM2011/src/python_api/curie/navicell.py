@@ -376,6 +376,15 @@ class NaviCell:
     def _make_data(self, data):
         return "@COMMAND " + json.dumps(data)
 
+    def _isImported(self):
+        return self._cli2srv('nv_is_imported', '', [], 'send_and_rcv') #nv_is_imported to be implemented in nv_api.js
+
+    # must also manage exceptions
+    def _waitForImported(self):
+        while not self._isImported():
+            time.sleep(0.1)
+        return True
+
     def _cli2srv(self, action, module, args, perform='send_and_rcv'):
         msg_id = self._message_id()
         return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args, 'msg_id': msg_id})})
@@ -601,6 +610,7 @@ class NaviCell:
             :param params (map): opening hints.
         """
         self._cli2srv('nv_import_datatables', '', [datatable_biotype, datatable_name, '', datatable_url_or_data, params])
+        self._waitForImported()
 
     def sampleAnnotationImport(self, sample_annotation_url_or_data):
         """ Import the given annotation data or URL.
@@ -612,6 +622,7 @@ class NaviCell:
         """
 #        self.sampleAnnotationOpen()
         self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data])
+        self._waitForImported()
 
     def sampleAnnotationOpen(self, module):
         """ Open the sample annotation dialog.

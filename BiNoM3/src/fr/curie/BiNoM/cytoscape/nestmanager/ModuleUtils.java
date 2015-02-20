@@ -41,7 +41,7 @@ public class ModuleUtils {
 	}
 	void checkModuleColumn(CyNetwork net){
 		checkNodeColumn(net,hasModule,Boolean.class);
-		checkNodeColumn(net,moduleNest,Long.class);
+		checkNodeColumn(net,moduleNest,String.class);
 	}
 	/**
 	 * Create the node/module/nest pointing to a network 
@@ -51,7 +51,7 @@ public class ModuleUtils {
 		newNode.setNetworkPointer(netPointer);
 		inNet.getRow(newNode).set(CyNetwork.NAME,netPointer.getRow(netPointer).get(CyNetwork.NAME,String.class));			
 		inNet.getRow(newNode).set(hasModule,true);
-		inNet.getRow(newNode).set(moduleNest,netPointer.getSUID());
+		inNet.getRow(newNode).set(moduleNest, netPointer.getRow(netPointer).get(CyNetwork.NAME, String.class) + " (SUID:" + netPointer.getSUID() + ")");
 		return newNode;
 	}
 	/**

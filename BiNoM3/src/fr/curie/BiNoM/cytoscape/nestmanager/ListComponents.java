@@ -9,12 +9,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import cytoscape.CyNetwork;
-import cytoscape.CyNode;
-import cytoscape.Cytoscape;
-import cytoscape.util.CytoscapeAction;
+
+import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
+
+import Main.Launcher;
 import fr.curie.BiNoM.cytoscape.utils.TextBox;
-import giny.model.GraphPerspective;
 /**
  * List component in current network and nests from species described as BiNoM syntax
  * Network generally converted from a CellDesigner file or URL
@@ -22,7 +23,13 @@ import giny.model.GraphPerspective;
  * 
  * @author Daniel.Rovera@curie.fr
  */
-public class ListComponents extends CytoscapeAction {
+public class ListComponents extends AbstractCyAction {
+	
+	public ListComponents(){
+		super(title,Launcher.getAdapter().getCyApplicationManager(),"network",Launcher.getAdapter().getCyNetworkViewManager());		
+		setPreferredMenu("Plugin.BiNoM 3.BiNoM Module Manager");
+	}
+	
 	private static final long serialVersionUID = 1L;
 	final public static String title="List Components of Species in Network and Modules";
 	static final char separator=':'; 
@@ -33,11 +40,15 @@ public class ListComponents extends CytoscapeAction {
 		Integer sum=components.get(component);
 		if(sum==null) components.put(component,1);else components.put(component,sum+1);
 	}
-	private HashMap<String,Integer> listComponents(GraphPerspective network){
+	private HashMap<String,Integer> listComponents(CyNetwork network){
 		HashMap<String,Integer> components=new HashMap<String,Integer>();
-		for(CyNode node:NestUtils.getNodeList(network)){
-			if(Cytoscape.getNodeAttributes().getStringAttribute(node.getIdentifier(),specieAttr)==null) continue;
-			StringBuffer nn=new StringBuffer(node.getIdentifier());
+		for(CyNode node:network.getNodeList()){
+			
+			
+			if(network.getRow(node).get(specieAttr, String.class)==null) 
+				continue;
+			
+			StringBuffer nn=new StringBuffer(network.getRow(node).get(CyNetwork.NAME, String.class));
 			StringBuffer sb=new StringBuffer();
 			Boolean ok=true;
 			for(int c=0;c<nn.length();c++){
@@ -54,7 +65,7 @@ public class ListComponents extends CytoscapeAction {
 		}
 		return components;
 	}
-	private String listNetworkComponents(GraphPerspective network, String title){
+	private String listNetworkComponents(CyNetwork network, String title){
 		HashMap<String,Integer> components=listComponents(network);
 		ArrayList<Map.Entry<String,Integer>> componentList=new ArrayList<Map.Entry<String,Integer>>();
 		componentList.addAll(components.entrySet());	
@@ -65,12 +76,14 @@ public class ListComponents extends CytoscapeAction {
 		return txt;
 	}
 	public void actionPerformed(ActionEvent arg0){
-		CyNetwork network=Cytoscape.getCurrentNetwork();
+		CyNetwork network=Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 		ArrayList<CyNode> nestList=new ArrayList<CyNode>();
-		for(CyNode node:NestUtils.getNodeList(network)) if(node.getNestedNetwork()!=null) nestList.add(node);
+		for(CyNode node:NestUtils.getNodeList(network)) 
+			if(node.getNetworkPointer()!=null) 
+				nestList.add(node);
 		String text="Network\tComponents\tInHowManySpecies";
-		for(CyNode nest:nestList) text=text+listNetworkComponents(nest.getNestedNetwork(),nest.getIdentifier());
-		text=text+listNetworkComponents(network,network.getTitle());		
-		new TextBox(Cytoscape.getDesktop(),title,text).setVisible(true);			
+		for(CyNode nest:nestList) text=text+listNetworkComponents(nest.getNetworkPointer(),network.getRow(nest).get(CyNetwork.NAME, String.class));
+		text=text+listNetworkComponents(network,network.getRow(network).get(CyNetwork.NAME, String.class));		
+		new TextBox(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),title,text).setVisible(true);			
 	}
 }

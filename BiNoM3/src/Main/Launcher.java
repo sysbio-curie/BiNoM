@@ -9,6 +9,12 @@ import java.util.Iterator;
 
 
 
+
+
+
+
+
+
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
@@ -67,14 +73,16 @@ import fr.curie.BiNoM.cytoscape.celldesigner.checkCellDesignerFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.pathwayStainingCellDesigner;
-import fr.curie.BiNoM.cytoscape.influence.UpdateInfluenceAttrib;
-import fr.curie.BiNoM.cytoscape.nestmanager.ClusterByShortPath;
-import fr.curie.BiNoM.cytoscape.nestmanager.CreateConnectionsBetweenNests;
+import fr.curie.BiNoM.cytoscape.nestmanager.CreateEdgesBetweenModulesAllFromRef;
+import fr.curie.BiNoM.cytoscape.nestmanager.CreateEdgesBetweenModulesDistinctEdges;
 import fr.curie.BiNoM.cytoscape.nestmanager.CreateModuleNetwork;
 import fr.curie.BiNoM.cytoscape.nestmanager.FindCommonNodes;
+import fr.curie.BiNoM.cytoscape.nestmanager.ListComponents;
+import fr.curie.BiNoM.cytoscape.nestmanager.ListEdges;
 import fr.curie.BiNoM.cytoscape.nestmanager.ListEdgesLinkingModules;
-import fr.curie.BiNoM.cytoscape.nestmanager.ListNodesByNest;
+import fr.curie.BiNoM.cytoscape.nestmanager.ListNodes;
 import fr.curie.BiNoM.cytoscape.nestmanager.PackInModules;
+import fr.curie.BiNoM.cytoscape.nestmanager.SCCinAttribute;
 import fr.curie.BiNoM.cytoscape.netwop.DoubleNetworkDifference;
 import fr.curie.BiNoM.cytoscape.netwop.NetworksUpdate;
 import fr.curie.BiNoM.cytoscape.sbml.SBMLExportToFile;
@@ -121,6 +129,8 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(CellDesignerAssociateSource.getInstance());
 		adapter.getCySwingApplication().addAction(new ListAllReactions());
 		adapter.getCySwingApplication().addAction(new ListAllNodes());
+		adapter.getCySwingApplication().addAction(new ListEdges());
+
 		
 		adapter.getCySwingApplication().addAction(new ColorCellDesignerProteins());
 		adapter.getCySwingApplication().addAction(new pathwayStainingCellDesigner());
@@ -137,6 +147,9 @@ public class Launcher extends AbstractCySwingApp
 		//analysis
 		adapter.getCySwingApplication().addAction(new ConnectedComponents());
 		adapter.getCySwingApplication().addAction(new StronglyConnectedComponents());
+		
+		adapter.getCySwingApplication().addAction(new SCCinAttribute());
+		
 		adapter.getCySwingApplication().addAction(new PruneGraph());
 		adapter.getCySwingApplication().addAction(new MaterialComponents());
 		adapter.getCySwingApplication().addAction(new CycleDecomposition());
@@ -156,14 +169,18 @@ public class Launcher extends AbstractCySwingApp
 		
 		//module manager
 		adapter.getCySwingApplication().addAction(new CreateModuleNetwork());
-		adapter.getCySwingApplication().addAction(new CreateConnectionsBetweenNests());
+		//adapter.getCySwingApplication().addAction(new CreateConnectionsBetweenNests());
+		adapter.getCySwingApplication().addAction(new CreateEdgesBetweenModulesAllFromRef());	
+		adapter.getCySwingApplication().addAction(new CreateEdgesBetweenModulesDistinctEdges());	
 		adapter.getCySwingApplication().addAction(new PackInModules());	
-		adapter.getCySwingApplication().addAction(new ClusterByShortPath());	
-		adapter.getCySwingApplication().addAction(new FindCommonNodes());
-		adapter.getCySwingApplication().addAction(new ListNodesByNest());
+		//adapter.getCySwingApplication().addAction(new ClusterByShortPath());	
+		adapter.getCySwingApplication().addAction(new ListNodes());
 		adapter.getCySwingApplication().addAction(new ListEdgesLinkingModules());
+		adapter.getCySwingApplication().addAction(new FindCommonNodes());	
 		
-		adapter.getCySwingApplication().addAction(new MergeSelectedNests());
+		adapter.getCySwingApplication().addAction(new ListComponents());	
+		
+		//adapter.getCySwingApplication().addAction(new MergeSelectedNests());
 		
 		
 		
@@ -211,9 +228,6 @@ public class Launcher extends AbstractCySwingApp
 		
 		//about BiNoM
 		adapter.getCySwingApplication().addAction(new AboutBox());
-		
-		
-		
 		
 		
 		

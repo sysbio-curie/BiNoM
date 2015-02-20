@@ -128,7 +128,7 @@ public class NetworkFactory {
 	for (int n = 0; n < nodes.length; n++) {
 	    edu.rpi.cs.xgmml.GraphicNode node = nodes[n];
 	    CyNode nd= netw.addNode();
-	    netw.getDefaultNodeTable().getRow(nd).set("name", toId(node.getId()));
+	    netw.getDefaultNodeTable().getRow(nd.getSUID()).set("name", toId(node.getId()));
 	    System.out.println(toId(node.getId()));
 	    
 	    log("nodes #" + n + " " + node.getId() + " " +	node.getLabel() + " " + node.getName());

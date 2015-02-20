@@ -157,28 +157,15 @@ class FormatProteinNotesBase
 		String word_boundary;
 		if (s[0].charAt(0) == '~') {
 			s_0 = s[0].substring(1);
-			/*
-			int s_0_len = s_0.length();
-			int idx = 0;
-			while (idx < s_0_len && s_0.charAt(idx) == '~') {
-				idx++;
-			}
-			if (idx > 0) {
-				int idx2 = 2*idx;
-				prefix = s_0.substring(idx, idx2);
-				s_0 = s_0.substring(idx2);
-			}
-			*/
 			xref_patterns.put(s[0], Pattern.compile(s_0));
 			word_boundary = "";
 		} else {
 			s_0 = s[0];
 			word_boundary = "\\b";
 		}
-		//return sb.append("|").append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
-		//return sb.append("|").append(prefix).append("\\b(").append(s_0).append(")(:)(").append(s[2]).append(")");
 		return sb.append("|").append(prefix).append(word_boundary).append("(").append(s_0).append(")(:)(").append(s[2]).append(")");
 	}
+
 	protected static final String[] colours = { "cyan", "LightGreen", "LightGoldenRodYellow", "Khaki", "SpringGreen", "Yellow" };
 
 	protected static boolean isValidEntry(String[] entry, int ind) {
@@ -204,8 +191,9 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	private String get_colour(String name)
 	{
 		String colour = colour_map.get(name);
-		if (colour == null)
+		if (colour == null) {
 			colour_map.put(name, colour = colours[colour_map.size() < colours.length ? colour_map.size() : 0]);
+		}
 		return colour;
 	}
 	private String get_class(String name)
@@ -448,6 +436,8 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 									StringBuffer tmp = new StringBuffer();
 									ProduceClickableMap.show_map_icon(tmp, wp);
 									ProduceClickableMap.add_link(res, "", tmp.toString(), url, target);
+								} else if (url.substring(0, 1).equals("@")) {
+									res.append(url.substring(1));
 								} else {
 									ProduceClickableMap.add_link(res, xtag, value, url, target);
 								}

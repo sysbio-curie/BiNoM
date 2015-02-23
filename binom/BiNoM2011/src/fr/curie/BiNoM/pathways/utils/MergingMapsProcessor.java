@@ -184,6 +184,15 @@ public class MergingMapsProcessor {
 	
 	public static void main(String args[]){
 
+		//Small tests - comment these lines in production!!!
+		/*try{
+			MergingMapsProcessor mm = new MergingMapsProcessor();
+			mm.verbose = true;
+			mm.updateMap("c:/datas/acsn/assembly/survival_src/survival_WNT_NON_CANONICAL.xml", "c:/datas/acsn/assembly/survival_src/survival_master_newIds.xml");
+		}catch(Exception e){
+			e.printStackTrace();
+		}*/
+		
 		String configFile = "";
 		String outputFileName = "";
 		
@@ -1751,37 +1760,53 @@ public class MergingMapsProcessor {
 		String targetXml = cd1.toString();
 		
 		// update species IDs
-		for (String targetID : spMap.keySet()) {
+		//if(verbose)
+		//	System.out.println("update species IDs...");
+		for (String targetID : spMap.keySet()) if(!targetID.equals(spMap.get(targetID))){
+			//if(verbose)
+			//	System.out.println(targetID+"<-"+spMap.get(targetID));
 			targetXml = Utils.replaceString(targetXml, "\""+targetID+"\"", "\""+spMap.get(targetID)+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+targetID+"<", ">"+spMap.get(targetID)+"<");
 		}	
 		
 		// update reaction IDs
-		for (String targetID : reMap.keySet()) {
+		//if(verbose)
+		//	System.out.println("update reaction IDs...");
+		for (String targetID : reMap.keySet()) if(!targetID.equals(reMap.get(targetID))){
+			//if(verbose)
+			//	System.out.println(targetID+"<-"+reMap.get(targetID));
 			targetXml = Utils.replaceString(targetXml, "\""+targetID+"\"", "\""+reMap.get(targetID)+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+targetID+"<", ">"+reMap.get(targetID)+"<");
 		}
 		
 		// update protein IDs
-		for (String id : this.proteinMap.keySet()) {
+		//if(verbose)
+		//	System.out.println("update protein IDs...");
+		for (String id : this.proteinMap.keySet())if(!id.equals(proteinMap.get(id))){
+			//if(verbose)
+			//	System.out.println(proteinMap.get(id)+"<-"+id);
 			targetXml = Utils.replaceString(targetXml, "\""+proteinMap.get(id)+"\"", "\""+id+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+proteinMap.get(id)+"<", ">"+id+"<");
 		}
 		
 		// update rna IDs
-		for (String id : this.rnaMap.keySet()) {
+		//if(verbose)
+		//	System.out.println("update rna IDs...");
+		for (String id : this.rnaMap.keySet()) if(!id.equals(rnaMap.get(id))){
+			//if(verbose)
+			//	System.out.println(rnaMap.get(id)+"<-"+id);
 			targetXml = Utils.replaceString(targetXml, "\""+rnaMap.get(id)+"\"", "\""+id+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+rnaMap.get(id)+"<", ">"+id+"<");
 		}
 		
 		// update asRNA IDs
-		for (String id : this.asRnaMap.keySet()) {
+		for (String id : this.asRnaMap.keySet()) if(!id.equals(asRnaMap.get(id))){
 			targetXml = Utils.replaceString(targetXml, "\""+asRnaMap.get(id)+"\"", "\""+id+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+asRnaMap.get(id)+"<", ">"+id+"<");
 		}
 		
 		// update gene IDs
-		for (String id : this.geneMap.keySet()) {
+		for (String id : this.geneMap.keySet()) if(!id.equals(geneMap.get(id))){
 			targetXml = Utils.replaceString(targetXml, "\""+geneMap.get(id)+"\"", "\""+id+"\"");
 			targetXml = Utils.replaceString(targetXml, ">"+geneMap.get(id)+"<", ">"+id+"<");
 		}

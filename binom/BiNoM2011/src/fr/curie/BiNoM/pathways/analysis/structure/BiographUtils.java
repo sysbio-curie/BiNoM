@@ -953,7 +953,7 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
       return res;
   }*/
   
-  public static HashMap getNeighborhoodSets(Graph network, Vector<String> selected, boolean goUpstream, boolean goDownstream, int searchRadius, int minimumNumberOfGenes, boolean takeFromHUGOatt){
+  public static HashMap getNeighborhoodSets(Graph network, Vector<String> selected, boolean goUpstream, boolean goDownstream, int searchRadius, int minimumNumberOfGenes, boolean takeFromHUGOatt, boolean useSpeciesId){
 	  HashMap<String,Vector<String>> geneSets = new HashMap<String,Vector<String>>();
 	  if(selected.size()==0){
 		  for(int i=0;i<network.Nodes.size();i++)
@@ -1001,7 +1001,15 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 			  if(nodes.size()==numberOfNodes)
 				  break;
 		  }
-		  geneSets.put(n.Id, names);
+		  
+		  String id = n.Id;
+		  
+		  if(useSpeciesId){
+			  String spid = n.getFirstAttributeValueWithSubstringInName("SPECIES");
+			  if(spid!=null)if(!spid.trim().equals(""))
+				  id = spid;
+		  }
+		  geneSets.put(id, names);
 	  }
 	  return geneSets;
   }

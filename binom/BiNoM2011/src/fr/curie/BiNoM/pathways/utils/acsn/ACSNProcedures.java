@@ -58,6 +58,8 @@ public class ACSNProcedures {
 			String fileOut = "";
 			String folder = "";
 			String bibfile = "";
+			String dscoresfile = "";
+			String fscoresfile = "";
 			
 			boolean removeReactions = false;
 			boolean mergepngs = false;
@@ -71,6 +73,7 @@ public class ACSNProcedures {
 			boolean makeBibliographyFromFile = false;
 			boolean addbibliographytonotes = false;
 			boolean spreadreactionrefs = false;
+			boolean insertconfidences = false;
 			
 			
 			
@@ -107,6 +110,8 @@ public class ACSNProcedures {
 					makeBibliographyFromFile = true;
 				if(args[i].equals("--addbibliographytonotes"))
 					addbibliographytonotes = true;
+				if(args[i].equals("--insertconfidences"))
+					insertconfidences = true;
 				
 				
 				
@@ -140,6 +145,10 @@ public class ACSNProcedures {
 					name = args[i+1];
 				if(args[i].equals("--biblfile"))
 					bibfile = args[i+1];
+				if(args[i].equals("--dscoresfile"))
+					dscoresfile = args[i+1];
+				if(args[i].equals("--fscoresfile"))
+					fscoresfile = args[i+1];
 				
 				
 				if(args[i].equals("--updatedbids"))
@@ -198,6 +207,12 @@ public class ACSNProcedures {
 			
 			if(makeBibliographyFromFile){
 				makeBibliographyFromXml(xmlFileName, bibfile, true);
+			}
+			
+			if(insertconfidences){
+				SbmlDocument cd = CellDesigner.loadCellDesigner(xmlFileName);
+				ConnectionToDatabases.annotateCellDesignerFileWithConfidenceScores(cd, dscoresfile, fscoresfile);
+				CellDesigner.saveCellDesigner(cd, xmlFileName);
 			}
 				
 			

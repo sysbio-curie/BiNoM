@@ -147,8 +147,10 @@ public class Utils {
         int i=0;
         String s1 = new String(source);
         StringBuffer sb = new StringBuffer(s1);
+        if(!shabl.equals(val)){
         while((i=sb.indexOf(shabl))>=0){
                 sb.replace(i,i+shabl.length(),val);
+        }
         }
         s1 = sb.toString();
         return s1;

@@ -58,7 +58,7 @@ public class testDialogs {
 			
 			Vector<String> selected = new Vector<String>();
 			selected.add(n.Id);
-			HashMap<String,Vector<String>> sets = BiographUtils.getNeighborhoodSets(gr,selected,true,true,3,1,true);
+			HashMap<String,Vector<String>> sets = BiographUtils.getNeighborhoodSets(gr,selected,true,true,3,1,true, false);
 			Set setsS = sets.keySet();
 			Iterator<String> it = setsS.iterator();
 			while(it.hasNext()){
@@ -78,7 +78,7 @@ public class testDialogs {
 
 			createNeighborhoodSetsDialog dial = createNeighborhoodSetsDialog.getInstance();
 			
-			HashMap<String,Vector<String>> geneSets = BiographUtils.getNeighborhoodSets(gr, selected, true, true, 3,10,true);
+			HashMap<String,Vector<String>> geneSets = BiographUtils.getNeighborhoodSets(gr, selected, true, true, 3,10,true, false);
     		//Set set = geneSets.keySet();
     		//System.out.println(set.size());
 			

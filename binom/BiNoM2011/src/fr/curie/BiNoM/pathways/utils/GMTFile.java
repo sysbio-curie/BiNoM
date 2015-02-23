@@ -12,8 +12,9 @@ public class GMTFile{
 	public static void main(String args[]){
 		try{
 			GMTFile gmt = new GMTFile();
-			gmt.load("c:/datas/acsn/acsn_only/acsn_src/temp.gmt");
-			gmt.saveAllNamesToFile("c:/datas/acsn/acsn_only/acsn_src/allnames.txt");
+			//gmt.load("c:/datas/acsn/acsn_only/acsn_src/temp.gmt");
+			gmt.load("c:/datas/acsn/acsn_master.xml.gmt");
+			gmt.saveAllNamesToFile("c:/datas/acsn/allnames.txt",true);
 			//gmt.load("c:/datas/navicell/test/merged/temp.gmt");
 			//gmt.saveAllNamesToFile("c:/datas/navicell/test/merged/allnames.txt");
 			
@@ -32,6 +33,7 @@ public class GMTFile{
 		while((s=lr.readLine())!=null){
 			StringTokenizer st = new StringTokenizer(s,"\t");
 			String groupName = st.nextToken().trim();
+			if(st.hasMoreTokens()){
 			setnames.add(groupName);
 			String description = st.nextToken();
 			HashSet<String> proteins = new HashSet<String>();
@@ -44,6 +46,7 @@ public class GMTFile{
 					allnames.add(protein);	
 			}
 			sets.add(proteins); //System.out.print(groupName+":"+proteins.size()+"\t");
+			}
 		}
 		System.out.println(fn+": total "+allnames.size()+" names.");
 		}catch(Exception e){
@@ -61,12 +64,13 @@ public class GMTFile{
 		return res;
 	}
 	
-	public void saveAllNamesToFile(String fn){
+	public void saveAllNamesToFile(String fn, boolean onlyThoseInCapitals){
 		try{
 			FileWriter fw = new FileWriter(fn);
 			Collections.sort(allnames);
 			for(int i=0;i<allnames.size();i++)
-				fw.write(allnames.get(i)+"\n");
+				if((!onlyThoseInCapitals)||(allnames.get(i).equals(allnames.get(i).toUpperCase())))
+					fw.write(allnames.get(i)+"\n");
 			fw.close();
 		}catch(Exception e){
 			e.printStackTrace();

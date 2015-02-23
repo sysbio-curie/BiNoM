@@ -81,6 +81,10 @@ public class CellDesignerToCytoscapeConverter {
     public static boolean alwaysMentionCompartment = false;
     public static boolean verbose = false;
     
+    // This should be made off for ACSN, probably??? because of species annotated by MODULES
+    // MODULE should prevent including HUGOs for complexes into the annotation, for example
+    public static boolean alwaysAnnotateSpecies = true;
+    
     public static HashMap<String,SpeciesDocument.Species> speciesMap = null;
     public static HashMap<String,CelldesignerSpeciesDocument.CelldesignerSpecies> includedSpeciesMap = null;
     public static HashMap<String,Vector<CelldesignerSpeciesDocument.CelldesignerSpecies>> complexSpeciesMap = null;
@@ -157,6 +161,8 @@ public class CellDesignerToCytoscapeConverter {
         SpeciesDocument.Species sp = sbml.getModel().getListOfSpecies().getSpeciesArray(i);
         Vector aliases = findAllAliasesForSpecies(sbml,sp.getId());
         
+
+        
         String lab = convertSpeciesToName(sbml,sp.getId(),true,true);
        
         if(verbose)
@@ -202,7 +208,7 @@ public class CellDesignerToCytoscapeConverter {
             	}
             }
             
-            if(annotateSpeciesFromEntityAnnotation){
+            if(annotateSpeciesFromEntityAnnotation||alwaysAnnotateSpecies){
             if(species_type.equals("PROTEIN")){
             	String id = Utils.getValue(sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerProteinReference());
             	CelldesignerProteinDocument.CelldesignerProtein protein = (CelldesignerProteinDocument.CelldesignerProtein)CellDesigner.entities.get(id);

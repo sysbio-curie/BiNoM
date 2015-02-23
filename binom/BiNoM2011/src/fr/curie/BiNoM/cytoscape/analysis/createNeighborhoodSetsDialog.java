@@ -107,7 +107,8 @@ public class createNeighborhoodSetsDialog extends JDialog {
     private JScrollPane scrollPane;
     private JCheckBox goUpstreamCB;
     private JCheckBox goDownstreamCB;
-    private JCheckBox checkHUGOatt;    
+    private JCheckBox checkHUGOatt;
+    private JCheckBox checkUseSpeciesId;    
     private JTextField searchRadius;
     private JTextField minimumNumberOfGenes;
 
@@ -244,6 +245,27 @@ public class createNeighborhoodSetsDialog extends JDialog {
 	c.fill = GridBagConstraints.NONE;
 	panel.add(checkHUGOatt, c);
 	y++;
+
+	label = new JLabel("Use species Ids");
+	label.setFont(BOLD_FONT);
+	c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	panel.add(label, c);
+	
+	checkUseSpeciesId = new JCheckBox();
+	checkUseSpeciesId.setSelected(false);
+	c = new GridBagConstraints();
+	c.gridx = x+1;
+	c.gridy = y;
+	c.gridheight = 2;
+	c.weightx = 0.0;
+	c.anchor = GridBagConstraints.WEST;
+	c.fill = GridBagConstraints.NONE;
+	panel.add(checkUseSpeciesId, c);
+	y++;
 	
 	
 	JPanel buttonPanel = new JPanel();
@@ -262,7 +284,7 @@ public class createNeighborhoodSetsDialog extends JDialog {
 				    selected.add(((CyNode)it.next()).getIdentifier());
 				
 				System.out.println("selected ="+selected.size());
-				HashMap<String,Vector<String>> geneSets = BiographUtils.getNeighborhoodSets(graph, selected, goUpstreamCB.isSelected(), goDownstreamCB.isSelected(), Integer.parseInt(searchRadius.getText()), Integer.parseInt(minimumNumberOfGenes.getText()),checkHUGOatt.isSelected());
+				HashMap<String,Vector<String>> geneSets = BiographUtils.getNeighborhoodSets(graph, selected, goUpstreamCB.isSelected(), goDownstreamCB.isSelected(), Integer.parseInt(searchRadius.getText()), Integer.parseInt(minimumNumberOfGenes.getText()),checkHUGOatt.isSelected(), checkUseSpeciesId.isSelected());
 	    		Set sets = geneSets.keySet();
 	    		System.out.println("size = "+sets.size());
 

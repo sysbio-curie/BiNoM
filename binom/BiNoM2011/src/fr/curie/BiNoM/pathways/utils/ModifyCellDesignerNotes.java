@@ -5,7 +5,6 @@ import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 
 import cytoscape.Cytoscape;
-
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotesDialog;
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
@@ -54,8 +53,8 @@ public class ModifyCellDesignerNotes {
 	 */
 	public String prefix = "";
 	
-	Vector<String> keys = new Vector<String>();
-	Vector<String> noteAdds = new Vector<String>();
+	public Vector<String> keys = new Vector<String>();
+	public Vector<String> noteAdds = new Vector<String>();
 	HashMap<String,Vector<String>> species2ReactionIds = new HashMap<String,Vector<String>>(); 
 	HashMap<String,String> reactionId2Annotation = new HashMap<String,String>();
 	
@@ -155,9 +154,7 @@ public class ModifyCellDesignerNotes {
 		}
 	}
 	
-	public void ModifyCellDesignerNotes() throws Exception{
-		//Vector<String> keys = new Vector<String>();
-		//Vector<String> noteAdds = new Vector<String>();
+	public void splitCommentsIntoNotes() throws Exception{
 		LineNumberReader lr = new LineNumberReader(new StringReader(comments));
 		String s = null;
 		String ks = null;
@@ -182,6 +179,23 @@ public class ModifyCellDesignerNotes {
 		}
 		annot = Utils.cutFirstLastNonVisibleSymbols(annot);
 		noteAdds.add(annot);
+	}
+	
+	public String mergeNotesIntoComments() throws Exception{
+		String res = "";
+		for(int i=0;i<keys.size();i++){
+			res+="### "+keys.get(i)+"\n";
+			res+="### ------------"+"\n";
+			res+=noteAdds.get(i);
+			res+="\n\n";
+		}
+		return res;
+	}
+	
+	public void ModifyCellDesignerNotes() throws Exception{
+		splitCommentsIntoNotes();
+		//Vector<String> keys = new Vector<String>();
+		//Vector<String> noteAdds = new Vector<String>();
 		
 		if(sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins()!=null)
 		for(int i=0;i<sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
@@ -338,7 +352,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+Utils.getValue(p.getName())+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+Utils.getValue(p.getName()));
 				if(formatAnnotation)
@@ -361,7 +375,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+" ### g"+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation){
@@ -388,7 +402,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+" ### r"+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation){
@@ -415,7 +429,7 @@ public class ModifyCellDesignerNotes {
 			if((!annotationEmpty)||(allannotations)){			
 				annotations.append("### "+p.getId()+"\n");
 				annotations.append("### "+p.getName()+" ### ar"+p.getName()+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+p.getId()+"/"+p.getName());
 				if(formatAnnotation){
@@ -444,7 +458,7 @@ public class ModifyCellDesignerNotes {
 					annotations.append("### "+CellDesignerToCytoscapeConverter.getReactionString(r, sbmlDoc, true)+"\n");
 				else
 					annotations.append("### "+r.getId()+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+r.getId());
 				if(formatAnnotation)
@@ -483,7 +497,7 @@ public class ModifyCellDesignerNotes {
 				
 				annotations.append("### "+sp.getId()+"\n");
 				annotations.append("### "+spName+"\n");
-				String reqsections[] = {"Identifiers","Maps_Modules","References"};
+				String reqsections[] = {"Identifiers","Maps_Modules","References","Confidence"};
 				if(verbose)
 					System.out.println("Processing "+sp.getId()+"/"+spName);
 				boolean degraded = false;
@@ -636,6 +650,10 @@ public class ModifyCellDesignerNotes {
 				AnnotationSection sec = getSectionByName(secs,"Maps_Modules");
 				sec.content+=s+" ";
 			}else
+			if(s.startsWith("CONFIDENCE:")){
+					AnnotationSection sec = getSectionByName(secs,"Confidence");
+					sec.content+=s+" ";
+			}else
 			{
 				AnnotationSection sec = getSectionByName(secs,"Identifiers");
 				sec.content+=s+" ";
@@ -724,6 +742,16 @@ public class ModifyCellDesignerNotes {
 		
 		
 		return annp;
+	}
+	
+	public Vector<AnnotationSection> reformatSectionsWithDefaultSection(Vector<AnnotationSection> secs1){
+		Vector<AnnotationSection> secs = new Vector<AnnotationSection>();
+		AnnotationSection nosection = new AnnotationSection();
+		nosection.name = null;
+		nosection.content = secs1.get(0).content;
+		secs.add(nosection);
+		for(int i=1;i<secs1.size();i++) secs.add(secs1.get(i));
+		return secs;
 	}
 	
 	public void fillIdentifiers(AnnotationSection identifiers, String entityName){

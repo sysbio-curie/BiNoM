@@ -90,13 +90,13 @@ public class GraphDocumentFactory {
 //            System.out.println("Position x: " + Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString()));
 //            System.out.println("Position y: " + Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).toString()));
             
-            System.out.println(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString());
+            //System.out.println(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString());
             
             graphics.setX(Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString()));
             graphics.setY(Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).toString()));
 		    	
 		    
-            String value = "";		
+            String value = null;		
             Iterator<CyColumn> columnsIterator = cyNetwork.getDefaultNodeTable().getColumns().iterator();
         	
 		    while(columnsIterator.hasNext()){
@@ -116,6 +116,11 @@ public class GraphDocumentFactory {
 					    	value = cyNetwork.getRow(node).get(col.getName(), Integer.class).toString();
 					    }catch(Exception e){}
 				    }
+				    if (value == null){
+					    try{	
+					    	value = cyNetwork.getRow(node).get(col.getName(), Boolean.class).toString();
+					    }catch(Exception e){}
+			    	}
 				    	
 		//		    if(nodeAttrs.getType(attrNames[n])==nodeAttrs.TYPE_STRING)
 		//		    	 value = nodeAttrs.getStringAttribute(id, attrNames[n]);
@@ -129,7 +134,7 @@ public class GraphDocumentFactory {
 				    if(value != null)
 				    	if(!value.trim().equals(""))
 				    		if(!value.trim().equals("null"))
-				    			Utils.addAttribute(gr_node, col.getName(), col.getName(), ""+value, ObjectType.STRING);
+				    			Utils.addAttribute(gr_node, col.getName(), col.getName(), value, ObjectType.STRING);
 			    }
 		    	catch(Exception e){
 			    	System.out.println("WARNING: "+col.getName()+" in "+id+" seems to be not of type string or double or integer!");	    	
@@ -163,8 +168,6 @@ public class GraphDocumentFactory {
 		System.out.println("Inizio archi");
 		
 		Iterator<CyEdge> iEdges = cyNetwork.getEdgeList().iterator();
-		
-
 		// cytoscape.data.CyAttributes edgeAttrs = Cytoscape.getEdgeAttributes();
 		while (iEdges.hasNext()) {
 		    CyEdge edge = (CyEdge)iEdges.next();
@@ -202,6 +205,11 @@ public class GraphDocumentFactory {
 		    	if (value == null){
 				    try{	
 				    	value = cyNetwork.getRow(edge).get(col.getName(), Integer.class).toString();
+				    }catch(Exception e){}
+		    	}
+		    	if (value == null){
+				    try{	
+				    	value = cyNetwork.getRow(edge).get(col.getName(), Boolean.class).toString();
 				    }catch(Exception e){}
 		    	}
 			    

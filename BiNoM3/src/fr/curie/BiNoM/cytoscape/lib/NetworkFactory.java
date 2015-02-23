@@ -46,6 +46,7 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -121,82 +122,84 @@ public class NetworkFactory {
 	CyNetworkView networkView = null;
 
 	netw.getRow(netw).set(CyNetwork.NAME, networkName);
-
+	System.out.println("NODES " + nodes.length + " EDGES " + edges.length);
 	log("NODES " + nodes.length + " EDGES " + edges.length);
 		
+	ArrayList nodesList = new ArrayList();
 	//create all nodes
 	for (int n = 0; n < nodes.length; n++) {
 	    edu.rpi.cs.xgmml.GraphicNode node = nodes[n];
-	    CyNode nd= netw.addNode();
-	    netw.getDefaultNodeTable().getRow(nd.getSUID()).set("name", toId(node.getId()));
-	    System.out.println(toId(node.getId()));
 	    
-	    log("nodes #" + n + " " + node.getId() + " " +	node.getLabel() + " " + node.getName());
-	 
-//		//get networkView
+	    //if(Launcher.findNodeWithName(netw, toId(node.getId())) == null){
+	    if(!nodesList.contains(toId(node.getId()))){
+	    	nodesList.add(toId(node.getId()));
+		    CyNode nd= netw.addNode();
+		    netw.getDefaultNodeTable().getRow(nd.getSUID()).set("name", toId(node.getId()));
+		    //System.out.println(toId(node.getId()));
+		    
+		    log("nodes #" + n + " " + node.getId() + " " +	node.getLabel() + " " + node.getName());
+				
+		    //save nodes attributes
+		    edu.rpi.cs.xgmml.AttDocument.Att attrs[] = node.getAttArray();
+		    HashMap listAttrMap = getListAttrMap(attrs);
 		
-    
-	    //save nodes attributes
-	    edu.rpi.cs.xgmml.AttDocument.Att attrs[] = node.getAttArray();
-	    HashMap listAttrMap = getListAttrMap(attrs);
-	
-	    //System.out.println("ND: " + nd.getIdentifier() + " (" + attrs.length + ")");
-	    for (int j = 0; j < attrs.length; j++) {
-	    	
-			edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
+		    //System.out.println("ND: " + nd.getIdentifier() + " (" + attrs.length + ")");
+		    for (int j = 0; j < attrs.length; j++) {
+		    	
+				edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
+				
 			
-		
-			String attrValue = attr.getValue();
-			
-			System.out.println(attr.getLabel() + ": " + attr.getValue());					
-			
-			if (listAttrMap.get(attr.getLabel()) != null) {
-			    // forse String o_attrValue = nodeAttrs.getStringAttribute(nd.getIdentifier(), attr.getLabel());
-				// String o_attrValue = nodeAttrs.getStringAttribute(nd.SUID, attr.getLabel());
-				String o_attrValue = netw.getRow(nd).get(attr.getLabel(), String.class);
-			    if (o_attrValue != null && o_attrValue.length() > 0) {
-			    	attrValue = o_attrValue + ATTR_SEP + attr.getValue();
-			    	//System.out.println(o_attrValue + ATTR_SEP + attr.getValue());
-			    }
-			}
-	
-			//if (attr.getLabel().equals("BIOPAX_URI")) {
-			//    System.out.println("   --> " + attr.getValue());
-			//}						
-			
-			if(attrValue!=null){
-				try{
-					if(attr.getType()==ObjectType.REAL){
-						try{
-						//create a new column if necessary
-						if(netw.getDefaultNodeTable().getColumn(attr.getLabel()) == null)
-							netw.getDefaultNodeTable().createColumn(attr.getLabel(), Double.class, false);
-						
-						//insert value in the table
-						netw.getRow(nd).set(attr.getLabel(), attr.getValue());
-								
-						// forse nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),Double.parseDouble(attrValue));
-						// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),Double.parseDouble(attrValue));
-						}catch(Exception e){
-							e.printStackTrace();
-						}
-					}
-					else {
-						//create string column if not exists
-						if(netw.getDefaultNodeTable().getColumn(attr.getLabel()) == null)
-							netw.getDefaultNodeTable().createColumn(attr.getLabel(), String.class, false);
-						
-						//insert value in the table
-						netw.getRow(nd).set(attr.getLabel(), attr.getValue());
-						
-						//nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),attrValue);
-						// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),attrValue);
-					}
-				}catch(Exception e){
+				String attrValue = attr.getValue();
+				
+				//System.out.println(attr.getLabel() + ": " + attr.getValue());					
+				
+				if (listAttrMap.get(attr.getLabel()) != null) {
+				    // forse String o_attrValue = nodeAttrs.getStringAttribute(nd.getIdentifier(), attr.getLabel());
+					// String o_attrValue = nodeAttrs.getStringAttribute(nd.SUID, attr.getLabel());
+					String o_attrValue = netw.getRow(nd).get(attr.getLabel(), String.class);
+				    if (o_attrValue != null && o_attrValue.length() > 0) {
+				    	attrValue = o_attrValue + ATTR_SEP + attr.getValue();
+				    	//System.out.println(o_attrValue + ATTR_SEP + attr.getValue());
+				    }
 				}
-			}
 		
-			log("\t" + attr.getLabel() + " " + attr.getName() + " = " + attr.getValue());
+				//if (attr.getLabel().equals("BIOPAX_URI")) {
+				//    System.out.println("   --> " + attr.getValue());
+				//}						
+				
+				if(attrValue!=null){
+					try{
+						if(attr.getType()==ObjectType.REAL){
+							try{
+							//create a new column if necessary
+							if(netw.getDefaultNodeTable().getColumn(attr.getLabel()) == null)
+								netw.getDefaultNodeTable().createColumn(attr.getLabel(), Double.class, false);
+							
+							//insert value in the table
+							netw.getRow(nd).set(attr.getLabel(), attr.getValue());
+									
+							// forse nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),Double.parseDouble(attrValue));
+							// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),Double.parseDouble(attrValue));
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+						else {
+							//create string column if not exists
+							if(netw.getDefaultNodeTable().getColumn(attr.getLabel()) == null)
+								netw.getDefaultNodeTable().createColumn(attr.getLabel(), String.class, false);
+							
+							//insert value in the table
+							netw.getRow(nd).set(attr.getLabel(), attr.getValue());
+							
+							//nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),attrValue);
+							// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),attrValue);
+						}
+					}catch(Exception e){
+					}
+				}		
+				log("\t" + attr.getLabel() + " " + attr.getName() + " = " + attr.getValue());
+		    }
 	    }
 	}				
 	
@@ -204,92 +207,101 @@ public class NetworkFactory {
 	//tolto CyNetworkView networkView = Cytoscape.createNetworkView(netw);
 
 	// edges part
+	ArrayList edgesList = new ArrayList();
 	for (int n = 0; n < edges.length; n++) {
 	    edu.rpi.cs.xgmml.GraphicEdge edge = edges[n];
-	    log("edge #" + n + " " + edge.getId() + " " + edges[n].getLabel() + " " + edges[n].getSource() + " " + edges[n].getTarget());
 	    
-	    //System.out.println("Adding edge id="+edges[n].getId()+" label="+edges[n].getLabel()+" name="+edges[n].getName());
-	    
-	    String interaction = "UNKNOWN";
-	    AttDocument.Att intatt = fr.curie.BiNoM.pathways.utils.Utils.getFirstAttribute(edges[n], "interaction");
-	    if(intatt!=null)
-	    	interaction = intatt.getValue();
-	    if(interaction.equals("UNKNOWN")){
-	    	AttDocument.Att atts[] = edges[n].getAttArray();
-	    	for(int kk=0;kk<atts.length;kk++){
-	    		AttDocument.Att att = atts[kk];
-	    		if(att.getName().toLowerCase().endsWith("edge_type"))
-	    			interaction = att.getValue();
-	    	}
-	    }
-	    
-	    
-	    //System.out.println("Edge requested "+"source:"+toId(edges[n].getSource())+" target:"+toId(edges[n].getTarget())+" interaction:"+interaction);
-	    
-	    /*CyEdge ed = Cytoscape.getCyEdge(Cytoscape.getCyNode(toId(edges[n].getSource())),
-					    Cytoscape.getCyNode(toId(edges[n].getTarget())),
-					    Semantics.INTERACTION,
-					    interaction,
-					    true);*/
-	    // System.out.println("Edge requested source:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource()))+" target:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget()))+" interaction:"+interaction);
-	     CyEdge ed = netw.addEdge(getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource())), 
-	    		getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget())), true);  
-	    	    
-	    
-	    //tolto CyEdge ed = Cytoscape.getCyEdge(toId(edges[n].getSource()), edges[n].getId(), toId(edges[n].getTarget()), interaction);    
-	    //tolto CyEdge ed = netw.addEdge(netw.getNode(arg0), arg1, arg2)
-	    		
-	    if(ed!=null){
-		    //System.out.println("Edge got "+ed.getIdentifier());
-		    // modificato con sotto ed.setIdentifier(edges[n].getId());
-		    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("name", toId(edges[n].getId()));
-		    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("interaction", interaction);
-		    //System.out.println("Setting id "+));
-		    //System.out.println("ID changed "+ed.getIdentifier());
+	    //if(Launcher.findEdgeWithName(netw, toId(edge.getId())) == null){	 
+	    if(!edgesList.contains(toId(edge.getId()))){
+	    	edgesList.add(toId(edge.getId()));
+		    log("edge #" + n + " " + edge.getId() + " " + edges[n].getLabel() + " " + edges[n].getSource() + " " + edges[n].getTarget());
 		    
-		    edu.rpi.cs.xgmml.AttDocument.Att attrs[] = edge.getAttArray();
-		    for (int j = 0; j < attrs.length; j++) {
-		    	edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
-		    	log("\t" + attr.getLabel() + " " +
-		    			attr.getName() + " = " + attr.getValue());
-		    	if(attr.getValue()!=null){
-		    		try{
-		    			//create colum if not exist
-		    			if(attr.getType()==ObjectType.REAL){
-		    				//create string column if not exists
-							if(netw.getDefaultEdgeTable().getColumn(attr.getLabel()) == null)
-								netw.getDefaultEdgeTable().createColumn(attr.getLabel(), Double.class, false);
-		    				try{
-		    					//insert value in the table
-								netw.getRow(ed).set(attr.getLabel(), attr.getValue());
-		    					
-		    					// edgeAttrs.setAttribute(ed.SUID, attr.getLabel(),Double.parseDouble(attr.getValue()));
-		    				}catch(Exception e){
-		    					e.printStackTrace();
-		    				}
-		    			}
-		    			else {
-		    				//create string column if not exists
-							if(netw.getDefaultEdgeTable().getColumn(attr.getLabel()) == null)
-								netw.getDefaultEdgeTable().createColumn(attr.getLabel(), String.class, false);
-							
-							
-		    				// edgeAttrs.setAttribute(ed.SUID, attr.getLabel(),attr.getValue());
-							//insert value in the table
-							netw.getRow(ed).set(attr.getLabel(), attr.getValue());
-		    			}
-		    		}catch(Exception e){
-		    		}
-		    		//edgeAttrs.setAttribute(ed.getIdentifier(), attr.getName(),attr.getValue());
+		    //System.out.println("Adding edge id="+edges[n].getId()+" label="+edges[n].getLabel()+" name="+edges[n].getName());
+		    
+		    String interaction = "UNKNOWN";
+		    AttDocument.Att intatt = fr.curie.BiNoM.pathways.utils.Utils.getFirstAttribute(edges[n], "interaction");
+		    if(intatt!=null)
+		    	interaction = intatt.getValue();
+		    if(interaction.equals("UNKNOWN")){
+		    	AttDocument.Att atts[] = edges[n].getAttArray();
+		    	for(int kk=0;kk<atts.length;kk++){
+		    		AttDocument.Att att = atts[kk];
+		    		if(att.getName().toLowerCase().endsWith("edge_type"))
+		    			interaction = att.getValue();
 		    	}
-		    	// tolto netw.addEdge(ed);
-			    else{
-			    	System.out.println("WARNING! Edge "+edges[n].getId()+" can not be created!");
-			    }
-			    //System.out.println("Number of edges = "+netw.getEdgeCount()+"\n");
-			}
+		    }
+		    
+		    
+		    //System.out.println("Edge requested "+"source:"+toId(edges[n].getSource())+" target:"+toId(edges[n].getTarget())+" interaction:"+interaction);
+		    
+		    /*CyEdge ed = Cytoscape.getCyEdge(Cytoscape.getCyNode(toId(edges[n].getSource())),
+						    Cytoscape.getCyNode(toId(edges[n].getTarget())),
+						    Semantics.INTERACTION,
+						    interaction,
+						    true);*/
+		    // System.out.println("Edge requested source:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource()))+" target:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget()))+" interaction:"+interaction);
+		     CyEdge ed = netw.addEdge(getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource())), 
+		    		getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget())), true);  
+		    	    
+		    
+		    //tolto CyEdge ed = Cytoscape.getCyEdge(toId(edges[n].getSource()), edges[n].getId(), toId(edges[n].getTarget()), interaction);    
+		    //tolto CyEdge ed = netw.addEdge(netw.getNode(arg0), arg1, arg2)
+		    		
+		    if(ed!=null){
+			    //System.out.println("Edge got "+ed.getIdentifier());
+			    // modificato con sotto ed.setIdentifier(edges[n].getId());
+			    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("name", toId(edges[n].getId()));
+			    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("interaction", interaction);
+			    //System.out.println("Setting id "+));
+			    //System.out.println("ID changed "+ed.getIdentifier());
+			    
+			    edu.rpi.cs.xgmml.AttDocument.Att attrs[] = edge.getAttArray();
+			    for (int j = 0; j < attrs.length; j++) {
+			    	edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
+			    	log("\t" + attr.getLabel() + " " +
+			    			attr.getName() + " = " + attr.getValue());
+			    	if(attr.getValue()!=null){
+			    		try{
+			    			//create colum if not exist
+			    			if(attr.getType()==ObjectType.REAL){
+			    				//create string column if not exists
+								if(netw.getDefaultEdgeTable().getColumn(attr.getLabel()) == null)
+									netw.getDefaultEdgeTable().createColumn(attr.getLabel(), Double.class, false);
+			    				try{
+			    					//insert value in the table
+									netw.getRow(ed).set(attr.getLabel(), attr.getValue());
+			    					
+			    					// edgeAttrs.setAttribute(ed.SUID, attr.getLabel(),Double.parseDouble(attr.getValue()));
+			    				}catch(Exception e){
+			    					e.printStackTrace();
+			    				}
+			    			}
+			    			else {
+			    				//create string column if not exists
+								if(netw.getDefaultEdgeTable().getColumn(attr.getLabel()) == null)
+									netw.getDefaultEdgeTable().createColumn(attr.getLabel(), String.class, false);
+								
+								
+			    				// edgeAttrs.setAttribute(ed.SUID, attr.getLabel(),attr.getValue());
+								//insert value in the table
+								netw.getRow(ed).set(attr.getLabel(), attr.getValue());
+			    			}
+			    		}catch(Exception e){
+			    		}
+			    		//edgeAttrs.setAttribute(ed.getIdentifier(), attr.getName(),attr.getValue());
+			    	}
+			    	// tolto netw.addEdge(ed);
+				    else{
+				    	System.out.println("WARNING! Edge "+edges[n].getId()+" can not be created!");
+				    }
+				    //System.out.println("Number of edges = "+netw.getEdgeCount()+"\n");
+				}
+		    }
 		}
 	}
+	
+	nodesList=null;
+	edgesList=null;
 	
 	networkView = adapter.getCyNetworkViewFactory().createNetworkView(netw);
 	

@@ -4,9 +4,13 @@ import java.util.Collection;
 import java.util.Iterator;
 
 
+
+
+
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
@@ -50,6 +54,7 @@ import fr.curie.BiNoM.cytoscape.biopax.query.BioPAXLoadIndex;
 import fr.curie.BiNoM.cytoscape.biopax.query.BioPAXSelectEntities;
 import fr.curie.BiNoM.cytoscape.biopax.query.BioPAXStandardQuery;
 import fr.curie.BiNoM.cytoscape.biopax.query.BioPAXViewQueryLog;
+import fr.curie.BiNoM.cytoscape.brf.CreateCellDesignerFileThroughBRF;
 import fr.curie.BiNoM.cytoscape.brf.ExportToBRFFile;
 import fr.curie.BiNoM.cytoscape.brf.ImportFromBRFFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CSMLImportFromFile;
@@ -102,6 +107,8 @@ public class Launcher extends AbstractCySwingApp
 		
 		adapter.getCySwingApplication().addAction(new BioPAXExportToFile());
 		adapter.getCySwingApplication().addAction(new CellDesignerExportToFile());
+		adapter.getCySwingApplication().addAction(new CreateCellDesignerFileThroughBRF());
+		
 		adapter.getCySwingApplication().addAction(new SBMLExportToFile());
 		adapter.getCySwingApplication().addAction(new ExportToBRFFile());
 		
@@ -230,6 +237,25 @@ public class Launcher extends AbstractCySwingApp
 	
 	
 	public static CyNode findNodeWithName(CyNetwork net, String name){
+		Iterator i = net.getNodeList().iterator();
+		while(i.hasNext()){
+			CyNode node = (CyNode)i.next();
+			if(net.getRow(node).get(CyNetwork.NAME, String.class).compareTo(name) == 0)
+				return node;
+		}
+		
+		return null;
+	}
+	
+	
+	
+	public static CyEdge findEdgeWithName(CyNetwork net, String name){
+		Iterator i = net.getEdgeList().iterator();
+		while(i.hasNext()){
+			CyEdge edge = (CyEdge)i.next();
+			if(net.getRow(edge).get(CyNetwork.NAME, String.class).compareTo(name) == 0)
+				return edge;
+		}
 		
 		return null;
 	}

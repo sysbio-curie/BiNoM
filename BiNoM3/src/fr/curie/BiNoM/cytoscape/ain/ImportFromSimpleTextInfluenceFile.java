@@ -11,6 +11,7 @@ import javax.swing.*;
 
 import org.cytoscape.application.swing.AbstractCyAction;
 
+import fr.curie.BiNoM.cytoscape.celldesigner.CSMLImportTask;
 import fr.curie.BiNoM.cytoscape.celldesigner.XMLFileFilter;
 import fr.curie.BiNoM.pathways.SimpleTextInfluenceToBioPAX;
 import fr.curie.BiNoM.pathways.utils.Utils;
@@ -79,8 +80,11 @@ public class ImportFromSimpleTextInfluenceFile extends AbstractCyAction {
 			
 
         if (file != null) {
-	    	ImportFromAINTask iain = new ImportFromAINTask(file,text,dialogCR.constitutiveReactions);
-	    	iain.run();
+        	ImportFromAINTask iain = new ImportFromAINTask(file,text,dialogCR.constitutiveReactions);
+            fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(iain);
+        	
+	    	//ImportFromAINTask iain = new ImportFromAINTask(file,text,dialogCR.constitutiveReactions);
+	    	//iain.run();
         	//JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Finished");
 	    }
         }
@@ -89,7 +93,7 @@ public class ImportFromSimpleTextInfluenceFile extends AbstractCyAction {
 	    catch(Exception ee) {
 	    	ee.printStackTrace();
 			JOptionPane.showMessageDialog
-			    (null, /*Cytoscape.getDesktop(),*/
+			    (Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 			     "Cannot open file " + file.getAbsolutePath() + " for reading\n"+ee.getMessage());
 		    }
 	    

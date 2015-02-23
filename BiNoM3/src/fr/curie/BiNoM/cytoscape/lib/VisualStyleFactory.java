@@ -76,8 +76,6 @@ public class VisualStyleFactory {
 
 		applyVisualStyle(vizsty_def, networkView);		
 		//applyImageMapping(vizsty_def, networkView);
-		
-
     }
 
     private void applyVisualStyle(VisualStyleDefinition vizsty_def,
@@ -137,11 +135,17 @@ public class VisualStyleFactory {
 
     public VisualStyle create(VisualStyleDefinition vizsty_def) {	
 	
-    	//if (vizsty != null)
-		//   return vizsty;
+    	Iterator it = Launcher.getAdapter().getVisualMappingManager().getAllVisualStyles().iterator();
+    	VisualStyle vs;
+    	while(it.hasNext()){
+    		vs = (VisualStyle)it.next();
+    		if(vs.getTitle().compareTo(vizsty_def.getName()) == 0)
+    			return vs;
+    	}
+
     	
     	// If the style already existed, remove it first
-		Iterator it = adapter.getVisualMappingManager().getAllVisualStyles().iterator();
+		it = adapter.getVisualMappingManager().getAllVisualStyles().iterator();
 		while (it.hasNext()){
 			VisualStyle curVS = (VisualStyle)it.next();
 			if (curVS.getTitle().equalsIgnoreCase("Sample Visual Style"))
@@ -304,8 +308,8 @@ public class VisualStyleFactory {
 		    if(m.getMappingValue() != null)
 		    	discreteMappingShape.putMapValue(m.getAttributeValue(), ((BioPAXVisualStyleDefinition.Arrow)(m.getMappingValue())).getShape());
 		    
-		    if(m.getMappingValue() != null)
-		    System.out.println(m.getAttributeValue() + "  " + ((BioPAXVisualStyleDefinition.Arrow)(m.getMappingValue())).getShape());
+		    //if(m.getMappingValue() != null)
+		    //System.out.println(m.getAttributeValue() + "  " + ((BioPAXVisualStyleDefinition.Arrow)(m.getMappingValue())).getShape());
 		    //discreteMappingColor.putMapValue(m.getAttributeValue(),
 			//		((Arrow)(m.getMappingValue())).getColor());
 		}

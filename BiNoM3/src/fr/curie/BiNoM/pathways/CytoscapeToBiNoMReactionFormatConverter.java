@@ -103,6 +103,7 @@ public class CytoscapeToBiNoMReactionFormatConverter{
 		
 		// write down reactions
 		for(int i=0;i<graph.Nodes.size();i++){
+			System.out.println("Numero nodi: " + graph.Nodes.size());
 			Node n = graph.Nodes.get(i);
 			if(reactions.contains(n.Id)){
 				String left = "";

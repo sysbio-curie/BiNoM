@@ -154,7 +154,7 @@ public class BioPAXVisualStyleDefinition
     @SuppressWarnings("unchecked")
 	private BioPAXVisualStyleDefinition() {
 	super("BiNoM BioPAX");
-
+	
 	nodeAttr = NODE_ATTR;
 	edgeAttr = EDGE_ATTR;
 

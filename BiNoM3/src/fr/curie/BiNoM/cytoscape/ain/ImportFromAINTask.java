@@ -42,7 +42,7 @@ public class ImportFromAINTask implements Task {
     }
 
     public String getTitle() {
-	return "AIN: Import AIN " + AINName;
+	return "AIN: Import AIN " + file.getName();
     }
 
     public CyNetwork getCyNetwork() {

@@ -33,6 +33,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
 
 import Main.Launcher;
@@ -47,7 +48,15 @@ import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 
-public class CreateCellDesignerFileThroughBRF implements ActionListener {
+public class CreateCellDesignerFileThroughBRF extends AbstractCyAction {
+	
+	public CreateCellDesignerFileThroughBRF(){
+		super("Create CellDesigner file from the current network...",
+        		Launcher.getAdapter().getCyApplicationManager(),
+            "pippo",
+            Launcher.getAdapter().getCyNetworkViewManager());
+        setPreferredMenu(Launcher.appName + ".BiNoM I/O");
+	}
 
     public void actionPerformed(ActionEvent e) {
 	CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();

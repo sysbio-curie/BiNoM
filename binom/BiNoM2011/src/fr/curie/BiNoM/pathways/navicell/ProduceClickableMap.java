@@ -2360,7 +2360,7 @@ public class ProduceClickableMap
 					// insert species neighbours here
 					Vector<String> speciesNeighbours = graphNeighbours.getSpeciesNeighbours(sp);
 					if (speciesNeighbours.size() > 0) {
-						System.out.println("species name: " + m.getName() + " -> " + speciesNeighbours.size());
+						//System.out.println("species name: " + m.getName() + " -> " + speciesNeighbours.size());
 						outjson.print("\"species_neighbours\": [");
 						int nn = 0;
 						for (String neighbourg : speciesNeighbours) {
@@ -2399,7 +2399,7 @@ public class ProduceClickableMap
 		// -----
 		Vector<String> entityNeighbours = graphNeighbours.getEntityNeighbours(ent.getId());
 		if (entityNeighbours.size() > 0) {
-			System.out.println("name: " + ent.getName() + " -> " + entityNeighbours.size());
+			//System.out.println("name: " + ent.getName() + " -> " + entityNeighbours.size());
 			outjson.print("\"entity_neighbours\": [");
 			int nn = 0;
 			for (String neighbourg : entityNeighbours) {
@@ -2495,7 +2495,7 @@ public class ProduceClickableMap
 								//outjson.print("\"said\" : \"XAID__" + r.getId() + "\""); // shape id to be ignored
 								Vector<String> speciesNeighbours = graphNeighbours.getReactionGraphNeighbourSpecies(r);
 								if (speciesNeighbours.size() > 0) {
-									System.out.println("reaction name: " + r.getId() + " -> " + speciesNeighbours.size());
+									//System.out.println("reaction name: " + r.getId() + " -> " + speciesNeighbours.size());
 									outjson.print(", \"species_neighbours\": [");
 									int nn = 0;
 									for (String neighbourg : speciesNeighbours) {
@@ -2520,6 +2520,7 @@ public class ProduceClickableMap
 				Collections.sort(entities); // EV 2013-06-19
 				outjson.print("\"entities\" : [");
 				for (final EntityBase ent : entities) {
+					try{
 					if (firstEntity == null) {
 						char cc = ent.getName().charAt(0);
 						if (!(cc >= '0' && cc <= '9')) {
@@ -2534,6 +2535,10 @@ public class ProduceClickableMap
 					outjson.print("{");
 					generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, outinfo_json, ent);
 					outjson.print("}");
+					}catch(Exception e){
+						Utils.eclipseErrorln("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
+						System.out.println("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
+					}
 				}
 				outjson.print("],");
 				outjson.print("\"entity_size\" : \"" + entities.size() + "\"");
@@ -2603,8 +2608,14 @@ public class ProduceClickableMap
 			
 			Collections.sort(sorted);
 			
-			for (final EntityBase ent : sorted)
+			for (final EntityBase ent : sorted){
+				try{
 				add_modifications_to_right(speciesAliases, placeMap, format, cd, blog_name, scales, output, cls, ent, wp);
+				}catch(Exception e){
+					Utils.eclipseErrorln("SERIOUS ERROR!!!: could not add modifications "+ent.getId()+" / "+ent.getName());
+					System.out.println("SERIOUS ERROR!!!: could not add modifications "+ent.getId()+" / "+ent.getName());
+				}
+			}
 			cls.close();
 		}
 		assert false;

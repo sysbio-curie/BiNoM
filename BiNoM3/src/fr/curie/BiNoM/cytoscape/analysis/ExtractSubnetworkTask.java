@@ -27,54 +27,23 @@ package fr.curie.BiNoM.cytoscape.analysis;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.cytoscape.utils.ShowTextDialog;
-import fr.curie.BiNoM.cytoscape.biopax.*;
-import fr.curie.BiNoM.cytoscape.celldesigner.*;
 import Main.Launcher;
-import cytoscape.Cytoscape;
 import cytoscape.task.Task;
 import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-
-import java.io.*;
-
-import cytoscape.task.ui.JTaskConfig;
-
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
-
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
-
-import java.io.InputStream;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.Iterator;
-import java.util.HashMap;
 import java.util.Set;
 import java.io.File;
-import java.net.URL;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
-import giny.view.NodeView;
-import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
-import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerSourceDB;
-import fr.curie.BiNoM.pathways.CytoscapeToBioPAXConverter;
-import fr.curie.BiNoM.pathways.CytoscapeToCellDesignerConverter;
-import fr.curie.BiNoM.pathways.CellDesignerToBioPAXConverter;
 import fr.curie.BiNoM.pathways.utils.*;
-
-import org.sbml.x2001.ns.celldesigner.*;
-
-import edu.rpi.cs.xgmml.*;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportTask;
 
 public class ExtractSubnetworkTask implements Task {
 

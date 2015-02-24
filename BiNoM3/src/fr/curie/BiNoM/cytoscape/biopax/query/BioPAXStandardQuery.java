@@ -45,10 +45,10 @@ public class BioPAXStandardQuery extends AbstractCyAction {
         System.out.println("BioPAXStandardQuery");
     	BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
     	if(beng==null){
-    		JOptionPane.showMessageDialog(null, /*Cytoscape.getDesktop()*/ "No query can be performed. Load BioPAX index first.");
+    		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "No query can be performed. Load BioPAX index first.");
     	}else{
     		if(Launcher.getAdapter().getCyNetworkManager().getNetworkSet().size()==0)
-    			JOptionPane.showMessageDialog(null, /*Cytoscape.getDesktop()*/ "No query can be performed. Select some entities first.");
+    			JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "No query can be performed. Select some entities first.");
     		else{
     			//System.out.println("Number of networks = "+Cytoscape.getNetworkSet().size());
     			BioPAXStandardQueryDialog.getInstance().raise(null);

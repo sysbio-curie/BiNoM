@@ -25,32 +25,21 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
-
-import java.io.*;
-
 import Main.Launcher;
 import cytoscape.task.Task;
 import cytoscape.task.TaskMonitor;
-import cytoscape.task.ui.JTaskConfig;
-import edu.rpi.cs.xgmml.*;
 
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyRow;
-import org.cytoscape.model.CyTable;
 
-import cytoscape.data.Semantics;
-
-import java.io.InputStream;
-import java.io.File;
-import java.net.URL;
-
-import org.biojava.bio.program.homologene.OrthoPairSet.Iterator;
+import com.sun.glf.goodies.ToneAdjustmentOp;
 
 
 public class EdgesFromOtherNetworkTask implements Task {
@@ -88,27 +77,47 @@ public class EdgesFromOtherNetworkTask implements Task {
 				  " Updated");*/
 		fr.curie.BiNoM.pathways.analysis.structure.Graph gnetworks[] = new fr.curie.BiNoM.pathways.analysis.structure.Graph[networks.length];
 		fr.curie.BiNoM.pathways.analysis.structure.Graph gnetwFrom = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(netwFrom));
+		
+		
+		
 		for(int i=0;i<networks.length;i++){
 		    gnetworks[i] = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(networks[i]));
 			gnetworks[i].addConnections(gnetwFrom);
 			java.util.Iterator it = netwFrom.getEdgeList().iterator();
+			
+			Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
+			Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+			CyNetworkView toView =null;
+			while(networkViewIterator.hasNext())
+				toView = networkViewIterator.next();
+			
 			while(it.hasNext()){
 				CyEdge edge = (CyEdge)it.next();
+				
 				if(gnetworks[i].getEdge(netwFrom.getRow(edge).get(CyNetwork.NAME, String.class))!=null){
-					if(!networks[i].containsEdge(edge))
-						networks[i].addEdge(edge.getSource(), edge.getTarget(), true);
-				}
+					if(!networks[i].containsEdge(edge)){
+						NetworkUtils.addEd(networks[i], netwFrom, edge);
+					}				
+				}		
+				
+				
+				taskMonitor.setPercentCompleted((int)(100f*i/networks.length));			
 			}
 			
-			CyNetworkView networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(networks[i]);
-			//networkView.redrawGraph(true, true);
-			networkView.updateView();
+			if(toView != null)
+				toView.updateView();
 			
-			taskMonitor.setPercentCompleted((int)(100f*i/networks.length));			
+			networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
+			networkViewIterator = networkViews.iterator();
+			CyNetworkView fromView =null;
+			while(networkViewIterator.hasNext())
+				fromView = networkViewIterator.next();
+			
+			VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(fromView);	
+			vs.apply(toView);
+			toView.updateView();	
+
 		}
-		
-		
-		
 	    taskMonitor.setPercentCompleted(100);
 	}
 	catch(Exception e) {

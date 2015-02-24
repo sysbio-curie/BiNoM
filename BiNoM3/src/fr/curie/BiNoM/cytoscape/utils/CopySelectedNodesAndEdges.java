@@ -46,7 +46,6 @@ public class CopySelectedNodesAndEdges {
 
     public void run() {
 	CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-	CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
 
 	NodesAndEdgesClipboard clipboard = NodesAndEdgesClipboard.getInstance();
 
@@ -55,8 +54,6 @@ public class CopySelectedNodesAndEdges {
 	    clipboard.setNetwork(network);
 	}
 
-	
-	
 	for (Iterator i = CyTableUtil.getNodesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).iterator(); i.hasNext(); ) {
 		CyNode nd = (CyNode) i.next();
 	    clipboard.add(nd);

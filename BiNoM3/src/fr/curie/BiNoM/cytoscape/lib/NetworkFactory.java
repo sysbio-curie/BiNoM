@@ -144,6 +144,8 @@ public class NetworkFactory {
 		    HashMap listAttrMap = getListAttrMap(attrs);
 		
 		    //System.out.println("ND: " + nd.getIdentifier() + " (" + attrs.length + ")");
+		  //  System.out.println("Attributes #: " + attrs.length);	
+		    
 		    for (int j = 0; j < attrs.length; j++) {
 		    	
 				edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
@@ -151,7 +153,7 @@ public class NetworkFactory {
 			
 				String attrValue = attr.getValue();
 				
-				//System.out.println(attr.getLabel() + ": " + attr.getValue());					
+				System.out.println("Attribute: " + attr.getLabel() + ": " + attr.getValue());					
 				
 				if (listAttrMap.get(attr.getLabel()) != null) {
 				    // forse String o_attrValue = nodeAttrs.getStringAttribute(nd.getIdentifier(), attr.getLabel());

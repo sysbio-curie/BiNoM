@@ -62,6 +62,7 @@ import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.view.vizmap.VisualStyle;
 
 import antlr.collections.List;
 import Main.Launcher;
@@ -416,7 +417,12 @@ public class IndexPathAnalysisDialog extends JDialog {
 				}
 			}
 			
-			view.updateView();			
+			VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(view);	
+			vs.apply(view);
+			view.fitContent();
+
+			view.updateView();
+			
 			//if (NetworksUpdateConfirmDialog.getInstance().raise(netwAdd, netwSup, idxs)) {
 			//    setVisible(false);
 			//}		

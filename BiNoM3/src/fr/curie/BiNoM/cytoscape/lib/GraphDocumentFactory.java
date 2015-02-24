@@ -74,7 +74,6 @@ public class GraphDocumentFactory {
 		while (iNodes.hasNext()) {
 		    CyNode node = (CyNode)iNodes.next();
 		    String id = cyNetwork.getRow(node).get(CyNetwork.NAME, String.class);
-//		    System.out.println("id: " + id);
 	
 		    GraphicNode gr_node = grf.addNewNode();
 		    gr_node.setId(id);
@@ -135,11 +134,15 @@ public class GraphDocumentFactory {
 				    	if(!value.trim().equals(""))
 				    		if(!value.trim().equals("null"))
 				    			Utils.addAttribute(gr_node, col.getName(), col.getName(), value, ObjectType.STRING);
+				    
+				    
 			    }
 		    	catch(Exception e){
 			    	System.out.println("WARNING: "+col.getName()+" in "+id+" seems to be not of type string or double or integer!");	    	
-		    	}		    
+		    	}	
 		    }
+	    	//System.out.println("# attributes saved: " + gr_node.getAttArray().length);
+
 		}	
 	    /*try{ //Attribute might be not of type string
 		String value = nodeAttrs.getStringAttribute(id, attrNames[n]);

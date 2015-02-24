@@ -29,9 +29,7 @@ import Main.Launcher;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
-
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 
 

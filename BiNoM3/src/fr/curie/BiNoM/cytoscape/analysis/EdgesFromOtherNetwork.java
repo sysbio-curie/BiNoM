@@ -28,10 +28,11 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 import org.cytoscape.application.swing.AbstractCyAction;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
 
 public class EdgesFromOtherNetwork extends AbstractCyAction {
 	
@@ -45,10 +46,11 @@ public class EdgesFromOtherNetwork extends AbstractCyAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		Set netwSet = Cytoscape.getNetworkSet();
+		Set netwSet = Launcher.getAdapter().getCyNetworkManager().getNetworkSet();
 		if (netwSet.size() < 1)
-		    return;
-		EdgesFromOtherNetworkDialog.getInstance().raise();
+			JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "More than one network is necessary for this operation.");
+		else    
+			EdgesFromOtherNetworkDialog.getInstance().raise();
 	}
 
 }

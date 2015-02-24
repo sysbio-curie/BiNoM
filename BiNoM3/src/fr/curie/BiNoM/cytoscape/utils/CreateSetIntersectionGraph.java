@@ -1,12 +1,8 @@
 package fr.curie.BiNoM.cytoscape.utils;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JFileChooser;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-
 import Main.Launcher;
 import fr.curie.BiNoM.pathways.utils.SetOverlapAnalysis;
 

@@ -406,15 +406,17 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	    
 	    for (int n = 0; n < nodeCB.length; n++) {
 		if (isSelected(nodeCB[n])) {
-		    //network.addNode((CyNode)cbNodeMap.get(nodeCB[n]));
-		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), clipboard.getNetwork(), fromView, network, networkView);
+			String name = clipboard.getNetwork().getRow((CyNode)cbNodeMap.get(nodeCB[n])).get(CyNetwork.NAME, String.class);
+		    if(Launcher.findNodeWithName(network, name) == null)
+	    		NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), clipboard.getNetwork(), fromView, network, networkView);
 		}
 	    }
 
 	    for (int n = 0; n < edgeNodeCB.length; n++) {
 		if (isSelected(edgeNodeCB[n])) {
-		    //network.addNode((CyNode)cbNodeMap.get(edgeNodeCB[n]));
-		    NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), clipboard.getNetwork(),fromView, network, networkView);
+			String name = clipboard.getNetwork().getRow((CyNode)cbNodeMap.get(edgeNodeCB[n])).get(CyNetwork.NAME, String.class);
+		    if(Launcher.findNodeWithName(network, name) == null)
+		    	NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), clipboard.getNetwork(),fromView, network, networkView);
 		}
 	    }
 
@@ -425,9 +427,14 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 			NetworkUtils.addEd(network, clipboard.getNetwork(), ed);
 			}
 	    }
-	    //view.redrawGraph(true, true);
+		
+		VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(networkView);	
+		vs.apply(networkView);
 	    networkView.fitContent();
-	    networkView.updateView();
+
+		networkView.updateView();
+	    
+
 	    setVisible(false);
 	}
 	else if (e.getSource() == selectdefB) {

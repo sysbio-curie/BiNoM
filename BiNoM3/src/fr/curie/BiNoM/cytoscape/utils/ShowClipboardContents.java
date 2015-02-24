@@ -51,7 +51,7 @@ public class ShowClipboardContents extends AbstractCyAction {
 	HashMap addEdges = new HashMap();
 	HashMap addEdgeNodes = new HashMap();
 	HashMap addNodes = new HashMap();
-
+	
 	for (Iterator i = clipboard.getEdges().iterator(); i.hasNext(); ) {
 	    CyEdge edge = (CyEdge)i.next();
 	    addEdges.put(edge, new Boolean(true));
@@ -66,7 +66,8 @@ public class ShowClipboardContents extends AbstractCyAction {
 	    CyNode node = (CyNode)i.next();
 	    addNodes.put(node, new Boolean(true));
 	}
-
+	
+	
 	ShowClipboardContentsDialog.getInstance().pop(addNodes, addEdges, addEdgeNodes);
     }
 }

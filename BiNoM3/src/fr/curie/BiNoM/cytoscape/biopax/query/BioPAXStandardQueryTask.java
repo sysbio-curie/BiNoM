@@ -27,6 +27,7 @@ package fr.curie.BiNoM.cytoscape.biopax.query;
 
 
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
@@ -196,8 +197,7 @@ public class BioPAXStandardQueryTask implements Task {
 			    	Attribute attr = (Attribute)n.Attributes.get(j);
 					//nodeAttrs.setAttribute(nd.getIdentifier(), attr.name,attr.value);
 			    	if(current.getDefaultNodeTable().getColumn(attr.name) == null)
-						current.getDefaultNodeTable().createColumn(attr.name, String.class, false);
-			    	
+						current.getDefaultNodeTable().createColumn(attr.name, String.class, false);    	
 					current.getRow(nd).set(attr.name, attr.value);
 			    }
 			    //nd.setIdentifier(nd.getIdentifier());
@@ -223,12 +223,22 @@ public class BioPAXStandardQueryTask implements Task {
 			    //current.addEdge(ed);
 			    for(int j=0;j<e.Attributes.size();j++){
 			    	Attribute attr = (Attribute)e.Attributes.get(j);
+			    	
+			    	if(current.getDefaultEdgeTable().getColumn(attr.name) == null)
+			    		current.getDefaultEdgeTable().createColumn(attr.name, String.class, false);
 			    	current.getRow(ed).set(attr.name, attr.value);
 					//edgeAttrs.setAttribute(ed.getIdentifier(), attr.name,attr.value);
 			    }
 				}
 			}
-			CyNetworkView networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(current);
+			
+			CyNetworkView networkView = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
+			networkView.updateView();
+			
+			VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(networkView);	
+			vs.apply(networkView);
+		    networkView.fitContent();			
+
 			networkView.updateView();
 		}else{
 			GraphDocument grDoc = XGMML.convertGraphToXGMML(query.result);

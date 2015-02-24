@@ -82,7 +82,6 @@ import fr.curie.BiNoM.cytoscape.utils.MergeNetworksAndFilter;
 import fr.curie.BiNoM.cytoscape.utils.PasteNodesAndEdges;
 import fr.curie.BiNoM.cytoscape.utils.SelectDownstreamNeighbours;
 import fr.curie.BiNoM.cytoscape.utils.SelectEdgesBetweenSelectedNodes;
-import fr.curie.BiNoM.cytoscape.utils.SelectNodesByAttributeSubstring;
 import fr.curie.BiNoM.cytoscape.utils.SelectUpstreamNeighbours;
 import fr.curie.BiNoM.cytoscape.utils.ShowClipboardContents;
 
@@ -183,7 +182,6 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(new EdgesFromOtherNetwork());
 		adapter.getCySwingApplication().addAction(new ConvertToUndirectedGraph());
 		adapter.getCySwingApplication().addAction(new MergeNetworksAndFilter());
-		adapter.getCySwingApplication().addAction(new SelectNodesByAttributeSubstring());
 		
 		adapter.getCySwingApplication().addAction(new CopySelectedNodesAndEdgesTrue());
 		adapter.getCySwingApplication().addAction(new CopySelectedNodesAndEdgesFalse());

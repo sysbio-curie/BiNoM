@@ -117,16 +117,22 @@ public class IndexPathAnalysisTask implements Task {
 		if(beng!=null){
 			System.out.println("bengDB " + beng.databaseCopyForPathAnalysis);
 			
+			//funzione da indagare
 			if(beng.databaseCopyForPathAnalysis==null)
 				beng.prepareDatabaseCopyForIndexPathAnalysis();
+			
+			System.out.println("1");
 			SelectedNodes = StructureAnalysisUtils.findPaths(beng.databaseCopyForPathAnalysis,sources,targets,options);
+			System.out.println("2");
 			Graph gr = new Graph();
 			Iterator sn = SelectedNodes.iterator();
 			while(sn.hasNext()){
 				Node n = beng.databaseCopyForPathAnalysis.getNode((String)(sn.next()));
 				gr.addNode(n);
 			}
+			System.out.println("3");
 			gr.addConnections(beng.databaseCopyForPathAnalysis);
+			System.out.println("4");
 			if(outputCurrentNetwork){
 //				CyNetwork current = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 //				
@@ -180,6 +186,7 @@ public class IndexPathAnalysisTask implements Task {
 //				//networkView.redrawGraph(true, false);
 //				networkView.updateView();
 			}else{
+				System.out.println("5");
 				GraphDocument grDoc = XGMML.convertGraphToXGMML(gr);
 				CyNetwork cyNetwork = NetworkFactory.createNetwork
 			    (grDoc.getGraph().getName(),
@@ -187,6 +194,7 @@ public class IndexPathAnalysisTask implements Task {
 			     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle(),
 			     true, // applyLayout
 			     taskMonitor);
+				System.out.println("6");
 			}
 			
 		}else{

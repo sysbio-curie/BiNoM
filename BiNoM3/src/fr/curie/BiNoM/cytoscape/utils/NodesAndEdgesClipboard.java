@@ -52,6 +52,9 @@ public class NodesAndEdgesClipboard {
     public void reset() {
 	nodes = new Vector();
 	edges = new Vector();
+	cEdges = new Vector();
+	cNodes = new Vector();
+	cEdgeNodes = new Vector();
     }
 
     public void add(CyNode node) {
@@ -79,16 +82,18 @@ public class NodesAndEdgesClipboard {
     }
 
     public void compile() {
-	cEdges = new Vector();
-	cNodes = new Vector();
-	cEdgeNodes = new Vector();
+	cEdges.removeAll(cEdges);
+	cNodes.removeAll(cNodes);
+	cEdgeNodes.removeAll(cEdgeNodes);
 
 	for (Iterator i = edges.iterator(); i.hasNext(); ) {
 	    CyEdge edge = (CyEdge)i.next();
 
 	    cEdges.add(edge);
-	    cEdgeNodes.add(edge.getSource());
-	    cEdgeNodes.add(edge.getTarget());
+	    if(!cEdgeNodes.contains(edge.getSource()))
+	    	cEdgeNodes.add(edge.getSource());
+	    if(!cEdgeNodes.contains(edge.getTarget()))    	
+	    	cEdgeNodes.add(edge.getTarget());
 	}
 	
 	for (Iterator i = nodes.iterator(); i.hasNext(); ) {

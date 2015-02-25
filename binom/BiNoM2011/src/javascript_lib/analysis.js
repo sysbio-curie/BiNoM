@@ -346,7 +346,7 @@ var find_diff_expr_genes_analysis_desc = {
 			 
 var gene_enrichment_analysis = new Analysis(gene_enrichment_analysis_desc);
 
-var find_diff_expr_genes_analysis = new Analysis(find_diff_expr_genes_analysis_desc);
+//var find_diff_expr_genes_analysis = new Analysis(find_diff_expr_genes_analysis_desc);
 
 // analysis management
 function update_analysis_table(doc, params)

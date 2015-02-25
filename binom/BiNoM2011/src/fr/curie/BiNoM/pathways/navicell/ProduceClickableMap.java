@@ -1070,6 +1070,9 @@ public class ProduceClickableMap
 					image = ImageIO.read(image_file);
 				}
 				catch (IOException e) {
+					//
+					System.err.println("notice: cannot load image: \"" + root + infix + "-" + file_number + image_suffix + "\": " + e);
+				       
 					if (imginfo == null) {
 						imginfo = new ImagesInfo(difference_zoom0_image0, last_found, TILE_WIDTH, TILE_HEIGHT, xshift_zoom0, yshift_zoom0, width_zoom0, height_zoom0, has_nobg);
 					}

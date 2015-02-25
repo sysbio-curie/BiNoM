@@ -2,14 +2,10 @@ package fr.curie.BiNoM.cytoscape.brf;
 
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-
 import javax.swing.*;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
-
 import Main.Launcher;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerVisualStyleDefinition;
 import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
@@ -26,7 +22,6 @@ public class ImportFromBRFFile extends AbstractCyAction {
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM I/O");
         this.insertSeparatorAfter();
-        
 	}
 	
     public void actionPerformed(ActionEvent e) {
@@ -65,7 +60,7 @@ public class ImportFromBRFFile extends AbstractCyAction {
 			    catch(Exception ee) {
 			    	ee.printStackTrace();
 					JOptionPane.showMessageDialog
-				    (null, /*Cytoscape.getDesktop(),*/
+				    (Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 				     "Cannot open file " + file.getAbsolutePath() + " for reading\n"+ee.getMessage());
 			    }
 	    	}

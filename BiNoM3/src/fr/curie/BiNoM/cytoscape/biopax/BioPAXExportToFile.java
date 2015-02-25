@@ -25,30 +25,15 @@
  */
 package fr.curie.BiNoM.cytoscape.biopax;
 
-import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.application.swing.AbstractCyAction;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.TaskMonitor;
-
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import fr.curie.BiNoM.biopax.BioPAXSourceDB;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerSourceDB;
-import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 
 public class BioPAXExportToFile extends AbstractCyAction{
 	
@@ -95,7 +80,7 @@ public class BioPAXExportToFile extends AbstractCyAction{
 				file = null;
 			
 			if(file.exists()){
-				int r = JOptionPane.showOptionDialog(null, file.getName() + " already exists. Do you want to merge or overwrite information in it?", 
+				int r = JOptionPane.showOptionDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), file.getName() + " already exists. Do you want to merge or overwrite information in it?", 
 						"Confirmation Dialog", JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 	
@@ -119,7 +104,7 @@ public class BioPAXExportToFile extends AbstractCyAction{
 				}
 				catch(Exception ee) {
 					JOptionPane.showMessageDialog
-					(Cytoscape.getDesktop(),
+					(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 							"Cannot open file " + file.getAbsolutePath() + " for writing");
 					break;
 				}

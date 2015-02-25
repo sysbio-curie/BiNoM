@@ -153,7 +153,7 @@ public class NetworkFactory {
 			
 				String attrValue = attr.getValue();
 				
-				System.out.println("Attribute: " + attr.getLabel() + ": " + attr.getValue());					
+				//System.out.println("Attribute: " + attr.getLabel() + ": " + attr.getValue());					
 				
 				if (listAttrMap.get(attr.getLabel()) != null) {
 				    // forse String o_attrValue = nodeAttrs.getStringAttribute(nd.getIdentifier(), attr.getLabel());

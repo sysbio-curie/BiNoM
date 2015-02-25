@@ -26,20 +26,13 @@
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
 import Main.Launcher;
-
-
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 
-import fr.curie.BiNoM.biopax.BioPAXImportDialog;
-import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportTaskFactory;
-import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 
 public class CellDesignerImportFromFile extends AbstractCyAction {
 	
@@ -72,7 +65,7 @@ public class CellDesignerImportFromFile extends AbstractCyAction {
 		    }
 		    catch(Exception ee) {
 			JOptionPane.showMessageDialog
-			    (null, /*Cytoscape.getDesktop(),*/
+			    (Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 			     "Cannot open file " + file.getAbsolutePath() + " for reading");
 		    }
 	    }        

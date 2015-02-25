@@ -27,20 +27,14 @@ package fr.curie.BiNoM.cytoscape.celldesigner;
 
 
 import Main.Launcher;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
 
-import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 
 
 public class CellDesignerExportToFile extends AbstractCyAction {
@@ -57,7 +51,7 @@ public class CellDesignerExportToFile extends AbstractCyAction {
 	CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 	if (!CellDesignerSourceDB.getInstance().isCellDesignerNetwork(network)) {
 	    int r = JOptionPane.showConfirmDialog
-		(null, /*Cytoscape.getDesktop(),*/
+		(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 		 "Warning: network is not associated with any CellDesigner source file. You must first associate a CellDesigner source to this network");
 
 	    if (r == JOptionPane.CANCEL_OPTION ||

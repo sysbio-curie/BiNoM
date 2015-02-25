@@ -46,7 +46,7 @@ public class BioPAXSelectEntities extends AbstractCyAction {
 	//BioPAXSelectEntitiesDialog.getInstance().raise(null);
     	BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
     	if(beng==null){
-    		JOptionPane.showMessageDialog(null, /*Cytoscape.getDesktop(),*/ "No query can be performed. Load BioPAX index first.");
+    		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "No query can be performed. Load BioPAX index first.");
     	}else
     	(new BioPAXSelectEntitiesDialog()).raise(null);
     	

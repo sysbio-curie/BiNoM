@@ -26,23 +26,12 @@
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 
-import fr.curie.BiNoM.biopax.BioPAXImportDialog;
-import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportTaskFactory;
-import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 
 public class CSMLImportFromFile extends AbstractCyAction {
 	

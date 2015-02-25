@@ -26,18 +26,11 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import Main.Launcher;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-
-import fr.curie.BiNoM.cytoscape.celldesigner.XMLFileFilter;
 
 public class BioPAXAssociateSource extends AbstractCyAction {
 	

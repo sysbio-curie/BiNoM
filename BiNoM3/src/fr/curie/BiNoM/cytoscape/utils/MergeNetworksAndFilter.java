@@ -53,7 +53,7 @@ public class MergeNetworksAndFilter extends AbstractCyAction {
 	Set netwSet = Launcher.getAdapter().getCyNetworkManager().getNetworkSet();
 	if (netwSet.size() < 2) {
 	    // should raise an information dialog
-		JOptionPane.showMessageDialog(null, "At lest 2 networks have to be present.");
+		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "At lest 2 networks have to be present.");
 	}
 	else{
 		ClusterNetworksDialog dlg = ClusterNetworksDialog.getInstance(new MergeNetworksAndFilterTaskFactory());

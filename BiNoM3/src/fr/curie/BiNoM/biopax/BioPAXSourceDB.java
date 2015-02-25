@@ -54,7 +54,7 @@ public class BioPAXSourceDB {
     }
 
     public BioPAX getBioPAX(Object network) {
-	return (BioPAX)network_bw.get(network);
+    	return (BioPAX)network_bw.get(network);
     }
 
     public void setBioPAX(Object network, BioPAX biopax) {

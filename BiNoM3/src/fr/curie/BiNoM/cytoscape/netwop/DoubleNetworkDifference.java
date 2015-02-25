@@ -48,7 +48,7 @@ public class DoubleNetworkDifference extends AbstractCyAction {
     public void actionPerformed(ActionEvent e) {
 	Set netwSet = Launcher.getAdapter().getCyNetworkManager().getNetworkSet();
 	if (netwSet.size() < 2)
-		JOptionPane.showMessageDialog(null, "At lest 2 networks have to be present.");
+		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "At lest 2 networks have to be present.");
 	else
 		DoubleNetworkDifferenceDialog.getInstance().raise();
     }

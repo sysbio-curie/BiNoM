@@ -22,14 +22,9 @@ public class ListAllNodes extends AbstractCyAction {
 
 	public void actionPerformed(ActionEvent e) {
 		
-		ListAllNodesDialog dialog = new ListAllNodesDialog();
-		
-		BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
+		ListAllNodesTask task= new ListAllNodesTask();
+		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
 
-		org.sbml.x2001.ns.celldesigner.SbmlDocument sbmlDoc = CellDesignerSourceDB.getInstance().getCellDesigner(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-		
-		dialog.pop(GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()),sbmlDoc,biopax);
-		
 	}
 
 }

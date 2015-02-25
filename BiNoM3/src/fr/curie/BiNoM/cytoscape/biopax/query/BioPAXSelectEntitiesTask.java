@@ -93,7 +93,8 @@ public class BioPAXSelectEntitiesTask implements Task {
 
 				// Dealing with networks
 				
-				if(Launcher.getAdapter().getCyNetworkManager().getNetworkSet().size()==0) outputType=OUTPUT_NEW_NETWORK;
+				if(Launcher.getAdapter().getCyNetworkManager().getNetworkSet().size()==0) 
+					outputType=OUTPUT_NEW_NETWORK;
 				if(outputType==OUTPUT_NEW_NETWORK){
 					GraphDocument grDoc = XGMML.convertGraphToXGMML(query.result);
 					CyNetwork cyNetwork = NetworkFactory.createNetwork

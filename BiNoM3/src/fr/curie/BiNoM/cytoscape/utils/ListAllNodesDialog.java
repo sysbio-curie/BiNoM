@@ -86,8 +86,6 @@ public class ListAllNodesDialog extends JDialog {
     	JPanel panel = new JPanel(new GridBagLayout());
     	
     	JPanel controlPanel = new JPanel(new GridBagLayout());
-    	
-    	
 
     	GridBagConstraints c;
     	

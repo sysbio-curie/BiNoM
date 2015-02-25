@@ -93,11 +93,8 @@ public class SelectUpstreamNeighbours extends AbstractCyAction {
 			    CyNode node = nView.getModel();
 			    if(newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)))
 			    	nView.setLockedValue(BasicVisualLexicon.NODE_SELECTED, newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
-			    	//nView.setSelected(newSelectedIds.contains(node.getIdentifier()));
 			}
-    		view.updateView();
-			//view.redrawGraph(true, false);    		
-    		
+    		view.updateView();    		
     	}
     		
     }

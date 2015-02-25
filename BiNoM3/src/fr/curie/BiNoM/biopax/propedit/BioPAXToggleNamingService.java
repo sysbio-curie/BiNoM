@@ -34,7 +34,7 @@ import Main.Launcher;
 public class BioPAXToggleNamingService extends AbstractCyAction {
 	
 	public BioPAXToggleNamingService(){
-		super("Toggle BioPAX 3 Naming Service",
+		super(BioPAXToggleNamingService.getNamingServiceMode() ? "Use Simplified URI Names" : "Use Naming Service Names",
         		Launcher.getAdapter().getCyApplicationManager(),
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
@@ -43,6 +43,10 @@ public class BioPAXToggleNamingService extends AbstractCyAction {
 
     public void actionPerformed(ActionEvent e) {
     	BioPAXPropertyUtils.toggleNamingServiceMode();
+    	if(getName().compareTo("Use Naming Service Names")==0)
+    		this.setName("Use Simplified URI Names");
+    	else
+    		this.setName("Use Naming Service Names");
     }
 
     public static boolean getNamingServiceMode() {

@@ -62,13 +62,10 @@ public class SelectEdgesBetweenSelectedNodes extends AbstractCyAction {
 	    
 	    if (nodes.contains(source) && nodes.contains(target)) {
 			System.out.println("select edge " + network.getRow(edge).get(CyNetwork.NAME, String.class));
-			//EdgeView eView = view.getEdgeView(edge);
 			eView.setLockedValue(BasicVisualLexicon.EDGE_SELECTED, true);
-			//eView.select();
 	    }
 	}
 	view.updateView();
-	//view.redrawGraph(true, false);
     }
 }
 

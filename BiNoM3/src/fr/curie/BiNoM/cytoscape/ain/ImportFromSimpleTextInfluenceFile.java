@@ -1,18 +1,10 @@
 package fr.curie.BiNoM.cytoscape.ain;
 
 import Main.Launcher;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
 import java.io.*;
-
 import javax.swing.*;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-
-import fr.curie.BiNoM.cytoscape.celldesigner.CSMLImportTask;
-import fr.curie.BiNoM.cytoscape.celldesigner.XMLFileFilter;
 import fr.curie.BiNoM.pathways.SimpleTextInfluenceToBioPAX;
 import fr.curie.BiNoM.pathways.utils.Utils;
 

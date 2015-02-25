@@ -3,10 +3,6 @@ package Main;
 import java.util.Collection;
 import java.util.Iterator;
 
-
-
-
-
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
@@ -128,8 +124,6 @@ public class Launcher extends AbstractCySwingApp
 		
 		adapter.getCySwingApplication().addAction(new ProduceNaviCellMapFiles());
 		adapter.getCySwingApplication().addAction(new MergingMaps());
-//		
-		
 		
 		
 		//analysis
@@ -195,8 +189,7 @@ public class Launcher extends AbstractCySwingApp
 		//about BiNoM
 		adapter.getCySwingApplication().addAction(new AboutBox());
 		
-		
-		
+
 		
 	}
 	

@@ -29,14 +29,10 @@ import Main.Launcher;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-
-import cytoscape.util.FileUtil;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 
@@ -54,7 +50,7 @@ public class BioPAXSaveAssociated extends AbstractCyAction {
 
 	BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 	if (biopax == null) {
-	    JOptionPane.showMessageDialog(null, /*Cytoscape.getDesktop(),*/
+	    JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 					  "Error: network is not associated with any BioPAX source file.");
 	    return;
 	}

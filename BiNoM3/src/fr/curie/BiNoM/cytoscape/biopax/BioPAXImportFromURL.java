@@ -26,21 +26,11 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.URL;
 import java.io.InputStream;
-
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.TaskMonitor;
-
 import fr.curie.BiNoM.biopax.BioPAXImportDialog;
 
 public class BioPAXImportFromURL extends AbstractCyAction {
@@ -75,7 +65,7 @@ public class BioPAXImportFromURL extends AbstractCyAction {
 		}
 		catch(Exception ee) {
 		    JOptionPane.showMessageDialog
-			(Cytoscape.getDesktop(), "Cannot open URL " + urlStr);
+			(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "Cannot open URL " + urlStr);
 		}
 	}
 }

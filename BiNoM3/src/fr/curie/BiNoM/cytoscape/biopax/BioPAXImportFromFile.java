@@ -26,8 +26,6 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,7 +74,7 @@ public class BioPAXImportFromFile extends AbstractCyAction{
 		    }
 		    catch(Exception ee) {
 			JOptionPane.showMessageDialog
-			    (Cytoscape.getDesktop(),
+			    (Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 			     "Cannot open file " + file.getAbsolutePath() + " for reading");
 		    }
 	    }

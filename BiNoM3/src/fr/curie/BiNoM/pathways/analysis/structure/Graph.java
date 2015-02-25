@@ -337,7 +337,8 @@ public class Graph {
   public Graph makeCopy(){
     Graph gr = new Graph();
     for(int i=0;i<Nodes.size();i++){
-      gr.addNode((Node)this.Nodes.elementAt(i));
+      gr.addNode((Node)
+	  this.Nodes.elementAt(i));
     }
     for(int i=0;i<Edges.size();i++){
       gr.addEdge((Edge)this.Edges.elementAt(i));

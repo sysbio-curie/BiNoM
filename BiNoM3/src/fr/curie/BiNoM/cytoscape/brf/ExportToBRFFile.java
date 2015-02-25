@@ -28,20 +28,13 @@ package fr.curie.BiNoM.cytoscape.brf;
 import Main.Launcher;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
-
 import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import fr.curie.BiNoM.pathways.CytoscapeToBiNoMReactionFormatConverter;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;

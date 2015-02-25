@@ -26,22 +26,13 @@
 package fr.curie.BiNoM.cytoscape.sbml;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
-
-import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 import fr.curie.BiNoM.cytoscape.celldesigner.XMLFileFilter;
 
 public class SBMLExportToFile extends AbstractCyAction {
@@ -86,7 +77,7 @@ public class SBMLExportToFile extends AbstractCyAction {
 
 		if (file.exists()) {
 		    int r = JOptionPane.showConfirmDialog
-			(Cytoscape.getDesktop(), "File " + file.getAbsolutePath() +
+			(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "File " + file.getAbsolutePath() +
 			 " already exists. Do you want to overwrite it?");
 		    if (r == JOptionPane.CANCEL_OPTION)
 			return;
@@ -101,7 +92,7 @@ public class SBMLExportToFile extends AbstractCyAction {
 			}
 			catch(Exception ee) {
 			    JOptionPane.showMessageDialog
-				(Cytoscape.getDesktop(),
+				(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 				 "Cannot open file " + file.getAbsolutePath() + " for writing");
 			}
 		}

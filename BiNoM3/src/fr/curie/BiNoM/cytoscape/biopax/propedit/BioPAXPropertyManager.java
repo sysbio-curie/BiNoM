@@ -50,7 +50,7 @@ public class BioPAXPropertyManager {
 	BioPAXPropertyManager() {
 	}
 
-	Vector getSelectedBioPAXObjects() {
+	public Vector getSelectedBioPAXObjects() {
 
 		CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 		CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
@@ -59,7 +59,7 @@ public class BioPAXPropertyManager {
 		BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(network);
 		if (biopax == null) {
 			JOptionPane.showMessageDialog
-			(null, /*Cytoscape.getDesktop(),*/
+			(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(),
 					"Warning: network is not associated with any BioPAX source file. You must first associate a BioPAX source to this network");
 			return null;
 		}

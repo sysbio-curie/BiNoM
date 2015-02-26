@@ -202,10 +202,27 @@ Analysis.prototype = {
 		if (!data) {
 			return;
 		}
+		var url;
 		var href = win.location.href;
 		var idx = href.indexOf('/navicell/');
-		var url = href.substr(0, idx) + '/' + this.analysis_desc.remote.url;
-		console.log("data [" + data + "]");
+		var mode = this.analysis_desc.remote.mode;
+		if (mode == "relative_to_base") {
+			url = win.location.protocol + "//" + win.location.hostname + "/" + this.analysis_desc.remote.url;
+		} else if (mode == "relative_to_navicell") {
+			url = href.substr(0, idx) + '/' + this.analysis_desc.remote.url;
+		} else if (mode == "absolute") {
+			url = this.analysis_desc.remote.url;
+		} else if (!mode || mode == "guess") {
+			if (this.analysis_desc.remote.url.indexOf('https://') == 0 || this.analysis_desc.remote.url.indexOf('http://') == 0) {
+				url = this.analysis_desc.remote.url;
+			} else {
+				url = href.substr(0, idx) + '/' + this.analysis_desc.remote.url;
+			}
+		} else {
+			error_dialog(analysis_desc.label, "Bad URL mode [" + mode + "] " + this.analysis_desc.remote.url, win);
+			return;
+		}
+		//console.log("data [" + data + "]");
 		console.log("url [" + url + "]");
 		$.ajax(url,
 		       {
@@ -215,7 +232,7 @@ Analysis.prototype = {
 			       type: 'POST',
 			       data: data,
 			       success: function(html_ret) {
-				       console.log("execute: response has been succesfully sent [" + html_ret + "]");
+				       //console.log("execute: response has been succesfully sent [" + html_ret + "]");
 				       var new_win = win.open();
 				       var doc = new_win.document;
 				       doc.title = "Gene Enrichment Analysis";
@@ -224,6 +241,7 @@ Analysis.prototype = {
 				       $('body', doc).append(html);
 			       },
 			       error: function(e) {
+				       error_dialog(analysis_desc.label, "Response failure  [" + url + "] " + e.toString(), win);
 				       console.log("execute: sending response failure " + e);
 			       }
 		       }
@@ -244,6 +262,7 @@ var gene_enrichment_analysis_build_data = function(module, analysis_desc, input_
 		}
 		var datatable = navicell.getDatatableByCanonName(input_val_arr[idx]);
 		if (!datatable) {
+			error_dialog(analysis_desc.label, "Datatable not specified", window);
 			console.log("invalid datatable: " + input_val_arr[idx]);
 			return null;
 		}
@@ -293,8 +312,8 @@ var gene_enrichment_analysis_desc = {
 		 type: ANALYSIS_BOOL_TYPE
 		}],
 	remote: {
-		//url: "cgi-bin/gene_enrichment_analysis.php", // must be a relative URL	
-		url: "cgi-bin/gene_enrichment_analysis.py", // must be a relative URL
+		mode: 'relative_to_base',
+		url: 'cgi-bin/gene_enrichment_analysis.py',
 		method: ANALYSIS_POST_METHOD,
 		build_data: gene_enrichment_analysis_build_data
 	},

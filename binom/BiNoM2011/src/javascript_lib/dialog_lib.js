@@ -164,7 +164,7 @@ function warning_dialog(header, msg, win)
 
 function error_dialog(header, msg, win)
 {
-	display_info_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win);
+	display_info_dialog('Error', header, "<span class=\"error-message\">" + msg + "</span>", win, 'center');
 }
 
 function notice_dialog(header, msg, win, position, width, height, command, ok_name)

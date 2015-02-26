@@ -1567,6 +1567,34 @@ Dataset.prototype = {
 // Encapsulate datatable contents (but only for genes existing in map) and type
 //
 
+function ImportSynchronizer() {
+	this.count = 0;
+	this.error = "";
+}
+
+ImportSynchronizer.prototype = {
+
+	start: function(count) {
+		this.count = count;
+		this.error = "";
+	},
+
+	success: function() {
+		this.count--;
+	},
+
+	setError: function(error) {
+		this.error = error;
+	},
+
+	isReady: function() {
+		if (this.error) {
+			return this.error;
+		}
+		return this.count == 0;
+	}
+};
+
 if (!String.prototype.trim) {
 	String.prototype.trim = function() {
 		return this.replace(/^\s+|\s+$/g,'');
@@ -1582,7 +1610,7 @@ function is_empty_value(value) {
 		return true;
 	}
 	var tvalue = value.trim().toUpperCase();
-	return tvalue == '' || tvalue == '_' || tvalue == '-' || tvalue == 'NA' || tvalue == 'N/A';
+	return tvalue == '' || tvalue == '_' || tvalue == '-' || tvalue == 'NA' || tvalue == 'N/A' || tvalue == 'NAN';
 }
 
 function force_datatable_display(id) {
@@ -4301,6 +4329,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 	ready.datatable = this;
 	if (dataset.datatables[name]) {
 		this.error = "datatable " + name + " already exists";
+		//navicell.import_synchronizer.setError(this.error);
 		ready.resolve(this);
 		return;
 	}
@@ -4315,6 +4344,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 	this.biotype = navicell.biotype_factory.getBiotype(biotype_name);
 	if (!this.biotype) {
 		this.error = "Unknown type: \"" + biotype_name + "\"";
+		//navicell.import_synchronizer.setError(this.error);
 		ready.resolve(this);
 		return;
 	}
@@ -4417,6 +4447,7 @@ Datatable.prototype = {
 		if (sample_cnt < 1) {
 			if (!biotype_is_set) {
 				this.error = "invalid file format: tabular, comma or space separated file expected";
+				//navicell.import_synchronizer.setError(this.error);
 				ready.resolve(this);
 				return;
 			}
@@ -4425,6 +4456,7 @@ Datatable.prototype = {
 		} else {
 			if (biotype_is_set) {
 				this.error = "invalid file format: only one column expected";
+				//navicell.import_synchronizer.setError(this.error);
 				ready.resolve(this);
 				return;
 			}
@@ -4453,6 +4485,7 @@ Datatable.prototype = {
 				this.warning += "line #" + (gene_jj+1) + " has less than " + sample_cnt + " samples";
 			} else if (line_cnt > sample_cnt) {
 				this.error += "line #" + (gene_jj+1) + " has more than " + sample_cnt + " samples";
+				//navicell.import_synchronizer.setError(this.error);
 				ready.resolve(this);
 				return;
 
@@ -4476,6 +4509,7 @@ Datatable.prototype = {
 				if (err) {
 					console.log("data error " + err);
 					this.error = "datatable " + name + " invalid data: " + err;
+					//navicell.import_synchronizer.setError(this.error);
 					ready.resolve(this);
 					return;
 				}
@@ -4503,6 +4537,7 @@ Datatable.prototype = {
 
 	loadDataError: function(ready, e) {
 		this.error = e.toString();
+		//navicell.import_synchronizer.setError(this.error);
 		console.log("Error", e);    // Just log it
 		ready.resolve(this);
 	},
@@ -5367,7 +5402,16 @@ AnnotationFactory.prototype = {
 		$("#dt_sample_annot_status").html("</br><span class=\"status-message\"><span style='font-weight: bold'>" + mapSize(navicell.group_factory.group_map) + "</span> groups of samples: groups are listed in My Data / Groups tab</span>");
 	},
 
+	startReading: function() {
+		this.sample_read = 0;
+		this.sample_annotated = 0;
+		this.error = "";
+		this.missing = "";
+	},
+
 	readannots: function(ready, error_trigger) {
+		this.startReading();
+
 		var lines = this.all_line_read;
 		if (!lines.length) {
 			if (ready) {
@@ -5379,9 +5423,6 @@ AnnotationFactory.prototype = {
 		var header_cnt;
 
 		var sep = null;
-		
-		this.sample_read = 0;
-		this.sample_annotated = 0;
 
 		for (var ii = 0; ii < INPUT_SEPS.length; ++ii) {
 			sep = INPUT_SEPS[ii];
@@ -5397,6 +5438,7 @@ AnnotationFactory.prototype = {
 
 		if (header_cnt < 2) {
 			this.error = "invalid file format";
+			//navicell.import_synchronizer.setError(this.error);
 			console.log("ERROR: " + this.error);
 			if (ready) {
 				ready.resolve();
@@ -5417,6 +5459,7 @@ AnnotationFactory.prototype = {
 			}
 			if (line_cnt > annot_cnt) {
 				this.error = "line #" + (sample_nn) + ", expected " + annot_cnt + " annotations, got " + line_cnt;
+				//navicell.import_synchronizer.setError(this.error);
 				console.log("ERROR2: " + this.error);
 				if (ready) {
 					ready.resolve();
@@ -5460,6 +5503,8 @@ AnnotationFactory.prototype = {
 
 	readurl: function(url) {
 		console.log("READING [" + url + "]");
+
+		this.startReading();
 		var ready = this.ready = $.Deferred();
 		var annot_factory = this;
 		$.ajax(url,
@@ -5474,6 +5519,10 @@ AnnotationFactory.prototype = {
 				       annot_factory.readannots(ready, null);
 			       },
 			       error: function(e) {
+				       var msg = "Loading Sample Annotations: cannot load URL " + url + " " + e.responseText;
+				       //navicell.import_synchronizer.setError(msg);
+				       annot_factory.error = msg;
+				       ready.resolve(annot_factory);
 				       error_dialog("Loading Sample Annotations", "Cannot load URL " + url + " " + e.responseText, window);
 			       }
 		       }
@@ -5481,6 +5530,7 @@ AnnotationFactory.prototype = {
 	},
 
 	readfile: function(file, error_trigger) {
+		this.startReading();
 		var reader = new FileReader();
 		reader.readAsBinaryString(file);
 
@@ -5493,11 +5543,16 @@ AnnotationFactory.prototype = {
 			annot_factory.readannots(ready);
 		},
 		reader.onerror = function(e) {  // If anything goes wrong
+			var msg = "Loading Sample Annotations: cannot load file " + file.name;
+			annot_factory.error = msg;
+			ready.resolve(annot_factory);
+			//navicell.import_synchronizer.setError(msg);
 			error_dialog("Loading Sample Annotations", "Cannot load file " + file.name, window);
 		}
 	},
 
 	readdata: function(data) {
+		this.startReading();
 		var ready = this.ready = $.Deferred();
 		var lines = data.split(LINE_BREAK_REGEX);
 		console.log("READDATA: " + lines.length);
@@ -6302,6 +6357,7 @@ function navicell_init() {
 	_navicell.module_init = {};
 	_navicell.mapTypes = {};
 
+	_navicell.import_synchronizer = new ImportSynchronizer();
 	_navicell.EXPRESSION = 1;
 	_navicell.COPYNUMBER = 2;
 	_navicell.MUTATION = 3;

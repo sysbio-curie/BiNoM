@@ -265,10 +265,10 @@ function compute_neighbours() {
 	overlay.IE_select_entities2 = select_entities2;
 }
 
+// TBD: must be callable from API
 function contextmenu_callback(key, options) {
-	var m = "NEW clicked: " + key;
 	var module = overlay.win.document.navicell_module_name;
-	window.console.log(m + " " + overlay.clicked_node_ctxmenu);
+	window.console.log(module + " " + overlay.clicked_node_ctxmenu);
 	$.each(overlay.win.bubble_list, function() {
 		this.close();
 	});
@@ -604,15 +604,6 @@ USGSOverlay.prototype.onAdd = function() {
 			event_ckmap(e, 'mouseup', overlay);
 		});
 	} else {
-		if (false) {
-			this.getMap().getDiv().onclick = function(event) {
-				overlay.win.event = event;
-				event_ckmap({pixel: {x: event.layerX, y: event.layerY}}, 'click', overlay);
-				//console.log("onclick: " + event.button);
-			}
-		}
-
-
 		this.getMap().getDiv().onmouseup = function(event) {
 			overlay.win.event = event;
 			event_ckmap({pixel: {x: event.layerX, y: event.layerY}}, 'mouseup', overlay);

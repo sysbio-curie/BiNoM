@@ -3473,6 +3473,7 @@ public class ProduceClickableMap
 	private void formatRegulators(StringBuffer fw, ReactionDocument.Reaction r, Hasher h, ReactionDisplayType pass2, Linker wp)
 	{
 		final Annotation annotation = r.getAnnotation();
+		final String NO_REACTION_REGULATORS = "\n<br><b>No reaction regulators</b>";
 		if (annotation != null)
 		{
 			final CelldesignerListOfModification modifications = annotation.getCelldesignerListOfModification();
@@ -3484,13 +3485,16 @@ public class ProduceClickableMap
 					final String regulator = modification.getModifiers();
 					final String type = titlecase(modification.getType());
 					ArrayList<String> l = type_map.get(type);
-					if (l == null)
+					if (l == null) {
 						type_map.put(type, l = new ArrayList<String>());
+					}
 					l.add(regulator);
 				}
 
 				if (!type_map.isEmpty())
 				{
+					//System.out.println("regulators not empty for " + r.getId());
+					fw.append("\n<br><b>Reaction regulators:</b>\n");
 					fw.append("<dl>");
 					for (final Entry<String, ArrayList<String>> g : type_map.entrySet())
 					{
@@ -3505,11 +3509,18 @@ public class ProduceClickableMap
 									Utils.eclipseErrorln("ERROR: For reaction "+r.getId()+" there is a null value in regulators");
 							}
 						}
-						fw.append("</ol></dd>\n");
+						//fw.append("</ol></dd>\n");
+						fw.append("</ol></dd>");
 					}
 					fw.append("</dl>");
+				} else {
+					fw.append(NO_REACTION_REGULATORS);
 				}
+			} else {
+				fw.append(NO_REACTION_REGULATORS);
 			}
+		} else {
+			fw.append(NO_REACTION_REGULATORS);
 		}
 	}
 
@@ -3564,15 +3575,17 @@ public class ProduceClickableMap
 	private void reaction_body(ReactionDocument.Reaction r, FormatProteinNotes format, final Hasher h, final StringBuffer fw, final ReactionDisplayType pass, Linker wp)
 	{
 		show_reaction(r, h, fw, pass, null, wp);
-		fw.append("\n<br><b>Reaction regulators:</b>\n");
+		//fw.append("\n<br><b>Reaction regulators:</b>\n");
 		formatRegulators(fw, r, h, pass, wp);
-		fw.append("\n");
+		//fw.append("\n");
 		switch (pass)
 		{
-		case SecondPass: format.pmid_post(r, fw, h, cd, wp);
+		case SecondPass:
+			format.pmid_post(r, fw, h, cd, wp);
 			break;
 		case ReactionPass:
 			format.pmid_bubble(r, fw, cd, wp);
+			break;
 			
 		}
 		fw.append("\n");
@@ -5531,6 +5544,7 @@ public class ProduceClickableMap
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
 		if (is_php) {
 			out.println("  navicell.id = '<?php echo $_GET[\"id\"] ?>';");
+			out.println("  navicell.proxy_url = '<?php echo $_GET[\"proxy_url\"] ?>';");
 		}
 		out.println("  $(document).ready(function() {");
 		
@@ -5610,7 +5624,7 @@ public class ProduceClickableMap
 				out.println("    }");
 				out.println("    var mode = '<?php echo $_GET[\"mode\"]; ?>';");
 				out.println("    if (navicell.id || mode == \"server\") {");
-				out.println("      nv_server(window, navicell.id);");
+				out.println("      nv_server(window, navicell.id, navicell.proxy_url);");
 				out.println("    }");
 			} else {
 				if (DEMO && demo_display_cnt == 0  && map_name.equals(master_map_name)) {

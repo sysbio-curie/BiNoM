@@ -236,7 +236,7 @@ $(function() {
 	$.contextMenu({
 		selector: '#inner_map', 
 		export_contextmenu_data: nv_set_contextmenu_data,
-		width_offset: -300, // hard coded value: should depend on right_panel width
+		width_offset: -450, // hard coded value: should depend on right_panel width
 		callback: contextmenu_callback,
 		items: {
 			title:  {name: "&nbsp;", className: 'species-contextmenu-data-title'},
@@ -249,6 +249,11 @@ $(function() {
 			reaction_neighbours: {
 				//name: "Reaction Graph Neighbours",
 				name: "Show Neighbours",
+				disabled: function(key, opt) {
+					if (getOverlay()) {
+						return getOverlay().RGN_select_entities.length == 1;
+					}
+				},
 				className: 'context-menu',
 				items: {
 					interact_title: {

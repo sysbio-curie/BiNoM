@@ -448,6 +448,7 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 		center : new google.maps.LatLng(10, 10),
 		disableDefaultUI: true,
 		zoomControl: true,
+		disableDoubleClickZoom: true,
 		overviewMapControl: false, // disconnecting minimap
 		overviewMapControlOptions :
 		{

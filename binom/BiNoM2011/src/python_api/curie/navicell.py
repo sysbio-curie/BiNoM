@@ -177,7 +177,7 @@ class BrowserLauncher:
 #        for item in browser_command.split(" "):
 #            self.cmd.append(item)
 
-    def launch(self, session_id):
+    def launch(self, session_id, proxy_url):
         """ Launchs the browser with the given session ID.
 
         Args:
@@ -195,7 +195,7 @@ class BrowserLauncher:
         else:
             controller = webbrowser
 
-        controller.open(self.map_url + suffix + "id=" + session_id)
+        controller.open(self.map_url + suffix + "id=" + session_id + "&proxy_url=" + proxy_url)
 
         #self.cmd.append(self.map_url + suffix + "id=" + session_id)
         #subprocess.check_call(self.self)
@@ -272,6 +272,7 @@ class NaviCell:
 
         self._msg_id = 1000
         self.session_id = "1"
+        self.proxy_url = options.proxy_url
 
         self._hugo_list = []
         self._hugo_map = {}
@@ -287,9 +288,9 @@ class NaviCell:
         idx = map_url.find('/navicell/')
         if idx < 0:
             raise Exception('invalid map url [' + map_url + '] must contains /navicell')
-        expected_proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
-        if expected_proxy_url != proxy_url:
-            raise Exception('invalid proxy url [' + proxy_url + '], expected [' + expected_proxy_url + ']')
+#        expected_proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
+#        if expected_proxy_url != proxy_url:
+#            raise Exception('invalid proxy url [' + proxy_url + '], expected [' + expected_proxy_url + ']')
 
     def _message_id(self):
         self._msg_id += 1
@@ -379,10 +380,15 @@ class NaviCell:
     def _isImported(self):
         return self._cli2srv('nv_is_imported', '', [], 'send_and_rcv') #nv_is_imported to be implemented in nv_api.js
 
-    # must also manage exceptions
     def _waitForImported(self):
-        while not self._isImported():
-            time.sleep(0.1)
+        while True:
+            ret = self._isImported()
+            if ret == True:
+                return True
+            if ret == False:
+                time.sleep(0.1)
+            else:
+                raise Exception(ret)
         return True
 
     def _cli2srv(self, action, module, args, perform='send_and_rcv'):
@@ -451,7 +457,7 @@ class NaviCell:
         if not self._browser_launcher:
             raise Exception("no launcher configurated")
         self.session_id = self._gen_session_id() # request nv_proxy.php to get a session ID
-        self._browser_launcher.launch(self.session_id) # launch browser using this session ID
+        self._browser_launcher.launch(self.session_id, self.proxy_url) # launch browser using this session ID
         self._waitForReady('') # wait until navicell server is ready for further commands
 
     def listSessions(self):
@@ -1882,6 +1888,8 @@ class NaviCell:
         """
         return self._cli2srv('nv_get_biotype_list', '', [], 'send_and_rcv')
 
+    # TBD: getHugoList(self, module = '')
+    # returns HUGO list per module if module is set
     def getHugoList(self):
         """ Return the list of HUGOs (gene names) of the NaviCell map.
         """

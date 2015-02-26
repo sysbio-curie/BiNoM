@@ -260,12 +260,16 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	StringBuffer pmid_post(ReactionDocument.Reaction r, StringBuffer fw, Hasher h, SbmlDocument cd, Linker wp)
 	{
 		final Notes notes = r.getNotes();
-		return notes == null ? fw : format(Utils.getValue(notes), fw, h, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_post, null, wp);
+		// EV: 2015-02-26: changed pat_pmid to pat_generic
+		//return notes == null ? fw : format(Utils.getValue(notes), fw, h, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_post, null, wp);
+		return notes == null ? fw : format(Utils.getValue(notes), fw, h, java.util.Arrays.asList(r.getId()), pat_generic, cd, null, show_shapes_on_map_from_post, null, wp);
 	}
 	StringBuffer pmid_bubble(ReactionDocument.Reaction r, StringBuffer fw, SbmlDocument cd, Linker wp)
 	{
 		final Notes notes = r.getNotes();
-		return notes == null ? fw : format(Utils.getValue(notes), fw, ProduceClickableMap.null_hasher, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_bubble, null, wp);
+		// EV: 2015-02-26: changed pat_pmid to pat_generic
+		//return notes == null ? fw : format(Utils.getValue(notes), fw, ProduceClickableMap.null_hasher, java.util.Arrays.asList(r.getId()), pat_pmid, cd, null, show_shapes_on_map_from_bubble, null, wp);
+		return notes == null ? fw : format(Utils.getValue(notes), fw, ProduceClickableMap.null_hasher, java.util.Arrays.asList(r.getId()), pat_generic, cd, null, show_shapes_on_map_from_bubble, null, wp);
 	}
 	StringBuffer module_post(StringBuffer result, String comment, Linker wp)
 	{

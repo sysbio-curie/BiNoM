@@ -106,6 +106,9 @@ Analysis.prototype = {
 			var selected_val = (select_map ? select_map[param_id] : '');
 			console.log(param.label + ": " + "selected_val: " + selected_val);
 			if (type == ANALYSIS_NUMBER_TYPE) {
+				if (!selected_val && param.default_value != undefined) {
+					selected_val = param.default_value;
+				}
 				html += "<input type='text' id='" +  param_id + "' value='" + selected_val + "'></input>";
 			} else if (type == ANALYSIS_BOOL_TYPE) {
 				var checked = selected_val ? " checked" : "";
@@ -278,7 +281,7 @@ var gene_enrichment_analysis_desc = {
 		{name: "p_value",
 		 label: "P-value Threshold",
 		 type: ANALYSIS_NUMBER_TYPE,
-		 defaut_value: "0.05" // to be implemented
+		 default_value: "0.05"
 		},
 		{name: "background_set",
 		 label: "Background Set",
@@ -410,6 +413,7 @@ $(function() {
 				if (Analysis.selected_analysis) {
 					Analysis.selected_analysis.executeAnalysis(window);
 				}
+				$(this).dialog("close");
 			}
 		}
 	});

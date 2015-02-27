@@ -25,6 +25,7 @@ import fr.curie.BiNoM.cytoscape.analysis.EdgesFromOtherNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.ExcludeIntermediateNodes;
 import fr.curie.BiNoM.cytoscape.analysis.ExtractReactionNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.ExtractSubnetwork;
+import fr.curie.BiNoM.cytoscape.analysis.InducedSubgraph;
 import fr.curie.BiNoM.cytoscape.analysis.LinearizeNetwork;
 import fr.curie.BiNoM.cytoscape.analysis.MaterialComponents;
 import fr.curie.BiNoM.cytoscape.analysis.MonoMolecularReactionsAsEdges;
@@ -137,6 +138,7 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(new CycleDecomposition());
 		adapter.getCySwingApplication().addAction(new PathAnalysis());
 		adapter.getCySwingApplication().addAction(new ExtractSubnetwork());
+		adapter.getCySwingApplication().addAction(new InducedSubgraph());
 		adapter.getCySwingApplication().addAction(new CalcCentralityUndirected());
 		adapter.getCySwingApplication().addAction(new CalcCentralityDirected());	
 		adapter.getCySwingApplication().addAction(new ClusterNetworks());	

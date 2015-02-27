@@ -163,25 +163,23 @@ public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed){
 	
 
     public static void reportPosition(CyNode node, CyNetworkView fromView, CyNetworkView toView) {
-    	
-    	
-    	
+	
 	    String id = fromView.getModel().getRow(node).get(CyNetwork.NAME, String.class);
 	    
-	    System.out.println("toView: " + toView);
+	    //System.out.println("toView: " + toView);
 	
 	    CyNode nd = (Launcher.getNodeWithName(toView.getModel(), toView.getModel().getDefaultNodeTable(), "name", id));
 	    
-	    System.out.println("node: " + nd);
+	    //System.out.println("node: " + nd);
 	    View<CyNode> toNodeView = toView.getNodeView(nd);
 	    
 	    toView.updateView();
 	    
-	    System.out.println("tonodeView : " + toNodeView);
+	    //System.out.println("tonodeView : " + toNodeView);
 	    
 	    View<CyNode> fromNodeView = fromView.getNodeView(node);
 	    
-	    System.out.println("FromnodeView : " + fromNodeView);
+	    //System.out.println("FromnodeView : " + fromNodeView);
 	    
 	    toNodeView.setVisualProperty(BasicVisualLexicon.NODE_X_LOCATION, fromNodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION));
 	    toNodeView.setVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION, fromNodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION));

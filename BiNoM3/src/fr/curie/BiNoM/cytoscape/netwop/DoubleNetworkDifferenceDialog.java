@@ -214,7 +214,7 @@ public class DoubleNetworkDifferenceDialog extends JDialog implements ActionList
 			*/
 			netw = Launcher.getAdapter().getCyNetworkFactory().createNetwork();
 			org.cytoscape.view.model.CyNetworkView netView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(netw);		
-			netw.getRow(netw).set(CyNetwork.NAME, diff1TF.getText());			
+			netw.getRow(netw).set(CyNetwork.NAME, diff1TF.getText());		
 			System.out.println("Rete 1");	
 			
 			Launcher.getAdapter().getCyNetworkManager().addNetwork(netw);

@@ -59,6 +59,6 @@ public class ExtractSubnetwork extends AbstractCyAction {
         		ExtractSubnetworkDialog.getInstance().raise();
         	else
         		JOptionPane.showMessageDialog(new javax.swing.JFrame(),"Select several nodes first\n");
-        	}
+    	}
     }
 }

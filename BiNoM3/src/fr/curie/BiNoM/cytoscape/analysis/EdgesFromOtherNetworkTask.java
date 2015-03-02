@@ -95,7 +95,8 @@ public class EdgesFromOtherNetworkTask implements Task {
 				CyEdge edge = (CyEdge)it.next();
 				
 				if(gnetworks[i].getEdge(netwFrom.getRow(edge).get(CyNetwork.NAME, String.class))!=null){
-					if(!networks[i].containsEdge(edge)){
+					if(Launcher.findEdgeWithName(networks[i], netwFrom.getRow(edge).get(CyNetwork.NAME, String.class)) == null){				
+					//if(!networks[i].containsEdge(edge)){
 						NetworkUtils.addEd(networks[i], netwFrom, edge);
 					}				
 				}		

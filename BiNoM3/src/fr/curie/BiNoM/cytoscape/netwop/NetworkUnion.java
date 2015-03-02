@@ -62,7 +62,8 @@ public class NetworkUnion extends NetworkBinaryOperation {
 	i = left.getEdgeList().iterator();
 	while (i.hasNext()) {
 	    CyEdge edge = (CyEdge)i.next();
-	    NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, fromView,  netw, netView);
+	    if(Launcher.findEdgeWithName(netw, left.getRow(edge).get(CyNetwork.NAME, String.class)) == null)
+	    	NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, left, fromView,  netw, netView);
 	}
 
 	
@@ -84,8 +85,8 @@ public class NetworkUnion extends NetworkBinaryOperation {
 	i = right.getEdgeList().iterator();
 	while (i.hasNext()) {
 	    CyEdge edge = (CyEdge)i.next();
-	    //if (!netw.containsEdge(edge))
-		NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, right, fromView, netw, netView);
+	    if(Launcher.findEdgeWithName(netw, right.getRow(edge).get(CyNetwork.NAME, String.class)) == null)
+	    	NetworkUtils.addEdgeAndConnectedNodesAndReportPositions(edge, right, fromView, netw, netView);
 	}
 	
 	return netw;

@@ -112,7 +112,7 @@ class Proxy:
         else:
             raise Exception("invalid format " + proxy_url)
 
-    def __init__(self, proxy_url = ''):
+    def __init__(self, proxy_url, map_url = ''):
         """ Instantiate a Proxy client to communicate with the NaviCell proxy server.
 
         Args:
@@ -120,7 +120,13 @@ class Proxy:
         """
 
         if not proxy_url:
-            raise Exception("empty proxy URL")
+            if map_url:
+                idx = map_url.find('/navicell/')
+                if idx < 0:
+                    raise Exception('invalid map url [' + map_url + '] must contains /navicell')
+                proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
+            else:
+                raise Exception("empty proxy URL")
 
         idx = proxy_url.find("http://")
         if idx != -1:
@@ -264,15 +270,15 @@ class NaviCell:
               an instance of optparse.Values.
 
         """
-        self.proxy = Proxy(options.proxy_url)
+        self.proxy = Proxy(options.proxy_url, options.map_url)
 
         if options.map_url: #and options.browser_command:
-            self._check_urls(options.proxy_url, options.map_url)
+            #self._check_urls(options.proxy_url, options.map_url)
             self._browser_launcher = BrowserLauncher(options.browser_command, options.map_url)
 
         self._msg_id = 1000
         self.session_id = "1"
-        self.proxy_url = options.proxy_url
+        self.proxy_url = self.proxy.getURL()
 
         self._hugo_list = []
         self._hugo_map = {}
@@ -284,13 +290,14 @@ class NaviCell:
     # private methods
     #
 
+    # obsolete method
     def _check_urls(self, proxy_url, map_url):
         idx = map_url.find('/navicell/')
         if idx < 0:
             raise Exception('invalid map url [' + map_url + '] must contains /navicell')
-#        expected_proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
-#        if expected_proxy_url != proxy_url:
-#            raise Exception('invalid proxy url [' + proxy_url + '], expected [' + expected_proxy_url + ']')
+        expected_proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
+        if expected_proxy_url != proxy_url:
+            raise Exception('invalid proxy url [' + proxy_url + '], expected [' + expected_proxy_url + ']')
 
     def _message_id(self):
         self._msg_id += 1
@@ -1925,7 +1932,7 @@ class NaviCell:
         print('nv.importDatatables("http://localhost/~eviara/data/cancer_cell_line_broad/datatable_list_localhost.txt", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
         print("")
 
-        print('nv.importDatatables("' + protocol + '://acsn.curie.fr/navicell/demo/data/CCL_CopyNumber.txt", "", "Continuous copy number data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print('nv.importDatatables("' + protocol + '://acsn.curie.fr/navicell/demo/data/CCL_CopyNumber.txt", "CopyNumber", "Continuous copy number data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
         print("")
 
         print('nv.importDatatables("' + protocol + '://acsn.curie.fr/navicell/demo/data/' + datalist_url + '", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')

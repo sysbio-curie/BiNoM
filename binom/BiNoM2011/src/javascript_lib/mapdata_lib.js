@@ -1088,12 +1088,14 @@ Mapdata.prototype = {
 
 		navicell.module_names.push(module_name);
 		var mapdata = this;
+		console.log("navicell: loading [" + url + "]");
 		$.ajax(url,
 		       {
 			       async: true,
 			       dataType: 'json',
 			       
 			       success: function(data) {
+				       console.log("navicell: loaded succesfully [" + url + "]");
 				       mapdata.straight_data[module_name] = data;
 				       if (mapdata.addModuleMapdata(module_name, data)) {
 				       }
@@ -1250,9 +1252,21 @@ Dataset.prototype = {
 	},
 
 	addDatatable: function(datatable) {
-		this.datatables[datatable.name] = datatable;
 		this.datatables_id[datatable.getId()] = datatable;
-		this.datatables_canon_name[datatable.getCanonName()] = datatable;
+		this.registerDatatableNames(datatable);
+		//this.datatables[datatable.name] = datatable;
+		//this.datatables_canon_name[datatable.getCanonName()] = datatable;
+		//this.datatables_canon_name[datatable.canon_name] = datatable;
+	},
+
+	registerDatatableNames: function(datatable) {
+		this.datatables[datatable.name] = datatable;
+		this.datatables_canon_name[datatable.canon_name] = datatable;
+	},
+
+	unregisterDatatableNames: function(datatable) {
+		delete this.datatables[datatable.name];
+		delete this.datatables_canon_name[datatable.canon_name];
 	},
 
 	getDatatableByName: function(name) {
@@ -4594,8 +4608,14 @@ Datatable.prototype = {
 	},
 
 	setName: function(name) {
+		this.dataset.unregisterDatatableNames(this);
+		//delete this.datatables[this.name];
+		//delete this.datatables_canon_name[this.canon_name];
 		this.name = name;
 		this.canon_name = canon_name(name);
+		//this.datatables[this.name] = this;
+		//this.datatables_canon_name[this.canon_name] = this;
+		this.dataset.registerDatatableNames(this);
 		this.html_name = name.replace(/ /g, "&nbsp;");
 	},
 

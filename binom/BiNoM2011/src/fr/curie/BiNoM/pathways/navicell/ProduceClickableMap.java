@@ -2259,34 +2259,8 @@ public class ProduceClickableMap
 						 final String blog_name,
 						 ImagesInfo scales, final PrintStream outjson, final JSONInfo outinfo_json, final EntityBase ent)
 	{
-		//String left_label = tojson(make_right_hand_link_to_blog(null, ent.getPostId()).toString());
-		//outjson.print("\"left_label\" : \"" + left_label + "\",");
 		String left_label = "blog:" + ent.getPostId();
 		outjson.print("\"left_label\" : \"" + left_label + "\",");
-//System.out.println("generate_json_entity: " + ent.getName());
-
-		/*
-		outjson.print("\"id\" : \"" + ent.getId() + "\",");
-		outjson.print("\"name\" : \"" + ent.getName() + "\",");
-		Vector<String> hugoNames = ent.getHugoNames();
-		int hugo_size = hugoNames.size();
-		outjson.print("\"hugo\" : [");
-		for (int nn = 0; nn < hugo_size; ++nn) {
-			outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
-			System.out.println("-----> : " + hugoNames.get(nn));
-		}
-		outjson.print("],");
-		outjson.print("\"postid\" : \"" + ent.getPostId() + "\",");
-		if (ent.getComment() != null) {
-			if (USE_JSON) {
-				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\t")) + "\",");
-				outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", NL_JSON).replaceAll("\"", DQ_JSON).replaceAll("\\\t", TB_JSON) + "\",");
-			} else {
-				//outjson.print("\"comment\" : \"" + ent.getComment().replaceAll("\\\n", java.util.regex.Matcher.quoteReplacement("\\\\n")).replaceAll("\"", java.util.regex.Matcher.quoteReplacement("\\\\\"")).replaceAll("\\\t", java.util.regex.Matcher.quoteReplacement("\\\\t")) + "\",");
-			}
-		}
-		*/
-
 		final List<Modif> modifs = new ArrayList<Modif>(ent.getPostTranslational().size() + ent.getAssociated().size());
 
 		for (final Modification m : ent.getPostTranslational()) {
@@ -2522,23 +2496,26 @@ public class ProduceClickableMap
 			
 				Collections.sort(entities); // EV 2013-06-19
 				outjson.print("\"entities\" : [");
+				boolean old_first2 = false;
 				for (final EntityBase ent : entities) {
-					try{
-					if (firstEntity == null) {
-						char cc = ent.getName().charAt(0);
-						if (!(cc >= '0' && cc <= '9')) {
-							firstEntity = ent;
+					try {
+						if (firstEntity == null) {
+							char cc = ent.getName().charAt(0);
+							if (!(cc >= '0' && cc <= '9')) {
+								firstEntity = ent;
+							}
 						}
-					}
-					if (first2) {
-						first2 = false;
-					} else {
-						outjson.print(",");
-					}
-					outjson.print("{");
-					generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, outinfo_json, ent);
-					outjson.print("}");
-					}catch(Exception e){
+						old_first2 = first2;
+						if (first2) {
+							first2 = false;
+						} else {
+							outjson.print(",");
+						}
+						outjson.print("{");
+						generate_json_entity(speciesAliases, placeMap, format, wp, cd, blog_name, scales, outjson, outinfo_json, ent);
+						outjson.print("}");
+					} catch(Exception e) {
+						first2 = old_first2;
 						Utils.eclipseErrorln("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
 						System.out.println("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
 					}
@@ -2860,7 +2837,6 @@ public class ProduceClickableMap
 							outjson.print("\"y\" : " + toDouble(scales.getY(position[1])) + "},");
 							// EV: 2014-04-15
 							outjson.print("\"left_label\" : \"<a href='#'>" + tojson(make_right_hand_module_entry(post_id, k.getKey(), null)) + "</a>\"");
-							//outjson.print("\"left_label\" : \"<a href='#'>" + tojson(make_right_hand_module_entry(post_id, full_module, null)) + "</a>\"");
 
 							if (!NO_BUBBLE) {
 								//outjson.print(",\"bubble\" : \"" + tojson(make_module_bubble(k.getKey(), k.getValue().notes, post_id, wp, notes_formatter)) + "\"");
@@ -2925,9 +2901,7 @@ public class ProduceClickableMap
 				map_item.getOutput().println(">");
 				content_line(map_item.add(),  " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName(), "");
 				if (outjson != null) {
-					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/> " + mapInfo.getName()) + "\",");
 					String map_blog_lnk = make_right_hand_link_to_blog_with_title(null, map_key, mapInfo.getName()).toString();
-					//					outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "\",");
 					outjson.print("\"left_label\" : \"<a href='#'>" + tojson(map_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + mapInfo.url + "' title='go to " + mapInfo.getName() + " map view'/>") + "</a>\",");
 					outjson.println("\"modules\" : [");
 				}
@@ -2976,9 +2950,7 @@ public class ProduceClickableMap
 					module_item.close();
 
 					if (outjson != null) {
-						//						outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/> " + moduleInfo.name) + "\"");
 						String module_key = mapInfo.id + ":" + moduleInfo.name;
-						//outjson.print("\"left_label\" : \"" + tojson("<img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/>") + "\"");
 						String module_blog_lnk = make_right_hand_link_to_blog_with_title(null, module_key, moduleInfo.name).toString();
 						outjson.print("\"left_label\" : \"" + tojson(module_blog_lnk + " <img align='top' class='mapmodulefromright' border='0' src='../../../map_icons/map.png' alt='" + moduleInfo.url + "' title='go to " + moduleInfo.name + " map view'/>") + "\"");
 						if (!NO_BUBBLE) {

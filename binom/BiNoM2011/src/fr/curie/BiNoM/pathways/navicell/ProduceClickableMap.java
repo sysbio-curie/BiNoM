@@ -2152,26 +2152,30 @@ public class ProduceClickableMap
 	)
 	{
 		// EXT_JSON_PANEL TAG #2
-		item_list_start(indent, m.getId(), right_hand_tag);
-		indent.getOutput().print(" position=\"");
-		boolean first = true;
-		for (final String shape_id : m.getShapeIds(speciesAliases))
-		{
-			final Vector<Place> places = placeMap.get(shape_id);
-			assert places.size() == 1 : shape_id + " " + places.size();
-			final Place place = places.get(0);
-			if (first)
-				first = false;
-			else
-				indent.getOutput().print(" ");
-			
-			indent.getOutput().print(toDouble(scales.getX(place.x)));
-			indent.getOutput().print(";");
-			indent.getOutput().print(toDouble(scales.getY(place.y)));
+		Vector<String> shapeIds = m.getShapeIds(speciesAliases);
+		if (shapeIds != null) {
+			item_list_start(indent, m.getId(), right_hand_tag);
+			indent.getOutput().print(" position=\"");
+			boolean first = true;
+			for (final String shape_id : shapeIds) {
+				final Vector<Place> places = placeMap.get(shape_id);
+				assert places.size() == 1 : shape_id + " " + places.size();
+				final Place place = places.get(0);
+				if (first)
+					first = false;
+				else
+					indent.getOutput().print(" ");
+				
+				indent.getOutput().print(toDouble(scales.getX(place.x)));
+				indent.getOutput().print(";");
+				indent.getOutput().print(toDouble(scales.getY(place.y)));
+			}
+			indent.getOutput().println("\">");
+			content_line(indent.add(), m.getName(), bubble);
+			indent.close();
+		} else {
+			System.err.println("modification_line: no shape ids for " + m.getId());
 		}
-		indent.getOutput().println("\">");
-		content_line(indent.add(), m.getName(), bubble);
-		indent.close();
 	}
 	
 	/*
@@ -2199,28 +2203,34 @@ public class ProduceClickableMap
 	)
 	{
 		// EXT_JSON_JSON TAG #2
-		outjson.print("\"positions\" : [");
-		boolean first = true;
-		for (final String shape_id : m.getShapeIds(speciesAliases))
-		{
-			final Vector<Place> places = placeMap.get(shape_id);
-			assert places.size() == 1 : shape_id + " " + places.size();
-			final Place place = places.get(0);
-			if (first) {
-				first = false;
-			} else {
-				outjson.print(",");
-			}
+		Vector<String> shapeIds = m.getShapeIds(speciesAliases);
+		if (shapeIds != null) {
+			outjson.print("\"positions\" : [");
+			boolean first = true;
+			for (final String shape_id : shapeIds) {
+				final Vector<Place> places = placeMap.get(shape_id);
+				assert places.size() == 1 : shape_id + " " + places.size();
+				final Place place = places.get(0);
+				if (first) {
+					first = false;
+				} else {
+					outjson.print(",");
+				}
 			
-			outjson.print("{");
-			outjson.print("\"x\" : " + toDouble(scales.getX(place.x)) + ", ");
-			outjson.print("\"y\" : " + toDouble(scales.getY(place.y)) + ", ");
-			outjson.print("\"w\" : " + toDouble(scales.getL(place.width)) + ", ");
-			outjson.print("\"h\" : " + toDouble(scales.getL(place.height)) + ", ");
-			outjson.print("\"said\" : \"" + shape_id + "\"");
-			outjson.print("}");
+				outjson.print("{");
+				outjson.print("\"x\" : " + toDouble(scales.getX(place.x)) + ", ");
+				outjson.print("\"y\" : " + toDouble(scales.getY(place.y)) + ", ");
+				outjson.print("\"w\" : " + toDouble(scales.getL(place.width)) + ", ");
+				outjson.print("\"h\" : " + toDouble(scales.getL(place.height)) + ", ");
+				outjson.print("\"said\" : \"" + shape_id + "\"");
+				outjson.print("}");
+			}
+			outjson.print("]");
+		} else {
+			outjson.print("\"no_modifs\" : \"\"");
+			System.err.println("json_entity_modification: no shape ids for " + m.getId());
 		}
-		outjson.print("]");
+
 
 		if (USE_EXT_JSON) {
 			if (!NO_BUBBLE) {
@@ -2518,6 +2528,7 @@ public class ProduceClickableMap
 						first2 = old_first2;
 						Utils.eclipseErrorln("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
 						System.out.println("SERIOUS ERROR!!!: could not generate json "+ent.getId()+" / "+ent.getName());
+						e.printStackTrace();
 					}
 				}
 				outjson.print("],");
@@ -2594,6 +2605,7 @@ public class ProduceClickableMap
 				}catch(Exception e){
 					Utils.eclipseErrorln("SERIOUS ERROR!!!: could not add modifications "+ent.getId()+" / "+ent.getName());
 					System.out.println("SERIOUS ERROR!!!: could not add modifications "+ent.getId()+" / "+ent.getName());
+					e.printStackTrace();
 				}
 			}
 			cls.close();
@@ -2659,7 +2671,7 @@ public class ProduceClickableMap
 						String b = create_entity_bubble(m, format, ent.getPost().getPostId(), ent, cd, blog_name, wp);
 						modification_line(entity.add(), m, speciesAliases, placeMap, b, scales);
 					}else{
-						Utils.eclipseErrorln("ERROR: no Post for "+ent.getId());
+						Utils.eclipseErrorln("ERROR: no Post for entity " +ent.getId());
 					}
 			}
 		}
@@ -3040,7 +3052,7 @@ public class ProduceClickableMap
 					final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 					reaction_line(right.add(), r, bubble, scales, post.getPostId());
 				}else{
-					Utils.eclipseErrorln("ERROR: No post for "+r.getId());
+					Utils.eclipseErrorln("ERROR: No post for reaction (2) "+r.getId());
 				}
 			}
 		}
@@ -3125,7 +3137,13 @@ public class ProduceClickableMap
 					final String title = r.getId();
 					final String body = createReactionBody(r, format, wp);
 					//Utils.eclipsePrintln("reaction setpost");
-					wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
+					final BlogCreator.Post post = wp.updateBlogPostId(r.getId(), title, body, atlasInfo, false);
+					// EV: 2015-03-05: added the following line
+					if (post != null) {
+						wp.updateBlogPostIfRequired(post, title, body, REACTION_CLASS_NAME, modules, atlasInfo, false);
+					} else {
+						Utils.eclipseErrorln("WARNING: no Post for reaction " + r.getId());
+					}
 				}
 			}
 		}
@@ -3157,7 +3175,7 @@ public class ProduceClickableMap
 							final String bubble = createReactionBubble(r, post.getPostId(), format, wp);
 							reaction_line(right.add(), r, bubble, scales, post.getPostId());
 						}else{
-							Utils.eclipseErrorln("ERROR: No post for "+r.getId());
+							Utils.eclipseErrorln("ERROR: No post for reaction " + r.getId());
 						}
 					}
 			}

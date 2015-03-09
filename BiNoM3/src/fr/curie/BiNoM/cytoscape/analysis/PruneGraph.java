@@ -26,11 +26,12 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import Main.Launcher;
-import cytoscape.view.CyNetworkView;
-import cytoscape.Cytoscape;
 import java.awt.event.ActionEvent;
+
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import edu.rpi.cs.xgmml.*;
 
@@ -53,9 +54,8 @@ public class PruneGraph extends AbstractCyAction {
 		}catch(Exception ee){
 			
 		}*/
-		
-		CyNetworkView view = Cytoscape.getCurrentNetworkView();
-		PruneGraphTask task = new PruneGraphTask(graphDocument, adapter.getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+				
+		TaskIterator t = new TaskIterator(new PruneGraphTask(graphDocument, adapter.getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
     }
 }

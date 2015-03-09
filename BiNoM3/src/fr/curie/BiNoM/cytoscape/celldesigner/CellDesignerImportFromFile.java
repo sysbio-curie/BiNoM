@@ -26,12 +26,16 @@
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
 import Main.Launcher;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 
 public class CellDesignerImportFromFile extends AbstractCyAction {
@@ -59,8 +63,9 @@ public class CellDesignerImportFromFile extends AbstractCyAction {
 		    file = fileChooser.getSelectedFile();
 		    try {
 		    	if (file != null) {
-		            CellDesignerImportTask task = new CellDesignerImportTask(file);
-		            fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		    		
+		    		TaskIterator t = new TaskIterator(new CellDesignerImportTask(file));
+		    		Launcher.getAdapter().getTaskManager().execute(t);
 		        }
 		    }
 		    catch(Exception ee) {

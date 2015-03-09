@@ -34,6 +34,8 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
+import org.cytoscape.work.TaskIterator;
+
 import Main.Launcher;
 
 import java.awt.Dimension;
@@ -51,6 +53,8 @@ import java.util.Vector;
 
 import fr.curie.BiNoM.analysis.AbstractClusterNetworksTaskFactory;
 import fr.curie.BiNoM.cytoscape.analysis.ClusterNetworksTask;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
+import fr.curie.BiNoM.cytoscape.utils.MergeNetworksAndFilterTask;
 
 public class ClusterNetworksDialog extends JDialog {
 	
@@ -75,9 +79,9 @@ public class ClusterNetworksDialog extends JDialog {
     private JScrollPane scrollPane;
     private JSlider intersectonThresholdS;
 
-    public static ClusterNetworksDialog getInstance(AbstractClusterNetworksTaskFactory factory) {
+    public static ClusterNetworksDialog getInstance() {
 	if (instance == null) {
-	    instance = new ClusterNetworksDialog(factory);
+	    instance = new ClusterNetworksDialog();
 	}
 	return instance;
     }
@@ -107,8 +111,7 @@ public class ClusterNetworksDialog extends JDialog {
 	setVisible(true);
     }
 
-    public ClusterNetworksDialog(AbstractClusterNetworksTaskFactory _factory) {
-	this.factory = _factory;
+    public ClusterNetworksDialog() {
 
 	JPanel panel = new JPanel(new GridBagLayout());
 	GridBagConstraints c;
@@ -202,10 +205,11 @@ public class ClusterNetworksDialog extends JDialog {
 //			 Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
 //			 fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);		    
 		    
-
-		    AbstractTask task = factory.createTask(idxs, options);
-		    task.execute();
-
+		    TaskIterator t = new TaskIterator(new MergeNetworksAndFilterTask
+		    	    (idxs, options,
+		    	   	     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+			Launcher.getAdapter().getTaskManager().execute(t);
+		    
 		    /*
 		      Vector<GraphDocument> modules = new Vector<GraphDocument>();
 		      for(int i=0;i<idxs.length;i++){

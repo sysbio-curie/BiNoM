@@ -63,6 +63,7 @@ import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.TaskIterator;
 
 import antlr.collections.List;
 import Main.Launcher;
@@ -395,10 +396,12 @@ public class IndexPathAnalysisDialog extends JDialog {
 			    ee.printStackTrace();
 			}
 			
-			IndexPathAnalysisTask task = new IndexPathAnalysisTask
-			    (sources,targets,options,
-			     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle(), outputCurrentNetworkRB.isSelected());
-			fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);		    
+			IndexPathAnalysisTask task = new IndexPathAnalysisTask(sources,targets,options,
+						     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle(), outputCurrentNetworkRB.isSelected());
+			TaskIterator t = new TaskIterator(task);
+			Launcher.getAdapter().getTaskManager().execute(t);
+			
+	    
 
 			setVisible(false);
 		    
@@ -411,8 +414,8 @@ public class IndexPathAnalysisDialog extends JDialog {
 					View<CyNode> nView = (View<CyNode>) i.next();
 				    CyNode node = nView.getModel();
 					System.out.println("name: " + network.getRow(node).get(CyNetwork.NAME, String.class));
-
-				    nView.setVisualProperty(BasicVisualLexicon.NODE_SELECTED, task.SelectedNodes.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
+			    	network.getRow(node).set("selected", task.SelectedNodes.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
+				    //nView.setVisualProperty(BasicVisualLexicon.NODE_SELECTED, task.SelectedNodes.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
 				    //setSelected(task.SelectedNodes.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
 				}
 			}

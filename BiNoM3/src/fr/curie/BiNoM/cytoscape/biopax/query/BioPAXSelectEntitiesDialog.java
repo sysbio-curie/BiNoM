@@ -46,6 +46,8 @@ import java.awt.event.ActionListener;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
+import org.cytoscape.work.TaskIterator;
+
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 
@@ -55,6 +57,7 @@ import fr.curie.BiNoM.pathways.utils.*;
 import java.util.*;
 
 import fr.curie.BiNoM.lib.*;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import edu.rpi.cs.xgmml.*;
 
@@ -274,8 +277,9 @@ public class BioPAXSelectEntitiesDialog extends JFrame {
 			if(listOfNamesRB.isSelected()) itype = BioPAXSelectEntitiesTask.INPUT_LISTOF_NAMES;
 			if(outputCurrentNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_CURRENT_NETWORK;
 			if(outputNewNetworkRB.isSelected()) otype = BioPAXSelectEntitiesTask.OUTPUT_NEW_NETWORK;
-			BioPAXSelectEntitiesTask task = new BioPAXSelectEntitiesTask(query,itype,otype);
-			fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+			
+			TaskIterator t = new TaskIterator(new BioPAXSelectEntitiesTask(query,itype,otype));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		}
 	});
 

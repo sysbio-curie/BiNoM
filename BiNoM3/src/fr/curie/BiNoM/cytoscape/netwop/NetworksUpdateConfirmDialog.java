@@ -30,12 +30,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -44,6 +46,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
 
 public class NetworksUpdateConfirmDialog extends JDialog {
@@ -257,10 +260,9 @@ public class NetworksUpdateConfirmDialog extends JDialog {
 			if (!cbs[n].isSelected())
 			    networks[n] = null;
 		    }
-
-		    NetworksUpdateTask netwUpdTask = new NetworksUpdateTask(networks, netwAdd, netwSup);
-
-		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(netwUpdTask);
+		    
+		    TaskIterator t = new TaskIterator(new NetworksUpdateTask(networks, netwAdd, netwSup));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		    setVisible(false);
 		}
 	    });

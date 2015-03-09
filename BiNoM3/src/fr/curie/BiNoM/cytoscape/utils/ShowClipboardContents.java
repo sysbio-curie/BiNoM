@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
@@ -52,18 +53,24 @@ public class ShowClipboardContents extends AbstractCyAction {
 	HashMap addEdgeNodes = new HashMap();
 	HashMap addNodes = new HashMap();
 	
-	for (Iterator i = clipboard.getEdges().iterator(); i.hasNext(); ) {
-	    CyEdge edge = (CyEdge)i.next();
+	for (Iterator i = clipboard.getEdges().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyEdge edge = (CyEdge) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
 	    addEdges.put(edge, new Boolean(true));
 	}
 
-	for (Iterator i = clipboard.getEdgeNodes().iterator(); i.hasNext(); ) {
-	    CyNode node = (CyNode)i.next();
+	for (Iterator i = clipboard.getEdgeNodes().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyNode node = (CyNode) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
 	    addEdgeNodes.put(node, new Boolean(true));
 	}
 
-	for (Iterator i = clipboard.getNodes().iterator(); i.hasNext(); ) {
-	    CyNode node = (CyNode)i.next();
+	for (Iterator i = clipboard.getNodes().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyNode node = (CyNode) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
 	    addNodes.put(node, new Boolean(true));
 	}
 	

@@ -34,6 +34,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 
 public class CellDesignerAssociateSource extends AbstractCyAction {
 
@@ -73,9 +76,9 @@ public class CellDesignerAssociateSource extends AbstractCyAction {
 
 	        if (file == null)
 		    return false;
-	
-	        CellDesignerAssociateSourceTask task = new CellDesignerAssociateSourceTask(file, file.getPath());
-			fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);		
+	        
+	        TaskIterator t = new TaskIterator(new CellDesignerAssociateSourceTask(file, file.getPath()));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		}
 		return true;
     }

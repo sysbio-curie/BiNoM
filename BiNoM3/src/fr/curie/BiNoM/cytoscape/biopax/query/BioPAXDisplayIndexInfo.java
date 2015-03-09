@@ -37,7 +37,7 @@ public class BioPAXDisplayIndexInfo extends AbstractCyAction {
     public BioPAXDisplayIndexInfo() {
     	super("Display Index Info",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "network",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query");
     }
@@ -46,7 +46,7 @@ public class BioPAXDisplayIndexInfo extends AbstractCyAction {
     	//BioPAXDisplayIndexInfoDialog.getInstance().raise(null);
     	BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
     	if(beng==null){
-    		JOptionPane.showMessageDialog(null, /*Cytoscape.getDesktop()*/ "Load BioPAX index first.");
+    		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), "Load BioPAX index first.");
     	}else
     		(new BioPAXDisplayIndexInfoDialog()).raise(null);
     }

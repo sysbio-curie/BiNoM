@@ -103,15 +103,15 @@ public class NetworkUtils {
 		return network;
 	}
 	
-public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed){
+public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed) throws Exception{
 	
 		//System.out.println("Node name sorce node : " + fromNet.getRow(ed.getSource()).get(CyNetwork.NAME, String.class));
 		
 		CyNode source = Launcher.getNodeWithName(network, network.getDefaultNodeTable(), "name", fromNet.getRow(ed.getSource()).get(CyNetwork.NAME, String.class));
 		CyNode target = Launcher.getNodeWithName(network, network.getDefaultNodeTable(), "name", fromNet.getRow(ed.getTarget()).get(CyNetwork.NAME, String.class));
 	
-		System.out.println("source: "+source);
-		System.out.println("target: "+target);
+		//System.out.println("source: "+source);
+		//System.out.println("target: "+target);
 		
 		CyEdge newEdge = network.addEdge(source, target, true);
 		//set node name 
@@ -229,7 +229,12 @@ public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed){
     	i = fromNetw.getEdgeList().iterator();
     	while(i.hasNext()){
     		CyEdge ed = (CyEdge) i.next();
-    		toNetw = addEd(toNetw, fromNetw, ed);
+    		try {
+				toNetw = addEd(toNetw, fromNetw, ed);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
     	//appendNetwork(fromNetw);
     }
@@ -298,7 +303,12 @@ public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed){
 		    //toNetw.addNode(target);
 	
 		if (!toNetw.containsEdge(edge))
-			toNetw = addEd(toNetw, fromNetw, edge);
+			try {
+				toNetw = addEd(toNetw, fromNetw, edge);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    //toNetw.addEdge(edge);
     }
 
@@ -319,7 +329,12 @@ public static CyNetwork addEd(CyNetwork network, CyNetwork fromNet, CyEdge ed){
 	    addNodeAndReportPosition(target, fromNetw, fromNetView, toNetw, netView);
 
 	if (!toNetw.containsEdge(edge))
-		toNetw = addEd(toNetw, fromNetw, edge);
+		try {
+			toNetw = addEd(toNetw, fromNetw, edge);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	    //toNetw.addEdge(edge);
     }
 

@@ -26,10 +26,15 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import Main.Launcher;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -99,8 +104,8 @@ public class BioPAXExportToFile extends AbstractCyAction{
 					os = new FileOutputStream(file);
 					os.close();
 					
-					BioPAXExportTask task = new BioPAXExportTask(file, merge);
-					fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+					TaskIterator t = new TaskIterator(new BioPAXExportTask(file, merge));
+					Launcher.getAdapter().getTaskManager().execute(t);
 				}
 				catch(Exception ee) {
 					JOptionPane.showMessageDialog

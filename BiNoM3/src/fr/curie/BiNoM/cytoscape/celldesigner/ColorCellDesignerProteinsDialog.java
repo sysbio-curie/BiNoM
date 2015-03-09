@@ -34,12 +34,18 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 
 import java.io.File;
@@ -260,8 +266,9 @@ public class ColorCellDesignerProteinsDialog extends JFrame {
             	task = new ColorCellDesignerProteinsTask(indexField.getText(),accNumField.getText());
             else
             	task = new ColorCellDesignerProteinsTask(indexField.getText(),null);
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-                }
+            
+    		Launcher.getAdapter().getTaskManager().execute(new TaskIterator(task));           
+				}
            });
 
 	cancelB = new JButton("Cancel");

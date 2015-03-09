@@ -26,20 +26,22 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
-
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
+
 import java.util.Vector;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import fr.curie.BiNoM.lib.AbstractTask;
 
-public class ModularViewTask implements Task, AbstractTask {
+public class ModularViewTask implements Task{
 
-    private TaskMonitor taskMonitor;
     private int idxAdd;
     private int idxs[];
     private VisualStyle vizsty;
@@ -65,27 +67,11 @@ public class ModularViewTask implements Task, AbstractTask {
     }
     */
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Creating modular view";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
-
-    public void execute() {
-	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this);
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
 	try {
 	    CyNetwork network = NetworkUtils.getNetwork(idxAdd - 1);
 	    
@@ -108,12 +94,18 @@ public class ModularViewTask implements Task, AbstractTask {
 		     false, // applyLayout
 		     taskMonitor);
 	    }
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in creating modular view " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error in creating modular view " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -37,7 +37,7 @@ public class BioPAXViewQueryLog extends AbstractCyAction {
     public BioPAXViewQueryLog() {
     	super("View Query Log",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "network",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query");
     }

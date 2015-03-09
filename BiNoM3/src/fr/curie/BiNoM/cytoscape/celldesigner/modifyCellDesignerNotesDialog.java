@@ -34,6 +34,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -253,8 +258,9 @@ public class modifyCellDesignerNotesDialog extends JFrame {
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
-			modifyCellDesignerNotesTask task = new modifyCellDesignerNotesTask(indexField.getText(),accNumField.getText());
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+            
+            TaskIterator t = new TaskIterator(new modifyCellDesignerNotesTask(indexField.getText(),accNumField.getText()));
+    		Launcher.getAdapter().getTaskManager().execute(t);
                 }
            });
 

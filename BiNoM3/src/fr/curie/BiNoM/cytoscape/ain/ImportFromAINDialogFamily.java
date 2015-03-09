@@ -25,48 +25,27 @@
 */
 package fr.curie.BiNoM.cytoscape.ain;
 
-import cytoscape.CyNetwork;
-import cytoscape.Cytoscape;
-import cytoscape.view.CyNetworkView;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
-
-import org.biojava.bio.program.homologene.OrthoPairSet.Iterator;
-
 import java.awt.Dimension;
-import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.*;
 import javax.swing.event.*;
 import java.awt.BorderLayout;
-import java.io.InputStream;
-
-import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.SimpleTextInfluenceToBioPAX;
-
-import java.io.File;
-import java.net.URL;
 import java.util.*;
-
-import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import fr.curie.BiNoM.lib.GraphicUtils;
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
-
-import fr.curie.BiNoM.pathways.*;
 
 public class ImportFromAINDialogFamily extends JDialog {
 

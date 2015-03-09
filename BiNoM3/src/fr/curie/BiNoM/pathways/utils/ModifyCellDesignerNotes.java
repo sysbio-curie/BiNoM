@@ -3,9 +3,6 @@ package fr.curie.BiNoM.pathways.utils;
 import org.w3c.dom.*;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
-
-import cytoscape.Cytoscape;
-
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotesDialog;
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;

@@ -26,20 +26,26 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 
-import Main.Launcher;
 import fr.curie.BiNoM.cytoscape.lib.*;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import edu.rpi.cs.xgmml.*;
+
+import java.util.HashMap;
 import java.util.Vector;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
+
 import org.cytoscape.model.CyNetwork;
+
+import Main.Launcher;
 
 
 public class StronglyConnectedComponentsTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private GraphDocument graphDocument;
     private VisualStyle vizsty;
 
@@ -48,44 +54,51 @@ public class StronglyConnectedComponentsTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Strongly Connection Components";
     }
 
-    public CyNetwork getCyNetwork() {
-    	
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+	public void run(TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
             Vector v = StructureAnalysisUtils.getStronglyConnectedComponents(graphDocument);
+            
+        CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
 
 	    int size = v.size();
 	    for (int n = 0; n < size; n++) {
 		GraphDocument grDoc = (GraphDocument)v.get(n);
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
 		    (grDoc.getGraph().getName(),
 		     grDoc,
 		     vizsty,
 		     false, // applyLayout
-		     taskMonitor);
+		     taskMonitor, netw, nodeMap, edgeMap);
 	    }
+	    
+	    nodeMap = null;
+	    edgeMap = null;
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
+	    
+	    
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error getting strongly connected components " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error getting strongly connected components " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

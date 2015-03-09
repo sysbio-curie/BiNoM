@@ -32,7 +32,6 @@ import Main.Launcher;
 import edu.rpi.cs.xgmml.*;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
-import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -60,7 +59,6 @@ public class GraphDocumentFactory {
 		GraphDocument gr = GraphDocument.Factory.newInstance();
 		GraphicGraph grf = gr.addNewGraph();
 		
-        // grf.setName(cyNetwork.getTitle());
 		grf.setName(cyNetwork.getRow(cyNetwork).get(CyNetwork.NAME, String.class));
 	
 		Iterator<CyNode> iNodes = cyNetwork.getNodeList().iterator();
@@ -70,7 +68,6 @@ public class GraphDocumentFactory {
 		while(networkViewIterator.hasNext())
 			networkView = networkViewIterator.next();
 		
-		System.out.println("Inizio nodi");
 		while (iNodes.hasNext()) {
 		    CyNode node = (CyNode)iNodes.next();
 		    String id = cyNetwork.getRow(node).get(CyNetwork.NAME, String.class);
@@ -84,12 +81,7 @@ public class GraphDocumentFactory {
             GraphicsDocument.Graphics graphics = gr_node.addNewGraphics();
 
             
-            View<CyNode> nv = networkView.getNodeView(node);        
-            
-//            System.out.println("Position x: " + Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString()));
-//            System.out.println("Position y: " + Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).toString()));
-            
-            //System.out.println(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString());
+            View<CyNode> nv = networkView.getNodeView(node);
             
             graphics.setX(Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).toString()));
             graphics.setY(Double.parseDouble(nv.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).toString()));
@@ -120,16 +112,6 @@ public class GraphDocumentFactory {
 					    	value = cyNetwork.getRow(node).get(col.getName(), Boolean.class).toString();
 					    }catch(Exception e){}
 			    	}
-				    	
-		//		    if(nodeAttrs.getType(attrNames[n])==nodeAttrs.TYPE_STRING)
-		//		    	 value = nodeAttrs.getStringAttribute(id, attrNames[n]);
-		//		    if(nodeAttrs.getType(attrNames[n])==nodeAttrs.TYPE_FLOATING)
-		//		    	if(value != null)
-		//		    		value = ""+nodeAttrs.getDoubleAttribute(id, attrNames[n]);
-		//		    if(nodeAttrs.getType(attrNames[n])==nodeAttrs.TYPE_INTEGER)
-		//		    	if(value != null)
-		//		    		value = ""+nodeAttrs.getIntegerAttribute(id, attrNames[n]);
-			    
 				    if(value != null)
 				    	if(!value.trim().equals(""))
 				    		if(!value.trim().equals("null"))
@@ -141,7 +123,6 @@ public class GraphDocumentFactory {
 			    	System.out.println("WARNING: "+col.getName()+" in "+id+" seems to be not of type string or double or integer!");	    	
 		    	}	
 		    }
-	    	//System.out.println("# attributes saved: " + gr_node.getAttArray().length);
 
 		}	
 	    /*try{ //Attribute might be not of type string
@@ -168,7 +149,6 @@ public class GraphDocumentFactory {
 	    }*/
 
 	
-		System.out.println("Inizio archi");
 		
 		Iterator<CyEdge> iEdges = cyNetwork.getEdgeList().iterator();
 		// cytoscape.data.CyAttributes edgeAttrs = Cytoscape.getEdgeAttributes();
@@ -176,16 +156,13 @@ public class GraphDocumentFactory {
 		    CyEdge edge = (CyEdge)iEdges.next();
 		    String id = cyNetwork.getRow(edge).get(CyNetwork.NAME, String.class);
 		    
-//		    System.out.println("id: " + id);
 		    
 		    GraphicEdge gr_edge = grf.addNewEdge();
 		    gr_edge.setId(id);
 	
 		    gr_edge.setName(id);
 		    gr_edge.setLabel(id);
-		    
-//		    System.out.println("id-FROM: " + cyNetwork.getRow(edge.getSource()).get(CyNetwork.NAME, String.class));
-//		    System.out.println("id-TO	: " + cyNetwork.getRow(edge.getTarget()).get(CyNetwork.NAME, String.class));
+		   
 	
 		    gr_edge.setSource(cyNetwork.getRow(edge.getSource()).get(CyNetwork.NAME, String.class));
 		    gr_edge.setTarget(cyNetwork.getRow(edge.getTarget()).get(CyNetwork.NAME, String.class));
@@ -219,17 +196,13 @@ public class GraphDocumentFactory {
 			    
 				if (value != null){
 				    Utils.addAttribute(gr_edge, col.getName(), col.getName(), value, ObjectType.STRING);
-//	    		    System.out.println(col.getName() + " :"+value);
 				}
 		    }
 		}
 	
 		edu.rpi.cs.xgmml.GraphicNode nodes[] = grf.getNodeArray();
 		edu.rpi.cs.xgmml.GraphicEdge edges[] = grf.getEdgeArray();
-	
-		System.out.println("nodes: " + nodes.length);
-		System.out.println("edges: " + edges.length);
-	
+		
 		return gr;
     }
 }

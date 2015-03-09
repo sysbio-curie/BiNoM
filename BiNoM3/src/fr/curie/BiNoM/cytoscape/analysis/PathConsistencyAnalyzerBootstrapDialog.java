@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -23,10 +24,11 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
+import org.cytoscape.work.TaskIterator;
 
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
+import fr.curie.BiNoM.cytoscape.brf.TXTFileFilter;
 import fr.curie.BiNoM.lib.GraphicUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
@@ -137,10 +139,20 @@ public class PathConsistencyAnalyzerBootstrapDialog extends JDialog {
     		public void actionPerformed(ActionEvent e) {
 		    if(analyzer.SA_pathScoresRandomDistribution!=null)if(analyzer.SA_targetScoreRandomDistribution!=null){
     			try{
-			    CyFileFilter textFilter = new CyFileFilter();
-			    textFilter.addExtension("txt");
-			    textFilter.setDescription("Text files");
-    			    File file = FileUtil.getFile("Save Permutation scores", FileUtil.SAVE, new CyFileFilter[]{textFilter});
+    				File file = null;
+    				JFileChooser fileChooser = new JFileChooser();  				
+    				fileChooser.setDialogTitle("Save Permutation scores");
+ 			
+    				JFrame frame = new JFrame();			
+    				int userSelection = fileChooser.showSaveDialog(frame);
+    				
+    				if (userSelection == JFileChooser.APPROVE_OPTION) {
+    					file = fileChooser.getSelectedFile();
+    					
+    					if(!file.getAbsolutePath().endsWith(".txt"))
+    						file = new File(file.getAbsolutePath() + ".txt");
+    				}
+    					    			    
     			    if(file!=null){
     			    	FileWriter fw = new FileWriter(file);
     			    	fw.write("TARGET SCORES:\n");
@@ -186,9 +198,10 @@ public class PathConsistencyAnalyzerBootstrapDialog extends JDialog {
 			analyzer.testSignificanceMode = analyzer.PERMUTE_NODE_ACTIVITIES;
 		    if(permuteAllNodesRB.isSelected())
 			analyzer.testSignificanceMode = analyzer.PERMUTE_NODE_ACTIVITIES;
+		    
+		    TaskIterator t = new TaskIterator(new PathConsistencyAnalyzerBootstrapTask(analyzer));
+			Launcher.getAdapter().getTaskManager().execute(t);
     			
-		    PathConsistencyAnalyzerBootstrapTask bstrTask = new PathConsistencyAnalyzerBootstrapTask(analyzer);
-		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(bstrTask);
     		}
     	    });
     	buttonPanel.add(okB);

@@ -25,54 +25,23 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
+import java.util.HashMap;
+
 import fr.curie.BiNoM.cytoscape.lib.*;
-import fr.curie.BiNoM.cytoscape.biopax.*;
-import fr.curie.BiNoM.cytoscape.celldesigner.*;
 
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyRow;
-import org.cytoscape.model.CyTable;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-
-import java.io.*;
-
-import cytoscape.task.ui.JTaskConfig;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
-
-import java.io.InputStream;
-import java.util.Vector;
-import java.util.Iterator;
-import java.io.File;
-import java.net.URL;
-
-import giny.view.NodeView;
-import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
-import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerSourceDB;
-import fr.curie.BiNoM.pathways.CytoscapeToBioPAXConverter;
-import fr.curie.BiNoM.pathways.CytoscapeToCellDesignerConverter;
-import fr.curie.BiNoM.pathways.CellDesignerToBioPAXConverter;
 
-import org.sbml.x2001.ns.celldesigner.*;
-
-import edu.rpi.cs.xgmml.*;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportTask;
 
 public class ExtractReactionNetworkTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private GraphDocument graphDocument;
     private VisualStyle vizsty;
 
@@ -81,47 +50,52 @@ public class ExtractReactionNetworkTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Extract Reaction Network";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 
 		Graph graph = XGMML.convertXGMMLToGraph(graphDocument);
 	    Graph grres = BiographUtils.ExtractReactionNetwork(graph);
 	    GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 		//GraphDocument grDoc = null;
+	    
+	    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    String netname = netw.getRow(netw).get(CyNetwork.NAME, String.class) + ".RN";
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
 
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
-		    (grDoc.getGraph().getName()+".RN",
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
+		    (/*grDoc.getGraph().getName()+".RN"*/netname,
 		     grDoc,
 		     vizsty,
 		     false, // applyLayout
-		     taskMonitor);
+		     taskMonitor, netw,nodeMap,edgeMap);
 
 		if(taskMonitor==null)
 			System.out.println("taskMonitor==null");
 		else
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
+		
+		nodeMap = null;
+	    edgeMap = null;
 		
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error Extracting Reaction Network " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error Extracting Reaction Network " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

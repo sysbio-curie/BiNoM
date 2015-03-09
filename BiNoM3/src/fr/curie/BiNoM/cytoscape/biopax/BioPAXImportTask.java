@@ -27,84 +27,65 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-import cytoscape.visual.VisualStyle;
-import cytoscape.task.ui.JTaskConfig;
+import fr.curie.BiNoM.biopax.BioPAXImportBaseTask;
 import fr.curie.BiNoM.biopax.BioPAXSourceDB;
-import edu.rpi.cs.xgmml.*;
-import cytoscape.CyNode;
-import cytoscape.CyEdge;
-import cytoscape.view.CyNetworkView;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
-
-import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.File;
 import java.net.URL;
-
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.app.CyAppAdapter;
-
-import fr.curie.BiNoM.pathways.wrappers.*;
-import fr.curie.BiNoM.lib.AbstractTask;
+import org.cytoscape.work.AbstractTask;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 
-public class BioPAXImportTask extends fr.curie.BiNoM.biopax.BioPAXImportBaseTask implements Task, AbstractTask {
+public class BioPAXImportTask extends AbstractTask {
 
-    private TaskMonitor taskMonitor;
     private CyNetwork cyNetwork;
+    BioPAXImportBaseTask baseTask;
     
 
     public BioPAXImportTask(File file, URL url, String name, int algos[],
 			    BioPAXToCytoscapeConverter.Option option,
 			    boolean applyLayout) {
-	super(file, url, name, algos, option, applyLayout);
+    	
+    	baseTask = new BioPAXImportBaseTask(file, url, name, algos, option, applyLayout);	
+    	
     }
 
-    public void halt() {
-    }
 
-	    public void setTaskMonitor(TaskMonitor taskMonitor)
-	            throws IllegalThreadStateException {
-	        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
-    	return "BiNoM: Import BioPAX " + bioPAXName;
+    	return "BiNoM: Import BioPAX " + baseTask.bioPAXName;
     }
 
-    public CyNetwork getCyNetwork() {
-    	return cyNetwork;
-    }
 
-    public void execute() {
-    	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this);
-    }
-
-    public void run() {
+	public void run(org.cytoscape.work.TaskMonitor taskMonitor) throws Exception{
+		taskMonitor.setTitle(getTitle());
 	try {
-	    for (int n = 0; n < bioPAXAlgos.length; n++) {
-		BioPAXToCytoscapeConverter.Graph graph = makeGraph(n);
-		if (graph != null) {
-		    cyNetwork = NetworkFactory.createNetwork(makeName(bioPAXAlgos[n], bioPAXName), graph.graphDocument,BioPAXVisualStyleDefinition.getInstance(),
-		    		applyLayout,taskMonitor);
+		System.out.println("1");
+	    for (int n = 0; n < baseTask.bioPAXAlgos.length; n++) {
+			System.out.println("2");
 
-		    if (cyNetwork != null) {
-		    	BioPAXSourceDB.getInstance().setBioPAX(cyNetwork, graph.biopax);
-		    }
-		}
+			BioPAXToCytoscapeConverter.Graph graph = baseTask.makeGraph(n);
+			System.out.println("3");
+	
+			if (graph != null) {
+			    cyNetwork = NetworkFactory.createNetwork(baseTask.makeName(baseTask.bioPAXAlgos[n], baseTask.bioPAXName), graph.graphDocument,BioPAXVisualStyleDefinition.getInstance(),
+			    		baseTask.applyLayout,taskMonitor);
+	
+			    if (cyNetwork != null) {
+			    	BioPAXSourceDB.getInstance().setBioPAX(cyNetwork, graph.biopax);
+			    }
+			}
+			System.out.println("4");
 	    }
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing BioPAX file " +
-				  bioPAXName + ": " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error importing BioPAX file " +
+	    		baseTask.bioPAXName + ": " + e);
+	    System.exit(0);
 	}
     }
+
+
 }
 

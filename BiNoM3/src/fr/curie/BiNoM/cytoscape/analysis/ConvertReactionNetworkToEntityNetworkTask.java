@@ -25,12 +25,18 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
+import java.util.HashMap;
+
 import fr.curie.BiNoM.cytoscape.lib.*;
+
 import org.cytoscape.model.CyNetwork;
+
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import edu.rpi.cs.xgmml.*;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
@@ -47,47 +53,52 @@ public class ConvertReactionNetworkToEntityNetworkTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Converting Reaction Network";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 
 		Graph graph = XGMML.convertXGMMLToGraph(graphDocument);
 	    Graph grres = BiographUtils.convertReactionNetworkIntoEntityNetwork(graph);
 	    GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 		//GraphDocument grDoc = null;
+	    
+	    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    String netname = netw.getRow(netw).get(CyNetwork.NAME, String.class) + ".entity";
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
 
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
-		    (grDoc.getGraph().getName()+".entity",
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
+		    (/*grDoc.getGraph().getName()+".entity"*/netname,
 		     grDoc,
 		     vizsty,
 		     false, // applyLayout
-		     taskMonitor);
+		     taskMonitor, netw, nodeMap, edgeMap);
 
 		if(taskMonitor==null)
 			System.out.println("taskMonitor==null");
 		else
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);;
 		
+		nodeMap = null;
+		edgeMap = null;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error Converting Reaction Network " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error Converting Reaction Network " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

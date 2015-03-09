@@ -35,14 +35,14 @@ import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 
 public class BioPAXImportBaseTask {
 
-    protected String bioPAXName;
-    protected BioPAXToCytoscapeConverter.Option bioPAXOption;
-    protected int bioPAXAlgos[];
-    protected File file;
-    protected URL url;
-    protected boolean applyLayout;
+    public String bioPAXName;
+    public BioPAXToCytoscapeConverter.Option bioPAXOption;
+    public int bioPAXAlgos[];
+    public File file;
+    public URL url;
+    public boolean applyLayout;
 
-    protected BioPAXImportBaseTask(File file, URL url, String name,
+    public BioPAXImportBaseTask(File file, URL url, String name,
 				   int algos[],
 				   BioPAXToCytoscapeConverter.Option option,
 				   boolean applyLayout) {
@@ -66,13 +66,15 @@ public class BioPAXImportBaseTask {
 		this.applyLayout = applyLayout;
     }
 
-    protected BioPAXToCytoscapeConverter.Graph makeGraph(int which) throws Exception {
+    public BioPAXToCytoscapeConverter.Graph makeGraph(int which) throws Exception {
+	BioPAXToCytoscapeConverter.Graph graph = null;
+    try{
 		if (bioPAXAlgos[which] == 0) {
 		    return null;
 	}
 
 	InputStream is;
-	BioPAXToCytoscapeConverter.Graph graph;
+	
 
 	if (url != null) {
 	    is = url.openStream();
@@ -95,6 +97,7 @@ public class BioPAXImportBaseTask {
 	}
 
 	is.close();
+    }catch(Exception ex){ex.printStackTrace();}
 	return graph;
     }
 

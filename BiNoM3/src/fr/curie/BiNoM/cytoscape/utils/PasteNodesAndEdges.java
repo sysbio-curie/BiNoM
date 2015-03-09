@@ -27,7 +27,9 @@ package fr.curie.BiNoM.cytoscape.utils;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
+
 import Main.Launcher;
+
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -55,23 +57,32 @@ public class PasteNodesAndEdges extends AbstractCyAction {
 	HashMap addEdgeNodes = new HashMap();
 	HashMap addNodes = new HashMap();
 
-	for (Iterator i = clipboard.getEdges().iterator(); i.hasNext(); ) {
-	    CyEdge edge = (CyEdge)i.next();
-	    addEdges.put(edge, new Boolean(network.containsEdge(edge)));
+	for (Iterator i = clipboard.getEdges().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyEdge edge = (CyEdge) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
+	    if(!network.containsEdge(edge))
+	    	addEdges.put(edge, netw);
 	}
 
-	for (Iterator i = clipboard.getEdgeNodes().iterator(); i.hasNext(); ) {
-	    CyNode node = (CyNode)i.next();
-	    addEdgeNodes.put(node, new Boolean(network.containsNode(node)));
+	for (Iterator i = clipboard.getEdgeNodes().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyNode node = (CyNode) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
+	    if(!network.containsNode(node))
+	    	addEdgeNodes.put(node, netw);
 	}
 
-	for (Iterator i = clipboard.getNodes().iterator(); i.hasNext(); ) {
-	    CyNode node = (CyNode)i.next();
+	for (Iterator i = clipboard.getNodes().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyNode node = (CyNode) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
 
 	    if (addEdgeNodes.get(node) != null)
 		System.out.println("OUPS.......");
-
-	    addNodes.put(node, new Boolean(network.containsNode(node)));
+	    
+	    if(!network.containsNode(node))
+	    	addNodes.put(node, netw);
 	}
 
 	PasteNodesAndEdgesDialog.getInstance().pop(addNodes, addEdges, addEdgeNodes);

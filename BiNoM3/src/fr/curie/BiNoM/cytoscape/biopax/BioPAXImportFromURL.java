@@ -60,7 +60,7 @@ public class BioPAXImportFromURL extends AbstractCyAction {
         try {
 		    URL url = new URL(urlStr);
 		    InputStream is = url.openStream();
-		    BioPAXImportDialog.getInstance().raise(new BioPAXImportTaskFactory(), url, urlStr);
+		    BioPAXImportDialog.getInstance().raise(url, urlStr);
 		    is.close();
 		}
 		catch(Exception ee) {

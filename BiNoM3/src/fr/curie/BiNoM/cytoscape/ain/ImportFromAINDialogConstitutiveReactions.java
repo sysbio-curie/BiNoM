@@ -26,12 +26,6 @@ BiNoM authors:
 
 package fr.curie.BiNoM.cytoscape.ain;
 
-import cytoscape.Cytoscape;
-import cytoscape.CyNetwork;
-import cytoscape.CyNode;
-import cytoscape.CyEdge;
-import cytoscape.view.CyNetworkView;
-
 import java.util.*;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -41,16 +35,13 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
-
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.InputStream;
-import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
+
 import fr.curie.BiNoM.pathways.*;
 
 public class ImportFromAINDialogConstitutiveReactions extends JDialog{

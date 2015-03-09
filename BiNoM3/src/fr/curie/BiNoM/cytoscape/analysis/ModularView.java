@@ -25,23 +25,12 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
-import cytoscape.CyNetwork;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
+import Main.Launcher;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.util.*;
-import cytoscape.view.CyNetworkView;
-import cytoscape.CyNode;
-import cytoscape.CyEdge;
-import giny.view.NodeView;
-import giny.view.EdgeView;
-
 import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
 import fr.curie.BiNoM.analysis.ModularViewDialog;
@@ -54,11 +43,11 @@ public class ModularView implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-	Set netwSet = Cytoscape.getNetworkSet();
+	Set netwSet = Launcher.getAdapter().getCyNetworkManager().getNetworkSet();
 	if (netwSet.size() < 2) {
 	    return;
 	}
 
-	ModularViewDialog.getInstance().raise(new ModularViewTaskFactory(), NetworkUtils.getNetworkNames(EMPTY_NAME));
+	ModularViewDialog.getInstance().raise(NetworkUtils.getNetworkNames(EMPTY_NAME));
     }
 }

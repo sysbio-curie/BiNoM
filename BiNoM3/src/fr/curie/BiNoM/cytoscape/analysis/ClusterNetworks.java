@@ -58,7 +58,7 @@ public class ClusterNetworks extends AbstractCyAction{
 		JOptionPane.showMessageDialog(null, "You must select al least two networks");
 	}
 	else{	
-		ClusterNetworksDialog.getInstance(new ClusterNetworksTaskFactory()).raise(NetworkUtils.getNetworkNames(EMPTY_NAME));
+		ClusterNetworksDialog.getInstance().raise(NetworkUtils.getNetworkNames(EMPTY_NAME));
 	}
     }
 }

@@ -26,11 +26,7 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
 
 import java.io.InputStream;
 
@@ -40,12 +36,13 @@ import java.io.File;
 import java.net.URL;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 
 public class BioPAXAssociateSourceTask implements Task {
-    private TaskMonitor taskMonitor;
     private CyNetwork cyNetwork;
     private File file;
     private String name;
@@ -63,23 +60,13 @@ public class BioPAXAssociateSourceTask implements Task {
 	this.name = name;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Associate BioPAX Source " + file;
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 	    /*int algo = BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION;
 	    FileInputStream is = new FileInputStream(file);
@@ -107,15 +94,22 @@ public class BioPAXAssociateSourceTask implements Task {
 		    (Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(), biopax);
 	    //}
 	    //is.close();
-	    taskMonitor.setStatus("File associated");
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setStatusMessage("File associated");
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing BioPAX file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error importing BioPAX file " +
 				  file + ": " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

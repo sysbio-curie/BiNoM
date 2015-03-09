@@ -25,24 +25,13 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import java.io.*;
 import java.util.Properties;
-
-import javax.swing.JOptionPane;
-
-import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.pathways.utils.*;
-import fr.curie.BiNoM.pathways.test.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
-import fr.curie.BiNoM.pathways.wrappers.XGMML;
-
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import fr.curie.BiNoM.pathways.navicell.*;
 
 public class ProduceNaviCellMapFilesTask implements Task {
-    private TaskMonitor taskMonitor;
     private String wordPressURL = null;
     private String wordPressUser = null;
     private String wordPressPassword = null;
@@ -65,7 +54,8 @@ public class ProduceNaviCellMapFilesTask implements Task {
 	demo = _demo;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File fc = new File(configFileName);
     		if(fc.exists()){
@@ -109,23 +99,23 @@ public class ProduceNaviCellMapFilesTask implements Task {
     				ProduceClickableMap.run(base, source_directory, make_tiles, only_tiles, blog_name, null, null, show_default_compartement_name, wordPressURL, wordPressPassword, wordPressUser, blog_name, wordpress_ssl, wordpress_xmlrpc_patched, destination, provideSourceFiles, nv2, demo);
     			}catch(ProduceClickableMap.NaviCellException ne){
         			System.out.println("ERROR: "+ne.getMessage());
-            	    taskMonitor.setPercentCompleted(99);
-            	    taskMonitor.setStatus("ERROR: "+ne.getMessage()+" \n(if this is a NullPointerException,\ntry to launch it for the second time)");
+            	    taskMonitor.setProgress(1);
+            	    taskMonitor.setStatusMessage("ERROR: "+ne.getMessage()+" \n(if this is a NullPointerException,\ntry to launch it for the second time)");
     			}
     			
-    			taskMonitor.setPercentCompleted(100);
-        	    taskMonitor.setStatus("Finished creating NaviCell maps.");
+    			taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("Finished creating NaviCell maps.");
     			
     		}else{
     			System.out.println("ERROR: File "+configFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+configFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("ERROR: File "+configFileName+" does not exist.");
     		}
     		
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error Creating NaviCell maps:" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error Creating NaviCell maps:" + e);
     	}
     }
 
@@ -133,14 +123,6 @@ public class ProduceNaviCellMapFilesTask implements Task {
     	return "BiNoM: Produce NaviCell map files...";
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-    
 	private static Properties load_config(File config)
 	{
 		final Properties configuration = new Properties();
@@ -166,6 +148,12 @@ public class ProduceNaviCellMapFilesTask implements Task {
 			return configuration;
 		}
 		return configuration;
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
     

@@ -27,14 +27,10 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
-
 import javax.swing.JOptionPane;
-
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyTableUtil;
 

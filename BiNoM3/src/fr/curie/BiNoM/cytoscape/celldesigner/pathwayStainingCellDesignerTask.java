@@ -25,23 +25,14 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import java.io.*;
-import javax.swing.JOptionPane;
 
-import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.pathways.CellDesignerColorProteins;
+import java.io.*;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import fr.curie.BiNoM.pathways.coloring.CellDesignerPathwayStaining;
-import fr.curie.BiNoM.pathways.utils.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
-import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class pathwayStainingCellDesignerTask implements Task {
-	
-    private TaskMonitor taskMonitor;
-    /*
+	    /*
      * If  FeatureTableFileName is empty then random or predefined colors will be used
      */
     private String DataTableFileName = null;
@@ -76,7 +67,8 @@ public class pathwayStainingCellDesignerTask implements Task {
     	options = _options;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File fc = new File(CellDesignerFileName);
     		if(fc.exists()){
@@ -93,13 +85,13 @@ public class pathwayStainingCellDesignerTask implements Task {
     			cps.run(CellDesignerFileName, PngFileName, DataTableFileName, ProteinGroupFileName);    			
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+CellDesignerFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("ERROR: File "+CellDesignerFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error coloring CellDesigner proteins:" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error coloring CellDesigner proteins:" + e);
     	}
     }
 
@@ -107,15 +99,11 @@ public class pathwayStainingCellDesignerTask implements Task {
     	return "BiNoM: Staining CellDesigner map...";
     }
 
-    public void halt() {
-    }
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
-    
-	
-	
 }

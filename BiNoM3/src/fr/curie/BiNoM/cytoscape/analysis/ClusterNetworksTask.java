@@ -27,17 +27,20 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
-import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import edu.rpi.cs.xgmml.*;
-import java.util.Vector;
-import fr.curie.BiNoM.pathways.analysis.structure.*;
-import fr.curie.BiNoM.lib.AbstractTask;
+import org.cytoscape.work.AbstractTask;
+import org.cytoscape.work.TaskMonitor;
 
-public class ClusterNetworksTask implements Task, AbstractTask {
+import Main.Launcher;
+import edu.rpi.cs.xgmml.*;
+
+import java.util.Vector;
+
+import fr.curie.BiNoM.pathways.analysis.structure.*;
+
+public class ClusterNetworksTask extends AbstractTask {
 
     private TaskMonitor taskMonitor;
     private int idxs[];
@@ -74,11 +77,7 @@ public class ClusterNetworksTask implements Task, AbstractTask {
     	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
     }
 
-    public void execute() {
-	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this);
-    }
-
-    public void run() {
+	public void run(TaskMonitor arg0) throws Exception {
 	try {
 	    Vector<GraphDocument> networks = new Vector<GraphDocument>();
 
@@ -101,12 +100,12 @@ public class ClusterNetworksTask implements Task, AbstractTask {
 		     taskMonitor);
 	    }
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in clustering networks " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error in clustering networks " + e);
 	}
     }
 }

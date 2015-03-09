@@ -27,12 +27,15 @@ package fr.curie.BiNoM.cytoscape.analysis;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.cytoscape.utils.ShowTextDialog;
-import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+
+import Main.Launcher;
 import edu.rpi.cs.xgmml.*;
+
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.Set;
@@ -47,7 +50,6 @@ import fr.curie.BiNoM.pathways.utils.*;
 
 public class ExtractSubnetworkTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private GraphDocument network;
     private VisualStyle vizsty;
     private Vector<String> selected;
@@ -63,23 +65,13 @@ public class ExtractSubnetworkTask implements Task {
 	this.options = options;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Extract subnetwork";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+	public void run(org.cytoscape.work.TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
 		
 		SubnetworkProperties snp = new SubnetworkProperties();
@@ -171,14 +163,18 @@ public class ExtractSubnetworkTask implements Task {
 			report.append("\n\n"+reportCompactness);
 		}
 		
-		GraphDocument subnetwork = XGMML.convertGraphToXGMML(snp.subnetwork);		
+		GraphDocument subnetwork = XGMML.convertGraphToXGMML(snp.subnetwork);	
+		CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+		String netname = netw.getRow(netw).get(CyNetwork.NAME, String.class) + ".Sub";
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
 		
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
-	    (subnetwork.getGraph().getName(),
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
+	    (/*subnetwork.getGraph().getName()*/ netname,
 	     subnetwork,
 	     vizsty,
 	     false,//true, // applyLayout
-	     taskMonitor);
+	     taskMonitor, netw, nodeMap,edgeMap);
 
 		
 		if(options.makeSizeSignificanceTest){
@@ -219,13 +215,21 @@ public class ExtractSubnetworkTask implements Task {
 			dialog.pop("Extract subnetwork report", report.toString());
 		}
 		
-		
-	    taskMonitor.setPercentCompleted(100);
+		nodeMap = null;
+	    edgeMap = null;
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in extracting subnetwork " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error in extracting subnetwork " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

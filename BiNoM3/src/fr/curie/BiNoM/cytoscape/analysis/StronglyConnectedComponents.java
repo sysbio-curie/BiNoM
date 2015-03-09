@@ -26,20 +26,14 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import Main.Launcher;
-import cytoscape.view.CyNetworkView;
-import cytoscape.Cytoscape;
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
-
 import javax.swing.JOptionPane;
-
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerSourceDB;
@@ -60,7 +54,8 @@ public class StronglyConnectedComponents extends AbstractCyAction {
     public void actionPerformed(ActionEvent e) {
     	CyAppAdapter adapter = Launcher.getAdapter();
     	GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork());
-		StronglyConnectedComponentsTask task = new StronglyConnectedComponentsTask(graphDocument,adapter.getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+    	
+    	TaskIterator t = new TaskIterator(new StronglyConnectedComponentsTask(graphDocument,adapter.getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
     }
 }

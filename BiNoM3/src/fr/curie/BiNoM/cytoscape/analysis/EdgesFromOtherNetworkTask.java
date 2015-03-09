@@ -24,26 +24,24 @@
 	Laurence Calzone :	http://leibniz.biol.vt.edu/people/laurence/laurence.html
 */
 package fr.curie.BiNoM.cytoscape.analysis;
-
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.swing.JOptionPane;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
 
-import com.sun.glf.goodies.ToneAdjustmentOp;
-
 
 public class EdgesFromOtherNetworkTask implements Task {
-    private TaskMonitor taskMonitor;
 
     CyNetwork networks[];
     CyNetwork netwFrom;
@@ -53,78 +51,80 @@ public class EdgesFromOtherNetworkTask implements Task {
 	this.netwFrom = netwFrom;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Update Connections from other network";
     }
 
-    public CyNetwork getCyNetwork() {
-	return null;
-    }
 
-    public void run() {
-	try {
-
-	    /*taskMonitor.setStatus(netw_cnt +
-				  " Network" + (netw_cnt != 1 ? "s" : "") +
-				  " Updated");*/
-		fr.curie.BiNoM.pathways.analysis.structure.Graph gnetworks[] = new fr.curie.BiNoM.pathways.analysis.structure.Graph[networks.length];
-		fr.curie.BiNoM.pathways.analysis.structure.Graph gnetwFrom = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(netwFrom));
+    public void run(TaskMonitor taskMonitor) {
+    	if(netwFrom != null && networks != null){
+	    	taskMonitor.setTitle(getTitle());
+			try {
 		
-		
-		
-		for(int i=0;i<networks.length;i++){
-		    gnetworks[i] = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(networks[i]));
-			gnetworks[i].addConnections(gnetwFrom);
-			java.util.Iterator it = netwFrom.getEdgeList().iterator();
-			
-			Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
-			Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
-			CyNetworkView toView =null;
-			while(networkViewIterator.hasNext())
-				toView = networkViewIterator.next();
-			
-			while(it.hasNext()){
-				CyEdge edge = (CyEdge)it.next();
-				
-				if(gnetworks[i].getEdge(netwFrom.getRow(edge).get(CyNetwork.NAME, String.class))!=null){
-					if(Launcher.findEdgeWithName(networks[i], netwFrom.getRow(edge).get(CyNetwork.NAME, String.class)) == null){				
-					//if(!networks[i].containsEdge(edge)){
-						NetworkUtils.addEd(networks[i], netwFrom, edge);
-					}				
-				}		
+			    /*taskMonitor.setStatus(netw_cnt +
+						  " Network" + (netw_cnt != 1 ? "s" : "") +
+						  " Updated");*/
+				fr.curie.BiNoM.pathways.analysis.structure.Graph gnetworks[] = new fr.curie.BiNoM.pathways.analysis.structure.Graph[networks.length];
+				fr.curie.BiNoM.pathways.analysis.structure.Graph gnetwFrom = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(netwFrom));
 				
 				
-				taskMonitor.setPercentCompleted((int)(100f*i/networks.length));			
+				
+				for(int i=0;i<networks.length;i++){
+				    gnetworks[i] = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(networks[i]));
+					gnetworks[i].addConnections(gnetwFrom);
+					java.util.Iterator it = netwFrom.getEdgeList().iterator();
+					
+					Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
+					Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+					CyNetworkView toView =null;
+					while(networkViewIterator.hasNext())
+						toView = networkViewIterator.next();
+					
+					while(it.hasNext()){
+						CyEdge edge = (CyEdge)it.next();
+						
+						if(gnetworks[i].getEdge(netwFrom.getRow(edge).get(CyNetwork.NAME, String.class))!=null){
+							if(Launcher.findEdgeWithName(networks[i], netwFrom.getRow(edge).get(CyNetwork.NAME, String.class)) == null){				
+							//if(!networks[i].containsEdge(edge)){
+								NetworkUtils.addEd(networks[i], netwFrom, edge);
+							}				
+						}		
+						
+						
+						taskMonitor.setProgress((int)(1f*i/networks.length));			
+					}
+					
+					if(toView != null)
+						toView.updateView();
+					
+					networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
+					networkViewIterator = networkViews.iterator();
+					CyNetworkView fromView =null;
+					while(networkViewIterator.hasNext())
+						fromView = networkViewIterator.next();
+					
+					VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(fromView);	
+					vs.apply(toView);
+					toView.updateView();	
+		
+				}
+			    taskMonitor.setProgress(1);;
 			}
-			
-			if(toView != null)
-				toView.updateView();
-			
-			networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(networks[i]);
-			networkViewIterator = networkViews.iterator();
-			CyNetworkView fromView =null;
-			while(networkViewIterator.hasNext())
-				fromView = networkViewIterator.next();
-			
-			VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(fromView);	
-			vs.apply(toView);
-			toView.updateView();	
-
-		}
-	    taskMonitor.setPercentCompleted(100);
-	}
-	catch(Exception e) {
-	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error updating networks: " + e);
-	}
+			catch(Exception e) {
+			    e.printStackTrace();
+			    taskMonitor.setProgress(1);;
+			    taskMonitor.setStatusMessage("Error updating networks: " + e);
+			}
+    	}
+    	else
+    		JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), 
+    				"Select from and to netwok first.");
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

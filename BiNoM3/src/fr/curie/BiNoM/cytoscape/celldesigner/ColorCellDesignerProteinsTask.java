@@ -25,11 +25,12 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import java.io.*;
+
 import javax.swing.JOptionPane;
+
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.CellDesignerColorProteins;
@@ -38,7 +39,6 @@ import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class ColorCellDesignerProteinsTask implements Task {
-    private TaskMonitor taskMonitor;
     private String FeatureTableFileName = null;
     private String CellDesignerFileName = null;
 
@@ -47,7 +47,8 @@ public class ColorCellDesignerProteinsTask implements Task {
     	CellDesignerFileName = cellDesignerFileName;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File fc = new File(CellDesignerFileName);
     		File ft = null;
@@ -60,13 +61,13 @@ public class ColorCellDesignerProteinsTask implements Task {
     				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),null);
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+CellDesignerFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("ERROR: File "+CellDesignerFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error coloring CellDesigner proteins:" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error coloring CellDesigner proteins:" + e);
     	}
     }
 
@@ -74,15 +75,10 @@ public class ColorCellDesignerProteinsTask implements Task {
     	return "BiNoM: Color CellDesigner proteins...";
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
-    
-	
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

@@ -27,13 +27,13 @@ package fr.curie.BiNoM.cytoscape.analysis;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import fr.curie.BiNoM.cytoscape.lib.*;
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
-
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 public class ConvertToUndirectedGraphTask implements Task {
@@ -47,23 +47,13 @@ public class ConvertToUndirectedGraphTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Remove multiple edges";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 
 	    Graph graph = StructureAnalysisUtils.removeReciprocalEdges(XGMML.convertXGMMLToGraph(graphDocument));
@@ -76,12 +66,18 @@ public class ConvertToUndirectedGraphTask implements Task {
 		     false, // applyLayout
 		     taskMonitor);
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error removing multiple edges " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error removing multiple edges " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

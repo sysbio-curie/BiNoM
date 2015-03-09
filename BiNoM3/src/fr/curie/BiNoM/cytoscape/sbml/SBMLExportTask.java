@@ -26,13 +26,14 @@
 package fr.curie.BiNoM.cytoscape.sbml;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
+
 import java.util.Vector;
 import java.io.File;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import fr.curie.BiNoM.pathways.BioPAXToSBMLConverter;
 import fr.curie.BiNoM.pathways.CytoscapeToBioPAXConverter;
@@ -46,7 +47,6 @@ import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 
 public class SBMLExportTask implements Task {
-    private TaskMonitor taskMonitor;
     private CyNetwork cyNetwork;
     private File file;
     private static java.util.HashMap network_bw = new java.util.HashMap();
@@ -55,23 +55,13 @@ public class SBMLExportTask implements Task {
 	this.file = file;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Export SBML " + file.getPath();
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
             CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 	    BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(network);
@@ -139,17 +129,23 @@ public class SBMLExportTask implements Task {
 
 	    // Third situation, 
 
-	    taskMonitor.setStatus("File exported (" + species.size() +
+	    taskMonitor.setStatusMessage("File exported (" + species.size() +
 				  " species, " + reactions.size() +
 				  " reactions)");
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing SBML file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error importing SBML file " +
 				  file.getAbsolutePath() + ": " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -18,6 +19,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
+
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 
 
 public class MergingMapsDialog extends JDialog {
@@ -197,9 +203,9 @@ public class MergingMapsDialog extends JDialog {
 	            options.mergeImages = mergeImages.isSelected();
 	            options.zoomLevel = Integer.parseInt(imageZoomLevel.getText());
 	            options.mergeSpecies = mergeSpecies.isSelected();
-	            MergingMapsTask task = new MergingMapsTask(field1.getText(), field2.getText(), options);
-	  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-
+	            
+	            TaskIterator t = new TaskIterator(new MergingMapsTask(field1.getText(), field2.getText(), options));
+	    		Launcher.getAdapter().getTaskManager().execute(t);
 			}
 		});
 		buttonPanel.add(okB);

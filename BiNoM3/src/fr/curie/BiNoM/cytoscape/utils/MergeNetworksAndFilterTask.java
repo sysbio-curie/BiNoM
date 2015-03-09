@@ -3,30 +3,24 @@ package fr.curie.BiNoM.cytoscape.utils;
 import fr.curie.BiNoM.cytoscape.lib.*;
 
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
+
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
+
 import java.util.Vector;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 import fr.curie.BiNoM.lib.AbstractTask;
 
-public class MergeNetworksAndFilterTask implements Task, AbstractTask {
+public class MergeNetworksAndFilterTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private int idxs[];
     private VisualStyle vizsty;
     private float intersectionThreshold = 0.3f;
-
-    /*
-    public ClusterNetworksTask(Vector<GraphDocument> networks, StructureAnalysisUtils.Option options, VisualStyle vizsty) {
-	this.networks = networks;
-	this.vizsty = vizsty;
-	this.intersectionThreshold = options.intersectionThreshold;
-    }
-    */
 
     public MergeNetworksAndFilterTask(int idxs[], StructureAnalysisUtils.Option options, VisualStyle vizsty) {
 	this.idxs = idxs;
@@ -34,27 +28,12 @@ public class MergeNetworksAndFilterTask implements Task, AbstractTask {
 	this.intersectionThreshold = options.intersectionThreshold;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-	throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Merging and filtering networks";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
-
-    public void execute() {
-	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this);
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 	    Vector<Graph> networks = new Vector<Graph>();
 	    String name = "";
@@ -80,13 +59,19 @@ public class MergeNetworksAndFilterTask implements Task, AbstractTask {
 		     false, // applyLayout
 		     taskMonitor);
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in clustering networks " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error in clustering networks " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

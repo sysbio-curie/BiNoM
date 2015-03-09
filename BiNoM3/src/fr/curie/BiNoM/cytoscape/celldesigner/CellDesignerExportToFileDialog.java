@@ -34,8 +34,12 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-
 import javax.swing.JScrollPane;
+
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -43,7 +47,6 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
-
 import java.io.File;
 
 public class CellDesignerExportToFileDialog extends JFrame {
@@ -483,8 +486,8 @@ public class CellDesignerExportToFileDialog extends JFrame {
             options.insertHypotheticalInfluences_complexMutualInhibition = cbinsertHypotheticalInfluences_complexMutualInhibition.isSelected();
             options.insertHypotheticalInfluences_inhCatalysisReactant = cbinsertHypotheticalInfluences_inhCatalysisReactant.isSelected();
             
-			CellDesignerExportTask task = new CellDesignerExportTask(cdfile,options);
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+            TaskIterator t = new TaskIterator(new CellDesignerExportTask(cdfile,options));
+    		Launcher.getAdapter().getTaskManager().execute(t);
                 }
            });
 

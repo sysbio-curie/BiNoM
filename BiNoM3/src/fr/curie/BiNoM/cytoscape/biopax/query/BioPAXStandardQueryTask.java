@@ -28,6 +28,8 @@ package fr.curie.BiNoM.cytoscape.biopax.query;
 
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
@@ -35,8 +37,6 @@ import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 
 import java.util.*;
 
@@ -82,7 +82,6 @@ public class BioPAXStandardQueryTask implements Task {
 	}
 
 	private StandardQueryOptions options = null;
-    private TaskMonitor taskMonitor;
     private BioPAXGraphQuery query = null; 
     private Vector selectedNodes = null;
     private boolean outputCurrentNetwork = false;
@@ -102,11 +101,9 @@ public class BioPAXStandardQueryTask implements Task {
 		return "BioPAX index standard query";
 	}
 
-	public void halt() {
 
-	}
-
-	public void run() {
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
 		try{
 		BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
 		
@@ -131,7 +128,7 @@ public class BioPAXStandardQueryTask implements Task {
 		
 		System.out.println("Number of edges after selectedNodes = "+query.result.Edges.size());
 		
-		taskMonitor.setStatus("Add complexes...");
+		taskMonitor.setStatusMessage("Add complexes...");
 		if(options.selectComplex){
 		    if(options.complexExpand)
 		    	beng.doQuery(query, query.ADD_COMPLEXES_EXPAND);
@@ -142,8 +139,8 @@ public class BioPAXStandardQueryTask implements Task {
 		
 		System.out.println("Number of edges after selectComplexes = "+query.result.Edges.size());
 		
-	    taskMonitor.setPercentCompleted(20);		
-		taskMonitor.setStatus("Add species...");	    
+	    taskMonitor.setProgress(0.2);
+		taskMonitor.setStatusMessage("Add species...");	    
 		if(options.selectSpecies){
 			beng.doQuery(query, query.ADD_SPECIES);
 			beng.query.input = beng.query.result;
@@ -151,8 +148,8 @@ public class BioPAXStandardQueryTask implements Task {
 		
 		System.out.println("Number of edges after add species = "+query.result.Edges.size());
 		
-	    taskMonitor.setPercentCompleted(40);		
-		taskMonitor.setStatus("Add reactions...");	    
+	    taskMonitor.setProgress(0.4);	
+		taskMonitor.setStatusMessage("Add reactions...");	    
 		if(options.selectReactions){
 			if(options.reactionConnecting)
 				beng.doQuery(query, query.ADD_CONNECTING_REACTIONS);
@@ -165,8 +162,8 @@ public class BioPAXStandardQueryTask implements Task {
 		
 		System.out.println("Number of edges after selectReactions = "+query.result.Edges.size());
 		
-	    taskMonitor.setPercentCompleted(60);		
-		taskMonitor.setStatus("Add publications...");	    
+	    taskMonitor.setProgress(0.6);	
+		taskMonitor.setStatusMessage("Add publications...");	    
 		if(options.selectPublications){
 			beng.doQuery(query, query.ADD_PUBLICATIONS);
 			beng.query.input = beng.query.result;
@@ -249,17 +246,18 @@ public class BioPAXStandardQueryTask implements Task {
 		     true, // applyLayout
 		     taskMonitor);
 		}
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 		}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error making standard query :" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error making standard query :" + e);
 		}
 	}
 
-	public void setTaskMonitor(TaskMonitor arg0)
-			throws IllegalThreadStateException {
-        this.taskMonitor = arg0;
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

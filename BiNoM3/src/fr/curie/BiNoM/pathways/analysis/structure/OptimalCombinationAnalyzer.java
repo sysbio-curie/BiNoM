@@ -287,15 +287,17 @@ public class OptimalCombinationAnalyzer {
 		HashSet<BitSet> mcs = new HashSet<BitSet>();
 		
 		// initialize mcs with first row of the matrix
-		BitSet firstRow = pathMatrixRowBin.get(0);
-		for (int i=0;i<pathMatrixNbCol;i++) {
-			BitSet tmp = new BitSet(pathMatrixNbCol);
-			tmp.set(i);
-			tmp.and(firstRow);
-			if (tmp.cardinality() == 1) {
-				BitSet b = new BitSet(pathMatrixNbCol);
-				b.set(i);
-				mcs.add(b);
+		if(mcs.size() > 0){
+			BitSet firstRow = pathMatrixRowBin.get(0);
+			for (int i=0;i<pathMatrixNbCol;i++) {
+				BitSet tmp = new BitSet(pathMatrixNbCol);
+				tmp.set(i);
+				tmp.and(firstRow);
+				if (tmp.cardinality() == 1) {
+					BitSet b = new BitSet(pathMatrixNbCol);
+					b.set(i);
+					mcs.add(b);
+				}
 			}
 		}
 		return(mcs);

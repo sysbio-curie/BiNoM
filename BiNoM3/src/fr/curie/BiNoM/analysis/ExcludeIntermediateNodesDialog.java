@@ -27,6 +27,7 @@
 package fr.curie.BiNoM.analysis;
 
 import java.util.*;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JCheckBox;
@@ -36,12 +37,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
+import fr.curie.BiNoM.cytoscape.analysis.ExcludeIntermediateNodesTask;
 import fr.curie.BiNoM.lib.AbstractTask;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 
@@ -119,8 +127,7 @@ public class ExcludeIntermediateNodesDialog  extends JDialog{
     }
 
 
-    public void raise(AbstractExcludeIntermediateNodesTaskFactory factory, Graph graph, Vector nodesToExclude) {
-	this.factory = factory;
+    public void raise(Graph graph, Vector nodesToExclude) {
 	this.graph = graph;
 	this.nodesToExclude = nodesToExclude;
 	 
@@ -219,9 +226,8 @@ public class ExcludeIntermediateNodesDialog  extends JDialog{
 			    nodesToExclude.add(cb.getText());
 			}
 		    }		    
-
-		    AbstractTask task = factory.createTask(graph, nodesToExclude);
-		    task.execute();
+		    TaskIterator t = new TaskIterator(new ExcludeIntermediateNodesTask(graph, nodesToExclude));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		}
 	    });
 	

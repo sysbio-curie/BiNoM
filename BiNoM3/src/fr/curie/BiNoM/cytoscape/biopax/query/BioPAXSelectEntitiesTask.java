@@ -26,33 +26,21 @@
 package fr.curie.BiNoM.cytoscape.biopax.query;
 
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyRow;
-import org.cytoscape.model.CyTable;
-
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-
-import java.io.*;
 import java.util.*;
-
-import javax.swing.JOptionPane;
-
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.utils.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 
 public class BioPAXSelectEntitiesTask implements Task {
 
-	private TaskMonitor taskMonitor;
 	private BioPAXGraphQuery query = null;
 	private int inputType = 0;
 	public static int INPUT_CURRENT_NETWORK = 0;
@@ -73,9 +61,9 @@ public class BioPAXSelectEntitiesTask implements Task {
 		return query;
 	}
 
-	public void run() {
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
 		try {
-
 			BioPAXIndexRepository.getInstance().addToReport("\nEntities: "+(new Date()).toString()+"\n");
 
 			BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
@@ -84,11 +72,11 @@ public class BioPAXSelectEntitiesTask implements Task {
 			if(beng!=null){
 
 				if(act!=null){
-					taskMonitor.setStatus("Looking for synonyms...");
+					taskMonitor.setStatusMessage("Looking for synonyms...");
 					act.addSynonyms(query);
 				}
 
-				taskMonitor.setStatus("Performing query...");
+				taskMonitor.setStatusMessage("Performing query...");
 				beng.doQuery(query, query.SELECT_ENTITIES);
 
 				// Dealing with networks
@@ -129,15 +117,15 @@ public class BioPAXSelectEntitiesTask implements Task {
 					//networkView.redrawGraph(true, false);
 				}
 			}else{
-				taskMonitor.setStatus("Query was not performed. No index loaded.");
+				taskMonitor.setStatusMessage("Query was not performed. No index loaded.");
 			}
 
-			taskMonitor.setPercentCompleted(100);
+			taskMonitor.setProgress(1);;
 
 		}catch(Exception e){
 			e.printStackTrace();
-			taskMonitor.setPercentCompleted(100);
-			taskMonitor.setStatus("Error selecting entities :" + e);
+			taskMonitor.setProgress(1);
+			taskMonitor.setStatusMessage("Error selecting entities :" + e);
 		}
 	}
 
@@ -145,12 +133,10 @@ public class BioPAXSelectEntitiesTask implements Task {
 		return "BiNoM: Select entities ";
 	}
 
-	public void halt() {
-	}
-
-	public void setTaskMonitor(TaskMonitor taskMonitor)
-	throws IllegalThreadStateException {
-		this.taskMonitor = taskMonitor;
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -69,7 +69,9 @@ public class BioPAXImportFromFile extends AbstractCyAction{
 		    try {
 			FileInputStream is = new FileInputStream(file);
 			is.close();
-			BioPAXImportDialog.getInstance().raise(new BioPAXImportTaskFactory(), file, file.getName());
+			
+			
+			BioPAXImportDialog.getInstance().raise(file, file.getName());
 			
 		    }
 		    catch(Exception ee) {

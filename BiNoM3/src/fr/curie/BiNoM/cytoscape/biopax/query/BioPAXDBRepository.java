@@ -25,9 +25,6 @@
 */
 package fr.curie.BiNoM.cytoscape.biopax.query;
 
-import cytoscape.CyNetwork;
-import cytoscape.Cytoscape;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JCheckBox;
@@ -59,9 +56,6 @@ import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
 import fr.curie.BiNoM.cytoscape.netwop.*;
 import fr.curie.BiNoM.cytoscape.lib.*;
 
-import cytoscape.CyNetwork;
-import cytoscape.CyNode;
-import cytoscape.CyEdge;
 
 public class BioPAXDBRepository extends BioPAXRepository{
 

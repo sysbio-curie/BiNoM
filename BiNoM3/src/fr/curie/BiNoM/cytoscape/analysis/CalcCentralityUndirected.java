@@ -39,6 +39,7 @@ import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
+import org.cytoscape.work.TaskIterator;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
@@ -74,8 +75,11 @@ public class CalcCentralityUndirected extends AbstractCyAction {
         	}
 			StructureAnalysisUtils.Option options = new StructureAnalysisUtils.Option();
 			GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork());
-    		CalcCentralityTask task = new CalcCentralityTask(graphDocument, selected, directed, options, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-    		task.run();
+			
+			CalcCentralityTask task = new CalcCentralityTask(graphDocument, selected, directed, options, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
+			TaskIterator t = new TaskIterator(task);
+			Launcher.getAdapter().getTaskManager().execute(t);
+			
     		ShowTextDialog dialog = new ShowTextDialog();
     		dialog.pop("Node Inbetweenness", task.getText().toString());
     		

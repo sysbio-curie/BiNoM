@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import Main.Launcher;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -48,7 +49,8 @@ public class ConnectedComponents extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-		ConnectedComponentsTask task = new ConnectedComponentsTask(graphDocument, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		
+		TaskIterator t = new TaskIterator(new ConnectedComponentsTask(graphDocument, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
 	}
 }

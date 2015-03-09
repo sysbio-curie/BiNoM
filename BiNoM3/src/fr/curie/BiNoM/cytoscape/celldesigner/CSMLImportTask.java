@@ -26,19 +26,20 @@
 package fr.curie.BiNoM.cytoscape.celldesigner;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.cytoscape.biopax.*;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+
 import java.io.*;
+
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.CSMLToCytoscapeConverter;
 
 import org.csml.csml.version3.*;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 public class CSMLImportTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private File CSMLFile;
     private CyNetwork cyNetwork;
 
@@ -46,27 +47,18 @@ public class CSMLImportTask implements Task {
         this.CSMLFile = file;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Import CSML File " + CSMLFile;
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
 
-    public void run() {
+	public void run(TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
 	    if (!CSMLFile.canRead()) {
-		taskMonitor.setStatus("Cannot read file: " + CSMLFile);
-		taskMonitor.setPercentCompleted(100);
+		taskMonitor.setStatusMessage("Cannot read file: " + CSMLFile);
+		taskMonitor.setProgress(1);;
 		return;
 	    }
 
@@ -88,11 +80,17 @@ public class CSMLImportTask implements Task {
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing CellDesigner file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error importing CellDesigner file " +
 				  CSMLFile.getAbsolutePath() +
 				  ": " + e);
 	}
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

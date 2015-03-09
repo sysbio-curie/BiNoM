@@ -30,17 +30,11 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.visual.*;
-import cytoscape.visual.calculators.*;
-import cytoscape.visual.mappings.ObjectMapping;
-import cytoscape.data.CyAttributes;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXVisualStyleDefinition;
-import giny.view.NodeView;
 
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.view.vizmap.VisualStyle;
@@ -58,8 +52,6 @@ public class VisualStyleFactory {
 	
 	CyAppAdapter adapter;
 
-    private CalculatorCatalog catalog;
-
     private static VisualStyleFactory instance;
 
     public static VisualStyleFactory getInstance() {
@@ -68,7 +60,7 @@ public class VisualStyleFactory {
 		return instance;
     }
 
-    VisualStyleFactory() {
+    public VisualStyleFactory() {
     	adapter = Launcher.getAdapter();
     }
 
@@ -84,54 +76,53 @@ public class VisualStyleFactory {
 		adapter.getVisualMappingManager().setVisualStyle(create(vizsty_def), networkView);
     }
 
-    private void applyImageMapping(VisualStyleDefinition vizsty_def, CyNetworkView networkView) {
-		Vector v = vizsty_def.getNodeImageMapping();
-		if (v.size() == 0)
-		    return;
-	
-		CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
-		String node_attr = vizsty_def.getNodeAttribute();
-		
-		Iterator<CyNode> i = networkView.getModel().getNodeList().iterator();
-	
-		while (i.hasNext()) {
-		    CyNode node = (CyNode)i.next();
-		    View<CyNode> nodeView = networkView.getNodeView(node);
-		    String value = nodeAttrs.getStringAttribute
-			(node.SUID, node_attr);
-	
-		    for (int n = 0; n < v.size(); n++) {
-				VisualStyleDefinition.ObjectMapping m =
-				    (VisualStyleDefinition.ObjectMapping)v.get(n);
-		
-				if (value.equals(m.getAttributeValue())) {
-				    VisualStyleDefinition.ImageDefinition img_def =
-					(VisualStyleDefinition.ImageDefinition)
-					m.getMappingValue();
-		
-				    try {
-					java.awt.image.BufferedImage img =
-					    javax.imageio.ImageIO.read(new java.io.File(img_def.img));
-		
-					int width = (int)(img.getWidth() * img_def.scale);
-					int height = (int)(img.getHeight() * img_def.scale);
-					java.awt.geom.Rectangle2D.Double rect = new
-				    java.awt.geom.Rectangle2D.Double
-				    (-width/2, -height/2, width, height);
-					ding.view.DNodeView dnv = (ding.view.DNodeView)nodeView;
-					java.awt.Paint paint =
-					    new java.awt.TexturePaint(img, null);
-					//dnv.addCustomGraphic(rect, paint, 0);
-		
-				    }
-				    catch(Exception e) {
-					e.printStackTrace();
-				    }
-				    break;
-				}
-		    }
-		}
-    }
+//    private void applyImageMapping(VisualStyleDefinition vizsty_def, CyNetworkView networkView) {
+//		Vector v = vizsty_def.getNodeImageMapping();
+//		if (v.size() == 0)
+//		    return;
+//	
+//		String node_attr = vizsty_def.getNodeAttribute();
+//		
+//		Iterator<CyNode> i = networkView.getModel().getNodeList().iterator();
+//	
+//		while (i.hasNext()) {
+//		    CyNode node = (CyNode)i.next();
+//		    View<CyNode> nodeView = networkView.getNodeView(node);
+//		    String value = nodeAttrs.getStringAttribute(node.SUID, node_attr);
+//		    cyNetwork.getRow(node).get(col.getName(), String.class);
+//	
+//		    for (int n = 0; n < v.size(); n++) {
+//				VisualStyleDefinition.ObjectMapping m =
+//				    (VisualStyleDefinition.ObjectMapping)v.get(n);
+//		
+//				if (value.equals(m.getAttributeValue())) {
+//				    VisualStyleDefinition.ImageDefinition img_def =
+//					(VisualStyleDefinition.ImageDefinition)
+//					m.getMappingValue();
+//		
+//				    try {
+//					java.awt.image.BufferedImage img =
+//					    javax.imageio.ImageIO.read(new java.io.File(img_def.img));
+//		
+//					int width = (int)(img.getWidth() * img_def.scale);
+//					int height = (int)(img.getHeight() * img_def.scale);
+//					java.awt.geom.Rectangle2D.Double rect = new
+//				    java.awt.geom.Rectangle2D.Double
+//				    (-width/2, -height/2, width, height);
+//					ding.view.DNodeView dnv = (ding.view.DNodeView)nodeView;
+//					java.awt.Paint paint =
+//					    new java.awt.TexturePaint(img, null);
+//					//dnv.addCustomGraphic(rect, paint, 0);
+//		
+//				    }
+//				    catch(Exception e) {
+//					e.printStackTrace();
+//				    }
+//				    break;
+//				}
+//		    }
+//		}
+//    }
 
     public VisualStyle create(VisualStyleDefinition vizsty_def) {	
 	
@@ -144,16 +135,16 @@ public class VisualStyleFactory {
     	}
 
     	
-    	// If the style already existed, remove it first
-		it = adapter.getVisualMappingManager().getAllVisualStyles().iterator();
-		while (it.hasNext()){
-			VisualStyle curVS = (VisualStyle)it.next();
-			if (curVS.getTitle().equalsIgnoreCase("Sample Visual Style"))
-			{
-				adapter.getVisualMappingManager().removeVisualStyle(curVS);
-				break;
-			}
-		}
+//    	// If the style already existed, remove it first
+//		it = adapter.getVisualMappingManager().getAllVisualStyles().iterator();
+//		while (it.hasNext()){
+//			VisualStyle curVS = (VisualStyle)it.next();
+//			if (curVS.getTitle().equalsIgnoreCase("Sample Visual Style"))
+//			{
+//				adapter.getVisualMappingManager().removeVisualStyle(curVS);
+//				break;
+//			}
+//		}
 
 		VisualStyle vizsty = adapter.getVisualStyleFactory().createVisualStyle(vizsty_def.getName());
 				

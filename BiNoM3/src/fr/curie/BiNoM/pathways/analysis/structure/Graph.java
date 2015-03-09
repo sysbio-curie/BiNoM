@@ -471,7 +471,6 @@ public class Graph {
   public void addNodesFromEdges(){
     for(int i=0;i<Edges.size();i++){
       Edge e = (Edge)Edges.elementAt(i);
-      System.out.println("Id edge: " + e.Id);
       int k1 = getNodeIndex(e.Node1.Id);
       int k2 = getNodeIndex(e.Node2.Id);
       if(k1<0)

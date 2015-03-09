@@ -28,6 +28,7 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import java.awt.event.ActionEvent;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 import Main.Launcher;
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -46,9 +47,9 @@ public class ConvertReactionNetworkToEntityNetwork extends AbstractCyAction {
     public void actionPerformed(ActionEvent e) {
 
 		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-		ConvertReactionNetworkToEntityNetworkTask task = new ConvertReactionNetworkToEntityNetworkTask(graphDocument,
-		     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		
+		TaskIterator t = new TaskIterator(new ConvertReactionNetworkToEntityNetworkTask(graphDocument,
+			     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
     }
-
 }

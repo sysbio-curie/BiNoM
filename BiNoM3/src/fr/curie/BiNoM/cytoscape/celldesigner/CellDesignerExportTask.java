@@ -34,16 +34,14 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 
 import java.io.*;
 
-import cytoscape.task.ui.JTaskConfig;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
 
 import java.io.InputStream;
 import java.util.Vector;
@@ -57,8 +55,6 @@ import org.apache.xmlbeans.XmlString;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 
-import com.lowagie.text.Entities;
-
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerImportTask;
@@ -69,7 +65,6 @@ import fr.curie.BiNoM.pathways.utils.Utils;
 import javax.swing.JOptionPane;
 
 public class CellDesignerExportTask implements Task {
-    private TaskMonitor taskMonitor;
     private CyNetwork cyNetwork;
     private File file;
     private static java.util.HashMap network_bw = new java.util.HashMap();
@@ -81,23 +76,13 @@ public class CellDesignerExportTask implements Task {
     	this.options = _options;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Export CellDesigner " + file.getPath();
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 		CyAppAdapter adapter = Launcher.getAdapter();
 		
@@ -188,8 +173,8 @@ public class CellDesignerExportTask implements Task {
                   } catch(Exception e) {
 		      System.out.println("Error in trying merging files...");
 		      e.printStackTrace();
-		      taskMonitor.setPercentCompleted(100);
-		      taskMonitor.setStatus("Error in merging CellDesigner files " +
+		      taskMonitor.setProgress(1);
+		      taskMonitor.setStatusMessage("Error in merging CellDesigner files " +
 				  file.getAbsolutePath() + ": " + e);
                   }
                 }else{
@@ -207,12 +192,12 @@ public class CellDesignerExportTask implements Task {
 
 	    }
 	    }
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error exporting CellDesigner file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error exporting CellDesigner file " +
 				  file.getAbsolutePath() + ": " + e);
 	}
     }
@@ -951,10 +936,13 @@ public class CellDesignerExportTask implements Task {
 			CelldesignerLineDocument.CelldesignerLine cl = an.addNewCelldesignerLine();
 			cl.setWidth("1.0");
 			cl.setColor(color);
-			
 		}
 
-    
+		@Override
+		public void cancel() {
+			// TODO Auto-generated method stub
+			
+		}
 }
 
 

@@ -31,14 +31,15 @@ import fr.curie.BiNoM.pathways.utils.*;
 
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
+
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.*;
 
 import java.util.Collection;
@@ -47,7 +48,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import fr.curie.BiNoM.pathways.analysis.structure.*;
-
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 
@@ -55,7 +55,6 @@ import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class IndexPathAnalysisTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private VisualStyle vizsty;
     private Vector<String> sources;
     private Vector<String> targets;
@@ -92,23 +91,14 @@ public class IndexPathAnalysisTask implements Task {
 	this.outputCurrentNetwork = ocn;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Index path analysis";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 		
 		BioPAXGraphQueryEngine beng = BioPAXIndexRepository.getInstance().getBioPAXGraphQueryEngine();
@@ -134,57 +124,57 @@ public class IndexPathAnalysisTask implements Task {
 			gr.addConnections(beng.databaseCopyForPathAnalysis);
 			System.out.println("4");
 			if(outputCurrentNetwork){
-//				CyNetwork current = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-//				
-//				
-//				//cytoscape.data.CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
-//				//cytoscape.data.CyAttributes edgeAttrs = Cytoscape.getEdgeAttributes();
-//
-//				
-//				GraphDocument currentGraphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-//				Graph currentGraph = XGMML.convertXGMMLToGraph(currentGraphDocument);
-//				for(int i=0;i<gr.Nodes.size();i++){
-//					Node n = (Node)gr.Nodes.get(i);
-//					if(currentGraph.getNode(n.Id)==null){
-//						
-//				    CyNode nd =  current.addNode();
-//				    //Cytoscape.getCyNode(NetworkFactory.toId(n.Id),true);
-//				    //current.addNode(nd);
-//				    for(int j=0;j<n.Attributes.size();j++){
-//				    	Attribute attr = (Attribute)n.Attributes.get(j);
-//				    	current.getRow(nd).set(attr.name, attr.value);
-//						//nodeAttrs.setAttribute(nd.getIdentifier(), attr.name,attr.value);
-//				    }				    
-//				    //nd.setIdentifier(nd.getIdentifier());
-//					}
-//				}
-//				for(int i=0;i<gr.Edges.size();i++){
-//					Edge e = (Edge)gr.Edges.get(i);
-//					if(currentGraph.getEdge(e.Id)==null){
-//					CyEdge ed = current.addEdge(getNodeWithName(current, current.getDefaultNodeTable(), "name", NetworkFactory.toId(e.Node1.Id)), 
-//							getNodeWithName(current, current.getDefaultNodeTable(), "name",NetworkFactory.toId(e.Node2.Id)), true)	;
-////				    CyEdge ed = Cytoscape.getCyEdge(
-////				    		Cytoscape.getCyNode(NetworkFactory.toId(e.Node1.Id)),
-////						    Cytoscape.getCyNode(NetworkFactory.toId(e.Node2.Id)),
-////						    Semantics.INTERACTION,
-////						    e.EdgeLabel,
-////						    true
-////				    );
-//					current.getDefaultEdgeTable().getRow(ed.getSUID()).set("name", e.Id);
-//				    //ed.setIdentifier(e.Id);
-//				    //System.out.println(""+(i+1)+") Creating edge: "+e.EdgeLabel+"\t"+ed.getIdentifier());
-//				    //current.addEdge(ed);
-//				    for(int j=0;j<e.Attributes.size();j++){
-//				    	Attribute attr = (Attribute)e.Attributes.get(j);
-//				    	current.getRow(ed).set(attr.name, attr.value);
-//						//edgeAttrs.setAttribute(ed.getIdentifier(), attr.name,attr.value);
-//				    }
-//					}
-//				}
-//				CyNetworkView networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-//				Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(current);
-//				//networkView.redrawGraph(true, false);
-//				networkView.updateView();
+				CyNetwork current = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+				
+				
+				//cytoscape.data.CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
+				//cytoscape.data.CyAttributes edgeAttrs = Cytoscape.getEdgeAttributes();
+
+				
+				GraphDocument currentGraphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
+				Graph currentGraph = XGMML.convertXGMMLToGraph(currentGraphDocument);
+				for(int i=0;i<gr.Nodes.size();i++){
+					Node n = (Node)gr.Nodes.get(i);
+					if(currentGraph.getNode(n.Id)==null){
+						
+				    CyNode nd =  current.addNode();
+				    //Cytoscape.getCyNode(NetworkFactory.toId(n.Id),true);
+				    //current.addNode(nd);
+				    for(int j=0;j<n.Attributes.size();j++){
+				    	Attribute attr = (Attribute)n.Attributes.get(j);
+				    	current.getRow(nd).set(attr.name, attr.value);
+						//nodeAttrs.setAttribute(nd.getIdentifier(), attr.name,attr.value);
+				    }				    
+				    //nd.setIdentifier(nd.getIdentifier());
+					}
+				}
+				for(int i=0;i<gr.Edges.size();i++){
+					Edge e = (Edge)gr.Edges.get(i);
+					if(currentGraph.getEdge(e.Id)==null){
+					CyEdge ed = current.addEdge(getNodeWithName(current, current.getDefaultNodeTable(), "name", NetworkFactory.toId(e.Node1.Id)), 
+							getNodeWithName(current, current.getDefaultNodeTable(), "name",NetworkFactory.toId(e.Node2.Id)), true)	;
+//				    CyEdge ed = Cytoscape.getCyEdge(
+//				    		Cytoscape.getCyNode(NetworkFactory.toId(e.Node1.Id)),
+//						    Cytoscape.getCyNode(NetworkFactory.toId(e.Node2.Id)),
+//						    Semantics.INTERACTION,
+//						    e.EdgeLabel,
+//						    true
+//				    );
+					current.getDefaultEdgeTable().getRow(ed.getSUID()).set("name", e.Id);
+				    //ed.setIdentifier(e.Id);
+				    //System.out.println(""+(i+1)+") Creating edge: "+e.EdgeLabel+"\t"+ed.getIdentifier());
+				    //current.addEdge(ed);
+				    for(int j=0;j<e.Attributes.size();j++){
+				    	Attribute attr = (Attribute)e.Attributes.get(j);
+				    	current.getRow(ed).set(attr.name, attr.value);
+						//edgeAttrs.setAttribute(ed.getIdentifier(), attr.name,attr.value);
+				    }
+					}
+				}
+				CyNetworkView networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
+				Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(current);
+				//networkView.redrawGraph(true, false);
+				networkView.updateView();
 			}else{
 				System.out.println("5");
 				GraphDocument grDoc = XGMML.convertGraphToXGMML(gr);
@@ -199,15 +189,22 @@ public class IndexPathAnalysisTask implements Task {
 			
 		}else{
 			Thread.sleep(100);
-			taskMonitor.setStatus("ERROR: Index is not loaded.");
+			taskMonitor.setStatusMessage("ERROR: Index is not loaded.");
 		}
 		
-		taskMonitor.setPercentCompleted(100);
+		taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in index path analysis " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error in index path analysis " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

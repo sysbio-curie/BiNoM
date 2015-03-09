@@ -25,20 +25,13 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import java.io.*;
-import javax.swing.JOptionPane;
-
-import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.pathways.CellDesignerColorProteins;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 import fr.curie.BiNoM.pathways.utils.*;
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
-import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class extractCellDesignerNotesTask implements Task {
-    private TaskMonitor taskMonitor;
     private String CellDesignerFileName = null;
     private extractingNotesOptions options = null;
 
@@ -60,7 +53,8 @@ public class extractCellDesignerNotesTask implements Task {
     	public boolean overwriteModuleSection = false;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File fc = new File(CellDesignerFileName);
     		if(fc.exists()){
@@ -93,13 +87,13 @@ public class extractCellDesignerNotesTask implements Task {
     			
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+CellDesignerFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("ERROR: File "+CellDesignerFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error extracting CellDesigner notes:" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error extracting CellDesigner notes:" + e);
     	}
     }
 
@@ -107,15 +101,12 @@ public class extractCellDesignerNotesTask implements Task {
     	return "BiNoM: Extract CellDesigner notes...";
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
-    
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
+  
 	
 	
 }

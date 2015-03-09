@@ -35,6 +35,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.TaskIterator;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
@@ -54,9 +55,8 @@ public class LinearizeNetwork extends AbstractCyAction {
 		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 
 		CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
-		LinearizeNetworkTask task = new LinearizeNetworkTask(graphDocument,Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-
+		
+		TaskIterator t = new TaskIterator(new LinearizeNetworkTask(graphDocument,Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
 	}
-
 }

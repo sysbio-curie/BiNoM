@@ -39,7 +39,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import fr.curie.BiNoM.lib.AbstractTask;
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportTask;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 
 public class BioPAXImportDialog extends JDialog implements ActionListener {
@@ -80,8 +83,6 @@ public class BioPAXImportDialog extends JDialog implements ActionListener {
     private URL url;
     private String name;
 
-    private AbstractBioPAXImportTaskFactory factory; // added
-
     public static BioPAXImportDialog instance;
 
     public static BioPAXImportDialog getInstance() {
@@ -91,16 +92,14 @@ public class BioPAXImportDialog extends JDialog implements ActionListener {
     }
 
     // added
-    public void raise(AbstractBioPAXImportTaskFactory factory, File file, String name) {
-	this.factory = factory;
+    public void raise(File file, String name) {
 	this.file = file;
 	this.url = null;
 	this.name = name;
 	pop();
     }
 
-    public void raise(AbstractBioPAXImportTaskFactory factory, URL url, String name) {
-	this.factory = factory;
+    public void raise( URL url, String name) {
 	this.file = null;
 	this.url = url;
 	this.name = name;
@@ -230,9 +229,11 @@ public class BioPAXImportDialog extends JDialog implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 		    int algos[] = getAlgos();
 		    if (algos[0] != 0) {
-			AbstractTask task = factory.createTask(file, url, name, algos, getOptions(), true);
-			task.execute();
-
+		    	
+		    
+	    	TaskIterator t = new TaskIterator(new BioPAXImportTask(file, url, name, algos, getOptions(), true));
+			Launcher.getAdapter().getTaskManager().execute(t);
+		    	
 			/*
 			BioPAXImportTask task = new BioPAXImportTask
 			    (plugin, file, url, name, algos, getOptions(), true);

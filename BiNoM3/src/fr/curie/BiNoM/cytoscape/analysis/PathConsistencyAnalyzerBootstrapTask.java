@@ -3,8 +3,9 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import java.text.DecimalFormat;
 import java.util.Random;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 public class PathConsistencyAnalyzerBootstrapTask implements Task {
@@ -23,13 +24,10 @@ public class PathConsistencyAnalyzerBootstrapTask implements Task {
 		return "Running significance test...";
 	}
 
-	public void halt() {
-		permutationsDone = analyzer.numberOfPermutations+1;
-	}
-
-	public void run() {
-		taskMonitor.setPercentCompleted(0);
-		taskMonitor.setStatus("Initializing...");
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
+		taskMonitor.setProgress(0);;
+		taskMonitor.setStatusMessage("Initializing...");
 		analyzer.initializeSignificanceAnalysis();
 		
 		Random r = new Random();
@@ -42,21 +40,27 @@ public class PathConsistencyAnalyzerBootstrapTask implements Task {
 				analyzer.significanceAnalysisDoPermutation(permutationsDone);
 				
 				if(permutationsDone==Math.round(10*(int)(0.1f*permutationsDone))){
-					taskMonitor.setPercentCompleted((int)(100f*permutationsDone/analyzer.numberOfPermutations));
-					taskMonitor.setStatus(permutationsDone+" permutations done...");
+					taskMonitor.setProgress((int)(1f*permutationsDone/analyzer.numberOfPermutations));
+					taskMonitor.setStatusMessage(permutationsDone+" permutations done...");
 				}
 				
 				permutationsDone++;
 			}
 		
-			taskMonitor.setPercentCompleted(100);
-			taskMonitor.setStatus("Permutation analysis completed.");
+			taskMonitor.setProgress(1);;
+			taskMonitor.setStatusMessage("Permutation analysis completed.");
 		}
 	}
 
 	public void setTaskMonitor(TaskMonitor arg0)
 			throws IllegalThreadStateException {
 		taskMonitor = arg0;
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

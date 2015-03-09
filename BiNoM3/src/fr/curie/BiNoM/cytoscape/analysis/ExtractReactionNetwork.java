@@ -28,6 +28,7 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import java.awt.event.ActionEvent;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 import Main.Launcher;
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -47,11 +48,9 @@ public class ExtractReactionNetwork extends AbstractCyAction {
 
 	GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 
-
-	ExtractReactionNetworkTask task = new ExtractReactionNetworkTask
-	    (graphDocument,
-	     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+	
+	TaskIterator t = new TaskIterator( new ExtractReactionNetworkTask
+		    (graphDocument, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+	Launcher.getAdapter().getTaskManager().execute(t);
     }
-
 }

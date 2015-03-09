@@ -25,24 +25,22 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
-import java.util.Vector;
+import java.util.HashMap;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.GraphDocument;
-import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
-import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
+import fr.curie.BiNoM.cytoscape.lib.NetworkFactorySubNetwork;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 public class MonoMolecularReactionsAsEdgesTask implements Task {
 	
-    private TaskMonitor taskMonitor;
 	private GraphDocument graphDocument = null;
 	private VisualStyle vizsty = null;
 
@@ -56,45 +54,47 @@ public class MonoMolecularReactionsAsEdgesTask implements Task {
 		return "Show mono-molecular reactions as edges";	
 	}
 
-	public void halt() {
-	}
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-        }
-
-	public void run() {
+	public void run(TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 		try {
 			Graph graph = XGMML.convertXGMMLToGraph(graphDocument);
 		    Graph grres = BiographUtils.ShowMonoMolecularReactionsAsEdges(graph);
 		    GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 			//GraphDocument grDoc = null;
+		    
+		    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+		    HashMap nodeMap = Launcher.getNodeMap(netw);
+			HashMap edgeMap = Launcher.getEdgeMap(netw);
 
-			CyNetwork cyNetwork = NetworkFactory.createNetwork
+			CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
 			    (grDoc.getGraph().getName()+".me",
 			     grDoc,
 			     Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle(),
 			     false, // applyLayout
-			     taskMonitor);
+			     taskMonitor, netw, nodeMap, edgeMap);
 			
 
 			/*if(taskMonitor==null)
 				System.out.println("taskMonitor==null");
 			else
 			*/
-		    taskMonitor.setPercentCompleted(100);
+			nodeMap = null;
+		    edgeMap = null;
+		    taskMonitor.setProgress(1);
 		}
 		catch(Exception e) {
 		    e.printStackTrace();
-		    taskMonitor.setPercentCompleted(100);
-		    taskMonitor.setStatus("Error substituting mono-molecular interactions... " + e);
+		    taskMonitor.setProgress(1);
+		    taskMonitor.setStatusMessage("Error substituting mono-molecular interactions... " + e);
 		}		
 
 	}
 
-	public void setTaskMonitor(TaskMonitor taskMonitor)
-			throws IllegalThreadStateException {
-            this.taskMonitor = taskMonitor;
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

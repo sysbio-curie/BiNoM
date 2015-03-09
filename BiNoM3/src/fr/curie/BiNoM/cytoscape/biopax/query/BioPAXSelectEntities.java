@@ -36,7 +36,7 @@ public class BioPAXSelectEntities extends AbstractCyAction {
     public BioPAXSelectEntities() {
     	super("Select Entities",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "network",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query");
     }

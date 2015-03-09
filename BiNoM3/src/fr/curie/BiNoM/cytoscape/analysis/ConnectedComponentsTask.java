@@ -25,21 +25,26 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 import Main.Launcher;
-
 import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
+import fr.curie.BiNoM.cytoscape.lib.NetworkFactorySubNetwork;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.subnetwork.CyRootNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.AbstractTask;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.GraphDocument;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
+
 import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
 
 public class ConnectedComponentsTask implements Task{
 
-    private TaskMonitor taskMonitor;
     private GraphDocument graphDocument;
     private VisualStyle vizsty;
     private CyNetwork cyNetwork;
@@ -49,54 +54,49 @@ public class ConnectedComponentsTask implements Task{
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
     public String getTitle() {
 	return "BiNoM: Connection Components";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
-
-	@Override
-	public void run() {
+	public void run(TaskMonitor taskMonitor) {
 		// TODO Auto-generated method stub
+		taskMonitor.setTitle(getTitle());
 		try {
 		    Vector v = StructureAnalysisUtils.getConnectedComponents(graphDocument);
 		    
-			System.out.println("inizio: "+graphDocument.getGraph().getNodeArray().length);
 			v.get(0);
+			
+			CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+			
+			HashMap nodeMap = Launcher.getNodeMap(netw);
+			HashMap edgeMap = Launcher.getEdgeMap(netw);
 
 		    int size = v.size();
 		    for (int n = 0; n < size; n++) {
-		    	System.out.println(size);
 				GraphDocument grDoc = (GraphDocument)v.get(n);
 								
-				System.out.println(grDoc.getGraph().getNodeArray().length);
 				if(grDoc.getGraph().getNodeArray().length>1){
-					System.out.println("Creo la rete");
 
-					cyNetwork = NetworkFactory.createNetwork
+					cyNetwork = NetworkFactorySubNetwork.createNetwork
 				    (grDoc.getGraph().getName(),
 				     grDoc,
 				     vizsty,
 				     false,//true, // applyLayout
-				     taskMonitor);
+				     taskMonitor, netw , nodeMap, edgeMap);
 				}
 		    }
-		    taskMonitor.setPercentCompleted(100);
+		    taskMonitor.setProgress(1);;
 		}
 		catch(Exception e) {
 		    e.printStackTrace();
-		    taskMonitor.setPercentCompleted(100);
-		    taskMonitor.setStatus("Error getting connected components " + e);
+		    taskMonitor.setProgress(1);;
+		    taskMonitor.setStatusMessage("Error getting connected components " + e);
 		}	
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 }	

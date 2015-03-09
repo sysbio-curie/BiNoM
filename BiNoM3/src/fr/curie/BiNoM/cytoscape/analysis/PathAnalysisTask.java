@@ -24,15 +24,8 @@
 	Laurence Calzone :	http://leibniz.biol.vt.edu/people/laurence/laurence.html
 */
 package fr.curie.BiNoM.cytoscape.analysis;
-
-
-import Main.Launcher;
-
-import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
-
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.AbstractTask;
 import edu.rpi.cs.xgmml.*;
 
 import java.util.Vector;
@@ -40,9 +33,8 @@ import java.util.Set;
 
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
-public class PathAnalysisTask implements Task {
+public class PathAnalysisTask extends AbstractTask{
 
-    private TaskMonitor taskMonitor;
     private GraphDocument network;
     private VisualStyle vizsty;
     private Vector<String> sources;
@@ -60,31 +52,22 @@ public class PathAnalysisTask implements Task {
 	this.options = options;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Path analysis";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+	public void run(org.cytoscape.work.TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
 		SelectedNodes = StructureAnalysisUtils.findPaths(network,sources,targets,options);
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error in path analysis " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error in path analysis " + e);
 	}
     }
 }

@@ -42,6 +42,7 @@ import javax.swing.JFrame;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -97,6 +98,7 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	JCheckBox cb;
 	JComponent component;
 	boolean isSelectable;
+	CyNetwork netw;
 
 	Component(JCheckBox cb, JComponent component, boolean isSelectable) {
 	    this.cb = cb;
@@ -145,6 +147,7 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
     }
 
     private Component makeCheckBox(boolean adding, CyNode cyNode) {
+	//System.out.println("Name: "+Launcher.findNetworkofNode(cyNode.getSUID()).getRow(cyNode).get(CyNetwork.NAME, String.class));
 	Component comp = makeCheckBox(adding, Launcher.findNetworkofNode(cyNode.getSUID()).getRow(cyNode).get(CyNetwork.NAME, String.class));
 
 	cbNodeMap.put(comp, cyNode);
@@ -268,9 +271,11 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	for (Iterator i = addNodes.entrySet().iterator(); i.hasNext(); n++) {
 	    Map.Entry e = (Map.Entry)i.next();
 	    CyNode cyNode = (CyNode)e.getKey();
-	    boolean adding = isAdding(e.getValue());
+	    CyNetwork netw = (CyNetwork) e.getValue();
+	    boolean adding = true;//isAdding(e.getValue());
 	    nodeCB[n] = makeCheckBox(adding, cyNode);
-
+	    nodeCB[n].netw = netw;
+	    		
 	    if (adding)
 		setSelected(nodeCB[n], true);
 
@@ -302,9 +307,10 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	for (Iterator i = addEdges.entrySet().iterator(); i.hasNext(); n++) {
 	    Map.Entry e = (Map.Entry)i.next();
 	    CyEdge cyEdge = (CyEdge)e.getKey();
-	    boolean adding = isAdding(e.getValue());
+	    CyNetwork netw = (CyNetwork) e.getValue();
+	    boolean adding = true;//isAdding(e.getValue());
 	    edgeCB[n] = makeCheckBox(adding, cyEdge);
-
+	    edgeCB[n].netw = netw;
 	    if (adding)
 		setSelected(edgeCB[n], true);
 
@@ -317,11 +323,11 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	    panel.add(edgeCB[n].getComponent(), c);
 
 	    CyNode source = (CyNode)cyEdge.getSource();
-	    boolean sourceAdding = isAdding(addEdgeNodes, source);
+	    boolean sourceAdding = true;//isAdding(addEdgeNodes, source);
 
 	    int m = edgeNodeSourceInd(n);
 	    edgeNodeCB[m] = makeCheckBox(sourceAdding, source);
-
+	    edgeNodeCB[m].netw = netw;
 	    if (sourceAdding)
 		setSelected(edgeNodeCB[m], true);
 
@@ -339,7 +345,7 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 
 	    m = edgeNodeTargetInd(n);
 	    edgeNodeCB[m] = makeCheckBox(targetAdding, target);
-
+	    edgeNodeCB[m].netw = netw;
 	    if (targetAdding)
 		setSelected(edgeNodeCB[m], true);
 
@@ -352,7 +358,7 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	    panel.add(edgeNodeCB[m].getComponent(), c);
 	}
 
-	System.out.println("y = " + y);
+	//System.out.println("y = " + y);
 	JPanel buttonPanel = new JPanel();
 
 	okB = new JButton("OK");
@@ -398,33 +404,44 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	    CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 	    CyNetworkView networkView = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
 	    
-	    Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(clipboard.getNetwork());
-		Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
-		CyNetworkView fromView =null;
-		while(networkViewIterator.hasNext())
-			fromView = networkViewIterator.next();
+	    
 	    
 	    for (int n = 0; n < nodeCB.length; n++) {
 		if (isSelected(nodeCB[n])) {
-			String name = clipboard.getNetwork().getRow((CyNode)cbNodeMap.get(nodeCB[n])).get(CyNetwork.NAME, String.class);
+			String name = nodeCB[n].netw.getRow((CyNode)cbNodeMap.get(nodeCB[n])).get(CyNetwork.NAME, String.class);
+			Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(nodeCB[n].netw);
+			Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+			CyNetworkView fromView =null;
+			while(networkViewIterator.hasNext())
+				fromView = networkViewIterator.next();
 		    if(Launcher.findNodeWithName(network, name) == null)
-	    		NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), clipboard.getNetwork(), fromView, network, networkView);
+	    		NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(nodeCB[n]), nodeCB[n].netw, fromView, network, networkView);
 		}
 	    }
 
 	    for (int n = 0; n < edgeNodeCB.length; n++) {
 		if (isSelected(edgeNodeCB[n])) {
-			String name = clipboard.getNetwork().getRow((CyNode)cbNodeMap.get(edgeNodeCB[n])).get(CyNetwork.NAME, String.class);
+			String name = edgeNodeCB[n].netw.getRow((CyNode)cbNodeMap.get(edgeNodeCB[n])).get(CyNetwork.NAME, String.class);
+			Collection<CyNetworkView> networkViews = Launcher.getAdapter().getCyNetworkViewManager().getNetworkViews(edgeNodeCB[n].netw);
+			Iterator<CyNetworkView> networkViewIterator = networkViews.iterator();
+			CyNetworkView fromView =null;
+			while(networkViewIterator.hasNext())
+				fromView = networkViewIterator.next();
 		    if(Launcher.findNodeWithName(network, name) == null)
-		    	NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), clipboard.getNetwork(),fromView, network, networkView);
+		    	NetworkUtils.addNodeAndReportPosition((CyNode)cbNodeMap.get(edgeNodeCB[n]), edgeNodeCB[n].netw, fromView, network, networkView);
 		}
 	    }
 
 	    for (int n = 0; n < edgeCB.length; n++) {
 		if (isSelected(edgeCB[n])) {
 			CyEdge ed = (CyEdge)cbEdgeMap.get(edgeCB[n]);
-
-			NetworkUtils.addEd(network, clipboard.getNetwork(), ed);
+			System.out.println("netw: " + edgeCB[n].netw);
+			String name = edgeCB[n].netw.getRow((CyEdge)cbEdgeMap.get(edgeCB[n])).get(CyNetwork.NAME, String.class);
+			if(Launcher.findEdgeWithName(network, name) == null)		
+				try{
+					NetworkUtils.addEd(network, edgeCB[n].netw, ed);
+				}catch(Exception exc){JOptionPane.showMessageDialog(Launcher.getCySwingAppAdapter().getCySwingApplication().getJFrame(), 
+						"Edge " + name + " cannot be added, edge source or target node have been deselected.");}
 			}
 	    }
 		
@@ -440,35 +457,35 @@ public class PasteNodesAndEdgesDialog extends JDialog implements ActionListener 
 	else if (e.getSource() == selectdefB) {
 	    int n = 0;
 	    for (Iterator i = addNodes.entrySet().iterator(); i.hasNext(); n++) {
-		Map.Entry entry = (Map.Entry)i.next();
-		CyNode cyNode = (CyNode)entry.getKey();
-		setSelected(nodeCB[n], isAdding(entry.getValue()));
-	    }
-	    
-	    n = 0;
-	    for (Iterator i = addEdges.entrySet().iterator(); i.hasNext(); n++) {
-		Map.Entry entry = (Map.Entry)i.next();
-		CyEdge cyEdge = (CyEdge)entry.getKey();
-		setSelected(edgeCB[n], isAdding(entry.getValue()));
+	    	Map.Entry entry = (Map.Entry)i.next();
+			CyNode cyNode = (CyNode)entry.getKey();
+			setSelected(nodeCB[n], isAdding(entry.getValue()));
+		    }
+		    
+		    n = 0;
+		    for (Iterator i = addEdges.entrySet().iterator(); i.hasNext(); n++) {
+			Map.Entry entry = (Map.Entry)i.next();
+			CyEdge cyEdge = (CyEdge)entry.getKey();
+			setSelected(edgeCB[n], isAdding(entry.getValue()));
 
-		CyNode source = (CyNode)cyEdge.getSource();
-		int m = edgeNodeSourceInd(n);
-		setSelected(edgeNodeCB[m], isAdding(addEdgeNodes, source));
+			CyNode source = (CyNode)cyEdge.getSource();
+			int m = edgeNodeSourceInd(n);
+			setSelected(edgeNodeCB[m], isAdding(addEdgeNodes, source));
 
-		m = edgeNodeTargetInd(n);
-		CyNode target = (CyNode)cyEdge.getTarget();
-		setSelected(edgeNodeCB[m], isAdding(addEdgeNodes, target));
+			m = edgeNodeTargetInd(n);
+			CyNode target = (CyNode)cyEdge.getTarget();
+			setSelected(edgeNodeCB[m], isAdding(addEdgeNodes, target));
 		
 	    }
 	}
     }
 
     private static boolean isAdding(Object o) {
-	return !((Boolean)o).booleanValue();
+	return true;//!((Boolean)o).booleanValue();
     }
 
     private static boolean isAdding(HashMap map, Object o) {
-	return isAdding(map.get(o));
+	return true;//isAdding(map.get(o));
     }
 
     private static String addingMessage(boolean adding) {

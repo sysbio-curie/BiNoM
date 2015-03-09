@@ -29,7 +29,10 @@ package fr.curie.BiNoM.cytoscape.utils;
 import Main.Launcher;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.*;
+
+import javax.swing.KeyStroke;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -53,7 +56,8 @@ public class SelectUpstreamNeighbours extends AbstractCyAction {
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM Utilities");
-	}
+        setAcceleratorKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_8, KeyEvent.CTRL_MASK));
+      	}
 
 
     public void actionPerformed(ActionEvent e) {
@@ -92,7 +96,7 @@ public class SelectUpstreamNeighbours extends AbstractCyAction {
     			View <CyNode> nView = (View<CyNode>) i.next();
 			    CyNode node = nView.getModel();
 			    if(newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)))
-			    	nView.setLockedValue(BasicVisualLexicon.NODE_SELECTED, newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
+			    	network.getRow(node).set("selected", newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
 			}
     		view.updateView();    		
     	}

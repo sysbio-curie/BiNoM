@@ -26,7 +26,6 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
 import javax.swing.JDialog;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -35,6 +34,9 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -43,7 +45,6 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
-
 import java.util.Vector;
 
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
@@ -196,8 +197,8 @@ public class EdgesFromOtherNetworkDialog extends JDialog {
 		    CyNetwork networks[] = NetworkUtils.getNetworks(idxs);
 			System.out.println("Network from "+netwFrom+" idxAdd="+idxAdd);		    
 		    
-		    EdgesFromOtherNetworkTask netwUpdTask = new EdgesFromOtherNetworkTask(networks, netwFrom);
-		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(netwUpdTask);
+			TaskIterator t = new TaskIterator( new EdgesFromOtherNetworkTask(networks, netwFrom));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		    
 		    setVisible(false);
 		}

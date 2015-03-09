@@ -4,16 +4,20 @@ import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXVisualStyleDefinition;
 import fr.curie.BiNoM.cytoscape.lib.*;
 import fr.curie.BiNoM.pathways.*;
+
 import org.cytoscape.model.CyNetwork;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import java.io.*;
+
 import edu.rpi.cs.xgmml.*;
+
 import java.util.*;
+
 import fr.curie.BiNoM.pathways.analysis.structure.BiographUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
 import fr.curie.BiNoM.pathways.wrappers.*;
-
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 
 public class ImportFromAINTask implements Task {
@@ -33,23 +37,14 @@ public class ImportFromAINTask implements Task {
     	constitutiveReactions = _creact;
     }
 
-    public void halt() {
-    }
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "AIN: Import AIN " + file.getName();
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 		
 		//biopax = SimpleTextInfluenceToBioPAX.convertFromFile(file.getAbsolutePath());
@@ -88,11 +83,18 @@ public class ImportFromAINTask implements Task {
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing AIN file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error importing AIN file " +
 				  AINName + ": " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
 

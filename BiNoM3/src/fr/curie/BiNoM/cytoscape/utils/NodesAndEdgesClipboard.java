@@ -35,9 +35,9 @@ public class NodesAndEdgesClipboard {
     static NodesAndEdgesClipboard instance;
 
     private CyNetwork network;
-    private Vector nodes;
-    private Vector edges;
-    private Vector cEdges, cNodes, cEdgeNodes;
+    private HashMap nodes;
+    private HashMap edges;
+    private HashMap cEdges, cNodes, cEdgeNodes;
 
     public static NodesAndEdgesClipboard getInstance() {
 	if (instance == null)
@@ -50,30 +50,27 @@ public class NodesAndEdgesClipboard {
     }
 
     public void reset() {
-	nodes = new Vector();
-	edges = new Vector();
-	cEdges = new Vector();
-	cNodes = new Vector();
-	cEdgeNodes = new Vector();
+	nodes = new HashMap();
+	edges = new HashMap();
     }
 
-    public void add(CyNode node) {
-	nodes.add(node);
+    public void add(CyNode node, CyNetwork netw) {
+	nodes.put(node, netw);
     }
 
-    public void add(CyEdge edge) {
-	edges.add(edge);
+    public void add(CyEdge edge, CyNetwork netw) {
+	edges.put(edge, netw);
     }
 
-    public Vector getNodes() {
+    public HashMap getNodes() {
 	return cNodes;
     }
 
-    public Vector getEdges() {
+    public HashMap getEdges() {
 	return cEdges;
     }
 
-    public Vector getEdgeNodes() {
+    public HashMap getEdgeNodes() {
 	return cEdgeNodes;
     }
 
@@ -82,24 +79,28 @@ public class NodesAndEdgesClipboard {
     }
 
     public void compile() {
-	cEdges.removeAll(cEdges);
-	cNodes.removeAll(cNodes);
-	cEdgeNodes.removeAll(cEdgeNodes);
+	cEdges = new HashMap();
+	cNodes = new HashMap();
+	cEdgeNodes = new HashMap();
 
-	for (Iterator i = edges.iterator(); i.hasNext(); ) {
-	    CyEdge edge = (CyEdge)i.next();
+	for (Iterator i = edges.entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	
+	    CyEdge edge = (CyEdge) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
 
-	    cEdges.add(edge);
-	    if(!cEdgeNodes.contains(edge.getSource()))
-	    	cEdgeNodes.add(edge.getSource());
-	    if(!cEdgeNodes.contains(edge.getTarget()))    	
-	    	cEdgeNodes.add(edge.getTarget());
+	    cEdges.put(edge, netw);
+	    cEdgeNodes.put(edge.getSource(), netw);
+	    cEdgeNodes.put(edge.getTarget(), netw);
 	}
 	
-	for (Iterator i = nodes.iterator(); i.hasNext(); ) {
-	    CyNode node = (CyNode)i.next();
-	    if (!cEdgeNodes.contains(node))
-		cNodes.add(node);
+	for (Iterator i = nodes.entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry pair = (Map.Entry)i.next();
+	    CyNode node = (CyNode) pair.getKey();
+	    CyNetwork netw = (CyNetwork) pair.getValue();
+	    
+	    if (!cEdgeNodes.containsKey(node))
+	    	cNodes.put(node, netw);
 	}
     }
 

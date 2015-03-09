@@ -1,13 +1,13 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 public class PathConsistencyAnalyzerTask implements Task {
 	
 	private DataPathConsistencyAnalyzer analyzer;
-    private TaskMonitor taskMonitor;
 	
 	public PathConsistencyAnalyzerTask(DataPathConsistencyAnalyzer _analyzer){
 		analyzer = _analyzer;
@@ -17,19 +17,18 @@ public class PathConsistencyAnalyzerTask implements Task {
 		return "Finding paths from active nodes to targets...";
 	}
 
-	public void halt() {
-		// TODO Auto-generated method stub
 
-	}
-
-	public void run() {
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
 		analyzer.findPaths();
-		taskMonitor.setPercentCompleted(100);
+		taskMonitor.setProgress(1);;
 	}
 
-	public void setTaskMonitor(TaskMonitor arg0)
-			throws IllegalThreadStateException {
-	    taskMonitor = arg0;
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
+
 
 }

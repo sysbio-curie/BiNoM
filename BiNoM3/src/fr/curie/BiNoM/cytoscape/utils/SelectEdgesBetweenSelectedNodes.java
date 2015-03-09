@@ -27,7 +27,11 @@ package fr.curie.BiNoM.cytoscape.utils;
 import Main.Launcher;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.*;
+
+import javax.swing.KeyStroke;
+
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
@@ -45,15 +49,16 @@ public class SelectEdgesBetweenSelectedNodes extends AbstractCyAction {
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM Utilities[5]");
+        setAcceleratorKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+
 	}
 
     public void actionPerformed(ActionEvent e) {
 	CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 	CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
 
-	for (Iterator i = view.getEdgeViews().iterator(); i.hasNext();) {
-	    View <CyEdge> eView = (View<CyEdge>) i.next();
-	    CyEdge edge = (CyEdge)eView.getModel();
+	for (Iterator i = network.getEdgeList().iterator(); i.hasNext();) {
+	    CyEdge edge = (CyEdge) i.next();
 
 	    CyNode source = edge.getSource();
 	    CyNode target = edge.getTarget();    
@@ -62,7 +67,7 @@ public class SelectEdgesBetweenSelectedNodes extends AbstractCyAction {
 	    
 	    if (nodes.contains(source) && nodes.contains(target)) {
 			System.out.println("select edge " + network.getRow(edge).get(CyNetwork.NAME, String.class));
-			eView.setLockedValue(BasicVisualLexicon.EDGE_SELECTED, true);
+	    	network.getRow(edge).set("selected", true);
 	    }
 	}
 	view.updateView();

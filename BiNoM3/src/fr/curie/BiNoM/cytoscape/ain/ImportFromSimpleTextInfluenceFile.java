@@ -1,10 +1,16 @@
 package fr.curie.BiNoM.cytoscape.ain;
 
 import Main.Launcher;
+
 import java.awt.event.ActionEvent;
 import java.io.*;
+
 import javax.swing.*;
+
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.pathways.SimpleTextInfluenceToBioPAX;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
@@ -72,8 +78,10 @@ public class ImportFromSimpleTextInfluenceFile extends AbstractCyAction {
 			
 
         if (file != null) {
-        	ImportFromAINTask iain = new ImportFromAINTask(file,text,dialogCR.constitutiveReactions);
-            fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(iain);
+        	
+        	TaskIterator t = new TaskIterator(new ImportFromAINTask(file,text,dialogCR.constitutiveReactions));
+    		Launcher.getAdapter().getTaskManager().execute(t);
+
         	
 	    	//ImportFromAINTask iain = new ImportFromAINTask(file,text,dialogCR.constitutiveReactions);
 	    	//iain.run();

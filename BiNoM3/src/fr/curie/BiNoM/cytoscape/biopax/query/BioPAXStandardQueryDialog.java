@@ -31,20 +31,25 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
+import org.cytoscape.work.TaskIterator;
+
 import Main.Launcher;
+
 import java.awt.BorderLayout;
 
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -55,6 +60,7 @@ import fr.curie.BiNoM.lib.GraphicUtils;
 
 import java.util.*;
 
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 
 
@@ -356,8 +362,9 @@ public class BioPAXStandardQueryDialog extends JFrame {
                     GraphDocument grDoc = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
                     query.input = XGMML.convertXGMMLToGraph(grDoc);
                     
-                    task = new BioPAXStandardQueryTask(options,query,selected,outputCurrentNetworkRB.isSelected());
-                    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+                    TaskIterator t = new TaskIterator(new BioPAXStandardQueryTask(options,query,selected,outputCurrentNetworkRB.isSelected()));
+            		Launcher.getAdapter().getTaskManager().execute(t);
+                  
                     
                     setVisible(false);
                 }

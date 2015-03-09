@@ -25,14 +25,14 @@
 */
 package fr.curie.BiNoM.cytoscape.biopax.query;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import java.io.*;
+
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import fr.curie.BiNoM.pathways.utils.*;
 
 public class BioPAXLoadIndexTask implements Task {
-    private TaskMonitor taskMonitor;
     private String AccNumFileName = null;
     private String IndexFileName = null;
 
@@ -41,13 +41,14 @@ public class BioPAXLoadIndexTask implements Task {
     	IndexFileName = indexFileName;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File f = new File(IndexFileName);
     		if(f.exists()){
 
     			System.out.println("Loading Index...");
-    		    taskMonitor.setStatus("Loading Index...");
+    		    taskMonitor.setStatusMessage("Loading Index...");
     		    BioPAXGraphQueryEngine beng = new BioPAXGraphQueryEngine();
     		    GraphXGMMLParser gp = new GraphXGMMLParser();
     		    gp.parse(IndexFileName);
@@ -55,53 +56,50 @@ public class BioPAXLoadIndexTask implements Task {
     		    BioPAXIndexRepository repository = BioPAXIndexRepository.getInstance();
     		    repository.setBioPAXGraphQueryEngine(beng);
     		    repository.setDatabaseFileName(IndexFileName);
-    		    taskMonitor.setPercentCompleted(50);
+    		    taskMonitor.setProgress(0.5);;
     		    System.out.println("Loaded.");
 
     		    if(!AccNumFileName.trim().equals("")){
     		    f = new File(AccNumFileName);
     		    if(f.exists()){
-        		    taskMonitor.setStatus("Loading Accession Number table...");
+        		    taskMonitor.setStatusMessage("Loading Accession Number table...");
         		    AccessionNumberTable table = new AccessionNumberTable();
         		    table.loadTable(AccNumFileName);
         		    repository.setAccessionNumberTable(table);
         		    repository.setAccNumberFileName(AccNumFileName);
     		    }else{
         			System.out.println("ERROR: File "+IndexFileName+" does not exist.");
-            	    taskMonitor.setPercentCompleted(99);
-            	    taskMonitor.setStatus("ERROR: File "+IndexFileName+" does not exist.");
+            	    taskMonitor.setProgress(1);
+            	    taskMonitor.setStatusMessage("ERROR: File "+IndexFileName+" does not exist.");
     		    }
     		    }
 
     		    Utils.printUsedMemory();
-    		    taskMonitor.setPercentCompleted(100);
+    		    taskMonitor.setProgress(1);;
 
     			
     		}else{
     			System.out.println("ERROR: File "+IndexFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+IndexFileName+" does not exist.");
+        	    taskMonitor.setProgress(0.99);;
+        	    taskMonitor.setStatusMessage("ERROR: File "+IndexFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error loading BioPAX file :" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error loading BioPAX file :" + e);
     	}
+    	
+    	 (new BioPAXDisplayIndexInfo()).actionPerformed(null);
     }
 
     public String getTitle() {
     	return "BiNoM: Loading BioPAX index ";
     }
 
-    public void halt() {
-    }
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
-
-    
-	
-	
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

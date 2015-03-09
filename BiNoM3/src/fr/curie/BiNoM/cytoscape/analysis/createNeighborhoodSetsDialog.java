@@ -37,18 +37,9 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
-
-
-
-
-
-
-
-
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.GridBagLayout;
@@ -76,13 +67,9 @@ import java.util.HashMap;
 import fr.curie.BiNoM.cytoscape.biopax.OWLFileFilter;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import fr.curie.BiNoM.cytoscape.lib.NetworkUtils;
-import giny.view.EdgeView;
-import giny.view.NodeView;
 import fr.curie.BiNoM.lib.GraphicUtils;
-
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;

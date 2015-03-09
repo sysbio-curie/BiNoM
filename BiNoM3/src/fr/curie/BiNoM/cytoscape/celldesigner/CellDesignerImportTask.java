@@ -27,13 +27,17 @@ package fr.curie.BiNoM.cytoscape.celldesigner;
 import fr.curie.BiNoM.cytoscape.lib.*;
 
 import org.cytoscape.model.CyNetwork;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.AbstractTask;
+
+
+import org.cytoscape.work.TaskMonitor;
+
 import java.io.*;
+
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 
 
-public class CellDesignerImportTask implements Task {
+public class CellDesignerImportTask extends AbstractTask {
 
     private TaskMonitor taskMonitor;
     private File cellDesignerFile;
@@ -59,11 +63,12 @@ public class CellDesignerImportTask implements Task {
 	return cyNetwork;
     }
 
-    public void run() {
+	public void run(TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
 	    if (!cellDesignerFile.canRead()) {
-		taskMonitor.setStatus("Cannot read file: " + cellDesignerFile);
-		taskMonitor.setPercentCompleted(100);
+	    	taskMonitor.setStatusMessage("Cannot read file: " + cellDesignerFile);
+		taskMonitor.setProgress(1);
 		return;
 	    }
 
@@ -84,11 +89,13 @@ public class CellDesignerImportTask implements Task {
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing CellDesigner file " +
+	    taskMonitor.setProgress(100);
+	    taskMonitor.setStatusMessage("Error importing CellDesigner file " +
 				  cellDesignerFile.getAbsolutePath() +
 				  ": " + e);
 	}
     }
+
+
 }
 

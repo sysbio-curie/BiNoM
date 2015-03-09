@@ -27,7 +27,11 @@ package fr.curie.BiNoM.cytoscape.utils;
 import Main.Launcher;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.*;
+
+import javax.swing.KeyStroke;
+
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
@@ -48,10 +52,14 @@ public class SelectDownstreamNeighbours extends AbstractCyAction {
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM Utilities");
+        setAcceleratorKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_9, KeyEvent.CTRL_MASK));
+
     }
 
     public void actionPerformed(ActionEvent e) {
     if(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()!=null)
+		System.out.println(CyTableUtil.getNodesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).size());
+
     	if(CyTableUtil.getNodesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).size()>0){
     		
     		Graph gr = XGMML.convertXGMMLToGraph(GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()));
@@ -59,6 +67,7 @@ public class SelectDownstreamNeighbours extends AbstractCyAction {
     		Vector<String> selectedIds = new Vector<String>();
     		CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
     		List<CyNode> nodes = CyTableUtil.getNodesInState(network,"selected",true);
+    		
     		for (Iterator i = view.getNodeViews().iterator(); i.hasNext(); ) {    			
     			View<CyNode> nView =  (View<CyNode>) i.next();
 			    CyNode node = (CyNode)nView.getModel();
@@ -84,9 +93,10 @@ public class SelectDownstreamNeighbours extends AbstractCyAction {
     		for (Iterator i = view.getNodeViews().iterator(); i.hasNext(); ) {
     			View <CyNode> nView = (View<CyNode>) i.next();
 			    CyNode node = nView.getModel();
-			    if(newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)))
-			    	nView.setLockedValue(BasicVisualLexicon.NODE_SELECTED, newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
-			}
+			    if(newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class))){
+			    	network.getRow(node).set("selected", newSelectedIds.contains(network.getRow(node).get(CyNetwork.NAME, String.class)));
+			    }
+    		}   
 
 			//view.redrawGraph(true, false);
 			view.updateView();

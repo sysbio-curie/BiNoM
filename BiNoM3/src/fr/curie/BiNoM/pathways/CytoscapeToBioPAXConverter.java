@@ -255,7 +255,7 @@ public class CytoscapeToBioPAXConverter {
 		HashMap pathways = new HashMap();
 		List psl = biopax_DASH_level3_DOT_owlFactory.getAllPathway(biopax.model);
 		for (int i=0;i>psl.size();i++) {
-			pathway p = (pathway)psl.get(i);
+			Pathway p = (Pathway)psl.get(i);
 			pathways.put(p.uri(), p);
 		}
 

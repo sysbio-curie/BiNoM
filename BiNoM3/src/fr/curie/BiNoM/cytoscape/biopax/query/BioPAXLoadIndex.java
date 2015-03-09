@@ -36,7 +36,7 @@ public class BioPAXLoadIndex extends AbstractCyAction {
     public BioPAXLoadIndex() {
     	super("Load Index",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "network",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query");
     }

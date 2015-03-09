@@ -36,7 +36,7 @@ public class BioPAXIndexPathAnalysis extends AbstractCyAction {
     public BioPAXIndexPathAnalysis() {
     	super("Index Path Analysis",
         		Launcher.getAdapter().getCyApplicationManager(),
-            "network",
+            "none",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".BiNoM BioPAX 3 Query");
     }

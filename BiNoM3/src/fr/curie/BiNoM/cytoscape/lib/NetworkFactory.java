@@ -25,8 +25,7 @@
 */
 package fr.curie.BiNoM.cytoscape.lib;
 
-import cytoscape.task.TaskMonitor;
-
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.app.CyAppAdapter;
 
 import edu.rpi.cs.xgmml.*;
@@ -45,7 +44,6 @@ import org.cytoscape.model.CyTable;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -83,7 +81,7 @@ public class NetworkFactory {
     }
 
     public static CyNetwork createNetwork(String networkName,GraphDocument graphDocument,VisualStyleDefinition vizsty_def,boolean applyLayout,
-    		TaskMonitor taskMonitor) throws Exception {
+    	 TaskMonitor taskMonitor) throws Exception {
     	return createNetworkPerform(networkName, graphDocument, null, vizsty_def, applyLayout, taskMonitor);
     }
 
@@ -99,9 +97,9 @@ public class NetworkFactory {
 
 	if (nodes.length == 0) {
 	    if (taskMonitor != null) {
-		taskMonitor.setStatus("File imported (" + nodes.length +
+		taskMonitor.setStatusMessage("File imported (" + nodes.length +
 				      " nodes, " + edges.length + " edges)");
-		taskMonitor.setPercentCompleted(100);
+		taskMonitor.setProgress(1);;
 	    }
 	    return null;
 	}
@@ -144,30 +142,20 @@ public class NetworkFactory {
 		    HashMap listAttrMap = getListAttrMap(attrs);
 		
 		    //System.out.println("ND: " + nd.getIdentifier() + " (" + attrs.length + ")");
-		  //  System.out.println("Attributes #: " + attrs.length);	
 		    
 		    for (int j = 0; j < attrs.length; j++) {
 		    	
 				edu.rpi.cs.xgmml.AttDocument.Att attr = attrs[j];
 				
-			
 				String attrValue = attr.getValue();
 				
 				//System.out.println("Attribute: " + attr.getLabel() + ": " + attr.getValue());					
-				
 				if (listAttrMap.get(attr.getLabel()) != null) {
-				    // forse String o_attrValue = nodeAttrs.getStringAttribute(nd.getIdentifier(), attr.getLabel());
-					// String o_attrValue = nodeAttrs.getStringAttribute(nd.SUID, attr.getLabel());
 					String o_attrValue = netw.getRow(nd).get(attr.getLabel(), String.class);
 				    if (o_attrValue != null && o_attrValue.length() > 0) {
 				    	attrValue = o_attrValue + ATTR_SEP + attr.getValue();
-				    	//System.out.println(o_attrValue + ATTR_SEP + attr.getValue());
 				    }
-				}
-		
-				//if (attr.getLabel().equals("BIOPAX_URI")) {
-				//    System.out.println("   --> " + attr.getValue());
-				//}						
+				}				
 				
 				if(attrValue!=null){
 					try{
@@ -180,8 +168,6 @@ public class NetworkFactory {
 							//insert value in the table
 							netw.getRow(nd).set(attr.getLabel(), attr.getValue());
 									
-							// forse nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),Double.parseDouble(attrValue));
-							// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),Double.parseDouble(attrValue));
 							}catch(Exception e){
 								e.printStackTrace();
 							}
@@ -193,9 +179,6 @@ public class NetworkFactory {
 							
 							//insert value in the table
 							netw.getRow(nd).set(attr.getLabel(), attr.getValue());
-							
-							//nodeAttrs.setAttribute(nd.getIdentifier(), attr.getLabel(),attrValue);
-							// nodeAttrs.setAttribute(nd.SUID, attr.getLabel(),attrValue);
 						}
 					}catch(Exception e){
 					}
@@ -233,25 +216,14 @@ public class NetworkFactory {
 		    	}
 		    }
 		    
-		    
-		    //System.out.println("Edge requested "+"source:"+toId(edges[n].getSource())+" target:"+toId(edges[n].getTarget())+" interaction:"+interaction);
-		    
-		    /*CyEdge ed = Cytoscape.getCyEdge(Cytoscape.getCyNode(toId(edges[n].getSource())),
-						    Cytoscape.getCyNode(toId(edges[n].getTarget())),
-						    Semantics.INTERACTION,
-						    interaction,
-						    true);*/
+		  
 		    // System.out.println("Edge requested source:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource()))+" target:"+getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget()))+" interaction:"+interaction);
 		     CyEdge ed = netw.addEdge(getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getSource())), 
 		    		getNodeWithName(netw, netw.getDefaultNodeTable(), "name", toId(edges[n].getTarget())), true);  
 		    	    
-		    
-		    //tolto CyEdge ed = Cytoscape.getCyEdge(toId(edges[n].getSource()), edges[n].getId(), toId(edges[n].getTarget()), interaction);    
-		    //tolto CyEdge ed = netw.addEdge(netw.getNode(arg0), arg1, arg2)
 		    		
 		    if(ed!=null){
 			    //System.out.println("Edge got "+ed.getIdentifier());
-			    // modificato con sotto ed.setIdentifier(edges[n].getId());
 			    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("name", toId(edges[n].getId()));
 			    netw.getDefaultEdgeTable().getRow(ed.getSUID()).set("interaction", interaction);
 			    //System.out.println("Setting id "+));
@@ -283,20 +255,15 @@ public class NetworkFactory {
 								if(netw.getDefaultEdgeTable().getColumn(attr.getLabel()) == null)
 									netw.getDefaultEdgeTable().createColumn(attr.getLabel(), String.class, false);
 								
-								
-			    				// edgeAttrs.setAttribute(ed.SUID, attr.getLabel(),attr.getValue());
 								//insert value in the table
 								netw.getRow(ed).set(attr.getLabel(), attr.getValue());
 			    			}
 			    		}catch(Exception e){
 			    		}
-			    		//edgeAttrs.setAttribute(ed.getIdentifier(), attr.getName(),attr.getValue());
 			    	}
-			    	// tolto netw.addEdge(ed);
 				    else{
 				    	System.out.println("WARNING! Edge "+edges[n].getId()+" can not be created!");
 				    }
-				    //System.out.println("Number of edges = "+netw.getEdgeCount()+"\n");
 				}
 		    }
 		}
@@ -349,7 +316,7 @@ public class NetworkFactory {
 //	networkView.redrawGraph(true, false);
 //	
 	if (taskMonitor != null) {
-	    taskMonitor.setStatus("File imported (" + nodes.length +
+	    taskMonitor.setStatusMessage("File imported (" + nodes.length +
 				  " nodes, " + edges.length + " edges)");
 	}
 	else {

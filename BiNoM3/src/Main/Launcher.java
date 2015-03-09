@@ -1,16 +1,25 @@
 package Main;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.print.attribute.HashAttributeSet;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
+import org.cytoscape.model.subnetwork.CyRootNetwork;
 
 import fr.curie.BiNoM.biopax.propedit.BioPAXToggleNamingService;
 import fr.curie.BiNoM.cytoscape.ain.ImportFromSimpleTextInfluenceFile;
@@ -41,7 +50,8 @@ import fr.curie.BiNoM.cytoscape.biopax.BioPAXExportToFile;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportFromFile;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXImportFromURL;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXSaveAssociated;
-import fr.curie.BiNoM.cytoscape.biopax.BioPAXSyncNetworks;
+//import fr.curie.BiNoM.cytoscape.biopax.BioPAXSyncNetworks;
+import fr.curie.BiNoM.cytoscape.biopax.BioPAXVisualStyleDefinition;
 import fr.curie.BiNoM.cytoscape.biopax.propedit.BioPAXClassTree;
 import fr.curie.BiNoM.cytoscape.biopax.propedit.BioPAXPropertyBrowser;
 import fr.curie.BiNoM.cytoscape.biopax.query.BioPAXDisplayIndexInfo;
@@ -58,6 +68,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.CSMLImportFromFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerAssociateSource;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportToFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerImportFromFile;
+import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerVisualStyleDefinition;
 import fr.curie.BiNoM.cytoscape.celldesigner.ColorCellDesignerProteins;
 import fr.curie.BiNoM.cytoscape.celldesigner.MergingMaps;
 import fr.curie.BiNoM.cytoscape.celldesigner.ProduceNaviCellMapFiles;
@@ -65,6 +76,7 @@ import fr.curie.BiNoM.cytoscape.celldesigner.checkCellDesignerFile;
 import fr.curie.BiNoM.cytoscape.celldesigner.extractCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.modifyCellDesignerNotes;
 import fr.curie.BiNoM.cytoscape.celldesigner.pathwayStainingCellDesigner;
+import fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory;
 import fr.curie.BiNoM.cytoscape.netwop.DoubleNetworkDifference;
 import fr.curie.BiNoM.cytoscape.netwop.NetworksUpdate;
 import fr.curie.BiNoM.cytoscape.sbml.SBMLExportToFile;
@@ -156,7 +168,7 @@ public class Launcher extends AbstractCySwingApp
 		adapter.getCySwingApplication().addAction(new BioPAXPropertyBrowser());
 		adapter.getCySwingApplication().addAction(new BioPAXClassTree());	
 		adapter.getCySwingApplication().addAction(new BioPAXToggleNamingService());
-		adapter.getCySwingApplication().addAction(new BioPAXSyncNetworks());
+//		adapter.getCySwingApplication().addAction(new BioPAXSyncNetworks());
 		
 		
 		// BioPAX 3 query menu
@@ -191,6 +203,10 @@ public class Launcher extends AbstractCySwingApp
 		//about BiNoM
 		adapter.getCySwingApplication().addAction(new AboutBox());
 		
+		fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory f = new fr.curie.BiNoM.cytoscape.lib.VisualStyleFactory();
+		f.create(BioPAXVisualStyleDefinition.getInstance());
+		f.create(CellDesignerVisualStyleDefinition.getInstance());
+		
 
 		
 	}
@@ -212,8 +228,6 @@ public class Launcher extends AbstractCySwingApp
         }
         return null;
     }
-	
-	
 	
 	public static CyNetwork findNetworkofNode(long id){
 		Iterator i = Launcher.getAdapter().getCyNetworkManager().getNetworkSet().iterator();
@@ -263,5 +277,42 @@ public class Launcher extends AbstractCySwingApp
 
 	public static void setAdapter(CySwingAppAdapter adapter) {
 		Launcher.adapter = adapter;
+	}
+	
+	public static HashMap getNodeMap(CyNetwork net){
+		HashMap m =new HashMap<String, CyNode>();
+		Iterator i = net.getNodeList().iterator();
+		while(i.hasNext()){
+			CyNode node = (CyNode)i.next();
+			m.put(net.getRow(node).get(CyNetwork.NAME, String.class), node);
+		}
+		
+		return m;
+	}
+	
+	public static HashMap getEdgeMap(CyNetwork net){
+		HashMap m =new HashMap<String, CyEdge>();
+		Iterator i = net.getEdgeList().iterator();
+		while(i.hasNext()){
+			CyEdge edge = (CyEdge)i.next();
+			m.put(net.getRow(edge).get(CyNetwork.NAME, String.class), edge);
+		}
+		
+		return m;
+	}
+	
+	public static boolean areInSameNetworkColelction(CyNetwork[] networks){
+		CyRootNetwork networkCollection = null;
+		
+		for(int i = 0; i < networks.length; i++){
+			CyNetwork netw = networks[i];
+			if(networkCollection == null)
+				networkCollection = Launcher.getAdapter().getCyRootNetworkManager().getRootNetwork(netw);
+			else{
+				if(Launcher.getAdapter().getCyRootNetworkManager().getRootNetwork(netw) != networkCollection)
+					return false;
+			}
+		}	
+		return true;
 	}
 }

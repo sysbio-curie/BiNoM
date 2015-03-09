@@ -24,19 +24,22 @@
 	Laurence Calzone :	http://leibniz.biol.vt.edu/people/laurence/laurence.html
 */
 package fr.curie.BiNoM.cytoscape.analysis;
-import Main.Launcher;
 import fr.curie.BiNoM.cytoscape.lib.*;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.Task;
+
+import Main.Launcher;
 import edu.rpi.cs.xgmml.*;
+
+import java.util.HashMap;
 import java.util.Vector;
+
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
 public class CycleDecompositionTask implements Task {
 
-    private TaskMonitor taskMonitor;
     private GraphDocument graphDocument;
     private VisualStyle vizsty;
 
@@ -45,44 +48,46 @@ public class CycleDecompositionTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Cycle Decomposition Components";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+	public void run(org.cytoscape.work.TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
-
 	    Vector v = StructureAnalysisUtils.getCyclicComponents(graphDocument, new StructureAnalysisUtils.Option());
 
 	    int size = v.size();
+	    
+	    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
+		
 	    for (int n = 0; n < size; n++) {
 		GraphDocument grDoc = (GraphDocument)v.get(n);
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
 		    (grDoc.getGraph().getName(),
 		     grDoc,
 		     vizsty,
 		     false, // applyLayout
-		     taskMonitor);
+		     taskMonitor, netw, nodeMap, edgeMap);
 	    }
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error getting cycle decomposition " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error getting cycle decomposition " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

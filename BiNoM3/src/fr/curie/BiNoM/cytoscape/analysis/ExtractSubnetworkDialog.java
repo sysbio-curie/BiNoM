@@ -28,10 +28,8 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
-
+import org.cytoscape.work.TaskIterator;
 import Main.Launcher;
-import cytoscape.Cytoscape;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JCheckBox;
@@ -43,14 +41,12 @@ import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
-
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
 import fr.curie.BiNoM.pathways.utils.SubnetworkProperties;
@@ -411,7 +407,7 @@ public class ExtractSubnetworkDialog extends JDialog {
 	int nga[] = {10,50,100,150,175,200,250,300,350,400,450,500,550,600,700,800,1000};
 	String sizes = "";
 	for(int i=0;i<nga.length;i++){
-		if(nga[i]<Cytoscape.getCurrentNetwork().getNodeCount())
+		if(nga[i]<Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork().getNodeCount())
 		     sizes+=""+nga[i]+"\n";
 	}
 	sizesToTest.setText(sizes);
@@ -452,10 +448,8 @@ public class ExtractSubnetworkDialog extends JDialog {
 				options.fixedNodeList.add(st.nextToken());
 			}
 			
-			
-			
-			ExtractSubnetworkTask task = new ExtractSubnetworkTask(graphDocument, selected, options, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+			TaskIterator t = new TaskIterator(new ExtractSubnetworkTask(graphDocument, selected, options, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+			Launcher.getAdapter().getTaskManager().execute(t);
 		    
 		    setVisible(false);
 		}

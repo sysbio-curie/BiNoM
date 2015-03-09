@@ -32,6 +32,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
 import fr.curie.BiNoM.lib.GraphicUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 import fr.curie.BiNoM.pathways.analysis.structure.Node;
@@ -604,8 +607,8 @@ public class OptimalCutSetAnalyzerDialog extends JDialog implements ActionListen
 						}
 					}
 					
-					OptimalCutSetAnalyzerTask task = new OptimalCutSetAnalyzerTask(analyzer);
-					fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+					TaskIterator t = new TaskIterator(new OptimalCutSetAnalyzerTask(analyzer));
+					Launcher.getAdapter().getTaskManager().execute(t);
 					
 					result = 1;
 					setVisible(false);

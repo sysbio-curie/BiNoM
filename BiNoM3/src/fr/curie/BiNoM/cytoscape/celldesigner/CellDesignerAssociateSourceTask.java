@@ -25,19 +25,17 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 
 import java.io.*;
-
 import fr.curie.BiNoM.pathways.wrappers.*;
 
 import org.sbml.x2001.ns.celldesigner.*;
 import org.apache.xmlbeans.*;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 public class CellDesignerAssociateSourceTask implements Task {
-    private TaskMonitor taskMonitor;
     private CyNetwork cyNetwork;
     private File file;
     private String name;
@@ -55,23 +53,14 @@ public class CellDesignerAssociateSourceTask implements Task {
 	this.name = name;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Associate CellDesigner Source " + file;
     }
 
-    public CyNetwork getCyNetwork() {
-	return cyNetwork;
-    }
 
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 
             //We do not need to make conversion, which can be long. We need only read sbml.
@@ -85,15 +74,22 @@ public class CellDesignerAssociateSourceTask implements Task {
             if (sbml != null)
             	CellDesignerSourceDB.getInstance().setCellDesigner(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(), sbml);
 
-	    taskMonitor.setStatus("File associated");
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setStatusMessage("File associated");
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error importing CellDesigner file " +
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error importing CellDesigner file " +
 				  file + ": " + e);
 	}
     }
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

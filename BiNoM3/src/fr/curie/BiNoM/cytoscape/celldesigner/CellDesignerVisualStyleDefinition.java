@@ -30,10 +30,7 @@ import java.awt.Color;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.view.presentation.property.ArrowShapeVisualProperty;
 import org.cytoscape.view.presentation.property.LineTypeVisualProperty;
-
-import cytoscape.visual.ArrowShape;
 import fr.curie.BiNoM.cytoscape.biopax.BioPAXVisualStyleDefinition.Arrow;
-import fr.curie.BiNoM.cytoscape.lib.VisualStyleDefinition.ObjectMapping;
 
 
 public class CellDesignerVisualStyleDefinition

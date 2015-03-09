@@ -25,11 +25,12 @@
 */
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import java.io.*;
+
 import javax.swing.JOptionPane;
+
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.cytoscape.utils.ShowTextDialog;
@@ -40,14 +41,14 @@ import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class checkCellDesignerFileTask implements Task {
-    private TaskMonitor taskMonitor;
     private String CellDesignerFileName = null;
 
     public checkCellDesignerFileTask(String cellDesignerFileName){
     	CellDesignerFileName = cellDesignerFileName;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File fc = new File(CellDesignerFileName);
     		if(fc.exists()){
@@ -69,13 +70,13 @@ public class checkCellDesignerFileTask implements Task {
     			
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(99);
-        	    taskMonitor.setStatus("ERROR: File "+CellDesignerFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);;
+        	    taskMonitor.setStatusMessage("ERROR: File "+CellDesignerFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error checkin CellDesigner file:" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error checkin CellDesigner file:" + e);
     	}
     }
 
@@ -83,13 +84,11 @@ public class checkCellDesignerFileTask implements Task {
     	return "BiNoM: Check CellDesigner file...";
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 
     
 	

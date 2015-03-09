@@ -26,26 +26,26 @@
 */
 package fr.curie.BiNoM.cytoscape.analysis;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import Main.Launcher;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.cytoscape.lib.NetworkFactory;
+import fr.curie.BiNoM.cytoscape.lib.NetworkFactorySubNetwork;
 import fr.curie.BiNoM.pathways.analysis.structure.StructureAnalysisUtils;
 import fr.curie.BiNoM.pathways.wrappers.*;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
-import fr.curie.BiNoM.lib.AbstractTask;
 
-public class ExcludeIntermediateNodesTask implements Task, AbstractTask {
+public class ExcludeIntermediateNodesTask implements Task {
 	
-    private TaskMonitor taskMonitor;
     private Graph graph = null;
     private Vector nodesToExclude;
 
@@ -58,48 +58,43 @@ public class ExcludeIntermediateNodesTask implements Task, AbstractTask {
 	return "Exclude intermediate nodes...";	
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-	throws IllegalThreadStateException {
-	this.taskMonitor = taskMonitor;
-    }
-
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
-
-    public void execute() {
-	fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(this);
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 	    Graph grres = BiographUtils.ExcludeIntermediateNodes(graph, nodesToExclude,false);
 	    GraphDocument grDoc = XGMML.convertGraphToXGMML(grres);
 
 	    BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 
-	    CyNetwork cyNetwork = NetworkFactory.createNetwork
+	    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
+		
+	    CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
 		(grDoc.getGraph().getName()+".inter_excluded",
 		 grDoc,
 		 Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle(),
 		 false, // applyLayout
-		 null);
+		 taskMonitor, netw,nodeMap,edgeMap);
 	
 	    if (biopax != null) {
 		BioPAXSourceDB.getInstance().setBioPAX(cyNetwork, biopax);
 	    }
 
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error substituting mono-molecular interactions... " + e);
+	    taskMonitor.setProgress(1);;
+	    taskMonitor.setStatusMessage("Error substituting mono-molecular interactions... " + e);
 	}		
 
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

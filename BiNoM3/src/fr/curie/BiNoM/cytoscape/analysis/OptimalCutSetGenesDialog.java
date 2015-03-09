@@ -21,9 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
-
-import cytoscape.util.CyFileFilter;
-import cytoscape.util.FileUtil;
 import fr.curie.BiNoM.lib.GraphicUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.DataPathConsistencyAnalyzer;
 

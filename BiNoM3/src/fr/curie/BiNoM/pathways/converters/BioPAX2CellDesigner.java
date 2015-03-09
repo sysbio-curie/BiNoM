@@ -28,24 +28,9 @@
 package fr.curie.BiNoM.pathways.converters;
 
 import fr.curie.BiNoM.pathways.*;
-import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
-import fr.curie.BiNoM.pathways.utils.*;
-import giny.view.NodeView;
-
-import java.io.*;
-import java.util.*;
-
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.util.*;
-import com.hp.hpl.jena.shared.*;
 
-import cytoscape.CyNode;
-
-import org.sbml.x2001.ns.celldesigner.*;
-import org.apache.xmlbeans.*;
-import edu.rpi.cs.xgmml.*;
 
 public class BioPAX2CellDesigner {
 

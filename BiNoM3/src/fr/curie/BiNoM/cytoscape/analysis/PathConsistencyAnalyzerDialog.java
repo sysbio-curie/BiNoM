@@ -1,11 +1,5 @@
 package fr.curie.BiNoM.cytoscape.analysis;
 
-import cytoscape.CyEdge;
-import cytoscape.CyNetwork;
-import cytoscape.Cytoscape;
-import cytoscape.view.CyNetworkView;
-import cytoscape.CyNode;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -21,6 +15,11 @@ import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.event.*;
 
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -29,7 +28,6 @@ import fr.curie.BiNoM.lib.GraphicUtils;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 import fr.curie.BiNoM.pathways.utils.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
-import giny.view.NodeView;
 
 import java.awt.Dimension;
 import java.awt.Color;
@@ -396,8 +394,8 @@ public class PathConsistencyAnalyzerDialog extends JDialog{
 				else
 					analyzer.searchRadius = Double.MAX_VALUE;
 				
-				PathConsistencyAnalyzerTask task = new PathConsistencyAnalyzerTask(analyzer);
-				fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+				TaskIterator t = new TaskIterator(new PathConsistencyAnalyzerTask(analyzer));
+				Launcher.getAdapter().getTaskManager().execute(t);
 
 				result = 1;
 

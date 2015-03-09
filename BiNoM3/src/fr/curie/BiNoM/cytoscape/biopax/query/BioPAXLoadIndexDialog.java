@@ -33,6 +33,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -40,6 +44,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 
 import java.io.File;
@@ -257,9 +262,11 @@ public class BioPAXLoadIndexDialog extends JFrame {
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
-			BioPAXLoadIndexTask task = new BioPAXLoadIndexTask(indexField.getText(),accNumField.getText());
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-  		    (new BioPAXDisplayIndexInfo()).actionPerformed(e);
+            
+            TaskIterator t = new TaskIterator(new BioPAXLoadIndexTask(indexField.getText(),accNumField.getText()));
+    		Launcher.getAdapter().getTaskManager().execute(t);
+    		
+  		   
                 }
            });
 

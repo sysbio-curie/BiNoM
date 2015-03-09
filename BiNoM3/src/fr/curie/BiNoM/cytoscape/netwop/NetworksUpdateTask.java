@@ -26,22 +26,18 @@
 package fr.curie.BiNoM.cytoscape.netwop;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-import cytoscape.visual.VisualStyle;
 
 import java.io.*;
 
-import cytoscape.task.ui.JTaskConfig;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
 
 import java.io.InputStream;
 import java.io.File;
 import java.net.URL;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 
 public class NetworksUpdateTask implements Task {
@@ -57,23 +53,14 @@ public class NetworksUpdateTask implements Task {
 	this.netwSup = netwSup;
     }
 
-    public void halt() {
-    }
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Networks Update";
     }
 
-    public CyNetwork getCyNetwork() {
-	return null;
-    }
-
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
 	try {
 	    int netw_cnt = 0;
 	    for (int n = 0; n < networks.length; n++) {
@@ -115,15 +102,23 @@ public class NetworksUpdateTask implements Task {
 		netw_cnt++;
 	    }
 
-	    taskMonitor.setStatus(netw_cnt +
+	    taskMonitor.setStatusMessage(netw_cnt +
 				  " Network" + (netw_cnt != 1 ? "s" : "") +
 				  " Updated");
-	    taskMonitor.setPercentCompleted(100);
+	    taskMonitor.setProgress(1);
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error updating networks: " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error updating networks: " + e);
 	}
     }
+
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 }

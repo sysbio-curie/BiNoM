@@ -34,6 +34,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -370,8 +375,9 @@ public class extractCellDesignerNotesDialog extends JFrame {
             options.overwriteModuleSection = overwriteModuleSection.isSelected();
             if(!gmtFileField.getText().trim().equals(""))
             	options.moduleGMTFileName = gmtFileField.getText();
-			extractCellDesignerNotesTask task = new extractCellDesignerNotesTask(indexField.getText(),options);
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+            
+            TaskIterator t = new TaskIterator(new extractCellDesignerNotesTask(indexField.getText(),options));
+    		Launcher.getAdapter().getTaskManager().execute(t);            
                 }
            });
 

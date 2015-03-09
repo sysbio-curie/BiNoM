@@ -56,7 +56,7 @@ public class ExcludeIntermediateNodes extends AbstractCyAction {
 		Vector nodesToExclude = new Vector();
 		BiographUtils.ExcludeIntermediateNodes(graph, nodesToExclude, true);
 	    
-		ExcludeIntermediateNodesDialog.getInstance().raise(new ExcludeIntermediateNodesTaskFactory(), graph, nodesToExclude);
+		ExcludeIntermediateNodesDialog.getInstance().raise(graph, nodesToExclude);
 
 	/*
 	if (dialog.result > 0) {

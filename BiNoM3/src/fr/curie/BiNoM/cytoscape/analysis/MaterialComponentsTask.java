@@ -24,53 +24,23 @@
 	Laurence Calzone :	http://leibniz.biol.vt.edu/people/laurence/laurence.html
 */
 package fr.curie.BiNoM.cytoscape.analysis;
-import Main.Launcher;
-
 import fr.curie.BiNoM.cytoscape.lib.*;
-import fr.curie.BiNoM.cytoscape.biopax.*;
-import fr.curie.BiNoM.cytoscape.celldesigner.*;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.vizmap.VisualStyle;
+import org.cytoscape.work.AbstractTask;
+import org.cytoscape.work.TaskMonitor;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-import java.io.*;
-import cytoscape.task.ui.JTaskConfig;
-
+import Main.Launcher;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.CyNode;
-import cytoscape.CyEdge;
-import cytoscape.view.CyNetworkView;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
-import java.io.InputStream;
 
+import java.util.HashMap;
 import java.util.Vector;
-import java.util.Iterator;
 
-import java.io.File;
-import java.net.URL;
-import giny.view.NodeView;
-
-import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
-
-import fr.curie.BiNoM.pathways.wrappers.BioPAX;
-import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerSourceDB;
-import fr.curie.BiNoM.pathways.CytoscapeToBioPAXConverter;
-import fr.curie.BiNoM.pathways.CytoscapeToCellDesignerConverter;
-import fr.curie.BiNoM.pathways.CellDesignerToBioPAXConverter;
-import org.sbml.x2001.ns.celldesigner.*;
-
-import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportTask;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
 
-public class MaterialComponentsTask implements Task {
+public class MaterialComponentsTask extends AbstractTask {
 
-    private TaskMonitor taskMonitor;
     private GraphDocument graphDocument;
     private VisualStyle vizsty;
 
@@ -79,23 +49,14 @@ public class MaterialComponentsTask implements Task {
 	this.vizsty = vizsty;
     }
 
-    public void halt() {
-    }
-
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
     public String getTitle() {
 	return "BiNoM: Material Components";
     }
 
-    public CyNetwork getCyNetwork() {
-    	return Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
-    }
 
-    public void run() {
+	public void run(TaskMonitor taskMonitor) throws Exception {
+		taskMonitor.setTitle(getTitle());
 	try {
 
 	    // begin of test
@@ -109,22 +70,28 @@ public class MaterialComponentsTask implements Task {
 	    Vector v = StructureAnalysisUtils.getMaterialComponents(graphDocument);
 
 	    int size = v.size();
+	    CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+	    HashMap nodeMap = Launcher.getNodeMap(netw);
+		HashMap edgeMap = Launcher.getEdgeMap(netw);
+		
 	    for (int n = 0; n < size; n++) {
 		GraphDocument grDoc = (GraphDocument)v.get(n);
-		CyNetwork cyNetwork = NetworkFactory.createNetwork
+		CyNetwork cyNetwork = NetworkFactorySubNetwork.createNetwork
 		    (grDoc.getGraph().getName(),
 		     grDoc,
 		     vizsty,
 		     false, // applyLayout
-		     taskMonitor);
+		     taskMonitor, netw, nodeMap,edgeMap);
 	    }
-
-	    taskMonitor.setPercentCompleted(100);
+	    nodeMap = null;
+	    edgeMap = null;
+	    taskMonitor.setProgress(1);;
 	}
 	catch(Exception e) {
 	    e.printStackTrace();
-	    taskMonitor.setPercentCompleted(100);
-	    taskMonitor.setStatus("Error getting Material components " + e);
+	    taskMonitor.setProgress(1);
+	    taskMonitor.setStatusMessage("Error getting Material components " + e);
 	}
     }
+
 }

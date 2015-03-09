@@ -28,7 +28,10 @@ package fr.curie.BiNoM.cytoscape.analysis;
 import Main.Launcher;
 
 import java.awt.event.ActionEvent;
+
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
 import fr.curie.BiNoM.cytoscape.lib.GraphDocumentFactory;
 import edu.rpi.cs.xgmml.*;
 
@@ -46,7 +49,7 @@ public class ConvertToUndirectedGraph extends AbstractCyAction {
 
 		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 
-		ConvertToUndirectedGraphTask task = new ConvertToUndirectedGraphTask(graphDocument,Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		TaskIterator t = new TaskIterator(new ConvertToUndirectedGraphTask(graphDocument,Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+		Launcher.getAdapter().getTaskManager().execute(t);
     }
 }

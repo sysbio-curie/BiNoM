@@ -25,11 +25,13 @@
 */
 package fr.curie.BiNoM.cytoscape.biopax.query;
 
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+
 import java.io.*;
+
 import javax.swing.JOptionPane;
+
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.analysis.structure.Graph;
@@ -39,7 +41,6 @@ import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 public class BioPAXGenerateIndexTask implements Task {
-    private TaskMonitor taskMonitor;
     private String BioPAXFileName = null;
     private String IndexFileName = null;
 
@@ -48,38 +49,39 @@ public class BioPAXGenerateIndexTask implements Task {
     	IndexFileName = indexFileName;
     }
     
-    public void run() {
+    public void run(TaskMonitor taskMonitor) {
+    	taskMonitor.setTitle(getTitle());
     	try {
     		File f = new File(BioPAXFileName);
     		if(f.exists()){
     			BioPAXGraphMappingService bgms = new BioPAXGraphMappingService();
     		    BioPAX biopax = new BioPAX();
     		    System.out.println("Loading BioPAX...");
-    		    taskMonitor.setStatus("Loading BioPAX...");
+    		    taskMonitor.setStatusMessage("Loading BioPAX...");
     		    biopax.loadBioPAX(BioPAXFileName);
-    		    taskMonitor.setPercentCompleted(50);
+    		    taskMonitor.setProgress(0.5);
     		    System.out.println("Loaded.");
 
-    		    taskMonitor.setStatus("Mapping BioPAX to index...");
+    		    taskMonitor.setStatusMessage("Mapping BioPAX to index...");
     		    Graph graph = bgms.mapBioPAXToGraph(biopax);
     		    Utils.printUsedMemory();
-    		    taskMonitor.setPercentCompleted(80);
+    		    taskMonitor.setProgress(0.8);;
 
-    		    taskMonitor.setStatus("Saving index...");
+    		    taskMonitor.setStatusMessage("Saving index...");
     		    Graph gr = graph; // XGMML.convertXGMMLToGraph(graph);
     		    //XGMML.saveToXGMML(graph,IndexFileName);
     		    gr.saveAsCytoscapeXGMML(IndexFileName);
-    		    taskMonitor.setPercentCompleted(100);
+    		    taskMonitor.setProgress(1);
     			
     		}else{
     			System.out.println("ERROR: File "+BioPAXFileName+" does not exist.");
-        	    taskMonitor.setPercentCompleted(100);
-        	    taskMonitor.setStatus("ERROR: File "+BioPAXFileName+" does not exist.");
+        	    taskMonitor.setProgress(1);
+        	    taskMonitor.setStatusMessage("ERROR: File "+BioPAXFileName+" does not exist.");
     		}
     	}catch(Exception e){
     		e.printStackTrace();
-    	    taskMonitor.setPercentCompleted(100);
-    	    taskMonitor.setStatus("Error generating BioPAX file :" + e);
+    	    taskMonitor.setProgress(1);
+    	    taskMonitor.setStatusMessage("Error generating BioPAX file :" + e);
     	}
     }
 
@@ -87,15 +89,12 @@ public class BioPAXGenerateIndexTask implements Task {
     	return "BiNoM: Generating BioPAX index ";
     }
 
-    public void halt() {
-    }
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public void setTaskMonitor(TaskMonitor taskMonitor)
-            throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
 
-    
-	
 	
 }

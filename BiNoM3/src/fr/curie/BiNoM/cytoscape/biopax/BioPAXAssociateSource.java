@@ -26,11 +26,17 @@
 package fr.curie.BiNoM.cytoscape.biopax;
 
 import Main.Launcher;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 
 public class BioPAXAssociateSource extends AbstractCyAction {
 	
@@ -71,9 +77,9 @@ public class BioPAXAssociateSource extends AbstractCyAction {
 
         if (file == null)
 	    return false;
-
-		BioPAXAssociateSourceTask task = new BioPAXAssociateSourceTask(file, file.getPath());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+        
+        TaskIterator t = new TaskIterator(new BioPAXAssociateSourceTask(file, file.getPath()));
+		Launcher.getAdapter().getTaskManager().execute(t);
 	return true;
     }
 }

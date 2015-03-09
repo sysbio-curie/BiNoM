@@ -56,12 +56,12 @@ public class CopySelectedNodesAndEdges {
 
 	for (Iterator i = CyTableUtil.getNodesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).iterator(); i.hasNext(); ) {
 		CyNode nd = (CyNode) i.next();
-	    clipboard.add(nd);
+	    clipboard.add(nd, network);
 	}
 
 	for (Iterator i = CyTableUtil.getEdgesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).iterator(); i.hasNext(); ) {
 		CyEdge ed = (CyEdge) i.next();
-	    clipboard.add(ed);
+	    clipboard.add(ed, network);
 	}
 
 	clipboard.compile();

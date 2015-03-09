@@ -27,18 +27,10 @@ package fr.curie.BiNoM.cytoscape.biopax;
 
 import fr.curie.BiNoM.cytoscape.lib.*;
 import Main.Launcher;
-import cytoscape.Cytoscape;
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
-import cytoscape.visual.VisualMappingManager;
-import cytoscape.visual.VisualStyle;
 
 import java.io.*;
 
-import cytoscape.task.ui.JTaskConfig;
 import edu.rpi.cs.xgmml.*;
-import cytoscape.data.Semantics;
-import cytoscape.visual.*;
 
 import java.io.InputStream;
 
@@ -51,13 +43,14 @@ import org.cytoscape.model.CyTable;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
 
 import java.util.Vector;
 import java.util.Iterator;
 import java.io.File;
 import java.net.URL;
 
-import giny.view.NodeView;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.biopax.BioPAXSourceDB;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
@@ -73,7 +66,6 @@ import org.sbml.x2001.ns.celldesigner.*;
 import fr.curie.BiNoM.cytoscape.celldesigner.CellDesignerExportTask;
 
 public class BioPAXExportTask implements Task {
-	private TaskMonitor taskMonitor;
 	private CyNetwork cyNetwork;
 	private File file;
 	boolean merge;
@@ -83,23 +75,14 @@ public class BioPAXExportTask implements Task {
 		this.merge = merge;
 	}
 
-	public void halt() {
-	}
-
-	public void setTaskMonitor(TaskMonitor taskMonitor)
-	throws IllegalThreadStateException {
-		this.taskMonitor = taskMonitor;
-	}
 
 	public String getTitle() {
 		return "BiNoM: Export BioPAX " + file.getPath();
 	}
 
-	public CyNetwork getCyNetwork() {
-		return cyNetwork;
-	}
 
-	public void run() {
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
 		try {
 			CyAppAdapter adapter = Launcher.getAdapter();
 
@@ -135,7 +118,7 @@ public class BioPAXExportTask implements Task {
 				System.out.println("Saving "+file.getAbsolutePath()+"...");
 				resbiopax.saveToFile(file.getAbsolutePath(), resbiopax.model);
 
-				taskMonitor.setStatus("File exported (" + species.size() +
+				taskMonitor.setStatusMessage("File exported (" + species.size() +
 						" species, " + reactions.size() +
 				" reactions)");
 
@@ -163,27 +146,25 @@ public class BioPAXExportTask implements Task {
 				cd2bp.biopax.saveToFile(file.getAbsolutePath(), cd2bp.biopax.biopaxmodel);
 
 
-				taskMonitor.setStatus("File exported (" + species.size() +
+				taskMonitor.setStatusMessage("File exported (" + species.size() +
 						" species, " + reactions.size() +
 				" reactions)");
 			}
 
-			taskMonitor.setPercentCompleted(100);
+			taskMonitor.setProgress(1);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			taskMonitor.setPercentCompleted(100);
-			taskMonitor.setStatus("Error exporting BioPAX file " +
+			taskMonitor.setProgress(1);
+			taskMonitor.setStatusMessage("Error exporting BioPAX file " +
 					file.getAbsolutePath() + ": " + e);
 		}
 	}
 
 	public static void findBioPAXSpeciesAndReactions(Vector species, Vector reactions) {
 		CyAppAdapter adapter = Launcher.getAdapter();
-
-		
+		CyNetwork netw = adapter.getCyApplicationManager().getCurrentNetwork();
 		CyNetworkView view = adapter.getCyApplicationManager().getCurrentNetworkView();
-		cytoscape.data.CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
 
 		/*
 	  if (view.getSelectedNodes().size() == 0) {
@@ -192,22 +173,28 @@ public class BioPAXExportTask implements Task {
 	  }
 		 */
 
-		for (Iterator i = view.getNodeViews().iterator(); i.hasNext(); ) {
-			NodeView nView = (NodeView)i.next();
-			CyNode node = (CyNode)nView.getNode();
+		for (Iterator i = netw.getNodeList().iterator(); i.hasNext(); ) {
+			CyNode node = (CyNode) i.next();
 			Object o;
 
-			o = nodeAttrs.getStringAttribute(node.SUID,"BIOPAX_SPECIES");
+			o = netw.getRow(node).get("BIOPAX_SPECIES", String.class);
 			if (o != null)
 				species.add(o);
 
-			o = nodeAttrs.getStringAttribute(node.SUID,"BIOPAX_REACTION");
+			o = netw.getRow(node).get("BIOPAX_REACTION", String.class);
 			if (o != null)
 				reactions.add(o);
 		}
 
 		System.out.println("vectors " + species.size() + " " +
 				reactions.size());
+	}
+
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

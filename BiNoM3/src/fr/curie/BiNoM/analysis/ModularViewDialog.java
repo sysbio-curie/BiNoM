@@ -36,6 +36,10 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JCheckBox;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.GridBagLayout;
@@ -48,6 +52,8 @@ import java.io.InputStream;
 import edu.rpi.cs.xgmml.GraphDocument;
 import fr.curie.BiNoM.pathways.BioPAXToCytoscapeConverter;
 import fr.curie.BiNoM.analysis.AbstractModularViewTaskFactory;
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
+import fr.curie.BiNoM.cytoscape.analysis.ModularViewTask;
 
 import java.io.File;
 import java.net.URL;
@@ -85,9 +91,7 @@ public class ModularViewDialog extends JDialog {
 	return instance;
     }
 
-    public void raise(AbstractModularViewTaskFactory factory, String netwNames[]) {
-
-	this.factory = factory;
+    public void raise(String netwNames[]) {
 	networkCB.removeAllItems();
 
 	//String[] netwNames = NetworkUtils.getNetworkNames(EMPTY_NAME);
@@ -212,8 +216,9 @@ public class ModularViewDialog extends JDialog {
 			*/
 
 			// will become:
-			AbstractTask task = factory.createTask(idxAdd, idxs, showIntersectionsCB.isSelected(), nodeIntersectionViewCB.isSelected());
-			task.execute();
+	    	TaskIterator t = new TaskIterator(new ModularViewTask
+	    		    (idxAdd, idxs, showIntersectionsCB.isSelected(), nodeIntersectionViewCB.isSelected()));
+			Launcher.getAdapter().getTaskManager().execute(t);	
 
 			/*
 			ModularViewTask task = new ModularViewTask

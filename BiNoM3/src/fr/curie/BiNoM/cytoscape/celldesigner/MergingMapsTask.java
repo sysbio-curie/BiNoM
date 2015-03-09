@@ -1,12 +1,12 @@
 package fr.curie.BiNoM.cytoscape.celldesigner;
 
-import cytoscape.task.Task;
-import cytoscape.task.TaskMonitor;
+import org.cytoscape.work.Task;
+import org.cytoscape.work.TaskMonitor;
+
 import fr.curie.BiNoM.pathways.utils.MergingMapsProcessor;
 
 public class MergingMapsTask implements Task {
 
-	private TaskMonitor taskMonitor;
 	private String configFileName;
 	private String outputFileName;
 	private MergingMapsOptions options;
@@ -24,12 +24,8 @@ public class MergingMapsTask implements Task {
 		options = _options;
 	}
 	
-	public void halt() {
-		// there is no life in the void
-	}
-	
-	public void run() {
-		
+	public void run(TaskMonitor taskMonitor) {
+		taskMonitor.setTitle(getTitle());
 		try {
 			MergingMapsProcessor mm = new MergingMapsProcessor();
 			mm.loadConfigFile(configFileName);
@@ -44,25 +40,28 @@ public class MergingMapsTask implements Task {
 			}
 			
 			if(taskMonitor!=null){
-				taskMonitor.setPercentCompleted(100);
-				taskMonitor.setStatus("Finished merging CellDesigner maps.");
+				taskMonitor.setProgress(1);
+				taskMonitor.setStatusMessage("Finished merging CellDesigner maps.");
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			if(taskMonitor!=null){			
-				taskMonitor.setPercentCompleted(100);
-				taskMonitor.setStatus("Error Creating NaviCell maps:" + e);
+				taskMonitor.setProgress(1);
+				taskMonitor.setStatusMessage("Error Creating NaviCell maps:" + e);
 			}
 		}
 		
 	}
 
-    public void setTaskMonitor(TaskMonitor taskMonitor) throws IllegalThreadStateException {
-        this.taskMonitor = taskMonitor;
-    }
     public String getTitle() {
     	return "BiNoM: Merge CellDesigner maps files...";
     }
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

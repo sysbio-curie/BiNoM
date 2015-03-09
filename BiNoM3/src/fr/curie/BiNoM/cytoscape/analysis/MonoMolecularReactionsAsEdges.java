@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
 
 import Main.Launcher;
 import edu.rpi.cs.xgmml.GraphDocument;
@@ -47,12 +48,10 @@ public class MonoMolecularReactionsAsEdges extends AbstractCyAction {
 	public void actionPerformed(ActionEvent e) {
 		
 	GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
-
-
-		MonoMolecularReactionsAsEdgesTask task = new MonoMolecularReactionsAsEdgesTask (graphDocument,
-				Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
-		fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-
+	
+	TaskIterator t = new TaskIterator(new MonoMolecularReactionsAsEdgesTask (graphDocument,
+			Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
+	Launcher.getAdapter().getTaskManager().execute(t);
 	}
 
 }

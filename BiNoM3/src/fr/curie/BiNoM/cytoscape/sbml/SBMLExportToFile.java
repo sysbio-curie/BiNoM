@@ -26,13 +26,19 @@
 package fr.curie.BiNoM.cytoscape.sbml;
 
 import Main.Launcher;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.work.TaskIterator;
+
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.cytoscape.celldesigner.XMLFileFilter;
 
 public class SBMLExportToFile extends AbstractCyAction {
@@ -87,8 +93,8 @@ public class SBMLExportToFile extends AbstractCyAction {
 			try {
 				FileOutputStream os = new FileOutputStream(file);
 			    os.close();
-			    SBMLExportTask task = new SBMLExportTask(file);
-			    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+			    TaskIterator t = new TaskIterator(new SBMLExportTask(file));
+				Launcher.getAdapter().getTaskManager().execute(t);
 			}
 			catch(Exception ee) {
 			    JOptionPane.showMessageDialog

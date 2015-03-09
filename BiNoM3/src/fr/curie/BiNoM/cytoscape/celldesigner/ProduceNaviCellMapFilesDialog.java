@@ -34,6 +34,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
+import org.cytoscape.work.TaskIterator;
+
+import Main.Launcher;
+
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -41,6 +45,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 
+import fr.curie.BiNoM.cytoscape.analysis.ConnectedComponentsTask;
 import fr.curie.BiNoM.pathways.wrappers.BioPAX;
 
 import java.io.File;
@@ -315,9 +320,10 @@ public class ProduceNaviCellMapFilesDialog extends JFrame {
 		public void actionPerformed(ActionEvent e) {
             setVisible(false);			
 			boolean nv2 = true;
-			boolean demo = false; // 2014-12-01: should we control this parameter with a button in the dialog ?
-			ProduceNaviCellMapFilesTask task = new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected(), provideSourceFiles.isSelected(), xrefFile.getText(), nv2, demo);
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+			boolean demo = false; // 2014-12-01: should we control this parameter with a button in the dialog ?+
+			TaskIterator t = new TaskIterator(new ProduceNaviCellMapFilesTask(configFile.getText(),wordPressURL.getText(), wordPressUser.getText(), wordPressPassw.getText(), produceBrowseOnlyVersion.isSelected(), provideSourceFiles.isSelected(), xrefFile.getText(), nv2, demo));
+			Launcher.getAdapter().getTaskManager().execute(t);
+
                 }
            });
 

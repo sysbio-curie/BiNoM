@@ -1,0 +1,951 @@
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' 
+   targetNamespace="http://www.sbml.org/2001/ns/celldesigner" 
+   xmlns="http://www.sbml.org/2001/ns/celldesigner" 
+   xmlns:mml="http://www.w3.org/1998/Math/MathML" 
+   xmlns:xlink="http://www.w3.org/1999/xlink" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+   elementFormDefault="qualified" 
+   attributeFormDefault="unqualified" 
+>
+ <xs:element name='algebraicRule'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='annotation'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='celldesigner_alias'/>
+     <xs:element ref='celldesigner_listOfIncludedSpecies'/>
+     <xs:element ref='celldesigner_listOfBlockDiagrams'/>
+     <xs:element ref='celldesigner_listOfCompartmentAliases'/>
+     <xs:element ref='celldesigner_listOfGroups'/>
+     <xs:element ref='celldesigner_listOfProteins'/>
+     <xs:element ref='celldesigner_listOfSpeciesAliases'/>
+     <xs:element ref='celldesigner_modelDisplay'/>
+     <xs:element ref='celldesigner_modelVersion'/>
+     <xs:element ref='celldesigner_offset'/>
+     <xs:element ref='celldesigner_listOfComplexSpeciesAliases'/>
+     <xs:element ref='celldesigner_listOfRNAs'/>
+     <xs:element ref='celldesigner_listOfGenes'/>
+     <xs:element ref='celldesigner_listOfAntisenseRNAs'/>
+     <xs:element ref='celldesigner_positionToCompartment'/>
+     <xs:element ref='celldesigner_speciesIdentity'/>
+     <xs:element ref='celldesigner_listOfCatalyzedReactions'/>
+     <xs:element ref='celldesigner_heterodimerIdentity'/>
+     <xs:element ref='celldesigner_name'/>
+     <xs:element ref='celldesigner_reactionType'/>
+     <xs:element ref='celldesigner_baseReactants'/>
+     <xs:element ref='celldesigner_baseProducts'/>
+     <xs:element ref='celldesigner_editPoints'/>
+     <xs:element ref='celldesigner_connectScheme'/>
+     <xs:element ref='celldesigner_listOfProductLinks'/>
+     <xs:element ref='celldesigner_listOfModification'/>
+     <xs:element ref='celldesigner_listOfReactantLinks'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='assignmentRule'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  <xs:attribute name='variable' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='body'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_AntisenseRNA'>
+  <xs:complexType>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='type' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_RNA'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_listOfRegions' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='type' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_activity'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_alias'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_annotation'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_complexSpecies'/>
+     <xs:element ref='celldesigner_speciesIdentity'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_antisensernaReference'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_baseProduct'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_linkAnchor' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='alias' use='required' type='xs:ID'/>
+  <xs:attribute name='species' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_baseProducts'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_baseProduct' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_baseReactant'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_linkAnchor' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='alias' use='required' type='xs:ID'/>
+  <xs:attribute name='species' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_baseReactants'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_baseReactant' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_bounds'>
+  <xs:complexType>
+  <xs:attribute name='h' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='w' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='x' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='y' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_boxSize'>
+  <xs:complexType>
+  <xs:attribute name='height' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='width' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_briefView'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_innerPosition'/>
+     <xs:element ref='celldesigner_boxSize'/>
+     <xs:element ref='celldesigner_singleLine'/>
+     <xs:element ref='celldesigner_paint'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_catalyzed'>
+  <xs:complexType>
+  <xs:attribute name='reaction' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_class'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_compartmentAlias'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_class'/>
+     <xs:element ref='celldesigner_bounds'/>
+     <xs:element ref='celldesigner_doubleLine'/>
+     <xs:element ref='celldesigner_paint'/>
+     <xs:element ref='celldesigner_point'/>
+   </xs:sequence>
+  <xs:attribute name='compartment' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_complexSpecies'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_complexSpeciesAlias'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_activity'/>
+     <xs:element ref='celldesigner_bounds'/>
+     <xs:element ref='celldesigner_view'/>
+     <xs:element ref='celldesigner_usualView'/>
+     <xs:element ref='celldesigner_briefView'/>
+   </xs:sequence>
+  <xs:attribute name='compartmentAlias' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='species' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_connectScheme'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_listOfLineDirection'/>
+   </xs:sequence>
+  <xs:attribute name='connectPolicy' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_doubleLine'>
+  <xs:complexType>
+  <xs:attribute name='innerWidth' fixed='1.0' type='xs:NMTOKEN'/>
+  <xs:attribute name='outerWidth' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='thickness' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_editPoints'>
+  <xs:complexType mixed='true'>
+	  <xs:attribute name='num0' type='xs:NMTOKEN'/>
+	  <xs:attribute name='num1' type='xs:NMTOKEN'/>
+	  <xs:attribute name='num2' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_gene'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_listOfRegions' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='type' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_geneReference'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_heterodimerEntry'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='celldesigner_class'/>
+     <xs:element ref='celldesigner_name'/>
+     <xs:element ref='celldesigner_proteinReference'/>
+     <xs:element ref='celldesigner_state'/>
+   </xs:choice>
+  <xs:attribute name='innerId' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='originalSpecies' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='s473'/>
+     <xs:enumeration value='s474'/>
+     <xs:enumeration value='unknown'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_heterodimerIdentity'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_listOfHeterodimerEntries'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_homodimer'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_hypothetical'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_innerPosition'>
+  <xs:complexType>
+  <xs:attribute name='x' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='y' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_line'>
+  <xs:complexType>
+  <xs:attribute name='color' fixed='ff000000' type='xs:NMTOKEN'/>
+  <xs:attribute name='width' fixed='1.0' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_lineDirection'>
+  <xs:complexType>
+  <xs:attribute name='arm' type='xs:NMTOKEN'/>
+  <xs:attribute name='index' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='value' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_linkAnchor'>
+  <xs:complexType>
+  <xs:attribute name='position' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='E'/>
+     <xs:enumeration value='ENE'/>
+     <xs:enumeration value='ESE'/>
+     <xs:enumeration value='N'/>    
+     <xs:enumeration value='S'/>    
+     <xs:enumeration value='NE'/>
+     <xs:enumeration value='NW'/>
+     <xs:enumeration value='SE'/>
+     <xs:enumeration value='SSW'/>
+     <xs:enumeration value='SW'/>
+     <xs:enumeration value='W'/>
+     <xs:enumeration value='WNW'/>
+     <xs:enumeration value='WSW'/>
+     <xs:enumeration value='SSE'/>
+     <xs:enumeration value='NNE'/>
+     <xs:enumeration value='NNW'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_linkTarget'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_linkAnchor'/>
+   </xs:sequence>
+  <xs:attribute name='alias' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='species' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfAntisenseRNAs'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_AntisenseRNA' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfBlockDiagrams'>
+  <xs:complexType/>
+ </xs:element>
+ <xs:element name='celldesigner_listOfCatalyzedReactions'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_catalyzed' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfCompartmentAliases'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_compartmentAlias' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfComplexSpeciesAliases'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_complexSpeciesAlias' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfGenes'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_gene' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfGroups'>
+  <xs:complexType/>
+ </xs:element>
+ <xs:element name='celldesigner_listOfHeterodimerEntries'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_heterodimerEntry' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfIncludedSpecies'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_species' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfLineDirection'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_lineDirection' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfModification'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_modification' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfModificationResidues'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_modificationResidue' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfModifications'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_modification' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfProductLinks'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_productLink' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfProteins'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_protein' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfRNAs'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_RNA' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfReactantLinks'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_reactantLink' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfRegions'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_region'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_listOfSpeciesAliases'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_speciesAlias' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_modelDisplay'>
+  <xs:complexType>
+  <xs:attribute name='sizeX' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='sizeY' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_modelVersion'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_modification'>
+  <xs:complexType>
+  <xs:attribute name='aliases' type='xs:NMTOKEN'/>
+  <xs:attribute name='editPoints'/>
+  <xs:attribute name='modifiers' type='xs:NMTOKEN'/>
+  <xs:attribute name='offsetX' type='xs:NMTOKEN'/>
+  <xs:attribute name='offsetY' type='xs:NMTOKEN'/>
+  <xs:attribute name='residue' type='xs:NMTOKEN'/>
+  <xs:attribute name='state'/>
+  <xs:attribute name='targetLineIndex'/>
+  <xs:attribute name='type'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='CATALYSIS'/>
+     <xs:enumeration value='INHIBITION'/>
+     <xs:enumeration value='TRANSCRIPTIONAL_ACTIVATION'/>
+     <xs:enumeration value='TRANSCRIPTIONAL_INHIBITION'/>
+     <xs:enumeration value='UNKNOWN_CATALYSIS'/>
+     <xs:enumeration value='UNKNOWN_INHIBITION'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_modificationResidue'>
+  <xs:complexType>
+  <xs:attribute name='angle' type='xs:NMTOKEN'/>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_name'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_notes'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='html'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_offset'>
+  <xs:complexType>
+  <xs:attribute name='x' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='y' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_paint'>
+  <xs:complexType>
+  <xs:attribute name='color' use='required'/>
+  <xs:attribute name='scheme' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='Color'/>
+     <xs:enumeration value='Gradation'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_point'>
+  <xs:complexType>
+  <xs:attribute name='x' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='y' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_positionToCompartment'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_productLink'>
+  <xs:complexType>
+  <xs:attribute name='alias' use='required' type='xs:ID'/>
+  <xs:attribute name='product' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='targetLineIndex' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_protein'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='celldesigner_listOfModificationResidues'/>
+     <xs:element ref='celldesigner_notes'/>
+   </xs:choice>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='name' use='required'/>
+  <xs:attribute name='type' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='GENERIC'/>
+     <xs:enumeration value='ION_CHANNEL'/>
+     <xs:enumeration value='RECEPTOR'/>
+     <xs:enumeration value='TRUNCATED'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_proteinReference'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_reactantLink'>
+  <xs:complexType>
+  <xs:attribute name='alias' use='required' type='xs:ID'/>
+  <xs:attribute name='reactant' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='targetLineIndex' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_reactionType'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_region'>
+  <xs:complexType>
+  <xs:attribute name='id' type='xs:NMTOKEN'/>
+  <xs:attribute name='pos' type='xs:NMTOKEN'/>
+  <xs:attribute name='size' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='type' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_rnaReference'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_singleLine'>
+  <xs:complexType>
+  <xs:attribute name='width' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='0.0'/>
+     <xs:enumeration value='1.0'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_species'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_annotation'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='initialAmount' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_speciesAlias'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_activity'/>
+     <xs:element ref='celldesigner_bounds'/>
+     <xs:element ref='celldesigner_view'/>
+     <xs:element ref='celldesigner_usualView'/>
+     <xs:element ref='celldesigner_briefView'/>
+   </xs:sequence>
+  <xs:attribute name='compartmentAlias'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ca7'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='complexSpeciesAlias' type='xs:NMTOKEN'/>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='species' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_speciesIdentity'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='celldesigner_antisensernaReference'/>
+     <xs:element ref='celldesigner_class'/>
+     <xs:element ref='celldesigner_geneReference'/>
+     <xs:element ref='celldesigner_hypothetical'/>
+     <xs:element ref='celldesigner_name'/>
+     <xs:element ref='celldesigner_proteinReference'/>
+     <xs:element ref='celldesigner_rnaReference'/>
+     <xs:element ref='celldesigner_state'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_state'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='celldesigner_homodimer'/>
+     <xs:element ref='celldesigner_listOfModifications'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_usualView'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='celldesigner_innerPosition'/>
+     <xs:element ref='celldesigner_boxSize'/>
+     <xs:element ref='celldesigner_singleLine'/>
+     <xs:element ref='celldesigner_paint'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='celldesigner_view'>
+  <xs:complexType>
+  <xs:attribute name='state' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='brief'/>
+     <xs:enumeration value='usual'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='compartment'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='annotation' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name'/>
+  <xs:attribute name='outside' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='delay'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='event'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='trigger'/>
+     <xs:element ref='delay'/>
+     <xs:element ref='listOfEventAssignments'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='timeUnits' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='eventAssignment'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  <xs:attribute name='variable' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='functionDefinition'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='html'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='body'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='kineticLaw'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+     <xs:element ref='listOfParameters'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfCompartments'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='compartment' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfEventAssignments'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='eventAssignment' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfEvents'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='event' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfFunctionDefinitions'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='functionDefinition' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfModifiers'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='modifierSpeciesReference' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfParameters'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='parameter' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfProducts'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='speciesReference' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfReactants'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='speciesReference' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfReactions'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='reaction' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfRules'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='algebraicRule'/>
+     <xs:element ref='assignmentRule' maxOccurs='unbounded'/>
+     <xs:element ref='rateRule' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfSpecies'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='species' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfUnitDefinitions'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='unitDefinition' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='listOfUnits'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='unit' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='math'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='model'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='annotation'/>
+     <xs:element ref='listOfFunctionDefinitions'/>
+     <xs:element ref='listOfUnitDefinitions'/>
+     <xs:element ref='listOfCompartments'/>
+     <xs:element ref='listOfSpecies'/>
+     <xs:element ref='listOfRules'/>
+     <xs:element ref='listOfReactions'/>
+     <xs:element ref='listOfEvents'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='modifierSpeciesReference'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='annotation'/>
+   </xs:sequence>
+  <xs:attribute name='species' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='notes'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='html'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='parameter'>
+  <xs:complexType>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='value' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='rateRule'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  <xs:attribute name='variable' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='reaction'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='notes'/>
+     <xs:element ref='annotation'/>
+     <xs:element ref='listOfReactants'/>
+     <xs:element ref='listOfProducts'/>
+     <xs:element ref='listOfModifiers'/>
+     <xs:element ref='kineticLaw'/>
+   </xs:choice>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='reversible' fixed='false' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sbml'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='model'/>
+   </xs:sequence>
+  <xs:attribute name='level' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='version' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='species'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='notes'/>
+     <xs:element ref='annotation'/>
+   </xs:choice>
+  <xs:attribute name='boundaryCondition' type='xs:NMTOKEN'/>
+  <xs:attribute name='constant' type='xs:NMTOKEN'/>
+  <xs:attribute name='hasOnlySubstanceUnits' type='xs:NMTOKEN'/>
+  <xs:attribute name='compartment' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='id' use='required' type='xs:ID'/>
+  <xs:attribute name='initialAmount'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='0.0'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='initialConcentration'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='0.0'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='name' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='speciesReference'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='annotation'/>
+   </xs:sequence>
+  <xs:attribute name='species' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='stoichiometry' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='trigger'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='math'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='unit'>
+  <xs:complexType>
+  <xs:attribute name='kind' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='unitDefinition'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='listOfUnits'/>
+   </xs:sequence>
+  <xs:attribute name='id' use='required' type='xs:NMTOKEN'/>
+  <xs:attribute name='name' use='required' type='xs:NMTOKEN'/>
+  </xs:complexType>
+ </xs:element>
+</xs:schema>

@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a><font color="#ffffff">curie</font></a>.navicell</strong></big></big> (version 1.3)</font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href="."></a><br><a href="file:/Users/viara/workspace/BiNoM2011/src/python_api/curie/navicell.py"></a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href="."></a><br><a href="file:/bioinfo/users/eviara/workspace/BiNoM2011/src/python_api/curie/navicell.py"></a></font></td></tr></table>
     <p><tt>This&nbsp;module&nbsp;implements&nbsp;the&nbsp;Python&nbsp;Binding&nbsp;for&nbsp;<a href="#NaviCell">NaviCell</a>.<br>
 &nbsp;<br>
 It&nbsp;can&nbsp;be&nbsp;used&nbsp;as&nbsp;a&nbsp;module&nbsp;or&nbsp;by&nbsp;using&nbsp;the&nbsp;"nvpy"&nbsp;python&nbsp;companion&nbsp;script.<br>
@@ -114,7 +114,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;browser_command&nbsp;(string):&nbsp;the&nbsp;full&nbsp;browser&nbsp;command<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;map_url&nbsp;(string):&nbsp;the&nbsp;URL&nbsp;of&nbsp;the&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;map</tt></dd></dl>
 
-<dl><dt><a name="BrowserLauncher-launch"><strong>launch</strong></a>(self, session_id)</dt><dd><tt>Launchs&nbsp;the&nbsp;browser&nbsp;with&nbsp;the&nbsp;given&nbsp;session&nbsp;ID.<br>
+<dl><dt><a name="BrowserLauncher-launch"><strong>launch</strong></a>(self, session_id, proxy_url)</dt><dd><tt>Launchs&nbsp;the&nbsp;browser&nbsp;with&nbsp;the&nbsp;given&nbsp;session&nbsp;ID.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;session_id&nbsp;(string):&nbsp;the&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;session&nbsp;ID</tt></dd></dl>
@@ -455,7 +455,7 @@ Args:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-drawingConfigSelectBarplot"><strong>drawingConfigSelectBarplot</strong></a>(self, module, select=True)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;barplot&nbsp;chart.<br>
+<dl><dt><a name="NaviCell-drawingConfigSelectBarplot"><strong>drawingConfigSelectBarplot</strong></a>(self, module, select<font color="#909090">=True</font>)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;barplot&nbsp;chart.<br>
 Similar&nbsp;to:<br>
 -&nbsp;a&nbsp;selection/unselection&nbsp;of&nbsp;the&nbsp;'Display'&nbsp;checkbox&nbsp;in&nbsp;the&nbsp;'Chart'&nbsp;section,&nbsp;and:<br>
 -&nbsp;a&nbsp;'Barplot'&nbsp;selection/unselection&nbsp;in&nbsp;the&nbsp;'Chart&nbsp;Type'&nbsp;list<br>
@@ -464,7 +464,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;select&nbsp;(boolean):&nbsp;select&nbsp;Barplot&nbsp;if&nbsp;True,&nbsp;unselect&nbsp;otherwise</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-drawingConfigSelectGlyph"><strong>drawingConfigSelectGlyph</strong></a>(self, module, num, select=True)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;given&nbsp;glyph.<br>
+<dl><dt><a name="NaviCell-drawingConfigSelectGlyph"><strong>drawingConfigSelectGlyph</strong></a>(self, module, num, select<font color="#909090">=True</font>)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;given&nbsp;glyph.<br>
 Similar&nbsp;to&nbsp;a&nbsp;selection/unselection&nbsp;of&nbsp;one&nbsp;of&nbsp;the&nbsp;'Display'&nbsp;checkbox&nbsp;in&nbsp;the&nbsp;'Glyphs'&nbsp;section<br>
 &nbsp;<br>
 Args:<br>
@@ -472,7 +472,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;num&nbsp;(int):&nbsp;glyph&nbsp;number;&nbsp;valid&nbsp;values&nbsp;are&nbsp;1&nbsp;to&nbsp;5.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;select&nbsp;(boolean):&nbsp;select&nbsp;the&nbsp;Glyph&nbsp;if&nbsp;True,&nbsp;unselect&nbsp;otherwise</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-drawingConfigSelectHeatmap"><strong>drawingConfigSelectHeatmap</strong></a>(self, module, select=True)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;heatmap&nbsp;chart.<br>
+<dl><dt><a name="NaviCell-drawingConfigSelectHeatmap"><strong>drawingConfigSelectHeatmap</strong></a>(self, module, select<font color="#909090">=True</font>)</dt><dd><tt>Select/unselect&nbsp;a&nbsp;heatmap&nbsp;chart.<br>
 Similar&nbsp;to:<br>
 -&nbsp;a&nbsp;selection/unselection&nbsp;of&nbsp;the&nbsp;'Display'&nbsp;checkbox&nbsp;in&nbsp;the&nbsp;'Chart'&nbsp;section,&nbsp;and:<br>
 &nbsp;-&nbsp;a&nbsp;'Heatmap'&nbsp;selection/unselection&nbsp;in&nbsp;the&nbsp;'Chart&nbsp;Type'&nbsp;list<br>
@@ -481,7 +481,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;select&nbsp;(boolean):&nbsp;select&nbsp;Heatmap&nbsp;if&nbsp;True,&nbsp;unselect&nbsp;otherwise</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-drawingConfigSelectMapStaining"><strong>drawingConfigSelectMapStaining</strong></a>(self, module, select=True)</dt><dd><tt>Select/unselect&nbsp;the&nbsp;map&nbsp;staining.<br>
+<dl><dt><a name="NaviCell-drawingConfigSelectMapStaining"><strong>drawingConfigSelectMapStaining</strong></a>(self, module, select<font color="#909090">=True</font>)</dt><dd><tt>Select/unselect&nbsp;the&nbsp;map&nbsp;staining.<br>
 Similar&nbsp;to&nbsp;a&nbsp;selection/unselection&nbsp;of&nbsp;the&nbsp;'Display'&nbsp;checkbox&nbsp;in&nbsp;the&nbsp;'Map&nbsp;Staining'&nbsp;section<br>
 &nbsp;<br>
 Args:<br>
@@ -492,7 +492,7 @@ Args:<br>
 
 <dl><dt><a name="NaviCell-executeCommands"><strong>executeCommands</strong></a>(self, module, commands)</dt><dd><tt>Execute&nbsp;a&nbsp;set&nbsp;of&nbsp;commands&nbsp;encoded&nbsp;in&nbsp;the&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;WS&nbsp;protocol.</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-findEntities"><strong>findEntities</strong></a>(self, module, pattern, hints={}, open_bubble=False)</dt><dd><tt>Find&nbsp;and&nbsp;select&nbsp;entities&nbsp;in&nbsp;the&nbsp;map.<br>
+<dl><dt><a name="NaviCell-findEntities"><strong>findEntities</strong></a>(self, module, pattern, hints<font color="#909090">={}</font>, open_bubble<font color="#909090">=False</font>)</dt><dd><tt>Find&nbsp;and&nbsp;select&nbsp;entities&nbsp;in&nbsp;the&nbsp;map.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
@@ -744,7 +744,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;value&nbsp;(double):&nbsp;transparency&nbsp;value.</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-importDatatables"><strong>importDatatables</strong></a>(self, datatable_url_or_data, datatable_name, datatable_biotype, params={})</dt><dd><tt>Import&nbsp;one&nbsp;or&nbsp;several&nbsp;datatables.<br>
+<dl><dt><a name="NaviCell-importDatatables"><strong>importDatatables</strong></a>(self, datatable_url_or_data, datatable_name, datatable_biotype, params<font color="#909090">={}</font>)</dt><dd><tt>Import&nbsp;one&nbsp;or&nbsp;several&nbsp;datatables.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable_url_or_data&nbsp;(string):&nbsp;datatable(s)&nbsp;to&nbsp;be&nbsp;imported:<br>
@@ -878,7 +878,7 @@ Args:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-noticeMessage"><strong>noticeMessage</strong></a>(self, module, header, msg, position='left top', width=0, height=0)</dt><dd><tt>Open&nbsp;the&nbsp;notice&nbsp;dialog&nbsp;and&nbsp;display&nbsp;a&nbsp;message.<br>
+<dl><dt><a name="NaviCell-noticeMessage"><strong>noticeMessage</strong></a>(self, module, header, msg, position<font color="#909090">='left top'</font>, width<font color="#909090">=0</font>, height<font color="#909090">=0</font>)</dt><dd><tt>Open&nbsp;the&nbsp;notice&nbsp;dialog&nbsp;and&nbsp;display&nbsp;a&nbsp;message.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
@@ -942,7 +942,7 @@ Args:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-sampleAnnotationSelectAnnotation"><strong>sampleAnnotationSelectAnnotation</strong></a>(self, module, annot, select=True)</dt><dd><tt>Select/unselect&nbsp;an&nbsp;annotation.<br>
+<dl><dt><a name="NaviCell-sampleAnnotationSelectAnnotation"><strong>sampleAnnotationSelectAnnotation</strong></a>(self, module, annot, select<font color="#909090">=True</font>)</dt><dd><tt>Select/unselect&nbsp;an&nbsp;annotation.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
@@ -955,7 +955,7 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;entity_name&nbsp;(string):&nbsp;name&nbsp;of&nbsp;the&nbsp;entity&nbsp;to&nbsp;be&nbsp;selected</tt></dd></dl>
 
-<dl><dt><a name="NaviCell-setCenter"><strong>setCenter</strong></a>(self, module, where, lng=0, lat=0)</dt><dd><tt>Set&nbsp;the&nbsp;center&nbsp;of&nbsp;the&nbsp;map.<br>
+<dl><dt><a name="NaviCell-setCenter"><strong>setCenter</strong></a>(self, module, where, lng<font color="#909090">=0</font>, lat<font color="#909090">=0</font>)</dt><dd><tt>Set&nbsp;the&nbsp;center&nbsp;of&nbsp;the&nbsp;map.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
@@ -1083,7 +1083,7 @@ Data descriptors defined here:<br>
 Generally&nbsp;speaking,&nbsp;for&nbsp;internal&nbsp;use&nbsp;by&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;class&nbsp;only.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Proxy-__init__"><strong>__init__</strong></a>(self, proxy_url='')</dt><dd><tt>Instantiate&nbsp;a&nbsp;<a href="#Proxy">Proxy</a>&nbsp;client&nbsp;to&nbsp;communicate&nbsp;with&nbsp;the&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;proxy&nbsp;server.<br>
+<dl><dt><a name="Proxy-__init__"><strong>__init__</strong></a>(self, proxy_url, map_url<font color="#909090">=''</font>)</dt><dd><tt>Instantiate&nbsp;a&nbsp;<a href="#Proxy">Proxy</a>&nbsp;client&nbsp;to&nbsp;communicate&nbsp;with&nbsp;the&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;proxy&nbsp;server.<br>
 &nbsp;<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;proxy_url&nbsp;(string):&nbsp;the&nbsp;proxy&nbsp;URL&nbsp;using&nbsp;HTTP&nbsp;or&nbsp;HTTPS&nbsp;protocol</tt></dd></dl>

@@ -24,9 +24,9 @@ public class TestBioPAXGraphMapper {
 		
 		try {
 			
-			//String BioPAXFileName = "/bioinfo/users/ebonnet/Binom/biopax/M-Phase-L3.owl";
+			String BioPAXFileName = "/Users/eric/wk/biopax_files/biopax3-short-metabolic-pathway.owl";
 			//String BioPAXFileName = "/bioinfo/users/ebonnet/Binom/biopax/Apoptosis3.owl";
-			String BioPAXFileName = "c:/datas/binomtest/biopaxtest/test.owl";
+			//String BioPAXFileName = "c:/datas/binomtest/biopaxtest/test.owl";
 			//String BioPAXFileName = "c:/datas/binomtest/biopaxtest/cellcycle_master.owl";
 			//String BioPAXFileName = "C:/Datas/acsn/acsn_only/acsn_src/acsn_master.owl";
 			//String BioPAXFileName = "C:/Datas/Reactome/reactome_human.owl";
@@ -35,7 +35,9 @@ public class TestBioPAXGraphMapper {
 			biopax.loadBioPAX(BioPAXFileName);
 
 			Graph graph = bgms.mapBioPAXToGraph(biopax);
-			graph.saveAsCytoscapeXGMML(BioPAXFileName+".xgmml");
+			//graph.saveAsCytoscapeXGMML(BioPAXFileName+".xgmml");
+			
+			
 			//XGMML.saveToXGMML(graph, BioPAXFileName+".xgmml");
 			
 			/*for(int i=0;i<graph.Nodes.size();i++)for(int j=i+1;j<graph.Nodes.size();j++){

@@ -1,6 +1,8 @@
 package fr.curie.BiNoM.pathways.test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 import org.sbml.x2001.ns.celldesigner.AnnotationDocument;
@@ -36,20 +38,31 @@ public class TestCellDesignerToBioPAXConverterPaxtools {
 		/*
 		 * Convert a bunch of files
 		 */
-		
-		
 		ArrayList<String> l = new ArrayList<String>();
-		l.add("/Users/eric/wk/acsn_maps/acsn_master.xml");
-		l.add("/Users/eric/wk/acsn_maps/apoptosis_master.xml");
-		l.add("/Users/eric/wk/acsn_maps/cellcycle_master.xml");
-		l.add("/Users/eric/wk/acsn_maps/dnarepair_master.xml");
-		l.add("/Users/eric/wk/acsn_maps/emtcellmotility_master.xml");
-		l.add("/Users/eric/wk/acsn_maps/survival_master.xml");
+	    try {
+	    	BufferedReader br = new BufferedReader(new FileReader("/Users/eric/biopax/files.txt"));
+	        //String line = br.readLine();
+	    	String line;
+	        while ((line = br.readLine()) != null) {
+	        	l.add(line.trim());
+	        }
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+		
+		
+//		l.add("/Users/eric/wk/acsn_maps/acsn_master.xml");
+//		l.add("/Users/eric/wk/acsn_maps/apoptosis_master.xml");
+//		l.add("/Users/eric/wk/acsn_maps/cellcycle_master.xml");
+//		l.add("/Users/eric/wk/acsn_maps/dnarepair_master.xml");
+//		l.add("/Users/eric/wk/acsn_maps/emtcellmotility_master.xml");
+//		l.add("/Users/eric/wk/acsn_maps/survival_master.xml");
 		
 		for (String fn : l) {
 			String output_fn = fn;
 			output_fn = output_fn.replace("master.xml", "v1.0.owl");
-			//System.out.println(fn+"\n"+output_fn);
+			System.out.println("processing "+fn+" "+output_fn);
 			CellDesignerToCytoscapeConverter.Graph graph = 
 					CellDesignerToCytoscapeConverter.convert(fn);
 			CellDesignerToBioPAXConverterPaxtools c2b = new CellDesignerToBioPAXConverterPaxtools();

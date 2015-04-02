@@ -282,7 +282,13 @@ function unlock($fdlck) {
 }
 
 $mode = get("mode", "none");
-$perform = get("perform", "");
+$perform = get("perform", "none");
+
+if ($mode == "none" && $perform == "none" && get("id", "")) {
+  $mode = "cli2srv";
+  $perform = "send_and_rcv";
+}
+
 if ($mode != "session") {
   $id = get("id", "");
 } 
@@ -319,6 +325,7 @@ if ($mode == "session") {
     if (!isset($id)) {
       $id = get("id", "");
     }
+    reset_session($id, false, false);
     write_session($id);
     creatfile(logfile($id));
     creatfile(lockfile($id));

@@ -1686,7 +1686,7 @@ function nv_rcv_perform(rsp_url, cmd)
 	nv_rsp(rsp_url, rspdata, data.msg_id);
 }
 
-function nv_init_session(win, url) {
+function nv_generate_session(win, url) {
 	$.ajax(url,
 	       {
 		       async: true,
@@ -1694,6 +1694,20 @@ function nv_init_session(win, url) {
 		       dataType: 'text',
 		       timeout: -1,
 		       success: function(id) {
+			       console.log("ID [" + id + "]");
+			       nv_server(win, id);
+		       }
+	       });
+}
+
+function nv_init_session(win, url, id) {
+	$.ajax(url,
+	       {
+		       async: true,
+		       cache: false, // don't work without cache off
+		       dataType: 'text',
+		       timeout: -1,
+		       success: function() {
 			       console.log("ID [" + id + "]");
 			       nv_server(win, id);
 		       }
@@ -1716,11 +1730,6 @@ function nv_reset_session(win)
 	if (!nv_server_id) {
 		return;
 	}
-	/*
-	var href = win.location.href;
-	var idx = href.indexOf('/navicell/');
-	var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=reset&id=" + nv_server_id;
-	*/
 	var url = nv_proxy_url + "?mode=session&perform=reset&id=" + nv_server_id;
 	$.ajax(url,
 	       {
@@ -1854,14 +1863,18 @@ function nv_server(win, id, proxy_url) {
 	//var idx = href.indexOf('/navicell/');
 	try {
 		if (id) {
-			//var base_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?id=" + id;
-			var base_url = nv_proxy_url + "?id=" + id;
-			var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
-			nv_rcv(base_url, url);
+			if (id.substr(0, 1) == "@") {
+				id = id.substr(1);
+				var url = nv_proxy_url + "?mode=session&perform=init&id=" + id;
+				nv_init_session(win, url, id);
+			} else {
+				var base_url = nv_proxy_url + "?id=" + id;
+				var url = base_url + "&mode=cli2srv&perform=rcv&block=on";
+				nv_rcv(base_url, url);
+			}
 		} else {
-			//var url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php?mode=session&perform=genid";
 			var url = nv_proxy_url + "?mode=session&perform=genid";
-			nv_init_session(win, url);
+			nv_generate_session(win, url);
 		}
 	} catch(e) {
 		console.log("NV Server: got exception at upper level [" + e.status + "] at " + date.toDateString() + " " + date.toLocaleTimeString() + ": exiting server mode");

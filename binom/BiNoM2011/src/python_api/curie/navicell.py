@@ -309,7 +309,8 @@ class NaviCell:
 
         packcount = 0 # useful when sending datatable contents
         params['id'] = self.session_id
-        params['msg_id'] = msg_id
+        if False:
+            params['msg_id'] = msg_id
 
         if 'data' in params:
             datalen = len(params['data']) # useful when sending datatable contents
@@ -324,6 +325,22 @@ class NaviCell:
         encoded_params = urllib.parse.urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         conn = self.proxy.newConnection()
+
+        url_params = ""
+        for key in params:
+            if key == 'data':
+                continue
+            if key == 'msg_id':
+                continue
+            if url_params:
+                url_params += "&"
+            url_params += str(key) + '=' + str(params[key])
+
+        if 'data' in params:
+            url_params += "&data=" + params['data']
+
+        if self.trace:
+            print("curl '" + self.proxy.getProtocol() + '://' + self.proxy.getHost() + self.proxy.getURL() + "' -d '" + url_params + "'")
 
         conn.request("POST", self.proxy.getURL(), encoded_params, headers)
 
@@ -400,7 +417,8 @@ class NaviCell:
 
     def _cli2srv(self, action, module, args, perform='send_and_rcv'):
         msg_id = self._message_id()
-        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args, 'msg_id': msg_id})})
+#        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args, 'msg_id': msg_id})})
+        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args})})
 
     def _notice_perform(self, module, action, arg1='', arg2='', arg3='', arg4='', arg5=''):
         self._cli2srv('nv_notice_perform', module, [action, arg1, arg2, arg3, arg4, arg5])
@@ -544,7 +562,8 @@ class NaviCell:
 
         for line in lines:
             arr = line.split('\t')
-            if arr[0] in hugo_map:
+            hugo = arr[0].replace("\n", "");
+            if hugo in hugo_map:
                 ret += line + "\n"
         return "@DATA\n" + ret
 
@@ -569,7 +588,8 @@ class NaviCell:
 
             for line in f:
                 arr = line.split('\t')
-                if arr[0] in hugo_map:
+                hugo = arr[0].replace("\n", "");
+                if hugo in hugo_map:
                     ret += line + "\n"
             return "@DATA\n" + ret
 

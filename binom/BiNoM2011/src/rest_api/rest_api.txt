@@ -1,0 +1,36 @@
+#curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'perform=reset&mode=session&id=johndoe'
+#curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'perform=init&mode=session&id=johndoe'
+
+1. lancement du serveur navicell avec l'id souhaite, par exemple:
+
+http://localhost/~eviara/navicell/maps/foo-debug-stain/master/index.php?id=@johndoe
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id=johndoe&data=@COMMAND {"action": "nv_set_zoom", "args": [3], "module": ""}'
+
+https://acsn.curie.fr/navicell/maps/acsn/master/index.php?id=@fr.curie.johndoe
+
+note: module is not mandatory =>
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id=johndoe&data=@COMMAND {"action": "nv_set_zoom", "args": [3]}'
+
+id=johndoe
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$id'&data=@COMMAND {"action": "nv_set_zoom", "args": [3], "module": ""}'
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id=johndoe&data=@COMMAND {"action": "nv_get_hugo_list", "args": [], "module": ""}'
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$id'&data=
+@COMMAND {"action": "nv_set_zoom", "args": [10], "module": ""}
+@COMMAND {"action": "nv_get_hugo_list", "args": [], "module": ""}
+'
+
+curl 'https://acsn.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$id'&data=
+@COMMAND {"action": "nv_set_zoom", "args": [10], "module": ""}
+@COMMAND {"action": "nv_get_hugo_list", "args": [], "module": ""}
+
+
+##
+
+nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/GeneList.txt"), "GeneList", "Gene list", {"import_display_markers": "checked"})
+
+

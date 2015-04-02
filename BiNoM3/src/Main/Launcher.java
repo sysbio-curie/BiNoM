@@ -17,14 +17,26 @@ import javax.swing.event.MenuListener;
 import org.cytoscape.app.CyAppAdapter;
 import org.cytoscape.app.swing.AbstractCySwingApp;
 import org.cytoscape.app.swing.CySwingAppAdapter;
+import org.cytoscape.application.CyApplicationManager;
+import org.cytoscape.application.swing.CySwingApplication;
+import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNetworkFactory;
+import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
 import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.model.subnetwork.CyRootNetwork;
+import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.CyNetworkViewFactory;
+import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
+import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.view.vizmap.VisualStyleFactory;
+import org.cytoscape.work.TaskManager;
 
 import fr.curie.BiNoM.cytoscape.nestmanager.*;
 import fr.curie.BiNoM.biopax.propedit.BioPAXToggleNamingService;
@@ -943,18 +955,88 @@ public class Launcher extends AbstractCySwingApp
 		return null;
 	}
 	
-	 public static CyAppAdapter getAdapter(){
-	    	return adapter;
-	    }
-	 
-	 
-	 public static CySwingAppAdapter getCySwingAppAdapter(){
-	    	return adapter;
-	    }
+//	 public static CyAppAdapter getAdapter(){
+//	    	return adapter;
+//	    }
+//	 
+//	 
+//	 public static CySwingAppAdapter getCySwingAppAdapter(){
+//	    	return adapter;
+//	    }
+//
+//	private static void setAdapter(CySwingAppAdapter adapter) {
+//		Launcher.adapter = adapter;
+//	}
+	
+	
+	public static CyAppAdapter getAdapterr(){
+    	return adapter;
+    }
+ 
+ public static CySwingAppAdapter getCySwingAppAdapterr(){
+    	return adapter;
+    }
+ 
+ public static adapterr getAdapter(){
+    	return new adapterr();
+    }
+ 
+ public static adapterr getCySwingAppAdapter(){
+    	return new adapterr();
+    }
 
-	private static void setAdapter(CySwingAppAdapter adapter) {
-		Launcher.adapter = adapter;
+public static void setAdapter(CySwingAppAdapter adapter) {
+	Launcher.adapter = adapter;
+}
+
+public static class adapterr{
+	
+	public CyNetworkManager getCyNetworkManager(){
+		return getAdapterr().getCyNetworkManager();
 	}
+	public CyNetworkFactory getCyNetworkFactory(){
+		return getAdapterr().getCyNetworkFactory();
+	}
+	public CyApplicationManager getCyApplicationManager(){
+		return getAdapterr().getCyApplicationManager();
+	}
+	public CyNetworkViewFactory getCyNetworkViewFactory(){
+		return getAdapterr().getCyNetworkViewFactory();
+	}
+	public CyNetworkViewManager getCyNetworkViewManager(){
+		return getAdapterr().getCyNetworkViewManager();
+	}
+	public VisualMappingManager getVisualMappingManager(){
+		return getAdapterr().getVisualMappingManager();
+	}
+	public TaskManager getTaskManager(){
+		return getAdapterr().getTaskManager();
+	}
+	
+	public CyEventHelper getCyEventHelper(){
+		return getAdapterr().getCyEventHelper();
+	}
+	
+	public VisualStyleFactory getVisualStyleFactory(){
+		return getAdapterr().getVisualStyleFactory();
+	}
+	
+	public VisualMappingFunctionFactory getVisualMappingFunctionPassthroughFactory(){
+		return getAdapterr().getVisualMappingFunctionPassthroughFactory();
+	}
+	
+	public VisualMappingFunctionFactory getVisualMappingFunctionDiscreteFactory(){
+		return getAdapterr().getVisualMappingFunctionDiscreteFactory();
+	}
+	
+	public CySwingApplication getCySwingApplication(){
+		return getCySwingAppAdapterr().getCySwingApplication();
+	}
+	
+	public CyRootNetworkManager getCyRootNetworkManager(){
+		return getCySwingAppAdapterr().getCyRootNetworkManager();
+	}
+}
 	
 	public static HashMap getNodeMap(CyNetwork net){
 		HashMap m =new HashMap<String, CyNode>();

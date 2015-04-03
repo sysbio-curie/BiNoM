@@ -11,6 +11,8 @@
 $LOCAL_TMPDIR = "/scratch/navicell";
 // ---------------------------------
 
+header("Access-Control-Allow-Origin: *");
+
 $FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
 $SESSION_FILE = $LOCAL_TMPDIR . "/nv_sessions.dat";
 $SESSION_LOCK_FILE = $LOCAL_TMPDIR . "/nv_sessions.lck";

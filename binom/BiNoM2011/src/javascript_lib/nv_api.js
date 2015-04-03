@@ -174,13 +174,17 @@ function nv_select_entity(win, id, mode, center, clicked_boundbox, was_checked)
 
 function nv_set_zoom(win, zoom)
 {
+	win = nv_win(win);
 	win.map.setZoom(zoom);
 	return null;
 }
 
 function nv_uncheck_all_entities(win)
 {
+	win = nv_win(win);
 	win.uncheck_all_entities(win);
+	$("#result_tree_header", win.document).html("");
+	$("#right_tabs", win.document).tabs("option", "active", 0);
 	return null;
 }
 

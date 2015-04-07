@@ -9,12 +9,18 @@
     font-style: italic;
 }
 
-/*
-.action-table {
-    cellpadding: 0;
-    cellspacing: 0;
+.table-header {
+    background: #f3efeb;
+/*    background: #ff8500; */
 }
-*.
+
+.table-contents {
+    background: lightyellow;
+}
+
+.table-example {
+    background: #eeeeff;
+}
 
 
 

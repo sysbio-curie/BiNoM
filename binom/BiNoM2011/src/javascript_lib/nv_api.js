@@ -1511,6 +1511,11 @@ function nv_sample_annotation_perform(win, command, arg1, arg2, arg3)
 	return null;
 }
 
+function nv_import_sample_annotations(win, arg1, arg2, arg3)
+{
+	return nv_sample_annotion_perform(win, "import", arg1, arg2, arg3);
+}
+
 function nv_mydata_perform(win, command, arg1, arg2)
 {
 	win = nv_win(win);
@@ -1578,6 +1583,8 @@ var nv_handlers = {
 	"nv_set_center": nv_set_center,
 
 	"nv_import_datatables": nv_import_datatables,
+	"nv_import_sample_annotations": nv_import_sample_annotations,
+
 	"nv_prepare_import_dialog": nv_prepare_import_dialog,
 	"nv_mydata_perform": nv_mydata_perform,
 	"nv_heatmap_editor_perform": nv_heatmap_editor_perform,

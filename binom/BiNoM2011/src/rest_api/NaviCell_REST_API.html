@@ -1,0 +1,214 @@
+<html>
+
+<head>
+<link rel='stylesheet' type='text/css' href="NaviCell_REST_API.css"/>
+<title>NaviCell REST API</title>
+</head>
+
+<body>
+
+<div align="center">
+<h1>NaviCell REST API</h1>
+Institut Curie, 26 rue d'Ulm - 75005 Paris
+<br/>
+March 2015
+</div>
+<hr/>
+<h2>Introduction</h2>
+
+<p>
+(intro in a a very few lines) NaviCell is a web-based tool to vizualise pathways and [...]. NaviCell tool can also act as a server allowing to be remotely controlled through a REST API.
+A python and a R language bindings have been developped on top of the REST API to hide technical details and to provide a user's friendly interface. A Java binding has been initiated.
+</p>
+<p>
+This document introduces the NaviCell REST API. The audience is developpers wanting to write a binding for other languages such as Ruby, Perl or whatever.
+</p>
+<p>
+To illustrate the REST API, we will use the <span style='font: fixed'>curl</span> standard program available on most platforms. In the following examples, we assume it has been correctly installed on your computer.
+</p>
+<h2>Launching NaviCell acting as a server</h2>
+
+<p>
+First, we need to chose a identifier to be used to communicate with the server. This identifier can be any sequence of letters, digits, underscores, hyphens or dots. If you are using a "official site" such as navicell.curie.fr, it is recommended that the identifier begins with your internet domain to avoid any session conflict.
+</p>
+<p>
+For instance, let say that your domain is mydomain.net and your name is John Doe, the identifier choosen can be net.mydomain.johndoe.
+<br/>
+To launch the NaviCell server, type the following URL in your Web Browser (Google Chrome is recommended, but NaviCell also works with Firefox and Safari):
+</p>
+<p>
+<a href="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php?id=@net.mydomain.johndoe" target="_blank">https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php?id=@net.mydomain.johndoe</a>
+</p>
+<p>
+ACSN map will appear on your screen.
+</p>
+<h2>Controlling NaviCell server using the REST API</h2>
+<p>
+The communicate with the NaviCell server, we recommend to use a Shell variable containing the choosen identifier.
+</p>
+<p>
+Open a Shell terminal and type the following command:
+<br/>
+ID=<span class='variable'>the_choosen_identifier</span>
+</p>
+<p>
+For instance (but choose another one for your experiments):
+<br/>
+<span class='command'>
+ID=net.mydomain.johndoe
+</span>
+</p>
+<p>
+To increase the zoom level using the REST API, in the same terminal type the following command:
+<br/>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_set_zoom", "args": [10]}'
+</span>
+</p>
+
+<p>
+To decrease the zoom level:
+<br/>
+<span class='command'>curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_set_zoom", "args": [3]}'</span>
+</span>
+</p>
+
+<p>
+To select the entities whose name match AKT1:
+<br/>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_find_entities", "args" : ["AKT1"]}'
+</span>
+</p>
+<p>
+To select the entities whose name start with A:
+<br/>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_find_entities", "args" : ["A*"]}'
+</span>
+</p>
+<p>
+Then to unselect all entities:
+<br/>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_uncheck_all_entities", "args" : []}'
+</span>
+</p>
+<h2>Understanding the REST API</h2>
+
+<h4>REST messages</h4>
+<p>
+A NaviCell REST message is under the form:
+<br/>
+<span class='command'>id=</span><span class='variable'>identifier</span><span class='command'>&amp;data=@COMMAND {"action": "</span><span class='variable'>command</span><span class='command'>", "args" : [</span><span class='variable'>argument_list</span><span class='command'>], "module" : "</span><span class='variable'>module_name</span><span class='command'>"}'</span>
+</p>
+<p>
+where:
+<ol>
+<li><span class='command'>id</span> is the navicell server identifier</li>
+<li><span class='command'>action</span> is the action to be executed</li>
+<li><span class='command'>args</span> is a JSON array containing the arguments of the commands</li>
+<li><span class='command'>module</span> is an optional argument containing the map or module name</li>
+</ol>
+</p>
+<p>
+The list of actions and their arguments are described in the section Reference Manual.
+</p>
+<h4>Multiple commands</h4>
+Several commands can be sent at the same time. For instance, to unselect all entities, select entities beginning with a B and setting the zoom level to 10:
+<p>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=
+<br/>
+@COMMAND {"action": "nv_uncheck_all_entities", "args" : []}
+<br/>
+@COMMAND {"action": "nv_find_entities", "args" : ["B*"]}
+<br/>
+@COMMAND {"action": "nv_set_zoom", "args": [10]}
+<br/>
+'
+</span>
+</p>
+<h4>Getting information from the server</h4>
+The REST API can also be used to get information from the server. For instance, to get the HUGO names stored in the map:
+<br/>
+<span class='command'>curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_get_hugo_list", "args": []}'</span>
+</span>
+<p>
+A JSON dictionary is returned, with a status key and a data key. The HUGO names are stored in the data value:
+</p>
+<p>
+<span class='command'>
+{"status":0,"data":["ATM","ATR","CDK2","CHEK2","CREBBP","CCNA1","CCNA2", ...]}
+</span>
+
+<h2>Reference Manual</h2>
+
+<h3>Navigation and selection</h3>
+
+<table border='1' cellpadding='4' cellspacing='0' class='action-table'>
+<tr><th>Description</th><th>Action Name</th><th colspan="4">Arguments</th></tr>
+<tr><td>&nbsp;</td><td><span class='command'>nv_set_zoom</span></td><td><span class='variable'>zoom level</span> :integer</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td></td><td><span class='command'>nv_select_entity</span></td><td><span class='variable'>entity identifier</span> :string</td><td><span class='variable'>select/toggle</span> :flag</td><td><span class='variable'>center</span> :boolean</td></tr>
+</table>
+
+<table border="1" cellpadding="4" cellspacing="0" class="action-table">
+<tr><th>Description</th><th>Action Name</th><th colspan="4">Arguments</th></tr>
+<tr><td>setting zoom level</td><td><span class="command">nv_set_zoom</span></td><td><span class="variable">zoom level</span> <span class="command">:integer</span></td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
+<tr><td>selecting an entity</td><td><span class="command">nv_select_entity</span></td><td><span class="variable">entity identifier</span> <span class="command">:string</span></td><td><span class="variable">select/toggle</span> <span class="command">:flag</span></td><td><span class="variable">center</span> <span class="command">:boolean</span></td></tr>
+</table>
+
+<table border="1" cellpadding="4" cellspacing="0" class="action-table">
+<tr><th>Description</th><th>Action Name</th><th>Command</th><th colspan="4">Arguments</th></tr>
+<tr><td>setting zoom level</td><td><span class="command">nv_set_zoom_perform</span></td><td><span class="command">doit</span></td><td><span class="variable">zoom level</span> <span class="command">:integer</span></td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
+<tr><td>selecting an entity</td><td><span class="command">nv_select_entity_perform</span></td><td><span class="command">import</span></td><td><span class="variable">entity identifier</span> <span class="command">:string</span></td><td><span class="variable">select/toggle</span> <span class="command">:flag</span></td><td><span class="variable">center</span> <span class="command">:boolean</span></td></tr>
+</table>
+
+	nv_select_entity
+	nv_find_entities
+	nv_uncheck_all_entities
+	nv_unhighlight_all_entities
+	nv_set_center
+
+<h3>Datatable import</h3>
+	nv_import_datatables
+
+<h3>Sample annotation import</h3>
+	nv_sample_annotation_perform
+
+<h3>Drawing configuration</h3>
+	nv_heatmap_editor_perform
+	nv_barplot_editor_perform
+	nv_glyph_editor_perform
+	nv_map_staining_editor_perform
+	nv_drawing_config_perform
+	nv_display_continuous_config_perform
+	nv_display_unordered_discrete_config_perform
+
+<!-- LATER -->
+<!--	nv_prepare_import_dialog -->
+
+<h3>Message display</h3>
+	nv_notice_perform
+
+<!-- LATER -->
+<!--	nv_execute_commands -->
+
+<h3>MyData dialog control</h3>
+	nv_mydata_perform
+
+<h3>Synchronization</h3>
+	nv_is_ready
+	nv_is_imported
+
+<h3>Getting information from the server</h3>
+	nv_get_module_list
+	nv_get_datatable_list
+	nv_get_datatable_gene_list
+	nv_get_datatable_sample_list
+	nv_get_hugo_list
+	nv_get_biotype_list
+	nv_get_command_history
+</body>
+
+</html>

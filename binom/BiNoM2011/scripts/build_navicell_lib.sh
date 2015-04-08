@@ -19,7 +19,9 @@ if [ $? = 0 ]; then dir=$(pwd)/$dir; fi
 tmpdir=/tmp/build_navicell_lib.$$
 trap "echo | rm -rf $tmpdir" 0 1 2 3
 
-ext=.$(date "+%Y-%m-%d")
+if [ -z "$NOEXT" ]; then
+    ext=.$(date "+%Y-%m-%d")
+fi
 
 libdir=lib${ext}
 tmplibdir=$tmpdir/$libdir

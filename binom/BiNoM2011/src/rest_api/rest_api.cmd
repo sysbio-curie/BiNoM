@@ -32,7 +32,7 @@ Set transparency	nv_heatmap_editor_perform	set_transparency	value	integer [1:100
 
 @4	Datatable Import
 Import a datatable from a URL	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	URL	string	@example	"Gene list", "MyGenes", "", "https://www.mydomain.net/my_genes.tsv"
-Import a datatable from data	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	data	string beginning with @DATA\n	@example	"Gene list", "MyGenes", "", "@DATA\nABL1\nABR\nACACA\nACACB\nACAD9\nACHE\nACLY"
+Import a datatable from data	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	data	string beginning with @DATA\n	@example	"Gene list", "MyGenes", "", "@DATA\nGENE\nABL1\nABR\nACACA\nACACB\nACAD9\nACHE\nACLY"
 
 @!2	Sample Annotation Import
 Open sample annotation dialog	nv_sample_annotation_perform	open	@example

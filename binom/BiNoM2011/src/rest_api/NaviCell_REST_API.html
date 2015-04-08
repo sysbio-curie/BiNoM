@@ -21,10 +21,10 @@
 <h2>Introduction</h2>
 
 <p>
-NaviCell is a web-based tool to vizualise pathways and <span style='font-style: italic'>blablabla (need help for that)</span>
+NaviCell is a web-based environment for browsing and commenting very large molecular networks using Google Maps and for visualizing omics data on top of the network maps.
 </p>
 <p>
-NaviCell tool can also act as a server allowing to be remotely controlled through a REST API.
+NaviCell can also act as a server allowing to be remotely controlled through a REST API.
 A python and a R language bindings have been developped on top of the REST API to hide technical details and to provide a user's friendly interface. A Java binding has been initiated.
 </p>
 <p>
@@ -76,7 +76,7 @@ curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COM
 <p>
 To decrease the zoom level:
 <br/>
-<span class='command'>curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_set_zoom", "args": [3]}'</span>
+<span class='command'>curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_set_zoom", "args": [2]}'</span>
 </span>
 </p>
 
@@ -100,6 +100,14 @@ Then to unselect all entities:
 <span class='command'>
 curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_uncheck_all_entities", "args" : []}'
 </span>
+</p>
+<p>
+To import and select a list of genes on map:
+<br/>
+<span class='command'>
+curl 'https://navicell.curie.fr/cgi-bin/nv_proxy.php' -d 'id='$ID'&amp;data=@COMMAND {"action": "nv_import_datatables", "args": ["Gene list", "My GeneList", "", "@DATA\nGENE\nACOT13\nACR\nACTG1\n", {"import_display_markers": "checked"}]}'
+</span>
+
 </p>
 <h2>Understanding the REST API</h2>
 
@@ -227,7 +235,7 @@ In the following examples, we assume that "MyExpression", "MyCopyNumber" and "My
 <tr><td>Import&nbsp;a&nbsp;datatable&nbsp;from&nbsp;a&nbsp;URL</td><td><span class="command">nv_import_datatables</span></td><td><span class="variable">biotype</span>&nbsp;<span class="command">:biotype</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">ignored&nbsp;argument</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">URL</span>&nbsp;<span class="command">:string</span></td></tr>
 <tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_import_datatables", "args": ["Gene&nbsp;list",&nbsp;"MyGenes",&nbsp;"",&nbsp;"https://www.mydomain.net/my_genes.tsv"]}</td></tr>
 <tr><td>Import&nbsp;a&nbsp;datatable&nbsp;from&nbsp;data</td><td><span class="command">nv_import_datatables</span></td><td><span class="variable">biotype</span>&nbsp;<span class="command">:biotype</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">ignored&nbsp;argument</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">data</span>&nbsp;<span class="command">:string&nbsp;beginning&nbsp;with&nbsp;@DATA\n</span></td></tr>
-<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_import_datatables", "args": ["Gene&nbsp;list",&nbsp;"MyGenes",&nbsp;"",&nbsp;"@DATA\nABL1\nABR\nACACA\nACACB\nACAD9\nACHE\nACLY"]}</td></tr>
+<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_import_datatables", "args": ["Gene&nbsp;list",&nbsp;"MyGenes",&nbsp;"",&nbsp;"@DATA\nGENE\nABL1\nABR\nACACA\nACACB\nACAD9\nACHE\nACLY"]}</td></tr>
 </table>
 
 <h3>Sample&nbsp;Annotation&nbsp;Import</h3>

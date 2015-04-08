@@ -22,7 +22,7 @@ Close heatmap editor	nv_heatmap_editor_perform	close	@example
 Apply changes	nv_heatmap_editor_perform	apply	@example
 Apply changes and close	nv_heatmap_editor_perform	apply_and_close	@example
 Cancel changes and close	nv_heatmap_editor_perform	cancel	@example
-Select sample or group	nv_heatmap_editor_perform	select_sample	column num	integer	sample name	string
+Select sample or group	nv_heatmap_editor_perform	select_sample	column num	integer	sample name	string	@example	1, "OVARY_H123"
 Select datatable	nv_heatmap_editor_perform	select_datatable	row num	integer	datatable name	string	@example	1, "MyExpression"
 Clear samples	nv_heatmap_editor_perform	clear_samples	@example
 Select all samples	nv_heatmap_editor_perform	all_samples	@example
@@ -31,7 +31,7 @@ Import samples from barplot	nv_heatmap_editor_perform	from_barplot	@example
 Set transparency	nv_heatmap_editor_perform	set_transparency	value	integer [1:100]	@example	90
 
 @4	Datatable Import
-Import a datatable from a URL	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	URL	string	@example	"Gene list", "MyGenes", "", "https://www.mydomain.net/my_genes.csv"
+Import a datatable from a URL	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	URL	string	@example	"Gene list", "MyGenes", "", "https://www.mydomain.net/my_genes.tsv"
 Import a datatable from data	nv_import_datatables	biotype	biotype	datatable name	string	ignored argument	string	data	string beginning with @DATA\n	@example	"Gene list", "MyGenes", "", "@DATA\nABL1\nABR\nACACA\nACACB\nACAD9\nACHE\nACLY"
 
 @!2	Sample Annotation Import
@@ -39,9 +39,9 @@ Open sample annotation dialog	nv_sample_annotation_perform	open	@example
 Close sample annotation dialog	nv_sample_annotation_perform	close	@example
 Apply changes	nv_sample_annotation_perform	apply	@example
 Cancel changes and close	nv_sample_annotation_perform	cancel	@example
-Import sample annotations from a URL	nv_sample_annotation_perform	import	URL	string
+Import sample annotations from a URL	nv_sample_annotation_perform	import	URL	string	@example	"http://www.mydomain.net/my_sample_annotations.tsv"
 Import sample annotations from data	nv_sample_annotation_perform	import	data	string beginning with @DATA\n
-Select/Unselect an annotation	nv_sample_annotation_perform	select_annotation	annot name	string	checked	boolean
+Select/Unselect an annotation	nv_sample_annotation_perform	select_annotation	annot name	string	checked	boolean	@example	@example	"Tissue", true	@example	"Cancer Type", false
 
 @!0	MyData Dialog Management
 Open MyData dialog	nv_mydata_perform	open	@example
@@ -58,10 +58,10 @@ Close drawing configuration dialog	nv_drawing_config_perform	close	@example
 Apply changes drawing configuration dialog	nv_drawing_config_perform	apply	@example
 Apply changes and close drawing configuration dialog	nv_drawing_config_perform	apply_and_close	@example
 Cancel changes and close drawing configuration dialog	nv_drawing_config_perform	cancel	@example
-Select heatmap display	nv_drawing_config_perform	select_heatmap	checked	boolean
-Select barplot display	nv_drawing_config_perform	select_barplot	checked	boolean
-Select glyph display	nv_drawing_config_perform	select_glyph	glyph num	integer	checked	boolean
-Select map staining display	nv_drawing_config_perform	select_map_staining	checked	boolean
+Select heatmap display	nv_drawing_config_perform	select_heatmap	checked	boolean	@example	true
+Select barplot display	nv_drawing_config_perform	select_barplot	checked	boolean	@example	false
+Select glyph display	nv_drawing_config_perform	select_glyph	glyph num	integer	checked	boolean	@example	1, true	@example	2, false
+Select map staining display	nv_drawing_config_perform	select_map_staining	checked	boolean	@example	true
 Select "Display All Genes"	nv_drawing_config_perform	display_all_genes	@example
 Select "Display Selected Genes"	nv_drawing_config_perform	display_selected_genes	@example
 
@@ -71,9 +71,9 @@ Close barplot editor	nv_barplot_editor_perform	close	@example
 Apply changes	nv_barplot_editor_perform	apply	@example
 Apply changes and close	nv_barplot_editor_perform	apply_and_close	@example
 Cancel changes and close	nv_barplot_editor_perform	cancel	@example
-Select sample or group	nv_barplot_editor_perform	select_sample	column num	integer	sample name	string
+Select sample or group	nv_barplot_editor_perform	select_sample	column num	integer	sample name	string	@example	2, "OVARY_H123"
 Select datatable	nv_barplot_editor_perform	select_datatable	datatable name	string
-Clear samples	nv_barplot_editor_perform	clear_samples	@example
+Clear samples	nv_barplot_editor_perform	clear_samples	@example	"MyExpression"
 Select all samples	nv_barplot_editor_perform	all_samples	@example
 Select all groups	nv_barplot_editor_perform	all_groups	@example
 Import samples from heatmap	nv_barplot_editor_perform	from_heatmap
@@ -102,55 +102,56 @@ Select datatable	nv_map_staining_editor_perform	select_datatable	datatable name	
 Set transparency	nv_map_staining_editor_perform	set_transparency	value	integer [1:100]	@example	90
 
 @!5	Display Continuous Configuration Editor
-Open editor	nv_display_continuous_config_perform	open	datatable name	string	shape|size|color	flag
-Close editor	nv_display_continuous_config_perform	close	datatable name	string	shape|size|color	flag
-Apply changes	nv_display_continuous_config_perform	apply	datatable name	string	shape|size|color	flag
-Apply changes and close	nv_display_continuous_config_perform	apply_and_close	datatable name	string	shape|size|color	flag
-Cancel changes and close	nv_display_continuous_config_perform	cancel	datatable name	string	shape|size|color	flag
-Set step count	nv_display_continuous_config_perform	step_count_change	sample|group	flag	shape|size|color	flag	datatable name	string	step count	integer
-Set absolute value mode	nv_display_continuous_config_perform	set_sample_absval	shape|size|color	flag	datatable name	string	checked	boolean
+Open editor	nv_display_continuous_config_perform	open	datatable name	string	shape|size|color	flag	@example	"MyExpression", "shape"
+Close editor	nv_display_continuous_config_perform	close	datatable name	string	shape|size|color	flag	@example	"MyExpression", "size"
+Apply changes	nv_display_continuous_config_perform	apply	datatable name	string	shape|size|color	flag	@example	"MyExpression", "color"
+Apply changes and close	nv_display_continuous_config_perform	apply_and_close	datatable name	string	shape|size|color	flag	@example	"MyExpression", "shape"
+Cancel changes and close	nv_display_continuous_config_perform	cancel	datatable name	string	shape|size|color	flag	@example	"MyExpression", "color"
+Set step count	nv_display_continuous_config_perform	step_count_change	sample|group	flag	shape|size|color	flag	datatable name	string	step count	integer	@example	""sample", "color", "MyExpression", 4
+Set absolute value mode	nv_display_continuous_config_perform	set_sample_absval	shape|size|color	flag	datatable name	string	checked	boolean	@example	"size", "MyExpression", true
 
-Set sample method	nv_display_continuous_config_perform	set_sample_method	shape|size|color	flag	datatable name	string	method	string
+Set sample method	nv_display_continuous_config_perform	set_sample_method	shape|size|color	flag	datatable name	string	method	string	@example	"size", "MyExpression", 3
 
-Set group method	nv_display_continuous_config_perform	set_group_method	shape|size|color	flag	datatable name	string	method	string
+Set group method	nv_display_continuous_config_perform	set_group_method	shape|size|color	flag	datatable name	string	method	string	@example	"size", "MyExpression", 3
 
-Set input value	nv_display_continuous_config_perform	set_input_value	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	value	double
+Set input value	nv_display_continuous_config_perform	set_input_value	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	value	double	@example	"size", "sample", 2, 12.345
 
-Set selection color	nv_display_continuous_config_perform	set_input_color	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	color	integer
-Set selection size	nv_display_continuous_config_perform	set_select_size	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	size	integer
+Set selection color	nv_display_continuous_config_perform	set_input_color	datatable name	string	color	flag	sample|group	flag	index	string	color	integer	@example	"color, "group", 3, "FFFFFF"
 
-Set selection shape	nv_display_continuous_config_perform	set_select_shape	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	shape	integer
+Set selection size	nv_display_continuous_config_perform	set_select_size	datatable name	string	size	flag	sample|group	flag	index	integer	size	integer	@example	"size", "sample", 2, 8
 
-Switch to "Sample" tab	nv_display_continuous_config_perform	switch_sample_tab	datatable name	string	shape|size|color	flag
-Switch to "Group" tab	nv_display_continuous_config_perform	switch_sample_group	datatable name	string	shape|size|color	flag
+Set selection shape	nv_display_continuous_config_perform	set_select_shape	datatable name	string	shape	flag	sample|group	flag	index	integer	shape	integer	@example	"shape", "sample", 4
+
+Switch to "Sample" tab	nv_display_continuous_config_perform	switch_sample_tab	datatable name	string	shape|size|color	flag	@example	"MyExpression", "shape"	@example	"MyCopyNumber", "size"
+Switch to "Group" tab	nv_display_continuous_config_perform	switch_sample_group	datatable name	string	shape|size|color	flag	@example	"MyExpression", "color"
 
 
 @!5	Display Unordered Discrete Configuration Editor
-Open editor	nv_display__unordered_discrete_config_perform	open	datatable name	string	shape|size|color	flag
-Close editor	nv_display__unordered_discrete_config_perform	close	datatable name	string	shape|size|color	flag
-Apply changes	nv_display__unordered_discrete_config_perform	apply	datatable name	string	shape|size|color	flag
-Apply changes and close	nv_display__unordered_discrete_config_perform	apply_and_close	datatable name	string	shape|size|color	flag
-Cancel changes and close	nv_display__unordered_discrete_config_perform	cancel	datatable name	string	shape|size|color	flag
+Open editor	nv_display__unordered_discrete_config_perform	open	datatable name	string	shape|size|color	flag	@example	"MyMutation", "shape"	@example	"MyMutation", "size"
+Close editor	nv_display__unordered_discrete_config_perform	close	datatable name	string	shape|size|color	flag	@example	"MyMutation", "shape"	@example	"MyMutation", "size"
+Apply changes	nv_display__unordered_discrete_config_perform	apply	datatable name	string	shape|size|color	flag	@example	"MyMutation", "color"	@example	"MyMutation", "size"
+Apply changes and close	nv_display__unordered_discrete_config_perform	apply_and_close	datatable name	string	shape|size|color	flag	@example	"MyMutation", "color"	@example	"MyMutation", "size"
+Cancel changes and close	nv_display__unordered_discrete_config_perform	cancel	datatable name	string	shape|size|color	flag	@example	"MyMutation", "color"	@example	"MyMutation", "size"
 
-Open/Close advanced configuration	nv_display_unordered_discrete_config_perform	set_advanced_configuration	datatable name	string	shape|size|color	flag	checked	boolean
+Open/Close advanced configuration	nv_display_unordered_discrete_config_perform	set_advanced_configuration	datatable name	string	shape|size|color	flag	checked	boolean	@example	"MyMutation", "shape", "color", true
 
-Set discrete value	nv_display_unordered_discrete_config_perform	set_discrete_value	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	value	double
+Set discrete value	nv_display_unordered_discrete_config_perform	set_discrete_value	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	value	double	@example	"MyMutation", "shape", "sample", 2, 4
 
-Set discrete color	nv_display_unordered_discrete_config_perform	set_discrete_color	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	color	integer
+Set discrete color	nv_display_unordered_discrete_config_perform	set_discrete_color	datatable name	string	color	flag	sample|group	flag	index	string	color	integer	@example	"MyMutation", "color", "sample", 3, "FF0000"
 
-Set discrete size	nv_display_unordered_discrete_config_perform	set_discrete_size	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	size	integer
+Set discrete size	nv_display_unordered_discrete_config_perform	set_discrete_size	datatable name	string	size	flag	sample|group	flag	index	integer	size	integer	@example	"MyMutation", "sample", 3, 10
 
-Set discrete shape	nv_display_unordered_discrete_config_perform	set_discrete_shape	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	shape	integer
+Set discrete shape	nv_display_unordered_discrete_config_perform	set_discrete_shape	datatable name	string	shape	flag	sample|group	flag	index	integer	shape	integer	@example	"MyMutation", "shape", "sample", 2, 5
 
-Set discrete condition	nv_display_unordered_discrete_config_perform	set_discrete_cond	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	condition	integer
+Set discrete condition	nv_display_unordered_discrete_config_perform	set_discrete_cond	datatable name	string	shape|size|color	flag	sample|group	flag	index	integer	condition	integer	@example	"MyMutation", "shape", "sample", 3, 2
 
-Switch to "Sample" tab	nv_display_unordered_discrete_config_perform	switch_sample_tab	datatable name	string	shape|size|color	flag
-Switch to "Group" tab	nv_display_unordered_discrete_config_perform	switch_sample_group	datatable name	string	shape|size|color	flag
+Switch to "Sample" tab	nv_display_unordered_discrete_config_perform	switch_sample_tab	datatable name	string	shape|size|color	flag	@example	"MyMutation", "size"
+Switch to "Group" tab	nv_display_unordered_discrete_config_perform	switch_sample_group	datatable name	string	shape|size|color	flag	@example	"MyMutation", "shape"
 
 @!5	Message Display
 Open message window	nv_notice_perform	open	@example
 Close message window	nv_notice_perform	close	@example
-Open message window and display a message	nv_notice_perform	set_message_and_open	header	string	message	string	position	string	width	integer	height	integer
+Open message window and display a message	nv_notice_perform	set_message_and_open	header	string	message	string	position	string	width	integer	height	integer	@example	"Notice", "Type AK* in the search form and type returns", "top-left", 200, 200
 
 @0	Getting Information from the Server
 Get HUGO list in map	nv_get_hugo_list	@example

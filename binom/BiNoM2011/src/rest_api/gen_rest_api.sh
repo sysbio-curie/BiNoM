@@ -62,7 +62,7 @@ NF > 1 {
   }
   printf("</tr>\n");
   if (example_cnt > 0) {
-     printf("<tr class=\"table-example\"><td style=\"font-size: small; text-align: right\">Example%s</td><td colspan=\"5\">%s</td></tr>\n", (example_cnt > 1 ? "s" : ""), example);
+     printf("<tr class=\"table-example\"><td style=\"font-size: small; text-align: right\">Example%s</td><td colspan=\"8\">%s</td></tr>\n", (example_cnt > 1 ? "s" : ""), example);
   }
 }
 

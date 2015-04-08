@@ -712,12 +712,14 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 	} else if (command == "set_input_color") {
 		var datatable_id = arg1;
 		var config = arg2;
+		/* TBD: config is useless as it must be color */
 		var tabname = arg3;
 		var idx = arg4;
 		var color = arg5;
 		DisplayContinuousConfig.setInputColor(datatable_id, config, tabname, idx, color, true);
 	} else if (command == "set_select_size") {
 		var datatable_id = arg1;
+		/* TBD: config is useless as it must be size */
 		var config = arg2;
 		var tabname = arg3;
 		var idx = arg4;
@@ -726,6 +728,7 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 	} else if (command == "set_select_shape") {
 		var datatable_id = arg1;
 		var config = arg2;
+		/* TBD: config is useless as it must be shape */
 		var tabname = arg3;
 		var idx = arg4;
 		var shape = arg5;

@@ -27,10 +27,9 @@ public class SCCinAttribute  extends AbstractCyAction {
             "network",
             Launcher.getAdapter().getCyNetworkViewManager());
         setPreferredMenu(Launcher.appName + ".Analysis");
-		this.adapter = Launcher.getCySwingAppAdapter();
 	}
 	public void actionPerformed(ActionEvent e) {		
-		CyApplicationManager applicationManager=adapter.getCyApplicationManager();
+		CyApplicationManager applicationManager=Launcher.getAdapter().getCyApplicationManager();
 		CyNetwork network=applicationManager.getCurrentNetwork();
 		SCCinTable graph=new SCCinTable(network);
 		ArrayList<HashSet<Integer>> scc=graph.SCC();

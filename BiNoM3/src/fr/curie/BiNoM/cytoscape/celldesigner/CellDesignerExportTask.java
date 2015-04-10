@@ -83,10 +83,8 @@ public class CellDesignerExportTask implements Task {
 
     public void run(TaskMonitor taskMonitor) {
     	taskMonitor.setTitle(getTitle());
-	try {
-		CyAppAdapter adapter = Launcher.getAdapter();
-		
-		CyNetwork network = adapter.getCyApplicationManager().getCurrentNetwork();
+	try {		
+		CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 
 	    SbmlDocument sbml = CellDesignerSourceDB.getInstance().getCellDesigner(network);
 	    if (sbml != null) {

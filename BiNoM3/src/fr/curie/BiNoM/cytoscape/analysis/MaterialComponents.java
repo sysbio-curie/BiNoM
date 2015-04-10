@@ -45,10 +45,9 @@ public class MaterialComponents extends AbstractCyAction {
 
     public void actionPerformed(ActionEvent e) {
 
-    	CyAppAdapter adapter = Launcher.getAdapter();
-		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork());
+		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 		
-		TaskIterator t = new TaskIterator(new MaterialComponentsTask(graphDocument,adapter.getVisualMappingManager().getCurrentVisualStyle()));
+		TaskIterator t = new TaskIterator(new MaterialComponentsTask(graphDocument,Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
 		Launcher.getAdapter().getTaskManager().execute(t);
     }
 }

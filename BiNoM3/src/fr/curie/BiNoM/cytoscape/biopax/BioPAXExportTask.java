@@ -84,10 +84,9 @@ public class BioPAXExportTask implements Task {
 	public void run(TaskMonitor taskMonitor) {
 		taskMonitor.setTitle(getTitle());
 		try {
-			CyAppAdapter adapter = Launcher.getAdapter();
 
 			
-			CyNetwork network = adapter.getCyApplicationManager().getCurrentNetwork();
+			CyNetwork network = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
 			BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(network);
 			SbmlDocument sbml = CellDesignerSourceDB.getInstance().getCellDesigner(network);
 
@@ -99,7 +98,7 @@ public class BioPAXExportTask implements Task {
 				//CytoscapeToBioPAXConverter.filterIDs(biopax, species, reactions);
 				
 				// print out the nb of nodes and edges
-				GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork()); 
+				GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()); 
 
 				BioPAX resbiopax = CytoscapeToBioPAXConverter.convert(graphDocument, biopax);
 				
@@ -162,9 +161,8 @@ public class BioPAXExportTask implements Task {
 	}
 
 	public static void findBioPAXSpeciesAndReactions(Vector species, Vector reactions) {
-		CyAppAdapter adapter = Launcher.getAdapter();
-		CyNetwork netw = adapter.getCyApplicationManager().getCurrentNetwork();
-		CyNetworkView view = adapter.getCyApplicationManager().getCurrentNetworkView();
+		CyNetwork netw = Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork();
+		CyNetworkView view = Launcher.getAdapter().getCyApplicationManager().getCurrentNetworkView();
 
 		/*
 	  if (view.getSelectedNodes().size() == 0) {

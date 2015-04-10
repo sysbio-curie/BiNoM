@@ -101,8 +101,6 @@ public class NetworkFactory {
 	    return null;
 	}
 
-	CyAppAdapter adapter = Launcher.getAdapter();
-
 //  
 //	BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(adapter.getCyApplicationManager().getCurrentNetwork());	
 //		
@@ -111,7 +109,7 @@ public class NetworkFactory {
 //	
 	
 	//create a new network
-	CyNetwork netw = adapter.getCyNetworkFactory().createNetwork();
+	CyNetwork netw = Launcher.getAdapter().getCyNetworkFactory().createNetwork();
 	CyNetworkView networkView = null;
 
 	netw.getRow(netw).set(CyNetwork.NAME, Launcher.noSynonymNetwork(networkName));
@@ -264,7 +262,7 @@ public class NetworkFactory {
 	nodesList=null;
 	edgesList=null;
 	
-	networkView = adapter.getCyNetworkViewFactory().createNetworkView(netw);
+	networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(netw);
 	
 	if(netw.getEdgeCount()!=graphDocument.getGraph().getEdgeArray().length){
 		System.out.println("ERROR: The number of edges in XGMML ("+graphDocument.getGraph().getEdgeArray().length+") is not equal to the Cytoscape ("+netw.getEdgeCount()+")");
@@ -274,7 +272,7 @@ public class NetworkFactory {
 	    VisualStyleFactory.getInstance().apply(vizsty_def, networkView);
 	}
 	 else if (vizsty != null)
-		adapter.getVisualMappingManager().setVisualStyle(vizsty, networkView);
+		 Launcher.getAdapter().getVisualMappingManager().setVisualStyle(vizsty, networkView);
 
 	//apply a layout
 	if (applyLayout)
@@ -324,8 +322,8 @@ public class NetworkFactory {
 //	}
 	
 
-	adapter.getCyNetworkManager().addNetwork(netw);
-	adapter.getCyNetworkViewManager().addNetworkView(networkView);
+	Launcher.getAdapter().getCyNetworkManager().addNetwork(netw);
+	Launcher.getAdapter().getCyNetworkViewManager().addNetworkView(networkView);
 	
 	networkView.updateView();
 	VisualStyle vs = Launcher.getAdapter().getVisualMappingManager().getVisualStyle(networkView);	

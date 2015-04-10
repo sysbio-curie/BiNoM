@@ -46,8 +46,7 @@ public class PruneGraph extends AbstractCyAction {
 	}
 
     public void actionPerformed(ActionEvent e) {
-    	CyAppAdapter adapter = Launcher.getAdapter();
-		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork());
+		GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 	
 		/*try{
 			fr.curie.BiNoM.pathways.wrappers.XGMML.saveToXMGML(graphDocument, "c:/datas/binomtest/prune_test.xgmml");
@@ -55,7 +54,7 @@ public class PruneGraph extends AbstractCyAction {
 			
 		}*/
 				
-		TaskIterator t = new TaskIterator(new PruneGraphTask(graphDocument, adapter.getVisualMappingManager().getCurrentVisualStyle()));
+		TaskIterator t = new TaskIterator(new PruneGraphTask(graphDocument, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle()));
 		Launcher.getAdapter().getTaskManager().execute(t);
     }
 }

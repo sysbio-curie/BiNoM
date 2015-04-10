@@ -62,9 +62,7 @@ public class CalcCentralityUndirected extends AbstractCyAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-    	
-    	CyAppAdapter adapter = Launcher.getAdapter();
-    	
+    	    	
         if(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork()!=null){
         	Vector<String> selected = new Vector<String>();
         	if(CyTableUtil.getNodesInState(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork(),"selected",true).size() > 1){
@@ -74,7 +72,7 @@ public class CalcCentralityUndirected extends AbstractCyAction {
     				selected.add(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork().getRow((CyNode)it.next()).get(CyNetwork.NAME, String.class));
         	}
 			StructureAnalysisUtils.Option options = new StructureAnalysisUtils.Option();
-			GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(adapter.getCyApplicationManager().getCurrentNetwork());
+			GraphDocument graphDocument = GraphDocumentFactory.getInstance().createGraphDocument(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 			
 			CalcCentralityTask task = new CalcCentralityTask(graphDocument, selected, directed, options, Launcher.getAdapter().getVisualMappingManager().getCurrentVisualStyle());
 			TaskIterator t = new TaskIterator(task);

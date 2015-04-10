@@ -103,9 +103,7 @@ public class NetworkFactorySubNetwork {
 	    }
 	    return null;
 	}
-
-	CyAppAdapter adapter = Launcher.getAdapter();
-	BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(adapter.getCyApplicationManager().getCurrentNetwork());
+	BioPAX biopax = BioPAXSourceDB.getInstance().getBioPAX(Launcher.getAdapter().getCyApplicationManager().getCurrentNetwork());
 	
 	CyRootNetwork networkCollection = Launcher.getAdapter().getCyRootNetworkManager().getRootNetwork(fromNetw);
 			
@@ -225,10 +223,10 @@ public class NetworkFactorySubNetwork {
     	}
     	netw.addEdge(ed);
 	}
-	adapter.getCyNetworkManager().addNetwork(netw);
-	CyNetworkView networkView = adapter.getCyNetworkViewFactory().createNetworkView(netw);
-	adapter.getVisualMappingManager().setVisualStyle(vizsty, networkView);
-	adapter.getCyNetworkViewManager().addNetworkView(networkView);
+	Launcher.getAdapter().getCyNetworkManager().addNetwork(netw);
+	CyNetworkView networkView = Launcher.getAdapter().getCyNetworkViewFactory().createNetworkView(netw);
+	Launcher.getAdapter().getVisualMappingManager().setVisualStyle(vizsty, networkView);
+	Launcher.getAdapter().getCyNetworkViewManager().addNetworkView(networkView);
 	
 	for (int n = 0; n < nodes.length; n++) {
 	    edu.rpi.cs.xgmml.GraphicNode node = nodes[n];

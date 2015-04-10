@@ -50,8 +50,6 @@ import org.cytoscape.view.vizmap.mappings.PassthroughMapping;
 
 public class VisualStyleFactory {
 	
-	CyAppAdapter adapter;
-
     private static VisualStyleFactory instance;
 
     public static VisualStyleFactory getInstance() {
@@ -61,7 +59,6 @@ public class VisualStyleFactory {
     }
 
     public VisualStyleFactory() {
-    	adapter = Launcher.getAdapter();
     }
 
     public void apply(VisualStyleDefinition vizsty_def, CyNetworkView networkView) {
@@ -73,7 +70,7 @@ public class VisualStyleFactory {
     private void applyVisualStyle(VisualStyleDefinition vizsty_def,
 				 CyNetworkView networkView) {
 		//tolto networkView. applyVizmapper(create(vizsty_def));
-		adapter.getVisualMappingManager().setVisualStyle(create(vizsty_def), networkView);
+    	Launcher.getAdapter().getVisualMappingManager().setVisualStyle(create(vizsty_def), networkView);
     }
 
 //    private void applyImageMapping(VisualStyleDefinition vizsty_def, CyNetworkView networkView) {
@@ -146,9 +143,9 @@ public class VisualStyleFactory {
 //			}
 //		}
 
-		VisualStyle vizsty = adapter.getVisualStyleFactory().createVisualStyle(vizsty_def.getName());
+		VisualStyle vizsty = Launcher.getAdapter().getVisualStyleFactory().createVisualStyle(vizsty_def.getName());
 				
-		adapter.getVisualMappingManager().addVisualStyle(vizsty);
+		Launcher.getAdapter().getVisualMappingManager().addVisualStyle(vizsty);
 			
 		// nodes
 		createNodeShape(vizsty_def, vizsty);
@@ -175,7 +172,7 @@ public class VisualStyleFactory {
 	  
 	  vs.setDefaultValue(BasicVisualLexicon.NODE_SHAPE, vizsty_def.defaultNodeShape); 
 	  
-	  DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().
+	  DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().
 			  createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_SHAPE);
 	  	  
 		Vector v = vizsty_def.getNodeShapeMapping();
@@ -194,7 +191,7 @@ public class VisualStyleFactory {
   
     private void createNodeSize(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-  	  DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_SIZE);
+  	  DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_SIZE);
 
   	vs.setDefaultValue(BasicVisualLexicon.NODE_SIZE, vizsty_def.defaultNodeSize);
   	  
@@ -210,7 +207,7 @@ public class VisualStyleFactory {
 
     private void createNodeLabel(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-    	PassthroughMapping passThroughMapping = (PassthroughMapping) adapter.getVisualMappingFunctionPassthroughFactory().createVisualMappingFunction("name", String.class, BasicVisualLexicon.NODE_LABEL);        
+    	PassthroughMapping passThroughMapping = (PassthroughMapping) Launcher.getAdapter().getVisualMappingFunctionPassthroughFactory().createVisualMappingFunction("name", String.class, BasicVisualLexicon.NODE_LABEL);        
         
         vs.addVisualMappingFunction(passThroughMapping);
         
@@ -218,7 +215,7 @@ public class VisualStyleFactory {
 
     private void createNodeColor(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-	  DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_FILL_COLOR);
+	  DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_FILL_COLOR);
 
 	  vs.setDefaultValue(BasicVisualLexicon.NODE_FILL_COLOR, vizsty_def.defaultNodeColor);
 	  
@@ -234,7 +231,7 @@ public class VisualStyleFactory {
 
     private void createNodeBorderColor(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-  	  DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_PAINT);
+  	  DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_PAINT);
 
 		Vector v = vizsty_def.getNodeBorderColorMapping();
 		for (int n = 0; n < v.size(); n++) {
@@ -249,7 +246,7 @@ public class VisualStyleFactory {
 
     private void createNodeBorderLineStyle(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-    	DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_LINE_TYPE);
+    	DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_LINE_TYPE);
 
     	vs.setDefaultValue(BasicVisualLexicon.NODE_BORDER_LINE_TYPE, vizsty_def.defaultNodeBorderLineStyle);
     	
@@ -263,7 +260,7 @@ public class VisualStyleFactory {
 		
 		vs.addVisualMappingFunction(discreteMapping);
 	    
-		DiscreteMapping discreteMapping1 = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_WIDTH);
+		DiscreteMapping discreteMapping1 = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getNodeAttribute(), String.class, BasicVisualLexicon.NODE_BORDER_WIDTH);
 
 	
 		v = vizsty_def.getNodeBorderLineWidthMapping();
@@ -281,7 +278,7 @@ public class VisualStyleFactory {
  
     private void createEdgeSourceArrow(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-    	DiscreteMapping discreteMappingShape = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_SOURCE_ARROW_SHAPE);
+    	DiscreteMapping discreteMappingShape = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_SOURCE_ARROW_SHAPE);
     	//DiscreteMapping discreteMappingColor = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction("BIOPAX_EDGE_TYPE", String.class, BasicVisualLexicon.);
 
 //    	/vs.setDefaultValue(BasicVisualLexicon.EDGE_SOURCE_ARROW_SHAPE, ((BioPAXVisualStyleDefinition.Arrow)vizsty_def.defaultEdgeSourceArrow).getShape());
@@ -299,7 +296,7 @@ public class VisualStyleFactory {
     }
 
     private void createEdgeTargetArrow(VisualStyleDefinition vizsty_def, VisualStyle vs) {
-    	DiscreteMapping discreteMappingShape = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_TARGET_ARROW_SHAPE);
+    	DiscreteMapping discreteMappingShape = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_TARGET_ARROW_SHAPE);
 //    	DiscreteMapping discreteMappingColor = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction("BIOPAX_EDGE_TYPE", String.class, BasicVisualLexicon.edge_);   
 
     	vs.setDefaultValue(BasicVisualLexicon.EDGE_TARGET_ARROW_SHAPE, ((BioPAXVisualStyleDefinition.Arrow)vizsty_def.defaultEdgeTargetArrow).getShape());
@@ -328,7 +325,7 @@ public class VisualStyleFactory {
 
     private void createEdgeLineType(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-    	DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_LINE_TYPE);
+    	DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_LINE_TYPE);
 
     	vs.setDefaultValue(BasicVisualLexicon.EDGE_LINE_TYPE, vizsty_def.defaultEdgeLineType);
 
@@ -346,7 +343,7 @@ public class VisualStyleFactory {
 
     private void createEdgeLineColor(VisualStyleDefinition vizsty_def, VisualStyle vs) {
 
-		DiscreteMapping discreteMapping = (DiscreteMapping) adapter.getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT);
+		DiscreteMapping discreteMapping = (DiscreteMapping) Launcher.getAdapter().getVisualMappingFunctionDiscreteFactory().createVisualMappingFunction(vizsty_def.getEdgeAttribute(), String.class, BasicVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT);
 		
 		vs.setDefaultValue(BasicVisualLexicon.EDGE_STROKE_UNSELECTED_PAINT, vizsty_def.defaultEdgeLineColor);
 		

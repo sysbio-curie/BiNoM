@@ -11,7 +11,7 @@
 <h1>NaviCell REST API</h1>
 <big>
 &nbsp;Version 1.1.3<br/>
-&nbsp;March 2015
+&nbsp;April 2015
 <br/>
 <br/>
 &nbsp;Institut Curie, 26 rue d'Ulm - 75005 Paris
@@ -127,7 +127,7 @@ where:
 </ol>
 </p>
 <p>
-The list of actions and their arguments are described in the section Quick Reference Card.
+The list of actions and their arguments are described in the section Reference Card.
 </p>
 <h4>Multiple commands</h4>
 Several commands can be sent at the same time. For instance, to unselect all entities, select entities beginning with a B and setting the zoom level to 10:
@@ -157,10 +157,10 @@ A JSON dictionary is returned, with a status key and a data key. The HUGO names 
 {"status":0,"data":["ATM","ATR","CDK2","CHEK2","CREBBP","CCNA1","CCNA2", ...]}
 </span>
 
-<h2>Quick Reference Card</h2>
+<h2>Reference Card</h2>
 
 <p>
-This quick reference card describes all the actions and arguments currently provided by the NaviCell REST API.
+This reference card describes all the actions and arguments currently provided by the NaviCell REST API.
 </p>
 <p>
 Some examples are included in the tables. To make these examples work, do not forget to add id=<span class='variable'>the_chosen_identifier</span> to the text displayed.
@@ -403,16 +403,16 @@ In the following examples, we assume that "MyExpression", "MyCopyNumber" and "My
 <tr><td>Set&nbsp;group&nbsp;method</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">set_group_method</span></td><td><span class="command">shape|size|color</span>&nbsp;<span class="command"></span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">method</span>&nbsp;<span class="command">:string</span></td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
 <tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_group_method", "size",&nbsp;"MyExpression",&nbsp;3]}</td></tr>
 <tr><td>Set&nbsp;input&nbsp;value</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">set_input_value</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">shape|size|color</span>&nbsp;<span class="command"></span></td><td><span class="command">sample|group</span>&nbsp;<span class="command"></span></td><td><span class="variable">index</span>&nbsp;<span class="command">:integer</span></td><td><span class="variable">value</span>&nbsp;<span class="command">:double</span></td></tr>
-<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_input_value", "size",&nbsp;"sample",&nbsp;2,&nbsp;12.345]}</td></tr>
+<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_input_value", "MyExpression", "size",&nbsp;"sample",&nbsp;2,&nbsp;12.345]}</td></tr>
 <tr><td>Set&nbsp;selection&nbsp;color</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">set_input_color</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">color</span>&nbsp;<span class="command"></span></td><td><span class="command">sample|group</span>&nbsp;<span class="command"></span></td><td><span class="variable">index</span>&nbsp;<span class="command">:string</span></td><td><span class="variable">color</span>&nbsp;<span class="command">:integer</span></td></tr>
-<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_input_color", "color,&nbsp;"group",&nbsp;3,&nbsp;"FFFFFF"]}</td></tr>
+<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_input_color", "MyExpression", "color,&nbsp;"group",&nbsp;3,&nbsp;"FFFFFF"]}</td></tr>
 <tr><td>Set&nbsp;selection&nbsp;size</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">set_select_size</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">size</span>&nbsp;<span class="command"></span></td><td><span class="command">sample|group</span>&nbsp;<span class="command"></span></td><td><span class="variable">index</span>&nbsp;<span class="command">:integer</span></td><td><span class="variable">size</span>&nbsp;<span class="command">:integer</span></td></tr>
-<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_select_size", "size",&nbsp;"sample",&nbsp;2,&nbsp;8]}</td></tr>
+<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_select_size", "MyExpression", "size",&nbsp;"sample",&nbsp;2,&nbsp;8]}</td></tr>
 <tr><td>Set&nbsp;selection&nbsp;shape</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">set_select_shape</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">shape</span>&nbsp;<span class="command"></span></td><td><span class="command">sample|group</span>&nbsp;<span class="command"></span></td><td><span class="variable">index</span>&nbsp;<span class="command">:integer</span></td><td><span class="variable">shape</span>&nbsp;<span class="command">:integer</span></td></tr>
-<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_select_shape", "shape",&nbsp;"sample",&nbsp;4]}</td></tr>
+<tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["set_select_shape", "MyExpression", "shape",&nbsp;"sample",&nbsp;4]}</td></tr>
 <tr><td>Switch&nbsp;to&nbsp;"Sample"&nbsp;tab</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">switch_sample_tab</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">shape|size|color</span>&nbsp;<span class="command"></span></td><td style="text-align: center">-</td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
 <tr class="table-example"><td style="font-size: small; text-align: right">Examples</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["switch_sample_tab", "MyExpression",&nbsp;"shape"]}<br/>data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["switch_sample_tab", "MyCopyNumber",&nbsp;"size"]}</td></tr>
-<tr><td>Switch&nbsp;to&nbsp;"Group"&nbsp;tab</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">switch_sample_group</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">shape|size|color</span>&nbsp;<span class="command"></span></td><td style="text-align: center">-</td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
+<tr><td>Switch&nbsp;to&nbsp;"Group"&nbsp;tab</td><td><span class="command">nv_display_continuous_config_perform</span></td><td><span class="command">switch_group_tab</span></td><td><span class="variable">datatable&nbsp;name</span>&nbsp;<span class="command">:string</span></td><td><span class="command">shape|size|color</span>&nbsp;<span class="command"></span></td><td style="text-align: center">-</td><td style="text-align: center">-</td><td style="text-align: center">-</td></tr>
 <tr class="table-example"><td style="font-size: small; text-align: right">Example</td><td colspan="8">data=@COMMAND {"action": "nv_display_continuous_config_perform", "args": ["switch_sample_group", "MyExpression",&nbsp;"color"]}</td></tr>
 </table>
 

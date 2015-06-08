@@ -1325,10 +1325,26 @@ function update_gene_status_table(doc, params) {
 	var str = "<thead>";
 	var opener = doc.win;
 	var module_stack = [];
+	while (opener) {
+		try {
+			if (!opener.document.map_name) {
+				break;
+			}
+			console.log("NOTICE: OK cross origin opener: " + opener.location.protocol + "//" + opener.location.host + " (current window: " + window.location.protocol + "//" + window.location.host + ")");
+			module_stack.push(opener.document.map_name);
+		}
+		catch(e) {
+			console.log("WARNING: caugth " + e);
+		}
+		opener = opener.opener;
+	}
+
+	/*
 	while (opener && opener.document.map_name) {
 		module_stack.push(opener.document.map_name);
 		opener = opener.opener;
 	}
+	*/
 	str += "<tr><td colspan='" + (module_stack.length) + "'>Genes&nbsp;in</td><td colspan='" + mapSize(navicell.dataset.datatables) + "'>&nbsp;#Samples&nbsp;for&nbsp;gene&nbsp;in&nbsp;datatable&nbsp;</td</tr>";
 	str += "<tr>";
 	for (var nn = module_stack.length-1; nn >= 0; --nn) {

@@ -89,7 +89,8 @@ import http.client, urllib.request, urllib.parse, urllib.error
 import datetime, time
 import webbrowser
 
-_NV_PACKSIZE = 500000
+#_NV_PACKSIZE = 500000
+_NV_PACKSIZE = 5000
 _NV_CONTINUOUS = 'CONTINUOUS'
 _NV_UNORDERED_DISCRETE = 'UNORDERED_DISCRETE'
 
@@ -270,6 +271,7 @@ class NaviCell:
               an instance of optparse.Values.
 
         """
+        print("WARNING: reduced packsize version")
         self.proxy = Proxy(options.proxy_url, options.map_url)
 
         if options.map_url: #and options.browser_command:
@@ -321,6 +323,7 @@ class NaviCell:
                 params['packcount'] = packcount
                 data = params['data']
                 params['data'] = "@@"
+                print ("PACKCOUNT: " + str(packcount))
 
         encoded_params = urllib.parse.urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
@@ -342,7 +345,8 @@ class NaviCell:
         if self.trace:
             print("curl '" + self.proxy.getProtocol() + '://' + self.proxy.getHost() + self.proxy.getURL() + "' -d '" + url_params + "'")
 
-        conn.request("POST", self.proxy.getURL(), encoded_params, headers)
+        # MOVED BELOW
+#        conn.request("POST", self.proxy.getURL(), encoded_params, headers)
 
         if packcount > 0: # condition and code useful when sending datatable contents
             fillparams = params
@@ -355,11 +359,13 @@ class NaviCell:
                 if end > datalen:
                     end = datalen
                 fillparams['data'] = data[beg:end]
-                encoded_params = urllib.parse.urlencode(fillparams)
+                fill_encoded_params = urllib.parse.urlencode(fillparams)
                 fillconn = self.proxy.newConnection()
-                fillconn.request("POST", self.proxy.getURL(), encoded_params, headers);
+                fillconn.request("POST", self.proxy.getURL(), fill_encoded_params, headers);
                 fillconn.close()
 
+        # MOVED
+        conn.request("POST", self.proxy.getURL(), encoded_params, headers)
         response = conn.getresponse()
         data = response.read()
 #        print ("status", response.status, "reason", response.reason, "data", data)
@@ -1957,7 +1963,8 @@ class NaviCell:
 
         print('nv.importDatatables("' + protocol + '://acsn.curie.fr/navicell/demo/data/' + datalist_url + '", "", "Datatable list", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
         print("")
-        print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+#        print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked", "import_display_heatmap": True})')
+        print('nv.importDatatables(nv.makeDataFromFile("/bioinfo/users/eviara/projects/navicell/data_examples/cancer_cell_line_broad/CCL_Expression_neg.txt"), "MyExpr", "Protein expression data", {"open_drawing_editor": True, "import_display_markers": "checked"})')
         print("")
         
         print('nv.executeCommands("", "!!' + protocol + '://acsn.curie.fr/navicell/demo/commands/demo1.nvc")')

@@ -89,8 +89,8 @@ import http.client, urllib.request, urllib.parse, urllib.error
 import datetime, time
 import webbrowser
 
-#_NV_PACKSIZE = 500000
-_NV_PACKSIZE = 5000
+_NV_PACKSIZE = 500000
+#_NV_PACKSIZE = 5000 # reduce packsize for testing
 _NV_CONTINUOUS = 'CONTINUOUS'
 _NV_UNORDERED_DISCRETE = 'UNORDERED_DISCRETE'
 
@@ -271,7 +271,6 @@ class NaviCell:
               an instance of optparse.Values.
 
         """
-        print("WARNING: reduced packsize version")
         self.proxy = Proxy(options.proxy_url, options.map_url)
 
         if options.map_url: #and options.browser_command:

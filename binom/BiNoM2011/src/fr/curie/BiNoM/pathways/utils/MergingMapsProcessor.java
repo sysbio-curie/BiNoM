@@ -965,6 +965,7 @@ public class MergingMapsProcessor {
 		}
 		
 		// add included species
+		if(cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for (int i=0; i<cd1.getSbml().getModel().getAnnotation()
 				.getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray(); i++) {
 			CelldesignerSpeciesDocument.CelldesignerSpecies sp = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
@@ -988,6 +989,7 @@ public class MergingMapsProcessor {
 			}
 		}
 		
+		if(cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for (CelldesignerSpeciesDocument.CelldesignerSpecies sp : cd2.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray()) {
 			String name = CellDesignerToCytoscapeConverter.convertSpeciesToName(cd2, sp.getId(), true, true);
 			if (includedSpeciesNames.containsKey(name)) {
@@ -1658,7 +1660,13 @@ public class MergingMapsProcessor {
 	private void updateMapAll() {
 		for (String target : updateMap.keySet()) {
 			String source = updateMap.get(target);
-			updateMap(target, source);
+			if(!(new File(source)).exists()) 
+				System.out.println("ERROR: File "+source+" does not exist!");
+			else if(!(new File(target)).exists()){
+				System.out.println("ERROR: File "+target+" does not exist!");
+			}else{
+				updateMap(target, source);
+			}
 		}
 	}
 	

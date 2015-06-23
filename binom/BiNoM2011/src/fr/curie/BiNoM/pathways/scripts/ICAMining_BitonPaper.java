@@ -55,14 +55,20 @@ public class ICAMining_BitonPaper {
 			//String folder = "C:/Datas/ICA/Anne/GSEA/results/res/";
 			//String gmts = "C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt";
 
-			String folder = "C:/Datas/ICA/Anne/CDK12/results/";
+			/*String folder = "C:/Datas/ICA/Anne/CDK12/results/";
 			String gmts = "C:/Datas/ICA/Anne/CDK12/CDK12.gmt";
-			FilterGSEAResults(folder, 5, 3f, 0.01f, 1f, gmts);
+			FilterGSEAResults(folder, 5, 3f, 0.01f, 1f, gmts);*/
 			
-			/*String folder = "./";
+			/*String folder = "C:/Datas/PanMethylome/methylome/BLCAC/gsea/results/";
+			String gmts = "C:/Datas/PanMethylome/methylome/BLCAC/gsea/results/msigdb_acsn.gmt";
+			//FilterGSEAResults(folder, 15, 3f, 0.01f, 0.01f, gmts);
+			FilterGSEAResults(folder, 10, 5f, 0.01f, 0.01f, gmts);*/
+			
+			String folder = "./";
 			String gmts = "msigdb.v4.0.symbols.gmt";
-			gmts = args[1];
-			FilterGSEAResults(folder, Integer.parseInt(args[0]), 3f, 0.01f, 1f, gmts);*/
+			gmts = args[2];
+			float thresh = Float.parseFloat(args[1]);
+			FilterGSEAResults(folder, Integer.parseInt(args[0]), thresh, 0.01f, 0.01f, gmts);
 			
 			//ReformatGSEAAnotationFile("C:/Datas/ICA/Anne/results_GSEA_filtered.html");
 			
@@ -202,8 +208,6 @@ public class ICAMining_BitonPaper {
 				for(int j=0;j<xlsFiles.length;j++){
 					if(xlsFiles[j].getName().endsWith(".xls")){
 						String module = xlsFiles[j].getName();
-						if(module.startsWith("JAEGER"))
-							System.out.println();
 						module = module.substring(0, module.length()-4);
 						if(true)/*if(gmt.setnames.contains(module))*/{
 							SimpleTable tab = new SimpleTable();
@@ -306,7 +310,7 @@ public class ICAMining_BitonPaper {
 				int inds[] = Utils.SortMass(props);
 				System.out.print(comps[i].getName()+"\t");
 				if(goodModules.size()>0){
-					fw.write(comps[i].getName()+"(<a href="+folder_filtered.getName()+"/"+comps[i].getName()+"_freqgenes.html"+">freqgenes</a>)"+"&nbsp;&nbsp;&nbsp;&nbsp;");
+					fw.write("<b><font color=\"red\">"+comps[i].getName()+"</font></b>"+"(<a href="+folder_filtered.getName()+"/"+comps[i].getName()+"_freqgenes.html"+">freqgenes</a>)"+"&nbsp;&nbsp;&nbsp;&nbsp;");
 					
 					FileWriter fw1 = new FileWriter(folder_filtered+"/"+comps[i].getName()+"_freqgenes.html");
 					float counts[] = new float[goodGenes.size()];

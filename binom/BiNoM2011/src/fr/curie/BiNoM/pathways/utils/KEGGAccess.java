@@ -17,8 +17,8 @@ public class KEGGAccess {
 			
 			//String prefix = "C:/Datas/KEGG/Yeast/";
 			//String file = "pathway_list";
-			String prefix = "C:/Datas/KEGG/Human/";
-			String file = "dnarepair";
+			String prefix = "C:/Datas/KEGG/ZebraFish/";
+			String file = "pathway_list";
 
 			Vector<String> pathwayList = Utils.loadStringListFromFile(prefix+file);
 			String gmt = loadKEGGasGMTString(pathwayList);

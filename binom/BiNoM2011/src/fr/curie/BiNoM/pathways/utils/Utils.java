@@ -1492,7 +1492,7 @@ public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VD
 				xj[k] = Float.parseFloat(vt2.stringTable[vt2.tableHashPrimary.get(names.get(k)).get(0)][j]);
 			}
 			float corr = VSimpleFunctions.calcCorrelationCoeff(xi, xj);
-			float abscorr = Math.abs(VSimpleFunctions.calcCorrelationCoeff(xi, xj));
+			float abscorr = Math.abs(corr);
 			System.out.print(corr+"\t");
 			if(!chooseOnlyMaximalCorrelation)
 			if(abscorr>=correlationThreshold){

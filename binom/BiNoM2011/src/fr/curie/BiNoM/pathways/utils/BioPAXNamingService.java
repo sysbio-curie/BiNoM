@@ -28,8 +28,11 @@ package fr.curie.BiNoM.pathways.utils;
 
 import java.util.*;
 import java.util.regex.*;
+
+import psidev.psi.mi.xml.model.FeatureType;
 import fr.curie.BiNoM.pathways.biopax.*;
 import fr.curie.BiNoM.pathways.wrappers.*;
+
 import com.ibm.adtech.jastor.JastorException;
 import com.ibm.adtech.jastor.JastorInvalidRDFNodeException;
 
@@ -68,17 +71,20 @@ public class BioPAXNamingService {
 
 	/**
 	 * Map of URI to all ModificationFeature terms (phosphorylation events)
+	 * and FragmentFeatures - this is done generecally as EntityFeature
 	 */
-	private HashMap<String,String> uri2ModificationFeatureName = new HashMap<String, String>();
+	private HashMap<String,String> uri2EntityFeatureName = new HashMap<String, String>();
 	
 	/**
 	 * Map of URI to all SequenceSite positions
 	 */
-	private HashMap<String, Integer> uri2SequenceSitePosition = new HashMap<String, Integer>();
+	private HashMap<String, String> uri2SequenceSiteName = new HashMap<String, String>();
 	
 	private HashMap<String, Entity> listOfComplexComponents = new HashMap<String, Entity>();
 
 	private BioPAX _biopax = null;
+	
+	public boolean guaranteeUniqueNamesForObjects = true;
 	
 	
 	/**
@@ -155,24 +161,66 @@ public class BioPAXNamingService {
 		 * 
 		 */
 		el = biopax_DASH_level3_DOT_owlFactory.getAllModificationFeature(biopax.model);
-		for (int i=0;i<el.size();i++) {
-			ControlledVocabulary cv = ((ModificationFeature) el.get(i)).getModificationType();
+		for (int i=0;i<el.size();i++){
+			
+			ModificationFeature mf = (ModificationFeature) el.get(i);
+			
+			ControlledVocabulary cv = mf.getModificationType();
 			if (cv != null) {
 				Iterator it = cv.getTerm();
-				String term = null;
+				String term = "";
 				while(it.hasNext()) {
-					term = (String) it.next();
+					term += (String) it.next()+"_";
 				}
-				this.uri2ModificationFeatureName.put(((ModificationFeature) el.get(i)).uri(), term);
+				if(term.endsWith("_")) term = term.substring(0, term.length()-1);
+				this.uri2EntityFeatureName.put(mf.uri(), term);
 			}
+		}
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllFragmentFeature(biopax.model);
+		for (int i=0;i<el.size();i++) {
+			
+			FragmentFeature ff = (FragmentFeature) el.get(i);
+			
+			String term = "fragf";
+			Iterator<ControlledVocabulary> cvi = ff.getFeatureLocationType();
+			if(cvi!=null)if(cvi.hasNext()){
+			ControlledVocabulary cv = cvi.next();
+			if (cv != null) {
+				
+				Iterator it = cv.getTerm();
+				while(it.hasNext()) {
+					term += (String) it.next()+"_";
+					
+				}
+			}}
+			this.uri2EntityFeatureName.put(ff.uri(), term);
 		}
 		
 		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceSite(biopax.model);
 		for (int i=0;i<el.size();i++) {
 			SequenceSite ss = (SequenceSite) el.get(i);
-			int pos = ss.getSequencePosition();
-			this.uri2SequenceSitePosition.put(ss.uri(), pos);
+			String s = getSequenceSiteName(ss);
+			this.uri2SequenceSiteName.put(ss.uri(), s);
 		}
+		
+		el = biopax_DASH_level3_DOT_owlFactory.getAllSequenceInterval(biopax.model);
+		for (int i=0;i<el.size();i++) {
+			SequenceInterval ss = (SequenceInterval) el.get(i);
+			SequenceSite sbegin = ss.getSequenceIntervalBegin();
+			SequenceSite send = ss.getSequenceIntervalEnd();
+			String s = "";
+			
+			String sb = "";
+			if(sbegin!=null)
+				sb = getSequenceSiteName(sbegin);
+			String se = "";
+			if(send!=null)
+				se = getSequenceSiteName(send);
+			s = sb+"_"+se;
+			this.uri2SequenceSiteName.put(ss.uri(), s);
+		}
+		
 
 		
 		/*
@@ -458,7 +506,7 @@ public class BioPAXNamingService {
 			uri2name.put(Utils.cutUri(uri),name);
 
 			String iuri = (String)name2uri.get(name);
-			if(iuri==null){
+			if(iuri==null || (!guaranteeUniqueNamesForObjects)){
 				name2uri.put(name,uri);
 			}
 			else{
@@ -553,6 +601,9 @@ public class BioPAXNamingService {
 		
 		if (pe instanceof Complex) {
 			name = createNameForComplex((Complex) pe);
+			
+			
+			
 		}
 		else if (pe instanceof Protein) {
 			
@@ -840,6 +891,18 @@ public class BioPAXNamingService {
 					name = getShortestName(co.getName());
 				}
 			}
+			
+			Iterator itf = ((Complex)co).getFeature();
+			while(itf.hasNext()) {
+				EntityFeature ef = (EntityFeature) itf.next();
+				String str = this.getPhosphorylationSiteName(ef);
+				if (str != null) {
+					name = "("+name+")" + "|" + str;
+				}
+				//System.out.println("\t\tFeature:"+name);
+			}
+
+			
 		}
 		catch (JastorException e){
 			System.out.println("WARNING: a JastorException occurred while getting the components of a complex.");
@@ -918,7 +981,7 @@ public class BioPAXNamingService {
 	 */
 	private String getPhosphorylationSiteName(EntityFeature ef) throws JastorException {
 
-		String modif_name  = uri2ModificationFeatureName.get(ef.uri());
+		String modif_name  = uri2EntityFeatureName.get(ef.uri());
 
 		if (modif_name != null) {
 			Pattern pat = Pattern.compile("_at_\\d+");
@@ -937,8 +1000,8 @@ public class BioPAXNamingService {
 						fl.add((SequenceLocation) it.next());
 					}
 
-					if (fl.size() > 0 && uri2SequenceSitePosition.get(fl.get(0).uri()) != null) {
-						modif_name += "_at_" + Integer.toString(uri2SequenceSitePosition.get(fl.get(0).uri()));
+					if (fl.size() > 0 && uri2SequenceSiteName.get(fl.get(0).uri()) != null) {
+						modif_name += "_at_" + uri2SequenceSiteName.get(fl.get(0).uri());
 					}
 //					else {
 //						modif_name += "_at_unknown"; 
@@ -992,6 +1055,28 @@ public class BioPAXNamingService {
 		String newname = name;
 		
 		return newname;
+	}
+	
+	public static String shortenLabel(String s, int length){
+		String ret = null;
+		if(s!=null){
+			ret = s.toLowerCase();
+			length = Math.min(length, ret.length());
+			ret = ret.substring(0, length);
+		}
+		return ret;
+	}
+	
+	public static String getSequenceSiteName(SequenceSite ss) throws JastorException{
+		String s = "";
+		int pos = ss.getSequencePosition();
+		String stat = shortenLabel(ss.getPositionStatus(),2);
+		if(stat==null){
+			s = ""+pos;
+		}else{
+			s = stat+pos;
+		}
+		return s;
 	}
 
 

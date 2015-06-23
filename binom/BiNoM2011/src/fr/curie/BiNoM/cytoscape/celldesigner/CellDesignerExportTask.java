@@ -64,8 +64,6 @@ import org.apache.xmlbeans.XmlString;
 import org.sbml.x2001.ns.celldesigner.*;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument.CelldesignerSpecies;
 
-import com.lowagie.text.Entities;
-
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 
 import fr.curie.BiNoM.pathways.wrappers.*;

@@ -45,6 +45,11 @@ public class OFTENAnalysis {
 			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/gsea/ica/S_EWING96.txt","S_EWING96");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/MOSAIC/analysis/ica/rhabdoid_48/S_RHD96.txt","S_RHD96");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/Ivashkine/ZebraFish/repeat/differences.txt","DF");
+			
+			//of.completeOFTENAnalysisOfTable("C:/Datas/DeDaL/appealing_example/tissues/S_tissues_table.txt","TISS");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/DeDaL/appealing_example/tissues/networks/tissues_grouped_c.txt","TS");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/DeDaL/appealing_example/tissues/networks/smoothed/tissues_grouped_c.txt0.5.txt","TSNS");
+			//System.exit(0);
 			 
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/attractor_metagenes/","C:/Datas/ICA/Anne/attractor_metagenes/attractor_metagenes.gmt","C:/Datas/ICA/Anne/attractor_metagenes/results/");
 			//of.makeGSEABatchFile("C:/Datas/Ivashkine/ZebraFish/repeat/gsea/","C:/Datas/Ivashkine/ZebraFish/repeat/gsea/go_symbol.gmt","C:/Datas/Ivashkine/ZebraFish/repeat/gsea/results/");
@@ -53,7 +58,11 @@ public class OFTENAnalysis {
 			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/ICA/Anne/cellline/exon_curie/GSEA/results/");
 			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica/","C:/Datas/ICA/Anne/GSEA/msigdb.v4.0.symbols.gmt","C:/Datas/MOSAIC/analysis/gsea/ica/results/");
 			//of.makeGSEABatchFile("C:/Datas/MOSAIC/analysis/gsea/ica_rhabdo/","msigdb.v4.0.symbols.gmt","results/");
-			of.makeGSEABatchFile("C:/Datas/ICA/Anne/CDK12/","CDK12.gmt","results/");
+			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/CDK12/","CDK12.gmt","results/");
+			
+			//of.makeGSEABatchFile("C:/Datas/PanMethylome/methylome/BLCAC/gsea/","msigdb_acsn.gmt","results/");
+			//of.makeGSEABatchFile("C:/Datas/PanMethylome/methylome/BLCA/gsea/","msigdb_acsn.gmt","results/");
+			
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABLADDER.txt","TCGABLCA");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_TCGABREAST.txt","TCGABREAST");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_COAD.txt","COAD");
@@ -68,6 +77,11 @@ public class OFTENAnalysis {
 			//String networks[] = {"CIT_networks.txt","TCGABLCA_networks.txt","TCGABREAST_networks.txt"};
 			//String prefixes[] = {"CIT","TCGABLCA","TCGABREAST"};
 			//MakeNetworkIntersectionGraph("C:/Datas/ICA/Anne/network_analysis/",networks,prefixes,0.1f,0.02f,"C:/Datas/ICA/Anne/network_analysis/network_intersection.txt");
+			
+			String networks[] = {"tissues.txt"};
+			String prefixes[] = {"TS"};
+			MakeNetworkIntersectionGraph("C:/Datas/DeDaL/appealing_example/tissues/networks/",networks,prefixes,0.05f,0.02f,"C:/Datas/DeDaL/appealing_example/tissues/networks/network_intersection.txt");
+			 
 			
 			System.exit(0);
 				
@@ -176,8 +190,8 @@ public class OFTENAnalysis {
 		}
 		// make often for all lists
 		int nstart = 300;
-		int nend = 700;
-		int step = 20;	
+		int nend = 1000;
+		int step = 50;	
 		int valuesToTest[] = new int[(int)((nend-nstart)/step)+1];
 		int k = 0;
 		for(int i=nstart;i<=nend;i+=step)
@@ -337,12 +351,12 @@ public class OFTENAnalysis {
 		fwn.write("NODE\tCONN_COMP_SCORE\n");
 		for(int k=0;k<network_files.length;k++){
 			SimpleTable tab = new SimpleTable();
+			Graph mergedGraph = new Graph();
 			tab.LoadFromSimpleDatFile(folder+network_files[k], true, "\t");
 			for(int i=0;i<tab.rowCount;i++){
 				float scplus = Float.parseFloat(tab.stringTable[i][tab.fieldNumByName("PLUS_SC")]);
 				float scminus = Float.parseFloat(tab.stringTable[i][tab.fieldNumByName("MINUS_SC")]);
-				float scabs = Float.parseFloat
-						(tab.stringTable[i][tab.fieldNumByName("ABS_SC")]);
+				float scabs = Float.parseFloat(tab.stringTable[i][tab.fieldNumByName("ABS_SC")]);
 				String suffix = "";
 				float f = Math.max(Math.max(scabs, scminus), scplus);
 				if((scplus>scminus)&&(scplus>scabs)) suffix = "plus";
@@ -351,10 +365,18 @@ public class OFTENAnalysis {
 				String name = tab.stringTable[i][tab.fieldNumByName("NAME")];
 				fwn.write(prefixes[k]+"_"+name+"\t"+f+"\n");
 				if(f>score_threshold){
-					fileNames.add(prefixes[k]+"_"+name+"_"+suffix+".xgmml");
+					String fname = prefixes[k]+"_"+name+"_"+suffix+".xgmml";
+					fileNames.add(fname);
 					node_names.add(prefixes[k]+"_"+name);
+					
+					Graph g = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(folder+fname));
+					mergedGraph.addNodes(g);
+					mergedGraph.addEdges(g);
 				}
 			}
+			String s = network_files[k];
+			if(s.endsWith(".txt")) s = s.substring(0, s.length()-4); 
+			XGMML.saveToXGMML(mergedGraph, folder+s+"_merged.xgmml");
 		}
 		fwn.close();
 		FileWriter fw = new FileWriter(outfilename);
@@ -381,17 +403,21 @@ public class OFTENAnalysis {
 		File dir = new File(folder);
 		File files[] = dir.listFiles();
 		FileWriter fw = new FileWriter(folder+"GSEA.bat"); 
+		FileWriter fwsh = new FileWriter(folder+"GSEA.sh");
 		for(File f: files){
 			String fileName = f.getAbsolutePath();
 			if(fileName.endsWith(".rnk")){
 				String prefix = f.getName();
+				String fname = f.getName();
 				prefix = prefix.substring(0, prefix.length()-4);
 				String command = "java -cp .;gsea2-2.0.14.jar -Xmx3000m xtools.gsea.GseaPreranked -gmx "+gmtFile+" -collapse false -mode Max_probe -norm meandiv -nperm 1000 -rnk "+fileName+" -scoring_scheme classic -rpt_label "+prefix+" -include_only_symbols true -make_sets true -plot_top_x 200 -rnd_seed timestamp -set_max 200 -set_min 8 -zip_report false -out "+outfolder+prefix+" -gui false";
+				String commandsh = "java -cp .:gsea2-2.0.14.jar -Xmx3000m xtools.gsea.GseaPreranked -gmx "+gmtFile+" -collapse false -mode Max_probe -norm meandiv -nperm 1000 -rnk "+fname+" -scoring_scheme classic -rpt_label "+prefix+" -include_only_symbols true -make_sets true -plot_top_x 200 -rnd_seed timestamp -set_max 200 -set_min 8 -zip_report false -out "+outfolder+prefix+" -gui false";
 				fw.write(command+"\n");
+				fwsh.write(command+"\n");
 			}
 		}
 		fw.close();
-		
+		fwsh.close();
 	}
 
 }

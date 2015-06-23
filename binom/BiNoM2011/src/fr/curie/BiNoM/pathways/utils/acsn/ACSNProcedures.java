@@ -526,7 +526,7 @@ public class ACSNProcedures {
     	   int k=0;
     	   for(String pmid: pmids){
     		   ConnectionToDatabases.Citation cit = ConnectionToDatabases.convertPMIDtoCitation(pmid);
-    		   System.out.println((++k)+"\t"+cit.year+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":""));
+    		   System.out.println((++k)+"\tPMID:"+pmid+"\t"+cit.year+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":""));
     		   if(addPMIDprefix)
     			   bib+="PMID:"+pmid+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":"")+"\n";
     		   else

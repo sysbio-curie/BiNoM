@@ -102,14 +102,22 @@ public class SimpleTable {
   
   public void LoadFromSimpleDatFile(String FileName,boolean firstLineFNames,String delim){
 	  try{
-		  LoadFromSimpleDatFile(new FileReader(FileName),firstLineFNames,delim);
+		  LoadFromSimpleDatFile(new FileReader(FileName),firstLineFNames,delim,1000000000);
+		  this.filename = FileName;
+	  }catch (Exception e) { System.out.println("Error in VDatReadWrite: "+e.toString());}
+  }
+
+  public void LoadFromSimpleDatFile(String FileName,boolean firstLineFNames,String delim, int mark){
+	  try{
+		  LoadFromSimpleDatFile(new FileReader(FileName),firstLineFNames,delim,mark);
 		  this.filename = FileName;
 	  }catch (Exception e) { System.out.println("Error in VDatReadWrite: "+e.toString());}
   }
   
+  
   public void LoadFromSimpleDatFileString(String text,boolean firstLineFNames,String delim){
 	  try{
-		  LoadFromSimpleDatFile(new StringReader(text),firstLineFNames,delim);		  
+		  LoadFromSimpleDatFile(new StringReader(text),firstLineFNames,delim,1000000000);		  
 	  }catch (Exception e) { System.out.println("Error in VDatReadWrite: "+e.toString());}
   }
   
@@ -120,15 +128,14 @@ public class SimpleTable {
    * @param firstLineFNames is there column names in the first row?
    * @param delim Table item delimiters
    */
-  public void LoadFromSimpleDatFile(Reader reader, boolean firstLineFNames, String delim){
-	  
+  public void LoadFromSimpleDatFile(Reader reader, boolean firstLineFNames, String delim, int mark){
+
   String s = null;
   try{
   LineNumberReader lri = new LineNumberReader(reader);
   
-  lri.mark(1000000000);
+  lri.mark(mark);
   //lri.mark(1);
-  
   s = lri.readLine();
   StringTokenizer sti = new StringTokenizer(s,delim);
   colCount = sti.countTokens();
@@ -144,6 +151,8 @@ public class SimpleTable {
     }
   }
   int cr = 0;
+  
+  
   while(lri.readLine()!= null) cr++;
   rowCount = cr;
   //lri.close(); 
@@ -157,8 +166,9 @@ public class SimpleTable {
     lri.readLine();
     //rowCount = rowCount-1;
   }
-
+  
   int i=0;
+  
   while ( ((s=lri.readLine()) != null)&&(i<=rowCount) )
      {
 	 //System.out.println(s);
@@ -174,6 +184,8 @@ public class SimpleTable {
         }
      i++;
      }
+  
+  
   }
   catch (Exception e) { 
 	  System.out.println("Error in VDatReadWrite: "+e.toString()+"\n"+s);

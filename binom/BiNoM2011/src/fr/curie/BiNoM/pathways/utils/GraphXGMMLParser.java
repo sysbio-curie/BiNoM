@@ -85,6 +85,8 @@ public class GraphXGMMLParser  extends DefaultHandler{
       String label = attributes.getValue("label");
       String source = attributes.getValue("source");
       String target = attributes.getValue("target");
+      if(id==null) id = label;
+      if(id.equals("")) id = label;
       currentEdge = graph.getCreateEdge(id);
       currentEdge.EdgeLabel = label;
       currentEdge.Node1 = graph.getNode(source);

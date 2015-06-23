@@ -61,6 +61,11 @@ public class BioPAXGraphMapper {
    */
   public HashMap<String, String> entityToReferenceUris = new HashMap<String, String>();
   /**
+   * Map from entity uris to generic entity uris 
+   */
+  public HashMap<String, String> entityToGenericEntityUris = new HashMap<String, String>();
+  public HashMap<String, Vector<String>> genericEntityToEntityVectorUris = new HashMap<String, Vector<String>>();
+  /**
    * Map from complete uris to interaction objects
    */
   public HashMap<String,Interaction> interactions = new HashMap();
@@ -121,44 +126,73 @@ public class BioPAXGraphMapper {
         pathwaySteps.put(p.uri(),p);
     }
     System.out.println("Hashing entity to reference connections...");
+    // For generics, member proteins will be mapped not to references but to the generic proteins 
     List<PhysicalEntity> l = biopax_DASH_level3_DOT_owlFactory.getAllProtein(biopax.model);
     for(PhysicalEntity p: l) 
-		if(((Protein)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((Protein)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((Protein)p).getEntityReference().uri());
     l = biopax_DASH_level3_DOT_owlFactory.getAllDna(biopax.model);
     for(PhysicalEntity p: l) 
-		if(((Dna)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((Dna)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((Dna)p).getEntityReference().uri());
     l = biopax_DASH_level3_DOT_owlFactory.getAllRna(biopax.model);
     for(PhysicalEntity p: l)
-		if(((Rna)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((Rna)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((Rna)p).getEntityReference().uri());
 	l = biopax_DASH_level3_DOT_owlFactory.getAllSmallMolecule(biopax.model);
 	for(PhysicalEntity p: l)
-		if(((SmallMolecule)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((SmallMolecule)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((SmallMolecule)p).getEntityReference().uri());
 	l = biopax_DASH_level3_DOT_owlFactory.getAllDnaRegion(biopax.model);
 	for(PhysicalEntity p: l) 
-		if(((DnaRegion)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((DnaRegion)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((DnaRegion)p).getEntityReference().uri());
 	l = biopax_DASH_level3_DOT_owlFactory.getAllRnaRegion(biopax.model);
 	for(PhysicalEntity p: l)
-		if(((RnaRegion)p).getEntityReference()==null)
-			System.out.println("EntityReference = null for "+p.uri());
-		else
+		if(((RnaRegion)p).getEntityReference()==null){
+			//System.out.println("EntityReference = null for "+p.uri());
+			Iterator it = p.getMemberPhysicalEntity();
+			while(it.hasNext())
+				entityToGenericEntityUris.put(((PhysicalEntity)it.next()).uri(), p.uri());
+		}else
 			entityToReferenceUris.put(p.uri(), ((RnaRegion)p).getEntityReference().uri());
 
-
+	
+	  Set<String> entities = entityToGenericEntityUris.keySet();
+	  for(String s: entities){
+		  String generic = entityToGenericEntityUris.get(s);
+		  Vector<String> ents = genericEntityToEntityVectorUris.get(generic);
+		  if(ents==null)
+			  ents = new Vector<String>();
+		  ents.add(s);
+		  genericEntityToEntityVectorUris.put(generic, ents);
+	  }
+	
       System.out.println("Generating names...");
       biopaxNaming.generateNames(biopax,false);
       //String nm = biopaxNaming.getNameByUri();
@@ -193,6 +227,19 @@ public class BioPAXGraphMapper {
       for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
       el = biopax_DASH_level3_DOT_owlFactory.getAllEntityReference(biopax.model);
       for(int i=0;i<el.size();i++) addEntityReferenceNode((EntityReference)el.get(i));
+      
+      // Connect entityReferencesToGenerics
+      el = biopax_DASH_level3_DOT_owlFactory.getAllProteinReference(biopax.model);
+      for(int i=0;i<el.size();i++) connectGenericsReferenceNodeToEntities((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllSmallMoleculeReference(biopax.model);
+      for(int i=0;i<el.size();i++) connectGenericsReferenceNodeToEntities((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllDnaReference(biopax.model);
+      for(int i=0;i<el.size();i++) connectGenericsReferenceNodeToEntities((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllRnaReference(biopax.model);
+      for(int i=0;i<el.size();i++) connectGenericsReferenceNodeToEntities((EntityReference)el.get(i));
+      el = biopax_DASH_level3_DOT_owlFactory.getAllEntityReference(biopax.model);
+      for(int i=0;i<el.size();i++) connectGenericsReferenceNodeToEntities((EntityReference)el.get(i));
+      
       
       // Add species
       System.out.println("Adding species...");
@@ -298,6 +345,19 @@ public class BioPAXGraphMapper {
 				  n.Attributes.add(new Attribute("BIOPAX_NODE_XREF",xrefname));
 			  }
 		  }
+		  
+		  Iterator itmem = en.getMemberEntityReference();
+		  if(itmem!=null){
+			  while(itmem.hasNext()){
+				  EntityReference mem = (EntityReference)itmem.next();
+				  entityToGenericEntityUris.put(mem.uri(), en.uri());
+				  Vector<String> mems = genericEntityToEntityVectorUris.get(en.uri());
+				  if(mems==null) mems = new Vector<String>();
+				  mems.add(mem.uri());
+				  genericEntityToEntityVectorUris.put(en.uri(),mems);
+			  }
+		  }
+		  
 		  nodes.put(id,n);
 		  nodes.put(en.uri(),n);
 		  nodes.put(getID(en),n);
@@ -307,6 +367,25 @@ public class BioPAXGraphMapper {
 		  n = nodes.get(id);
 	  }
 	  return n;
+  }
+  
+  private void connectGenericsReferenceNodeToEntities(EntityReference en){
+	  String name = biopaxNaming.getNameByUri(en.uri());
+	  if(genericEntityToEntityVectorUris.get(en.uri())!=null){
+		  Vector<String> mems = genericEntityToEntityVectorUris.get(en.uri());
+		  for(String mem: mems){
+		  Node member = nodes.get(mem);
+		  Node generic = nodes.get(en.uri());
+          Edge e = new Edge(); 
+          e.Id = member.Id+" ("+"SPECIESOF"+") "+generic.Id;
+          e.EdgeLabel = "SPECIESOF";
+          graph.addEdge(e);
+          e.Node1 = member;
+          e.Node2 = generic;
+          e.Attributes.add(new Attribute("BIOPAX_EDGE_TYPE","SPECIESOF"));
+          e.Attributes.add(new Attribute("BIOPAX_EDGE_ID",member.Id+"("+"SPECIESOF"+")"+generic.Id));
+		  }
+	  }
   }
 
  
@@ -318,13 +397,17 @@ public class BioPAXGraphMapper {
 		  Iterator itc = compl.getComponent();
 		  while(itc.hasNext()){
 			  PhysicalEntity pep = (PhysicalEntity)itc.next();
+			  //System.out.println("pep.uri="+pep.uri());
 			  String refuri = "";
-			  if(entityToReferenceUris.get(pep.uri())!=null)
+			  if(entityToReferenceUris.get(pep.uri())!=null){
 				  refuri = entityToReferenceUris.get(pep.uri());
+			  }else{
+				  refuri = pep.uri();
+			  }
 			  Node n1 = nodes.get(refuri);
-			  if(n1==null)
+			  if(n1==null){
 				  System.out.println("WARNING!!! COMPLEX COMPONENT IS NOT INCLUDED: "+getID(compl));
-			  else{
+			  }else{
 				  Edge ee = new Edge(); 
 				  ee.Id = n1.Id+" (CONTAINS) "+n.Id;
 				  ee.EdgeLabel = "CONTAINS";
@@ -366,6 +449,7 @@ public class BioPAXGraphMapper {
 			   * the two Id are different with expression !n1.Id.equals(n.Id)
 			   *  
 			   */
+			  //System.out.println("Entity="+n1.Id);
 			  if(n1!=null && !n1.Id.equals(n.Id)){
 				  Edge ee = new Edge();  
 				  ee.Id = n1.Id+" (SPECIESOF) "+n.Id; 
@@ -376,6 +460,26 @@ public class BioPAXGraphMapper {
 				  ee.Attributes.add(new Attribute("BIOPAX_EDGE_TYPE","SPECIESOF"));
 				  ee.Attributes.add(new Attribute("BIOPAX_EDGE_ID",n.Id+"("+"SPECIESOF"+")"+n1.Id));
 			  }
+			  
+			  if(entityToReferenceUris.get(ent.uri())==null){
+				  Vector<String> ents = genericEntityToEntityVectorUris.get(ent.uri());
+				  if(ents!=null){
+					  for(String enturi: ents){
+						   n1 = nodes.get(entityToReferenceUris.get(enturi));
+							  if(n1!=null && !n1.Id.equals(n.Id)){
+								  Edge ee = new Edge();  
+								  ee.Id = n1.Id+" (SPECIESOF) "+n.Id; 
+								  ee.EdgeLabel = "SPECIESOF";
+								  graph.addEdge(ee);
+								  ee.Node1 = n1;
+								  ee.Node2 = n;
+								  ee.Attributes.add(new Attribute("BIOPAX_EDGE_TYPE","SPECIESOF"));
+								  ee.Attributes.add(new Attribute("BIOPAX_EDGE_ID",n.Id+"("+"SPECIESOF"+")"+n1.Id));
+							  }
+					  }
+				  }
+			  }
+			  
 		  }else{
 			  System.out.println("ERROR: entity is null for "+getID(bs)+" ("+bs.name+")");
 		  }
@@ -457,11 +561,11 @@ public class BioPAXGraphMapper {
 	  Iterator _reactants = null;
 	  Iterator _products = null;
 	  
-	  if((spont==null)||(spont==false)||(dir.equals("REVERSIBLE"))||(dir.equals("PHYSIOL-LEFT-TO-RIGHT"))||(dir.equals("IRREVERSIBLE-LEFT-TO-RIGHT"))){
+	  if((dir==null)||(spont==null)||(spont==false)||(dir.equals("REVERSIBLE"))||(dir.equals("PHYSIOL-LEFT-TO-RIGHT"))||(dir.equals("IRREVERSIBLE-LEFT-TO-RIGHT"))){
 		  _reactants = conv.getLeft();
 		  _products = conv.getRight();
 	  }
-	  else {
+	  else if(dir!=null){
 		  if ((dir.equals("PHYSIOL-RIGHT-TO-LEFT"))||(dir.equals("IRREVERSIBLE-RIGHT-TO-LEFT"))) {
 			  _reactants = conv.getRight();
 			  _products = conv.getLeft();

@@ -625,8 +625,15 @@ public class ConnectionToDatabases {
 		  confidenceSection.name = "Confidence";
 		  secs.add(confidenceSection);
 	  }
-		  if(confidenceSection.content.trim().equals(""))
-			  confidenceSection.content+="CONFIDENCE:"+dscore+"_"+fscore+" REF="+dscore+" FUNCD="+fscore;
+		  if(confidenceSection.content.trim().equals("")){
+			  String color = "red";
+			  if(fscore==0) color = "black";
+			  if(fscore==1) color = "purple";
+			  if(fscore==2) color = "blue";
+			  if(fscore==3) color = "green";
+			  if(fscore==4) color = "orange";
+			  confidenceSection.content+="CONFIDENCE:"+dscore+"_"+fscore+" REF="+dscore+" <span style='color:"+color+"'>FUNC="+fscore+"</span>";
+		  }
 	  note = "";
 	  for(int j=1;j<secs.size();j++) note+=secs.get(j).toString();
 	  mn.noteAdds.set(k, note);

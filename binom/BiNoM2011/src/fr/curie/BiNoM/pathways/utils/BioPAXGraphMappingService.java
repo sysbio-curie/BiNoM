@@ -72,4 +72,15 @@ public Graph mapBioPAXToGraph(BioPAX biopax) throws Exception{
 
 }
 
+public Graph mapBioPAXToGraph(BioPAX biopax, boolean guaranteeUniqueNames) throws Exception{
+
+	  BioPAXGraphMapper mapper = new BioPAXGraphMapper();
+	  mapper.biopaxNaming.guaranteeUniqueNamesForObjects = guaranteeUniqueNames;
+	  mapper.biopax = biopax;
+	  mapper.map();
+	  return mapper.graph;
+
+}
+
+
 }

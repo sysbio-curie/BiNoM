@@ -535,6 +535,12 @@ public class SetOverlapAnalysis {
 		frequencies.add(analyzeHitFrequency(hitSetString));		
 		}
 		
+		saveSetFrequencies(fileNamePreifix, maxFoundSize, frequencies);
+		
+		fw.close();
+	}
+	
+	public void saveSetFrequencies(String fileNamePreifix, int maxFoundSize, Vector<Vector<OmegaScoreData>> frequencies) throws Exception{
 		FileWriter fw1 = new FileWriter(fileNamePreifix+".freqmhs");		
 		/*System.out.println();
 		System.out.print("NODE\tSETS\tNSETS\t");*/ fw1.write("NODE\tSETS\tNSETS\t");
@@ -553,9 +559,7 @@ public class SetOverlapAnalysis {
 			/*System.out.println();*/ fw1.write("\n");
 		}
 		fw1.close();
-		
-		
-		fw.close();
+
 	}
 	
 	public Vector<String> getListOfSets(String node){
@@ -569,6 +573,15 @@ public class SetOverlapAnalysis {
 	}
 	
 	public Vector<OmegaScoreData> analyzeHitFrequency(Vector<Vector<String>> hitSet){
+		
+		if(allproteins==null){
+			allproteins = new Vector<String>();
+			for(Vector<String> v: hitSet)
+				for(String s: v)
+					if(!allproteins.contains(s))
+						allproteins.add(s);
+		}
+		
 		Vector<OmegaScoreData> frequencies = new Vector<OmegaScoreData>();
 		for(int i=0;i<allproteins.size();i++)
 			frequencies.add(new OmegaScoreData(allproteins.get(i),0));

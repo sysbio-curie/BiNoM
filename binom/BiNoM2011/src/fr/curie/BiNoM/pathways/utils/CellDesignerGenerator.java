@@ -184,8 +184,9 @@ public class CellDesignerGenerator {
 		//cg.addReactionStatement("A+C/EBP-beta -> A:C/EBP-beta");
 		//cg.addSpeciesStatement("Lamin|pho");
 		//cg.addSpeciesStatement("TP53|hm8");
-		cg.addSpeciesStatement("A@nucleus");
-		cg.addReactionStatement("A@nucleus->B@");
+		//cg.addSpeciesStatement("A@nucleus");
+		//cg.addReactionStatement("A@nucleus->B@");
+		cg.addReactionStatement("IC1_GG@nucleus->IC2_GG@cytoplasm");
 		cg.processStatements();
 		
 		//cg.createReactionFromString("TP53 -> null");
@@ -370,8 +371,10 @@ public class CellDesignerGenerator {
 	
 	public SpeciesDocument.Species createSpeciesFromString(String id, String name, String structuredString, float x, float y){
 		
+		System.out.println("Old (x,y) = "+x+","+y);
 		x = (x-shiftX)*scaleX;
 		y = (y-shiftY)*scaleY;
+		System.out.println("New (x,y) = "+x+","+y);
 		
 		SpeciesDocument.Species sp = cd.getSbml().getModel().getListOfSpecies().addNewSpecies();
 		sp.setId(id);
@@ -1151,8 +1154,8 @@ public class CellDesignerGenerator {
 		// fourth, reposition the aliases
 		if(repositionAliases)
 		for(String sid: speciesIds){
-			System.out.println("Positioning "+sid);
 			CelldesignerSpeciesAlias sas = speciesAliases.get(sid+"_alias");
+			System.out.println("Positioning auto..."+sid);
 			if(sas!=null){
 				positionSpeciesAliasAutomatically(sas.getId(), speciesId2StructuredString.get(sid), true);
 			}

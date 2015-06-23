@@ -83,7 +83,7 @@ public class GraphAlgorithms {
 		
 		while(grcopy.Nodes.size()>0){
 			Node n = (Node)grcopy.Nodes.get(0);
-			System.out.println("\nStarting from "+n.Id);
+			//System.out.println("\nStarting from "+n.Id);
 			grcopy.calcNodesInOut();
 			Vector<Graph> extractedScc = RunTarjan(grcopy,n);
 			for(int i=0;i<extractedScc.size();i++){
@@ -98,7 +98,7 @@ public class GraphAlgorithms {
 			}
 			
 		}
-		System.out.println("");
+		//System.out.println("");
 		return scc;
 	}
 	
@@ -130,12 +130,12 @@ public class GraphAlgorithms {
 			}
 		}
 		if(lowlinkMap.get(v).equals(dfsMap.get(v))){
-			System.out.print("\nSZK : ");
+			//System.out.print("\nSZK : ");
 			Graph gr = new Graph();
 			Node vs = null;
 			do{
 				vs = stack.pop();
-				System.out.print(vs.Id+"\t");
+				//System.out.print(vs.Id+"\t");
 				gr.addNode(vs);
 			}while(!v.equals(vs));
 			scc.add(gr);

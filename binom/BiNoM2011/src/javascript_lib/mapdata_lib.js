@@ -1588,17 +1588,24 @@ function ImportSynchronizer() {
 
 ImportSynchronizer.prototype = {
 
-	start: function(count) {
+	start: function(count, wait_cursor_on, win) {
 		this.count = count;
+		this.wait_cursor = wait_cursor_on ? new WaitCursor(wait_cursor_on, win) : null;
 		this.error = "";
 	},
 
 	success: function() {
 		this.count--;
+		if (!this.count && this.wait_cursor) {
+			this.wait_cursor.restore();
+		}
 	},
 
 	setError: function(error) {
 		this.error = error;
+		if (this.error && this.wait_cursor) {
+			this.wait_cursor.restore();
+		}
 	},
 
 	isReady: function() {
@@ -1871,7 +1878,7 @@ DisplayContinuousConfig.prototype = {
 		}
 
 		for (var nn = 1+offset; nn < len; ++nn) {
-			if (value < values[nn]) {
+			if (value <= values[nn]) { // EV: 2015-06-11 patch: changed < to <=
 				return nn-1;
 			}
 		}
@@ -2056,6 +2063,9 @@ DisplayContinuousConfig.prototype = {
 				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
 			if (idx == len+DisplayContinuousConfig.GT_MAX) {
+				if (!colors[len-1]) {
+					console.log("ERROR: color.length=" + len + ", tabname=" + tabname + ", config=" + config);
+				}
 				var color = RGBColor.fromHex(colors[len-1]);
 				return new RGBColor(color.getRed(), color.getGreen(), color.getBlue()).getRGBValue();
 			}
@@ -2400,7 +2410,8 @@ DisplayContinuousConfig.prototype = {
 		var step_cnt = this.getStepCount(config, tabname);
 		for (var idx = beg; idx < step_cnt; idx++) {
 			if (really_dont_use_gradient) {
-				html += "<tr><td><span class='less-than'>Less&nbsp;than</span></td>";
+				//html += "<tr><td><span class='less-than'>Less&nbsp;than</span></td>";
+				html += "<tr><td><span class='less-than'>Less&nbsp;or&nbsp;equal&nbsp;to</span></td>";
 			} else {
 				html += "<tr>";
 			}
@@ -4895,7 +4906,7 @@ Datatable.prototype = {
 				var len = values.length;
 				values.sort(cmp=function(x, y) {return x-y;});
 				var len2 = Math.floor(len/2);
-				if (0 == (len & 1)) {
+				if (len == 1 || 0 == (len & 1)) {
 					return values[len2];
 				}
 				return (values[len2-1]+values[len2])/2;
@@ -5881,7 +5892,7 @@ Group.prototype = {
 				}
 				values.sort(cmp=function(x, y) {return x-y;});
 				var len2 = Math.floor(len/2);
-				if (0 == (len & 1)) {
+				if (len == 1 || 0 == (len & 1)) {
 					return values[len2];
 				}
 				return (values[len2-1]+values[len2])/2;

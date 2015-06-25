@@ -124,8 +124,14 @@ function display_info_dialog(title, header, msg, win, position, width, height, c
 				},
 				{
 					text: ok_name,
+					id: 'dialog_ok_button',
 					click: function() {
-						nv_execute_commands(win, nv_CMD_MARK + ' ' + command);
+						//var body = $('body', win.document);
+						var wait_cursor = new WaitCursor(['#dialog_ok_button'], win);
+						setTimeout(function() {
+							nv_execute_commands(win, nv_CMD_MARK + ' ' + command);
+							wait_cursor.restore();
+						}, DISPLAY_TIMEOUT);
 					}
 				}
 			]
@@ -390,74 +396,86 @@ $(function() {
 		width: get_dialog_width(IMPORT_DIALOG_WIDTH),
 		height: get_dialog_height(IMPORT_DIALOG_HEIGHT),
 		modal: false,
-		buttons: {
-			"Import": function() {
-				var module = get_module();
-				var drawing_config = navicell.getDrawingConfig(module);
-				var error = "";
-				if (!name.val() && type.val() != DATATABLE_LIST) {
-					error = "Missing Name"
-				}
-				if (!file.val() && !url.val().trim()) {
-					if (error) {
-						error += ", ";
-					} else {
-						error = "Missing ";
+		buttons: [ // 2015-06-11: added braket
+			{
+				text: "Import",
+				id : "import_dialog_button",
+				click : function() {
+					var module = get_module();
+					var drawing_config = navicell.getDrawingConfig(module);
+					var error = "";
+					if (!name.val() && type.val() != DATATABLE_LIST) {
+						error = "Missing Name"
 					}
-					error += "File or URL";
-				}
-				if (type.val() == "_none_") {
-					if (error) {
-						error += ", ";
-					} else {
-						error = "Missing ";
+					if (!file.val() && !url.val().trim()) {
+						if (error) {
+							error += ", ";
+						} else {
+							error = "Missing ";
+						}
+						error += "File or URL";
 					}
-					error += "Type";
-				}
-				if (file.val() && url.val().trim()) {
-					if (error) {
-						error += "<br/>";
+					if (type.val() == "_none_") {
+						if (error) {
+							error += ", ";
+						} else {
+							error = "Missing ";
+						}
+						error += "Type";
 					}
-					error += "Cannot specify a File and an URL";
-				}
+					if (file.val() && url.val().trim()) {
+						if (error) {
+							error += "<br/>";
+						}
+						error += "Cannot specify a File and an URL";
+					}
 
-				if (error) {
-					error2_message(error);
-					return;
-				}
+					if (error) {
+						error2_message(error);
+						return;
+					}
 
-				$("#dt_import_file_message").css("display", "none");
-				setTimeout(function() {
-					error_message("");
-					status_message("Importing...");
-					var file_elem = (file ? file.get()[0].files[0] : null);
-					nv_perform("nv_import_datatables", window, type.val().trim(), name.val().trim(), (file_elem == undefined ? "" : file_elem), url.val().trim(),
-							     {status_message: status_message,
-							      error_message: error2_message,
-							      open_drawing_editor: true,
-							      async: true,
-							      import_display_markers: import_display_markers.attr('checked'),
-							      import_display_barplot: import_display_barplot.attr('checked'),
-							      import_display_heatmap: import_display_heatmap.attr('checked')});
-				}, DISPLAY_TIMEOUT);
+					$("#dt_import_file_message").css("display", "none");
+					setTimeout(function() {
+						error_message("");
+						status_message("Importing...");
+						var file_elem = (file ? file.get()[0].files[0] : null);
+						nv_perform("nv_import_datatables", window, type.val().trim(), name.val().trim(), (file_elem == undefined ? "" : file_elem), url.val().trim(),
+							   {status_message: status_message,
+							    error_message: error2_message,
+							    open_drawing_editor: true,
+							    async: true,
+							    import_display_markers: import_display_markers.attr('checked'),
+							    import_display_barplot: import_display_barplot.attr('checked'),
+							    import_display_heatmap: import_display_heatmap.attr('checked'),
+							    wait_cursor_on: ['#import_dialog_button', '#import_clear_button', '#import_done_button']});
+					}, DISPLAY_TIMEOUT);
+				},
 			},
-
-			Clear: function() {
-				// TBD:
-				//nv_perform("nv_import_dialog_perform", window, "clear");
-				name.val("");
-				file.val("");
-				url.val("");
-				type.val("");
-				status_message("");
+			{
+				text: "Clear",
+				id: "import_clear_button",
+				click: function() {
+					// TBD:
+					//nv_perform("nv_import_dialog_perform", window, "clear");
+					name.val("");
+					file.val("");
+					url.val("");
+					type.val("");
+					status_message("");
+				},
 			},
-
-			Done: function() {
-				// TBD:
-				//nv_perform("nv_import_dialog_perform", window, "done");
-				$(this).dialog('close');
+			{
+				text: "Done",
+				id: "import_done_button",
+				click: function() {
+					// TBD:
+					//nv_perform("nv_import_dialog_perform", window, "done");
+					$(this).dialog('close');
+				}
 			}
-		}});
+		]
+	});
 
 	$("#dt_status_tabs").dialog({
 		autoOpen: false,
@@ -648,6 +666,7 @@ $(function() {
 			buttons: {
 				"Apply": function() {
 					var num = $(this).data('num');
+					console.log("APPLY: " + num);
 					nv_perform("nv_glyph_editor_perform", window, "apply", num, true);
 				},
 				
@@ -1266,10 +1285,26 @@ function in_module_gene_count(module_name) {
 function download_genes() {
 	var opener = document.win;
 	var module_stack = [];
+	while (opener) {
+		try {
+			if (!opener.document.map_name) {
+				break;
+			}
+			//console.log("NOTICE 2: OK cross origin opener: " + opener.location.protocol + "//" + opener.location.host + " (current window: " + window.location.protocol + "//" + window.location.host + ")");
+			module_stack.push(opener.document.map_name);
+		}
+		catch(e) {
+			console.log("WARNING #2: cross origin problem ? caugth " + e);
+		}
+		opener = opener.opener;
+	}
+
+	/*
 	while (opener && opener.document.map_name) {
 		module_stack.push(opener.document.map_name);
 		opener = opener.opener;
 	}
+	*/
 
 	var str = "Genes in";
 	for (var ll = 0; ll < module_stack.length; ll++) {
@@ -1330,11 +1365,11 @@ function update_gene_status_table(doc, params) {
 			if (!opener.document.map_name) {
 				break;
 			}
-			console.log("NOTICE: OK cross origin opener: " + opener.location.protocol + "//" + opener.location.host + " (current window: " + window.location.protocol + "//" + window.location.host + ")");
+			//console.log("NOTICE 1: OK cross origin opener: " + opener.location.protocol + "//" + opener.location.host + " (current window: " + window.location.protocol + "//" + window.location.host + ")");
 			module_stack.push(opener.document.map_name);
 		}
 		catch(e) {
-			console.log("WARNING: caugth " + e);
+			console.log("WARNING #1: cross origin problem ? caugth " + e);
 		}
 		opener = opener.opener;
 	}
@@ -3663,4 +3698,36 @@ function draw_voronoi(module, context, div)
 			context.strokeText(shape_id, (min_x + max_x)/2-40, (min_y + max_y)/2+3);
 		}
 	}		
+}
+
+function WaitCursor(elems, win) {
+	this.ocursors = {};
+	if (!win) {
+		win = window;
+	}
+	this.win = win;
+	this.elems = elems;
+	this.elems.push('body');
+	this.elems.push('#map');
+	this.elems.push('#map_canvas');
+	for (var idx in this.elems) {
+		var elem = this.elems[idx];
+		if (elem in this.ocursors) {
+			continue;
+		}
+		var elem_obj = $(elem, this.win.document);
+		//console.log("wait cursor on " + elem);
+		this.ocursors[elem] = elem_obj.css("cursor");
+		elem_obj.css("cursor", "wait");
+	}
+}
+
+WaitCursor.prototype = {
+	restore: function() {
+		//console.log("WAIT_CURSOR RESTORE");
+		for (var idx in this.elems) {
+			var elem = this.elems[idx];
+			$(elem, this.win.document).css("cursor", this.ocursors[elem]);
+		}
+	}
 }

@@ -295,7 +295,7 @@ if ($mode != "session") {
   $id = get("id", "");
 } 
 
-$msg_id = get("msg_id", "UNKNOWN");
+$msg_id = get("msg_id", "<undefined>");
 
 if ($mode == "session") {
   if ($perform == "check") {
@@ -386,7 +386,10 @@ if ($mode == "session") {
     return;
   } else if ($perform == "send" || $perform == "send_and_rcv") {
     $data = get_post_var("data");
-    logmsg($id, "cli2srv: $perform $id $msg_id [$data]\n");
+    if (!$data) {
+      $data = get_url_var("data");
+    }
+    logmsg($id, "cli2srv: $perform id=$id msg_id=$msg_id [$data]\n");
 
     if ($data) {
       $file = cmdfile($id);

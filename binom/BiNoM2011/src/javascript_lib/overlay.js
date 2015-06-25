@@ -725,7 +725,7 @@ USGSOverlay.prototype.onAdd = function() {
 	div.style.top = '0px';
 
 	var draw_canvas = document.createElement('canvas');
-//	draw_canvas.id = "map_canvas";
+	draw_canvas.id = "map_canvas"; // 2015-06-11
 	draw_canvas.style.left = '0px';
 	draw_canvas.style.top = '0px';
 

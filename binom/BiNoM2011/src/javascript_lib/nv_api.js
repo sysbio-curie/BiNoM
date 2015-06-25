@@ -280,7 +280,11 @@ function nv_is_ready(win)
 
 function nv_is_imported(win)
 {
-	console.log("is_imported: " + navicell.import_synchronizer.isReady());
+	try {
+		console.log("is_imported: " + navicell.import_synchronizer.isReady());
+	} catch(e) {
+		console.log("WARNING 4: caugth " + e);
+	}
 	return navicell.import_synchronizer.isReady();
 }
 
@@ -296,142 +300,163 @@ function nv_import_datatables(win, type, name, file_elem, url, params)
 	var error_message = params ? params.error_message : null;
 	var status_message = params ? params.status_message : null;
 
-	navicell.import_synchronizer.start(dt_desc_list.length);
+	//console.log("import_datatables: type=" + type + " name=" + name + " url=" + url);
+	navicell.import_synchronizer.start(dt_desc_list.length, params ? params.wait_cursor_on : null, win);
 
-	ready.then(function() {
-		try {
-			var msg_cnt = 0;
-			if (!dt_desc_list.length) {
-				if (error_message) {
-					error_message("No Datatables Imported");
-				} else {
-					throw "nv_import_datatables error: No Datatables Imported";
-				}
-				return;
-			}
-			for (var idx in dt_desc_list) {
-				var dt_desc = dt_desc_list[idx];
-				var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, win, async);
-				if (datatable.error) {
-					var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
-					error_str += "<table>";
-					error_str += "<tr><td>Datatable</td><td>" + dt_desc.name + "</td></tr>";
-					error_str += "<tr><td>Error</td><td>" + datatable.error + "</td></tr>";
-					error_str += "</table>";
+	setTimeout(function() {
+		ready.then(function() {
+			try {
+				var msg_cnt = 0;
+				if (!dt_desc_list.length) {
 					if (error_message) {
-						error_message(error_str, msg_cnt++);
+						error_message("No Datatables Imported");
 					} else {
-						throw "nv_import_datatables error: datatable " + dt_desc.name + ": " + datatable.error;
+						throw "nv_import_datatables error: No Datatables Imported";
 					}
-				} else {
-					datatable.ready.then(function(my_datatable) {
-						try {
-							if (my_datatable.error) {
-								var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
-								error_str += "<table>";
-								error_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
-								error_str += "<tr><td>Error</td><td>" + my_datatable.error + "</td></tr>";
-								error_str += "</table>";
-								if (error_message) {
-									error_message(error_str, msg_cnt++);
-								} else {
-									throw "nv_import_datatables error: " + error_str;
-								}
-							} else {
-								var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
-								status_str += "<table>";
-								status_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
-								status_str += "<tr><td>Samples</td><td>" + my_datatable.getSampleCount() + "</td></tr>\n";
-								var opener = win;
-								var nnn = 0;
-								while (opener && opener.document.map_name) {
-									status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + my_datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
-									opener = opener.opener;
-									if (nnn++ > 4) {
-										win.console.log("too many level of hierarchy !");
-										break;
+					return;
+				}
+				for (var idx in dt_desc_list) {
+					var dt_desc = dt_desc_list[idx];
+					var datatable = navicell.dataset.readDatatable(dt_desc.type, dt_desc.name, dt_desc.file_elem, dt_desc.url, win, async);
+					if (datatable.error) {
+						var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
+						error_str += "<table>";
+						error_str += "<tr><td>Datatable</td><td>" + dt_desc.name + "</td></tr>";
+						error_str += "<tr><td>Error</td><td>" + datatable.error + "</td></tr>";
+						error_str += "</table>";
+						if (error_message) {
+							error_message(error_str, msg_cnt++);
+						} else {
+							throw "nv_import_datatables error: datatable " + dt_desc.name + ": " + datatable.error;
+						}
+					} else {
+						datatable.ready.then(function(my_datatable) {
+							try {
+								if (my_datatable.error) {
+									var error_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Failed</span></div>";
+									error_str += "<table>";
+									error_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
+									error_str += "<tr><td>Error</td><td>" + my_datatable.error + "</td></tr>";
+									error_str += "</table>";
+									if (error_message) {
+										error_message(error_str, msg_cnt++);
+									} else {
+										throw "nv_import_datatables error: " + error_str;
 									}
-								}
-								status_str += "</table>";
-								if (status_message) {
-									status_message(status_str, msg_cnt++);
 								} else {
-									win.console.log("nv_import_datatables notice: " + status_str);
-								}
-								navicell.annot_factory.refresh();
-								var display_graphics = false;
-								if (params) {
-									if (params.import_display_barplot) {
-										var barplotConfig = drawing_config.getEditingBarplotConfig();
-										barplotConfig.setDatatableAt(0, datatable);
-										if (params.open_drawing_editor) {
-											$("#barplot_editing", win.document).html(EDITING_CONFIGURATION);
-											$("#barplot_editor_div", win.document).dialog("open");
-										} else {
-											$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
-											$("#drawing_config_chart_type", win.document).val('Barplot');
-											drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
-											barplot_sample_action('all_samples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
-											
-											barplot_editor_apply(drawing_config.getBarplotConfig());
-											barplot_editor_apply(drawing_config.getEditingBarplotConfig());
-											barplot_editor_set_editing(false);
-
-											max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
-
-											display_graphics = true;
-										}
-									} else if (params.import_display_heatmap) {
-										var heatmapConfig = drawing_config.getEditingHeatmapConfig();
-										var datatable_cnt = mapSize(navicell.dataset.datatables);
-										for (var idx = 0; idx < datatable_cnt; ++idx) {
-											if (!heatmapConfig.getDatatableAt(idx)) {
+									var status_str = "<div align='center'><span style='text-align: center; font-weight: bold'>Import Successful</span></div>";
+									status_str += "<table>";
+									status_str += "<tr><td>Datatable</td><td>" + my_datatable.name + "</td></tr>";
+									status_str += "<tr><td>Samples</td><td>" + my_datatable.getSampleCount() + "</td></tr>\n";
+									var opener = win;
+									var nnn = 0;
+									while (opener) {
+										try {
+											if (!opener.document.map_name) {
 												break;
 											}
+											//console.log("NOTICE 3: OK cross origin opener: " + opener.location.protocol + "//" + opener.location.host + " (current window: " + window.location.protocol + "//" + window.location.host + ")");
+											status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + my_datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
 										}
-										heatmapConfig.setDatatableAt(idx, datatable);
-										if (params.open_drawing_editor) {
-											$("#heatmap_editing", win.document).html(EDITING_CONFIGURATION);
-											$("#heatmap_editor_div", win.document).dialog("open");
-										} else {
-											$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
-											$("#drawing_config_chart_type", win.document).val('Heatmap');
-											drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
-											if (!drawing_config.getHeatmapConfig().getSampleOrGroupCount()) {
-												win.heatmap_sample_action_perform('all_samples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
-											} else {
-												win.heatmap_sample_action_perform('pass');
-											}
-
-											win.heatmap_editor_apply(drawing_config.getHeatmapConfig());
-											win.heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
-											win.heatmap_editor_set_editing(false);
-
-											win.max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
-
-											display_graphics = true;
+										catch(e) {
+											console.log("WARNING #3: cross origin problem ? caugth " + e);
 										}
-									} else {
-										display_graphics = false;
+										opener = opener.opener;
+										if (nnn++ > 4) {
+											win.console.log("too many level of hierarchy !");
+											break;
+										}
 									}
+									/*
+									while (opener && opener.document.map_name) {
+										status_str += "<tr><td>Genes mapped on " + opener.document.map_name + "</td><td>" + my_datatable.getGeneCountPerModule(opener.document.map_name) + "</td></tr>";
+										opener = opener.opener;
+										if (nnn++ > 4) {
+											win.console.log("too many level of hierarchy !");
+											break;
+										}
+									}
+									*/
+									status_str += "</table>";
+									if (status_message) {
+										status_message(status_str, msg_cnt++);
+									} else {
+										win.console.log("nv_import_datatables notice: " + status_str);
+									}
+									navicell.annot_factory.refresh();
+									var display_graphics = false;
+									if (params) {
+										if (params.import_display_barplot) {
+											var barplotConfig = drawing_config.getEditingBarplotConfig();
+											barplotConfig.setDatatableAt(0, datatable);
+											if (params.open_drawing_editor) {
+												$("#barplot_editing", win.document).html(EDITING_CONFIGURATION);
+												$("#barplot_editor_div", win.document).dialog("open");
+											} else {
+												$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
+												$("#drawing_config_chart_type", win.document).val('Barplot');
+												drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
+												barplot_sample_action('all_samples', DEF_OVERVIEW_BARPLOT_SAMPLE_CNT);
+												
+												barplot_editor_apply(drawing_config.getBarplotConfig());
+												barplot_editor_apply(drawing_config.getEditingBarplotConfig());
+												barplot_editor_set_editing(false);
 
+												max_barplot_sample_cnt = DEF_MAX_BARPLOT_SAMPLE_CNT;
+
+												display_graphics = true;
+											}
+										} else if (params.import_display_heatmap) {
+											var heatmapConfig = drawing_config.getEditingHeatmapConfig();
+											var datatable_cnt = mapSize(navicell.dataset.datatables);
+											for (var idx = 0; idx < datatable_cnt; ++idx) {
+												if (!heatmapConfig.getDatatableAt(idx)) {
+													break;
+												}
+											}
+											heatmapConfig.setDatatableAt(idx, datatable);
+											if (params.open_drawing_editor) {
+												$("#heatmap_editing", win.document).html(EDITING_CONFIGURATION);
+												$("#heatmap_editor_div", win.document).dialog("open");
+											} else {
+												$("#drawing_config_chart_display", win.document).attr("checked", 'checked')
+												$("#drawing_config_chart_type", win.document).val('Heatmap');
+												drawing_config.setDisplayCharts($("#drawing_config_chart_display", win.document).attr("checked"), $("#drawing_config_chart_type", win.document).val());
+												if (!drawing_config.getHeatmapConfig().getSampleOrGroupCount()) {
+													win.heatmap_sample_action_perform('all_samples', DEF_OVERVIEW_HEATMAP_SAMPLE_CNT);
+												} else {
+													win.heatmap_sample_action_perform('pass');
+												}
+
+												win.heatmap_editor_apply(drawing_config.getHeatmapConfig());
+												win.heatmap_editor_apply(drawing_config.getEditingHeatmapConfig());
+												win.heatmap_editor_set_editing(false);
+
+												win.max_heatmap_sample_cnt = DEF_MAX_HEATMAP_SAMPLE_CNT;
+
+												display_graphics = true;
+											}
+										} else {
+											display_graphics = false;
+										}
+
+									}
+									var display_markers = params ? params.import_display_markers : true;
+									my_datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
+									drawing_editing(false);
+									update_status_tables();
 								}
-								var display_markers = params ? params.import_display_markers : true;
-								my_datatable.display(win.document.navicell_module_name, win, display_graphics, display_markers);
-								drawing_editing(false);
-								update_status_tables();
+							} catch(e) {
+								navicell.import_synchronizer.setError(e.toString());
 							}
-						} catch(e) {
-							navicell.import_synchronizer.setError(e.toString());
-						}
-					});
+						});
+					}
+					navicell.import_synchronizer.success();
 				}
-				navicell.import_synchronizer.success();
+			} catch(e) {
+				navicell.import_synchronizer.setError(e.toString());
 			}
-		} catch(e) {
-			navicell.import_synchronizer.setError(e.toString());
-		}
-	});
+		})}, DISPLAY_TIMEOUT*1); // *10 for testing
 	return null;
 }
 
@@ -630,13 +655,14 @@ function nv_display_continuous_config_perform(win, command, arg1, arg2, arg3, ar
 		var use_gradient = displayConfig.use_gradient[what];
 		for (var idx = 0; idx < step_cnt; ++idx) {
 			var value;
-			if (idx == step_cnt-1 && !use_gradient) {
+			if (step_cnt > 1 && idx == step_cnt-1 && !use_gradient) { // EV 2015-06-11
 				value = datatable.maxval;
 			} else {
 				value = $("#step_value_" + what + '_' + datatable_id + "_" + idx, doc).val();
 			}
 			value *= 1.;
 			if (value <= prev_value) {
+				console.log("nv_display_continuous_config_perform error #2: " + value + " " + prev_value);
 				error = 1;
 				break;
 			}
@@ -1788,9 +1814,17 @@ function nv_execute_commands(win, cmd, relurl) {
 	      );
 }
 
+var MAX_COMMAND_DISPLAY_LENGTH = 350;
+var MAX_COMMAND_DISPLAY_LENGTH_2 = MAX_COMMAND_DISPLAY_LENGTH/2;
+
 function nv_manage_command(cmd, base_url, url) {
 	if (SERVER_TRACE) {
 		console.log("NV Server: received length [" + cmd.length + "]");
+		if (cmd.length > MAX_COMMAND_DISPLAY_LENGTH) {
+			console.log("NV Server: received [" + cmd.substring(0, MAX_COMMAND_DISPLAY_LENGTH_2) + " ... " + cmd.substring(cmd.length - MAX_COMMAND_DISPLAY_LENGTH_2) + "]");
+		} else {
+			console.log("NV Server: received [" + cmd + "]");
+		}
 	}
 	if (cmd.length == 0) {
 		nv_rcv(base_url, url);

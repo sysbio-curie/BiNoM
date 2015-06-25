@@ -322,7 +322,6 @@ class NaviCell:
                 params['packcount'] = packcount
                 data = params['data']
                 params['data'] = "@@"
-                print ("PACKCOUNT: " + str(packcount))
 
         encoded_params = urllib.parse.urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}

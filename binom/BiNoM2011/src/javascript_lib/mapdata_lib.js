@@ -1698,12 +1698,10 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.use_gradient['shape'] = false;
 		this.use_gradient['size'] = false;
 
-        // modif ebo
-		//this.default_step_count['sample']['color'] = 1;
+        // set default step count value to 2 
 		this.default_step_count['sample']['color'] = 2;
 		this.default_step_count['sample']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 		this.default_step_count['sample']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
-		//this.default_step_count['group']['color'] = 1;
 		this.default_step_count['group']['color'] = 2;
 		this.default_step_count['group']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 		this.default_step_count['group']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
@@ -1865,10 +1863,8 @@ DisplayContinuousConfig.prototype = {
 		beg = 0;
 	    }
 	    var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1); 
-	    // modif ebo/ev
-            console.log("test ebo " + config + " step_cnt=" + step_cnt);
 	    for (var ii = beg; ii < step_cnt; ++ii) {
-		// modif ebo
+		// set middle color to white for 2 step count (default) 
 		if (step_cnt_1 == 3 &&
 		    ((this.has_empty_values && ii == 2) ||
 		     (!this.has_empty_values && ii == 1))) {

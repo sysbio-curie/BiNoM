@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+
 var GLYPH_COUNT = 5;
 var DISPLAY_TIMEOUT = 500;
 var MAX_DISCRETE_VALUES = 30;
@@ -27,6 +28,7 @@ var MULTI_REV_SHAPE_MAP = true;
 var cache_value_cnt = 0;
 var no_cache_value_cnt = 0;
 var NO_CHANGE_STEP_COUNT = true;
+var EMPTY_VALUE_DEFAULT_COLOR = "DDDDDD";
 
 if (!window.console) {
 	window.console = new function()
@@ -1696,10 +1698,13 @@ function DisplayContinuousConfig(datatable, win, discrete_ordered) {
 		this.use_gradient['shape'] = false;
 		this.use_gradient['size'] = false;
 
-		this.default_step_count['sample']['color'] = 1;
+        // modif ebo
+		//this.default_step_count['sample']['color'] = 1;
+		this.default_step_count['sample']['color'] = 2;
 		this.default_step_count['sample']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 		this.default_step_count['sample']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
-		this.default_step_count['group']['color'] = 1;
+		//this.default_step_count['group']['color'] = 1;
+		this.default_step_count['group']['color'] = 2;
 		this.default_step_count['group']['shape'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 		this.default_step_count['group']['size'] = DisplayContinuousConfig.DEFAULT_STEP_COUNT;
 
@@ -1776,30 +1781,36 @@ DisplayContinuousConfig.prototype = {
 		var minval = this.getDatatableMinval(config, tabname);
 		var maxval = this.getDatatableMaxval(config, tabname);
 		if (this.discrete_ordered[tabname]) {
-			if (this.has_empty_values) {
-				values.push(Number.MIN_NUMBER);
+		    if (this.has_empty_values) {
+			values.push(Number.MIN_NUMBER);
+		    }
+		    var discrete_values = this.datatable.getDiscreteValues();
+		    for (var idx in discrete_values) {
+			var value = discrete_values[idx];
+			if (!is_empty_value(value)) {
+			    values.push(value);
 			}
-			var discrete_values = this.datatable.getDiscreteValues();
-			for (var idx in discrete_values) {
-				var value = discrete_values[idx];
-				if (!is_empty_value(value)) {
-					values.push(value);
-				}
-			}
+		    }
 		} else {
-			var step = (maxval - minval)/(step_cnt);
-			if (this.has_empty_values) {
-				values.push(Number.MIN_NUMBER);
-			}
-			values.push(minval);
+		    var step = (maxval - minval)/(step_cnt);
+		    if (this.has_empty_values) {
+			values.push(Number.MIN_NUMBER);
+		    }
+		    values.push(minval);
+		    // modif ebo/ev
+		    //if (step_cnt == 2 && maxval > 0 && minval < 0) {
+		    if (this.centerOnZero(step_cnt, minval, maxval)) {
+			values.push(0.);
+		    } else {
 			for (var nn = 0; nn < step_cnt-1; ++nn) {
-				var value = minval + (nn+1.)*step;
-				value = parseInt(value*100.)/100;
-				values.push(value);
+			    var value = minval + (nn+1.)*step;
+			    value = parseInt(value*100.)/100;
+			    values.push(value);
 			}
-			values.push(this.datatable.maxval);
+		    }
+		    values.push(this.datatable.maxval);
 		}
-		if (this.has_empty_values && !keep) {
+	        if (this.has_empty_values && !keep) {
 			step_cnt++;
 		}
 		if (!keep) {
@@ -1820,6 +1831,10 @@ DisplayContinuousConfig.prototype = {
 	},
 
 
+        centerOnZero: function(step_cnt, minval, maxval) {
+	    return step_cnt == 2 && maxval > 0 && minval < 0;
+	},
+
 	setStepInfo: function(config, tabname, idx, value, color, size, shape) {
 		//console.log("setStepInfo: " + config + " " + idx + " " + value + " " + color);
 		if (value != Number.MIN_NUMBER) {
@@ -1837,22 +1852,31 @@ DisplayContinuousConfig.prototype = {
 	},
 
 	setDefaults: function(step_cnt, config, tabname) {
-		if (this.use_gradient[config]) {
-			step_cnt++;
-		}
-		var step_cnt_1, beg;
-		if (this.has_empty_values) {
-			this.setStepInfo(config, tabname, 0, Number.MIN_NUMBER, "FFFFFF", 4, 0);
-			step_cnt_1 = step_cnt-1;
-			beg = 1;
+	    if (this.use_gradient[config]) {
+		step_cnt++;
+	    }
+	    var step_cnt_1, beg;
+	    if (this.has_empty_values) {
+		this.setStepInfo(config, tabname, 0, Number.MIN_NUMBER, EMPTY_VALUE_DEFAULT_COLOR, 4, 0);
+		step_cnt_1 = step_cnt-1;
+		beg = 1;
+	    } else {
+		step_cnt_1 = step_cnt;
+		beg = 0;
+	    }
+	    var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1); 
+	    // modif ebo/ev
+            console.log("test ebo " + config + " step_cnt=" + step_cnt);
+	    for (var ii = beg; ii < step_cnt; ++ii) {
+		// modif ebo
+		if (step_cnt_1 == 3 &&
+		    ((this.has_empty_values && ii == 2) ||
+		     (!this.has_empty_values && ii == 1))) {
+                    this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, "FFFFFF", 4+2*ii, ii);
 		} else {
-			step_cnt_1 = step_cnt;
-			beg = 0;
+		    this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii-beg].getRGBValue(), 4+2*ii, ii);
 		}
-		var colors = color_gradient(new RGBColor(0, 255, 0), new RGBColor(255, 0, 0), step_cnt_1); 
-		for (var ii = beg; ii < step_cnt; ++ii) {
-			this.setStepInfo(config, tabname, ii, Number.MIN_NUMBER, colors[ii-beg].getRGBValue(), 4+2*ii, ii);
-		}
+	    }
 	},
 
 	getStepIndex: function(config, tabname, value, gradient_mode) {
@@ -3071,7 +3095,7 @@ DisplayUnorderedDiscreteConfig.prototype = {
 		var colors;
 		var step_cnt_1, beg;
 		if (tabname == 'sample' && this.has_empty_values) {
-			this.setValueInfo(config, tabname, 0, "FFFFFF", 4, 0, Group.DISCRETE_IGNORE);
+			this.setValueInfo(config, tabname, 0,  EMPTY_VALUE_DEFAULT_COLOR, 4, 0, Group.DISCRETE_IGNORE);
 			step_cnt_1 = step_cnt-1;
 			beg = 1;
 		} else {

@@ -70,7 +70,7 @@ function clear_sessions() {
   }
   fclose($fd);
 
-  unlink($SESSION_FILE);
+  //unlink($SESSION_FILE);
 
   flock($fdlck, LOCK_UN);
   fclose($fdlck);

@@ -411,6 +411,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							String url = substitute(entry[1], value_map);
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
 							//System.out.println("TAG " + tag);
+							/*
 							if (tag.equals("MAP") && atlasInfo != null) {
 								//System.err.println("ATLAS INFO: " + atlasInfo);
 								mapInfo = atlasInfo.getMapInfo(value);
@@ -418,6 +419,21 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 									value = mapInfo.getName();
 									assert mapInfo.url != null;
 									url = mapInfo.url;
+								}
+								res.append(xtag).append(value).append("&nbsp;");
+								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
+							*/
+							if (tag.equals("MAP")) {
+								//System.err.println("ATLAS INFO: " + atlasInfo);
+								if (atlasInfo != null) {
+									mapInfo = atlasInfo.getMapInfo(value);
+									if (mapInfo != null) {
+										value = mapInfo.getName();
+										assert mapInfo.url != null;
+										url = mapInfo.url;
+									}
+								} else {
+									System.err.println("MAP: found with atlasInfo");
 								}
 								res.append(xtag).append(value).append("&nbsp;");
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);

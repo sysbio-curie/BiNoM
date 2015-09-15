@@ -3595,6 +3595,7 @@ public class ProduceClickableMap
 	static void show_map_icon(final StringBuffer fw, Linker wp)
 	{
 		show_map_icon(fw, wp.getMapIconURL());
+		//show_map_icon(fw, wp != null ? wp.getMapIconURL() : icons_directory + "/map.png"); // EV: 2015-06-26
 	}
 
 	private static void show_map_icon(final StringBuffer fw, final String url)

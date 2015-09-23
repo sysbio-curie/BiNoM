@@ -3,17 +3,11 @@ package fr.curie.BiNoM.pathways;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
-import org.biopax.paxtools.model.level3.DnaRegion;
-import org.biopax.paxtools.model.level3.DnaRegionReference;
-import org.biopax.paxtools.model.level3.ProteinReference;
-import org.biopax.paxtools.model.level3.PublicationXref;
-import org.biopax.paxtools.model.level3.RelationshipXref;
-import org.biopax.paxtools.model.level3.RnaRegionReference;
 import org.sbml.x2001.ns.celldesigner.CelldesignerAntisenseRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
@@ -27,6 +21,7 @@ import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
 
 import fr.curie.BiNoM.pathways.utils.Utils;
+import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
 
 public class CellDesignerToGeneSpringConverter {
 
@@ -152,19 +147,18 @@ public class CellDesignerToGeneSpringConverter {
 		int numberOfComplexAliases = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;		
 		System.out.println("Number of complex aliases: "+numberOfComplexAliases);
 		
-		
 		BufferedWriter coord_file = null;
 		BufferedWriter hugo_file = null;
 		try {
-			coord_file = new BufferedWriter(new FileWriter("/Users/eric/coord.txt"));
-			hugo_file = new BufferedWriter(new FileWriter("/Users/eric/hugo.txt"));
+			coord_file = new BufferedWriter(new FileWriter("/Users/eric/wk/genespring_integration/cell_cycle/coord.txt"));
+			hugo_file = new BufferedWriter(new FileWriter("/Users/eric/wk/genespring_integration/cell_cycle/hugo.txt"));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 		
-		
+		// process simple aliases
 		for (int i=0;i<numberOfAliases;i++) {
 			
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
@@ -245,6 +239,27 @@ public class CellDesignerToGeneSpringConverter {
 			}
 		}
 		
+		// process complex aliases
+		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++){
+			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias cspa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
+			String cspa_id = cspa.getId();
+			int x1 = (int) Math.round(Float.parseFloat(cspa.getCelldesignerBounds().getX()));
+			int y1 = (int) Math.round(Float.parseFloat(cspa.getCelldesignerBounds().getY()));
+			int width = (int) Math.round(Float.parseFloat(cspa.getCelldesignerBounds().getW()));
+			int height = (int) Math.round(Float.parseFloat(cspa.getCelldesignerBounds().getH()));
+			String cspa_species_id = cspa.getSpecies();
+			
+			SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(cspa.getSpecies());
+			String entname = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbml);
+			String label =  CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), sp.getId(), entname, sp.getCompartment(), true, true, "", sbml); //spa.getSpecies();
+			Vector<CelldesignerSpeciesDocument.CelldesignerSpecies> vis = CellDesignerToCytoscapeConverter.complexSpeciesMap.get(cspa_species_id);
+			
+			//System.out.println(cspa_id+" "+ vis);
+			
+			
+		}
+		
+		// close output files
 		try {
 			coord_file.close();
 			hugo_file.close();

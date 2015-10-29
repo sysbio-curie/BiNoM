@@ -93,6 +93,7 @@ _NV_PACKSIZE = 500000
 #_NV_PACKSIZE = 5000 # reduce packsize for testing
 _NV_CONTINUOUS = 'CONTINUOUS'
 _NV_UNORDERED_DISCRETE = 'UNORDERED_DISCRETE'
+_NV_ORDERED_DISCRETE = 'ORDERED_DISCRETE'
 
 class Proxy:
     """
@@ -1457,7 +1458,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'open', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1478,7 +1479,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'close', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1499,7 +1500,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'cancel', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1520,7 +1521,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'apply', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1557,7 +1558,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'step_count_change', tabname, config_type, datatable, step_count)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1579,7 +1580,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_sample_absval', config_type, datatable, checked)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1603,7 +1604,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_sample_method', config_type, datatable, method)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1627,7 +1628,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_group_method', config_type, datatable, method)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1653,7 +1654,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_input_color', datatable, config_type, tabname, idx, color)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1679,7 +1680,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_input_value', datatable, config_type, tabname, idx, value)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1705,7 +1706,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_select_size', datatable, config_type, tabname, idx, size)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1733,7 +1734,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'set_select_shape', datatable, config_type, tabname, idx, shape)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1745,7 +1746,7 @@ class NaviCell:
         """
         Set condition at a specified index in the datatable configuration dialog for the given type.
 
-        Args:
+            Args:
             :param module (string): module on which to apply the command; empty string for current map.
             :param datatable (string): datatable name
             :param config_type (string): configuration type; must be NaviCell.CONFIG_COLOR,
@@ -1762,7 +1763,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             raise Exception("cannot set group method on datatable " + datatable + " continuous configuration")
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1787,7 +1788,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             raise Exception("cannot set group advanced configuration on datatable " + datatable + " continuous configuration")
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1809,7 +1810,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'switch_sample_tab', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:
@@ -1831,7 +1832,7 @@ class NaviCell:
         if not subtype:
             raise Exception("unknown datatable " + datatable)
 
-        if subtype == _NV_CONTINUOUS:
+        if subtype == _NV_CONTINUOUS or subtype == _NV_ORDERED_DISCRETE:
             return self._display_continuous_config_perform(module, 'switch_group_tab', datatable, config_type)
 
         if subtype == _NV_UNORDERED_DISCRETE:

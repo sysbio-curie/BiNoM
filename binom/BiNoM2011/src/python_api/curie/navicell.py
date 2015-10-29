@@ -647,7 +647,7 @@ class NaviCell:
             :param datatable_biotype (string): biotype of the datatable file.
             :param params (map): opening hints.
         """
-        self._cli2srv('nv_import_datatables', '', [datatable_biotype, datatable_name, '', datatable_url_or_data, params])
+        self._cli2srv('nv_import_datatables', '', [datatable_biotype, datatable_name, '', datatable_url_or_data, params], True)
         self._waitForImported()
 
     def sampleAnnotationImport(self, sample_annotation_url_or_data):
@@ -659,7 +659,7 @@ class NaviCell:
              URL or data returned from makeAnnotationData or makeAnnotationDataFromFile expected.
         """
 #        self.sampleAnnotationOpen()
-        self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data])
+        self._cli2srv('nv_sample_annotation_perform', '', ['import', sample_annotation_url_or_data], True)
         self._waitForImported()
 
     def sampleAnnotationOpen(self, module):

@@ -175,15 +175,10 @@ class BrowserLauncher:
             :param map_url (string): the URL of the NaviCell map
         """
 
-#        if not browser_command:
-#            raise Exception("browser command is not set")
         if not map_url:
             raise Exception("map url is not set")
         self.map_url = map_url
         self.browser_command = browser_command
-#        self.cmd = []
-#        for item in browser_command.split(" "):
-#            self.cmd.append(item)
 
     def launch(self, session_id, proxy_url):
         """ Launchs the browser with the given session ID.
@@ -274,8 +269,7 @@ class NaviCell:
         """
         self.proxy = Proxy(options.proxy_url, options.map_url)
 
-        if options.map_url: #and options.browser_command:
-            #self._check_urls(options.proxy_url, options.map_url)
+        if options.map_url:
             self._browser_launcher = BrowserLauncher(options.browser_command, options.map_url)
 
         self._msg_id = 1000
@@ -285,21 +279,14 @@ class NaviCell:
         self._hugo_list = []
         self._hugo_map = {}
 
+        self._async_buffer = []
+        self._async_mode = False
         self.trace = False
         self.packsize = _NV_PACKSIZE
 
     #
     # private methods
     #
-
-    # obsolete method
-    def _check_urls(self, proxy_url, map_url):
-        idx = map_url.find('/navicell/')
-        if idx < 0:
-            raise Exception('invalid map url [' + map_url + '] must contains /navicell')
-        expected_proxy_url = map_url[0:idx] + '/cgi-bin/nv_proxy.php'
-        if expected_proxy_url != proxy_url:
-            raise Exception('invalid proxy url [' + proxy_url + '], expected [' + expected_proxy_url + ']')
 
     def _message_id(self):
         self._msg_id += 1
@@ -401,13 +388,13 @@ class NaviCell:
         return True
 
     def _isReady(self, module):
-        return self._cli2srv('nv_is_ready', module, [], 'send_and_rcv')
+        return self._cli2srv('nv_is_ready', module, [], True)
 
     def _make_data(self, data):
         return "@COMMAND " + json.dumps(data)
 
     def _isImported(self):
-        return self._cli2srv('nv_is_imported', '', [], 'send_and_rcv') #nv_is_imported to be implemented in nv_api.js
+        return self._cli2srv('nv_is_imported', '', [], True) #nv_is_imported to be implemented in nv_api.js
 
     def _waitForImported(self):
         while True:
@@ -420,10 +407,20 @@ class NaviCell:
                 raise Exception(ret)
         return True
 
-    def _cli2srv(self, action, module, args, perform='send_and_rcv'):
+    def flush(self):
+        if self._async_buffer:
+            msg_id = self._message_id()
+            self._send(msg_id, {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': ' '.join(self._async_buffer)})
+            self._async_buffer = []
+
+    def _cli2srv(self, action, module, args, force_sync = False):
+        if self._async_mode:
+            if not force_sync:
+                self._async_buffer.append(self._make_data({'action': action, 'module': module, 'args' : args}))
+                return 0
+            self.flush()
         msg_id = self._message_id()
-#        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args, 'msg_id': msg_id})})
-        return self._send(msg_id, {'mode': 'cli2srv', 'perform': perform, 'data': self._make_data({'action': action, 'module': module, 'args' : args})})
+        return self._send(msg_id, {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': self._make_data({'action': action, 'module': module, 'args' : args})})
 
     def _notice_perform(self, module, action, arg1='', arg2='', arg3='', arg4='', arg5=''):
         self._cli2srv('nv_notice_perform', module, [action, arg1, arg2, arg3, arg4, arg5])
@@ -445,9 +442,6 @@ class NaviCell:
 
     def _map_staining_editor_perform(self, module, action, arg1='', arg2='', arg3=''):
         self._cli2srv('nv_map_staining_editor_perform', module, [action, arg1, arg2, arg3])
-
-#    def _datatable_config_perform(self, module, action, datatable, config_type, arg1='', arg2=''):
-#        self._cli2srv('nv_datatable_config_perform', module, [action, datatable, config_type, arg1, arg2])
 
     def _display_continuous_config_perform(self, module, action, datatable, config_type, arg1='', arg2='', arg3='', arg4='', arg5=''):
         self._cli2srv('nv_display_continuous_config_perform', module, [action, datatable, config_type, arg1, arg2, arg3, arg4, arg5])
@@ -546,6 +540,12 @@ class NaviCell:
         self.session_id = "1"
 
 ### utility data methods
+    def setASyncMode(self, async_mode):
+        self._async_mode = async_mode
+
+    def isASync(self):
+        return self._async_mode
+
     def setTrace(self, trace):
         """ For debug only. Activates / Desactivates traces according to the trace argument. """
         self.trace = trace
@@ -705,19 +705,19 @@ class NaviCell:
             :param annot (annot): annotation name
             :param select (boolean): select annotation if True, unselect otherwise
         """
-        return self._cli2srv('nv_sample_annotation_perform', module, ['select_annotation', annot, select])
+        self._cli2srv('nv_sample_annotation_perform', module, ['select_annotation', annot, select])
 
     def getDatatableList(self):
         """ Return the datatables imported in the NaviCell map. """
-        return self._cli2srv('nv_get_datatable_list', '', [], 'send_and_rcv')
+        return self._cli2srv('nv_get_datatable_list', '', [], True)
 
     def getDatatableGeneList(self):
         """ Return the list of genes of the imported datatables which have been found in the map. """
-        return self._cli2srv('nv_get_datatable_gene_list', '', [], 'send_and_rcv')
+        return self._cli2srv('nv_get_datatable_gene_list', '', [], True)
 
     def getDatatableSampleList(self):
         """ Return the list of samples of the imported datatables. """
-        return self._cli2srv('nv_get_datatable_sample_list', '', [], 'send_and_rcv')
+        return self._cli2srv('nv_get_datatable_sample_list', '', [], True)
 
 ### entity search and select
     def findEntities(self, module, pattern, hints = {}, open_bubble = False):
@@ -789,7 +789,7 @@ class NaviCell:
                         mod += ";"
                     mod += mod_list[ind]
                 pattern += " " + mod
-        return self._cli2srv('nv_find_entities', module, [pattern, open_bubble])
+        self._cli2srv('nv_find_entities', module, [pattern, open_bubble])
 
     def uncheckAllEntities(self, module):
         """ Unselect all entities in the map.
@@ -806,7 +806,7 @@ class NaviCell:
             :param module (string): module on which to apply the command; empty string for current map.
             :param entity_name (string): name of the entity to be selected
         """
-        return self._cli2srv('nv_find_entities', module, [entity_name])
+        self._cli2srv('nv_find_entities', module, [entity_name])
 
 ### navigation
     def setZoom(self, module, zoom):
@@ -1875,7 +1875,7 @@ class NaviCell:
         Args:
             :param module (string): module on which to apply the command; empty string for current map.
         """
-        return self._cli2srv('nv_get_command_history', module, [], 'send_and_rcv')
+        return self._cli2srv('nv_get_command_history', module, [], True)
 
     def executeCommands(self, module, commands):
         """ Execute a set of commands encoded in the NaviCell WS protocol. """
@@ -1904,7 +1904,7 @@ class NaviCell:
         {'name': 'CYCLINB', 'id': 'CYCLINB'},
         {'name': 'APC', 'id': 'APC'}]
         """
-        return self._cli2srv('nv_get_module_list', '', [], 'send_and_rcv')
+        return self._cli2srv('nv_get_module_list', '', [], True)
 
     def getBiotypeList(self):
         """ Return the list of biotypes understood by NaviCell Web Service.
@@ -1918,7 +1918,7 @@ class NaviCell:
         {'name': 'Mutation data', 'subtype': 'UNORDERED_DISCRETE', 'type': 'MUTATION'},
         {'name': 'Gene list', 'subtype': 'SET', 'type': 'GENELIST'}]
         """
-        return self._cli2srv('nv_get_biotype_list', '', [], 'send_and_rcv')
+        return self._cli2srv('nv_get_biotype_list', '', [], True)
 
     # TBD: getHugoList(self, module = '')
     # returns HUGO list per module if module is set
@@ -1927,7 +1927,7 @@ class NaviCell:
         """
         module = ''
         if not self._hugo_list:
-            self._hugo_list = self._cli2srv('nv_get_hugo_list', '', [], 'send_and_rcv')
+            self._hugo_list = self._cli2srv('nv_get_hugo_list', '', [], True)
             hugo_map = {}
             for hugo_name in self._hugo_list:
                 hugo_map[hugo_name] = True

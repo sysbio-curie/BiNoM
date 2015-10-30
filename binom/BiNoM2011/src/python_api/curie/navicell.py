@@ -281,6 +281,7 @@ class NaviCell:
 
         self._async_buffer = []
         self._async_mode = False
+        self._async_module = None
         self.trace = False
         self.packsize = _NV_PACKSIZE
 
@@ -410,11 +411,16 @@ class NaviCell:
     def flush(self):
         if self._async_buffer:
             msg_id = self._message_id()
-            self._send(msg_id, {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': ' '.join(self._async_buffer)})
+            async_buffer = self._async_buffer
             self._async_buffer = []
+            self._async_module = None
+            self._send(msg_id, {'mode': 'cli2srv', 'perform': 'send_and_rcv', 'data': ' '.join(async_buffer)})
 
     def _cli2srv(self, action, module, args, force_sync = False):
         if self._async_mode:
+            if self._async_module != None and module != self._async_module:
+                self.flush()
+            self._async_module = module
             if not force_sync:
                 self._async_buffer.append(self._make_data({'action': action, 'module': module, 'args' : args}))
                 return 0

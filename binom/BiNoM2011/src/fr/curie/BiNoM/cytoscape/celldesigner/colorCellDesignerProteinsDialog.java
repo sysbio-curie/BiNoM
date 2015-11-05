@@ -81,6 +81,10 @@ public class colorCellDesignerProteinsDialog extends JFrame {
     private JButton browseAccNum = null;
     private JTextField indexField = null;
     private JButton browseIndex = null;
+    private JLabel minLabel = null;
+    private JTextField minTextField = null; 
+    private JLabel maxLabel = null;
+    private JTextField maxTextField = null; 
     
 
     private static final double COEF_X = 4, COEF_Y = 1.10;
@@ -210,6 +214,48 @@ public class colorCellDesignerProteinsDialog extends JFrame {
 	c.weightx = 0;
 	panel.add(browseAccNum,c);
 
+	y++;
+	x=0;
+	minLabel = new JLabel("Min");
+	c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.EAST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(minLabel,c);
+
+	x++;
+	minTextField = new JTextField(30);
+	c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y;
+	//c.anchor = GridBagConstraints.HORIZONTAL;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 0;
+	panel.add(minTextField,c);
+
+	y++;
+	x=0;
+	maxLabel = new JLabel("Max");
+	c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y;
+	c.anchor = GridBagConstraints.EAST;
+	c.fill = GridBagConstraints.NONE;
+	c.weightx = 0;
+	panel.add(maxLabel,c);
+
+	x++;
+	maxTextField = new JTextField(30);
+	c = new GridBagConstraints();
+	c.gridx = x;
+	c.gridy = y;
+	//c.anchor = GridBagConstraints.HORIZONTAL;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.weightx = 0;
+	panel.add(maxTextField,c);
+	
 	padPanel = new JPanel();
 	c = new GridBagConstraints();
 	c.ipadx = 5;
@@ -249,15 +295,19 @@ public class colorCellDesignerProteinsDialog extends JFrame {
 
 	okB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            setVisible(false);
-            colorCellDesignerProteinsTask task = null;
-            if(!accNumField.getText().equals(""))
-            	task = new colorCellDesignerProteinsTask(indexField.getText(),accNumField.getText());
-            else
-            	task = new colorCellDesignerProteinsTask(indexField.getText(),null);
-  		    fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
-                }
-           });
+			setVisible(false);
+			colorCellDesignerProteinsTask task = null;
+			if(!accNumField.getText().equals(""))
+				task = new colorCellDesignerProteinsTask(indexField.getText(),accNumField.getText());
+			else
+				task = new colorCellDesignerProteinsTask(indexField.getText(),null);
+			
+			task.minValue = minTextField.getText();
+			task.maxValue = maxTextField.getText();
+			
+			fr.curie.BiNoM.cytoscape.lib.TaskManager.executeTask(task);
+		}
+	});
 
 	cancelB = new JButton("Cancel");
 
@@ -290,7 +340,7 @@ public class colorCellDesignerProteinsDialog extends JFrame {
 	this.biopax = biopax;
 
 	Dimension size = getSize();
-	setSize(new Dimension(550, 200));
+	setSize(new Dimension(550, 250));
 
 	setLocation((screenSize.width - getSize().width) / 2,
                     (screenSize.height - getSize().height) / 2);

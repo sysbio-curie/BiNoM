@@ -41,6 +41,8 @@ public class colorCellDesignerProteinsTask implements Task {
     private TaskMonitor taskMonitor;
     private String FeatureTableFileName = null;
     private String CellDesignerFileName = null;
+    public String minValue;
+    public String maxValue;
 
     public colorCellDesignerProteinsTask(String cellDesignerFileName, String featureTableFileName){
     	FeatureTableFileName = featureTableFileName;
@@ -55,9 +57,9 @@ public class colorCellDesignerProteinsTask implements Task {
     			ft = new File(FeatureTableFileName);
     		if(fc.exists()){
     			if(ft!=null)
-    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),ft.getAbsolutePath());
+    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),ft.getAbsolutePath(), minValue, maxValue);
     			else
-    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),null);
+    				CellDesignerColorProteins.colorProteins(fc.getAbsolutePath(),null, minValue, maxValue);
     		}else{
     			System.out.println("ERROR: File "+CellDesignerFileName+" does not exist.");
         	    taskMonitor.setPercentCompleted(99);

@@ -107,7 +107,9 @@ public class CellDesignerToGeneSpringConverter {
 
 	public static void main(String[] args) {
 
-		String fn = "/Users/eric/wk/genespring_integration/cell_cycle/cellcycle_master.xml";
+		//String fn = "/Users/eric/wk/genespring_integration/cell_cycle/cellcycle_master.xml";
+		//String fn = "/Users/eric/maps/cellcycle_master.xml";
+		String fn = "/Users/eric/maps/apoptosis_master.xml";
 
 		CellDesignerToGeneSpringConverter c2b = new CellDesignerToGeneSpringConverter();
 		c2b.convert(fn);
@@ -213,12 +215,15 @@ public class CellDesignerToGeneSpringConverter {
 				String cdClass = Utils.getValue(spe.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass());
 				String speciesName = cleanString(Utils.getValue(spe.getName()));
 				CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si = spe.getAnnotation().getCelldesignerSpeciesIdentity();
-				
+
 				//System.out.println("simple_alias::"+cdClass+"::"+spa_id+"::"+speciesName+" "+x1+" "+y1+" "+x2+" "+y2);
 
 				Alias al = new Alias();
 				al.alias_id = spa_id;
-				al.species_name = speciesName;
+				if (speciesName != "")
+					al.species_name = speciesName;
+				else
+					al.species_name = species_id;
 				al.x1 = x1;
 				al.y1 = y1;
 				al.x2 = x2;
@@ -245,7 +250,7 @@ public class CellDesignerToGeneSpringConverter {
 
 				aliasList.add(al);
 			}
-	
+
 		}
 	}
 
@@ -261,13 +266,13 @@ public class CellDesignerToGeneSpringConverter {
 			int height = (int) Math.round(Float.parseFloat(cspa.getCelldesignerBounds().getH()));
 			int x2  = x1 + width;
 			int y2 = y1 + height;
-			
+
 			String cspa_species_id = cspa.getSpecies();
 
 			SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(cspa.getSpecies());
 			String entname = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),sbml);
 			String label =  CellDesignerToCytoscapeConverter.getSpeciesName(sp.getAnnotation().getCelldesignerSpeciesIdentity(), sp.getId(), entname, sp.getCompartment(), true, true, "", sbml); //spa.getSpecies();
-			
+
 			Alias al = new Alias();
 			al.alias_id = cspa_id;
 			al.species_name = label;
@@ -275,249 +280,251 @@ public class CellDesignerToGeneSpringConverter {
 			al.y1 = y1;
 			al.x2 = x2;
 			al.y2 = y2;
-			
+
 			// get list of species included in the complex and build hugo list from species
 			HashSet<String> hg = new HashSet<String>(); 
 			Vector<CelldesignerSpeciesDocument.CelldesignerSpecies> vis = CellDesignerToCytoscapeConverter.complexSpeciesMap.get(cspa_species_id);
-			for (CelldesignerSpeciesDocument.CelldesignerSpecies ispc: vis) {
-				//System.out.println("complex_aliases::"+cspa_id + "::" + label + "::" + entname + "::"+ispc.getId() + " " + Utils.getValue(ispc.getName())+" "+x1+" "+y1+" "+x2+" "+y2);
-				CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si = ispc.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();	
-				String speciesName = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,ispc.getId(),true,true);
-				speciesName = cleanString(speciesName);
-				String cdClass = Utils.getValue(si.getCelldesignerClass());
-				
-				String referenceId = null;
-				if (cdClass.equals("PROTEIN")) {
-					referenceId = Utils.getValue(si.getCelldesignerProteinReference());
-				}
-				else if (cdClass.equals("GENE")) {
-					referenceId = Utils.getValue(si.getCelldesignerGeneReference());
-				}
-				else if (cdClass.equals("RNA")) {
-					referenceId = Utils.getValue(si.getCelldesignerRnaReference());
-				}
-				else if (cdClass.equals("ANTISENSE_RNA")) {
-					referenceId = Utils.getValue(si.getCelldesignerAntisensernaReference());
-				}
+			if (vis != null) {
+				for (CelldesignerSpeciesDocument.CelldesignerSpecies ispc: vis) {
+					//System.out.println("complex_aliases::"+cspa_id + "::" + label + "::" + entname + "::"+ispc.getId() + " " + Utils.getValue(ispc.getName())+" "+x1+" "+y1+" "+x2+" "+y2);
+					CelldesignerSpeciesIdentityDocument.CelldesignerSpeciesIdentity si = ispc.getCelldesignerAnnotation().getCelldesignerSpeciesIdentity();	
+					String speciesName = CellDesignerToCytoscapeConverter.convertSpeciesToName(sbml,ispc.getId(),true,true);
+					speciesName = cleanString(speciesName);
+					String cdClass = Utils.getValue(si.getCelldesignerClass());
 
-				if (referenceId != null && entityReferences.get(referenceId) != null) {
-					for (String h : entityReferences.get(referenceId)) {
-						hg.add(h);
+					String referenceId = null;
+					if (cdClass.equals("PROTEIN")) {
+						referenceId = Utils.getValue(si.getCelldesignerProteinReference());
+					}
+					else if (cdClass.equals("GENE")) {
+						referenceId = Utils.getValue(si.getCelldesignerGeneReference());
+					}
+					else if (cdClass.equals("RNA")) {
+						referenceId = Utils.getValue(si.getCelldesignerRnaReference());
+					}
+					else if (cdClass.equals("ANTISENSE_RNA")) {
+						referenceId = Utils.getValue(si.getCelldesignerAntisensernaReference());
+					}
+
+					if (referenceId != null && entityReferences.get(referenceId) != null) {
+						for (String h : entityReferences.get(referenceId)) {
+							hg.add(h);
+						}
 					}
 				}
-			}
-			al.hugo_list = hg;
-			aliasList.add(al);
-		}
-	}
-
-
-
-/**
- * Fill the map of CellDesigner species.
- */
-private void getSpecies(){
-	for (int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++) {
-		SpeciesDocument.Species s = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
-		species.put(s.getId(), s);
-	}
-}
-
-/**
- * Fill the map of CellDesigner included species.
- */
-private void getIncludedSpecies(){
-	if (sbml.getSbml().getModel().getAnnotation() != null) {
-		if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies() != null) {
-			for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
-				CelldesignerSpeciesDocument.CelldesignerSpecies s = 
-						sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
-				includedSpecies.put(s.getId(), s);
-			}
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner reactions and create pathway objects.
- */
-private void getReactions(){
-	if (sbml.getSbml().getModel().getListOfReactions() != null) {
-		for (int i=0; i<sbml.getSbml().getModel().getListOfReactions().getReactionArray().length; i++) {
-			ReactionDocument.Reaction r = sbml.getSbml().getModel().getListOfReactions().getReactionArray(i);
-			reactions.put(r.getId(),r);
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner complexes.
- */
-private void getComplexes() {
-	if (sbml.getSbml().getModel().getAnnotation()!=null)if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) {
-		for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++) {
-			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias c = 
-					sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().
-					getCelldesignerComplexSpeciesAliasArray(i);
-			complexes.put(c.getId(), c);
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner proteins. 
- */
-private void getProteins() {
-	if (sbml.getSbml().getModel().getAnnotation()!=null) {
-		if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins() != null) {
-			for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray().length;i++) {
-				CelldesignerProteinDocument.CelldesignerProtein prot = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
-				proteins.put(prot.getId(), prot);
-			}
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner genes.
- */
-private void getGenes() {
-	if (sbml.getSbml().getModel().getAnnotation() != null) {
-		if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes() != null) {
-			for (int i=0;i<sbml.getSbml().getModel().getAnnotation().
-					getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++) {
-				CelldesignerGeneDocument.CelldesignerGene gene = sbml.getSbml().getModel().
-						getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
-				genes.put(gene.getId(), gene);
-			}
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner rnas.
- */
-private void getRNAs() {
-	if (sbml.getSbml().getModel().getAnnotation() != null) {
-		if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs() != null) {
-			for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().
-					sizeOfCelldesignerRNAArray();i++) {
-				CelldesignerRNADocument.CelldesignerRNA rna = 
-						sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
-				rnas.put(rna.getId(), rna);
-			}
-		}
-	}
-}
-
-/**
- * Fill the map of CellDesigner antisense RNAs.
- */
-private void getAntisenseRNAs() {
-	if (sbml.getSbml().getModel().getAnnotation() != null) {
-		if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs() != null) {
-			for (int i=0;i<sbml.getSbml().getModel().getAnnotation().
-					getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++) {
-				CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asrna = 
-						sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
-				asrnas.put(asrna.getId(), asrna);
-			}
-		}
-	}
-}
-
-
-/**
- * Eliminates spaces, stars, dashes from the string 
- */
-private String cleanString(String s){
-	s = Utils.replaceString(s, "@", "_at_");
-	s = Utils.replaceString(s, ":", "_");
-	s = Utils.replaceString(s, "|", "_");
-	char c[] = s.toCharArray();
-	for(int i=0;i<c.length;i++){
-		if((c[i]>='a')&&(c[i]<='z')) continue;
-		if((c[i]>='A')&&(c[i]<='Z')) continue;
-		if((c[i]>='0')&&(c[i]<='9')) continue;
-		if(c[i]=='_') continue;
-		c[i] = '_';
-	}
-	// string starting with numbers not allowed
-	s = new String(c);
-	if((c[0]>='0')&&(c[0]<='9'))
-		s = "id_"+s;
-	// remove any trailing underscore character(s)
-	while (s.endsWith("_") == true)
-		s = s.substring(0, s.length()-1); 
-	return s;
-}
-
-
-private void buildEntityReferences() {
-
-	for (String id : proteins.keySet()) {
-		CelldesignerProteinDocument.CelldesignerProtein prot = proteins.get(id);
-		//String protName = cleanString(prot.getName().getStringValue());
-
-		if (prot.getCelldesignerNotes() != null) {
-			String notes = Utils.getValue(prot.getCelldesignerNotes()).trim();
-			extractHUGOReferences(notes, id);
-		}
-	}
-
-	for (String id : genes.keySet()) {
-		CelldesignerGeneDocument.CelldesignerGene gene = genes.get(id);
-		//String geneName = cleanString(gene.getName());
-
-		if (gene.getCelldesignerNotes() != null) {
-			String notes = Utils.getValue(gene.getCelldesignerNotes()).trim();
-			extractHUGOReferences(notes, id);
-		}
-	}
-
-	for (String id : rnas.keySet()) {
-		CelldesignerRNADocument.CelldesignerRNA rna = rnas.get(id);
-		//String rnaName = cleanString(rna.getName());
-
-		if (rna.getCelldesignerNotes() != null) {
-			String notes = Utils.getValue(rna.getCelldesignerNotes()).trim();
-			extractHUGOReferences(notes, id);
-		}
-	}
-
-	for (String id : asrnas.keySet()) {
-		CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA arna = asrnas.get(id);
-		//String arnaName = cleanString(arna.getName());
-
-		// add publications and HUGO gene names
-		if (arna.getCelldesignerNotes() != null) {
-			String notes = Utils.getValue(arna.getCelldesignerNotes()).trim();
-			extractHUGOReferences(notes, id);
-		}
-	}
-}
-
-private void extractHUGOReferences(String comment, String id) {
-
-	StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
-	HashSet<String> hugo_list = new HashSet<String>();
-	while (st.hasMoreTokens()){
-		String ss = st.nextToken();
-		if (ss.toLowerCase().equals("hugo")) {
-			if(st.hasMoreTokens()) {
-				String hugo_id = st.nextToken();
-				hugo_list.add(hugo_id);
+				al.hugo_list = hg;
+				aliasList.add(al);
 			}
 		}
 	}
 
-	for (String hugo_id : hugo_list) {
-		if (entityReferences.get(id) == null)
-			entityReferences.put(id, new HashSet<String>());
 
-		entityReferences.get(id).add(hugo_id);
+
+	/**
+	 * Fill the map of CellDesigner species.
+	 */
+	private void getSpecies(){
+		for (int i=0;i<sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray().length;i++) {
+			SpeciesDocument.Species s = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
+			species.put(s.getId(), s);
+		}
 	}
-}
+
+	/**
+	 * Fill the map of CellDesigner included species.
+	 */
+	private void getIncludedSpecies(){
+		if (sbml.getSbml().getModel().getAnnotation() != null) {
+			if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies() != null) {
+				for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
+					CelldesignerSpeciesDocument.CelldesignerSpecies s = 
+							sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
+					includedSpecies.put(s.getId(), s);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner reactions and create pathway objects.
+	 */
+	private void getReactions(){
+		if (sbml.getSbml().getModel().getListOfReactions() != null) {
+			for (int i=0; i<sbml.getSbml().getModel().getListOfReactions().getReactionArray().length; i++) {
+				ReactionDocument.Reaction r = sbml.getSbml().getModel().getListOfReactions().getReactionArray(i);
+				reactions.put(r.getId(),r);
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner complexes.
+	 */
+	private void getComplexes() {
+		if (sbml.getSbml().getModel().getAnnotation()!=null)if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null) {
+			for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray().length;i++) {
+				CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias c = 
+						sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().
+						getCelldesignerComplexSpeciesAliasArray(i);
+				complexes.put(c.getId(), c);
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner proteins. 
+	 */
+	private void getProteins() {
+		if (sbml.getSbml().getModel().getAnnotation()!=null) {
+			if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins() != null) {
+				for (int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray().length;i++) {
+					CelldesignerProteinDocument.CelldesignerProtein prot = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
+					proteins.put(prot.getId(), prot);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner genes.
+	 */
+	private void getGenes() {
+		if (sbml.getSbml().getModel().getAnnotation() != null) {
+			if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfGenes() != null) {
+				for (int i=0;i<sbml.getSbml().getModel().getAnnotation().
+						getCelldesignerListOfGenes().sizeOfCelldesignerGeneArray();i++) {
+					CelldesignerGeneDocument.CelldesignerGene gene = sbml.getSbml().getModel().
+							getAnnotation().getCelldesignerListOfGenes().getCelldesignerGeneArray(i);
+					genes.put(gene.getId(), gene);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner rnas.
+	 */
+	private void getRNAs() {
+		if (sbml.getSbml().getModel().getAnnotation() != null) {
+			if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs() != null) {
+				for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().
+						sizeOfCelldesignerRNAArray();i++) {
+					CelldesignerRNADocument.CelldesignerRNA rna = 
+							sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfRNAs().getCelldesignerRNAArray(i);
+					rnas.put(rna.getId(), rna);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fill the map of CellDesigner antisense RNAs.
+	 */
+	private void getAntisenseRNAs() {
+		if (sbml.getSbml().getModel().getAnnotation() != null) {
+			if (sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs() != null) {
+				for (int i=0;i<sbml.getSbml().getModel().getAnnotation().
+						getCelldesignerListOfAntisenseRNAs().sizeOfCelldesignerAntisenseRNAArray();i++) {
+					CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA asrna = 
+							sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfAntisenseRNAs().getCelldesignerAntisenseRNAArray(i);
+					asrnas.put(asrna.getId(), asrna);
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Eliminates spaces, stars, dashes from the string 
+	 */
+	private String cleanString(String s){
+		s = Utils.replaceString(s, "@", "_at_");
+		s = Utils.replaceString(s, ":", "_");
+		s = Utils.replaceString(s, "|", "_");
+		char c[] = s.toCharArray();
+		for(int i=0;i<c.length;i++){
+			if((c[i]>='a')&&(c[i]<='z')) continue;
+			if((c[i]>='A')&&(c[i]<='Z')) continue;
+			if((c[i]>='0')&&(c[i]<='9')) continue;
+			if(c[i]=='_') continue;
+			c[i] = '_';
+		}
+		// string starting with numbers not allowed
+		s = new String(c);
+		if((c[0]>='0')&&(c[0]<='9'))
+			s = "id_"+s;
+		// remove any trailing underscore character(s)
+		while (s.endsWith("_") == true)
+			s = s.substring(0, s.length()-1); 
+		return s;
+	}
+
+
+	private void buildEntityReferences() {
+
+		for (String id : proteins.keySet()) {
+			CelldesignerProteinDocument.CelldesignerProtein prot = proteins.get(id);
+			//String protName = cleanString(prot.getName().getStringValue());
+
+			if (prot.getCelldesignerNotes() != null) {
+				String notes = Utils.getValue(prot.getCelldesignerNotes()).trim();
+				extractHUGOReferences(notes, id);
+			}
+		}
+
+		for (String id : genes.keySet()) {
+			CelldesignerGeneDocument.CelldesignerGene gene = genes.get(id);
+			//String geneName = cleanString(gene.getName());
+
+			if (gene.getCelldesignerNotes() != null) {
+				String notes = Utils.getValue(gene.getCelldesignerNotes()).trim();
+				extractHUGOReferences(notes, id);
+			}
+		}
+
+		for (String id : rnas.keySet()) {
+			CelldesignerRNADocument.CelldesignerRNA rna = rnas.get(id);
+			//String rnaName = cleanString(rna.getName());
+
+			if (rna.getCelldesignerNotes() != null) {
+				String notes = Utils.getValue(rna.getCelldesignerNotes()).trim();
+				extractHUGOReferences(notes, id);
+			}
+		}
+
+		for (String id : asrnas.keySet()) {
+			CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA arna = asrnas.get(id);
+			//String arnaName = cleanString(arna.getName());
+
+			// add HUGO gene names
+			if (arna.getCelldesignerNotes() != null) {
+				String notes = Utils.getValue(arna.getCelldesignerNotes()).trim();
+				extractHUGOReferences(notes, id);
+			}
+		}
+	}
+
+	private void extractHUGOReferences(String comment, String id) {
+
+		StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
+		HashSet<String> hugo_list = new HashSet<String>();
+		while (st.hasMoreTokens()){
+			String ss = st.nextToken();
+			if (ss.toLowerCase().equals("hugo")) {
+				if(st.hasMoreTokens()) {
+					String hugo_id = st.nextToken();
+					hugo_list.add(hugo_id);
+				}
+			}
+		}
+
+		for (String hugo_id : hugo_list) {
+			if (entityReferences.get(id) == null)
+				entityReferences.put(id, new HashSet<String>());
+
+			entityReferences.get(id).add(hugo_id);
+		}
+	}
 
 
 }

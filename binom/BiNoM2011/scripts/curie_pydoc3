@@ -4,6 +4,11 @@
 #
 # Eric Viara, Institut Curie, 29 December 2014
 #
+# usage:
+# cd src/python_api
+# sh ../../scripts/curie_pydoc3 curie.navicell
+# => wrote curie.navicell.html
+#
 
 if [ $# != 1 ]; then
    echo "usage: $0 PYTHON_MODULE"

@@ -22,7 +22,7 @@ sh make_factory_package.sh /scratch/NAVICELL_PUB
 list of created directories:
 /scratch/NAVICELL_PUB/navicell/factory
 /scratch/NAVICELL_PUB/navicell/factory/examples
-/scratch/NAVICELL_PUB/navicell/factory/examples/rbe2f_src
+/scratch/NAVICELL_PUB/navicell/factory/examples/cellcycle_src
 /scratch/NAVICELL_PUB/navicell/factory/lib
 /scratch/NAVICELL_PUB/navicell/factory/data
 /scratch/NAVICELL_PUB/navicell/factory/scripts
@@ -34,7 +34,7 @@ sh make_site_package.sh /scratch/NAVICELL_PUB
 Notice:
   At this step, we can:
   a. build a cellcyle map
-  b. manipulate rbe2f with navicell using the file:// protocol
+  b. manipulate cellcycle with navicell using the file:// protocol
 
 3. building binding package
 

@@ -23,7 +23,7 @@ mydir=$(pwd)
 
 set -e 
 
-map_example=rbe2f
+map_example=cellcycle
 
 mkdir -p $topdir
 mkdir $topdir/lib

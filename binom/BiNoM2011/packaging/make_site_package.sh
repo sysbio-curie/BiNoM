@@ -12,7 +12,8 @@ if [ $# != 1 ]; then echo "usage: $0 TARGET_DIR"; exit 1; fi
 echo $1 | grep "^/" > /dev/null
 if [ $? != 0 ]; then echo "$0: TARGET_DIR must be an absolute path"; exit 1; fi
 
-topdir=$1/navicell/site
+target_dir=$1
+topdir=${target_dir}/navicell/site
 
 if [ -d $topdir ]; then echo "$0: TARGET_DIR $topdir already exists"; exit 1; fi
 
@@ -52,6 +53,13 @@ cp ../src/analysis_cgi/gene_enrichment/* $cgibinroot/
 cp ../src/phplib/nv_proxy.php $cgibinroot/
 rm -f $cgibinroot/*~
 
-#
-#(cd $nv_topdir/maps; tar xfz $mydir/cellcycle_demo.tgz)
+package=site
 
+cd ${target_dir}
+
+tar cfz navicell_${package}.tgz navicell/${package}
+
+rm -rf ${target_dir}/navicell
+
+echo
+echo "tar file is $(pwd)/navicell_${package}.tgz"

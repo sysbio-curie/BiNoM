@@ -12,7 +12,8 @@ if [ $# != 1 ]; then echo "usage: $0 TARGET_DIR"; exit 1; fi
 echo $1 | grep "^/" > /dev/null
 if [ $? != 0 ]; then echo "$0: TARGET_DIR must be an absolute path"; exit 1; fi
 
-topdir=$1/navicell/factory
+target_dir=$1
+topdir=${target_dir}/navicell/factory
 
 export topdir
 
@@ -49,3 +50,13 @@ cp ../scripts/run_factory.sh $topdir/scripts/
 cp build_cellcycle_map.sh $topdir/examples/
 cp cellcycle_xrefs.txt $topdir/examples/
 
+package=factory
+
+cd ${target_dir}
+
+tar cfz navicell_${package}.tgz navicell/${package}
+
+rm -rf ${target_dir}/navicell
+
+echo
+echo "tar file is $(pwd)/navicell_${package}.tgz"

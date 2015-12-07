@@ -12,7 +12,8 @@ if [ $# != 1 ]; then echo "usage: $0 TARGET_DIR"; exit 1; fi
 echo $1 | grep "^/" > /dev/null
 if [ $? != 0 ]; then echo "$0: TARGET_DIR must be an absolute path"; exit 1; fi
 
-topdir=$1/navicell/bindings
+target_dir=$1
+topdir=${target_dir}/navicell/bindings
 
 if [ -d $topdir ]; then echo "$0: TARGET_DIR $topdir already exists"; exit 1; fi
 
@@ -38,3 +39,13 @@ do
     echo | rm -r $topdir/$pack/.git
 done
 
+package=bindings
+
+cd ${target_dir}
+
+tar cfz navicell_${package}.tgz navicell/${package}
+
+rm -rf ${target_dir}/navicell
+
+echo
+echo "tar file is $(pwd)/navicell_${package}.tgz"

@@ -2,8 +2,14 @@
 Building packages
 -----------------
 
+Requirements
+- must be on a unix computer
+- needs Java 1.6 or later
+- needs svn
+
 cd workspace/BiNoM2011
-svn update # or co 
+svn update # or svn co svn+ssh://svn.curie.fr/U900/research/software-dvt/binom/trunk/binom/BiNoM2011
+
 
 cd packaging
 

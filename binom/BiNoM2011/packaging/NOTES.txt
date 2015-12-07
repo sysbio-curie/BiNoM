@@ -1,0 +1,49 @@
+
+package:
+
+$TARGET/navicell/factory/
+  lib/
+  data/
+  scripts/
+  examples/ # to produce maps 
+
+$TARGET/navicell/site/
+   html/demo
+   html/data # dont need to be on web site
+   html/maps/cellcycle_light
+   html/navicell/lib
+   html/navicell/map_icons
+
+   # following directories can be see later
+   html/navicell/doc
+   cgi-bin/
+
+   html/navicell/images # don't seem to be useful
+
+$TARGET/navicell/bindings/
+   python/
+   R/      # see with EB
+   java/   # see with EB
+
+rest_api generation:
+pwd
+/bioinfo/users/eviara/workspace/BiNoM2011/src/python_api
+ sh ../../scripts/curie_pydoc3 curie.navicell
+
+navicell_demo/demo -> html/demo
+src/data -> html/data
+html/maps -> ...
+
+cd scripts
+NOEXT=1 sh build_navicell_lib.sh /tmp/t.tgz 
+cd $TARGET/navicell/site/html/navicell
+tar xvfz /tmp/t.tgz
+
+gene enrichment
+src/analysis_cgi/gene_enrichment/ -> cgi-bin/
+
+making the demo:
+pwd
+/bioinfo/projects_prod/acsn/5_ACSN_Assembly
+tar chvfz ~/workspace/BiNoM2011/packaging/cellcycle_demo.tgz cellcycle_light
+=> NO, bad way to build this tar

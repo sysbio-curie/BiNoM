@@ -23,12 +23,14 @@ mydir=$(pwd)
 
 set -e 
 
+map_example=rbe2f
+
 mkdir -p $topdir
 mkdir $topdir/lib
 mkdir $topdir/data
 mkdir $topdir/scripts
 mkdir $topdir/examples
-mkdir $topdir/examples/cellcycle_src
+mkdir $topdir/examples/${map_example}_src
 
 (
   cd ..
@@ -43,12 +45,12 @@ mkdir $topdir/examples/cellcycle_src
 
 (
   cd $topdir/examples
-  tar xfz $mydir/cellcycle_src.tgz
+  tar xfz $mydir/${map_example}_src.tgz
 )
 
 cp ../scripts/run_factory.sh $topdir/scripts/
-cp build_cellcycle_map.sh $topdir/examples/
-cp cellcycle_xrefs.txt $topdir/examples/
+cp build_${map_example}_map.sh $topdir/examples/
+cp ${map_example}_xrefs.txt $topdir/examples/
 
 package=factory
 

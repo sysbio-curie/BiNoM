@@ -10,7 +10,6 @@ Requirements
 cd workspace/BiNoM2011
 svn update # or svn co svn+ssh://svn.curie.fr/U900/research/software-dvt/binom/trunk/binom/BiNoM2011
 
-
 cd packaging
 
 Let /scratch/NAVICELL_PUB being the target directory:

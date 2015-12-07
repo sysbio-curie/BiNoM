@@ -39,13 +39,3 @@ do
     echo | rm -r $topdir/$pack/.git
 done
 
-package=bindings
-
-cd ${target_dir}
-
-tar cfz navicell_${package}.tgz navicell/${package}
-
-rm -rf ${target_dir}/navicell
-
-echo
-echo "tar file is $(pwd)/navicell_${package}.tgz"

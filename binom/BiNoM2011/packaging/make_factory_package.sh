@@ -52,13 +52,3 @@ cp ../scripts/run_factory.sh $topdir/scripts/
 cp build_${map_example}_map.sh $topdir/examples/
 cp ${map_example}_xrefs.txt $topdir/examples/
 
-package=factory
-
-cd ${target_dir}
-
-tar cfz navicell_${package}.tgz navicell/${package}
-
-rm -rf ${target_dir}/navicell
-
-echo
-echo "tar file is $(pwd)/navicell_${package}.tgz"

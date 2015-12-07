@@ -1,0 +1,41 @@
+
+
+# Web site installation
+# 
+#
+# navicell download directory
+NAVICELL_PUB=/scratch/NAVICELL_PUB
+
+cd $NAVICELL_PUB/navicell/factory/examples
+sh build_cellcycle_map.sh ../../site/docroot/navicell/maps
+
+MIND: google chrome must be launched with this option
+google-chrome --allow-file-access-from-files
+
+# the document root of you web site
+WEBSITE_DOCROOT=/bioinfo/users/eviara/public_html
+# the cgi-bin of you web site
+WEBSITE_CGI_BIN=/bioinfo/users/eviara/public_html/cgi-bin
+# the top URL of your website
+WEBSITE_URL="http://localhost/~eviara"
+
+cp -r ${NAVICELL_PUB}/navicell/site/docroot/* $WEBSITE_DOCROOT/
+cp ${NAVICELL_PUB}/navicell/site/cgi-bin/* $WEBSITE_CGI_BIN/
+=> NOTICE: needs PHP mode in apache
+
+=> MIND: must change rights as follows:
+find $WEBSITE_DOCROOT/navicell $WEBSITE_DOCROOT/data -type d | xargs chmod a+rx
+find $WEBSITE_DOCROOT/navicell $WEBSITE_DOCROOT/data \! -type d | xargs chmod a+r
+find $WEBSITE_CGI_BIN | xargs chmod a+rx
+
+cellcycle: URL
+CELLCYCLE_URL="${WEBSITE_URL}/navicell/maps/cellcycle/master/index.php?demo=on"
+echo $CELLCYCLE_URL
+
+Python binding
+--------------
+
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+export NV_PROXY_URL=${WEBSITE_URL}/cgi-bin/nv_proxy.php
+
+$NAVICELL_PUB/navicell/bindings/python/nvpy --map-url "${CELLCYCLE_URL}&" --launch-browser

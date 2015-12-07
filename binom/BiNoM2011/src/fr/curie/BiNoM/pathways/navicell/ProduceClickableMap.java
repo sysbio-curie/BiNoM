@@ -87,7 +87,7 @@ import fr.curie.BiNoM.pathways.utils.voronoicell.GenerateVoronoiCellsForMap;
 
 public class ProduceClickableMap
 {
-	private static boolean NV2 = false;
+	private static boolean NV2 = true;
 	private static boolean DEMO = false;
 	private static int demo_display_cnt = 0;
 	private static boolean USE_JXTREE = true;
@@ -516,7 +516,7 @@ public class ProduceClickableMap
 		boolean make_tiles = true;
 		boolean only_tiles = false;
 		boolean provide_sources = false;
-		boolean nv2 = false;
+		boolean nv2 = true;
 		boolean demo = false;
 
 		String project_name = null;
@@ -5534,8 +5534,18 @@ public class ProduceClickableMap
 
 		out.println("  navicell.isAtlas = " + (atlasInfo != null && atlasInfo.isAtlas()) + ";");
 		if (is_php) {
-			out.println("  navicell.id = '<?php echo $_GET[\"id\"] ?>';");
-			out.println("  navicell.proxy_url = '<?php echo $_GET[\"proxy_url\"] ?>';");
+			out.println("  <?php");
+			out.println("  function get_url_var($param) {");
+			out.println("    if (isset($_GET[$param])) {");
+			out.println("      return $_GET[$param];");
+			out.println("    }");
+			out.println("    if (isset($_POST[$param])) {");
+			out.println("      return $_POST[$param];");
+			out.println("    }");
+			out.println("    return \"\";");
+			out.println("  }\n  ?>");
+			out.println("  navicell.id = '<?= get_url_var(\"id\") ?>';");
+			out.println("  navicell.proxy_url = '<?= get_url_var(\"proxy_url\") ?>';");
 		}
 		out.println("  $(document).ready(function() {");
 		
@@ -5598,22 +5608,19 @@ public class ProduceClickableMap
 			out.println("    map_staining_editor_set_editing(true, undefined, window.document.navicell_module_name);");
 			out.println("    overlay_init(map);");
 			if (is_php) {
-				out.println("    var demo = '<?php echo $_GET[\"demo\"]; ?>';");
+				out.println("    var demo = '<?= get_url_var(\"demo\"); ?>';");
 				out.println("    if (demo != '') {");
 				out.println("      $('#demo').css('display', 'block');");
 				out.println("      if (demo != 'on' && demo != 'default') {");
 				out.println("        nv_demo_file = demo;");
 				out.println("      }");
 				out.println("    }");
-				out.println("    var command = '<?php echo $_POST[\"command\"]; ?>';");
-				out.println("    if (!command) {");
-				out.println("      command = '<?php echo $_GET[\"command\"]; ?>';");
-				out.println("    }");
+				out.println("    var command = '<?= get_url_var(\"command\"); ?>';");
 				out.println("    console.log(\"COMMAND [\" + command + \"]\");");
 				out.println("    if (command) {");
 				out.println("      nv_decode(command);");
 				out.println("    }");
-				out.println("    var mode = '<?php echo $_GET[\"mode\"]; ?>';");
+				out.println("    var mode = '<?= get_url_var(\"mode\"); ?>';");
 				out.println("    if (navicell.id || mode == \"server\") {");
 				out.println("      nv_server(window, navicell.id, navicell.proxy_url);");
 				out.println("    }");
@@ -5774,6 +5781,7 @@ public class ProduceClickableMap
 		}
 		catch (Exception e1)
 		{
+			e1.printStackTrace();
 			System.err.println(e1.getMessage());
 			System.exit(1);
 			return null;

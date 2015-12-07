@@ -297,7 +297,7 @@ Args:<br>
 
 <dl><dt><a name="NaviCell-datatableConfigSetCondAt"><strong>datatableConfigSetCondAt</strong></a>(self, module, datatable, config_type, tabname, idx, cond)</dt><dd><tt>Set&nbsp;condition&nbsp;at&nbsp;a&nbsp;specified&nbsp;index&nbsp;in&nbsp;the&nbsp;datatable&nbsp;configuration&nbsp;dialog&nbsp;for&nbsp;the&nbsp;given&nbsp;type.<br>
 &nbsp;<br>
-Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable&nbsp;(string):&nbsp;datatable&nbsp;name<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;config_type&nbsp;(string):&nbsp;configuration&nbsp;type;&nbsp;must&nbsp;be&nbsp;<a href="#NaviCell">NaviCell</a>.CONFIG_COLOR,<br>
@@ -547,6 +547,8 @@ xp&nbsp;rbx&nbsp;/class!=protein,gene<br>
 xp&nbsp;rbx&nbsp;/op=neq;in=label;class=protein,gene<br>
 xp&nbsp;rxb&nbsp;/token=regex;in=all</tt></dd></dl>
 
+<dl><dt><a name="NaviCell-flush"><strong>flush</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="NaviCell-getBiotypeList"><strong>getBiotypeList</strong></a>(self)</dt><dd><tt>Return&nbsp;the&nbsp;list&nbsp;of&nbsp;biotypes&nbsp;understood&nbsp;by&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;Web&nbsp;Service.<br>
 &nbsp;<br>
 In&nbsp;the&nbsp;current&nbsp;version,&nbsp;the&nbsp;returned&nbsp;biotype&nbsp;list&nbsp;is&nbsp;as&nbsp;follows:<br>
@@ -753,6 +755,8 @@ Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;datatable_biotype&nbsp;(string):&nbsp;biotype&nbsp;of&nbsp;the&nbsp;datatable&nbsp;file.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;params&nbsp;(map):&nbsp;opening&nbsp;hints.</tt></dd></dl>
 
+<dl><dt><a name="NaviCell-isASync"><strong>isASync</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="NaviCell-launchBrowser"><strong>launchBrowser</strong></a>(self)</dt><dd><tt>Launchs&nbsp;the&nbsp;client&nbsp;browser&nbsp;according&nbsp;to&nbsp;options&nbsp;given&nbsp;at&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;instantation.</tt></dd></dl>
 
 <dl><dt><a name="NaviCell-listSessions"><strong>listSessions</strong></a>(self)</dt><dd><tt>Display&nbsp;all&nbsp;active&nbsp;<a href="#NaviCell">NaviCell</a>&nbsp;Web&nbsp;Service&nbsp;sessions.<br>
@@ -954,6 +958,8 @@ Args:<br>
 Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;module&nbsp;(string):&nbsp;module&nbsp;on&nbsp;which&nbsp;to&nbsp;apply&nbsp;the&nbsp;command;&nbsp;empty&nbsp;string&nbsp;for&nbsp;current&nbsp;map.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;:param&nbsp;entity_name&nbsp;(string):&nbsp;name&nbsp;of&nbsp;the&nbsp;entity&nbsp;to&nbsp;be&nbsp;selected</tt></dd></dl>
+
+<dl><dt><a name="NaviCell-setASyncMode"><strong>setASyncMode</strong></a>(self, async_mode)</dt></dl>
 
 <dl><dt><a name="NaviCell-setCenter"><strong>setCenter</strong></a>(self, module, where, lng<font color="#909090">=0</font>, lat<font color="#909090">=0</font>)</dt><dd><tt>Set&nbsp;the&nbsp;center&nbsp;of&nbsp;the&nbsp;map.<br>
 &nbsp;<br>

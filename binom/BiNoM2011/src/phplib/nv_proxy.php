@@ -17,6 +17,13 @@ $FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
 $SESSION_FILE = $LOCAL_TMPDIR . "/nv_sessions.dat";
 $SESSION_LOCK_FILE = $LOCAL_TMPDIR . "/nv_sessions.lck";
 
+function check_fopen_read($file) {
+  if (!file_exists($file)) {
+    return NULL;
+  }
+  return fopen($file, "r");
+}
+
 function mydie($str) {
   header("HTTP/1.1 500 " . $str);
   exit(1);
@@ -62,15 +69,13 @@ function clear_sessions() {
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
     mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
-  $fd = fopen($SESSION_FILE, "r") or mydie("cannot append to file " . $SESSION_FILE);
+  $fd = check_fopen_read($SESSION_FILE) or mydie("cannot append to file " . $SESSION_FILE);
   while ($line = fgets($fd)) {
     $fields = explode("\t", $line);
     $id = $fields[0];
     reset_session($id, false, true);
   }
   fclose($fd);
-
-  //unlink($SESSION_FILE);
 
   flock($fdlck, LOCK_UN);
   fclose($fdlck);
@@ -91,7 +96,7 @@ function list_session($which) {
     mydie("cannot lock file " . $SESSION_LOCK_FILE);
   }
   $lines = array();
-  $fd = fopen($SESSION_FILE, "r") or mydie("cannot append to file " . $SESSION_FILE);
+  $fd = check_fopen_read($SESSION_FILE) or mydie("cannot append to file " . $SESSION_FILE);
   while ($line = fgets($fd)) {
     $lines[] = $line;
   }
@@ -140,7 +145,7 @@ function reset_session($id, $check, $nolock) {
       mydie("cannot lock file " . $SESSION_LOCK_FILE);
     }
   }
-  $fd = fopen($SESSION_FILE, "r") or mydie("cannot read file " . $SESSION_FILE);
+  $fd = check_fopen_read($SESSION_FILE) or mydie("cannot read file " . $SESSION_FILE);
   $sessions = array();
   while ($line = fgets($fd)) {
     $fields = explode("\t", $line);
@@ -231,11 +236,13 @@ function creatfile($file) {
 }
 
 function delfile($file, $check) {
-  if (!$check) {
+  if (file_exists($file)) {
     unlink($file);
   } else {
-    unlink($file) or mydie("cannot delete file " . $file);
-  }
+    if ($check) {
+      mydie("cannot delete file " . $file);
+    }
+  } 
 }
 
 function mkfile($id, $ext) {
@@ -264,13 +271,13 @@ function packnumfile($id) {
 }
 
 function checkfile($file) {
-  $fd = fopen($file, "r") or mydie("cannot open file " . $file . " for reading");
+  $fd = check_fopen_read($file) or mydie("cannot open file " . $file . " for reading");
   fclose($fd);
 }
 
 function lock($id) {
   $file = lockfile($id);
-  $fdlck = fopen($file, "r") or mydie("cannot open file " . $file . " for reading");
+  $fdlck = check_fopen_read($file) or mydie("cannot open file " . $file . " for reading");
   $wouldblock = 1;
   if (!flock($fdlck, LOCK_EX, $wouldblock)) {
     mydie("cannot lock file " . $file);
@@ -300,7 +307,7 @@ $msg_id = get("msg_id", "<undefined>");
 if ($mode == "session") {
   if ($perform == "check") {
     $id = get("id", "");
-    $fd = fopen(logfile($id), "r");
+    $fd = check_fopen_read(logfile($id));
     if (!$fd) {
       print "bad";
     } else {

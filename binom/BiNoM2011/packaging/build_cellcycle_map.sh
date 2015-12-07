@@ -8,8 +8,8 @@
 if [ $# != 1 ]; then
     echo "usage: $0 TARGET_DIR";
     echo "       /cellcycle will be automatically appended to TARGET_DIR (=> don't include it in TARGET_DIR)"
-    if [ -d ../../site/html/navicell/maps ]; then
-	echo "for instance: sh $0 ../../site/html/navicell/maps";
+    if [ -d ../../site/docroot/navicell/maps ]; then
+	echo "for instance: sh $0 ../../site/docroot/navicell/maps";
     fi
     exit 1;
  fi

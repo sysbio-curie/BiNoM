@@ -149,9 +149,9 @@ function reset_session($id, $check, $nolock) {
       mydie("cannot lock file " . $SESSION_LOCK_FILE);
     }
   }
+  $sessions = array();
   $fd = check_fopen_read($SESSION_FILE);
   if ($fd) {
-    $sessions = array();
     while ($line = fgets($fd)) {
       $fields = explode("\t", $line);
       if ($fields[0] != $id) {

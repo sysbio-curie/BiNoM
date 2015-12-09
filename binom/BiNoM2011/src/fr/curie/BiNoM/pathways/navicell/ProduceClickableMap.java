@@ -898,7 +898,7 @@ public class ProduceClickableMap
 			String base_name = f.getName();
 			String map_name = base_name.substring(base.length(), base_name.length() - celldesigner_suffix.length());
 
-			System.err.println("FILE [" + source_directory + "/" + f.getName() + "]");
+			//System.err.println("FILE [" + source_directory + "/" + f.getName() + "]");
 			list.put(map_name, null);
 		}
 		return (list);

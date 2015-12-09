@@ -1,0 +1,59 @@
+
+# from up-to-date svn directory 
+sh make_navicell_package.sh /Users/eric/tmp/
+
+tar xzvf navicell.2.1.tgz 
+
+cd navicell/factory/examples/
+
+sh build_cellcycle_map.sh ../../site/docroot/navicell/maps
+
+file:///Users/eric/tmp/navicell/site/docroot/navicell/maps/cellcycle/master/index.html
+
+open -a "Google Chrome" --args --allow-file-access-from-files
+
+
+# edit the apache configuration file
+sudo edit /etc/apache2/httpd.conf
+
+#-- uncomment the lines:
+LoadModule php5_module libexec/apache2/libphp5.so
+LoadModule cgi_module libexec/apache2/mod_cgi.so
+
+# Uncomment this line and add .py support
+AddHandler cgi-script .cgi .py
+
+# restart the apache server
+sudo apachectl start
+
+# change to the default cgi-bin default location and 
+# copy all cgi-bin files:
+cd /Library/WebServer/CGI-Executables/
+sudo cp -r /Users/eric/tmp/navicell/site/cgi-bin/* .
+
+# set the permissions to read & execute
+sudo bash
+find . | xargs chmod a+rx
+exit
+
+# FIXME: edit python script with correct Rscript binary path on local host:
+Rcmd = "/usr/local/bin/Rscript script.R " ....
+
+# cd to the default html location 
+cd /Library/WebServer/Documents/
+
+# copy all files
+sudo cp -r /Users/eric/tmp/navicell/site/docroot/* .
+
+# set correct permissions for all files and directories
+sudo bash
+find navicell/ data/ -type d | xargs chmod a+rx
+find navicell/ data/ \! -type d | xargs chmod a+r
+exit
+
+# test URLs
+http://localhost/navicell/maps/cellcycle/master/index.html
+http://localhost/navicell/maps/cellcycle/master/index.php
+
+
+

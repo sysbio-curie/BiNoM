@@ -7,11 +7,15 @@
  *
  */
 
-// ------- local environment -------
-$LOCAL_TMPDIR = "/scratch/navicell";
-// ---------------------------------
+// ------- local tmp dir (may be changed) -------
+$LOCAL_TMPDIR = "/tmp/navicell";
+// ----------------------------------------------
 
 header("Access-Control-Allow-Origin: *");
+
+if (!is_dir($LOCAL_TMPDIR)) {
+  mkdir($LOCAL_TMPDIR);
+}
 
 $FILE_PREFIX = $LOCAL_TMPDIR . "/nv_";
 $SESSION_FILE = $LOCAL_TMPDIR . "/nv_sessions.dat";
@@ -145,16 +149,17 @@ function reset_session($id, $check, $nolock) {
       mydie("cannot lock file " . $SESSION_LOCK_FILE);
     }
   }
-  $fd = check_fopen_read($SESSION_FILE) or mydie("cannot read file " . $SESSION_FILE);
-  $sessions = array();
-  while ($line = fgets($fd)) {
-    $fields = explode("\t", $line);
-    if ($fields[0] != $id) {
-      $sessions[] = $line;
+  $fd = check_fopen_read($SESSION_FILE);
+  if ($fd) {
+    $sessions = array();
+    while ($line = fgets($fd)) {
+      $fields = explode("\t", $line);
+      if ($fields[0] != $id) {
+	$sessions[] = $line;
+      }
     }
+    fclose($fd);
   }
-
-  fclose($fd);
 
   $fd = fopen($SESSION_FILE, "w") or mydie("cannot write to file " . $SESSION_FILE);
   ftruncate($fd, 0);

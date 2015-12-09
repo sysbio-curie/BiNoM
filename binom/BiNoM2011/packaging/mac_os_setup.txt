@@ -1,17 +1,45 @@
+#
+#
+# Setup for NaviCell server on Mac OS X 
+# version tested: el capitan 10.11.1
+# written by Eric Bonnet
+#
+#
 
-# from up-to-date svn directory 
+Requirements:
+  - xcode command line tools installed (type 'xcode-select -p' in a terminal window)
+  - R installed (https://cran.r-project.org/bin/macosx/)
+  - up-to-date Java installation
+  - Google Chrome installed
+
+
+#----------------------------------------------------
+#  Build and test the package (without apache server)
+#----------------------------------------------------
+
+# svn URL: https://svn.curie.fr/svn/U900/research/software-dvt/binom/trunk/binom/BiNoM2011
+# checkout the lastest version of BiNoM package, 
+# then change directory to 'packaging'
+# target directory for the package: /Users/eric/tmp/
 sh make_navicell_package.sh /Users/eric/tmp/
 
+# Go to target directory and un-tar package 
 tar xzvf navicell.2.1.tgz 
 
+# go to 'examples' and build test map (Cell Cycle) 
 cd navicell/factory/examples/
-
 sh build_cellcycle_map.sh ../../site/docroot/navicell/maps
 
-file:///Users/eric/tmp/navicell/site/docroot/navicell/maps/cellcycle/master/index.html
-
+# Open Google Chrome browser with specific option in order to navigate 
+# the map in 'file' mode
 open -a "Google Chrome" --args --allow-file-access-from-files
 
+# Open the map with this URL
+file:///Users/eric/tmp/navicell/site/docroot/navicell/maps/cellcycle/master/index.html
+
+#----------------------------------------------
+# Apache server configuration on local computer
+#----------------------------------------------
 
 # edit the apache configuration file
 sudo edit /etc/apache2/httpd.conf

@@ -1758,7 +1758,7 @@ function nv_server_init(win, id, proxy_url)
 {
 	if (!proxy_url) {
 		var href = win.location.href;
-		var idx = href.indexOf('/navicell/');
+		var idx = href.lastIndexOf('/navicell/');
 		proxy_url = href.substr(0, idx) + "/cgi-bin/nv_proxy.php";
 	}
 	nv_proxy_url = proxy_url;
@@ -1798,7 +1798,7 @@ function nv_execute_commands(win, cmd, relurl) {
 		return win.nv_decode(cmd);
 	}
 	var href = win.location.href;
-	var idx = href.indexOf('/navicell/');
+	var idx = href.lastIndexOf('/navicell/');
 	var url = href.substr(0, idx) + '/navicell/' + relurl;
 	//console.log("executing URL " + url);
 	$.ajax(url,

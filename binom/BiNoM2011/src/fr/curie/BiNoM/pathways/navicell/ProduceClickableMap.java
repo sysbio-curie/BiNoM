@@ -5629,6 +5629,7 @@ public class ProduceClickableMap
 					out.println("    $('#demo').css('display', 'block');");
 					demo_display_cnt++; // to avoid multiple demo buttons
 				}
+				out.println("    $('#functional_analysis').css('display', 'none');");
 			}
 		}
 		out.println("  });\n");

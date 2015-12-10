@@ -4423,7 +4423,7 @@ function Datatable(dataset, biotype_name, name, file, url, datatable_id, win, as
 		} else {
 			$.ajax(url,
 			       {
-				       crossDomain: true, // TESTING
+				       //crossDomain: true, // 2015-12-10: disconnected because of demo running problem with files
 				       async: async,
 				       dataType: 'text',
 				       success: function(data) {

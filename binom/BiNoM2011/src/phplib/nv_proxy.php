@@ -13,6 +13,8 @@ $LOCAL_TMPDIR = "/tmp/navicell";
 
 header("Access-Control-Allow-Origin: *");
 
+date_default_timezone_set('UTC');
+
 if (!is_dir($LOCAL_TMPDIR)) {
   mkdir($LOCAL_TMPDIR);
 }

@@ -2,7 +2,7 @@
 #
 # Setup for NaviCell server on Mac OS X 
 # version tested: el capitan 10.11.1
-# written by Eric Bonnet
+# written by Eric Bonnet 12.2015
 #
 #
 

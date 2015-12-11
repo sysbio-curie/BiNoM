@@ -387,6 +387,7 @@ public class ProduceClickableMap
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd.getSbml());
 		
 		findAllPlacesInCellDesigner();
+		
 //		updateStandardNames();
 
 		CellDesigner.entities = CellDesigner.getEntities(cd);

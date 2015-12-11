@@ -108,8 +108,9 @@ public class CellDesignerToGeneSpringConverter {
 	public static void main(String[] args) {
 
 		//String fn = "/Users/eric/wk/genespring_integration/cell_cycle/cellcycle_master.xml";
+		String fn = "/Users/eric/wk/genespring_integration/apoptosis/apoptosis_master.xml";
 		//String fn = "/Users/eric/maps/cellcycle_master.xml";
-		String fn = "/Users/eric/maps/apoptosis_master.xml";
+		//String fn = "/Users/eric/maps/apoptosis_master.xml";
 
 		CellDesignerToGeneSpringConverter c2b = new CellDesignerToGeneSpringConverter();
 		c2b.convert(fn);

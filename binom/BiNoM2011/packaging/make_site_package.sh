@@ -29,6 +29,7 @@ mkdir -p $docroot/data
 mkdir -p $nv_topdir
 mkdir $nv_topdir/maps
 mkdir $nv_topdir/demo
+mkdir $nv_topdir/proxy
 
 export topdir nv_topdir docroot
 
@@ -50,6 +51,7 @@ export topdir nv_topdir docroot
 mkdir -p $cgibinroot
 
 cp ../src/analysis_cgi/gene_enrichment/* $cgibinroot/
-cp ../src/phplib/nv_proxy.php $cgibinroot/
+#cp ../src/phplib/nv_proxy.php $cgibinroot/
+cp ../src/phplib/nv_proxy.php $nv_topdir/proxy/
 rm -f $cgibinroot/*~
 

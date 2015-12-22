@@ -28,7 +28,7 @@ tar xzvf navicell.2.1.tgz
 
 # go to 'examples' and build test map (Cell Cycle) 
 cd navicell/factory/examples/
-sh build_cellcycle_map.sh ../../site/docroot/navicell/maps
+sh build_cellcycle_map.sh
 
 # Open Google Chrome browser with specific option in order to navigate 
 # the map in 'file' mode

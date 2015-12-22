@@ -7,7 +7,7 @@
 NAVICELL_PUB=/scratch/NAVICELL_PUB
 
 cd $NAVICELL_PUB/navicell/factory/examples
-sh build_cellcycle_map.sh ../../site/docroot/navicell/maps
+sh build_cellcycle_map.sh
 
 MIND: google chrome must be launched with this option
 google-chrome --allow-file-access-from-files
@@ -35,7 +35,79 @@ echo $CELLCYCLE_URL
 Python binding
 --------------
 
+# to use Chrome, set this environment variable:
 export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
-export NV_PROXY_URL=${WEBSITE_URL}/cgi-bin/nv_proxy.php
+# else the default browser will be used
 
-$NAVICELL_PUB/navicell/bindings/python/nvpy --map-url "${CELLCYCLE_URL}&" --launch-browser
+export PYTHONPATH=$NAVICELL_PUB/navicell/bindings/python:$NAVICELL_PUB/navicell/bindings/python/examples
+
+cd $NAVICELL_PUB/navicell/bindings/python/examples
+
+1. Using Curie Institute site
+
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+$NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+import test
+test.test(nv)
+
+2. Using localhost installation
+
+export NV_PROXY_URL=${WEBSITE_URL}/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="${WEBSITE_URL}/navicell/maps/cellcycle/master/index.php"
+
+$NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+import test
+test.test(nv)
+
+R binding
+---------
+
+# to use Chrome, set this environment variable:
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+# else the default browser will be used
+
+cd $NAVICELL_PUB/navicell/bindings/RNaviCell/examples
+
+1. Using Curie Institute site
+
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+R
+library('RCurl')
+library('RJSONIO')
+source('../R/NaviCell_RC.R')
+source('test.R')
+
+2. Using localhost installation
+
+export NV_PROXY_URL=${WEBSITE_URL}/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="${WEBSITE_URL}/navicell/maps/cellcycle/master/index.php"
+
+R
+library('RCurl')
+library('RJSONIO')
+source('../R/NaviCell_RC.R')
+source('test.R')
+
+Java binding
+------------
+
+cd $NAVICELL_PUB/navicell/bindings/JNaviCell/examples
+sh compile_test.sh 
+
+1. Using Curie Institute site
+
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+sh run_test.sh
+
+2. Using localhost installation
+
+export NV_PROXY_URL=${WEBSITE_URL}/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="${WEBSITE_URL}/navicell/maps/cellcycle/master/index.php"
+
+sh run_test.sh

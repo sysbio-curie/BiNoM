@@ -25,11 +25,9 @@ mkdir -p $topdir/python
 
 export topdir
 
-# python
-
 (
     cd ../src/python_api
-    find curie curie.navicell.html setup.py nvpy  README.txt  MANIFEST MANIFEST.in  | grep -v "\.svn" | cpio -pdmv $topdir/python
+    find curie curie.navicell.html setup.py nvpy README.txt MANIFEST MANIFEST.in | grep -v "\.svn" | cpio -pdmv $topdir/python
 )
 
 export https_proxy=http://www-cache.curie.fr:3128
@@ -37,5 +35,9 @@ for pack in JNaviCell RNaviCell
 do
     git clone "https://github.com/sysbio-curie/$pack" $topdir/$pack
     echo | rm -r $topdir/$pack/.git
+
 done
 
+(cd ../src/python_api; find examples | grep -v "\.svn" | cpio -pdmv $topdir/python)
+(cd ../src/Java_api; find  examples | grep -v "\.svn" | cpio -pdmv $topdir/JNaviCell)
+(cd ../src/R_api; find  examples | grep -v "\.svn" | cpio -pdmv $topdir/RNaviCell)

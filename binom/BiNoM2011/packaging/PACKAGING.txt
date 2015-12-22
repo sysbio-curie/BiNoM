@@ -1,0 +1,16 @@
+
+Building NaviCell package
+-------------------------
+
+NaviCell package must be built on a unix machine. Java (including compiler) must be installed.
+
+Choose a target directory (must not exist), for instance /tmp/NAVICELL_PUB, then:
+
+(dont' forget to svn update before)
+
+cd BiNoM2011/packaging
+
+sh make_navicell_package.sh /tmp/NAVICELL_PUB
+
+a lot of messages are displayed, the last one should be:
+navicell tar file is /tmp/NAVICELL_PUB/navicell.2.1.tgz

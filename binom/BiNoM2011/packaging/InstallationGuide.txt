@@ -1,0 +1,220 @@
+
+Installation on Linux and MacOS
+-------------------------------
+
+In a terminal:
+
+I. Primary installation and testing
+-----------------------------------
+
+1. go to the directory containing navicell package
+
+2. set the environment variable NAVICELL_PUB (will be used later) as follows:
+
+export NAVICELL_PUB=$(pwd)
+
+3. un-tar the package
+tar xvfz navicell.2.1.tgz 
+
+4. go to 'examples' and build test map (Cell Cycle) 
+
+cd navicell/factory/examples/
+
+sh build_cellcycle_map.sh
+
+A lot of messages will be displayed, the last ones should be like:
+
+"""""""
+cellcycle map has been succesfully generated
+
+Available at URL file:///__NAVICELL_PUB__/navicell/site/docroot/navicell/maps/cellcycle/master/index.html
+
+If you are using Chrome, open it using --allow-file-access-from-files option
+
+Under Linux
+google-chrome --allow-file-access-from-files
+
+Under MacOS
+open -a "Google Chrome" --args --allow-file-access-from-files
+"""""""
+
+__NAVICELL_PUB__ being the directory containing navicell package, equivalent to:
+echo $NAVICELL_PUB
+
+5. open one of the two browsers:
+- Chrome (in the way indicated in the previous messages)
+- Safari
+
+NaviCell also works on firefox, but using the http protocol (not the file protocol)
+
+And copy/paste the URL file:///.... indicated in the previous messages
+
+=> it should works
+=> to launch the online demo, you need to click on the Live Example button at the bottom right
+
+II. Using the bindings using NaviCell Curie Web Server
+------------------------------------------------------
+
+NaviCell comes with 3 bindings:
+- python
+- R
+- Java
+
+1. Python Binding
+
+Requirements:
+- python3 needs to be installed on your computer
+
+To use Chrome, set this environment variable as follows:
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+else the default browser will be used
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/python/examples
+
+b. set the following environment variables:
+export PYTHONPATH=$NAVICELL_PUB/navicell/bindings/python:$NAVICELL_PUB/navicell/bindings/python/examples
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+c. launch the python binding as follows:
+$NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+
+Note:
+if you get a message such as /usr/bin/python3 does not exist, type:
+python3 $NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+
+The browser should be launched with the cellcycle map.
+Then, type in your python session:
+import test
+test.test(nv)
+
+heatmaps should be displayed on the map.
+
+2. R Binding
+
+Requirements:
+- R needs to be installed on your computer
+
+To use Chrome, set this environment variable as follows:
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+else the default browser will be used
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/RNaviCell/examples
+
+b. set the following environment variables:
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+c. launch R, and type the following commands:
+
+library('RCurl')
+library('RJSONIO')
+source('../R/NaviCell_RC.R')
+source('test.R')
+
+The browser should be launched with the cellcycle map and heatmaps should be displayed on the map.
+
+3. Java Binding
+
+Requirements:
+- Java JDK needs to be installed on your computer
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/JNaviCell/examples
+
+b. compile the example:
+sh compile_test.sh 
+
+c. set the following environment variables:
+export NV_PROXY_URL="https://navicell.curie.fr/cgi-bin/nv_proxy.php"
+export NV_MAP_URL="https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php"
+
+d. launch the Test class as follows:
+sh run_test.sh
+
+The browser should be launched with the cellcycle map and heatmaps should be displayed on the map.
+
+III. Installing NaviCell as a web server
+---------------------------------------
+
+A. MacOS Installation
+
+a. edit the apache configuration file
+sudo edit /etc/apache2/httpd.conf
+
+b. uncomment the lines:
+LoadModule php5_module libexec/apache2/libphp5.so
+LoadModule cgi_module libexec/apache2/mod_cgi.so
+
+c. uncomment this line and add .py support
+AddHandler cgi-script .cgi .py
+
+d. restart the apache server
+sudo apachectl start
+
+e. change to the default cgi-bin default location and copy all cgi-bin files:
+cd /Library/WebServer/CGI-Executables/
+sudo cp -r $NAVICELL_PUB/navicell/site/cgi-bin/* .
+
+Note:
+the python script gene_enrichment_analysis.py in CGI-Executables/ will not have the correct R path, you need to manually change the path, for instance:
+sudo edit gene_enrichment_analysis.py
+then change Rcmd to:
+Rcmd = "/usr/local/bin/Rscript script.R " ....
+
+f. set the permissions to read & execute
+sudo bash
+find . | xargs chmod a+rx
+exit
+
+g. change to the default html location 
+cd /Library/WebServer/Documents/
+
+h. copy all files
+sudo cp -r $NAVICELL_PUB/navicell/site/docroot/* .
+
+i. set correct permissions for all files and directories
+sudo bash
+find navicell/ data/ -type d | xargs chmod a+rx
+find navicell/ data/ \! -type d | xargs chmod a+r
+exit
+
+j. open Safari, Chrome or Firefox with one of the following URLs:
+http://localhost/navicell/maps/cellcycle/master/index.html
+http://localhost/navicell/maps/cellcycle/master/index.php
+
+B. Linux Installation
+
+a. change to the default cgi-bin default location and copy all cgi-bin files:
+cd /var/www/cgi-bin/
+sudo cp -r $NAVICELL_PUB/navicell/site/cgi-bin/* .
+
+Notes:
+- The cgi-bin directory maybe different than /var/www/cgi-bin depending on your Linux installationn
+- the python script gene_enrichment_analysis.py in CGI-Executables/ will not have the correct R path, you need to manually change the path, for instance:
+sudo edit gene_enrichment_analysis.py
+then change Rcmd to:
+Rcmd = "/usr/local/bin/Rscript script.R " ....
+
+b. set the permissions to read & execute
+sudo bash
+find . | xargs chmod a+rx
+exit
+
+c. change to the default html location 
+cd /var/www/html/
+
+d. copy all files
+sudo cp -r $NAVICELL_PUB/navicell/site/docroot/* .
+
+e. set correct permissions for all files and directories
+sudo bash
+find navicell/ data/ -type d | xargs chmod a+rx
+find navicell/ data/ \! -type d | xargs chmod a+r
+exit
+
+f. open Chrome or Firefox with one of the following URLs:
+http://localhost/navicell/maps/cellcycle/master/index.html
+http://localhost/navicell/maps/cellcycle/master/index.php

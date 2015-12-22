@@ -218,3 +218,85 @@ exit
 f. open Chrome or Firefox with one of the following URLs:
 http://localhost/navicell/maps/cellcycle/master/index.html
 http://localhost/navicell/maps/cellcycle/master/index.php
+
+IV. Using the bindings using the localhost Web Server
+-----------------------------------------------------
+
+The way to use bindings with the localhost Web Server is very similar to the way to use it with the NaviCell Curie Web Server. Only environment variables have to be changed.
+
+1. Python Binding
+
+Requirements:
+- python3 needs to be installed on your computer
+
+To use Chrome, set this environment variable as follows:
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+else the default browser will be used
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/python/examples
+
+b. set the following environment variables:
+export PYTHONPATH=$NAVICELL_PUB/navicell/bindings/python:$NAVICELL_PUB/navicell/bindings/python/examples
+export NV_PROXY_URL=http://localhost/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="http://localhost/navicell/maps/cellcycle/master/index.php"
+
+c. launch the python binding as follows:
+$NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+
+Note:
+if you get a message such as /usr/bin/python3 does not exist, type:
+python3 $NAVICELL_PUB/navicell/bindings/python/nvpy --launch-browser
+
+The browser should be launched with the cellcycle map.
+Then, type in your python session:
+import test
+test.test(nv)
+
+heatmaps should be displayed on the map.
+
+2. R Binding
+
+Requirements:
+- R needs to be installed on your computer
+
+To use Chrome, set this environment variable as follows:
+export NV_BROWSER_COMMAND='/usr/bin/google-chrome %s'
+else the default browser will be used
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/RNaviCell/examples
+
+b. set the following environment variables:
+export NV_PROXY_URL=http://localhost/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="http://localhost/navicell/maps/cellcycle/master/index.php"
+
+c. launch R, and type the following commands:
+
+library('RCurl')
+library('RJSONIO')
+source('../R/NaviCell_RC.R')
+source('test.R')
+
+The browser should be launched with the cellcycle map and heatmaps should be displayed on the map.
+
+3. Java Binding
+
+Requirements:
+- Java JDK needs to be installed on your computer
+
+a. go to the example directory 
+cd $NAVICELL_PUB/navicell/bindings/JNaviCell/examples
+
+b. compile the example:
+sh compile_test.sh 
+
+c. set the following environment variables:
+export NV_PROXY_URL=http://localhost/navicell/proxy/nv_proxy.php
+export NV_MAP_URL="http://localhost/navicell/maps/cellcycle/master/index.php"
+
+d. launch the Test class as follows:
+sh run_test.sh
+
+The browser should be launched with the cellcycle map and heatmaps should be displayed on the map.
+

@@ -1,4 +1,4 @@
-/* Stuart Pook & Eric Viara (Sysra) $Id$
+/* Stuart Pook & Eric Viara (Sysra) $Id: ProduceClickableMap.java 31813 2015-12-09 17:16:39Z eviara $
  *
  *
  * Copyright (C) 2011-2012 Curie Institute, 26 rue d'Ulm, 75005 Paris, France
@@ -387,7 +387,6 @@ public class ProduceClickableMap
 		CellDesignerToCytoscapeConverter.createSpeciesMap(cd.getSbml());
 		
 		findAllPlacesInCellDesigner();
-		
 //		updateStandardNames();
 
 		CellDesigner.entities = CellDesigner.getEntities(cd);
@@ -825,7 +824,7 @@ public class ProduceClickableMap
 		java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z\n");
 		sb.append(dateFormat.format(new Date()));
 		
-		sb.append("$Id$\n");
+		sb.append("$Id: ProduceClickableMap.java 31813 2015-12-09 17:16:39Z eviara $\n");
 		sb.append("created by http://navicell.curie.fr/");
 
 		return sb.toString();
@@ -5214,7 +5213,7 @@ public class ProduceClickableMap
 			final FileWriter fileWriter = new FileWriter(tmp);
 			markers = new BufferedWriter(fileWriter);
 			markers.write("<?xml version=\"1.0\" encoding=\"" + fileWriter.getEncoding() + "\"?>\n");
-			markers.write("<!-- " + formatter.format(new Date()) + " " + System.getProperty("user.name") + " $Id$ -->\n");
+			markers.write("<!-- " + formatter.format(new Date()) + " " + System.getProperty("user.name") + " $Id: ProduceClickableMap.java 31813 2015-12-09 17:16:39Z eviara $ -->\n");
 			BufferedReader existing;
 			try
 			{
@@ -5426,7 +5425,7 @@ public class ProduceClickableMap
 		
 		out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		out.println("<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'>");
-		out.println("<!-- $Id$ -->");
+		out.println("<!-- $Id: ProduceClickableMap.java 31813 2015-12-09 17:16:39Z eviara $ -->");
 		out.println("<head>");
 		out.println("<meta http-equiv='content-type' content='text/html;charset=UTF-8'/>");
 		out.println("<title>" + blog_name + " &#x2014; " + title + "</title>");
@@ -5679,7 +5678,6 @@ public class ProduceClickableMap
 		header_right.close();
 		header.close();
 
-		out.println("<canvas id='export_image_canvas'></canvas>");
 		final Div map_div = new Div(left_content, "id='" + map_div_name + "'");
 		out.println("The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.");
 		map_div.close();

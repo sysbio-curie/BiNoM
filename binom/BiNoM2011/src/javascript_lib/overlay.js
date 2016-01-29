@@ -808,7 +808,7 @@ USGSOverlay.prototype.hasHighlight = function() {
 	return this.highlight_boxes.length > 0;
 }
 
-USGSOverlay.prototype.drawScreenShot = function(module, context, delta_x, delta_y) {
+USGSOverlay.prototype.drawExportImage = function(module, context, delta_x, delta_y) {
 	var o_context = this.context;
 	this.context = context;
 	this.image_mode = true;
@@ -842,7 +842,7 @@ USGSOverlay.prototype.draw = function(module) {
 	var drawing_config = navicell.getDrawingConfig(module);
 	if (drawing_config.displayDLOs()) {
 		if (drawing_config.displayMapStaining()) {
-			draw_voronoi(module, this.context, this.div_);
+			draw_voronoi(module, this.context, this.div_, this.image_mode, this.delta_x, this.delta_y);
 		}
 
 		var arrpos = null;
@@ -1017,8 +1017,8 @@ function visible_screenshot()
         $("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
 }
 
-function ScreenShotLoader(screenShot, module, context, ntiles, delta_x, delta_y) {
-	this.screenShot = screenShot;
+function ExportImageLoader(exportImage, module, context, ntiles, delta_x, delta_y) {
+	this.exportImage = exportImage;
 	this.module = module;
 	this.context = context;
 	this.total_img_cnt = ntiles*ntiles;
@@ -1027,76 +1027,61 @@ function ScreenShotLoader(screenShot, module, context, ntiles, delta_x, delta_y)
 	this.delta_y = delta_y;
 }
 
-ScreenShotLoader.prototype = {
+ExportImageLoader.prototype = {
 
 	imgLoaded: function() {
 		if (++this.img_cnt == this.total_img_cnt) {
-			console.log("imgLoaded !");
-			overlay.drawScreenShot(this.module, this.context, this.delta_x, this.delta_y);
-			var url = this.screenShot.toDataURL();
-			nScreenshots++;
-			console.log(url.substring(0,40));
-			console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
-			$("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+			overlay.drawExportImage(this.module, this.context, this.delta_x, this.delta_y);
+			var url = this.exportImage.toDataURL();
+			$("#export_image_link").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank'>download image</a></span>");
 		}
 	}
 };
 
-function full_screenshot(module)
+function navicell_export_image(module)
 {
-	/*
-	console.log("here we are");
-	
-	if (screenShot) {
-		var url = screenShot.toDataURL();
-		nScreenshots++;
-		console.log(url.substring(0,40));
-		console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
-		$("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
-		screenShot = null;
-		ctx = null;
-		return;
-	};
-	*/
-        screenShot = document.getElementById("screenshot_canvas");
-        // CSS dimensions and canvas dimension have to be equal to get a 1:1 scaling
+        var exportImage = document.getElementById("export_image_canvas");
 
-	//var zoom = 3; // hard-coded to be changed
 	var zoom = overlay.map_.zoom;
 	var ntiles = 1 << zoom;
 	var tile_width = 256; // hard-coded to be changed
 	var tile_height = 256; // hard-coded to be changed
-	var width, height;
-	width = ntiles * tile_width;
-	height = ntiles * tile_height;
+	var width = ntiles * tile_width;
+	var height = ntiles * tile_height;
+
         var px = new RegExp("px|em", "g");
-	$(screenShot).attr("height", height);
-        $(screenShot).attr("width", width + "px");
 
-        $(screenShot).css("height", $(screenShot).attr("height"));
-        $(screenShot).css("width", $(screenShot).attr("width"));
+	$(exportImage).attr("height", height);
+        $(exportImage).attr("width", width + "px");
 
-        ctx = screenShot.getContext("2d");
-        ctx.clearRect(0, 0, screenShot.width, screenShot.height);
+        $(exportImage).css("height", $(exportImage).attr("height"));
+        $(exportImage).css("width", $(exportImage).attr("width"));
+
+        ctx = exportImage.getContext("2d");
+        ctx.clearRect(0, 0, exportImage.width, exportImage.height);
 
 	var imgs = [];
         var tiles_div = $("#innermap").parent().next().next().next();
         var tiles = tiles_div.children().first().children();
-        console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
 
 	var tile_map = {};
+	var nobg = "";
 	for (var ii = 0; ii < tiles.length; ++ii) {
 		var tile = $("img", tiles.eq(ii));
 		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
 		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
-		tile_map[tile.attr("src")] = [left, top];
-		console.log("src: " + tile.attr("src") + " " + left + " " + top);
+		var src = tile.attr("src");
+		if (!nobg && src.indexOf("_nobg") > 0) {
+			nobg = "_nobg";
+		}
+		tile_map[src] = [left, top];
 	}
+
 	var delta_x = 0;
 	var delta_y = 0;
 	for (var ii = 0; ii < ntiles; ++ii) {
 		for (var jj = 0; jj < ntiles; ++jj) {
-			var src = "tiles/" + zoom + "/" + ii + "_" + jj + ".png";
+			var src = "tiles/" + zoom + "/" + ii + "_" + jj + nobg + ".png";
 			if (tile_map[src]) {
 				var x_offset = (ii*tile_width);
 				var y_offset = (jj*tile_height);
@@ -1106,29 +1091,24 @@ function full_screenshot(module)
 			}
 		}
 	}
-	console.log("DELTA_X: " + delta_x + " DELTA_Y:" + delta_y);
-	var screenShotLoader = new ScreenShotLoader(screenShot, module, ctx, ntiles, delta_x, delta_y);
+
+	var exportImageLoader = new ExportImageLoader(exportImage, module, ctx, ntiles, delta_x, delta_y);
 	for (var ii = 0; ii < ntiles; ++ii) {
-		//var tile = $("img", tiles.eq(ii));
 		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
 		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
-		//console.log("tiles: " + ii + " left: " + left + " top:" + top);
 		imgs[ii] = [];
 		for (var jj = 0; jj < ntiles; ++jj) {
 			var img = document.createElement('img');
-			var src = "tiles/" + zoom + "/" + ii + "_" + jj + ".png";
-			//console.log("SRC " + src + " " + ((ii*tile_width)-xOffset) + " " + ((jj*tile_height)-yOffset));
+			var src = "tiles/" + zoom + "/" + ii + "_" + jj + nobg + ".png";
 			$(img).attr("src", src);
 			img.xx = ii;
 			img.yy = jj;
 			img.onload = function() {
-				//console.log("IMAGE LOADED " + this.xx + " " + this.yy);
 				ctx.drawImage(this, 0, 0, tile_width, tile_height, ((this.xx)*tile_width), ((this.yy)*tile_height), tile_width, tile_height);
-				screenShotLoader.imgLoaded();
+				exportImageLoader.imgLoaded();
 			};
 			imgs[ii].push(img);
 
 		}
 	}
-	console.log("EXITING");
 }

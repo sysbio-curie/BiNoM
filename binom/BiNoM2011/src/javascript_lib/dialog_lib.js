@@ -575,11 +575,8 @@ $(function() {
 		}
 	});
 
-	// mathurin
-	console.log(" !!!!! SCREEN click function !!!");
-        $("#screen_shot").button().click(function(){
-		console.log("CLICK!");
-                full_screenshot(get_module());
+        $("#export_image").button().click(function(){
+                navicell_export_image(get_module());
         });
 
 	$("#functional_analysis").button().click(function() {
@@ -3614,7 +3611,7 @@ function get_voronoi_color(module, modifs_id, sel_color_datatable, sel_sample, s
 	return len == 0 ? 0 : (new RGBColor(red/len, green/len, blue/len)).getRGBValue();
 }
 
-function draw_voronoi(module, context, div)
+function draw_voronoi(module, context, div, image_mode, delta_x, delta_y)
 {
 	var map_staining_display_labels = $("#map_staining_display_labels").attr("checked") == "checked";
 	var drawing_config = navicell.getDrawingConfig(module);
@@ -3667,8 +3664,8 @@ function draw_voronoi(module, context, div)
 			var gpt = new google.maps.Point(xx, yy);
 			var latlng = mapProjection.fromPointToLatLng(gpt);
 			var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-			var bx = pix.x - div.left;
-			var by = pix.y - div.top;
+			var bx = pix.x - (image_mode ? delta_x : div.left);
+			var by = pix.y - (image_mode ? delta_y : div.top);
 			if (kk == 1) {
 				context.moveTo(bx, by);
 			} else {

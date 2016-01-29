@@ -45,6 +45,7 @@ function USGSOverlay(map) {
 	this.setMap(map);
 	this.reset(true);
 	this.highlight_boxes = [];
+	this.image_mode = false;
 
 	//this.arrpos = [];
 
@@ -807,6 +808,17 @@ USGSOverlay.prototype.hasHighlight = function() {
 	return this.highlight_boxes.length > 0;
 }
 
+USGSOverlay.prototype.drawScreenShot = function(module, context, delta_x, delta_y) {
+	var o_context = this.context;
+	this.context = context;
+	this.image_mode = true;
+	this.delta_x = delta_x;
+	this.delta_y = delta_y;
+	this.draw(module);
+	this.image_mode = false;
+	this.context = o_context;
+}
+
 USGSOverlay.prototype.draw = function(module) {
 
 	if (this.div_ == null) {
@@ -818,7 +830,9 @@ USGSOverlay.prototype.draw = function(module) {
 	}
 	this.resize();
 
-	this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+	if (!this.image_mode) {
+		this.context.clearRect(0, 0, MAX_SCREEN_WIDTH, MAX_SCREEN_HEIGHT);
+	}
 	this.boundBoxes = [];
 
 	if (!module) {
@@ -846,19 +860,30 @@ USGSOverlay.prototype.draw = function(module) {
 			var scale = Math.pow(2, this.map_.zoom);
 
 			var MARGIN = 30;
-			var div_width = div.width;
-			var div_height = div.height+MARGIN;
+			var div_width = this.image_mode ? MAX_SCREEN_WIDTH : div.width;
+			var div_height = this.image_mode ? MAX_SCREEN_HEIGHT : div.height+MARGIN;
+			var div_left = this.image_mode ? this.delta_x : div.left;
+			var div_top = this.image_mode ? this.delta_y : div.top;
+			//var div_left = div.left;
+			//var div_top = div.top;
 			cache_value_cnt = 0;
 			no_cache_value_cnt = 0;
+			console.log("div width: " + div_width + " height: " + div_height + " left: " + div_left + " (" + div.left + ") top: " + div_top + " (" + div.top + ") " + arrpos.length);
 			for (var nn = 0; nn < arrpos.length; ++nn) {
 				var latlng = mapProjection.fromPointToLatLng(arrpos[nn].p);
 				var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-				var pos_x = pix.x - div.left;
-				var pos_y = pix.y - div.top;
-				if (pos_x > -MARGIN && pos_x < div_width &&
-				    pos_y >= 0 && pos_y < div_height) {
-					navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].id, arrpos[nn].gene_name, pix.x-div.left, pix.y-div.top);
+				if (nn == 0) {
+					console.log("latlng: " + latlng.lat() + " " + latlng.lng());
+					console.log("pix: " + pix.x + " " + pix.y);
+				}
+				var pos_x = pix.x - div_left;
+				var pos_y = pix.y - div_top;
+				if (this.image_mode ||
+				    (pos_x > -MARGIN && pos_x < div_width &&
+				     pos_y >= 0 && pos_y < div_height)) {
+					navicell.dataset.drawDLO(module, this, this.context, scale, arrpos[nn].id, arrpos[nn].gene_name, pix.x-div_left, pix.y-div_top);
 				} else {
+					console.log("not drawed");
 				}
 			}
 			//console.log("CACHE_VALUE_CNT " + cache_value_cnt + " " + no_cache_value_cnt);
@@ -926,3 +951,184 @@ USGSOverlay.prototype.onRemove = function() {
 	this.div_ = null;
 }
 
+
+// By Mathurin, take a screenshot in a customized hidden canvas
+// will be moved to screenshot.js
+var nScreenshots = 0;
+
+function visible_screenshot()
+{
+	console.log("here we are");
+        var mm = document.getElementById("innermap");
+        var mm2 = document.getElementById("map_canvas");
+        var screenShot = document.getElementById("screenshot_canvas");
+	console.log("screenshot: " + screenShot);
+        // CSS dimensions and canvas dimension have to be equal to get a 1:1 scaling
+
+	var width, height;
+	if (false) {
+		//width = $(mm2).css("width");
+		//height = $(mm2).css("height");
+		width = "2500";
+		height = "2000";
+	} else {
+		width = $(mm).css("width");
+		height = $(mm).css("height");
+	}
+        px = new RegExp("px|em", "g");
+        var mmWidth = parseInt(width.replace(px, ""));
+	$(screenShot).attr("height", height);
+        $(screenShot).attr("width", document.width + "px");
+
+        $(screenShot).css("height", $(screenShot).attr("height"));
+        $(screenShot).css("width", $(screenShot).attr("width"));
+
+        var ctx = screenShot.getContext("2d");
+        ctx.clearRect(0, 0, screenShot.width, screenShot.height);
+
+        xOffset = parseInt($("#innermap").css("left").replace(px, ""));
+        yOffset = parseInt($("#innermap").css("top").replace(px, ""));
+	
+        var tiles_div = $("#innermap").parent().next().next().next();
+        var tiles = tiles_div.children().first().children();
+        console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
+        for (var ii = 0 ; ii < tiles.length ; ii++) {
+                var tile = $("img", tiles.eq(ii));
+                var width = parseInt(tile.css("width").replace(px, ""))
+                var height = parseInt(tile.css("height").replace(px, ""));
+                var xx = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+                var yy = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+                var wCorrected = width - ((xx - xOffset + width) - mmWidth); // Compute x without exiting the border
+		console.log("width: " + width + " height " + height + " " + xx + " " + (xx-xOffset) + " " + yy + " " + (yy-yOffset));
+                if (wCorrected < width) {
+                        ctx.drawImage(tile[0], 0, 0, wCorrected, height, xx-xOffset, yy-yOffset, wCorrected, height);
+                } else {
+                        ctx.drawImage(tile[0], 0, 0, width, height, xx-xOffset, yy-yOffset, width, height);
+                }
+        }
+
+        // Draw the overlay
+	ctx.drawImage(mm.firstChild, 0, 0, mm.width, mm.height, 0, 0, mm.width, mm.height);
+        // Save the screenshot canvas as URL and provide a link to that URL
+        var url = screenShot.toDataURL();
+        nScreenshots++;
+        console.log(url.substring(0,40));
+	console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+        $("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+}
+
+function ScreenShotLoader(screenShot, module, context, ntiles, delta_x, delta_y) {
+	this.screenShot = screenShot;
+	this.module = module;
+	this.context = context;
+	this.total_img_cnt = ntiles*ntiles;
+	this.img_cnt = 0;
+	this.delta_x = delta_x;
+	this.delta_y = delta_y;
+}
+
+ScreenShotLoader.prototype = {
+
+	imgLoaded: function() {
+		if (++this.img_cnt == this.total_img_cnt) {
+			console.log("imgLoaded !");
+			overlay.drawScreenShot(this.module, this.context, this.delta_x, this.delta_y);
+			var url = this.screenShot.toDataURL();
+			nScreenshots++;
+			console.log(url.substring(0,40));
+			console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+			$("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+		}
+	}
+};
+
+function full_screenshot(module)
+{
+	/*
+	console.log("here we are");
+	
+	if (screenShot) {
+		var url = screenShot.toDataURL();
+		nScreenshots++;
+		console.log(url.substring(0,40));
+		console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+		$("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+		screenShot = null;
+		ctx = null;
+		return;
+	};
+	*/
+        screenShot = document.getElementById("screenshot_canvas");
+        // CSS dimensions and canvas dimension have to be equal to get a 1:1 scaling
+
+	//var zoom = 3; // hard-coded to be changed
+	var zoom = overlay.map_.zoom;
+	var ntiles = 1 << zoom;
+	var tile_width = 256; // hard-coded to be changed
+	var tile_height = 256; // hard-coded to be changed
+	var width, height;
+	width = ntiles * tile_width;
+	height = ntiles * tile_height;
+        var px = new RegExp("px|em", "g");
+	$(screenShot).attr("height", height);
+        $(screenShot).attr("width", width + "px");
+
+        $(screenShot).css("height", $(screenShot).attr("height"));
+        $(screenShot).css("width", $(screenShot).attr("width"));
+
+        ctx = screenShot.getContext("2d");
+        ctx.clearRect(0, 0, screenShot.width, screenShot.height);
+
+	var imgs = [];
+        var tiles_div = $("#innermap").parent().next().next().next();
+        var tiles = tiles_div.children().first().children();
+        console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
+
+	var tile_map = {};
+	for (var ii = 0; ii < tiles.length; ++ii) {
+		var tile = $("img", tiles.eq(ii));
+		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+		tile_map[tile.attr("src")] = [left, top];
+		console.log("src: " + tile.attr("src") + " " + left + " " + top);
+	}
+	var delta_x = 0;
+	var delta_y = 0;
+	for (var ii = 0; ii < ntiles; ++ii) {
+		for (var jj = 0; jj < ntiles; ++jj) {
+			var src = "tiles/" + zoom + "/" + ii + "_" + jj + ".png";
+			if (tile_map[src]) {
+				var x_offset = (ii*tile_width);
+				var y_offset = (jj*tile_height);
+				delta_x = tile_map[src][0] - x_offset; 
+				delta_y = tile_map[src][1] - y_offset;
+				break;
+			}
+		}
+	}
+	console.log("DELTA_X: " + delta_x + " DELTA_Y:" + delta_y);
+	var screenShotLoader = new ScreenShotLoader(screenShot, module, ctx, ntiles, delta_x, delta_y);
+	for (var ii = 0; ii < ntiles; ++ii) {
+		//var tile = $("img", tiles.eq(ii));
+		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+		//console.log("tiles: " + ii + " left: " + left + " top:" + top);
+		imgs[ii] = [];
+		for (var jj = 0; jj < ntiles; ++jj) {
+			var img = document.createElement('img');
+			var src = "tiles/" + zoom + "/" + ii + "_" + jj + ".png";
+			//console.log("SRC " + src + " " + ((ii*tile_width)-xOffset) + " " + ((jj*tile_height)-yOffset));
+			$(img).attr("src", src);
+			img.xx = ii;
+			img.yy = jj;
+			img.onload = function() {
+				//console.log("IMAGE LOADED " + this.xx + " " + this.yy);
+				ctx.drawImage(this, 0, 0, tile_width, tile_height, ((this.xx)*tile_width), ((this.yy)*tile_height), tile_width, tile_height);
+				screenShotLoader.imgLoaded();
+			};
+			imgs[ii].push(img);
+
+		}
+	}
+	console.log("EXITING");
+}

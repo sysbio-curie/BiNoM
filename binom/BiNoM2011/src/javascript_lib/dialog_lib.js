@@ -575,6 +575,13 @@ $(function() {
 		}
 	});
 
+	// mathurin
+	console.log(" !!!!! SCREEN click function !!!");
+        $("#screen_shot").button().click(function(){
+		console.log("CLICK!");
+                full_screenshot(get_module());
+        });
+
 	$("#functional_analysis").button().click(function() {
 		//if (true || navicell.dataset.datatableCount()) {
 		if (navicell.dataset.datatableCount()) {

@@ -18,8 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-var MAX_SCREEN_WIDTH = 2500;
-var MAX_SCREEN_HEIGHT = 2000;
+//var MAX_SCREEN_WIDTH = 2500;
+//var MAX_SCREEN_HEIGHT = 2000;
+var MAX_SCREEN_WIDTH = 8192;
+var MAX_SCREEN_HEIGHT = 8192;
 var ESP_LATLNG = 0.01;
 var CENTER_HIGHLIGHT_SHAPE = true;
 var CENTER_HIGHLIGHT_CIRCLE = !CENTER_HIGHLIGHT_SHAPE;
@@ -1024,7 +1026,7 @@ function visible_screenshot()
         $("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
 }
 
-function ExportImageLoader(exportImage, overlayImage, module, context, context2, ntiles, width, height, delta_x, delta_y) {
+function ExportImageLoader(exportImage, overlayImage, module, context, context2, ntiles, width, height, delta_x, delta_y, wait_cursor) {
 	this.exportImage = exportImage;
 	this.overlayImage = overlayImage;
 	this.module = module;
@@ -1036,16 +1038,55 @@ function ExportImageLoader(exportImage, overlayImage, module, context, context2,
 	this.height = height;
 	this.delta_x = delta_x;
 	this.delta_y = delta_y;
+	this.wait_cursor = wait_cursor;
 }
+
+var MAX_IMAGE_WIDTH = 4096;
 
 ExportImageLoader.prototype = {
 
 	imgLoaded: function() {
 		if (++this.img_cnt == this.total_img_cnt) {
 			overlay.drawExportImage(this.module, this.context2, this.delta_x, this.delta_y);
+
 			this.context.drawImage(this.overlayImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-			var url = this.exportImage.toDataURL();
-			$("#export_image_link").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank'>download image</a></span>");
+			console.log("here we go " + this.width);
+			if (this.width > MAX_IMAGE_WIDTH) {
+				var count = this.width/MAX_IMAGE_WIDTH;
+				console.log("splitting in " + count);
+				var count2 = count*count;
+				var width_splitted = this.width/count;
+				var height_splitted = this.height/count;
+				var nn = 1;
+				for (var abs = 0; abs < count; ++abs) {
+					for (var ord = 0; ord < count; ++ord) {
+						var canvas = document.createElement('canvas');
+					
+						canvas.width = width_splitted;
+						canvas.height = height_splitted;
+						var ctx = canvas.getContext('2d');
+						var x = abs * width_splitted;
+						var y = ord * height_splitted
+						ctx.drawImage(this.exportImage, x, y, width_splitted, height_splitted, 0, 0, width_splitted, height_splitted);
+						console.log("x " + x + " " + y + " width " + width_splitted + " " + height_splitted);
+						var url = canvas.toDataURL();
+						$("#export_image_link_" + nn).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='image_" + nn + ".png'>download image part " + nn + "</a></span>");
+						nn++;
+						$(canvas).remove();
+					}
+				}
+			} else {
+				console.log("direct");
+				var url = this.exportImage.toDataURL();
+				$("#export_image_link_1").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='image.png'>download image</a></span>");
+			}
+			this.wait_cursor.restore();
+			/*
+			var button = document.getElementById('export_image_link');
+w			button.onclick = function () {
+				window.location.href = url.replace('image/png', 'image/octet-stream');
+			};
+			*/
 		}
 	}
 };
@@ -1069,6 +1110,7 @@ function navicell_export_image(module)
         $(exportImage).css("height", $(exportImage).attr("height"));
         $(exportImage).css("width", $(exportImage).attr("width"));
 
+
         ctx = exportImage.getContext("2d");
         ctx.clearRect(0, 0, exportImage.width, exportImage.height);
 
@@ -1083,6 +1125,10 @@ function navicell_export_image(module)
 		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
 		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
 		var src = tile.attr("src");
+		if (!src) {
+			console.log("notice: no src at " + ii + "/" + tiles.length);
+			continue;
+		}
 		if (!nobg && src.indexOf("_nobg") > 0) {
 			nobg = "_nobg";
 		}
@@ -1113,10 +1159,16 @@ function navicell_export_image(module)
         var ctx2 = overlayImage.getContext("2d");
         ctx2.clearRect(0, 0, overlayImage.width, overlayImage.height);
 
-	var exportImageLoader = new ExportImageLoader(exportImage, overlayImage, module, ctx, ctx2, ntiles, width, height, delta_x, delta_y);
+	var wait_cursor = new WaitCursor(["#export_image", "body"]);
+	var exportImageLoader = new ExportImageLoader(exportImage, overlayImage, module, ctx, ctx2, ntiles, width, height, delta_x, delta_y, wait_cursor);
 	for (var ii = 0; ii < ntiles; ++ii) {
-		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
-		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+		var tile = tiles.eq(ii);
+		if (!tile) {
+			console.log("notice: no tile at " + ii + " " + jj + " / " + ntiles);
+			continue;
+		}
+		//var left = parseInt(tile.css("left").replace(px, ""));
+		//var top = parseInt(tile.css("top").replace(px, ""));
 		imgs[ii] = [];
 		for (var jj = 0; jj < ntiles; ++jj) {
 			var img = document.createElement('img');
@@ -1132,4 +1184,8 @@ function navicell_export_image(module)
 
 		}
 	}
+	$('html').css('overflow', 'hidden');
+	$('body').css('overflow', 'hidden');
+	$(overlay.div_).css('overflow', 'hidden');
+	$("#map_canvas").css('overflow', 'hidden');
 }

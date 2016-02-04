@@ -7,7 +7,7 @@ In a terminal:
 I. Primary installation and testing
 -----------------------------------
 
-1. go to the directory containing navicell package
+1. go to the directory containing the navicell package
 
 2. set the environment variable NAVICELL_PUB (will be used later) as follows:
 

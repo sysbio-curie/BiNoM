@@ -5679,8 +5679,6 @@ public class ProduceClickableMap
 		header_right.close();
 		header.close();
 
-		out.println("<canvas id='export_image_canvas'></canvas>");
-		out.println("<canvas id='overlay_image_canvas'></canvas>");
 		final Div map_div = new Div(left_content, "id='" + map_div_name + "'");
 		out.println("The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.");
 		map_div.close();
@@ -5736,6 +5734,8 @@ public class ProduceClickableMap
 		out.println("</div>");
 		out.println("<div id='info_dialog' title=''>");
 		out.println("</div>");
+		out.println("<canvas id='export_image_canvas'></canvas>");
+		out.println("<canvas id='overlay_image_canvas'></canvas>");
 		out.println("</body>");
 		out.println("</html>");
 		out.flush();

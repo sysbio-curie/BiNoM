@@ -142,6 +142,8 @@ function scaled_boxes_from_boxes(overlay, boxes) {
 	var scale = Math.pow(2, overlay.map_.zoom);
 	var div = overlay.div_;
 	var array = [];
+	var div_left = this.image_mode ? this.delta_x : div.left;
+	var div_top = this.image_mode ? this.delta_y : div.top;
 	for (var idx in boxes) {
 		var box = boxes[idx];
 		//var box = [pos.x, pos.w, pos.y, pos.h, pos.said];
@@ -151,8 +153,8 @@ function scaled_boxes_from_boxes(overlay, boxes) {
 		}
 		var latlng = mapProjection.fromPointToLatLng(box.gpt);
 		var pix = overlayProjection.fromLatLngToDivPixel(latlng);
-		var bx = pix.x - div.left;
-		var by = pix.y - div.top;
+		var bx = pix.x - div_left;
+		var by = pix.y - div_top;
 		var bw = box[1]*scale;
 		var bh = box[3]*scale;
 		array.push([pix.x, bw, pix.y, bh]);
@@ -794,10 +796,12 @@ USGSOverlay.prototype.highlight = function(boxes) {
 	this.initHighlight();
 	var context = this.context;
 	var div = this.div_;
+	var div_left = this.image_mode ? this.delta_x : div.left;
+	var div_top = this.image_mode ? this.delta_y : div.top;
 	for (var idx in boxes) {
 		var box = boxes[idx];
-		var x = box[0] - div.left;
-		var y = box[2] - div.top;
+		var x = box[0] - div_left;
+		var y = box[2] - div_top;
 		var w = box[1];
 		var h = box[3];
 		context.clearRect(x-1, y-1, w+2, h+2);
@@ -898,8 +902,10 @@ USGSOverlay.prototype.draw = function(module) {
 		var div = this.div_;
 		var boxes = scaled_boxes_from_boxes(this, [overlay.neighbour_of_box]);
 		var box = boxes[0];
-		var x = box[0] - div.left;
-		var y = box[2] - div.top;
+		var div_left = this.image_mode ? this.delta_x : div.left;
+		var div_top = this.image_mode ? this.delta_y : div.top;
+		var x = box[0] - div_left;
+		var y = box[2] - div_top;
 		var w = box[1];
 		var h = box[3];
 		var dim = w > h ? w : h;
@@ -909,6 +915,7 @@ USGSOverlay.prototype.draw = function(module) {
 		this.context.arc(x+dim2, y+dim4, dim2+5, 0., Math.PI*2);
 		this.context.closePath();
 		this.context.stroke();
+
 	}
 }
 
@@ -1017,12 +1024,16 @@ function visible_screenshot()
         $("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
 }
 
-function ExportImageLoader(exportImage, module, context, ntiles, delta_x, delta_y) {
+function ExportImageLoader(exportImage, overlayImage, module, context, context2, ntiles, width, height, delta_x, delta_y) {
 	this.exportImage = exportImage;
+	this.overlayImage = overlayImage;
 	this.module = module;
 	this.context = context;
+	this.context2 = context2;
 	this.total_img_cnt = ntiles*ntiles;
 	this.img_cnt = 0;
+	this.width = width;
+	this.height = height;
 	this.delta_x = delta_x;
 	this.delta_y = delta_y;
 }
@@ -1031,7 +1042,8 @@ ExportImageLoader.prototype = {
 
 	imgLoaded: function() {
 		if (++this.img_cnt == this.total_img_cnt) {
-			overlay.drawExportImage(this.module, this.context, this.delta_x, this.delta_y);
+			overlay.drawExportImage(this.module, this.context2, this.delta_x, this.delta_y);
+			this.context.drawImage(this.overlayImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 			var url = this.exportImage.toDataURL();
 			$("#export_image_link").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank'>download image</a></span>");
 		}
@@ -1092,7 +1104,16 @@ function navicell_export_image(module)
 		}
 	}
 
-	var exportImageLoader = new ExportImageLoader(exportImage, module, ctx, ntiles, delta_x, delta_y);
+	// new
+        var overlayImage = document.getElementById("overlay_image_canvas");
+	$(overlayImage).attr("height", height);
+        $(overlayImage).attr("width", width + "px");
+        $(overlayImage).css("height", $(overlayImage).attr("height"));
+        $(overlayImage).css("width", $(overlayImage).attr("width"));
+        var ctx2 = overlayImage.getContext("2d");
+        ctx2.clearRect(0, 0, overlayImage.width, overlayImage.height);
+
+	var exportImageLoader = new ExportImageLoader(exportImage, overlayImage, module, ctx, ctx2, ntiles, width, height, delta_x, delta_y);
 	for (var ii = 0; ii < ntiles; ++ii) {
 		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
 		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));

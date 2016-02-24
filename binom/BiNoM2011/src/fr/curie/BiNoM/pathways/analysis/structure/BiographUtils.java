@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.*;
 
+import fr.curie.BiNoM.pathways.utils.Utils;
 import fr.curie.BiNoM.pathways.wrappers.XGMML;
 
 
@@ -1082,7 +1083,8 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  Node n = nodes.get(i);
 		  Vector v = n.getAttributesWithSubstringInName("REACTION");
 		  if(v.size()==0){
-			  Vector<String> pnames = extractProteinNamesFromNodeName(n.Id);
+			  //Vector<String> pnames = extractProteinNamesFromNodeName(n.Id);
+			  Vector<String> pnames = extractProteinNamesFromNodeName(n);
 			  for(int j=0;j<pnames.size();j++)
 				  if(!res.contains(pnames.get(j)))
 					  res.add(pnames.get(j));
@@ -1091,7 +1093,15 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  return res;
   }
   
+  public static Vector<String> extractProteinNamesFromNodeName(Node n){
+	  return extractProteinNamesFromNodeName(n.Id,n);
+  }
+  
   public static Vector<String> extractProteinNamesFromNodeName(String id){
+	  return extractProteinNamesFromNodeName(id, null);
+  }
+  
+  public static Vector<String> extractProteinNamesFromNodeName(String id, Node n){
 	  Vector<String> names = new Vector<String>();
 	  if(!id.trim().equals("")){
 	  StringTokenizer st = new StringTokenizer(id,"@");
@@ -1109,15 +1119,27 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  String proteinName = st1.nextToken();
 		  if((proteinName.startsWith("g"))||(proteinName.startsWith("r"))){
 			  //System.out.println(proteinName);
-			  if(proteinName.substring(1, 2).equals(proteinName.substring(1, 2).toUpperCase())){
-			  	proteinName = proteinName.substring(1, proteinName.length());
+			  if(n!=null){
+				  String tp = n.getFirstAttributeValueWithSubstringInName("NODE_TYPE");
+				  if(tp.equals("GENE")||tp.equals("dna")||tp.equals("RNA")||tp.equals("rna"))
+					  proteinName = proteinName.substring(1, proteinName.length());
+			  }else{
+				  if(proteinName.substring(1, 2).equals(proteinName.substring(1, 2).toUpperCase())){
+					  	proteinName = proteinName.substring(1, proteinName.length());
+					  }
 			  }
 			  //System.out.println(proteinName);
 		  }
 		  if(proteinName.startsWith("ar")){
 			  //System.out.println(proteinName);
-			  if(proteinName.substring(2, 3).equals(proteinName.substring(2, 3).toUpperCase())){
-			  	proteinName = proteinName.substring(2, proteinName.length());
+			  if(n!=null){
+				  String tp = n.getFirstAttributeValueWithSubstringInName("NODE_TYPE");
+				  if(tp.contains("RNA"))
+					  proteinName = proteinName.substring(2, proteinName.length());
+			  }else{
+				  if(proteinName.substring(2, 3).equals(proteinName.substring(2, 3).toUpperCase())){
+					  	proteinName = proteinName.substring(2, proteinName.length());
+					  }
 			  }
 			  //System.out.println(proteinName);
 		  }
@@ -1199,13 +1221,15 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  }
 	  // First, create intersection relations
 	  for(int i=0;i<reactionNetwork.Nodes.size();i++){
-		  Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i).Id);
+		  //Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i).Id);
+		  Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i));
+		  String pmids = reactionNetwork.Nodes.get(i).getFirstAttributeValue("PMID");
 		  for(int j=0;j<names.size();j++)for(int k=0;k<names.size();k++)if(j!=k){
 			  String id = "";
 			  //if(names.get(j).compareTo(names.get(k))<0)
-				  id = names.get(j)+" (interesects) "+names.get(k);
+				  id = names.get(j)+" (intersects) "+names.get(k);
 			  //else
-			  //	  id = names.get(k)+" (interesects) "+names.get(j);
+			  //	  id = names.get(k)+" (intersects) "+names.get(j);
 			  Edge e = entityNetwork.getCreateEdge(id);
 			  int inter_size = 1;
 			  String inter_string = reactionNetwork.Nodes.get(i).Id;
@@ -1217,13 +1241,21 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 			  e.Node2 = entityNetwork.getNode(names.get(k));
 			  e.setAttributeValueUnique("INTERSECTION", ""+inter_string, Attribute.ATTRIBUTE_TYPE_STRING);			  
 			  e.setAttributeValueUnique("INTERSECTION_SIZE", ""+inter_size, Attribute.ATTRIBUTE_TYPE_STRING);
-			  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "INTERSECTION", Attribute.ATTRIBUTE_TYPE_STRING);
+			  if(names.size()==2)
+				  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "INTERSECTION@@PROTEIN_INTERACTION", Attribute.ATTRIBUTE_TYPE_STRING);
+			  else
+				  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", "INTERSECTION@@COMPLEX_EXPANSION", Attribute.ATTRIBUTE_TYPE_STRING);
 			  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", "INTERSECTION", Attribute.ATTRIBUTE_TYPE_STRING);
+			  updatePMIDs(e,pmids);
 			  entityNetwork.addEdge(e);
 		  }
 	  }
 	  // Second, all regulation relations
 	  for(int i=0;i<reactionNetwork.Nodes.size();i++)if(reactionNetwork.Nodes.get(i).getAttributesWithSubstringInName("REACTION")!=null)if(reactionNetwork.Nodes.get(i).getAttributesWithSubstringInName("REACTION").size()!=0){
+		  
+		  Node reaction = reactionNetwork.Nodes.get(i);
+		  String reaction_pmids = reaction.getFirstAttributeValue("PMID");
+		  
 		  Vector<Edge> incoming = reactionNetwork.Nodes.get(i).incomingEdges;
 		  Node reactionNode = reactionNetwork.Nodes.get(i);
 		  String type = "";
@@ -1234,17 +1266,21 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  Vector<String> reactants = new Vector<String>();
 		  Vector<String> products = new Vector<String>();
 		  for(int k=0;k<reactionNode.incomingEdges.size();k++)if(reactionNode.incomingEdges.get(k).getFirstAttributeValue("interaction").equals("LEFT")){
-			  Vector<String> reactants1 = extractProteinNamesFromNodeName(reactionNode.incomingEdges.get(k).Node1.Id);	
+			  //Vector<String> reactants1 = extractProteinNamesFromNodeName(reactionNode.incomingEdges.get(k).Node1.Id);	
+			  Vector<String> reactants1 = extractProteinNamesFromNodeName(reactionNode.incomingEdges.get(k).Node1);
 			  for(int l=0;l<reactants1.size();l++) reactants.add(reactants1.get(l));
 		  }
 		  for(int k=0;k<reactionNode.outcomingEdges.size();k++)if(reactionNode.outcomingEdges.get(k).getFirstAttributeValue("interaction").equals("RIGHT")){
-			  Vector<String> products1 = extractProteinNamesFromNodeName(reactionNode.outcomingEdges.get(k).Node2.Id);		  			  
+			  //Vector<String> products1 = extractProteinNamesFromNodeName(reactionNode.outcomingEdges.get(k).Node2.Id);		  			  
+			  Vector<String> products1 = extractProteinNamesFromNodeName(reactionNode.outcomingEdges.get(k).Node2);
 			  for(int l=0;l<products1.size();l++) products.add(products1.get(l));
 		  }
 		  
 		  for(int j=0;j<incoming.size();j++)if(!incoming.get(j).getFirstAttributeValue("interaction").equals("LEFT"))if(!incoming.get(j).getFirstAttributeValue("interaction").equals("RIGHT")){
 			  Node n = incoming.get(j).Node1;
-			  Vector<String> namesReg = extractProteinNamesFromNodeName(n.Id);
+			  String regulator_pmids = n.getFirstAttributeValue("PMID");
+			  //Vector<String> namesReg = extractProteinNamesFromNodeName(n.Id);
+			  Vector<String> namesReg = extractProteinNamesFromNodeName(n);
 			  // now whe should construct a list of everything that regulated (reactants and products)
 			  Vector<String> names = new Vector<String>();
 			  for(int s=0;s<reactants.size();s++) 
@@ -1268,12 +1304,38 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 				  		  e.Node1 = entityNetwork.getNode(namesReg.get(l));
 				  		  e.Node2 = entityNetwork.getNode(names.get(k));
 				  		  e.Attributes = incoming.get(j).Attributes;
+				  		  //e.Attributes.add(new Attribute("PMID", regulator_pmids, Attribute.ATTRIBUTE_TYPE_STRING));
+				  		  //e.Attributes.add(new Attribute("PMID", reaction_pmids, Attribute.ATTRIBUTE_TYPE_STRING));
+				  		  updatePMIDs(e,regulator_pmids);
+				  		  updatePMIDs(e,reaction_pmids);
 					  }
 			  }
 		  }
 		  
-			  // Next, if there is a conversion of one entity into another one
-		      if(!type.contains("INFLUENCE"))
+
+		  // Next, explicit association and disassociation of heterodimers  
+	      if(type.contains("HETERODIMER"))
+	  	  for(int k=0;k<products.size();k++){
+			  for(int l=0;l<reactants.size();l++)if(!reactants.get(l).equals(products.get(k))){
+				  String id = reactants.get(l)+" ("+type+") "+products.get(k);
+				  //System.out.println(id+"\t"+reaction_pmids);
+				  if(entityNetwork.getNode(reactants.get(l))!=null)
+					  if(entityNetwork.getNode(products.get(k))!=null){					  
+						  Edge e = entityNetwork.getCreateEdge(id);			
+				  		  e.Node1 = entityNetwork.getNode(reactants.get(l));
+				  		  e.Node2 = entityNetwork.getNode(products.get(k));
+						  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+						  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+						  //e.Attributes.add(new Attribute("PMID", reaction_pmids, Attribute.ATTRIBUTE_TYPE_STRING));
+						  updatePMIDs(e,reaction_pmids);
+						  //System.out.println(id+" -> "+e.getFirstAttributeValue("PMID1"));
+						  //Utils.addAttributeUniqueNameConcatenatedValues(e, "PMID", "PMID", reaction_pmids, fr.curie.BiNoM.pathways.analysis.structure.Attribute.ATTRIBUTE_TYPE_STRING);
+					  }					  
+			  }
+		  }
+		  
+		  // Next, if there is a conversion of one entity into another one
+		      if(!type.contains("INFLUENCE"))if(!type.contains("HETERODIMER"))
 		  	  for(int k=0;k<products.size();k++)if(!reactants.contains(products.get(k))){
 				  for(int l=0;l<reactants.size();l++){
 					  String id = reactants.get(l)+" ("+type+") "+products.get(k);
@@ -1284,6 +1346,8 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 					  		  e.Node2 = entityNetwork.getNode(products.get(k));
 							  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
 							  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+							  //e.Attributes.add(new Attribute("PMID", reaction_pmids, Attribute.ATTRIBUTE_TYPE_STRING));
+							  updatePMIDs(e,reaction_pmids);
 						  }					  
 				  }
 			  }
@@ -1304,6 +1368,8 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 						  			  e.setAttributeValueUnique("interaction", "inhibits", Attribute.ATTRIBUTE_TYPE_STRING);
 								  e.setAttributeValueUnique("CELLDESIGNER_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
 								  e.setAttributeValueUnique("BIOPAX_EDGE_TYPE", type, Attribute.ATTRIBUTE_TYPE_STRING);
+								  //e.Attributes.add(new Attribute("PMID", reaction_pmids, Attribute.ATTRIBUTE_TYPE_STRING));
+								  updatePMIDs(e,reaction_pmids);
 							  }					  
 					  }
 				  }
@@ -1312,6 +1378,26 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  }
 	  
 	  return entityNetwork;
+  }
+  
+  public static void updatePMIDs(Edge e, String pmids){
+	  Vector<String> vpmids = e.getAttributeValues("PMID");
+	  vpmids.add(pmids);
+	  Vector<String> newpmids = new Vector<String>();
+	  for(String pmid: vpmids)if(pmid!=null){
+		  StringTokenizer st = new StringTokenizer(pmid,"@,;. ");
+		  while(st.hasMoreTokens()){
+			  String pm = st.nextToken();
+			  if(!pm.equals("")){
+				  if(!newpmids.contains(pm))
+					  newpmids.add(pm);
+			  }
+		  }
+	  }
+	  String pms = "";
+	  for(String s: newpmids) pms+=s+"@@";
+	  if(pms.length()>1) pms = pms.substring(0, pms.length()-2);
+	  e.setAttributeValueUnique("PMID", pms, Attribute.ATTRIBUTE_TYPE_STRING);
   }
   
   

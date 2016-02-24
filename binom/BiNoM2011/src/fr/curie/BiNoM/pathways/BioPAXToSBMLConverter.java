@@ -383,7 +383,8 @@ public class BioPAXToSBMLConverter {
     		Iterator comps = compl.getComponent();
     		while(comps.hasNext()) {
     			PhysicalEntity pe = (PhysicalEntity) comps.next();
-    			addIncludedParticipant(pe);
+    			//addIncludedParticipant(pe);
+    			addParticipant(pe);
     		}
     	}
     	// Now let us detect those who participate in reactions and exclude them from the list

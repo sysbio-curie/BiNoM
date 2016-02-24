@@ -63,12 +63,21 @@ public class ICAMining_BitonPaper {
 			String gmts = "C:/Datas/PanMethylome/methylome/BLCAC/gsea/results/msigdb_acsn.gmt";
 			//FilterGSEAResults(folder, 15, 3f, 0.01f, 0.01f, gmts);
 			FilterGSEAResults(folder, 10, 5f, 0.01f, 0.01f, gmts);*/
+
+			//String folder = "C:/Datas/CAFibroblasts/gsea/results/";
+			//String gmts = "C:/Datas/CAFibroblasts/gsea/results/msigdb_acsn.gmt";
+			//FilterGSEAResults(folder, 15, 3f, 0.01f, 0.01f, gmts);
+			String folder = "C:/Datas/ICA/Anne/metaranking/GSEA/results/";
+			String gmts = "C:/Datas/ICA/Anne/metaranking/GSEA/results/vantveer_signatures.gmt";
+			FilterGSEAResults(folder, 5, 3f, 0.01f, 0.01f, gmts);
+
 			
-			String folder = "./";
+			/*String folder = "./";
 			String gmts = "msigdb.v4.0.symbols.gmt";
 			gmts = args[2];
 			float thresh = Float.parseFloat(args[1]);
 			FilterGSEAResults(folder, Integer.parseInt(args[0]), thresh, 0.01f, 0.01f, gmts);
+			*/
 			
 			//ReformatGSEAAnotationFile("C:/Datas/ICA/Anne/results_GSEA_filtered.html");
 			

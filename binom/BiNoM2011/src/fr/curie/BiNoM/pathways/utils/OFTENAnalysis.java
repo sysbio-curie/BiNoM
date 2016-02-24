@@ -38,6 +38,13 @@ public class OFTENAnalysis {
 			OFTENAnalysis of = new OFTENAnalysis();
 			//of.loadHPRD(pathToHPRD);
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_CIT.txt","CIT");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/CAFibroblasts/caf_lc_S.xls","caf");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/ASSET/miRNA_Iljin_Kristina/analysis/scores.txt","ASP14");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/ASSET/miRNA_Iljin_Kristina/UW228/scores.xls","UW228");
+			//of.completeOFTENAnalysisOfTable("C:/Datas/SingleCellTranscriptomics/MonocleData/ica/GSE52529_uniquelog_ica_S.xls","SSM");
+			//of.makeGSEABatchFile("C:/Datas/SingleCellTranscriptomics/MonocleData/ica/gsea/","coordinated_set_of_genes_150.gmt","results/");
+			//of.makeGSEABatchFile("C:/Datas/ICA/Anne/metaranking/GSEA/","vantveer_signatures.gmt","results/");
+			System.exit(0);
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/SADP_rda_files/S_CIT.txt","CIT");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/broad/S_CCLE05.txt","CCLE05");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/cellline/exon_curie/S_CUEX20.txt","CUEX20");

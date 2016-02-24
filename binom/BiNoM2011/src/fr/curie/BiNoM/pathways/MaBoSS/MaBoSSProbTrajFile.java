@@ -64,13 +64,18 @@ public class MaBoSSProbTrajFile {
 		//makeGeneticInteractionTable(vt1,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_mutants/");
 		
 		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/","metastasis_","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls");
+		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastasis_mutants_logics/","metastasis","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastases_ls"); 
 		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/Merged_phenotypes.txt"));
-		prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
+		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
+		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
 
 		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_mutants_logics/","meta_physio_","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_ls");
 		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_ls.xls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/Merged_phenotypes.txt"));
 		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
-
+		
+		//prob.makeLogicMutantTableFromFolder("D:/temp/metastasis_mutants_logics/","metastasis","D:/temp/metastasis_mutants_logics/descriptions.txt","D:/temp/metastases_ls");		
+		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastases_ls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/Merged_phenotypes.txt"));
+		prob.normalizeProbabilityTable("D:/temp/metastases_ls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/Merged_phenotypes.txt"));
 		
 		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
 		 * 
@@ -176,7 +181,7 @@ public class MaBoSSProbTrajFile {
 		if(fileName.endsWith("_probtraj.csv"))
 			pair = fileName.substring(0, fileName.length()-13);
 		if(pair.startsWith(prefix))
-			pair = pair.substring(prefix.length(), pair.length());
+			pair = pair.substring(prefix.length()+1, pair.length());
 		if(pair.equals(prefix.substring(0,prefix.length()-1)))
 			pair = "";
 		if(!pair.equals("")){
@@ -201,7 +206,7 @@ public class MaBoSSProbTrajFile {
 			type = 0;
 		}
 		SimpleTable table = new SimpleTable();
-		table.LoadFromSimpleDatFile(fn, true, "\t", 1000000);
+		table.LoadFromSimpleDatFile(fn, true, "\t", 10000000);
 		int last = table.rowCount-1;
 		int k=5;
 		for(int i=0;i<table.colCount;i++)
@@ -224,8 +229,10 @@ public class MaBoSSProbTrajFile {
 		File dir = new File(folder);
 		Vector<MaBoSSProbTrajFile> trajs = new Vector<MaBoSSProbTrajFile>();
 		Vector<String> phenotypes = new Vector<String>();
+		int kk =0;
 		for(File f: dir.listFiles())if(f.getName().endsWith("probtraj.csv")){
-			System.out.println("Loading "+f.getName());
+			kk++;
+			System.out.println(kk+": Loading "+f.getName());
 			MaBoSSProbTrajFile traj = new MaBoSSProbTrajFile();
 			traj.load(f.getAbsolutePath(), prefix);
 			trajs.add(traj);
@@ -292,15 +299,23 @@ public class MaBoSSProbTrajFile {
 		HashMap<String, String> descriptions = new HashMap<String, String>();
 		for(String s: descs)if(!s.trim().equals("")){
 			StringTokenizer st = new StringTokenizer(s,"\t");
-			descriptions.put(st.nextToken(),st.nextToken());
+			String id = st.nextToken();
+			String logics = st.nextToken();
+			String select = "0";
+			if(st.hasMoreTokens())
+				select = st.nextToken();
+			if(select.equals("1"))
+				descriptions.put(id,logics);
 		}
 		
 		File dir = new File(folder);
 		Vector<MaBoSSProbTrajFile> trajs = new Vector<MaBoSSProbTrajFile>();
 		Vector<String> phenotypes = new Vector<String>();
 		File list[] = dir.listFiles();
+		int kk=0;
 		for(File f: list)if(f.getName().endsWith("probtraj.csv")){
-			System.out.println("Loading "+f.getName());
+			kk++;
+			System.out.println(kk+": Loading "+f.getName());
 			MaBoSSProbTrajFile traj = new MaBoSSProbTrajFile();
 			traj.load(f.getAbsolutePath(), prefix);
 			trajs.add(traj);
@@ -365,6 +380,7 @@ public class MaBoSSProbTrajFile {
 					level = s.substring(5, s.length());
 			}
 			
+			if(!description.equals("NA")){
 			fw.write(id+"\t"+type+"\t"+description+"\t"+level+"\t"+inter1+"\t"+inter_type1+"\t"+inter2+"\t"+inter_type2+"\tNA\t");
 			for(String s: sorted_phenotypes){
 				int k = traj.phenotypes.indexOf(s);
@@ -373,6 +389,7 @@ public class MaBoSSProbTrajFile {
 				fw.write(f+"\t");	
 			}
 			fw.write("\n");
+			}
 		}
 		fw.close();
 		

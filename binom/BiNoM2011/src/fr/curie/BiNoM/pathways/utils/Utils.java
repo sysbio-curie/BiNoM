@@ -376,6 +376,42 @@ public static void addAttributeUniqueNameConcatenatedValues(GraphicNode n,String
 	  at.setType(typ);
 }
 
+public static void addAttributeUniqueNameConcatenatedValues(GraphicEdge e,String label,String name, String value, ObjectType.Enum typ){
+	  AttDocument.Att at = getFirstAttribute(e,name);
+	  String val = "";
+	  if(at==null){
+	  		at = e.addNewAtt();
+	  		at.setName(name);
+	  		at.setValue(val);
+	  }else
+		  val = at.getValue();
+	  
+	  if(val.equals(""))
+		  at.setValue(value);
+	  else
+		  at.setValue(val+"@@"+value);
+	  at.setLabel(label);
+	  at.setType(typ);
+}
+
+public static void addAttributeUniqueNameConcatenatedValues(Edge e,String label,String name, String value, int typ){
+	  Attribute at = e.getFirstAttribute(name);
+	  String val = "";
+	  if(at==null){
+		    at = new Attribute(name,value);
+	  		e.Attributes.add(at);
+	  }else
+		  val = at.value;
+	  
+	  if(val.equals(""))
+		  at.value = value;
+	  else
+		  at.value = val+"@@"+value;
+	  at.type = typ;
+}
+
+
+
 /**
  * Add an attribute to GraphicEdge
  * @param n
@@ -1439,6 +1475,64 @@ public static char[] charHistogram(String text){
 	return hist;
 }
 
+public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VDataTable vt2, String prefix2, float correlationThreshold, boolean chooseOnlyMaximalCorrelation) throws Exception{
+	return makeTableCorrelationGraph(vt1, prefix1, vt2, prefix2, correlationThreshold, chooseOnlyMaximalCorrelation, false);
+}
+
+public static VDataTable separatePositiveOrNegativeValues(VDataTable vt, boolean positive){
+	Vector<String> colNames = new Vector<String>();
+	for(int i=0;i<vt.colCount;i++)if(vt.fieldTypes[i]==vt.NUMERICAL){
+		String fn = vt.fieldNames[i];
+		colNames.add(fn);
+	}
+	
+	VDataTable vt1 = new VDataTable();
+	vt1.copyHeader(vt);
+	vt1.stringTable = new String[vt.rowCount][vt.colCount];
+	for(int i=0;i<vt.rowCount;i++)for(int j=0;j<vt1.colCount;j++)
+		vt1.stringTable[i][j] = vt.stringTable[i][j];
+	
+	for(int i=0;i<colNames.size();i++){
+		String fn = colNames.get(i);
+		for(int j=0;j<vt1.rowCount;j++){
+			String val = vt1.stringTable[j][vt.fieldNumByName(fn)];
+				float f = Float.parseFloat(val);
+				vt1.stringTable[j][vt.fieldNumByName(fn)] = "N/A";
+				if(f>0)if(positive) vt1.stringTable[j][vt1.fieldNumByName(fn)] = ""+f;
+				if(f<0)if(!positive) vt1.stringTable[j][vt1.fieldNumByName(fn)] = ""+f;
+		}
+	}
+	
+	return vt1;
+}
+
+public static void separatePositiveAndNegativeValues(VDataTable vt){
+	Vector<String> colNames = new Vector<String>();
+	for(int i=0;i<vt.colCount;i++)if(vt.fieldTypes[i]==vt.NUMERICAL)if(!vt.fieldNames[i].endsWith("_ps"))if(!vt.fieldNames[i].endsWith("_ng")){
+		String fn = vt.fieldNames[i];
+		colNames.add(fn);
+	}
+	
+	
+	
+	for(int i=0;i<colNames.size();i++){
+		String fn = colNames.get(i);
+		if(vt.fieldNumByName(fn+"_ps")<0)if(vt.fieldNumByName(fn+"_ng")<0){
+		vt.addNewColumn(fn+"_ps", "", "", vt.NUMERICAL, "N/A");
+		vt.addNewColumn(fn+"_ng", "", "", vt.NUMERICAL, "N/A");
+		for(int j=0;j<vt.rowCount;j++){
+			String val = vt.stringTable[j][vt.fieldNumByName(fn)];
+			if(!val.toLowerCase().equals("na"))if(!val.toLowerCase().equals("n/a"))if(!val.toLowerCase().equals("@"))if(!val.toLowerCase().equals("_")){
+				float f = Float.parseFloat(val);
+				if(f>0) vt.stringTable[j][vt.fieldNumByName(fn+"_ps")] = ""+f;
+				if(f<0) vt.stringTable[j][vt.fieldNumByName(fn+"_ng")] = ""+f;
+			}
+		}
+		}
+	}
+	
+}
+
 /** 
  * The tables should have first column as index.
  * @param vt1
@@ -1449,7 +1543,7 @@ public static char[] charHistogram(String text){
  * @param correlationThreshold
  * @throws Exception
  */
-public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VDataTable vt2, String prefix2, float correlationThreshold, boolean chooseOnlyMaximalCorrelation) throws Exception{
+public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VDataTable vt2, String prefix2, float correlationThreshold, boolean chooseOnlyMaximalCorrelation, boolean splitTails) throws Exception{
 	vt1.makePrimaryHash(vt1.fieldNames[0]);
 	vt2.makePrimaryHash(vt2.fieldNames[0]);
 	// make common list of objects
@@ -1476,35 +1570,69 @@ public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VD
 		String fni = vt1.fieldNames[i]+"_"+prefix1;
 		Node ni = graph.getCreateNode(fni);
 		ni.setAttributeValueUnique("FIELD", vt1.fieldNames[i], Attribute.ATTRIBUTE_TYPE_STRING);
-		ni.setAttributeValueUnique("SET", prefix1, Attribute.ATTRIBUTE_TYPE_STRING);
+		String set1 = prefix1;
+		if(prefix1.endsWith("_positive")) set1 = prefix1.substring(0, prefix1.length()-9);
+		if(prefix1.endsWith("_negative")) set1 = prefix1.substring(0, prefix1.length()-9);
+		//System.out.println(prefix1+"->"+set1);
+		ni.setAttributeValueUnique("SET", set1, Attribute.ATTRIBUTE_TYPE_STRING);
+		if(vt1.fieldNames[i].endsWith("_ps")||prefix1.contains("_positive"))
+			ni.setAttributeValueUnique("TAIL", "positive", Attribute.ATTRIBUTE_TYPE_STRING);
+		if(vt1.fieldNames[i].endsWith("_ng")||prefix1.contains("_negative"))
+			ni.setAttributeValueUnique("TAIL", "negative", Attribute.ATTRIBUTE_TYPE_STRING);
+		
 		int maxi = -1;
 		float maxabscorr = 0f;
+		int maxnumberofpoints = 0;
 		float maxcorr = 0f;
 		for(int j=0;j<vt2.colCount;j++)if(vt2.fieldTypes[j]==vt2.NUMERICAL){
 			String fnj = vt2.fieldNames[j]+"_"+prefix2;
 			Node nj = graph.getCreateNode(fnj);
 			nj.setAttributeValueUnique("FIELD", vt2.fieldNames[j], Attribute.ATTRIBUTE_TYPE_STRING);
-			nj.setAttributeValueUnique("SET", prefix2, Attribute.ATTRIBUTE_TYPE_STRING);
+			String set2 = prefix2;
+			if(prefix2.endsWith("_positive")) set2 = prefix2.substring(0, prefix2.length()-9);
+			if(prefix2.endsWith("_negative")) set2 = prefix2.substring(0, prefix2.length()-9);
+			//System.out.println(prefix2+"->"+set2);
+			nj.setAttributeValueUnique("SET", set2, Attribute.ATTRIBUTE_TYPE_STRING);
+			if(vt2.fieldNames[j].endsWith("_ps")||prefix2.contains("_positive"))
+				nj.setAttributeValueUnique("TAIL", "positive", Attribute.ATTRIBUTE_TYPE_STRING);
+			if(vt2.fieldNames[j].endsWith("_ng")||prefix2.contains("_negative"))
+				nj.setAttributeValueUnique("TAIL", "negative", Attribute.ATTRIBUTE_TYPE_STRING);
 			float xi[] = new float[names.size()];
 			float xj[] = new float[names.size()];
 			for(int k=0;k<names.size();k++){
-				xi[k] = Float.parseFloat(vt1.stringTable[vt1.tableHashPrimary.get(names.get(k)).get(0)][i]);
-				xj[k] = Float.parseFloat(vt2.stringTable[vt2.tableHashPrimary.get(names.get(k)).get(0)][j]);
+				String vi = vt1.stringTable[vt1.tableHashPrimary.get(names.get(k)).get(0)][i];
+				String vj = vt2.stringTable[vt2.tableHashPrimary.get(names.get(k)).get(0)][j];
+				if(vi.toLowerCase().equals("n/a"))
+					xi[k] = Float.NaN;
+				else
+					xi[k] = Float.parseFloat(vi);
+				if(vj.toLowerCase().equals("n/a"))
+					xj[k] = Float.NaN;
+				else
+					xj[k] = Float.parseFloat(vj);
 			}
-			float corr = VSimpleFunctions.calcCorrelationCoeff(xi, xj);
+			float corr = VSimpleFunctions.calcCorrelationCoeffMissingValues(xi, xj);
 			float abscorr = Math.abs(corr);
+			int numberOfPoints = VSimpleFunctions.getNumberOfCompleteNumberPairs(xi, xj);
+			double pval = VSimpleFunctions.calcCorrelationPValue(abscorr, numberOfPoints);
+			
 			System.out.print(corr+"\t");
 			if(!chooseOnlyMaximalCorrelation)
-			if(abscorr>=correlationThreshold){
+			if(abscorr>=correlationThreshold)if(numberOfPoints>10)if(pval<0.01){
 			//	fw.write(fni+"_"+prefix1+"\t"+fnj+"_"+prefix2+"\t"+corr+"\t"+Math.abs(corr)+"\n");
 				Edge e = graph.getCreateEdge(fni+"__"+fnj);
 				e.Node1 = ni;
 				e.Node2 = nj;
 				e.setAttributeValueUnique("CORR", ""+corr, Attribute.ATTRIBUTE_TYPE_REAL);
 				e.setAttributeValueUnique("ABSCORR", ""+abscorr, Attribute.ATTRIBUTE_TYPE_REAL);
+				
+				e.setAttributeValueUnique("NUMBER_OF_POINTS", ""+numberOfPoints, Attribute.ATTRIBUTE_TYPE_REAL);
+				e.setAttributeValueUnique("LOG10PVAL", ""+(-Math.log10(pval)), Attribute.ATTRIBUTE_TYPE_REAL);
+				
 			}
 			if(abscorr>maxabscorr){
 				maxabscorr = abscorr;
+				maxnumberofpoints = numberOfPoints;
 				maxi = j;
 			}
 		}
@@ -1519,6 +1647,11 @@ public static Graph makeTableCorrelationGraph(VDataTable vt1, String prefix1, VD
 				e.Node2 = nj;
 				e.setAttributeValueUnique("CORR", ""+maxcorr, Attribute.ATTRIBUTE_TYPE_REAL);
 				e.setAttributeValueUnique("ABSCORR", ""+maxabscorr, Attribute.ATTRIBUTE_TYPE_REAL);
+
+				double pval1 = VSimpleFunctions.calcCorrelationPValue(maxabscorr, maxnumberofpoints);
+				e.setAttributeValueUnique("NUMBER_OF_POINTS", ""+maxnumberofpoints, Attribute.ATTRIBUTE_TYPE_REAL);
+				e.setAttributeValueUnique("LOG10PVAL", ""+(-Math.log10(pval1)), Attribute.ATTRIBUTE_TYPE_REAL);
+				
 			}
 		}
 	}

@@ -2,19 +2,24 @@ package fr.curie.BiNoM.pathways.utils;
 
 import java.io.FileWriter;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Vector;
 
 public class MetaGene {
 	public String name = "";
+	HashMap<String, Integer> hashName = new HashMap<String, Integer>();
 	public Vector<String> genes = new Vector<String>();
 	public Vector<Float> weights = new Vector<Float>();
 
 	public void add(String gene, float weight){
-		int k = genes.indexOf(gene);
-		if(k>=0){
+		//int k = genes.indexOf(gene);
+		Integer k = hashName.get(gene);
+		if(k!=null){
 			weights.set(k, weight);
 		}else{
 			genes.add(gene);
+			hashName.put(gene, genes.size()-1);
 			weights.add(weight);
 		}
 	}
@@ -33,6 +38,18 @@ public class MetaGene {
 		if(valsf.length>1)
 			std = Utils.calcStandardDeviation(valsf);
 		return std;
+	}
+	
+	public float sumOfWeightsAboveThreshold(int side, float threshold){
+		float sum = 0f;
+		for(int i=0;i<weights.size();i++){
+			if(side*weights.get(i)>0){
+				float val = side*weights.get(i);
+				if(val>threshold)
+					sum+=val;
+			}
+		}
+		return sum;
 	}
 	
 	public void normalizeWeightsToSidedZScores(){
@@ -61,18 +78,21 @@ public class MetaGene {
 	
 	public static float correlationTwoMetagenes(MetaGene m1, MetaGene m2){
 		float corr = 0f;
-		Vector<String> commonNames = new Vector<String>();
+		HashSet<String> commonNames = new HashSet<String>();
 		for(int i=0;i<m1.genes.size();i++)
-			if(m2.genes.contains(m1.genes.get(i)))
+			if(m2.hashName.containsKey(m1.genes.get(i)))
 				if(!commonNames.contains(m1.genes.get(i)))
 					commonNames.add(m1.genes.get(i));
 		float m1f[] = new float[commonNames.size()];
 		float m2f[] = new float[commonNames.size()];
+		HashMap<String, Integer> commonNamesHash = new HashMap<String, Integer>();
+		int k=0;
 		for(String n: commonNames){
-			float f1 = m1.weights.get(m1.genes.indexOf(n));
-			float f2 = m2.weights.get(m2.genes.indexOf(n));
-			m1f[commonNames.indexOf(n)] = f1;
-			m2f[commonNames.indexOf(n)] = f2;
+			float f1 = m1.weights.get(m1.hashName.get(n));
+			float f2 = m2.weights.get(m2.hashName.get(n));
+			m1f[k] = f1;
+			m2f[k] = f2;
+			k++;
 		}
 		corr = Utils.calcCorrelationCoeff(m1f, m2f);
 		return corr;
@@ -87,7 +107,7 @@ public class MetaGene {
 		for(int i=0;i<metagenes.size();i++){
 			MetaGene mg = metagenes.get(i);
 			float corr = correlationTwoMetagenes(this, mg);
-			//System.out.println("Correlation "+name+"<>"+mg.name+" = "+corr);
+			System.out.println("Correlation "+name+"<->"+mg.name+" = "+corr);
 			if(corr<0)
 				mg.invertSignsOfWeights();
 			res.add(mg);
@@ -97,14 +117,14 @@ public class MetaGene {
 	
 	public static MetaGene makeMetaGeneScoredFromMetagenes(Vector<MetaGene> metagenes, int minOccurenceOfGene, boolean useMedian){
 		MetaGene metametagene = new MetaGene();
-		Vector<String> allnames = new Vector<String>();
+		HashSet<String> allnames = new HashSet<String>();
 		for(int i=0;i<metagenes.size();i++){
 			MetaGene mg = metagenes.get(i);
 			for(int j=0;j<mg.genes.size();j++){
 				String gene = mg.genes.get(j);
 				int found = 0;
 				for(MetaGene mgt: metagenes){
-					if(mgt.genes.indexOf(gene)>=0)
+					if(mgt.hashName.containsKey(gene))
 						found++;
 				}
 			if(found>=minOccurenceOfGene){
@@ -117,12 +137,12 @@ public class MetaGene {
 		for(String gene: allnames){
 			Vector<Float> values = new Vector<Float>();
 			for(MetaGene m: metagenes){
-				if(m.genes.indexOf(gene)>=0){
-					values.add(m.weights.get(m.genes.indexOf(gene)));
-					/*if(gene.equals("TYMP")){
-						System.out.println("TYMP in "+m.name+": "+m.weights.get(m.genes.indexOf(gene)));
-					}
-					if(gene.equals("IFIT1")){
+				if(m.hashName.containsKey(gene)){
+					values.add(m.weights.get(m.hashName.get(gene)));
+					//if(gene.equals("CCNB2")){
+					//	System.out.println("CCNB2 in "+m.name+": "+m.weights.get(m.hashName.get(gene)));
+					//}
+					/*if(gene.equals("IFIT1")){
 						System.out.println("TYMP in "+m.name+": "+m.weights.get(m.genes.indexOf(gene)));
 					}*/
 				}
@@ -183,6 +203,14 @@ public class MetaGene {
 		for(int i=0;i<genes.size();i++)
 			fw.write(genes.get(i)+"\t"+weights.get(i)+"\n");
 		fw.close();
+	}
+	
+	public float getWeight(String gene){
+		float f = Float.NaN;
+		Integer k = hashName.get(gene);
+		if(k!=null)
+			f = weights.get(k);
+		return f;
 	}
 	
 

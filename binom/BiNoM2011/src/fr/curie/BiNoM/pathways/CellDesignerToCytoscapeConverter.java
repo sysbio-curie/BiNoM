@@ -33,7 +33,7 @@ import java.awt.*;
 import fr.curie.BiNoM.pathways.utils.*;
 import fr.curie.BiNoM.pathways.BioPAXToSBMLConverter.BioPAXSpecies;
 import fr.curie.BiNoM.pathways.analysis.structure.*;
-import fr.curie.BiNoM.pathways.biopax.physicalEntityParticipant;
+//import fr.curie.BiNoM.pathways.biopax.physicalEntityParticipant;
 import fr.curie.BiNoM.pathways.wrappers.*;
 
 import org.sbml.x2001.ns.celldesigner.*;
@@ -336,6 +336,11 @@ public class CellDesignerToCytoscapeConverter {
             Utils.addAttribute(n2,"CELLDESIGNER_NODE_TYPE","CELLDESIGNER_NODE_TYPE",rtype,ObjectType.STRING);
             Utils.addAttribute(n2,"CELLDESIGNER_REACTION","CELLDESIGNER_REACTION",r.getId(),ObjectType.STRING);
             NodeIDs.put(r.getId(),n2);
+            if(r.getNotes()!=null){
+            	Vector<Vector<String>> atts = extractAttributesFromNotes(r.getNotes());
+            	for(Vector<String> att: atts)
+            		Utils.addAttributeUniqueNameConcatenatedValues(n2, att.get(0), att.get(0), att.get(1), ObjectType.STRING);
+            }
           }
           GraphicEdge e = grf.addNewEdge();
           Utils.addAttribute(e,"CELLDESIGNER_EDGE_TYPE","CELLDESIGNER_EDGE_TYPE","LEFT",ObjectType.STRING);
@@ -383,6 +388,11 @@ public class CellDesignerToCytoscapeConverter {
             Utils.addAttribute(n1,"CELLDESIGNER_NODE_TYPE","CELLDESIGNER_NODE_TYPE",rtype,ObjectType.STRING);
             Utils.addAttribute(n1,"CELLDESIGNER_REACTION","CELLDESIGNER_REACTION",r.getId(),ObjectType.STRING);
             NodeIDs.put(r.getId(),n1);
+            if(r.getNotes()!=null){
+            	Vector<Vector<String>> atts = extractAttributesFromNotes(r.getNotes());
+            	for(Vector<String> att: atts)
+            		Utils.addAttributeUniqueNameConcatenatedValues(n1, att.get(0), att.get(0), att.get(1), ObjectType.STRING);
+            }
           }
           GraphicEdge e = grf.addNewEdge();
           Utils.addAttribute(e,"CELLDESIGNER_EDGE_TYPE","CELLDESIGNER_EDGE_TYPE","RIGHT",ObjectType.STRING);
@@ -449,6 +459,11 @@ public class CellDesignerToCytoscapeConverter {
           n2.setName("reaction");
           Utils.addAttribute(n1,"CELLDESIGNER_NODE_TYPE","CELLDESIGNER_NODE_TYPE",rtype,ObjectType.STRING);
           Utils.addAttribute(n1,"CELLDESIGNER_REACTION","CELLDESIGNER_REACTION",r.getId(),ObjectType.STRING);
+          if(r.getNotes()!=null){
+          	Vector<Vector<String>> atts = extractAttributesFromNotes(r.getNotes());
+          	for(Vector<String> att: atts)
+          		Utils.addAttributeUniqueNameConcatenatedValues(n2, att.get(0), att.get(0), att.get(1), ObjectType.STRING);
+          }
           NodeIDs.put(r.getId(),n2);
         }
         GraphicEdge e = grf.addNewEdge();
@@ -500,6 +515,11 @@ public class CellDesignerToCytoscapeConverter {
             n2.setName("reaction");
             Utils.addAttribute(n2,"CELLDESIGNER_NODE_TYPE","CELLDESIGNER_NODE_TYPE",rtype,ObjectType.STRING);
             Utils.addAttribute(n2,"CELLDESIGNER_REACTION","CELLDESIGNER_REACTION",r.getId(),ObjectType.STRING);
+            if(r.getNotes()!=null){
+            	Vector<Vector<String>> atts = extractAttributesFromNotes(r.getNotes());
+            	for(Vector<String> att: atts)
+            		Utils.addAttributeUniqueNameConcatenatedValues(n2, att.get(0), att.get(0), att.get(1), ObjectType.STRING);
+            }
             NodeIDs.put(r.getId(),n2);
           }
           GraphicEdge e = grf.addNewEdge();

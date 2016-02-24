@@ -37,16 +37,50 @@ public class BiNoMReactionFormatToCytoscapeConverter {
 		//String prefix = "c:/datas/BinomTest/M-phase2";
 		//String prefix = "c:/datas/BinomTest/Biopax3/test";
 		//String prefix = "C:/Datas/EWING/network/Ewing_influence_nodes";
-		String prefix = "C:/Datas/EWING/network/Ewing_influence_1";
-		brf2c.celldesignergenerator.repositionAliases = false;
-		brf2c.celldesignergenerator.shiftY = 332f;
+		//String prefix = "C:/Datas/EWING/network/Ewing_influence_1";
+		//String prefix = "C:/Datas/PanMethylome/analysis/correlationgraph/panmeth_navicell/test_influence";
+		String prefix = "C:/Datas/PanMethylome/analysis/correlationgraph/panmeth_navicell/panmeth";
+		
+		String point_names[] = {"IC2_ESCA","IC7_OVCA"};
+		float point_positions[][] = {{147f,147f},{3407f,1409f}};
+		//String point_names[] = {"IC11_KIRPn","IC9_KIRP"};
+		//float point_positions[][] = {{689f,127f},{1014f,612f}};
+		/*brf2c.celldesignergenerator.shiftY = 332f;
 		brf2c.celldesignergenerator.shiftX = -15f;
 		brf2c.celldesignergenerator.scaleX = 2*2572f/2640f;
-		brf2c.celldesignergenerator.scaleY = 2f-0.05f;
-		brf2c.celldesignergenerator.defaultProteinWidth = 60;
-		brf2c.celldesignergenerator.defaultProteinHeight = 60;
+		brf2c.celldesignergenerator.scaleY = 2f-0.05f;*/
+		brf2c.celldesignergenerator.repositionAliases = false;
 		brf2c.loadFile(prefix+".txt");
+		System.out.println("===========================");
+		System.out.println("======= PASS 1    =========");
+		System.out.println("===========================");
 		Graph graph = brf2c.convertToGraph();
+		brf2c.rescale(graph, point_names, point_positions);
+		
+		float shiftX = brf2c.celldesignergenerator.shiftX; 
+		float shiftY = brf2c.celldesignergenerator.shiftY;
+		float scaleX = brf2c.celldesignergenerator.scaleX;
+		float scaleY = brf2c.celldesignergenerator.scaleY;
+		brf2c.celldesignergenerator = new CellDesignerGenerator();
+		brf2c.celldesignergenerator.repositionAliases = false;
+		brf2c.celldesignergenerator.defaultProteinWidth = 30;
+		brf2c.celldesignergenerator.defaultProteinHeight = 30;
+		brf2c.celldesignergenerator.shiftX = shiftX;
+		brf2c.celldesignergenerator.shiftY = shiftY;
+		brf2c.celldesignergenerator.scaleX = scaleX;
+		brf2c.celldesignergenerator.scaleY = scaleY;
+		
+		System.out.println("===========================");
+		System.out.println("======= PASS 2    =========");
+		System.out.println("===========================");
+		
+		brf2c.loadFile(prefix+".txt");
+		graph = brf2c.convertToGraph();
+		
+		System.out.println("===========================");
+		System.out.println("======= SAVING XML ========");
+		System.out.println("===========================");
+		
 		CellDesigner.saveCellDesigner(brf2c.celldesignergenerator.cd, prefix+"_1.xml");
 		//CellDesigner.saveCellDesigner(brf2c.celldesignergenerator.cd, "C:/Datas/NaviCell2.2/maps/ewing_src/master.xml");
 		XGMML.saveToXGMML(graph, prefix+".xgmml");
@@ -98,6 +132,27 @@ public class BiNoMReactionFormatToCytoscapeConverter {
 			else
 				celldesignergenerator.addStatement(parts[0], celldesignergenerator.SPECIES, attrs);
 		}
+	}
+	
+	public void rescale(Graph graph, String names[], float positions[][]){
+		float xold1 = graph.getNode(names[0]).x;
+		float yold1 = graph.getNode(names[0]).y;
+		float xold2 = graph.getNode(names[1]).x;
+		float yold2 = graph.getNode(names[1]).y;
+		
+		float xnew1 = positions[0][0];
+		float ynew1 = positions[0][1];
+		float xnew2 = positions[1][0];
+		float ynew2 = positions[1][1];
+		
+
+		// xnew = (xold-shiftX)*scaleX; xnew = xold*scaleX-shiftX*scaleX; xnew2-xnew1 = (xold2-xold1)*scaleX; shiftX = (xold1*scaleX - xnew1)/scaleX;
+		// 
+		celldesignergenerator.scaleX = (xnew2-xnew1)/(xold2-xold1);
+		celldesignergenerator.scaleY = (ynew2-ynew1)/(yold2-yold1);
+		celldesignergenerator.shiftX = (xold1*celldesignergenerator.scaleX-xnew1)/celldesignergenerator.scaleX;
+		celldesignergenerator.shiftY = (yold1*celldesignergenerator.scaleY-ynew1)/celldesignergenerator.scaleY;
+		
 	}
 
 }

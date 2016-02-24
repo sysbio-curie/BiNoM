@@ -35,8 +35,8 @@ public class CellDesignerPathwayStaining {
 	
 	public float width = 0;
 	public float height = 0;
-	public float gridStepX = 20;
-	public float gridStepY = 20;
+	public float gridStepX = 1;
+	public float gridStepY = 1;
 	float windowSizeX = 20;
 	float windowSizeT = 20;
 	
@@ -80,7 +80,8 @@ public class CellDesignerPathwayStaining {
 			
 			//String prefix = "c:/datas/acsn/acsn_only/acsn_src/";
 			//String prefix = "C:/Datas/ColorMaps/test/";
-			String prefix = "C:/Datas/ColorMaps/Stained_ACSN/EMT/";
+			//String prefix = "C:/Datas/ColorMaps/Stained_ACSN/EMT/";
+			String prefix = "C:/Datas/Kolodkin/Model/";
 				
 			CellDesignerPathwayStaining cm = new CellDesignerPathwayStaining();
 			/*cm.loadMap(prefix+"acsn_master.xml");
@@ -107,8 +108,9 @@ public class CellDesignerPathwayStaining {
 			//cm.scaleImage = 8f;
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f_scaled8.png", prefix+"data.txt", null);
 			cm.scaleImage = 1;
-			cm.infradius = 0.001f;
-			cm.run(prefix+"emtcellmotility_master.xml", prefix+"emtcellmotility_master-3_gs_edges.png", prefix+"sum_exprs_data.txt", null);
+			cm.infradius = 0.01f;
+			//cm.run(prefix+"emtcellmotility_master.xml", prefix+"emtcellmotility_master-3_gs_edges.png", prefix+"sum_exprs_data.txt", null);
+			cm.run(prefix+"Model.xml", prefix+"Model.png", prefix+"data1.txt", null);
 			//cm.run(prefix+"acsn_master.xml", null, prefix+"ica_module_averages.txt", prefix+"acsn_master.gmt");
 			//cm.run(prefix+"rbe2f.xml", prefix+"rbe2f.png", null, null);
 			System.exit(0);
@@ -589,7 +591,7 @@ public class CellDesignerPathwayStaining {
 			table.LoadFromSimpleDatFile(fn, true, "\t");
 			//for(int i=0;i<table.rowCount;i++)
 			//	table.stringTable[i][0] = table.stringTable[i][0].toLowerCase();
-			table.makeUpperCaseInIndex = true;
+			//table.makeUpperCaseInIndex = true;
 			table.createIndex(table.fieldNames[0]);
 	  }
 	

@@ -38,6 +38,12 @@ public class SetOverlapAnalysis {
 			//System.exit(0);
 			
 			SetOverlapAnalysis so = new SetOverlapAnalysis();
+			so.LoadSetsFromGMT("C:/Datas/ROMA/data/caf/ligands.gmt");
+			Vector<Float> percentages = new Vector<Float>();
+			Vector<Integer> occs = so.countOccurenciesInSets(so.allproteins, percentages);
+			for(int i=0;i<so.allproteins.size();i++)
+				System.out.println(so.allproteins.get(i)+"\t"+occs.get(i));
+			System.exit(0);
 
 			/*Vector<String> current = new Vector<String>();
 			Vector<Vector<String>> setofsets = new Vector<Vector<String>>();

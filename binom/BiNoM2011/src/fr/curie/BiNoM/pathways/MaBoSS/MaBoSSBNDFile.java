@@ -2,6 +2,8 @@ package fr.curie.BiNoM.pathways.MaBoSS;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -18,6 +20,11 @@ public class MaBoSSBNDFile {
 	String description = null;
 	
 	public static int maxNumberOfLogicalRuleChanges = 1;
+	public static boolean makeChangesIn2Rules = false;
+	public static boolean makeChangesInAllRules = false;
+	public static int numberOfSamplesModelVariants = 1000;
+	
+	HashMap<String,String> ruleModifications = new HashMap<String,String>();
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -41,6 +48,13 @@ public class MaBoSSBNDFile {
 					bndFile = args[i+1];
 				if(args[i].equals("-level"))
 					maxNumberOfLogicalRuleChanges = Integer.parseInt(args[i+1]);
+				if(args[i].equals("-several"))
+					makeChangesIn2Rules = true;
+				if(args[i].equals("-all"))
+					makeChangesInAllRules = true;
+				if(args[i].equals("-samples"))
+					numberOfSamplesModelVariants = Integer.parseInt(args[i+1]);
+				
 			}
 			MaBoSSBNDFile bnd = new MaBoSSBNDFile();
 			bnd.cfgFiles = new Vector<String>(); 
@@ -77,6 +91,16 @@ public class MaBoSSBNDFile {
 		int k = 0;
 		
 		Vector<MaBoSSBNDFile> allMutants = makeLogicMutants();
+		if(makeChangesIn2Rules){
+			Vector<MaBoSSBNDFile> mutantsIn2Rules = makeLogicMutants2Rules();
+			for(MaBoSSBNDFile f: mutantsIn2Rules)
+				allMutants.add(f);
+		}
+		if(makeChangesInAllRules){
+			Vector<MaBoSSBNDFile> mutantsInAllRules = makeLogicMutantsAllRulesSample();
+			for(MaBoSSBNDFile f: mutantsInAllRules)
+				allMutants.add(f);
+		}
 		int num = allMutants.size();
 		
 		
@@ -134,7 +158,7 @@ public class MaBoSSBNDFile {
 			if(!line.trim().startsWith("logic")){
 				newLines.add(line);
 			}else{
-				Vector<String> rules = generatePermutedLogicRules(line);
+				Vector<String> rules = generatePermutedLogicRules(line, true);
 				int k=0;
 				for(String rule: rules)if(!rule.equals(line)){
 					MaBoSSBNDFile mutant = new MaBoSSBNDFile();
@@ -144,12 +168,11 @@ public class MaBoSSBNDFile {
 					k++;
 					mutant.name = fileNamePrefix + "_"+currentNode+"_"+k;
 					System.out.println("Adding mutant "+mutant.name);
-					if(mutant.name.contains("GF"))
-						System.out.println();
 					mutant.file_bnd = mutant.name+".bnd";
 					int level = calcEditingDistance(rule.trim(),line.trim());
 					mutant.description = currentNode+";"+rule+";LEVEL"+level;
 					mutant.lines = new Vector<String>();
+					ruleModifications.put(currentNode, rule);
 					for(int j=0;j<newLines.size();j++)
 						mutant.lines.add(newLines.get(j));
 					mutant.lines.add(rule);
@@ -163,7 +186,74 @@ public class MaBoSSBNDFile {
 		return mutants;
 	}
 	
-	public static Vector<String> generatePermutedLogicRules(String s){
+	public Vector<MaBoSSBNDFile> makeLogicMutants2Rules(){
+		Vector<MaBoSSBNDFile> mutants = new Vector<MaBoSSBNDFile>();
+		HashMap<String,String> allrules = allLogicalRules();
+		Vector<String> nodes = new Vector<String>();
+		Iterator<String> keys = allrules.keySet().iterator();
+		while(keys.hasNext()) nodes.add(keys.next());
+		
+		for(int i=0;i<nodes.size();i++)
+			for(int j=i+1;j<nodes.size();j++){
+				int k=0;
+				String rulei = allrules.get(nodes.get(i));
+				String rulej = allrules.get(nodes.get(j));
+				int maxtemp = maxNumberOfLogicalRuleChanges;
+				maxNumberOfLogicalRuleChanges = 1;
+				Vector<String> modsi = generatePermutedLogicRules(rulei, false);
+				Vector<String> modsj = generatePermutedLogicRules(rulej, false);
+				maxNumberOfLogicalRuleChanges = maxtemp;
+				for(int ii=0;ii<modsi.size();ii++)
+					for(int jj=0;jj<modsj.size();jj++){
+						k++;
+						String s = nodes.get(i)+"_"+nodes.get(j)+"_"+k;
+						MaBoSSBNDFile mutant = new MaBoSSBNDFile();
+						mutant.fileNamePrefix = fileNamePrefix;
+						mutant.folder = folder;
+						mutant.cfgFiles = cfgFiles;
+						mutant.name = fileNamePrefix +"_"+ s;
+						System.out.println("Adding mutant "+mutant.name);
+						mutant.file_bnd = mutant.name+".bnd";
+						mutant.description = nodes.get(i)+";"+modsi.get(ii)+nodes.get(j)+";"+modsj.get(jj)+";LEVEL2.5";
+						mutant.lines = new Vector<String>();
+						for(int kk=0;kk<lines.size();kk++){
+							String line = lines.get(kk);
+							if(line.trim().equals(rulei.trim())) line = modsi.get(ii);
+							if(line.trim().equals(rulej.trim())) line = modsj.get(jj);
+							mutant.lines.add(line);
+						}
+						mutants.add(mutant);
+					}
+			}
+		return mutants;
+	}
+	
+	public HashMap<String,String> allLogicalRules(){
+		HashMap<String,String> allrules = new HashMap<String,String>();
+		String currentNode = "";
+		for(int l=0;l<lines.size();l++){
+			String line = lines.get(l);
+			if(line.trim().startsWith("Node")){
+				StringTokenizer st = new StringTokenizer(line,"\t {}");
+				st.nextToken();
+				currentNode = st.nextToken();
+			}
+			if(line.trim().startsWith("logic")){
+				allrules.put(currentNode, line);
+			}
+		}
+		return allrules;
+	}
+	
+	public Vector<MaBoSSBNDFile> makeLogicMutantsAllRulesSample(){
+		Vector<MaBoSSBNDFile> mutants = new Vector<MaBoSSBNDFile>();
+		HashMap<String,String> allrules = allLogicalRules();
+		
+		return mutants;
+	}
+	
+	
+	public static Vector<String> generatePermutedLogicRules(String s, boolean includeWTsequence){
 		Vector<String> logics = new Vector<String>();
 		String wtsequence = "";
 		for(char c: s.toCharArray()){
@@ -175,7 +265,8 @@ public class MaBoSSBNDFile {
 			Vector<String> seqTable = getMutantSequences(wtsequence, maxNumberOfLogicalRuleChanges);
 			seqTable  = filterSequencesByEditingDistance(seqTable, wtsequence, maxNumberOfLogicalRuleChanges);
 			seqTable.remove(seqTable.indexOf(wtsequence));
-			seqTable.insertElementAt(wtsequence, 0);
+			if(includeWTsequence)
+				seqTable.insertElementAt(wtsequence, 0);
 			for(int k=0;k<seqTable.size();k++){
 			String rule = new String(s);
 			int l = 0;

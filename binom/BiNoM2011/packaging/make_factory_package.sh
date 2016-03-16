@@ -50,5 +50,5 @@ mkdir $topdir/examples/${map_example}_src
 
 cp ../scripts/run_factory.sh $topdir/scripts/
 cp build_${map_example}_map.sh $topdir/examples/
-cp ${map_example}_xrefs.txt $topdir/examples/
+cp xrefs.txt $topdir/examples/
 

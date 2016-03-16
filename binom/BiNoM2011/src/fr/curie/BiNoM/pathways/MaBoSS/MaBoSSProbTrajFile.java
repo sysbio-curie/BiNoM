@@ -36,85 +36,13 @@ public class MaBoSSProbTrajFile {
 	public static void main(String[] args) {
 		try{
 		MaBoSSProbTrajFile prob = new MaBoSSProbTrajFile();
-		/*prob.load("C:/Datas/Calzone/EMT/ModNet_mutants/ModNet_probtraj.csv", "ModNet_");
-		for(int i=0;i<prob.phenotypes.size();i++){
-			System.out.println(prob.phenotypes.get(i)+"\t"+prob.probabilities.get(i));
-		}
-		System.out.println(prob.interactor1+"\t"+prob.interactorType1);
-		System.out.println(prob.interactor2+"\t"+prob.interactorType2);
-		System.out.println(prob.type);*/
-		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/EMT/ModNet_mutants/","ModNet_","C:/Datas/Calzone/EMT/ModNet_mutants.xls");
-		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/EMT/metastasis_mutants/","metastasis_","C:/Datas/Calzone/EMT/metastasis_mutants.xls");
-		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/genetic_interactions/cellfate_mutants/","cellfate_","C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls");
 		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/genetic_interactions/restriction_mutants/","restriction_","C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls");
-		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls", 0.01f);
 		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
-		//VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/EMT/ModNet_mutants.xls.dat");
-		
 		//makeGeneticInteractionTable(vt,"Invasion/Migration/Metastasis/CellCycleArrest","metastasis","C:/Datas/Calzone/EMT/ModNet_mutants");
-		//VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Metastasis/Cohen2014/genetic_interactions/metastasis_mutants.xls.dat");
-		//makeGeneticInteractionTable(vt,"Invasion/EMT/Migration/Metastasis/CellCycleArrest","metastasis","C:/Datas/Metastasis/Cohen2014/genetic_interactions/metastasis_mut");
-		
-		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Metastasis/Cohen2014/genetic_interactions/metastasis_mutants1_metastasis_edges.dat");
-		compressGeneInteractionTable(vt,"EPS","C:/Datas/Metastasis/Cohen2014/genetic_interactions/metastasis_mutants1_metastasis_edges_compressed");
-		compressGeneInteractionTable(vt,"P12","C:/Datas/Metastasis/Cohen2014/genetic_interactions/metastasis_mutants1_metastasis_edges_compressed_P21");*/
-		
-		//VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/EMT/metastasis_mutants.xls.dat");
-		//VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls.dat");
-		//makeGeneticInteractionTable(vt1,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_mutants/");
-		
-		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/","metastasis_","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls");
-		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastasis_mutants_logics/","metastasis","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastases_ls"); 
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/Merged_phenotypes.txt"));
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
+//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/prova/a/","metastasis","C:/Users/Arnau/Desktop/prova/a/descriptions.txt","C:/Users/Arnau/Desktop/prova/metastasis.xls");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/prova/ginsimout2_mutants/","ginsimout2","C:/Users/Arnau/Desktop/prova/ginsimout_mutants.xls");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/prova/a/","metastasis","C:/Users/Arnau/Desktop/prova/a_mutants.xls");
 
-		//prob.makeLogicMutantTableFromFolder("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_mutants_logics/","meta_physio_","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastasis_mutants_logics/descriptions.txt","C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_ls");
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/meta_physio_ls.xls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/Merged_phenotypes.txt"));
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/metastases_ls.xls",0.01f,"");
-		
-		//prob.makeLogicMutantTableFromFolder("D:/temp/metastasis_mutants_logics/","metastasis","D:/temp/metastasis_mutants_logics/descriptions.txt","D:/temp/metastases_ls");		
-		//prob.normalizeProbabilityTable("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/metastases_ls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/Merged_phenotypes.txt"));
-		prob.normalizeProbabilityTable("D:/temp/metastases_ls",0.01f,new File("C:/Datas/Metastasis/Cohen2014/logic_sensitivity/FinalAnalysis010915/Merged_phenotypes.txt"));
-		
-		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
-		 * 
-		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
-		makeGeneticInteractionTable(vt,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
-		makeGeneticInteractionTable(vt,"NonACD","necrosis","C:/Datas/Calzone/genetic_interactions/cellfate_",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
-		
-		prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
-		VDataTable vt1 = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1_mutants_norm.dat");
-		makeGeneticInteractionTable(vt1,"Survival","survival","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
-		makeGeneticInteractionTable(vt1,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);
-		makeGeneticInteractionTable(vt1,"NonACD","necrosis","C:/Datas/Calzone/genetic_interactions/cellfate_TNF_1",GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE);*/
-		
-		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls", 0.01f, "CycD=CycD+CycB+CycD/CycB");
-		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/restriction_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Rb","cc_arrest","C:/Datas/Calzone/genetic_interactions/restriction_");
-		makeGeneticInteractionTable(vt,"CycD","cc_prolif","C:/Datas/Calzone/genetic_interactions/restriction_");*/
-		
-		/*prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/mapk_mutants.xls", 0.01f, "Apoptosis=Apoptosis+Apoptosis/Growth_Arrest");
-		VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/mapk_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Apoptosis","apoptosis","C:/Datas/Calzone/genetic_interactions/mapk_");
-		makeGeneticInteractionTable(vt,"Growth_Arrest","ga","C:/Datas/Calzone/genetic_interactions/mapk_");
-		makeGeneticInteractionTable(vt,"Proliferation","proliferation","C:/Datas/Calzone/genetic_interactions/mapk_");*/
-		
-		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
-		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
-		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_mutants.xls", 0.01f, "Cas3/DNADamageEvent=NFkB/Cas3/DNADamageEvent+Cas3/DNADamageEvent;NFkB=NFkB/IAP/BclX+NFkB+NFkB/IAP+NFkB/BclX+IAP+BclX+IAP/BclX");
-		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_");
-		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_");*/
-		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_");
-		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_no_signal_");*/
-		/*VDataTable vt = VDatReadWrite.LoadFromVDatFile("C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_mutants_norm.dat");
-		makeGeneticInteractionTable(vt,"Cas3/DNADamageEvent","apoptosis","C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_");
-		makeGeneticInteractionTable(vt,"NFkB","survival","C:/Datas/Calzone/genetic_interactions/apoptosis_GFonly_");*/
-		
-		
 		String folder = "";
 		String prefix = "";
 		String out = "";
@@ -142,7 +70,6 @@ public class MaBoSSProbTrajFile {
 			if(args[i].equals("-table"))
 				table = args[i+1];
 			if(args[i].equals("-mergedphenotypes"))
-				
 				mergedPhenotypes = args[i+1];
 			if(args[i].equals("-maketable"))
 				makeTable = true;
@@ -301,10 +228,10 @@ public class MaBoSSProbTrajFile {
 			StringTokenizer st = new StringTokenizer(s,"\t");
 			String id = st.nextToken();
 			String logics = st.nextToken();
-			String select = "0";
-			if(st.hasMoreTokens())
-				select = st.nextToken();
-			if(select.equals("1"))
+//			String select = "0";
+//			if(st.hasMoreTokens())
+//				select = st.nextToken();
+//			if(select.equals("1"))
 				descriptions.put(id,logics);
 		}
 		
@@ -312,7 +239,7 @@ public class MaBoSSProbTrajFile {
 		Vector<MaBoSSProbTrajFile> trajs = new Vector<MaBoSSProbTrajFile>();
 		Vector<String> phenotypes = new Vector<String>();
 		File list[] = dir.listFiles();
-		int kk=0;
+		int kk =0;
 		for(File f: list)if(f.getName().endsWith("probtraj.csv")){
 			kk++;
 			System.out.println(kk+": Loading "+f.getName());
@@ -339,7 +266,8 @@ public class MaBoSSProbTrajFile {
 		}
 		
 		FileWriter fw = new FileWriter(outfile);
-		fw.write("ID\tTYPE\tDESCRIPTION\tLEVEL\tINTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tCONDITION\t");
+//		fw.write("ID\tTYPE\tDESCRIPTION\tLEVEL\tINTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tCONDITION\t");
+		fw.write("ID\tTYPE\tDESCRIPTION\tLEVEL\tINTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\t");
 		for(String s: sorted_phenotypes)
 			fw.write(s.replace(" -- ", "/")+"\t");
 		fw.write("\n");
@@ -371,7 +299,7 @@ public class MaBoSSProbTrajFile {
 			String id1 = traj.interactor1;
 			if(id1.endsWith("_lm")) id1 = id1.substring(0, id1.length()-3);
 			if(descriptions.get(id1)!=null)
-				description = descriptions.get(id1);
+			description = descriptions.get(id1);
 			String level = "0";
 			StringTokenizer st = new StringTokenizer(description,";");
 			while(st.hasMoreTokens()){
@@ -380,8 +308,8 @@ public class MaBoSSProbTrajFile {
 					level = s.substring(5, s.length());
 			}
 			
-			if(!description.equals("NA")){
-			fw.write(id+"\t"+type+"\t"+description+"\t"+level+"\t"+inter1+"\t"+inter_type1+"\t"+inter2+"\t"+inter_type2+"\tNA\t");
+//			if(!description.equals("NA")){		//better to leave the NA if no description on description file
+			fw.write(id+"\t"+type+"\t"+description+"\t"+level+"\t"+inter1+"\t"+inter_type1+"\t"+inter2+"\t"+inter_type2+"\t");
 			for(String s: sorted_phenotypes){
 				int k = traj.phenotypes.indexOf(s);
 				float f = 0f;
@@ -389,7 +317,7 @@ public class MaBoSSProbTrajFile {
 				fw.write(f+"\t");	
 			}
 			fw.write("\n");
-			}
+//			}
 		}
 		fw.close();
 		

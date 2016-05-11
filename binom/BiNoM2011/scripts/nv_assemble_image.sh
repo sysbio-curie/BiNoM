@@ -26,7 +26,7 @@ if [ $img_count = 0 ]; then
     exit 1
 fi
 
-NV_IMAGE=NV_IMAGE
+NV_IMAGE_ASSEMBLY=NV_IMAGE_ASSEMBLY
 
 count=$(echo "sqrt($img_count)" | bc) 
 computed_count=$(echo "$count * $count" | bc) 
@@ -47,14 +47,14 @@ do
 	image_list_x="$image_list_x nv_image_x_${x}_y_${y}.png"
     done
 
-    image_y=${NV_IMAGE}_${y}.png
+    image_y=${NV_IMAGE_ASSEMBLY}_${y}.png
     ${convert} $image_list_x +append $image_y
     image_list_y="$image_list_y $image_y"
 done
 
-${convert} $image_list_y -append ${NV_IMAGE}.png
+${convert} $image_list_y -append ${NV_IMAGE_ASSEMBLY}.png
 
 echo "[image successfully generated]"
-file ${NV_IMAGE}.png
+file ${NV_IMAGE_ASSEMBLY}.png
 
 rm -f $image_list_y

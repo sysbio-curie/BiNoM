@@ -35,6 +35,20 @@ var ESCAPE_LINE_BREAK = /\\n/g;
 var ESCAPE_QUOTE = /\\"/g;
 var ESCAPE_TAB = /\\t/g;
 
+// Export Image function
+//
+
+function nv_export_image_enable()
+{
+	console.log("nv_export_image_enable");
+	$("#export_image").css("display", "block");
+}
+
+function nv_export_image_set_maxsize(size)
+{
+	MAX_IMAGE_WIDTH = size;
+}
+
 // Utility functions
 function add_to_datatable_desc_list(dt_desc_list, data) {
 	var lines = data.split(LINE_BREAK_REGEX);
@@ -1935,6 +1949,17 @@ function nv_deferred_perform(win, timeout, action_str, arg1, arg2, arg3, arg4, a
 	setTimeout(function() { // breaking closure
 		nv_perform(action_str, win, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 	}, timeout);
+}
+
+function nv_eval(cmd)
+{
+	cmd = cmd.trim();
+	if (cmd.substring(0, 3) == "nv_") {
+		console.log("executing " + cmd);
+		eval(cmd);
+	} else {
+		console.log("invalid command " + cmd);
+	}
 }
 
 function nv_decode(str)

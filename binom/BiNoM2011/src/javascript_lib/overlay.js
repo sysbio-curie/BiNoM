@@ -1041,10 +1041,13 @@ function ExportImageLoader(exportImage, overlayImage, module, context, context2,
 	this.wait_cursor = wait_cursor;
 }
 
-var MAX_IMAGE_WIDTH = 4096;
-//var MAX_IMAGE_WIDTH = 2048;
+// can be set with nv_export_image_set_maxsize(size)
+var MAX_IMAGE_WIDTH = 2048;
 
 /*
+@! nv_export_image_enable()
+@! nv_export_image_set_maxsize(1024)
+
 merging images
 
 sur CentOS
@@ -1058,24 +1061,23 @@ convert image_x_1_y_1.png image_x_2_y_1.png +append IMAGE_1.png
 convert image_x_1_y_2.png image_x_2_y_2.png +append IMAGE_2.png
 convert IMAGE_1.png IMAGE_2.png -append IMAGE.png
 
+scripts/nv_assemble_images.sh
+
 */
 
 
 function ExportImageLoaderIterator(exportImageLoader, count) {
 	this.exportImageLoader = exportImageLoader;
 	this.count = count;
-	console.log("COUNT=" + count);
 	this.count2 = count*count;
 	this.width_splitted = exportImageLoader.width/count;
 	this.height_splitted = exportImageLoader.height/count;
-	//this.img_lnk = $(document.getElementById('export_image_link_x'));
-	this.topelem = document.getElementById('export_image_link');
+	this.topelem = document.getElementById('export_image_link_multi_parts');
 }
 
 ExportImageLoaderIterator.prototype = {
 
 	_perform: function() {
-		console.log("perform");
 		var canvas = document.createElement('canvas');
 		
 		canvas.width = this.width_splitted;
@@ -1083,14 +1085,17 @@ ExportImageLoaderIterator.prototype = {
 		var ctx = canvas.getContext('2d');
 		var x = this.current_abs * this.width_splitted;
 		var y = this.current_ord * this.height_splitted
+		var img_lnk;
 		ctx.drawImage(this.exportImageLoader.exportImage, x, y, this.width_splitted, this.height_splitted, 0, 0, this.width_splitted, this.height_splitted);
 		var url = canvas.toDataURL();
-		console.log("x " + x + " " + y + " width " + this.width_splitted + " " + this.height_splitted + " " + url.length);
-		var img_lnk = document.createElement('div');
+		img_lnk = document.createElement('div');
+		console.log("x=" + x + " y=" + y + " width=" + this.width_splitted + " height=" + this.height_splitted + " URL.length=" + url.length);
 		this.topelem.appendChild(img_lnk);
-		$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='image_x_" + (this.current_abs+1) + "_y_" + (this.current_ord+1) + ".png'>download image part " + this.current_count + " / " + this.count2 + "</a></span>");
+		$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='nv_image_x_" + (this.current_abs+1) + "_y_" + (this.current_ord+1) + ".png'>download image part " + this.current_count + " / " + this.count2 + "</a></span>");
+
 		var exportImageLoaderIterator = this;
 		$(img_lnk).click(function() {
+			//exportImageLoaderIterator.topelem.removeChild(exportImageLoaderIterator.topelem.firstChild);
 			$(this).remove();
 			exportImageLoaderIterator.next();
 		});
@@ -1115,7 +1120,7 @@ ExportImageLoaderIterator.prototype = {
 		} else {
 			return;
 		}
-		console.log("next " + this.current_abs + " " + this.current_ord);
+		console.log("next abs=" + this.current_abs + " ord=" + this.current_ord);
 		this._perform();
 	}
 };
@@ -1130,6 +1135,7 @@ ExportImageLoader.prototype = {
 			this.context.drawImage(this.overlayImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 			console.log("total width: " + this.width);
 			var topelem = document.getElementById('export_image_link');
+			console.log("MAX_IMAGE_WIDTH: " + MAX_IMAGE_WIDTH);
 			if (this.width > MAX_IMAGE_WIDTH) {
 				var count = this.width/MAX_IMAGE_WIDTH;
 				var exportImageLoaderIterator = new ExportImageLoaderIterator(this, count);
@@ -1171,8 +1177,8 @@ ExportImageLoader.prototype = {
 				//img_lnk.id = "EXPORT_image_link_" + nn;
 				topelem.appendChild(img_lnk);
 				var url = this.exportImage.toDataURL();
-				//$("#export_image_link_1").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='image.png'>download image</a></span>");
-				$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='image.png'>download image</a></span>");
+				//$("#export_image_link_1").html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
+				$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
 				$(img_lnk).click(function() {
 					$(this).remove();
 				});

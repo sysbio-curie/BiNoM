@@ -46,7 +46,12 @@ function nv_export_image_enable()
 
 function nv_export_image_set_maxsize(size)
 {
-	MAX_IMAGE_WIDTH = size;
+	EXPORT_IMAGE_MAX_WIDTH = size;
+}
+
+function nv_export_image_set_visible_part(visible)
+{
+	EXPORT_IMAGE_VISIBLE_PART = visible;
 }
 
 // Utility functions

@@ -964,36 +964,51 @@ USGSOverlay.prototype.onRemove = function() {
 // By Mathurin, take a screenshot in a customized hidden canvas
 // will be moved to screenshot.js
 var nScreenshots = 0;
+var screenShot = null;
+
+// can be set with nv_export_image_set_maxsize(size)
+var EXPORT_IMAGE_MAX_WIDTH = 2048;
+//var EXPORT_IMAGE_VISIBLE_PART = false;
+var EXPORT_IMAGE_VISIBLE_PART = true;
+
+function download_screenshot_epilogue()
+{
+	if (screenShot) {
+		var mainmap = document.getElementById("map");
+		mainmap.removeChild(screenShot);
+		$("#screenshot_link").html("");
+		$(screenShot).remove();
+		screenShot = null;
+	}
+}
 
 function visible_screenshot()
 {
-	console.log("here we are");
+	download_screenshot_epilogue();
         var mm = document.getElementById("innermap");
-        var mm2 = document.getElementById("map_canvas");
-        var screenShot = document.getElementById("screenshot_canvas");
-	console.log("screenshot: " + screenShot);
+	screenShot = document.createElement('canvas');
+        var mainmap = document.getElementById("map");
+	mainmap.appendChild(screenShot);
+	
         // CSS dimensions and canvas dimension have to be equal to get a 1:1 scaling
 
-	var width, height;
-	if (false) {
-		//width = $(mm2).css("width");
-		//height = $(mm2).css("height");
-		width = "2500";
-		height = "2000";
-	} else {
-		width = $(mm).css("width");
-		height = $(mm).css("height");
-	}
-        px = new RegExp("px|em", "g");
-        var mmWidth = parseInt(width.replace(px, ""));
+        var px = new RegExp("px|em", "g");
+
+	var width = $(mm).css("width");
+	var height = $(mm).css("height");
+        width = parseInt(width.replace(px, ""));
+        height = parseInt(height.replace(px, ""));
+
+        //var mmWidth = width;
 	$(screenShot).attr("height", height);
-        $(screenShot).attr("width", document.width + "px");
+        $(screenShot).attr("width", width);
 
         $(screenShot).css("height", $(screenShot).attr("height"));
         $(screenShot).css("width", $(screenShot).attr("width"));
 
         var ctx = screenShot.getContext("2d");
         ctx.clearRect(0, 0, screenShot.width, screenShot.height);
+	console.log("xWIDTH " + screenShot.width + " HEIGHT " + screenShot.height);
 
         xOffset = parseInt($("#innermap").css("left").replace(px, ""));
         yOffset = parseInt($("#innermap").css("top").replace(px, ""));
@@ -1003,27 +1018,28 @@ function visible_screenshot()
         console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
         for (var ii = 0 ; ii < tiles.length ; ii++) {
                 var tile = $("img", tiles.eq(ii));
-                var width = parseInt(tile.css("width").replace(px, ""))
-                var height = parseInt(tile.css("height").replace(px, ""));
-                var xx = parseInt(tiles.eq(ii).css("left").replace(px, ""));
-                var yy = parseInt(tiles.eq(ii).css("top").replace(px, ""));
-                var wCorrected = width - ((xx - xOffset + width) - mmWidth); // Compute x without exiting the border
-		console.log("width: " + width + " height " + height + " " + xx + " " + (xx-xOffset) + " " + yy + " " + (yy-yOffset));
-                if (wCorrected < width) {
-                        ctx.drawImage(tile[0], 0, 0, wCorrected, height, xx-xOffset, yy-yOffset, wCorrected, height);
-                } else {
-                        ctx.drawImage(tile[0], 0, 0, width, height, xx-xOffset, yy-yOffset, width, height);
-                }
+                var tile_width = parseInt(tile.css("width").replace(px, ""))
+                var tile_height = parseInt(tile.css("height").replace(px, ""));
+                var tile_xx = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+                var tile_yy = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+		console.log("tile width: " + tile_width + " height " + tile_height + " " + tile_xx + " " + (tile_xx-xOffset) + " " + tile_yy + " " + (tile_yy-yOffset));
+                ctx.drawImage(tile[0], 0, 0, tile_width, tile_height, tile_xx-xOffset, tile_yy-yOffset, tile_width, tile_height);
         }
 
         // Draw the overlay
 	ctx.drawImage(mm.firstChild, 0, 0, mm.width, mm.height, 0, 0, mm.width, mm.height);
         // Save the screenshot canvas as URL and provide a link to that URL
-        var url = screenShot.toDataURL();
+	var url;
+	try {
+		url = screenShot.toDataURL();
+	} catch(e) {
+		console.log(e);
+		download_screenshot_epilogue();
+		return;
+	}
         nScreenshots++;
-        console.log(url.substring(0,40));
-	console.log("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
-        $("#screen_shot_link").html("<a href='" + url + "' target='_blank'>Download screenshot " + nScreenshots.toString() + "</a>");
+        console.log(url.substring(0, 40));
+        $("#screenshot_link").html("<span style='font-size: x-small; padding-left: 5px'><a a style='text-decoration: none; color: blue' onclick='download_screenshot_epilogue()' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
 }
 
 function ExportImageLoader(exportImage, overlayImage, module, context, context2, ntiles, width, height, delta_x, delta_y, wait_cursor) {
@@ -1041,12 +1057,10 @@ function ExportImageLoader(exportImage, overlayImage, module, context, context2,
 	this.wait_cursor = wait_cursor;
 }
 
-// can be set with nv_export_image_set_maxsize(size)
-var MAX_IMAGE_WIDTH = 2048;
-
 /*
 @! nv_export_image_enable()
 @! nv_export_image_set_maxsize(1024)
+@! nv_export_image_set_visible_part(true)
 
 merging images
 
@@ -1133,11 +1147,11 @@ ExportImageLoader.prototype = {
 			overlay.drawExportImage(this.module, this.context2, this.delta_x, this.delta_y);
 
 			this.context.drawImage(this.overlayImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-			console.log("MAX_IMAGE_WIDTH: " + MAX_IMAGE_WIDTH);
+			console.log("EXPORT_IMAGE_MAX_WIDTH: " + EXPORT_IMAGE_MAX_WIDTH);
 			console.log("total image width: " + this.width);
 			var topelem = document.getElementById('export_image_link');
-			if (this.width > MAX_IMAGE_WIDTH) {
-				var count = this.width/MAX_IMAGE_WIDTH;
+			if (this.width > EXPORT_IMAGE_MAX_WIDTH) {
+				var count = this.width/EXPORT_IMAGE_MAX_WIDTH;
 				var exportImageLoaderIterator = new ExportImageLoaderIterator(this, count);
 				exportImageLoaderIterator.start();
 			} else {
@@ -1156,6 +1170,11 @@ ExportImageLoader.prototype = {
 
 function navicell_export_image(module)
 {
+	if (EXPORT_IMAGE_VISIBLE_PART) {
+		visible_screenshot();
+		return;
+	}
+
         var exportImage = document.getElementById("export_image_canvas");
 
 	var zoom = overlay.map_.zoom;

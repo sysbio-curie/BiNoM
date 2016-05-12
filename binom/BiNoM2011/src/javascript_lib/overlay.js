@@ -963,20 +963,26 @@ USGSOverlay.prototype.onRemove = function() {
 
 // By Mathurin, take a screenshot in a customized hidden canvas
 // will be moved to screenshot.js
-var nScreenshots = 0;
 var screenShot = null;
 
 // can be set with nv_export_image_set_maxsize(size)
 var EXPORT_IMAGE_MAX_WIDTH = 2048;
-//var EXPORT_IMAGE_VISIBLE_PART = false;
-var EXPORT_IMAGE_VISIBLE_PART = true;
+var EXPORT_IMAGE_FULL_MAP = false;
 
-function download_screenshot_epilogue()
+function export_image_button_enable(enable)
+{
+	var button = $("#export_image");
+	//button.attr("disabled", !enable);
+	button.button(enable ? "enable" : "disable");
+}
+
+function screenshot_epilogue()
 {
 	if (screenShot) {
 		var mainmap = document.getElementById("map");
+		export_image_button_enable(true);
 		mainmap.removeChild(screenShot);
-		$("#screenshot_link").html("");
+		$("#export_image_link").html("");
 		$(screenShot).remove();
 		screenShot = null;
 	}
@@ -984,7 +990,7 @@ function download_screenshot_epilogue()
 
 function visible_screenshot()
 {
-	download_screenshot_epilogue();
+	screenshot_epilogue();
         var mm = document.getElementById("innermap");
 	screenShot = document.createElement('canvas');
         var mainmap = document.getElementById("map");
@@ -1034,12 +1040,13 @@ function visible_screenshot()
 		url = screenShot.toDataURL();
 	} catch(e) {
 		console.log(e);
-		download_screenshot_epilogue();
+		error_dialog("Export Image", "Image cannot be generated: may be beyond image borders", window);
+		screenshot_epilogue();
 		return;
 	}
-        nScreenshots++;
+	export_image_button_enable(false);
         console.log(url.substring(0, 40));
-        $("#screenshot_link").html("<span style='font-size: x-small; padding-left: 5px'><a a style='text-decoration: none; color: blue' onclick='download_screenshot_epilogue()' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
+        $("#export_image_link").html("<span style='font-size: x-small; padding-left: 5px'><a a style='text-decoration: none; color: blue' onclick='screenshot_epilogue()' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
 }
 
 function ExportImageLoader(exportImage, overlayImage, module, context, context2, ntiles, width, height, delta_x, delta_y, wait_cursor) {
@@ -1060,7 +1067,8 @@ function ExportImageLoader(exportImage, overlayImage, module, context, context2,
 /*
 @! nv_export_image_enable()
 @! nv_export_image_set_maxsize(1024)
-@! nv_export_image_set_visible_part(true)
+@! nv_export_image_set_full_map(true)
+@! nv_export_image_set_full_map(false)
 
 merging images
 
@@ -1105,11 +1113,12 @@ ExportImageLoaderIterator.prototype = {
 		img_lnk = document.createElement('div');
 		console.log("x=" + x + " y=" + y + " width=" + this.width_splitted + " height=" + this.height_splitted + " URL.length=" + url.length);
 		this.topelem.appendChild(img_lnk);
+		export_image_button_enable(false);
 		$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='nv_image_x_" + (this.current_abs+1) + "_y_" + (this.current_ord+1) + ".png'>download image part " + this.current_count + " / " + this.count2 + "</a></span>");
 
 		var exportImageLoaderIterator = this;
 		$(img_lnk).click(function() {
-			//exportImageLoaderIterator.topelem.removeChild(exportImageLoaderIterator.topelem.firstChild);
+			export_image_button_enable(true);
 			$(this).remove();
 			exportImageLoaderIterator.next();
 		});
@@ -1158,8 +1167,10 @@ ExportImageLoader.prototype = {
 				var img_lnk = document.createElement('div');
 				topelem.appendChild(img_lnk);
 				var url = this.exportImage.toDataURL();
+				export_image_button_enable(false);
 				$(img_lnk).html("<span style='font-size: x-small; padding-left: 5px'><a style='text-decoration: none; color: blue' href='" + url + "' target='_blank' download='nv_image.png'>download image</a></span>");
 				$(img_lnk).click(function() {
+					export_image_button_enable(true);
 					$(this).remove();
 				});
 			}
@@ -1170,7 +1181,7 @@ ExportImageLoader.prototype = {
 
 function navicell_export_image(module)
 {
-	if (EXPORT_IMAGE_VISIBLE_PART) {
+	if (!EXPORT_IMAGE_FULL_MAP) {
 		visible_screenshot();
 		return;
 	}

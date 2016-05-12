@@ -49,9 +49,9 @@ function nv_export_image_set_maxsize(size)
 	EXPORT_IMAGE_MAX_WIDTH = size;
 }
 
-function nv_export_image_set_visible_part(visible)
+function nv_export_image_set_full_map(full_map)
 {
-	EXPORT_IMAGE_VISIBLE_PART = visible;
+	EXPORT_IMAGE_FULL_MAP = full_map;
 }
 
 // Utility functions

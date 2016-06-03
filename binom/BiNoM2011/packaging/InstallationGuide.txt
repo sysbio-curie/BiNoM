@@ -300,3 +300,7 @@ sh run_test.sh
 
 The browser should be launched with the cellcycle map and heatmaps should be displayed on the map.
 
+===========================================================================
+======================== FURTHER COMMENTS =================================
+===========================================================================
+

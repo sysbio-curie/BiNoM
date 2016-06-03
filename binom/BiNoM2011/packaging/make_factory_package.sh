@@ -23,14 +23,19 @@ mydir=$(pwd)
 
 set -e 
 
-map_example=cellcycle
+map_example1=cellcycle
+map_example2=simple_map
+map_example3=simple_modular
 
 mkdir -p $topdir
 mkdir $topdir/lib
 mkdir $topdir/data
 mkdir $topdir/scripts
 mkdir $topdir/examples
-mkdir $topdir/examples/${map_example}_src
+mkdir $topdir/maps
+mkdir $topdir/maps/${map_example1}_src
+mkdir $topdir/examples/${map_example2}_src
+mkdir $topdir/examples/${map_example3}_src
 
 (
   cd ..
@@ -44,11 +49,20 @@ mkdir $topdir/examples/${map_example}_src
 )
 
 (
+  cd $topdir/maps
+  tar xfz $mydir/${map_example1}_src.tgz
   cd $topdir/examples
-  tar xfz $mydir/${map_example}_src.tgz
+  tar xfz $mydir/${map_example2}_src.tgz
+  tar xfz $mydir/${map_example3}_src.tgz
 )
 
 cp ../scripts/run_factory.sh $topdir/scripts/
-cp build_${map_example}_map.sh $topdir/examples/
+cp build_${map_example1}_map.sh $topdir/maps/
+cp build_${map_example1}_map.bat $topdir/maps/
+cp build_${map_example2}_map.sh $topdir/examples/
+cp build_${map_example2}_map.bat $topdir/examples/
+cp build_${map_example3}_map.sh $topdir/examples/
+cp build_${map_example3}_map.bat $topdir/examples/
 cp xrefs.txt $topdir/examples/
+cp xrefs.txt $topdir/maps/
 

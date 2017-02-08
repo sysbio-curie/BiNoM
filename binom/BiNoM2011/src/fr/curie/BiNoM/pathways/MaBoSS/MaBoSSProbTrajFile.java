@@ -3,7 +3,7 @@ package fr.curie.BiNoM.pathways.MaBoSS;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Collections;
-import java.util.Date;
+//import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -36,13 +36,13 @@ public class MaBoSSProbTrajFile {
 	public static void main(String[] args) {
 		try{
 		MaBoSSProbTrajFile prob = new MaBoSSProbTrajFile();
-		//prob.makeProbabilityTableFromFolder("C:/Datas/Calzone/genetic_interactions/restriction_mutants/","restriction_","C:/Datas/Calzone/genetic_interactions/restriction_mutants.xls");
-		//prob.normalizeProbabilityTable("C:/Datas/Calzone/genetic_interactions/cellfate_mutants.xls", 0.01f, "Apoptosis=Apoptosis+NonACD/Apoptosis;NonACD=NonACD+NonACD/Apoptosis");
-		//makeGeneticInteractionTable(vt,"Invasion/Migration/Metastasis/CellCycleArrest","metastasis","C:/Datas/Calzone/EMT/ModNet_mutants");
-//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/prova/a/","metastasis","C:/Users/Arnau/Desktop/prova/a/descriptions.txt","C:/Users/Arnau/Desktop/prova/metastasis.xls");
-//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/prova/ginsimout2_mutants/","ginsimout2","C:/Users/Arnau/Desktop/prova/ginsimout_mutants.xls");
-//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/prova/a/","metastasis","C:/Users/Arnau/Desktop/prova/a_mutants.xls");
 
+//		prob.normalizeProbabilityTable("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2.xls", 0.01f, "");
+//		VDataTable vtable = VDatReadWrite.LoadFromVDatFile("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2_norm.dat");
+//		makeGeneticInteractionTable(vtable,"CellCycleArrest","CCA","oldginsimout2");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/bona/","ginsimout_","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse.xls");
+//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/", "ginsimout_" ,"C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/descriptions.txt", "C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/out.txt");
+		
 		String folder = "";
 		String prefix = "";
 		String out = "";
@@ -90,7 +90,7 @@ public class MaBoSSProbTrajFile {
 			prob.makeLogicMutantTableFromFolder(folder,prefix,descriptionFile, out);
 		}		
 		if(normTable){
-			prob.normalizeProbabilityTable(table, 0.01f, mergedPhenotypes);
+			MaBoSSProbTrajFile.normalizeProbabilityTable(table, 0.01f, mergedPhenotypes);
 		}
 		if(computeGeneticInteractions){
 			VDataTable vtable = VDatReadWrite.LoadFromVDatFile(table);
@@ -108,7 +108,8 @@ public class MaBoSSProbTrajFile {
 		if(fileName.endsWith("_probtraj.csv"))
 			pair = fileName.substring(0, fileName.length()-13);
 		if(pair.startsWith(prefix))
-			pair = pair.substring(prefix.length()+1, pair.length());
+//			pair = pair.substring(prefix.length()+1, pair.length());
+			pair = pair.substring(prefix.length(), pair.length());
 		if(pair.equals(prefix.substring(0,prefix.length()-1)))
 			pair = "";
 		if(!pair.equals("")){
@@ -144,7 +145,7 @@ public class MaBoSSProbTrajFile {
 			String phenotype = table.stringTable[last][k];
 			if(phenotype!=null)if(!phenotype.trim().equals("")){
 				float prob = Float.parseFloat(table.stringTable[last][k+1]);
-				float errprob = Float.parseFloat(table.stringTable[last][k+2]);
+//				float errprob = Float.parseFloat(table.stringTable[last][k+2]);
 				phenotypes.add(phenotype);
 				probabilities.add(prob);
 			}
@@ -216,7 +217,7 @@ public class MaBoSSProbTrajFile {
 		
 		VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(outfile, true, "\t");
 		for(String s: sorted_phenotypes)
-			vt.fieldTypes[vt.fieldNumByName(s.replace(" -- ", "/"))] = vt.NUMERICAL;
+			vt.fieldTypes[vt.fieldNumByName(s.replace(" -- ", "/"))] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt, outfile+".dat");
 	}
 	
@@ -307,7 +308,8 @@ public class MaBoSSProbTrajFile {
 				if(s.startsWith("LEVEL"))
 					level = s.substring(5, s.length());
 			}
-			
+//			System.out.println(id);
+
 //			if(!description.equals("NA")){		//better to leave the NA if no description on description file
 			fw.write(id+"\t"+type+"\t"+description+"\t"+level+"\t"+inter1+"\t"+inter_type1+"\t"+inter2+"\t"+inter_type2+"\t");
 			for(String s: sorted_phenotypes){
@@ -323,7 +325,7 @@ public class MaBoSSProbTrajFile {
 		
 		VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(outfile, true, "\t");
 		for(String s: sorted_phenotypes)
-			vt.fieldTypes[vt.fieldNumByName(s.replace(" -- ", "/"))] = vt.NUMERICAL;
+			vt.fieldTypes[vt.fieldNumByName(s.replace(" -- ", "/"))] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt, outfile+".dat");
 	}
 	
@@ -353,7 +355,7 @@ public class MaBoSSProbTrajFile {
 		fwess.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
 		fwes3.write("INTERACTOR1\tINTERACTOR_TYPE1\tINTERACTOR2\tINTERACTOR_TYPE2\tINTERACTION_ID\tP1\tP2\tP12\tEPS_ADD\tEPS_MULT\tEPS_MIN\tEPS_MAX\tEPS_LOG\tEPS_BEST\tEPS_BEST_NORM\tINEQUALITY\tINEQ_TYPE\tINEQ_DIR\n");
 		HashMap<String, Integer> singles = new HashMap<String, Integer>();
-		int wtline = -1;
+//		int wtline = -1;
 		float wt_prob = 1f;
 		Vector<String> singleko = new Vector<String>();
 		Vector<String> singleoe = new Vector<String>();
@@ -381,7 +383,7 @@ public class MaBoSSProbTrajFile {
 						singles_v.add(id);
 			}
 			if(type.equals("WT")){
-				wtline = i;
+//				wtline = i;
 				wt_prob = sumColumns(i,vt,elementaryPhenotypes);
 			}
 		}
@@ -406,8 +408,8 @@ public class MaBoSSProbTrajFile {
 			if(type.equals("DOUBLE")){
 				String inter1 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR1")];
 				String inter2 = vt.stringTable[i][vt.fieldNumByName("INTERACTOR2")];
-				String inter1_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")];
-				String inter2_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE2")];
+//				String inter1_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE1")];
+//				String inter2_type = vt.stringTable[i][vt.fieldNumByName("INTERACTOR_TYPE2")];
 				//float P12 = Float.parseFloat(vt.stringTable[i][vt.fieldNumByName(phenotype)]);
 				float P12 = sumColumns(i,vt,elementaryPhenotypes);
 				int i1 = singles.get(inter1);
@@ -419,16 +421,17 @@ public class MaBoSSProbTrajFile {
 				P1s.add(P1);
 				P2s.add(P2);
 				P12s.add(P12);
+//				System.out.println(P12s);
 			}
 		}
 		
 		GeneticInteractionNetworks gn = new GeneticInteractionNetworks();
 		gn.ChooseBestNullEpistasisModel(P1s, P2s, P12s, forcedModelChoice);
 		System.out.println("\nPhenotype: "+phenotype+" ("+phenotype_short+")");
-		for(int i=0;i<gn.numberofnullmodels;i++){
-			System.out.println(gn.modelNames[i]+":\t corr="+gn.correlations[i]+"\t alpha="+gn.alphas[i]);			
+		for(int i=0;i<GeneticInteractionNetworks.numberofnullmodels;i++){
+			System.out.println(GeneticInteractionNetworks.modelNames[i]+":\t corr="+gn.correlations[i]+"\t alpha="+gn.alphas[i]);			
 		}
-		System.out.println("Best model: "+gn.modelNames[gn.bestNullEpistasisModel]);
+		System.out.println("Best model: "+GeneticInteractionNetworks.modelNames[GeneticInteractionNetworks.bestNullEpistasisModel]);
 		System.out.println("Negative threshold = "+gn.threshold_negative);
 		System.out.println("Positive threshold = "+gn.threshold_positive);
 		
@@ -449,26 +452,26 @@ public class MaBoSSProbTrajFile {
 				float P1 = sumColumns(i1,vt,elementaryPhenotypes);
 				float P2 = sumColumns(i2,vt,elementaryPhenotypes);
 				
-				float EPS_ADD = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_ADDITIVE]*(P1+P2);
-				float EPS_MLT = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MULTIPLICATIVE]*(P1*P2);
-				float EPS_MIN = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MIN]*Math.min(P1,P2);
-				float EPS_MAX = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_MAX]*Math.max(P1,P2);
-				float EPS_LOG = P12-gn.alphas[gn.EPISTASIS_NULL_MODEL_LOG]*(gn.log2((float)((Math.pow(2,P1)-1)*(Math.pow(2,P2)-1)+1)));
+				float EPS_ADD = P12-gn.alphas[GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE]*(P1+P2);
+				float EPS_MLT = P12-gn.alphas[GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MULTIPLICATIVE]*(P1*P2);
+				float EPS_MIN = P12-gn.alphas[GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MIN]*Math.min(P1,P2);
+				float EPS_MAX = P12-gn.alphas[GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MAX]*Math.max(P1,P2);
+				float EPS_LOG = P12-gn.alphas[GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_LOG]*(gn.log2((float)((Math.pow(2,P1)-1)*(Math.pow(2,P2)-1)+1)));
 				
 				float EPS_BEST = 0f;
 				
-				String ineq = gn.interactionInequality(wt_prob, P1, P2, P12, thresholdForDistinctFitness);
-				String ineq_type = gn.inequalityType(ineq);
-				int ineq_dir_i = gn.inequalityDirection(ineq);
+				String ineq = GeneticInteractionNetworks.interactionInequality(wt_prob, P1, P2, P12, thresholdForDistinctFitness);
+				String ineq_type = GeneticInteractionNetworks.inequalityType(ineq);
+				int ineq_dir_i = GeneticInteractionNetworks.inequalityDirection(ineq);
 				String ineq_dir = "symmetric";
 				if(ineq_dir_i==1) ineq_dir="A->B";
 				if(ineq_dir_i==-1) ineq_dir="A<-B";
 				
-				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_ADDITIVE) EPS_BEST = EPS_ADD;
-				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MULTIPLICATIVE) EPS_BEST = EPS_MLT;
-				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MIN) EPS_BEST = EPS_MIN;
-				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_MAX) EPS_BEST = EPS_MAX;
-				if(gn.bestNullEpistasisModel==gn.EPISTASIS_NULL_MODEL_LOG) EPS_BEST = EPS_LOG;
+				if(GeneticInteractionNetworks.bestNullEpistasisModel==GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_ADDITIVE) EPS_BEST = EPS_ADD;
+				if(GeneticInteractionNetworks.bestNullEpistasisModel==GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MULTIPLICATIVE) EPS_BEST = EPS_MLT;
+				if(GeneticInteractionNetworks.bestNullEpistasisModel==GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MIN) EPS_BEST = EPS_MIN;
+				if(GeneticInteractionNetworks.bestNullEpistasisModel==GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_MAX) EPS_BEST = EPS_MAX;
+				if(GeneticInteractionNetworks.bestNullEpistasisModel==GeneticInteractionNetworks.EPISTASIS_NULL_MODEL_LOG) EPS_BEST = EPS_LOG;
 				
 				if(swapPhenotypesToHaveSameDirection){
 					if(ineq_dir_i==-1){
@@ -537,12 +540,12 @@ public class MaBoSSProbTrajFile {
 		fwes3.close();
 		
 		VDataTable vte = VDatReadWrite.LoadFromSimpleDatFile(outfile_prefix+"_"+phenotype_short+"_edges.txt", true, "\t");
-		vte.fieldTypes[vte.fieldNumByName("P1")] = vt.NUMERICAL;
-		vte.fieldTypes[vte.fieldNumByName("P2")] = vt.NUMERICAL;
-		vte.fieldTypes[vte.fieldNumByName("P12")] = vt.NUMERICAL;
+		vte.fieldTypes[vte.fieldNumByName("P1")] = VDataTable.NUMERICAL;
+		vte.fieldTypes[vte.fieldNumByName("P2")] = VDataTable.NUMERICAL;
+		vte.fieldTypes[vte.fieldNumByName("P12")] = VDataTable.NUMERICAL;
 		for(int i=0;i<vte.colCount;i++)
 			if(vte.fieldNames[i].startsWith("EPS_"))
-				vte.fieldTypes[i] = vt.NUMERICAL;
+				vte.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vte, outfile_prefix+"_"+phenotype_short+"_edges.dat");
 		// Writing down the epistatic profile matrices
 		FileWriter fw = new FileWriter(outfile_prefix+"_"+phenotype_short+"_epi.txt");
@@ -587,15 +590,15 @@ public class MaBoSSProbTrajFile {
 
 		VDataTable vt1 = VDatReadWrite.LoadFromSimpleDatFile(outfile_prefix+"_"+phenotype_short+"_epi.txt", true, "\t");
 		for(int i=1;i<vt1.colCount;i++)
-			vt1.fieldTypes[i] = vt1.NUMERICAL;
+			vt1.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt1, outfile_prefix+"_"+phenotype_short+"_epi.dat");
 		vt1 = VDatReadWrite.LoadFromSimpleDatFile(outfile_prefix+"_"+phenotype_short+"_epiko.txt", true, "\t");
 		for(int i=1;i<vt1.colCount;i++)
-			vt1.fieldTypes[i] = vt1.NUMERICAL;
+			vt1.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt1, outfile_prefix+"_"+phenotype_short+"_epiko.dat");
 		vt1 = VDatReadWrite.LoadFromSimpleDatFile(outfile_prefix+"_"+phenotype_short+"_epioe.txt", true, "\t");
 		for(int i=1;i<vt1.colCount;i++)
-			vt1.fieldTypes[i] = vt1.NUMERICAL;
+			vt1.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt1, outfile_prefix+"_"+phenotype_short+"_epioe.dat");
 		
 	}
@@ -664,7 +667,7 @@ public class MaBoSSProbTrajFile {
 			while(it.hasNext()){
 				String phname = it.next();
 				if(vt.fieldNumByName(phname)==-1){
-					vt.addNewColumn(phname, "", "", vt.NUMERICAL, "0");
+					vt.addNewColumn(phname, "", "", VDataTable.NUMERICAL, "0");
 				}
 			}
 			prob_averages = new float[vt.colCount-numberOfFirstColumns];
@@ -699,7 +702,7 @@ public class MaBoSSProbTrajFile {
 		VDatReadWrite.saveToSimpleDatFile(vt, fn1+".xls", true);
 		for(int i=numberOfFirstColumns;i<vt.colCount;i++)
 			if(prob_averages[i-numberOfFirstColumns]>thresh)
-				vt.fieldTypes[i] = vt.NUMERICAL;
+				vt.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt, fn1+".dat");
 	}
 	
@@ -760,7 +763,7 @@ public class MaBoSSProbTrajFile {
 		fw.close();
 		VDataTable vt1 = VDatReadWrite.LoadFromSimpleDatFile(outFileNamePrefix+".txt", true, "\t");
 		for(int i=3;i<vt1.colCount;i++)
-			vt1.fieldTypes[i] = vt1.NUMERICAL;
+			vt1.fieldTypes[i] = VDataTable.NUMERICAL;
 		VDatReadWrite.saveToVDatFile(vt1, outFileNamePrefix+".dat");
 	}
 	

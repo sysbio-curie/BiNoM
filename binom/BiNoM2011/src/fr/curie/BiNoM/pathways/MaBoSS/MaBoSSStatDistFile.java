@@ -2,11 +2,14 @@ package fr.curie.BiNoM.pathways.MaBoSS;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Collections;
+//import java.io.PrintWriter;
+//import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.regex.*;
 
 import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
@@ -24,9 +27,11 @@ public class MaBoSSStatDistFile {
 		try{
 			MaBoSSStatDistFile prob = new MaBoSSStatDistFile();
 			
-//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/prova/Windows/metastasis_mutants_logics/");
-//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/prova/a1/", "metastasis");
-//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/prova/a2/");
+//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/metastasis_mutants_logics/", "metastasis");
+//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics2/", "ginsimout");
+//			prob.makeDistTableFromFolder("X:/tutorial/6/ginsimout_mutants_logics_2/", "ginsimout");
+//			prob.makeDistTableFromFolder("X:/tutorial/6/metastasis2_mutants_logics/", "metastasis2");
+//			prob.makeDistTableFromFolder("X:/tutorial/6/metastasis_mutants_logics_old/", "metastasis");
 			
 			String folder = "";
 			String prefix = "";
@@ -46,8 +51,8 @@ public class MaBoSSStatDistFile {
 			e.printStackTrace();
 		}
 		}
+	
 	public void makeDistTableFromFolder(String folder, String prefix) throws Exception{
-//			File dir = new File(folder);
 			Vector<String> mutants = Utils.loadStringListFromFile(folder+"descriptions.txt");
 			FileWriter fw = new FileWriter(folder+prefix+"_dist_mutants.txt");
 			int count=0;
@@ -62,10 +67,11 @@ public class MaBoSSStatDistFile {
 				else
 					select = "1";
 				if(select.equals("1")){
-				String fn = folder+"metastasis_"+id+"_lm--metastasis_cm_statdist.csv";
-				String fp = folder+"metastasis_"+id+"_lm--metastasis_cm_fp.csv";
+//				String fn = folder+"metastasis_"+id+"_lm--metastasis_cm_statdist.csv";
+//				String fp = folder+"metastasis_"+id+"_lm--metastasis_cm_fp.csv";
+				String fn = folder+prefix+"_"+id+"_lm--"+prefix+"_cm_statdist.csv";
+				String fp = folder+prefix+"_"+id+"_lm--"+prefix+"_cm_fp.csv";
 				if(!desc.contains("up &")&&(new File(fn).exists())){
-//				if(new File(fn).exists()){
 				count++;
 				MaBoSSStatDistFile ms = new MaBoSSStatDistFile();
 				ms.phenotypes.add("Invasion");
@@ -76,10 +82,8 @@ public class MaBoSSStatDistFile {
 				ms.phenotypes.add("CellCycleArrest");
 				ms.id = id;
 				ms.description = desc;
-				//String fn = folder+"metastasis_"+id+"_lm_statdist.csv";
-				
-//				ms.extractFixedPoints(fn);
 				ms.extractFixedPoints(fp);
+//				ms.extractFixedPoints(fn);
 				System.out.println((i+1)+": "+id);
 				if(i==0){
 					fw.write(ms.toString(true));
@@ -98,7 +102,7 @@ public class MaBoSSStatDistFile {
 			System.out.println(count+" mutants are counted");
 			
 			VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(folder+prefix+"_dist_mutants.txt", true, "\t");
-			for(int i=4;i<vt.colCount;i++) vt.fieldTypes[i] = vt.NUMERICAL;
+			for(int i=4;i<vt.colCount;i++) vt.fieldTypes[i] = VDataTable.NUMERICAL;
 			VDatReadWrite.saveToVDatFile(vt,folder+prefix+"_dist_mutants.dat");
 			
 			/*
@@ -112,7 +116,7 @@ public class MaBoSSStatDistFile {
 				if(counts.get(fp)!=null) count = counts.get(fp);
 				counts.put(fp, count+1);
 			}
-			vt1.addNewColumn("COUNT", "", "", vt1.NUMERICAL, "1");
+			vt1.addNewColumn("COUNT", "", "", VDataTable.NUMERICAL, "1");
 			for(int i=0;i<vt1.rowCount;i++){
 				String fp = vt1.stringTable[i][vt1.fieldNumByName("FP_STRING")];
 				vt1.stringTable[i][vt1.fieldNumByName("COUNT")] = ""+counts.get(fp);
@@ -120,14 +124,64 @@ public class MaBoSSStatDistFile {
 			}
 			VDatReadWrite.saveToVDatFile(vt1,folder+prefix+"_dist_mutants_count.dat");
 			VDatReadWrite.saveToSimpleDatFile(vt1, folder+prefix+"_dist_mutants_count.txt",false);
+
+//			code not used:
+//			Iterator<String> it = counts.keySet().iterator();
+//			while(it.hasNext()){
+//				String s = it.next();
+//			}
 			
-			Iterator<String> it = counts.keySet().iterator();
-			while(it.hasNext()){
-				String s = it.next();
-//				System.out.println("_"+s+"\t"+counts.get(s));
+			/*
+			 * Hamming distance
+			 */
+			VDataTable vt2 = VDatReadWrite.LoadFromVDatFile(folder+prefix+"_dist_mutants_count.dat");
+			HashMap<String,String> WT = new HashMap<String,String>();
+			HashMap<String,String> MUT = new HashMap<String,String>();
+			for(int i=0;i<vt2.rowCount;i++){
+				String fp_id = vt2.stringTable[i][vt2.fieldNumByName("FP_ID")];
+				String fp = vt2.stringTable[i][vt2.fieldNumByName("FP_STRING")];
+				String pattern = "_WT";
+			    Pattern r = Pattern.compile(pattern);
+			    Matcher m = r.matcher(fp_id);
+			    if (m.find( )) {
+						WT.put(fp_id,fp);
+			    }else {
+						MUT.put(fp_id,fp);
+			      }
 			}
+			HashMap<String,Integer> distWT = new HashMap<String,Integer>();
+			HashMap<String,String> closestWT = new HashMap<String,String>();
+
+			for(Entry<String, String> entrymut: MUT.entrySet()) {
+				String mutvalue= entrymut.getValue();
+				String mutkey= entrymut.getKey();
+			    int countmin=1000;
+			    String minWT = null;
+			    for(Entry<String, String> entryWT: WT.entrySet()) {
+				    int Hdist = getHammingDistance(entryWT.getValue(),mutvalue);
+				    if (Hdist < countmin){
+				    	countmin = Hdist;
+				    	minWT = entryWT.getKey();
+				    }
+				    else {}
+			    }
+				distWT.put(mutkey,countmin);
+				closestWT.put(mutkey,minWT);
 			}
-	
+			vt2.addNewColumn("Dist_to_WT", "", "", VDataTable.NUMERICAL, "1");
+			for(int i=0;i<vt2.rowCount;i++){
+				String fp = vt2.stringTable[i][vt2.fieldNumByName("FP_ID")];
+				vt2.stringTable[i][vt2.fieldNumByName("Dist_to_WT")] = ""+distWT.get(fp);
+			}
+			vt2.addNewColumn("Closest_WT", "", "", VDataTable.STRING, "1");
+			for(int i=0;i<vt2.rowCount;i++){
+				String fp = vt2.stringTable[i][vt2.fieldNumByName("FP_ID")];
+				vt2.stringTable[i][vt2.fieldNumByName("Closest_WT")] = ""+closestWT.get(fp);
+			}
+			VDatReadWrite.saveToVDatFile(vt2,folder+prefix+"_dist_mutants_Hamming.dat");
+			VDatReadWrite.saveToSimpleDatFile(vt2, folder+prefix+"_dist_mutants_Hamming.txt",false);
+}
+
 	public String toString(){
 		return toString(false);
 	}
@@ -161,7 +215,6 @@ public class MaBoSSStatDistFile {
 				if(n.equals("State")){
 					while(st.hasMoreTokens()){
 					String nodeName = st.nextToken();
-//					System.out.println(nodeName);
 					if(phenotypes.contains(nodeName))
 						nodeName = "0_"+nodeName;
 					if(!nodeNames.contains(nodeName))
@@ -170,7 +223,6 @@ public class MaBoSSStatDistFile {
 				}
 			}
 		}
-//		Collections.sort(nodeNames);
 		Vector<Integer> fixedPoint = null;
 		for(String s: lines){
 			StringTokenizer st = new StringTokenizer(s,"\n");
@@ -204,4 +256,24 @@ public class MaBoSSStatDistFile {
 			s+=""+i;
 		return s;
 	}
+	 
+//  Hamming Distance for two strings of the same length:
+	public String compOne;
+	public String compTwo;
+	public int getHammingDistance(String one, String two){
+	    	compOne = one;
+	        compTwo = two;
+
+	        if (compOne.length() != compTwo.length())
+	        {
+	            return -1;
+	        }
+	        int counter = 0;
+	        for (int i = 0; i < compOne.length(); i++)
+	        {
+	            if (compOne.charAt(i) != compTwo.charAt(i)) counter++;
+	        }
+//			System.out.println(counter);
+	        return counter;
+	    }
 }

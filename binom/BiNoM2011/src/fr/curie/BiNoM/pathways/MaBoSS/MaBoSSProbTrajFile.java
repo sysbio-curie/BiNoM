@@ -16,7 +16,7 @@ import fr.curie.BiNoM.pathways.utils.GeneticInteractionNetworks;
 import fr.curie.BiNoM.pathways.utils.SimpleTable;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
-public class MaBoSSProbTrajFile {
+public class MaBoSSProbTrajFile_svn {
 
 	int type = 0; // 0 - wild type, 1 - single mutant, 2 - double mutant
 	String interactor1 = "_";
@@ -35,13 +35,7 @@ public class MaBoSSProbTrajFile {
 	
 	public static void main(String[] args) {
 		try{
-		MaBoSSProbTrajFile prob = new MaBoSSProbTrajFile();
-
-//		prob.normalizeProbabilityTable("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2.xls", 0.01f, "");
-//		VDataTable vtable = VDatReadWrite.LoadFromVDatFile("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2_norm.dat");
-//		makeGeneticInteractionTable(vtable,"CellCycleArrest","CCA","oldginsimout2");
-//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/bona/","ginsimout_","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse.xls");
-//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/", "ginsimout_" ,"C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/descriptions.txt", "C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/out.txt");
+		MaBoSSProbTrajFile_svn prob = new MaBoSSProbTrajFile_svn();
 		
 		String folder = "";
 		String prefix = "";
@@ -90,7 +84,7 @@ public class MaBoSSProbTrajFile {
 			prob.makeLogicMutantTableFromFolder(folder,prefix,descriptionFile, out);
 		}		
 		if(normTable){
-			MaBoSSProbTrajFile.normalizeProbabilityTable(table, 0.01f, mergedPhenotypes);
+			MaBoSSProbTrajFile_svn.normalizeProbabilityTable(table, 0.01f, mergedPhenotypes);
 		}
 		if(computeGeneticInteractions){
 			VDataTable vtable = VDatReadWrite.LoadFromVDatFile(table);
@@ -155,13 +149,13 @@ public class MaBoSSProbTrajFile {
 	
 	public void makeProbabilityTableFromFolder(String folder, String prefix, String outfile) throws Exception{
 		File dir = new File(folder);
-		Vector<MaBoSSProbTrajFile> trajs = new Vector<MaBoSSProbTrajFile>();
+		Vector<MaBoSSProbTrajFile_svn> trajs = new Vector<MaBoSSProbTrajFile_svn>();
 		Vector<String> phenotypes = new Vector<String>();
 		int kk =0;
 		for(File f: dir.listFiles())if(f.getName().endsWith("probtraj.csv")){
 			kk++;
 			System.out.println(kk+": Loading "+f.getName());
-			MaBoSSProbTrajFile traj = new MaBoSSProbTrajFile();
+			MaBoSSProbTrajFile_svn traj = new MaBoSSProbTrajFile_svn();
 			traj.load(f.getAbsolutePath(), prefix);
 			trajs.add(traj);
 			for(String phen: traj.phenotypes){
@@ -189,7 +183,7 @@ public class MaBoSSProbTrajFile {
 			fw.write(s.replace(" -- ", "/")+"\t");
 		fw.write("\n");
 		for(int i=0;i<trajs.size();i++){
-			MaBoSSProbTrajFile traj = trajs.get(i);
+			MaBoSSProbTrajFile_svn traj = trajs.get(i);
 			String id = traj.interactor1;
 			if(!traj.interactor2.equals("_"))
 				id+="__"+traj.interactor2;
@@ -237,14 +231,14 @@ public class MaBoSSProbTrajFile {
 		}
 		
 		File dir = new File(folder);
-		Vector<MaBoSSProbTrajFile> trajs = new Vector<MaBoSSProbTrajFile>();
+		Vector<MaBoSSProbTrajFile_svn> trajs = new Vector<MaBoSSProbTrajFile_svn>();
 		Vector<String> phenotypes = new Vector<String>();
 		File list[] = dir.listFiles();
 		int kk =0;
 		for(File f: list)if(f.getName().endsWith("probtraj.csv")){
 			kk++;
 			System.out.println(kk+": Loading "+f.getName());
-			MaBoSSProbTrajFile traj = new MaBoSSProbTrajFile();
+			MaBoSSProbTrajFile_svn traj = new MaBoSSProbTrajFile_svn();
 			traj.load(f.getAbsolutePath(), prefix);
 			trajs.add(traj);
 			for(String phen: traj.phenotypes){
@@ -273,7 +267,7 @@ public class MaBoSSProbTrajFile {
 			fw.write(s.replace(" -- ", "/")+"\t");
 		fw.write("\n");
 		for(int i=0;i<trajs.size();i++){
-			MaBoSSProbTrajFile traj = trajs.get(i);
+			MaBoSSProbTrajFile_svn traj = trajs.get(i);
 			String id = traj.interactor1;
 			if(!traj.interactor2.equals("_"))
 				id+="__"+traj.interactor2;

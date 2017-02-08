@@ -15,7 +15,7 @@ import vdaoengine.data.VDataTable;
 import vdaoengine.data.io.VDatReadWrite;
 import fr.curie.BiNoM.pathways.utils.Utils;
 
-public class MaBoSSStatDistFile {
+public class MaBoSSStatDistFile_svn {
 
 	public String id = "id";
 	public String description = "none";
@@ -25,14 +25,8 @@ public class MaBoSSStatDistFile {
 	
 	public static void main(String[] args) {
 		try{
-			MaBoSSStatDistFile prob = new MaBoSSStatDistFile();
-			
-//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/metastasis_mutants_logics/", "metastasis");
-//			prob.makeDistTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics2/", "ginsimout");
-//			prob.makeDistTableFromFolder("X:/tutorial/6/ginsimout_mutants_logics_2/", "ginsimout");
-//			prob.makeDistTableFromFolder("X:/tutorial/6/metastasis2_mutants_logics/", "metastasis2");
-//			prob.makeDistTableFromFolder("X:/tutorial/6/metastasis_mutants_logics_old/", "metastasis");
-			
+			MaBoSSStatDistFile_svn prob = new MaBoSSStatDistFile_svn();
+						
 			String folder = "";
 			String prefix = "";
 			boolean makeTable = false;
@@ -73,7 +67,7 @@ public class MaBoSSStatDistFile {
 				String fp = folder+prefix+"_"+id+"_lm--"+prefix+"_cm_fp.csv";
 				if(!desc.contains("up &")&&(new File(fn).exists())){
 				count++;
-				MaBoSSStatDistFile ms = new MaBoSSStatDistFile();
+				MaBoSSStatDistFile_svn ms = new MaBoSSStatDistFile_svn();
 				ms.phenotypes.add("Invasion");
 				ms.phenotypes.add("EMT");
 				ms.phenotypes.add("Migration");

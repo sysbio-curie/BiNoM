@@ -36,7 +36,7 @@ public class MaBoSSProbTrajFile_svn {
 	public static void main(String[] args) {
 		try{
 		MaBoSSProbTrajFile_svn prob = new MaBoSSProbTrajFile_svn();
-		
+
 		String folder = "";
 		String prefix = "";
 		String out = "";
@@ -128,7 +128,8 @@ public class MaBoSSProbTrajFile_svn {
 			type = 0;
 		}
 		SimpleTable table = new SimpleTable();
-		table.LoadFromSimpleDatFile(fn, true, "\t", 10000000);
+//		table.LoadFromSimpleDatFile(fn, true, "\t", 10000000);
+		table.LoadFromSimpleDatFile(fn, true, "\t", 100000000);
 		int last = table.rowCount-1;
 		int k=5;
 		for(int i=0;i<table.colCount;i++)
@@ -302,8 +303,6 @@ public class MaBoSSProbTrajFile_svn {
 				if(s.startsWith("LEVEL"))
 					level = s.substring(5, s.length());
 			}
-//			System.out.println(id);
-
 //			if(!description.equals("NA")){		//better to leave the NA if no description on description file
 			fw.write(id+"\t"+type+"\t"+description+"\t"+level+"\t"+inter1+"\t"+inter_type1+"\t"+inter2+"\t"+inter_type2+"\t");
 			for(String s: sorted_phenotypes){
@@ -415,7 +414,6 @@ public class MaBoSSProbTrajFile_svn {
 				P1s.add(P1);
 				P2s.add(P2);
 				P12s.add(P12);
-//				System.out.println(P12s);
 			}
 		}
 		

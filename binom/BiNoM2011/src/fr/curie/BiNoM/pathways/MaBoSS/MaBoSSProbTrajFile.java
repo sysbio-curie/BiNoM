@@ -102,8 +102,8 @@ public class MaBoSSProbTrajFile_svn {
 		if(fileName.endsWith("_probtraj.csv"))
 			pair = fileName.substring(0, fileName.length()-13);
 		if(pair.startsWith(prefix))
-//			pair = pair.substring(prefix.length()+1, pair.length());
-			pair = pair.substring(prefix.length(), pair.length());
+			pair = pair.substring(prefix.length()+1, pair.length());
+			// pair = pair.substring(prefix.length(), pair.length());
 		if(pair.equals(prefix.substring(0,prefix.length()-1)))
 			pair = "";
 		if(!pair.equals("")){

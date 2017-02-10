@@ -101,11 +101,16 @@ public class MaBoSSProbTrajFile_svn {
 		String pair = "";
 		if(fileName.endsWith("_probtraj.csv"))
 			pair = fileName.substring(0, fileName.length()-13);
+		// modified the declaration of type and pair to WT
+		if(pair.equals(prefix)) {
+			pair = "";
+			type = 0;
+		}else{
 		if(pair.startsWith(prefix))
 			pair = pair.substring(prefix.length()+1, pair.length());
-			// pair = pair.substring(prefix.length(), pair.length());
-		if(pair.equals(prefix.substring(0,prefix.length()-1)))
-			pair = "";
+		}
+//		if(pair.equals(prefix.substring(0,prefix.length()-1)))
+//			pair = "";
 		if(!pair.equals("")){
 			type = 1;
 			pair = pair.replaceFirst("--", "%");
@@ -123,10 +128,10 @@ public class MaBoSSProbTrajFile_svn {
 			if(interactor2.endsWith("_cm")) { interactorType2 = +2; interactor2 = interactor2.substring(0,interactor2.length()-3); } 
 			if(interactor1.endsWith("_lm")) { interactorType1 = +3; interactor1	= interactor1.substring(0,interactor1.length()-3); }
 			if(interactor2.endsWith("_lm")) { interactorType2 = +3; interactor2 = interactor2.substring(0,interactor2.length()-3); }
-			
-		}else{
-			type = 0;
-		}
+			}
+//		else{
+//			type = 0;
+//		}
 		SimpleTable table = new SimpleTable();
 //		table.LoadFromSimpleDatFile(fn, true, "\t", 10000000);
 		table.LoadFromSimpleDatFile(fn, true, "\t", 100000000);
@@ -140,6 +145,7 @@ public class MaBoSSProbTrajFile_svn {
 			String phenotype = table.stringTable[last][k];
 			if(phenotype!=null)if(!phenotype.trim().equals("")){
 				float prob = Float.parseFloat(table.stringTable[last][k+1]);
+				//errprob not used throughout the file
 //				float errprob = Float.parseFloat(table.stringTable[last][k+2]);
 				phenotypes.add(phenotype);
 				probabilities.add(prob);

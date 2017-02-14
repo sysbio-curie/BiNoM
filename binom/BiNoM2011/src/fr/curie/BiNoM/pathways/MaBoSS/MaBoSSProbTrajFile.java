@@ -36,7 +36,6 @@ public class MaBoSSProbTrajFile_svn {
 	public static void main(String[] args) {
 		try{
 		MaBoSSProbTrajFile_svn prob = new MaBoSSProbTrajFile_svn();
-
 		String folder = "";
 		String prefix = "";
 		String out = "";
@@ -617,7 +616,9 @@ public class MaBoSSProbTrajFile_svn {
 	 */
 	public static void normalizeProbabilityTable(String fn, float thresh, String mergedPhenotypes){
 		VDataTable vt = VDatReadWrite.LoadFromSimpleDatFile(fn, true, "\t");
-		int numberOfFirstColumns = 9;
+		// modified the number of first phenotype column
+//		int numberOfFirstColumns = 9;
+		int numberOfFirstColumns = 6;
 		String fn1 = fn.substring(0, fn.length()-4)+"_norm";
 		float wt_probs[] = new float[vt.colCount-numberOfFirstColumns];
 		float prob_averages[] = new float[vt.colCount-numberOfFirstColumns];

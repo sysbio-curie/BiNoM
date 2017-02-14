@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 //import java.io.PrintWriter;
 //import java.util.Collections;
-import java.util.HashMap;
 //import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -26,7 +26,6 @@ public class MaBoSSStatDistFile_svn {
 	public static void main(String[] args) {
 		try{
 			MaBoSSStatDistFile_svn prob = new MaBoSSStatDistFile_svn();
-						
 			String folder = "";
 			String prefix = "";
 			boolean makeTable = false;
@@ -68,16 +67,16 @@ public class MaBoSSStatDistFile_svn {
 				if(!desc.contains("up &")&&(new File(fn).exists())){
 				count++;
 				MaBoSSStatDistFile_svn ms = new MaBoSSStatDistFile_svn();
-				ms.phenotypes.add("Invasion");
-				ms.phenotypes.add("EMT");
-				ms.phenotypes.add("Migration");
-				ms.phenotypes.add("Metastasis");
-				ms.phenotypes.add("Apoptosis");
-				ms.phenotypes.add("CellCycleArrest");
+				// removed the addition of phenotypes
+//				ms.phenotypes.add("Invasion");
+//				ms.phenotypes.add("EMT");
+//				ms.phenotypes.add("Migration");
+//				ms.phenotypes.add("Metastasis");
+//				ms.phenotypes.add("Apoptosis");
+//				ms.phenotypes.add("CellCycleArrest");
 				ms.id = id;
 				ms.description = desc;
 				ms.extractFixedPoints(fp);
-//				ms.extractFixedPoints(fn);
 				System.out.println((i+1)+": "+id);
 				if(i==0){
 					fw.write(ms.toString(true));

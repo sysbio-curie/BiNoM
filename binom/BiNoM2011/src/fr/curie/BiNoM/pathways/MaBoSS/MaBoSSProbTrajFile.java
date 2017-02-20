@@ -36,6 +36,20 @@ public class MaBoSSProbTrajFile_svn {
 	public static void main(String[] args) {
 		try{
 		MaBoSSProbTrajFile_svn prob = new MaBoSSProbTrajFile_svn();
+
+//		prob.normalizeProbabilityTable("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2.xls", 0.01f, "");
+//		VDataTable vtable = VDatReadWrite.LoadFromVDatFile("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/old/oldginsimout2_norm.dat");
+//		makeGeneticInteractionTable(vtable,"CellCycleArrest","CCA","oldginsimout2");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/bona/","ginsimout_","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse.xls");
+//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/", "ginsimout_" ,"C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/descriptions.txt", "C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/out.txt");
+//		prob.makeLogicMutantTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/", "ginsimout" ,"C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/descriptions.txt", "C:/Users/Arnau/Desktop/Tutorial/6 Predicting logical gates interactions/ginsimout_mutants_logics/out.txt");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/prova/","ginsimout","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse_1.xls");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_mutants/","ginsimout","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse.xls");
+//		prob.makeProbabilityTableFromFolder("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_mutants/","ginsimout","C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout_eclipse.xls");
+//		prob.normalizeProbabilityTable("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout2.xls", 0.01f, "Mig=Metastasis+ECMicroenv/EMT/CellCycleArrest/GF/TGFbeta;Mig2=Metastasis+ECMicroenv/Migration/Metastasis/Invasion/EMT/GF/TGFbeta");
+//		prob.normalizeProbabilityTable("C:/Users/Arnau/Desktop/Tutorial/4 Predicting genetic interactions/ginsimout2.xls", 0.01f, "");
+		
+
 		String folder = "";
 		String prefix = "";
 		String out = "";
@@ -132,6 +146,7 @@ public class MaBoSSProbTrajFile_svn {
 //			type = 0;
 //		}
 		SimpleTable table = new SimpleTable();
+		//need to increase the load buffer so that it reaches the end of the file
 //		table.LoadFromSimpleDatFile(fn, true, "\t", 10000000);
 		table.LoadFromSimpleDatFile(fn, true, "\t", 100000000);
 		int last = table.rowCount-1;

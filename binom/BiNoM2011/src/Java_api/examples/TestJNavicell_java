@@ -1,7 +1,10 @@
+
+package Java_api.examples;
+
 import fr.curie.jnavicell.NaviCell;
 
-public class Test {
 
+public class Test {
     public static void main(String[] args) {
 
             NaviCell nv = new NaviCell();

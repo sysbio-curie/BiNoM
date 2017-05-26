@@ -976,7 +976,7 @@ function show_map_and_markers(map_name, ids)
 	}
 	else
 	{
-		if (map_name.indexOf(".html") > 0) {
+		if (map_name.indexOf(".html") > 0 || map_name.indexOf(".php") > 0) {
 			map = window.open(map_name);
 		} else {
 			map = window.open("../" + map_name + "/index.html");

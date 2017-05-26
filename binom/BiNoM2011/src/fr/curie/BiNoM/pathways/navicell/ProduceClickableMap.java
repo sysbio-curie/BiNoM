@@ -4209,6 +4209,7 @@ public class ProduceClickableMap
 	{
 		// NV_SERVER: 2014-08-26
 		//fw.append(onclick_before).append("show_map_and_markers(");
+		//System.out.println("nv_open_module " + map_name);
 		fw.append(onclick_before).append("nv_perform(\"nv_open_module\", window, ");
 		html_quote(fw, map_name);
 		fw.append(", [");
@@ -5545,6 +5546,10 @@ public class ProduceClickableMap
 			out.println("    }");
 			out.println("    return \"\";");
 			out.println("  }\n  ?>");
+			out.println("  var show_ids = '<?= get_url_var(\"show_ids\") ?>';");
+			out.println("  if (show_ids) {");
+			out.println("    to_open = JSON.parse(show_ids);");
+			out.println("  }");
 			out.println("  navicell.id = '<?= get_url_var(\"id\") ?>';");
 			out.println("  navicell.proxy_url = '<?= get_url_var(\"proxy_url\") ?>';");
 		}
@@ -5799,8 +5804,9 @@ public class ProduceClickableMap
 			Vector<String[]> ret = new Vector<String[]>();
 			String line;
 			while ((line = xref_stream.readLine()) != null) {
-				String[] cols = line.replaceAll("#.*", "").split("\t");
-				//System.out.println("line [" + line + "] -> " + cols.length);
+				// EV: 2017-05-26
+				//String[] cols = line.replaceAll("#.*", "").split("\t");
+				String[] cols = line.replaceAll("(^#.*| #.*)", "").split("\t");
 				if (cols.length >= 3) {
 					ret.add(cols);
 				}

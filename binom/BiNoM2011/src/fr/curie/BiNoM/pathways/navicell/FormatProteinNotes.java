@@ -21,6 +21,7 @@ package fr.curie.BiNoM.pathways.navicell;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -126,9 +127,15 @@ class FormatProteinNotesBase
 		sb.append("\\b(").append(block_name_pattern).append(")(_begin):");
 		sb.append("|");
 		sb.append("\\b(").append(block_name_pattern).append(")(_end)\\b");
+
+		// EV: 2017-05-26
+		//sb.append("|\\b(MAP:)").append("([A-Za-z0-9_]+(#[A-Za-z0-9_,]+)?)\\b");
+		//sb.append("|\\b(MODULE:)").append("([A-Za-z0-9_]+(#[A-Za-z0-9_,]+)?)\\b");
+
 		for (final String tag : layer_tags) {
 			sb.append("|\\b(").append(tag).append(":)([A-Z][A-Z0-9_]*)\\b");
 		}
+
 
 		for (final String[] s : xrefs)
 		{
@@ -142,8 +149,8 @@ class FormatProteinNotesBase
 			s[1] = s[1].replace("&", "&amp;");
 			add_link_rule(sb, s);
 		}
-
-		//System.out.println("SB [" + sb + "]");
+		
+		System.out.println("SB [" + sb + "]");
 		pat_bubble = pat_generic = Pattern.compile(sb.toString());
 	}
 
@@ -304,6 +311,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 	{
 		final String comment = build_comment(note, comments);
 		
+		//System.out.println("format BEGIN");
 		hash(comment, h);
 
 		String block = null;
@@ -318,6 +326,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 				offset++;
 			}
 			String tag = m.group(offset);
+			//System.out.println("TAG: //" + tag + "//" + m.group(offset+1) + "//" + m.group(offset+2));
 			if (tag.startsWith("\n") && tag.endsWith("\n"))	{
 				//m.appendReplacement(res, (after_block) ? "\n" : "<br>\n");
 				//m.appendReplacement(res, (after_block) ? "" : "<br>");
@@ -375,7 +384,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 					}
 					after_block = false;
 				} else {
-					//System.out.println("else...");
+					//System.out.println("else... TAG: " + tag);
 					boolean done = false;
 					for (final String[] entry : xrefs) {
 						String vtag;
@@ -410,24 +419,22 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 							}
 							String url = substitute(entry[1], value_map);
 							String xtag = isValidEntry(entry, 4) ? substitute(entry[4], value_map) : tag + ":";
-							//System.out.println("TAG " + tag);
-							/*
-							if (tag.equals("MAP") && atlasInfo != null) {
-								//System.err.println("ATLAS INFO: " + atlasInfo);
-								mapInfo = atlasInfo.getMapInfo(value);
-								if (mapInfo != null) {
-									value = mapInfo.getName();
-									assert mapInfo.url != null;
-									url = mapInfo.url;
-								}
-								res.append(xtag).append(value).append("&nbsp;");
-								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
-							*/
+							//System.out.println("value " + value);
 							if (tag.equals("MAP")) {
+								int idx = value.indexOf('#');
+								if (idx > 0) {
+									String arr[] = value.split("#");
+									value = arr[0];
+									all = Arrays.asList(arr[1].split(","));
+									//System.out.println("value2 " + value + " " + all);
+								}
 								//System.err.println("ATLAS INFO: " + atlasInfo);
 								if (atlasInfo != null) {
 									mapInfo = atlasInfo.getMapInfo(value);
-									if (mapInfo != null) {
+									if (mapInfo == null) {
+										System.out.println("ERROR: Map info = null for map " + value);
+									} else {
+										System.out.println("Map info found for map " + value);
 										value = mapInfo.getName();
 										assert mapInfo.url != null;
 										url = mapInfo.url;
@@ -438,9 +445,16 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 								res.append(xtag).append(value).append("&nbsp;");
 								show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 							} else if (tag.equals("MODULE")) {
+								int idx = value.indexOf('#');
+								if (idx > 0) {
+									String arr[] = value.split("#");
+									value = arr[0];
+									all = Arrays.asList(arr[1].split(","));
+								}
 								if (mapInfo==null) {
-									System.out.println("ERROR: Map info = null for "+value+"\n"+note	);
+									System.out.println("ERROR: Map info = null for module " + value);
 								} else {
+									System.out.println("OK: Map info found for module " + value);
 									ProduceClickableMap.AtlasModuleInfo moduleInfo = mapInfo.getModuleInfo(value);
 									if (moduleInfo != null) {
 										assert moduleInfo.url != null;
@@ -449,6 +463,8 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 									res.append(xtag).append(value).append("&nbsp;");
 									show_shapes_on_map.show_shapes_on_map(h, res, all, url, blog_name, wp);
 								}
+							} else if (tag.equals("IDENTIFIERS")) {
+								System.out.println("FOUND IDENTIFIERS: " + value);
 							} else {
 								String target = isValidEntry(entry, 5) ? substitute(entry[5], value_map) : "_blank";
 								if (isValidEntry(entry, 6) && entry[6].equalsIgnoreCase("icon")) {
@@ -480,6 +496,7 @@ public class FormatProteinNotes extends FormatProteinNotesBase
 			Collections.sort(modules_found);
 		}
 		res.replace(0, res.length(), res.toString().replaceAll("\\\n", "<BR>").replaceAll("<BR></p>", "</p>").replaceAll("</p><BR>", "</p>"));
+		//System.out.println("format END");
 		return res;
 	}
 	private void hash(final String comment, final Hasher h)

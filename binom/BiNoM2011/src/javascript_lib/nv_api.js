@@ -119,10 +119,14 @@ function nv_win(win)
 
 function nv_open_module(win, module_id, ids)
 {
-	//console.log("module: [" + module_id + "] " + ids.length);
+	console.log("module: [" + module_id + "] " + ids.length);
 	var url;
 	if (module_id.match('/index.html')) {
 		url = module_id;
+	} else if (module_id.match('/index.php')) { // EV: 2017-05-26
+		var ids_arg = ids ? JSON.stringify(ids) : "";
+		url = module_id + (ids_arg ? "?show_ids=" + ids_arg : "");
+
 	} else {
 		var module = navicell.mapdata.getModuleDescriptions()[module_id];
 		if (!module) {
@@ -130,6 +134,7 @@ function nv_open_module(win, module_id, ids)
 		}
 		url = module.url ? module.url : module_id;
 	}
+	console.log("-> show_map_and_markers(url=" + url + ", ids=" + ids + ")");
 	win.show_map_and_markers(url, ids ? ids : []);
 	return null;
 }

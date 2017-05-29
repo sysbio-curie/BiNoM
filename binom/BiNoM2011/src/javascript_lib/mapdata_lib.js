@@ -234,12 +234,32 @@ function load_voronoi(url, module_name)
 	      );
 }
 
+function load_mapurls(url)
+{
+    $.ajax(url,
+	   {
+	       async: true,
+	       dataType: 'text',
+	       
+	       success: function(data) {
+		   console.log("navicell: mapurls [" + url + "] loaded successfully!");
+		   navicell.mapdata.setMapURLs(data);
+	       },
+			       
+	       error: function() {
+		   console.log("navicell: mapurls [" + url + "] loading error !");
+	       }
+	   }
+	  );
+}
+
 //
 // Mapdata class
 //
 // Encapsulate all module entities, including map positions
 //
 
+var SIMPLE_COMMENT_REGEX = new RegExp("(^#.*)|( *#.*)", "g");
 var jxtree_mapfun_map = {};
 
 jxtree_mapfun_map['label'] = function(datanode) {
@@ -1111,7 +1131,32 @@ Mapdata.prototype = {
 		      );
 	},
 
-	getClass: function() {return "Mapdata";}
+	setMapURLs: function(data) {
+	    if (!this.mapurl_map) {
+		this.mapurl_map = {};
+	    }
+	    console.log("set map urls");
+	    var lines = data.split(LINE_BREAK_REGEX);
+	    var len = lines.length;
+	    for (var nn = 0; nn < len; ++nn) {
+		var line = lines[nn].replace(SIMPLE_COMMENT_REGEX, "");
+		if (line) {
+		    var arr = line.split("\t");
+		    if (arr.length == 2) {
+			var pattern = "{{" + arr[0] + "}}";
+			this.mapurl_map[pattern] = arr[1];
+			//console.log("setting " + pattern + " " + arr[1]);
+		    }
+		}
+	    }
+	},
+    
+    getMapURL: function(pattern) {
+	//console.log("getmapurl: " + pattern + " " + this.mapurl_map[pattern]);
+	return this.mapurl_map[pattern];
+    },
+    
+    getClass: function() {return "Mapdata";}
 };
 
 // 2013-10-28: seems to be obsolete

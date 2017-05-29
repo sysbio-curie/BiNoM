@@ -5566,6 +5566,7 @@ public class ProduceClickableMap
 			out.println("    });\n");		
 		}
 		
+		out.println("    load_mapurls(\"" + common_directory_url + "/mapurls.csv\");");
 		if (NV2) {
 			if (USE_JXTREE) {
 				out.println("    load_info(\"" + common_directory_url + "/" + map_name + "_info.json\", window.document.navicell_module_name);");

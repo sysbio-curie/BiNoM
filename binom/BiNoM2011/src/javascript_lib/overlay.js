@@ -1019,17 +1019,20 @@ function visible_screenshot()
         xOffset = parseInt($("#innermap").css("left").replace(px, ""));
         yOffset = parseInt($("#innermap").css("top").replace(px, ""));
 	
-        var tiles_div = $("#innermap").parent().next().next().next();
-        var tiles = tiles_div.children().first().children();
-        console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
+    var tiles_div = $("#innermap").parent().next().next().next();
+    var tiles = tiles_div.children().first().children();
+    console.log("len: " + tiles.length + " " +  $(screenShot).css("height") + " " +  $(screenShot).css("width"));
         for (var ii = 0 ; ii < tiles.length ; ii++) {
-                var tile = $("img", tiles.eq(ii));
-                var tile_width = parseInt(tile.css("width").replace(px, ""))
-                var tile_height = parseInt(tile.css("height").replace(px, ""));
-                var tile_xx = parseInt(tiles.eq(ii).css("left").replace(px, ""));
-                var tile_yy = parseInt(tiles.eq(ii).css("top").replace(px, ""));
-		console.log("tile width: " + tile_width + " height " + tile_height + " " + tile_xx + " " + (tile_xx-xOffset) + " " + tile_yy + " " + (tile_yy-yOffset));
-                ctx.drawImage(tile[0], 0, 0, tile_width, tile_height, tile_xx-xOffset, tile_yy-yOffset, tile_width, tile_height);
+            var tile = $("img", tiles.eq(ii));
+	    if (!tile || !tile.css("width")) {
+		continue;
+	    }
+            var tile_width = parseInt(tile.css("width").replace(px, ""))
+            var tile_height = parseInt(tile.css("height").replace(px, ""));
+            var tile_xx = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+            var tile_yy = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+	    console.log("tile width: " + tile_width + " height " + tile_height + " " + tile_xx + " " + (tile_xx-xOffset) + " " + tile_yy + " " + (tile_yy-yOffset));
+            ctx.drawImage(tile[0], 0, 0, tile_width, tile_height, tile_xx-xOffset, tile_yy-yOffset, tile_width, tile_height);
         }
 
         // Draw the overlay
@@ -1214,18 +1217,21 @@ function navicell_export_image(module)
 	var tile_map = {};
 	var nobg = "";
 	for (var ii = 0; ii < tiles.length; ++ii) {
-		var tile = $("img", tiles.eq(ii));
-		var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
-		var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
-		var src = tile.attr("src");
-		if (!src) {
-			console.log("notice: no src at " + ii + "/" + tiles.length);
-			continue;
-		}
-		if (!nobg && src.indexOf("_nobg") > 0) {
-			nobg = "_nobg";
-		}
-		tile_map[src] = [left, top];
+	    var tile = $("img", tiles.eq(ii));
+	    if (!tile || !tile.css("left")) {
+		continue;
+	    }
+	    var left = parseInt(tiles.eq(ii).css("left").replace(px, ""));
+	    var top = parseInt(tiles.eq(ii).css("top").replace(px, ""));
+	    var src = tile.attr("src");
+	    if (!src) {
+		console.log("notice: no src at " + ii + "/" + tiles.length);
+		continue;
+	    }
+	    if (!nobg && src.indexOf("_nobg") > 0) {
+		nobg = "_nobg";
+	    }
+	    tile_map[src] = [left, top];
 	}
 
 	var delta_x = 0;

@@ -67,17 +67,18 @@ public class ICAMining_BitonPaper {
 			//String folder = "C:/Datas/CAFibroblasts/gsea/results/";
 			//String gmts = "C:/Datas/CAFibroblasts/gsea/results/msigdb_acsn.gmt";
 			//FilterGSEAResults(folder, 15, 3f, 0.01f, 0.01f, gmts);
-			String folder = "C:/Datas/ICA/Anne/metaranking/GSEA/results/";
-			String gmts = "C:/Datas/ICA/Anne/metaranking/GSEA/results/vantveer_signatures.gmt";
-			FilterGSEAResults(folder, 5, 3f, 0.01f, 0.01f, gmts);
+			//String folder = "C:/Datas/ICA/Anne/metaranking/GSEA/results/";
+			//String gmts = "C:/Datas/ICA/Anne/metaranking/GSEA/results/vantveer_signatures.gmt";
+			//FilterGSEAResults(folder, 5, 3f, 0.01f, 0.01f, gmts);
 
 			
-			/*String folder = "./";
+			String folder = "./";
+			//String folder = "C:/_DatasArchive/ICA/test/GSEA/";
 			String gmts = "msigdb.v4.0.symbols.gmt";
 			gmts = args[2];
 			float thresh = Float.parseFloat(args[1]);
 			FilterGSEAResults(folder, Integer.parseInt(args[0]), thresh, 0.01f, 0.01f, gmts);
-			*/
+			
 			
 			//ReformatGSEAAnotationFile("C:/Datas/ICA/Anne/results_GSEA_filtered.html");
 			
@@ -220,7 +221,7 @@ public class ICAMining_BitonPaper {
 						module = module.substring(0, module.length()-4);
 						if(true)/*if(gmt.setnames.contains(module))*/{
 							SimpleTable tab = new SimpleTable();
-							//System.out.println(xlsFiles[j].getAbsolutePath());
+							System.out.println(xlsFiles[j].getAbsolutePath());
 							tab.LoadFromSimpleDatFile(xlsFiles[j].getAbsolutePath(), true, "\t");
 							if(tab.fieldNumByName("PROBE")!=-1){
 								

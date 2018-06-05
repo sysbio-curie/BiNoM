@@ -211,8 +211,11 @@ public class XGMML {
          n.NodeLabel = xn.getLabel();
       //System.out.println("Id = "+n.Id+" canName = "+canName+" nodeLabel = "+n.NodeLabel);      
       n.NodeClass = 0;
+      //if(n.NodeLabel.equals("0_MCL_cluster_7"))
+      //	  System.out.println("");
       for(int j=0;j<xn.getAttArray().length;j++){
         String attname = xn.getAttArray(j).getName();
+        if(attname!=null){
         String attvalue = xn.getAttArray(j).getValue();
         if(attname.indexOf("_REACTION")>=0)
           if((attvalue!=null)&&(!attvalue.equals("")))
@@ -231,6 +234,7 @@ public class XGMML {
       //  System.out.print(((new Date()).getTime()-tm1.getTime())+" ");
       //  tm1 = new Date();
       //}
+      }
     }
     //System.out.println("\nEdges: "+xgr.getGraph().getEdgeArray().length);
     GraphicEdge are[] = xgr.getGraph().getEdgeArray();

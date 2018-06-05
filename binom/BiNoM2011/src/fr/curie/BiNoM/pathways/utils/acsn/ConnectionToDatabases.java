@@ -279,7 +279,8 @@ public class ConnectionToDatabases {
 	  citation.pmid = pmid;
 	  citation.oneLineCitation = "Author 1, Author 2. "+citation.year+". Science";*/
 	  
-	  String record = Utils.downloadURL("http://www.ncbi.nlm.nih.gov/pubmed/"+pmid+"?report=xml&format=text");
+	  //String record = Utils.downloadURL("http://www.ncbi.nlm.nih.gov/pubmed/"+pmid+"?report=xml&format=text");
+	  String record = Utils.downloadURL("https://www.ncbi.nlm.nih.gov/pubmed/"+pmid+"?report=xml&format=text");
 	  record = record.replace("&lt;", "<");
 	  record = record.replace("&gt;", ">");
 	  try{

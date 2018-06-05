@@ -1162,7 +1162,7 @@ public static Vector<String> guessProteinIdentifiers(String name) throws Excepti
 	String query1 = "http://www.genenames.org/cgi-bin/search?search_type=symbol&search="+name+"&submit=Submit";
 	String html1 = downloadURL(query1);
 	
-	if(html1.contains("refused"))
+	if(html1.contains("refused")||html1.contains("timed out"))
 		System.out.println(html1);
 	//System.out.println(html1);
 	
@@ -1496,10 +1496,12 @@ public static VDataTable separatePositiveOrNegativeValues(VDataTable vt, boolean
 		String fn = colNames.get(i);
 		for(int j=0;j<vt1.rowCount;j++){
 			String val = vt1.stringTable[j][vt.fieldNumByName(fn)];
-				float f = Float.parseFloat(val);
 				vt1.stringTable[j][vt.fieldNumByName(fn)] = "N/A";
+				if(!val.equals("@")){
+				float f = Float.parseFloat(val);
 				if(f>0)if(positive) vt1.stringTable[j][vt1.fieldNumByName(fn)] = ""+f;
 				if(f<0)if(!positive) vt1.stringTable[j][vt1.fieldNumByName(fn)] = ""+f;
+				}
 		}
 	}
 	

@@ -154,7 +154,9 @@ public class SimpleTable {
   
   
   while(lri.readLine()!= null) cr++;
+  if(!firstLineFNames) cr++;
   rowCount = cr;
+  //System.out.println("Rows number = "+cr);
   //lri.close(); 
   lri.reset();
   //lri.mark(0);

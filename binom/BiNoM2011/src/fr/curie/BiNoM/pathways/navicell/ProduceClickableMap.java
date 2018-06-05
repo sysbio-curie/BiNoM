@@ -4638,7 +4638,7 @@ public class ProduceClickableMap
 		return hugoNames;
 	}
 	
-	private Pair findCentralPlaceForReaction(ReactionDocument.Reaction r){
+	public Pair findCentralPlaceForReaction(ReactionDocument.Reaction r){
 		Pair position = new Pair(0f,0f);
 		String rtype = Utils.getValue(r.getAnnotation().getCelldesignerReactionType());
 		Vector<Place> startPoints = new Vector<Place>();

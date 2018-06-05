@@ -882,6 +882,7 @@ public class MergingMapsProcessor {
 		HashMap<String,String> proteinNames = new HashMap<String,String>();
 		for(int i=0;i<cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().sizeOfCelldesignerProteinArray();i++){
 			CelldesignerProteinDocument.CelldesignerProtein p = cd1.getSbml().getModel().getAnnotation().getCelldesignerListOfProteins().getCelldesignerProteinArray(i);
+			//System.out.println(p.getId()+"\t"+Utils.getValue(p.getName()));
 			proteinNames.put(Utils.getValue(p.getName()), p.getId());
 		}
 		this.proteinMap = new HashMap<String, String>();

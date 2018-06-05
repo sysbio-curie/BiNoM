@@ -1,5 +1,6 @@
 package fr.curie.BiNoM.pathways.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,6 +64,8 @@ import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
 import fr.curie.BiNoM.pathways.utils.SpeciesStructure.SpeciesStructureComponent;
 import fr.curie.BiNoM.pathways.utils.SpeciesStructure.SpeciesStructureComponentModification;
 import fr.curie.BiNoM.pathways.wrappers.CellDesigner;
+import vdaoengine.data.VDataTable;
+import vdaoengine.data.io.VDatReadWrite;
 
 public class CellDesignerGenerator {
 	
@@ -74,7 +77,16 @@ public class CellDesignerGenerator {
 	public float shiftY = 0f;
 	public float scaleX = 1f;
 	public float scaleY = 1f;
-
+	
+	public boolean addHUGO2ProteinNote = false;
+	
+	//public String GMTFileHUGOMap = null;
+	public String annotationFile = null;
+	public String annotationFieldForLink = null;
+	public String annotationFieldForLinkValue = null;
+	private VDataTable annotationTable = null;
+	public String GMTFileHUGOMap = null;
+	private HashMap<String,Vector<String>> nameHUGOMap = new HashMap<String,Vector<String>>();
 
 	
 	public class Statement{
@@ -200,6 +212,25 @@ public class CellDesignerGenerator {
 	}
 	
 	public void createNewCellDesignerFile(String id, int sizeX, int sizeY) throws Exception{
+		
+		if(annotationFile!=null){
+			annotationTable = VDatReadWrite.LoadFromSimpleDatFile(annotationFile, true, "\t");
+			annotationTable.makePrimaryHash(annotationTable.fieldNames[0]);
+		}
+		if(GMTFileHUGOMap!=null){
+			GMTFile gmt = new GMTFile();
+			System.out.println("Loading gene lists...");
+			gmt.load(GMTFileHUGOMap);
+			System.out.println("Loaded...");
+			for(int i=0;i<gmt.setnames.size();i++){
+				Vector<String> names = new Vector<String>(); 
+				for(String s: gmt.sets.get(i)) 
+					names.add(s);
+				Collections.sort(names);
+				nameHUGOMap.put(gmt.setnames.get(i), names);
+			}
+		}
+		
 		cd = SbmlDocument.Factory.newInstance();
 		cd.addNewSbml();
 		cd.getSbml().addNewModel(); 
@@ -728,6 +759,40 @@ public class CellDesignerGenerator {
 			XmlString xs = XmlString.Factory.newInstance(); xs.setStringValue(name);
 			protein.setName(xs);
 			proteins.put(id, protein);
+			String annotation = "";
+			if(addHUGO2ProteinNote){
+				annotation+="Identifiers_begin:\n";
+				annotation+="HUGO:"+name+"\n";
+				if(annotationTable!=null){
+					if(!annotationTable.tableHashPrimary.containsKey(name))
+						System.out.println("ERROR: "+name+" object is not found in the annotation table.");
+					int k = annotationTable.tableHashPrimary.get(name).get(0);
+					String link = annotationTable.stringTable[k][annotationTable.fieldNumByName(annotationFieldForLink)];
+					String linkValue = annotationTable.stringTable[k][annotationTable.fieldNumByName(annotationFieldForLinkValue)];
+					annotation+=link+":"+linkValue+"\n";
+				}
+				annotation+="Identifiers_end\n";
+			}
+			if(annotationTable!=null){
+				annotation+="Properties_begin:\n";
+				int k = annotationTable.tableHashPrimary.get(name).get(0);
+				for(int l=1;l<annotationTable.colCount;l++)if(!annotationTable.fieldNames[l].equals(annotationFieldForLink))if(!annotationTable.fieldNames[l].equals(annotationFieldForLinkValue))
+					annotation+=annotationTable.fieldNames[l]+" = "+annotationTable.stringTable[k][l]+"\n";
+				annotation+="Properties_end\n";
+			}
+			if(GMTFileHUGOMap!=null){
+				annotation+="GeneList_begin:\n";
+				Vector<String> names = nameHUGOMap.get(name);
+				if(names==null){
+					System.out.println("WARNING: gene set "+name+" is not found");
+				}else{
+				for(int l=0;l<names.size();l++){
+					annotation+="HUGO:"+names.get(l)+"\n";
+				}
+				annotation+="GeneList_end\n";}
+			}
+			xs = XmlString.Factory.newInstance(); xs.setStringValue(annotation);
+			protein.addNewCelldesignerNotes().addNewHtml().addNewBody().set(xs);
 		}
 		return protein;
 	}

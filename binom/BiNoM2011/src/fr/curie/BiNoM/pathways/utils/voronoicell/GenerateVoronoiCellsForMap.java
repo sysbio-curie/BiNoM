@@ -176,6 +176,7 @@ public class GenerateVoronoiCellsForMap {
 		
 		
 		HashSet<String> includedSpecies = new HashSet<String>();
+		if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
 			CelldesignerSpeciesDocument.CelldesignerSpecies cs = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(i);
 			includedSpecies.add(cs.getId());
@@ -195,6 +196,8 @@ public class GenerateVoronoiCellsForMap {
 			n.setAttributeValueUnique("CELLDESIGNER_ALIAS", csa.getId(), Attribute.ATTRIBUTE_TYPE_STRING);
 			}
 		}
+		
+		if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases()!=null)
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
 			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 			String species = csa.getSpecies();

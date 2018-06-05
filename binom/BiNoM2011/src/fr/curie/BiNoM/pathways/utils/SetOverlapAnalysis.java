@@ -36,14 +36,21 @@ public class SetOverlapAnalysis {
 
 			//makeSLNetworkFromYeastScreen();
 			//System.exit(0);
-			
+
 			SetOverlapAnalysis so = new SetOverlapAnalysis();
-			so.LoadSetsFromGMT("C:/Datas/ROMA/data/caf/ligands.gmt");
+			//so.LoadSetsFromGMT("C:/Datas/ROMA/data/caf/ligands.gmt");
+			so.LoadSetsFromGMT("C:/Datas/ColonCancer/analysis/often_communities/_analysis/compare_networks/networks.gmt");
+			so.printSetIntersections(null);
+			System.exit(0);
+			
+			/*SetOverlapAnalysis so = new SetOverlapAnalysis();
+			//so.LoadSetsFromGMT("C:/Datas/ROMA/data/caf/ligands.gmt");
+			so.LoadSetsFromGMT("C:/Datas/ColonCancer/analysis/often_communities/_analysis/compare_networks/networks.gmt");
 			Vector<Float> percentages = new Vector<Float>();
 			Vector<Integer> occs = so.countOccurenciesInSets(so.allproteins, percentages);
 			for(int i=0;i<so.allproteins.size();i++)
 				System.out.println(so.allproteins.get(i)+"\t"+occs.get(i));
-			System.exit(0);
+			System.exit(0);*/
 
 			/*Vector<String> current = new Vector<String>();
 			Vector<Vector<String>> setofsets = new Vector<Vector<String>>();
@@ -267,6 +274,22 @@ public class SetOverlapAnalysis {
 		return inters;
 	}
 	
+	public Vector<String> calcUnionOfSets(HashSet<String> set1, HashSet<String> set2){
+		Vector<String> inters = new Vector<String>();
+		Iterator<String> it = set1.iterator();
+		while(it.hasNext()){
+			String s = it.next();
+			inters.add(s);
+		}
+		it = set2.iterator();
+		while(it.hasNext()){
+			String s = it.next();
+			if(!set1.contains(s))
+				inters.add(s);
+		}
+		return inters;
+	}
+	
 	public Vector<Integer> countOccurenciesInSets(Vector<String> list, Vector<Float> percentages){
 		Vector<Integer> occs = new Vector<Integer>();
 		for(int i=0;i<list.size();i++){
@@ -321,7 +344,7 @@ public class SetOverlapAnalysis {
 		FileWriter fw = null;
 		if(filename!=null)
 			fw = new FileWriter(filename);
-		System.out.println("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION");
+		System.out.println("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION\tUNION\tJACCARD");
 		if(fw!=null)
 			fw.write("SET1\tSET2\tINTER\tINTERSECTION_SIZE\tINTERSECTION\n");
 		for(int i=0;i<sets.size();i++){
@@ -329,6 +352,8 @@ public class SetOverlapAnalysis {
 				HashSet<String> seti = sets.get(i);
 				HashSet<String> setj = sets.get(j);		
 				Vector<String> names = calcIntersectionOfSets(seti, setj);
+				Vector<String> namesU = calcUnionOfSets(seti, setj);
+				float jaccard = (float)names.size()/(float)namesU.size();
 				Collections.sort(names);
 				if(names.size()>0){
 					System.out.print(setnames.get(i)+"\t"+setnames.get(j)+"\tintersects\t"+names.size()+"\t");
@@ -337,7 +362,7 @@ public class SetOverlapAnalysis {
 				}
 				for(int k=0;k<names.size();k++)
 					if(k==names.size()-1){
-						System.out.print(names.get(k)+"\n");
+						System.out.print(names.get(k)+"\t"+namesU.size()+"\t"+jaccard+"\n");
 						if(fw!=null)
 							fw.write(names.get(k)+"\n");
 					}

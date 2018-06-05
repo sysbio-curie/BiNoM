@@ -1103,6 +1103,7 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
   
   public static Vector<String> extractProteinNamesFromNodeName(String id, Node n){
 	  Vector<String> names = new Vector<String>();
+	  if(id!=null){
 	  if(!id.trim().equals("")){
 	  StringTokenizer st = new StringTokenizer(id,"@");
 	  String nameWithoutCompartment = "";
@@ -1116,6 +1117,7 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  while(st.hasMoreTokens()){
 		  String part = st.nextToken();
 		  StringTokenizer st1 = new StringTokenizer(part,"(|)'");
+		  if(st1.hasMoreTokens()){
 		  String proteinName = st1.nextToken();
 		  if((proteinName.startsWith("g"))||(proteinName.startsWith("r"))){
 			  //System.out.println(proteinName);
@@ -1145,7 +1147,11 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 		  }
 		  if(!names.contains(proteinName))
 			  names.add(proteinName);
-	  }}
+		  }
+	  }}}
+	  //}else{
+	  //	  System.out.println("Warning: id = null for "+n.Id);
+	  //}
 	  return names;
   }
   
@@ -1222,6 +1228,19 @@ public static Graph CollapseMetaNodes(Graph global, boolean showIntersections, b
 	  // First, create intersection relations
 	  for(int i=0;i<reactionNetwork.Nodes.size();i++){
 		  //Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i).Id);
+		  if(reactionNetwork.Nodes.get(i).Id==null){
+			  System.out.println("Warning: a node with id=null found. Looking at neighbours:");
+			  Node n = reactionNetwork.Nodes.get(i);
+			  reactionNetwork.calcNodesInOut();
+			  System.out.println("Incoming:");
+			  for(int l=0;l<n.incomingEdges.size();l++){
+				  System.out.println(n.incomingEdges.get(l).Node1.Id);
+			  }
+			  System.out.println("Outgoing:");
+			  for(int l=0;l<n.incomingEdges.size();l++){
+				  System.out.println(n.outcomingEdges.get(l).Node2.Id);
+			  }
+		  }
 		  Vector<String> names = extractProteinNamesFromNodeName(reactionNetwork.Nodes.get(i));
 		  String pmids = reactionNetwork.Nodes.get(i).getFirstAttributeValue("PMID");
 		  for(int j=0;j<names.size();j++)for(int k=0;k<names.size();k++)if(j!=k){

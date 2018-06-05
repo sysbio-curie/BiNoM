@@ -515,16 +515,17 @@ public class ACSNProcedures {
       
       
       
-       public static void makeBibliographyFromXml(String xmlFileName, String textFileName, boolean addPMIDprefix){
+       public static void makeBibliographyFromXml(String xmlFileName, String textFileName, boolean addPMIDprefix) throws Exception{
     	   String bib = makeBibliographyFromXml(xmlFileName, addPMIDprefix);
     	   Utils.saveStringToFile(bib, textFileName);
        }
        
-       public static String makeBibliographyFromXml(String xmlFileName, boolean addPMIDprefix){
+       public static String makeBibliographyFromXml(String xmlFileName, boolean addPMIDprefix) throws Exception{
     	   String bib = "";
     	   Vector<String> pmids = getAllPMIDsFromCellDesigner(new File(xmlFileName));
     	   int k=0;
     	   for(String pmid: pmids){
+    		   Thread.sleep(3000);
     		   ConnectionToDatabases.Citation cit = ConnectionToDatabases.convertPMIDtoCitation(pmid);
     		   System.out.println((++k)+"\tPMID:"+pmid+"\t"+cit.year+"\t"+cit.oneLineCitation()+(cit.isReview?" [REVIEW]":""));
     		   if(addPMIDprefix)

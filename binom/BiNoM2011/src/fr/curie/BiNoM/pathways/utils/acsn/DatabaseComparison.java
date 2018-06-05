@@ -53,12 +53,12 @@ public class DatabaseComparison {
 			
 			
 			
-			String fn = "C:/Datas/PID_NCI_pathways/PPI_network_extracted.xgmml";
+			/*String fn = "C:/Datas/PID_NCI_pathways/PPI_network_extracted.xgmml";
 			String fn_out = "C:/Datas/PID_NCI_pathways/PPI_NCI_PID";
 			String fn_biopax = "C:/Datas/PID_NCI_pathways/NCI-Nature_Curated.bp3.owl_nouniquenames.xgmml";
 			ConvertXGMML2PPINetwork(fn,fn_biopax,fn_out);
 			System.exit(0);
-			
+			*/
 			
 			/*String fileName = "C:/Datas/acsn/biopax/version1.1/acsn_v1.0.owl";
 			
@@ -119,14 +119,16 @@ public class DatabaseComparison {
 			sp.printSetIntersections("C:/Datas/acsn/database_comparison/publications/pmids_inters.txt");
 			sp.printSetSizes();*/
 			
-			/*HashMap<String,Integer> countJournals = new HashMap<String,Integer>();
-			Vector<String> list = Utils.loadStringListFromFile("c:/datas/acsn/database_comparison/publications/reactome_biblio_report.part1");
+			HashMap<String,Integer> countJournals = new HashMap<String,Integer>();
+			//Vector<String> list = Utils.loadStringListFromFile("c:/datas/acsn/database_comparison/publications/reactome_biblio_report.part1");
+			Vector<String> list = Utils.loadStringListFromFile("C:/Datas/Kondratova/DC_CAF/DC_bib.txt");
 			//Vector<String> list = Utils.loadStringListFromFile("c:/datas/acsn/database_comparison/publications/acsn_biblio_report.txt");
 			//Vector<String> list = Utils.loadStringListFromFile("c:/datas/acsn/database_comparison/publications/nci_biblio_report.txt");
 			int counter = 0;
+			int counterReviews = 0;
 			for(String s: list)if(s.length()>40){
 				s=s.trim();
-				if(s.endsWith("[REVIEW]")) s = s.substring(0, s.length()-9);
+				if(s.endsWith("[REVIEW]")) { s = s.substring(0, s.length()-9); counterReviews++; }
 				if(s.contains("J. Biol. Chem.")){
 					s = "J. Biol. Chem.";
 				}else{
@@ -167,12 +169,13 @@ public class DatabaseComparison {
 				System.out.println(s+"\t"+countJournals.get(s));
 			}
 			System.out.println("Total = "+counter);
+			System.out.println("Total reviews = "+counterReviews);
 			//Graph index = dc.createIndexForBioPAX(biopax);
 			//XGMML.saveToXGMML(index, fileName+".xgmml");*/
 			
 			//decomposeIntoSCC("C:/Datas/acsn/database_comparison/connectivity/acsn_lcc.xgmml");
 			//decomposeIntoSCC("C:/Datas/acsn/database_comparison/connectivity/nci_lcc.xgmml");
-			decomposeIntoSCC("C:/Datas/acsn/database_comparison/connectivity/reactome_lcc.xgmml");
+			//decomposeIntoSCC("C:/Datas/acsn/database_comparison/connectivity/reactome_lcc.xgmml");
 			//decomposeIntoSCC("C:/Datas/acsn/database_comparison/connectivity/nci_test.xgmml");
 			System.exit(0);
 			

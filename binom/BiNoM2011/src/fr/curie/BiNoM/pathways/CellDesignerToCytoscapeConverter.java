@@ -708,6 +708,10 @@ public class CellDesignerToCytoscapeConverter {
     }
     }
 
+    if(alias==null){
+        if(verbose) System.out.println("Reaction "+r.getId()+" alias of "+id+" is null");
+        alias = id;
+    }else
     if(alias.equals("")){
       if(verbose) System.out.println("Reaction "+r.getId()+" alias of "+id+" is empty");
       alias = id;

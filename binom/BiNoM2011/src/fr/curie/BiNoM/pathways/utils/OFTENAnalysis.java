@@ -27,15 +27,40 @@ public class OFTENAnalysis {
 	
 	int optimalNumberOfGenes = -1;
 	float optimalScore = -1f;
+	float pvalue = 1f;
 	int optimalComponentSize = -1;
 	int sizeOfComponentToSelect = -1;
 	
 	public static void main(String[] args) {
 		try{
 			
+			//extractScoresFromOFTENReports("C:/Datas/ColonCancer/analysis/often_communities/_analysis/");
+			makeGMTfromSetOfXGMMLfiles("C:/Datas/ColonCancer/analysis/often_communities/pca/significant/");
+			System.exit(0);
+			
 			String pathToHPRD = "C:/Datas/HPRD9/hprd9_pc_clicks.xgmml";
+			String tablePath = "";
+			String name = "";
+			int nstart = 100; 
+			int nend = 1000; 
+			int nstep = 50;
 			
 			OFTENAnalysis of = new OFTENAnalysis();
+			
+			for(int i=0;i<args.length;i++){
+				if(args[i].equals("-xgmml")) pathToHPRD = args[i+1];
+				if(args[i].equals("-table")) tablePath = args[i+1];
+				if(args[i].equals("-name")) name = args[i+1];
+				if(args[i].equals("-start")) nstart = Integer.parseInt(args[i+1]);
+				if(args[i].equals("-end")) nend = Integer.parseInt(args[i+1]);
+				if(args[i].equals("-step")) nstep = Integer.parseInt(args[i+1]);
+				if(args[i].equals("-nperm")) of.numberOfPermutationsForSizeTest = Integer.parseInt(args[i+1]);
+			}
+			of.loadHPRD(pathToHPRD);
+			of.completeOFTENAnalysisOfTable(tablePath,name,nstart,nend,nstep);
+			
+			System.exit(0);
+			
 			//of.loadHPRD(pathToHPRD);
 			//of.completeOFTENAnalysisOfTable("C:/Datas/ICA/Anne/network_analysis/S_CIT.txt","CIT");
 			//of.completeOFTENAnalysisOfTable("C:/Datas/CAFibroblasts/caf_lc_S.xls","caf");
@@ -94,8 +119,8 @@ public class OFTENAnalysis {
 				
 			//String prefix = "C:/Datas/EWING/ICA/";
 			String prefix = "C:/Datas/Kairov/DifferentialExpression4BC/lists/"; 
-			int nstart = 530;
-			int nend = nstart;
+			nstart = 530;
+			nend = nstart;
 			int step = 10;	
 			
 			int valuesToTest[] = new int[(int)((nend-nstart)/step)+1];
@@ -138,11 +163,16 @@ public class OFTENAnalysis {
 
 	}
 	
-	public void completeOFTENAnalysisOfTable(String fn, String name) throws Exception{
+	public void completeOFTENAnalysisOfTable(String fn, String name, int nstart, int nend, int nstep) throws Exception{
 		// produce ranked lists from a table
 		String folder = (new File(fn)).getParentFile().getAbsolutePath();
 		SimpleTable tab = new SimpleTable();
-		tab.LoadFromSimpleDatFile(fn, true, "\t");
+		if(fn.endsWith(".rnk")){
+			tab.LoadFromSimpleDatFile(fn, false, "\t");
+		}else{
+			tab.LoadFromSimpleDatFile(fn, true, "\t");
+		}
+		
 		for(int i=1;i<tab.colCount;i++){
 			String field = tab.fieldNames[i];
 			FileWriter fw_minus_rnk = new FileWriter(folder+"/"+name+"_"+field+".rnk");
@@ -196,9 +226,9 @@ public class OFTENAnalysis {
 			fw_plus.close();fw_minus.close();fw_abs.close(); fw_minus_rnk.close();
 		}
 		// make often for all lists
-		int nstart = 300;
-		int nend = 1000;
-		int step = 50;	
+		//int nstart = 300;
+		//int nend = 1000;
+		int step = nstep;	
 		int valuesToTest[] = new int[(int)((nend-nstart)/step)+1];
 		int k = 0;
 		for(int i=nstart;i<=nend;i+=step)
@@ -207,6 +237,9 @@ public class OFTENAnalysis {
 		Vector<Float> scores_plus = new Vector<Float>();
 		Vector<Float> scores_minus = new Vector<Float>();
 		Vector<Float> scores_abs = new Vector<Float>();
+		Vector<Float> pval_plus = new Vector<Float>();
+		Vector<Float> pval_minus = new Vector<Float>();
+		Vector<Float> pval_abs = new Vector<Float>();
 		Vector<Integer> sizes_plus = new Vector<Integer>();
 		Vector<Integer> sizes_minus = new Vector<Integer>();
 		Vector<Integer> sizes_abs = new Vector<Integer>();
@@ -226,18 +259,18 @@ public class OFTENAnalysis {
 			String filename = folder+"/"+name+"_"+field+suff;
 			loadRandkedGeneList(filename);
 			makeOFTENAnalysis(valuesToTest, false);
-			if(k==0) { scores_abs.add(optimalScore); sizes_abs.add(optimalComponentSize); genes_abs.add(optimalNumberOfGenes); }
-			if(k==1) { scores_plus.add(optimalScore); sizes_plus.add(optimalComponentSize); genes_plus.add(optimalNumberOfGenes); }
-			if(k==2) { scores_minus.add(optimalScore); sizes_minus.add(optimalComponentSize); genes_minus.add(optimalNumberOfGenes); }
+			if(k==0) { scores_abs.add(optimalScore); sizes_abs.add(optimalComponentSize); genes_abs.add(optimalNumberOfGenes); pval_abs.add(pvalue); }
+			if(k==1) { scores_plus.add(optimalScore); sizes_plus.add(optimalComponentSize); genes_plus.add(optimalNumberOfGenes); pval_plus.add(pvalue); }
+			if(k==2) { scores_minus.add(optimalScore); sizes_minus.add(optimalComponentSize); genes_minus.add(optimalNumberOfGenes); pval_minus.add(pvalue); }
 			extractedNetwork.name = field+suff;
 			XGMML.saveToXGMML(extractedNetwork, filename+".xgmml");
 		}
 		}
 		
 		System.out.println("=====================================");
-		System.out.println("NAME\tPLUS_GENES\tPLUS_N\tPLUS_SC\tMINUS_GENES\tMINUS_N\tMINUS_SC\tABS_GENES\tABS_N\tABS_SC");
+		System.out.println("NAME\tPLUS_GENES\tPLUS_N\tPLUS_SC\tPLUS_PVAL\tMINUS_GENES\tMINUS_N\tMINUS_SC\tMINUS_PVAL\tABS_GENES\tABS_N\tABS_SC\tABS_PVAL");
 		for(int i=0;i<names.size();i++){
-			System.out.println(names.get(i)+"\t"+genes_plus.get(i)+"\t"+sizes_plus.get(i)+"\t"+scores_plus.get(i)+"\t"+genes_minus.get(i)+"\t"+sizes_minus.get(i)+"\t"+scores_minus.get(i)+"\t"+genes_abs.get(i)+"\t"+sizes_abs.get(i)+"\t"+scores_abs.get(i));
+			System.out.println(names.get(i)+"\t"+genes_plus.get(i)+"\t"+sizes_plus.get(i)+"\t"+scores_plus.get(i)+"\t"+pval_plus.get(i)+"\t"+genes_minus.get(i)+"\t"+sizes_minus.get(i)+"\t"+scores_minus.get(i)+"\t"+pval_minus.get(i)+"\t"+genes_abs.get(i)+"\t"+sizes_abs.get(i)+"\t"+scores_abs.get(i)+"\t"+pval_abs.get(i));
 		}
 		
 	}
@@ -259,14 +292,17 @@ public class OFTENAnalysis {
     	tb.LoadFromSimpleDatFileString(reportSizeSignificance, true, "\t");
     	optimalNumberOfGenes = -1;
     	optimalScore = -1f;
+    	pvalue = 1f;
     	for(int i=0; i<tb.rowCount;i++){
     		int ngenes = Integer.parseInt(tb.stringTable[i][tb.fieldNumByName("NGENES")]);
     		float score = Float.parseFloat(tb.stringTable[i][tb.fieldNumByName("SCORE")]);
-    		int largestconncomp = Integer.parseInt(tb.stringTable[i][tb.fieldNumByName("LARGESTCOMPONENT")]);;
+    		int largestconncomp = Integer.parseInt(tb.stringTable[i][tb.fieldNumByName("LARGESTCOMPONENT")]);
+    		float pval = Float.parseFloat(tb.stringTable[i][tb.fieldNumByName("SIGNIFICANCE")]);
     		if(score>optimalScore){
     			optimalScore = score;
     			optimalNumberOfGenes = ngenes;
     			optimalComponentSize = largestconncomp;
+    			pvalue = pval;
     		}
     	}
     	if(verbose)
@@ -425,6 +461,74 @@ public class OFTENAnalysis {
 		}
 		fw.close();
 		fwsh.close();
+	}
+	
+	public static void extractScoresFromOFTENReports(String folder) throws Exception{
+		File files[] = (new File(folder)).listFiles();
+		System.out.println("LABEL\tSCORE\tPVAL\tNGENES\tN\tTYPE");
+		for(int i=0;i<files.length;i++){
+			String fn = files[i].getName();
+			if(fn.startsWith("report_"))
+				if(fn.endsWith(".txt")){
+					String label = fn.substring(7, fn.length()-4);
+					LineNumberReader lr = new LineNumberReader(new FileReader(files[i]));
+					String s = null;
+					String table = null;
+					while((s=lr.readLine())!=null){
+						if(s.startsWith("NAME\tPLUS_GENES")){
+							table = s+"\n";
+							table+=lr.readLine()+"\n";
+						}
+					}
+					SimpleTable tab = new SimpleTable();
+					tab.LoadFromSimpleDatFileString(table,true,"\t");
+					float plus_sc = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("PLUS_SC")]);
+					float minus_sc = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("MINUS_SC")]);
+					float abs_sc = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("ABS_SC")]);
+					float score = 0f;
+					float pval = 1f;
+					int numgenes = 0;
+					int networksize = 0;
+					String tp = null;
+					if(plus_sc>Math.max(minus_sc, abs_sc)){
+						score = plus_sc;
+						pval = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("PLUS_PVAL")]);
+						numgenes = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("PLUS_GENES")]);
+						networksize = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("PLUS_N")]);
+						tp = "PLUS";
+					}
+					if(minus_sc>Math.max(plus_sc, abs_sc)){
+						score = minus_sc;
+						pval = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("MINUS_PVAL")]);
+						numgenes = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("MINUS_GENES")]);
+						networksize = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("MINUS_N")]);
+						tp = "MINUS";
+					}
+					if(abs_sc>Math.max(plus_sc, minus_sc)){
+						score = abs_sc;
+						pval = Float.parseFloat(tab.stringTable[0][tab.fieldNumByName("ABS_PVAL")]);
+						numgenes = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("ABS_GENES")]);
+						networksize = Integer.parseInt(tab.stringTable[0][tab.fieldNumByName("ABS_N")]);
+						tp = "ABS";
+					}
+					System.out.println(label+"\t"+score+"\t"+pval+"\t"+numgenes+"\t"+networksize+"\t"+tp);
+				}
+		}
+	}
+	
+	public static void makeGMTfromSetOfXGMMLfiles(String folder) throws Exception{
+		File f[] = new File(folder).listFiles();
+		FileWriter fw = new FileWriter(folder+"result.gmt");
+		for(int i=0;i<f.length;i++)if(!f[i].isDirectory())if(f[i].getName().endsWith("xgmml")){
+			Graph gr = XGMML.convertXGMMLToGraph(XGMML.loadFromXMGML(f[i].getAbsolutePath()));
+			String fn = f[i].getName();
+			fn = fn.substring(0, fn.length()-6);
+			fw.write(fn+"\tna\t");
+			for(int j=0;j<gr.Nodes.size();j++)
+				fw.write(gr.Nodes.get(j).Id+"\t");
+			fw.write("\n");
+		}
+		fw.close();
 	}
 
 }

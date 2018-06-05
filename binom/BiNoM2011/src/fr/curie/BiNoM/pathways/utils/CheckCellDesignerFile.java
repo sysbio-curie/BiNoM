@@ -29,9 +29,13 @@ public class CheckCellDesignerFile {
 		//String nameCD = "C:/Datas/binomtest/problems";
 		//String nameCD = "C:/Datas/NaviCell2.2/dnarepair_src_2014/dnarepair_FANCONI";
 		//String nameCD = "C:/Datas/NaviCell2.2/iron_metabolism_src/master";
-		String nameCD = "C:/Datas/binomtest/mapmerging/test1/merged";
+		//String nameCD = "C:/Datas/binomtest/mapmerging/test1/merged";
+		//String nameCD = "C:/Datas/ColonCancer/map/Colon_Cancer_Map";
+		//String nameCD = "C:/Datas/Parkinson/PD_160714_2";
+		String nameCD = "C:/Datas/RECON2/map/recon2_src/recon2_master";
 		//String nameCD = "C:/Datas/acsn/assembly/survival_src/survival_HEDGEHOG"; 
 		cf.sbmlDoc = CellDesigner.loadCellDesigner(nameCD+".xml");
+		CellDesignerToCytoscapeConverter.verbose = true;
 		cf.checkIfReactionConnectedToIncludedSpecies();
 		cf.checkIfSpeciesIsWithoutAlias();
 		cf.checkComplexFormationConsistency();
@@ -41,11 +45,11 @@ public class CheckCellDesignerFile {
 		//SpeciesDocument.Species sp = cf.sbmlDoc.getSbml().getModel().getListOfSpecies().getSpeciesArray(0);
 		//sp.getAnnotation()
 		
-		CelldesignerSpeciesDocument.CelldesignerSpecies sp = cf.sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(0);
+		/*CelldesignerSpeciesDocument.CelldesignerSpecies sp = cf.sbmlDoc.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().getCelldesignerSpeciesArray(0);
 		XmlString str = XmlString.Factory.newInstance();
 		str.set("XXX");
 		sp.getCelldesignerAnnotation().getCelldesignerComplexSpecies().set(str);
-		CellDesigner.saveCellDesigner(cf.sbmlDoc, nameCD+"_.xml");
+		CellDesigner.saveCellDesigner(cf.sbmlDoc, nameCD+"_.xml");*/
 		
 		}catch(Exception e){
 			e.printStackTrace();
@@ -285,6 +289,7 @@ public class CheckCellDesignerFile {
 				for(fr.curie.BiNoM.pathways.analysis.structure.Edge e: n.outcomingEdges)if(e.getFirstAttributeValue("CELLDESIGNER_EDGE_TYPE").equals("RIGHT")){
 					String id = e.Node2.Id;
 					if(e.Node2.getFirstAttributeValue("CELLDESIGNER_NODE_TYPE").equals("COMPLEX")){
+						System.out.println(e.Node2.Id+"\t"+e.Node2.getFirstAttributeValue("CELLDESIGNER_SPECIES"));
 						complexComponents = BiographUtils.extractProteinNamesFromNodeName(e.Node2.Id);
 						complex = id;
 					}

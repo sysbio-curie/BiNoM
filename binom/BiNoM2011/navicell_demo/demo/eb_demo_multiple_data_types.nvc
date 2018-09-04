@@ -132,7 +132,7 @@
 
 @COMMAND {"action":"nv_drawing_config_perform","module":"","args":["apply_and_close",null,null,null,null,null,null],"timestamp":1418378638857}
 
-@COMMAND {"action":"nv_set_center","module":"","args":["absolute",-1.6845703125,-2.001953125,null,null,null,null],"timestamp":1418378647842}
+@COMMAND {"action":"nv_set_center","module":"","args":["absolute_legacy",-1.6845703125,-2.001953125,null,null,null,null],"timestamp":1418378647842}
 
 
 @COMMAND {"action":"nv_set_zoom","module":"","args":[2,null,null,null,null,null,null],"timestamp":1418378649830}

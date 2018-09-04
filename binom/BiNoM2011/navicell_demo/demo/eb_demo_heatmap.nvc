@@ -37,7 +37,7 @@
 
 @COMMAND {"action":"nv_heatmap_editor_perform","module":"","args":["apply",30,null,null,null,null,null],"timestamp":1418308796185}
 
-@COMMAND {"action":"nv_set_center","module":"","args":["absolute",-3.33251953125,0.732421875,null,null,null,null],"timestamp":1418308824231}
+@COMMAND {"action":"nv_set_center","module":"","args":["absolute_legacy",-3.33251953125,0.732421875,null,null,null,null],"timestamp":1418308824231}
 
 ## @COMMAND {"action": "nv_execute_commands", "args": ["", "demo/eb_demo_3.nvc"], "module": "", "timeout": 0}
 

@@ -2,11 +2,11 @@
 
 @COMMAND {"action":"nv_set_zoom","module":"","args":[3,null,null,null,null,null,null],"timestamp":1418378648027}
 
-@COMMAND {"action":"nv_set_center","module":"","args":["absolute",-2.52685546875,-3.5400390625,null,null,null,null],"timestamp":1418378649691}
+@COMMAND {"action":"nv_set_center","module":"","args":["absolute_legacy",-2.52685546875,-3.5400390625,null,null,null,null],"timestamp":1418378649691}
 
 @COMMAND {"action":"nv_set_zoom","module":"","args":[4,null,null,null,null,null,null],"timestamp":1418378649830}
 
-@COMMAND {"action":"nv_set_center","module":"","args":["absolute",-3.778076171875,-3.515625,null,null,null,null],"timestamp":1418378651996}
+@COMMAND {"action":"nv_set_center","module":"","args":["absolute_legacy",-3.778076171875,-3.515625,null,null,null,null],"timestamp":1418378651996}
 
 @COMMAND {"action":"nv_set_zoom","module":"","args":[5,null,null,null,null,null,null],"timestamp":1418378652129}
 

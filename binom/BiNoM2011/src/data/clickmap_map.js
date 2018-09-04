@@ -421,6 +421,15 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	var lng_ = 180;
 	lat_ = 50;
 	lng_ = 50;
+	//lat_ = 30;
+	//lng_ = 30;
+	var bound_min_x = -width-10;;
+	var bound_max_x = width+10;
+	var bound_min_lng = -180.;
+	//var bound_min_lng = 0.;
+	var bound_max_lng = 180.;
+
+	var COEF = 10;
 	function ClickMapProjection()
 	{
 		// http://code.google.com/apis/maps/documentation/javascript/examples/map-projection-simple.html
@@ -428,24 +437,43 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	ClickMapProjection.prototype.fromPointToLatLng = function(point, noWrap) {
 		var y = point.y;
 		var x = point.x;
-		var lng = -x / tile_width * (2 * lng_) + lng_;
-		var lat = y / tile_height * (2 * lat_) - lat_;
+		var lat = (y / tile_height) * (2 * lat_) - lat_;
+		var lng = (x-bound_min_x)*((bound_max_lng-bound_min_lng)/(bound_max_x-bound_min_x)) + bound_min_lng;
 		var r = new google.maps.LatLng(lat, lng, noWrap);
+		if (false) {
+			console.log("fromPointToLatLng: " + x + " " + y + " -> " + r);
+		}
 		return r;
 	};
-	ClickMapProjection.prototype.fromLatLngToPoint = function(latLng)
+	ClickMapProjection.prototype.fromLatLngToPoint = function(latLng, point)
 	{
-		var x = -(latLng.lng() - lng_) / (2 * lng_) * tile_width;
-		var y = (latLng.lat() + lat_) / (2 * lat_) * tile_height;
+		var y = ((latLng.lat() + lat_) / (2 * lat_)) * tile_height;
+		var x = (latLng.lng() - bound_min_lng) * ((bound_max_x-bound_min_x)/(bound_max_lng-bound_min_lng)) + bound_min_x;
 		var r = new google.maps.Point(x, y);
+		if (false) {
+			console.log("fromLatLngToPoint: lat=" + latLng.lat() + " lng=" + latLng.lng() + " -> " + r);
+		}
 		return r;
 	}
 	
+	ClickMapProjection.prototype.fromLatLngToPoint_legacy = function(latLng, point)
+	{
+		var x = ((latLng.lng() + lng_) / (2 * lng_)) * tile_width;
+		var y = ((latLng.lat() + lat_) / (2 * lat_)) * tile_height;
+		var r = new google.maps.Point(x, y);
+		return r;
+	}
+
 	var element = document.getElementById(map_elementId);
 
 	map = new google.maps.Map(element, {
 		copyright_owner: 'Institut Curie',
 		center : new google.maps.LatLng(10, 10),
+		//center : new google.maps.LatLng(90, 90),
+		// EV: 2018-08-26
+		//center : {lat: 0, lng: 0},
+		// EV: 2018-08-26
+		streetViewControl: false,
 		disableDefaultUI: true,
 		zoomControl: true,
 		disableDoubleClickZoom: true,
@@ -485,12 +513,22 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 		var map_type = new google.maps.ImageMapType({
 			getTileUrl: function(coord, zoom) {
 				var ntiles = 1 << zoom;
-				if (coord.y < 0 || coord.y >= ntiles)
+				var x = coord.x;
+				var y = coord.y;
+				//console.log("getTileUrl: " + zoom + " " + ntiles + " " + x + " " + y);
+				if (y < 0 || y >= ntiles) {
+					y = (y % ntiles + ntiles) % ntiles;
 					return null;
-				if (coord.x < 0 || coord.x >= ntiles)
+				}
+				if (x < 0 || x >= ntiles) {
+					x = (x % ntiles + ntiles) % ntiles;
 					return null;
-			
-				var r = coord.x + "_" + coord.y;
+					console.log("ADJUSTING");
+				}
+					
+				//console.log("getTileUrl_bis: " + x + " " + y);
+				var r = x + "_" + y;
+				var ret_tile = "tiles/" + zoom + "/" + r + navicell.getMapTypes(get_module()).tile_suffix + ".png";
 				return "tiles/" + zoom + "/" + r + navicell.getMapTypes(get_module()).tile_suffix + ".png";
 			},
 			tileSize : new google.maps.Size(tile_width, tile_height),
@@ -500,6 +538,7 @@ function start_map(map_name, map_elementId, min_zoom, max_zoom, tile_width, tile
 	
 		map_type.projection = projection;
 		mapTypes.set(id, map_type);
+		//map.mapTypes.set(id, map_type); // EV: 2018-08-26
 	}
 	
 	mapTypes.setDefaultMapType();
@@ -924,6 +963,7 @@ function clickmap_start(blogname, map_name, panel_selector, map_selector, source
 		$("img.mapmodulefromright").click(open_module_map_click);
 	
 	};
+	//console.log("MAP.projection " + map.projection.fromLatLngToPoint);
         start_right_hand_panel(panel_selector, source, map.map, map.projection, whenready, firstEntityName);
 	var tell_opener = function()
 	{

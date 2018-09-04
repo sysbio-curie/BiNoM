@@ -5471,7 +5471,9 @@ public class ProduceClickableMap
 			out.println("<script src=\"" + jslib_dir + "/overlay.js" + "\" type='text/javascript'></script>");
 		}
 	
-		out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
+		// EV: 2018-09-04: changed clickmap_map.js location to lib dir
+		//out.println("<script src=\"" + common_directory_url + "/" + included_map_base + ".js\" type='text/javascript'></script>");
+		out.println("<script src=\"" + jslib_dir + "/" + included_map_base + ".js\" type='text/javascript'></script>");
 
 		if (NV1_2) {
 			/* jquery-UI files */

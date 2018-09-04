@@ -13,8 +13,10 @@ echo $tarfile | grep "^/" > /dev/null
 if [ $? != 0 ]; then tarfile=$(pwd)/$tarfile; fi
 
 dir=$(dirname $0)
-echo $dir | grep "^\." > /dev/null
-if [ $? = 0 ]; then dir=$(pwd)/$dir; fi
+#echo $dir | grep "^\." > /dev/null
+#if [ $? = 0 ]; then dir=$(pwd)/$dir; fi
+echo $dir | grep "^/" > /dev/null
+if [ $? != 0 ]; then dir=$(pwd)/$dir; fi
 
 tmpdir=/tmp/build_navicell_lib.$$
 trap "echo | rm -rf $tmpdir" 0 1 2 3
@@ -34,6 +36,10 @@ mkdir -p $tmpicondir
 cd $dir/../navicell_lib
 
 find . -print | grep -v "\.svn" | cpio -pdm $tmplibdir
+
+cd $dir/../src/data
+
+find . -name \*.js | cpio -pdm $tmplibdir
 
 cd $dir/../src/javascript_lib
 

@@ -19,6 +19,7 @@ import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level3.BioSource;
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Catalysis;
+import org.biopax.paxtools.model.level3.CellularLocationVocabulary;
 import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.ComplexAssembly;
 import org.biopax.paxtools.model.level3.Control;
@@ -60,6 +61,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerStateDocument;
 import org.sbml.x2001.ns.celldesigner.ReactionDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
 import org.sbml.x2001.ns.celldesigner.SpeciesDocument;
+import org.sbml.x2001.ns.celldesigner.CompartmentDocument;
 
 import fr.curie.BiNoM.pathways.utils.Utils;
 
@@ -99,6 +101,11 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	private HashMap<String, ReactionDocument.Reaction> reactions;
 	
 	/**
+	 * Map of CellDesigner compartment IDs to compartment objects.
+	 */  
+	private HashMap<String, CompartmentDocument.Compartment> compartments;
+	
+	/**
 	 * Map of CellDesigner complex IDs to complex objects.
 	 */  
 	private HashMap<String, CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias> complexes;
@@ -123,6 +130,11 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	private HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA> asrnas;
 	
+	/**
+	 * Map to BioPAX EntityReference objects.
+	 */
+	private HashMap<String, CellularLocationVocabulary> bpCellularLocations;
+
 	/**
 	 * Map to BioPAX EntityReference objects.
 	 */
@@ -184,12 +196,14 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		genes = new HashMap<String, CelldesignerGeneDocument.CelldesignerGene>();
 		rnas = new HashMap<String, CelldesignerRNADocument.CelldesignerRNA>();
 		asrnas = new HashMap<String, CelldesignerAntisenseRNADocument.CelldesignerAntisenseRNA>();
+		compartments = new HashMap<String, CompartmentDocument.Compartment>();
 		reactionToPathwayMap = new HashMap<String, HashSet<String>>();
 		pathwayMap = new HashMap<String, Pathway>();
 		pathwayNames = new HashSet<String>();
 		state2MODCode = new HashMap<String, String>();
 		
 		// initialize BioPAX objects containers
+		bpCellularLocations = new HashMap<String, CellularLocationVocabulary>();
 		bpEntityReferences = new HashMap<String, EntityReference>();
 		bpPhysicalEntities = new HashMap<String, PhysicalEntity>();
 		bpPublicationXref = new HashMap<String, PublicationXref>();
@@ -252,7 +266,9 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		getGenes();
 		getRNAs();
 		getAntisenseRNAs();
+		getCompartments();
 		
+		setBioPAXCellularLocation();
 		setBioPAXPhenotypes();
 		setBioPAXUnknowns();
 		setBioPAXProteins();
@@ -394,6 +410,34 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		}
 	}
 	
+	/**
+	 * Fill the map of CellDesigner compartments.
+	 */
+	private void getCompartments() {
+		if (sbml.getSbml().getModel().getListOfCompartments() != null) {
+			for (int i=0;i<sbml.getSbml().getModel().getListOfCompartments().getCompartmentArray().length;i++) {
+				CompartmentDocument.Compartment compartment = 
+						sbml.getSbml().getModel().getListOfCompartments().getCompartmentArray(i);
+				compartments.put(compartment.getId(), compartment);
+			}
+		}
+	}
+	
+	/**
+	 * Encode CellDesigner Compartments as BioPAX CellularLocation.
+	 */
+	private void setBioPAXCellularLocation() {
+		for (String id : compartments.keySet()) {
+			CompartmentDocument.Compartment comp = compartments.get(id);
+			String uri = biopaxNameSpacePrefix + comp.getId();
+			CellularLocationVocabulary clv = model.addNew(CellularLocationVocabulary.class, uri);
+
+			if (comp.getName() != null) {
+				clv.addComment(comp.getName().getStringValue());
+			}
+			bpCellularLocations.put(comp.getId(), clv);
+		}
+	}
 
 	/**
 	 * Encode CellDesigner Phenotypes as BioPAX PhysicalEntities.
@@ -759,6 +803,15 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			pe.addComment("This is a CellDesigner PHENOTYPE entity, representing an abstract biological process.");
 			bpPhysicalEntities.put(speciesId, pe);
 			retPe = pe;
+		}
+		
+		if (sp != null && retPe != null) {
+			String compartment = sp.getCompartment();
+			// System.out.println("Compartment : " + compartment);
+			// for (String comp : bpCellularLocations.keySet()) {
+			// 	System.out.println("Existing compartment : " + comp);
+			// }
+			retPe.setCellularLocation(bpCellularLocations.get(compartment));
 		}
 		
 		return retPe;

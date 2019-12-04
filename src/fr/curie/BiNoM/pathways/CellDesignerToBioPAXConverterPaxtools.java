@@ -964,7 +964,10 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	private void buildPathwayReactionMap(ReactionDocument.Reaction reaction) {
 		String reactionId  = reaction.getId();
-		String comment  = Utils.getValue(reaction.getNotes()).trim();
+		String comment = "";
+		if (reaction.getNotes() != null) {
+			comment = Utils.getValue(reaction.getNotes()).trim();
+		}
 		StringTokenizer st = new StringTokenizer(comment," :\r\n\t;.,");
 		while (st.hasMoreTokens()) {
 			String ss = st.nextToken();

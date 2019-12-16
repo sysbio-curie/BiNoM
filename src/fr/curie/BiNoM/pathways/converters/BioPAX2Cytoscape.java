@@ -49,7 +49,6 @@ import fr.curie.BiNoM.pathways.*;
 public class BioPAX2Cytoscape extends BioPAX2SBML {
 
     public static void main(String[] args) {
-	try {
             //String prefix = "example";
             //String prefix = "glycolysis";
             //String prefix = "nfkb_simplest_plus";
@@ -69,35 +68,78 @@ public class BioPAX2Cytoscape extends BioPAX2SBML {
 		//String prefix = "c:/datas/binomtest/apoptosis";
 		//String prefix = "c:/docs/newbinom/temp";
 		//String prefix = "c:/datas/binomtest/pathway-test";
-		String prefix = "c:/datas/binomtest/NCI_example";
+        String prefix = "c:/datas/binomtest/NCI_example";
+        int algo = BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION;
 
 	    if (args.length>0) {
-		prefix = args[0];
-		if(prefix.toLowerCase().endsWith(".owl"))
-		    prefix = prefix.substring(0,prefix.length()-4);
-	    }
+            try {
+                prefix = args[0];
+                if(prefix.toLowerCase().endsWith(".owl"))
+                    prefix = prefix.substring(0,prefix.length()-4);
 
-	    BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
+                if (args.length > 1) {
+                    switch (args[1]) {
+                        case "PATHWAY_STRUCTURE_CONVERSION":
+                            System.out.println("Algo chosen : pathway structure conversion");
+                            algo = BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION;
+                            break;
+                        
+                        case "FULL_INDEX_CONVERSION":
+                            System.out.println("Algo chosen : full index conversion");
+                            algo = BioPAXToCytoscapeConverter.FULL_INDEX_CONVERSION;
+                            break;
 
-            /*BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
-	    edu.rpi.cs.xgmml.GraphicGraph grf = gr.graphDocument.getGraph();
-	    edu.rpi.cs.xgmml.GraphicNode nodes[] = grf.getNodeArray();
-	    edu.rpi.cs.xgmml.GraphicEdge edges[] = grf.getEdgeArray();
-	    System.out.println("NODES " + nodes.length + " EDGES " + edges.length);
-            //XGMML.saveToXMGML(gr.graphDocument,prefix+"_reaction.xgmml");
-	        XGMML.saveToXGMML(gr.graphDocument, prefix + "_RN.xgmml");*/
+                        case "REACTION_NETWORK_CONVERSION":
+                            System.out.println("Algo chosen : reaction network conversion");
+                            algo = BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION;
+                            break;
 
-            BioPAXToCytoscapeConverter.Option options = new BioPAXToCytoscapeConverter.Option();
-            options.includeNextLinks = false;
-            BioPAXToCytoscapeConverter.Graph grp = b2c.convert(BioPAXToCytoscapeConverter.PATHWAY_STRUCTURE_CONVERSION, prefix + ".owl", options);
-            XGMML.saveToXGMML(grp.graphDocument, prefix + "_pathways.xgmml");
+                        case "PROTEIN_PROTEIN_INTERACTION_CONVERSION":
+                            System.out.println("Algo chosen : protein protein interaction conversion");    
+                            algo = BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION;
+                            break;
 
-            //BioPAXToCytoscapeConverter.Graph grpp = b2c.convert(BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
-            //XGMML.saveToXMGML(grpp.graphDocument, prefix + "_proteins.xgmml");
+                        default:
+                            algo = BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION;
+                            break;
+
+                    }
+                }
+
+	            BioPAXToCytoscapeConverter b2c = new BioPAXToCytoscapeConverter();
+
+                /*BioPAXToCytoscapeConverter.Graph gr = b2c.convert(BioPAXToCytoscapeConverter.REACTION_NETWORK_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
+                edu.rpi.cs.xgmml.GraphicGraph grf = gr.graphDocument.getGraph();
+                edu.rpi.cs.xgmml.GraphicNode nodes[] = grf.getNodeArray();
+                edu.rpi.cs.xgmml.GraphicEdge edges[] = grf.getEdgeArray();
+                System.out.println("NODES " + nodes.length + " EDGES " + edges.length);
+                //XGMML.saveToXMGML(gr.graphDocument,prefix+"_reaction.xgmml");
+                XGMML.saveToXGMML(gr.graphDocument, prefix + "_RN.xgmml");*/
+
+                BioPAXToCytoscapeConverter.Option options = new BioPAXToCytoscapeConverter.Option();
+                options.includeNextLinks = false;
+                BioPAXToCytoscapeConverter.Graph grp = b2c.convert(algo, prefix + ".owl", options);
+                XGMML.saveToXGMML(grp.graphDocument, prefix + "_pathways.xgmml");
+
+                //BioPAXToCytoscapeConverter.Graph grpp = b2c.convert(BioPAXToCytoscapeConverter.PROTEIN_PROTEIN_INTERACTION_CONVERSION, prefix + ".owl", new BioPAXToCytoscapeConverter.Option());
+                //XGMML.saveToXMGML(grpp.graphDocument, prefix + "_proteins.xgmml");
 
 
-	} catch(Exception e){
-	    e.printStackTrace();
-	}
+            } 
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        } else {
+            
+            System.out.println("Usage:\tBioPAX2Cytoscape filename [algo]");
+            System.out.println("algo:");
+            System.out.println("\t- FULL_INDEX_CONVERSION");
+            System.out.println("\t- REACTION_NETWORK_CONVERSION");
+            System.out.println("\t- PATHWAY_STRUCTURE_CONVERSION (default)");
+            System.out.println("\t- PROTEIN_PROTEIN_INTERACTION_CONVERSION");
+            System.out.println("");
+
+            return;
+        }
     }
 }

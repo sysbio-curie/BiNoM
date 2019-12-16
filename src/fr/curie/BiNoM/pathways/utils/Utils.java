@@ -369,13 +369,21 @@ public static String cutNameSpace(String uri){
  * @return
  */
 public static String correctName(String name){
-  name = Utils.replaceString(name," ","_");
-  name = Utils.replaceString(name,"*","_");
-  name = Utils.replaceString(name,"-","_");
-  name = Utils.replaceString(name,"[","_");
-  name = Utils.replaceString(name,"]","_");
-  name = Utils.replaceString(name,"__","_");
-  name = Utils.replaceString(name,"__","_");
+   // cleanup non ascii characters
+	name =  name.replaceAll("[^\\p{ASCII}]", "");
+
+	name = Utils.replaceString(name," ","_");
+	name = Utils.replaceString(name,":","_");	
+	name = Utils.replaceString(name,"/","_");
+	name = Utils.replaceString(name,"|","_");
+	name = Utils.replaceString(name,"*","_");
+	name = Utils.replaceString(name,"-","_");
+	name = Utils.replaceString(name,"[","_");
+	name = Utils.replaceString(name,"]","_");
+	name = Utils.replaceString(name,"(","_");
+	name = Utils.replaceString(name,")","_");
+	name = Utils.replaceString(name,"__","_");
+	name = Utils.replaceString(name,"__","_");
   //name = Utils.replaceString(name,":","_");
   if(name.endsWith("_"))
     name = name.substring(0,name.length()-1);

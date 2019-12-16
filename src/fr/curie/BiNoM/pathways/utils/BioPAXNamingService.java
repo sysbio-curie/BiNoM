@@ -587,7 +587,9 @@ public String createNameForComplex(complex compl) throws Exception{
         	if(ss.endsWith("\""))
         		ss = ss.substring(0,ss.length()-1);
         	if(ss.indexOf("\"^^")>=0)
-        		ss = ss.substring(0,ss.indexOf("\"^^"));
+            ss = ss.substring(0,ss.indexOf("\"^^"));
+          if(ss.indexOf(".")>= 0)
+            ss = ss.substring(0, ss.indexOf("."));
         	stoich = Integer.parseInt(ss);
     	}
     //}

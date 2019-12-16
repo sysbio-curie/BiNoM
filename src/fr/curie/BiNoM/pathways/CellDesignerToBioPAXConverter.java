@@ -463,7 +463,11 @@ public class CellDesignerToBioPAXConverter {
           //if(mtyp.equals("UNKNOWN"))
           //  cat.setCONTROL_DASH_TYPE("");
           cat.addCOMMENT("CDTYPE:"+mtyp);
-          cat.addINTERACTION_DASH_TYPE((openControlledVocabulary)cellDesignerTerms.get(mtyp));
+          if (cellDesignerTerms.get(mtyp) != null) {
+            cat.addINTERACTION_DASH_TYPE((openControlledVocabulary)cellDesignerTerms.get(mtyp));
+          } else {
+            System.out.println("WARNING!!! Unknown CDType : " + mtyp);
+          }
         }
       }
 

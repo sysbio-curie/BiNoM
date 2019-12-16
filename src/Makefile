@@ -1,9 +1,9 @@
 
-JARDIR = ../lib
+JARDIR = ../pathways-lib
 
-CLASSPATH = $(JARDIR)/cd3.jar:$(JARDIR)/commons-beanutils.jar:$(JARDIR)/commons-cli.jar:$(JARDIR)/commons-dbcp-1.1.jar:$(JARDIR)/commons-digester-1.7.jar:$(JARDIR)/commons-logging.jar:$(JARDIR)/commons-pool-1.1.jar:$(JARDIR)/dom4j.jar:$(JARDIR)/jastor-1.0.3.jar:$(JARDIR)/jsr173_1.0_api.jar:$(JARDIR)/sax.jar:$(JARDIR)/VDAOEngine.jar:$(JARDIR)/xbean.jar:$(JARDIR)/xgmml.jar:$(JARDIR)/jena/antlr.jar:$(JARDIR)/jena/concurrent.jar:$(JARDIR)/jena/icu4j_3_4.jar:$(JARDIR)/jena/icu4j.jar:$(JARDIR)/jena/iri.jar:$(JARDIR)/jena/jakarta-oro-2.0.5.jar:$(JARDIR)/jena/jena.jar:$(JARDIR)/jena/junit.jar:$(JARDIR)/jena/rdf-api-2001-01-19.jar:$(JARDIR)/jena/xercesImpl.jar:$(JARDIR)/jena/xml-apis.jar:.
+CLASSPATH = $(JARDIR)/jena.jar:$(JARDIR)/cd4.jar:$(JARDIR)/xbean.jar:$(JARDIR)/xgmml.jar:$(JARDIR)/jastor-1.0.3.jar:$(JARDIR)/VDAOEngine.jar:.
 
-JAVAC = $(HOME)/jdk1.5.0_16/bin/javac -d classes -classpath $(CLASSPATH)
+JAVAC = javac -encoding ISO-8859-1 -d classes -classpath $(CLASSPATH)
 
 plugin:
 	sh COMPILE.sh

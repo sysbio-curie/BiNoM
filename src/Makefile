@@ -1,7 +1,7 @@
 
 JARDIR = ../pathways-lib
 
-CLASSPATH = $(JARDIR)/jena.jar:$(JARDIR)/cd4.jar:$(JARDIR)/xbean.jar:$(JARDIR)/xgmml.jar:$(JARDIR)/jastor-1.0.3.jar:$(JARDIR)/VDAOEngine.jar:.
+CLASSPATH = $(JARDIR)/jena.jar:$(JARDIR)/cd4.jar:$(JARDIR)/xbean.jar:$(JARDIR)/xgmml.jar:$(JARDIR)/jastor-1.0.3.jar:$(JARDIR)/VDAOEngine.jar:$(JARDIR)/giny.jar:$(JARDIR)/cytoscape270.jar:.
 
 JAVAC = javac -encoding ISO-8859-1 -d classes -classpath $(CLASSPATH)
 

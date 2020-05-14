@@ -3,14 +3,18 @@ package fr.curie.BiNoM.pathways.utils.voronoicell;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.sbml.x2001.ns.celldesigner.CelldesignerClassDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
 import org.sbml.x2001.ns.celldesigner.SbmlDocument;
+import org.sbml.x2001.ns.celldesigner.SpeciesDocument.Species;
+import org.apache.xmlbeans.SimpleValue;
 
 import fr.curie.BiNoM.pathways.CellDesignerToCytoscapeConverter;
 import fr.curie.BiNoM.pathways.analysis.structure.Attribute;
@@ -155,7 +159,28 @@ public class GenerateVoronoiCellsForMap {
 		}
 		return descr;
 	}
-	
+	public boolean checkNode(HashMap<String, Species> list_of_species, String id) {
+
+		Species sp = list_of_species.get(id);
+		
+		// Degradations and Phenotypes
+		// Check if the class is one of the autorized ones, not if it's a forbidden one 
+		// First four + complexes
+		if (sp.getAnnotation().getCelldesignerSpeciesIdentity() != null && sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass() != null) {
+			CelldesignerClassDocument.CelldesignerClass name = sp.getAnnotation().getCelldesignerSpeciesIdentity().getCelldesignerClass();
+			if (
+				((SimpleValue) name).getStringValue().compareTo("PROTEIN") == 0 
+			 || ((SimpleValue) name).getStringValue().compareTo("GENE") == 0
+			 || ((SimpleValue) name).getStringValue().compareTo("RNA") == 0
+			 || ((SimpleValue) name).getStringValue().compareTo("ANTISENSE_RNA") == 0
+			 || ((SimpleValue) name).getStringValue().compareTo("SIMPLE_MOLECULE") == 0
+			) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	public void loadMap(String fn) throws Exception{
 		CellDesigner cd = new CellDesigner();
@@ -174,7 +199,13 @@ public class GenerateVoronoiCellsForMap {
 				}
 		}*/
 		
-		
+		HashMap<String, Species> list_of_species = new HashMap<String, Species>();
+		if (sbml.getSbml().getModel().getListOfSpecies() != null)
+		for (int i=0; i<sbml.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray(); i++) {
+			Species t_species = sbml.getSbml().getModel().getListOfSpecies().getSpeciesArray(i);
+			list_of_species.put(t_species.getId(), t_species);
+		}
+
 		HashSet<String> includedSpecies = new HashSet<String>();
 		if(sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies()!=null)
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfIncludedSpecies().sizeOfCelldesignerSpeciesArray();i++){
@@ -186,7 +217,7 @@ public class GenerateVoronoiCellsForMap {
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().sizeOfCelldesignerSpeciesAliasArray();i++){
 			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
 			String species = csa.getSpecies();
-			if(!includedSpecies.contains(species)){
+			if(!includedSpecies.contains(species) && checkNode(list_of_species, species)){
 			Node n = cdgraph.getCreateNode(csa.getId());
 			n.x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 			n.y = Float.parseFloat(csa.getCelldesignerBounds().getY());
@@ -201,7 +232,7 @@ public class GenerateVoronoiCellsForMap {
 		for(int i=0;i<sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().sizeOfCelldesignerComplexSpeciesAliasArray();i++){
 			CelldesignerComplexSpeciesAliasDocument.CelldesignerComplexSpeciesAlias csa = sbml.getSbml().getModel().getAnnotation().getCelldesignerListOfComplexSpeciesAliases().getCelldesignerComplexSpeciesAliasArray(i);
 			String species = csa.getSpecies();
-			if(!includedSpecies.contains(species)){
+			if(!includedSpecies.contains(species) && checkNode(list_of_species, species)){
 			Node n = cdgraph.getCreateNode(csa.getId());
 			n.x = Float.parseFloat(csa.getCelldesignerBounds().getX());
 			n.y = Float.parseFloat(csa.getCelldesignerBounds().getY());

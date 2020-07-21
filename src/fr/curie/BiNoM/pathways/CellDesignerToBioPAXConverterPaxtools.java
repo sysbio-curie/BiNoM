@@ -8,11 +8,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.biopax.paxtools.io.BioPAXIOHandler;
 import org.biopax.paxtools.io.SimpleIOHandler;
+import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.BioPAXFactory;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
@@ -28,17 +30,20 @@ import org.biopax.paxtools.model.level3.Conversion;
 import org.biopax.paxtools.model.level3.Degradation;
 import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.Entity;
+import org.biopax.paxtools.model.level3.EntityFeature;
 import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Interaction;
 import org.biopax.paxtools.model.level3.ModificationFeature;
 import org.biopax.paxtools.model.level3.Pathway;
 import org.biopax.paxtools.model.level3.PhysicalEntity;
+import org.biopax.paxtools.model.level3.PositionStatusType;
 import org.biopax.paxtools.model.level3.Protein;
 import org.biopax.paxtools.model.level3.ProteinReference;
 import org.biopax.paxtools.model.level3.PublicationXref;
 import org.biopax.paxtools.model.level3.RelationshipXref;
 import org.biopax.paxtools.model.level3.RnaRegionReference;
 import org.biopax.paxtools.model.level3.SequenceModificationVocabulary;
+import org.biopax.paxtools.model.level3.SequenceSite;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.UnificationXref;
@@ -53,6 +58,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerListOfModificationsDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerModificationDocument;
+import org.sbml.x2001.ns.celldesigner.CelldesignerModificationResidueDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerProteinDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerRNADocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerSpeciesDocument;
@@ -180,6 +186,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 * PSI-MOD codes (Proteomic Standard Initiative Modification codes).
 	 */
 	private HashMap<String, String> state2MODCode;
+	private HashMap<String, String> letter2MODCode;
+	private HashMap<String, String> letter2State;
 	
 	
 	/**
@@ -201,6 +209,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		pathwayMap = new HashMap<String, Pathway>();
 		pathwayNames = new HashSet<String>();
 		state2MODCode = new HashMap<String, String>();
+		letter2State = new HashMap<String, String>();
+		letter2MODCode = new HashMap<String, String>();
 		
 		// initialize BioPAX objects containers
 		bpCellularLocations = new HashMap<String, CellularLocationVocabulary>();
@@ -215,6 +225,8 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	public void convert() {
 		buildState2MODCodeMap();
+		buildLetter2StateMap();
+		buildLetter2MODCodeMap();
 		createBioPAXModel();
 		fillBioPAXModel();
 	}
@@ -294,6 +306,34 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		state2MODCode.put("prenylated", "00703");
 		state2MODCode.put("ubiquitinated", "01148");
 	}
+	
+	/** 
+	 * Build the improved state to PSI-MOD maps
+	 */
+	private void buildLetter2MODCodeMap() {
+		letter2MODCode.put("C", "00043");
+		letter2MODCode.put("R", "00227");
+		letter2MODCode.put("H", "00890");
+		letter2MODCode.put("K", "01931");
+		letter2MODCode.put("D", "00042");
+		letter2MODCode.put("S", "00046");
+		letter2MODCode.put("T", "00047");
+		letter2MODCode.put("Y", "00048");
+		letter2MODCode.put("", "00696");
+	}
+	
+	private void buildLetter2StateMap() {
+		letter2State.put("C", "S-phospho-L-cysteine");
+		letter2State.put("R", "omega-N-phospho-L-arginine");
+		letter2State.put("H", "phosphorylated L-histidine");
+		letter2State.put("K", "N6-phospho-L-lysine");
+		letter2State.put("D", "L-aspartic 4-phosphoric anhydride");
+		letter2State.put("S", "O-phospho-L-serine");
+		letter2State.put("T", "O-phospho-L-threonine");
+		letter2State.put("Y", "O4'-phospho-L-tyrosine");
+		letter2State.put("", "UNKNOWN");
+	}
+	 
 	
 	/**
 	 * Fill the map of CellDesigner species.
@@ -515,6 +555,51 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				for (RelationshipXref u_xref : extractHUGOReferencesAsRelationshipXref(notes, id))
 					pr.addXref(u_xref);
 			}
+			
+			// add modifications
+			if (prot.getCelldesignerListOfModificationResidues() != null) {
+//				System.out.println("Looking at modifications of protein :");
+//				System.out.println(prot.getCelldesignerListOfModificationResidues().sizeOfCelldesignerModificationResidueArray() + " modification found");
+				
+				CelldesignerModificationResidueDocument.CelldesignerModificationResidue[] modifs = prot.getCelldesignerListOfModificationResidues().getCelldesignerModificationResidueArray();
+				for (int i=0; i < modifs.length; i++) {
+					CelldesignerModificationResidueDocument.CelldesignerModificationResidue modif = modifs[i];
+					
+					if (modif.getName() != null){
+						String name = modif.getName().getStringValue();
+						String type = name.substring(0, 1);
+						
+						ModificationFeature bp_mod = addModificationFeature(
+							prot.getId(), modif.getId(), 
+							letter2State.get(type),
+							letter2MODCode.get(type)
+						);
+						try{
+							if (name.length() > 1) {
+								int localisation = Integer.parseInt(name.substring(1));
+								SequenceSite ss = addSequenceSite(prot.getId(), modif.getId(), localisation);
+								bp_mod.setFeatureLocation(ss);		
+							} else throw new Exception();
+						} catch (Exception e) {
+//							System.out.println("Could not parse modification sequence location");
+								SequenceSite ss = addSequenceSite(prot.getId(), modif.getId(), 0);
+								bp_mod.setFeatureLocation(ss);		
+						}
+						pr.addEntityFeature(bp_mod);
+						
+					} else {
+						// If not we just put a placeholder, with the idea that we'll get more info when parsing the protein
+						ModificationFeature bp_mod = addModificationFeature(
+							prot.getId(), modif.getId(),
+							"", "MOD:00000"	
+						);
+						SequenceSite ss = addSequenceSite(prot.getId(), modif.getId(), 0);
+						bp_mod.setFeatureLocation(ss);		
+						pr.addEntityFeature(bp_mod);
+					}
+				}
+			}
+			
 			bpEntityReferences.put(prot.getId(), pr);
 		}
 	}
@@ -712,6 +797,9 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				String referenceId = Utils.getValue(si.getCelldesignerProteinReference());
 				pr.setEntityReference(bpEntityReferences.get(referenceId));
 				
+				ProteinReference pre = (ProteinReference) bpEntityReferences.get(referenceId);
+				Set<EntityFeature> features = pre.getEntityFeature();
+				Object[] a_features = features.toArray();
 				// add post-translational modifications
 				CelldesignerStateDocument.CelldesignerState state = si.getCelldesignerState();
 				if (state!=null) {
@@ -719,15 +807,49 @@ public class CellDesignerToBioPAXConverterPaxtools {
 							 si.getCelldesignerState().getCelldesignerListOfModifications();
 					 if (lmodifs != null) {
 						 CelldesignerModificationDocument.CelldesignerModification modifs[] = lmodifs.getCelldesignerModificationArray();
+						 
 						 for (int j=0; j < modifs.length; j++) {
 							 CelldesignerModificationDocument.CelldesignerModification cm = modifs[j];
+//							 System.out.println("We found a residue : " + cm.getResidue());
 							 String residueId = cm.getResidue();
-							 String stateStr = Utils.getValue(cm.getState());
-							 String MOD_code = state2MODCode.get(stateStr);
-							 if (residueId != null && stateStr != null && MOD_code != null) {
-								ModificationFeature mf = addModificationFeature(speciesId, residueId, stateStr, MOD_code);
-								pr.addFeature(mf);
+							 
+							 int k=0;
+							 boolean foundModif = false;
+							 while(!foundModif && k < a_features.length) {
+								 
+								 BioPAXElement t_feature = (BioPAXElement) a_features[k];
+								 String featId = Utils.cutRdfId(t_feature.getRDFId());
+								 
+								 if (featId.equals("_" + referenceId + "_" + cm.getResidue())) {
+									 foundModif = true;
+								 }
+								 k++;
 							 }
+							 
+							 
+							 ModificationFeature modif_feature = (ModificationFeature) a_features[k-1];
+							 String stateStr = Utils.getValue(cm.getState());
+							 if (stateStr.equals("empty")) {
+								 pr.addNotFeature((EntityFeature) modif_feature);
+							 } else {
+								 pr.addFeature((EntityFeature) modif_feature);
+								 
+								 // Here we can actually try to improve the description of the modification 
+								 // In case we didn't have enough information when building it in ProteinReference
+//								 if (modif_feature.getModificationType().getXref() equals("[MOD:MOD:00046]"))
+//								 
+//								  String MOD_code = state2MODCode.get(stateStr);
+//									  if (residueId != null && stateStr != null && MOD_code != null) {
+//									 	ModificationFeature mf = addModificationFeature(speciesId, residueId, stateStr, MOD_code);
+//									 	pre.addEntityFeature(mf);
+//									  }
+//							 	}
+							 }
+							//  String MOD_code = state2MODCode.get(stateStr);
+							//  if (residueId != null && stateStr != null && MOD_code != null) {
+							// 	ModificationFeature mf = addModificationFeature(speciesId, residueId, stateStr, MOD_code);
+							// 	pr.addFeature(mf);
+							//  }
 						 }
 					 }
 				}
@@ -1085,7 +1207,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 	 */
 	private ModificationFeature addModificationFeature(String speciesId, String residueId, String stateStr, String MOD_code) {
 		
-		String uri = biopaxNameSpacePrefix + "_" + speciesId + "_" + residueId + "_" + stateStr;
+		String uri = biopaxNameSpacePrefix + "_" + speciesId + "_" + residueId;
 		ModificationFeature mf = model.addNew(ModificationFeature.class, uri);
 		String modifId = "MODIFICATION_FEATURE_" + stateStr;
 		SequenceModificationVocabulary smv = (SequenceModificationVocabulary) model.getByID(modifId);
@@ -1105,6 +1227,24 @@ public class CellDesignerToBioPAXConverterPaxtools {
 		mf.setModificationType(smv);
 		return mf;
 	}
+	
+	/**
+	 * Create a new sequence site for modification feature object.
+	 * 
+	 * @param speciesId species ID
+	 * @param residueId residue ID
+	 * @param location location of the site
+	 * @return SequenceSite object
+	 */
+	
+	private SequenceSite addSequenceSite(String speciesId, String residueId, int location ){
+		String uri = biopaxNameSpacePrefix + "_" + speciesId + "_" + residueId + "_" + location;
+		SequenceSite ss = model.addNew(SequenceSite.class, uri);
+		ss.setPositionStatus(PositionStatusType.EQUAL);
+		ss.setSequencePosition(location);
+		return ss;
+	}
+	
 	
 	/**
 	 * print a list of HUGO codes for each pathway.

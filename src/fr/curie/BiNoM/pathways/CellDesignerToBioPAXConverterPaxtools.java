@@ -497,10 +497,13 @@ public class CellDesignerToBioPAXConverterPaxtools {
 			String protName = cleanString(prot.getName().getStringValue());
 			String uri = biopaxNameSpacePrefix + prot.getId() + "_ref";
 			
+			BioSource bs = (BioSource) model.getByID(biopaxNameSpacePrefix + "_organism");
+			
 			ProteinReference pr = model.addNew(ProteinReference.class, uri);
 			pr.addName(protName);
 			pr.setDisplayName(protName);
 			pr.setStandardName(protName);
+			pr.setOrganism(bs);
 			
 			// add publications and HUGO gene names
 			if (prot.getCelldesignerNotes() != null) {

@@ -465,6 +465,10 @@ public static String cutNameSpace(String uri){
 	  return uri.substring(0,k);
 	}
 
+public static String cutRdfId(String rdfid) {
+	String[] tokens = rdfid.split("/");
+	return tokens[tokens.length-1];
+}
 /**
  * Substitutes strings ' ','*','-','[',']','__',':' to underscore symbol
  * @param name

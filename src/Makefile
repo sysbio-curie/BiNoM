@@ -1,7 +1,7 @@
 
 JARDIR = ../lib
 
-CLASSPATH = .:../lib/cd4.jar:../lib/binomlibext.jar:../lib/xgmml.jar:../lib/VDAOEngine.jar:../lib/psi25-xml-1.8.3.jar:../lib/paxtools-4.2.1-no-jena.jar
+CLASSPATH = .:../lib/cd4.jar:../lib/binomlibext.jar:../lib/xgmml.jar:../lib/VDAOEngine.jar:../lib/psi25-xml-1.8.3.jar:../lib/paxtools-5.1.0.jar
 JAVAC = javac -encoding ISO-8859-1 -d classes -classpath $(CLASSPATH)
 
 plugin:

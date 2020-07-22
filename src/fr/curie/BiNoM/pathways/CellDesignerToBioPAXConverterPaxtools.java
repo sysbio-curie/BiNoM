@@ -818,8 +818,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 							 while(!foundModif && k < a_features.length) {
 								 
 								 BioPAXElement t_feature = (BioPAXElement) a_features[k];
-								 String featId = Utils.cutRdfId(t_feature.getRDFId());
-								 
+								 String featId = Utils.cutRdfId(t_feature.getUri());
 								 if (featId.equals("_" + referenceId + "_" + cm.getResidue())) {
 									 foundModif = true;
 								 }

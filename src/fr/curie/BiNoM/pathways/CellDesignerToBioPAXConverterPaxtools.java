@@ -1049,6 +1049,7 @@ public class CellDesignerToBioPAXConverterPaxtools {
 				reactionType.equals("POSITIVE_INFLUENCE") ||
 				reactionType.equals("UNKNOWN_POSITIVE_INFLUENCE") ||
 				reactionType.equals("UNKNOWN_NEGATIVE_INFLUENCE") ||
+				reactionType.equals("PHYSICAL_STIMULATION") || // Here we added Physical Stimulation here, because it seems an ok place, and we have such a case in telomere_maintenance
 				reactionType.equals("MODULATION") ||
 				reactionType.equals("REDUCED_MODULATION") ||
 				reactionType.equals("NEGATIVE_INFLUENCE")

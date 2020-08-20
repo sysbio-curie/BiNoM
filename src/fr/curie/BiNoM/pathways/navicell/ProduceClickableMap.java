@@ -2377,9 +2377,14 @@ public class ProduceClickableMap
 		Vector<String> hugoNames = ent.getHugoNames();
 		int hugo_size = hugoNames.size();
 		outjson.print("\"hugo\" : [");
-		for (int nn = 0; nn < hugo_size; ++nn) {
-			outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
-			//System.out.println("-----> : " + hugoNames.get(nn));
+		if (hugo_size > 0) {
+			for (int nn = 0; nn < hugo_size; ++nn) {
+				outjson.print((nn > 0 ? "," : "") + "\"" + hugoNames.get(nn) + "\"");
+				//System.out.println("-----> : " + hugoNames.get(nn));
+			}
+		} else {
+			System.out.println("WARNING : no hugo name defined for " + ent.getName() + " : adding it's name not to leave it empty");
+			outjson.print("\"" + ent.getName() + "\"");
 		}
 		outjson.print("],");
 		// -----

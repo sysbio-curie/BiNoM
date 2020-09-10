@@ -5694,7 +5694,7 @@ public class ProduceClickableMap
 		header_right.close();
 		header.close();
 
-		final Div map_div = new Div(left_content, "id='" + map_div_name + "'");
+		final Div map_div = new Div(left_content, "id='" + map_div_name + "''map' style='background-color: black'");
 		out.println("The map is loading. If this message isn't replaced by the map in a few seconds then have a look in your navigator's error console.");
 		map_div.close();
 		

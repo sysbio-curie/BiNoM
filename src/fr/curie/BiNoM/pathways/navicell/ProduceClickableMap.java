@@ -5450,12 +5450,14 @@ public class ProduceClickableMap
 		}
 		if (NV2) {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + "_v2.css\"/>");
+			out.println("<link rel='stylesheet' type='text/css' href=\"" + jslib_dir + "/openlayers/ol.css\"/>");
 		} else {
 			out.println("<link rel='stylesheet' type='text/css' href=\"" + common_directory_url + "/" + included_map_base + ".css\"/>");
 		}
 		// ] CSS
 
 		out.println("<script src='https://maps.googleapis.com/maps/api/js?sensor=false' type='text/javascript'></script>");
+		out.println("<script src=\"" + jslib_dir + "/openlayers/ol.js\" type='text/javascript'></script>");
 //		out.println("<script src='/javascript/jquery/jquery.js' type='text/javascript'></script>");
 		out.println("<script src='" + (NV1_2 ? jquery_NV2_js : jquery_js) + "' type='text/javascript'></script>");
 		if (!USE_JXTREE) {

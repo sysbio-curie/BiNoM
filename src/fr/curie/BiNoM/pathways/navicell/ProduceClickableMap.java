@@ -48,6 +48,7 @@ import org.sbml.x2001.ns.celldesigner.CelldesignerAntisensernaReferenceDocument.
 import org.sbml.x2001.ns.celldesigner.CelldesignerBaseProductDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerBaseReactantDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerBoundsDocument.CelldesignerBounds;
+import org.sbml.x2001.ns.celldesigner.CelldesignerCompartmentAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerComplexSpeciesAliasDocument;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneDocument.CelldesignerGene;
 import org.sbml.x2001.ns.celldesigner.CelldesignerGeneReferenceDocument.CelldesignerGeneReference;
@@ -365,6 +366,66 @@ public class ProduceClickableMap
 		return atlasInfo;
 	}
 
+	public static float[] getBorders(File input) {
+		// this.blog_name = blog_name;
+		// this.input = input;
+		assert input.canRead() : "cannot read " + input;
+		assert input.getName().endsWith(celldesigner_suffix) : "bad input file " + input + " (name must end in xml)";
+		
+		// module_name = input.getName().substring(0, input.getName().length() - celldesigner_suffix.length());
+
+		// loadCellDesigner(input.getPath());
+		//voronoiCells = GenerateVoronoiCellsForMap.getVoronoiCellsForCellDesignerMap(input.getPath());
+		
+		SbmlDocument cd = CellDesigner.loadCellDesigner(input.getPath());
+		// CellDesigner.entities = CellDesigner.getEntities(cd);
+		// graphNeighbours = new GraphNeighbours(cd);
+		
+		float total_x = Float.parseFloat(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeX());
+		float total_y = Float.parseFloat(cd.getSbml().getModel().getAnnotation().getCelldesignerModelDisplay().getSizeY());
+		
+		System.out.println("Total size : " + total_x + ", " + total_y);
+		float min_x = Float.MAX_VALUE;
+		float min_y = Float.MAX_VALUE;
+		float max_x = 0;
+		float max_y = 0;
+		int numberOfCompartmentAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray().length;
+		System.out.println("Finding places for compartment aliases ("+numberOfCompartmentAliases+") in CellDesigner: ");
+		
+		for(int i=0;i<numberOfCompartmentAliases;i++){
+		
+			CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i);
+			
+			if (spa.getCelldesignerBounds() != null) {
+				min_x = Math.min(min_x, Float.parseFloat(spa.getCelldesignerBounds().getX()));
+				min_y = Math.min(min_y, Float.parseFloat(spa.getCelldesignerBounds().getY()));
+				max_x = Math.max(max_x, Float.parseFloat(spa.getCelldesignerBounds().getX()) + Float.parseFloat(spa.getCelldesignerBounds().getW()));
+				max_y = Math.max(max_y, Float.parseFloat(spa.getCelldesignerBounds().getY()) + Float.parseFloat(spa.getCelldesignerBounds().getH()));
+			}
+		
+		}
+		
+		int numberOfAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;
+		System.out.println("Finding places for aliases ("+numberOfAliases+") in CellDesigner: ");
+		for(int i=0;i<numberOfAliases;i++){
+		
+			CelldesignerSpeciesAliasDocument.CelldesignerSpeciesAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray(i);
+			final String species_id = spa.getSpecies();
+			
+			if (spa.getCelldesignerBounds() != null){
+				min_x = Math.min(min_x, Float.parseFloat(spa.getCelldesignerBounds().getX()));
+				min_y = Math.min(min_y, Float.parseFloat(spa.getCelldesignerBounds().getY()));
+				max_x = Math.max(max_x, Float.parseFloat(spa.getCelldesignerBounds().getX()) + Float.parseFloat(spa.getCelldesignerBounds().getW()));
+				max_y = Math.max(max_y, Float.parseFloat(spa.getCelldesignerBounds().getY()) + Float.parseFloat(spa.getCelldesignerBounds().getH()));
+			}
+	
+	
+		}
+		float[] result = {min_x, min_y, total_x-max_x, total_y-max_y};
+		return result;
+	}
+	
+	
 	public ProduceClickableMap(final String blog_name, File input)
 	{
 		this.blog_name = blog_name;
@@ -1020,7 +1081,10 @@ public class ProduceClickableMap
 			final int width0 = image0.getWidth();
 			final int height0 = image0.getHeight();
 		
-			       
+			System.out.println("Width 0 : " + width0);
+			System.out.println("Height 0 : " + height0);
+			System.out.println("MAX_HEIGHT : " + MAX_HEIGHT);
+			System.out.println("MAX_WIDTH : " + MAX_WIDTH);
 			int tmp_difference_zoom2_image0 = Math.max(get_maxscale(height0, MAX_HEIGHT), get_maxscale(width0, MAX_WIDTH));
 			
 			//System.out.println("width0 " + width0 + ", height0 " + height0 + ", max_width " + max_width + ", max_height " + max_height + ", diff_zoom " + difference_zoom0_image0 + " " + get_maxscale(height0, max_height) + " " + get_maxscale(width0, max_width));
@@ -1119,6 +1183,8 @@ public class ProduceClickableMap
 				Utils.printUsedMemory();
 			}
 		}
+		System.out.println("Make tiles return : ");
+		System.out.println(imginfo.toString());
 		return imginfo;
 	}
 
@@ -1455,9 +1521,33 @@ public class ProduceClickableMap
 	/* Function to find all coordinate information.
 	 * */
 	private void findAllPlacesInCellDesigner(){
+		
+		Date time = new Date();
+
+		float min_x = Float.MAX_VALUE;
+		float min_y = Float.MAX_VALUE;
+		float max_x = 0;
+		float max_y = 0;
+		int numberOfCompartmentAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray().length;
+		System.out.println("Finding places for compartment aliases ("+numberOfCompartmentAliases+") in CellDesigner: "+this.module_name);
+		
+		for(int i=0;i<numberOfCompartmentAliases;i++){
+			//if(i==100*(int)(i*0.01f))
+			//	System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
+			//Date time1 = new Date();
+			//System.out.println((new Date().getTime())-time1.getTime());			
+			CelldesignerCompartmentAliasDocument.CelldesignerCompartmentAlias spa = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfCompartmentAliases().getCelldesignerCompartmentAliasArray(i);
+			
+			min_x = Math.min(min_x, Float.parseFloat(spa.getCelldesignerBounds().getX()));
+			min_y = Math.min(min_y, Float.parseFloat(spa.getCelldesignerBounds().getY()));
+			max_x = Math.max(max_x, Float.parseFloat(spa.getCelldesignerBounds().getX()) + Float.parseFloat(spa.getCelldesignerBounds().getW()));
+			max_y = Math.max(max_y, Float.parseFloat(spa.getCelldesignerBounds().getY()) + Float.parseFloat(spa.getCelldesignerBounds().getH()));
+		
+		
+		}
+		
 		int numberOfAliases = cd.getSbml().getModel().getAnnotation().getCelldesignerListOfSpeciesAliases().getCelldesignerSpeciesAliasArray().length;
 		System.out.println("Finding places for aliases ("+numberOfAliases+") in CellDesigner: "+this.module_name);
-		Date time = new Date();
 		for(int i=0;i<numberOfAliases;i++){
 			//if(i==100*(int)(i*0.01f))
 			//	System.out.print((i+1)+"/"+((int)(0.001f*(new Date().getTime()-time.getTime())))+"\t");
@@ -1477,6 +1567,11 @@ public class ProduceClickableMap
 			place.height = Float.parseFloat(spa.getCelldesignerBounds().getH());
 			place.type = place.RECTANGLE;
 			place.sbmlid = species_id;
+			
+			min_x = Math.min(min_x, place.x);
+			min_y = Math.min(min_y, place.y);
+			max_x = Math.max(max_x, place.x + place.width);
+			max_y = Math.max(max_y, place.y + place.height);
 			
 			Object obj = CellDesigner.entities.get(species_id);
 			
@@ -1524,7 +1619,11 @@ public class ProduceClickableMap
 			place.height = Float.parseFloat(cspa.getCelldesignerBounds().getH());
 			place.type = place.RECTANGLE;
 			place.sbmlid = cspa.getSpecies();
-
+			min_x = Math.min(min_x, place.x);
+			min_y = Math.min(min_y, place.y);
+			max_x = Math.max(max_x, place.x + place.width);
+			max_y = Math.max(max_y, place.y + place.height);
+			
 			try{
 				SpeciesDocument.Species sp = (SpeciesDocument.Species)CellDesigner.entities.get(cspa.getSpecies());
 				String entname = CellDesignerToCytoscapeConverter.getEntityName(sp.getId(),sp.getAnnotation().getCelldesignerSpeciesIdentity(),cd);
@@ -1566,6 +1665,9 @@ public class ProduceClickableMap
 				System.out.println(place.sbmlid+" is not species in findAllPlacesInCellDesigner/elldesignerListOfComplexSpeciesAliases");
 			}
 		}
+		
+		System.out.println("Borders of the graph : " + min_x + " -> " + max_x + ", " + min_y + " -> " + max_y);
+		
 		System.out.println();
 		// Now species comments
 		int numberOfSpecies = cd.getSbml().getModel().getListOfSpecies().sizeOfSpeciesArray();
